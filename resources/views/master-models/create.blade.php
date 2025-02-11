@@ -1,4 +1,12 @@
 @extends('layouts.main')
+
+<style>
+    .custom-error {
+        color: red;
+        margin-top: 10px !important;
+    }
+</style>
+
 @section('content')
     @can('create-master-models')
         @php
@@ -301,6 +309,14 @@
                     required: true,
                 },
             },
+            errorPlacement: function(error, element) {
+                error.addClass('custom-error');
+                if (element.attr("name") === "variant_id") {
+                    error.insertAfter(element.next('.select2'));
+                } else {
+                    error.insertAfter(element);
+                }
+            }
         });
         function showOrHideLoiDescription() {
             let variantId = $("#variant_id").val();

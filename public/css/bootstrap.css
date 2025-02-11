@@ -2492,7 +2492,7 @@ textarea.form-control-lg {
 .was-validated .input-group .form-control:invalid, .input-group .form-control.is-invalid, .was-validated
 .input-group .form-select:invalid,
 .input-group .form-select.is-invalid {
-  z-index: 2; }
+  z-index: 1; }
   .was-validated .input-group .form-control:invalid:focus, .input-group .form-control.is-invalid:focus, .was-validated
   .input-group .form-select:invalid:focus,
   .input-group .form-select.is-invalid:focus {

@@ -11,7 +11,7 @@
 
     .nav-fill .nav-item .nav-link, .nav-justified .nav-item .nav-link {
       width: 100% !important;     
-      padding: 8px 40px !important; 
+      padding: 8px 30px !important; 
     }
     
     .nav-fill .nav-item, .nav-fill>.nav-link {
@@ -140,6 +140,14 @@ tr.highlight-orange {
   {
     border-left: 17px solid #3498DB;
   }
+  @media screen and (max-width: 1399px) {
+    .daily-leads-menus-button-container {
+      flex-direction: column-reverse;
+    }
+    .daily-leads-button-container-only {
+      padding: 10px 0px;
+    }
+  }
   @media (max-width: 765px)
   {
     .arrow-steps .step {
@@ -168,64 +176,49 @@ input[type=number]::-webkit-outer-spin-button
               {{ Session::get('success') }}
           </div>
       @endif
-      @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
-                    @endphp
-                    @if ($hasPermission)
-      <a class="btn btn-sm btn-info float-end" href="{{ route('salescustomers.index') }}" text-align: right>
-        <i class="fa fa-users" aria-hidden="true"></i> Customers
-      </a>
-      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
-      <a class="btn btn-sm btn-primary float-end" href="{{ route('booking.index') }}" text-align: right>
-        <i class="fa fa-info" aria-hidden="true"></i> Bookings
-      </a>
-      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
-      <a class="btn btn-sm btn-success float-end" href="{{ route('dailyleads.create') }}" text-align: right>
-        <i class="fa fa-plus" aria-hidden="true"></i> Add New Lead
-      </a>
-      @endif
-      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
-      <!-- <a class="btn btn-sm btn-primary float-end" href="" text-align: right>
-        <i class="fa fa-info" aria-hidden="true"></i> Bookings (Coming Soon)
-      </a> -->
-      <div class="clearfix"></div>
-<br>
-    <ul class="nav nav-pills nav-fill d-flex">
-      <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">New / Pending Inquiry</a>
-      </li>
-      <!-- <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab9">FollowUp</a>
-      </li> -->
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab11">Active Leads</a>
-      </li>
-      <!-- <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Prospecting</a>
-      </li> -->
-      <!-- <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab3">Demands</a>
-      </li> -->
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab4">Quotation</a>
-      </li>
-      <!-- <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab5">Negotiation</a>
-      </li> -->
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab8">Pre-Orders</a>
-      </li>
-      <!-- <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab6">Sales Order</a>
-      </li> -->
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab10">Bulk & Special Deals</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab7">Rejected</a>
-      </li>
-    </ul>
-  </div>
+
+    <div class="row align-items-center daily-leads-menus-button-container">
+        <div class=" col-xxl-9 col-lg-12 col-md-12 mb-3 mb-lg-0">
+            <ul class="nav nav-pills nav-fill d-flex flex-wrap">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="pill" href="#tab1">New / Pending Inquiry</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#tab11">Active Leads</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#tab4">Quotation</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#tab8">Pre-Orders</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#tab10">Bulk & Special Deals</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#tab7">Rejected</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="col-xxl-3 col-lg-12 col-md-12 text-end daily-leads-button-container-only">
+            @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+            @endphp
+            @if ($hasPermission)
+                <a class="btn btn-sm btn-success me-lg-1" href="{{ route('dailyleads.create') }}">
+                    <i class="fa fa-plus" aria-hidden="true"></i> Add New Lead
+                </a>
+                <a class="btn btn-sm btn-primary me-lg-1" href="{{ route('booking.index') }}">
+                    <i class="fa fa-info" aria-hidden="true"></i> Bookings
+                </a>
+                <a class="btn btn-sm btn-info" href="{{ route('salescustomers.index') }}">
+                    <i class="fa fa-users" aria-hidden="true"></i> Customers
+                </a>
+            @endif
+        </div>
+    </div>
+
   <div class="tab-content">
       <div class="tab-pane fade show active" id="tab1">
       <br>

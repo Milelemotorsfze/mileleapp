@@ -37,11 +37,12 @@
                 <div class="modal-body">
                     <input type="hidden" name="id" id="bankAccountId">
                     <div class="form-group">
-                        <label for="currentBalance">Current Balance</label>
+                        <label for="currentBalance"><strong>Current Balance</strong></label>
                         <p id="currentBalance" class="form-control-plaintext"></p>
                     </div>
+                    <br/>
                     <div class="form-group">
-                        <label for="newBalance">New Balance</label>
+                        <label for="newBalance"><strong>New Balance</strong></label>
                         <input type="number" name="new_balance" id="newBalance" class="form-control" required>
                     </div>
                 </div>

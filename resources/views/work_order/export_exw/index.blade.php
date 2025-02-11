@@ -195,19 +195,19 @@
 						</div>
 					</div>
 				@endforeach
-				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div">
-					<button id="apply-filters" type="submit" class="btn btn-info btn-sm mb-3" style="margin-top:25px!important;">
+				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div d-flex align-items-end">
+					<button id="apply-filters" type="submit" class="btn btn-info btn-sm">
 						Save & Apply Filters
 					</button>
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-xxl-2 col-lg-6 col-md-6 ms-auto d-flex justify-content-end select-button-main-div">
+				<div class="col-xxl-2 col-lg-6 col-md-6 ms-auto d-flex justify-content-end align-items-end select-button-main-div">
 					<div class="dropdown-option-div me-2"> <!-- Add spacing between input and button -->
 						<label for="search" class="col-form-label text-md-end">Search</label>
 						<input id="search" name="search" type="text" class="form-control widthinput" placeholder="Search" autocomplete="search" value="{{ isset($search) ? $search : '' }}">
 					</div>
-					<button id="apply_search" type="button" class="btn btn-info btn-sm mb-3" style="margin-top:25px!important;">
+					<button id="apply_search" type="button" class="btn btn-info btn-sm">
 						Search
 					</button>
 				</div>

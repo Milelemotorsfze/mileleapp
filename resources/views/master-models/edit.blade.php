@@ -1,4 +1,12 @@
 @extends('layouts.main')
+
+<style>
+    .custom-error {
+        color: red;
+        margin-top: 10px !important;
+    }
+</style>
+
 @section('content')
     @can('edit-master-models')
     @php
@@ -89,7 +97,7 @@
                     <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">Variant</label>
                         <select class="form-control" name="variant_id" @if($disableVariantEdit == 1) disabled title="Not allowed to edit! already used in LOI/PFI/PO" @else 
-                        title="Variant" @endif id="variant_id">
+                        title="Variant is missing" @endif id="variant_id">
                             <option></option>
                             @foreach($variants as $variant)
                                 <option value="{{ $variant->id }}" {{$masterModel->variant_id == $variant->id ? 'selected' : " "}}>{{$variant->name}}</option>
@@ -324,6 +332,14 @@
                     required: true,
                 },
             },
+            errorPlacement: function(error, element) {
+                error.addClass('custom-error');
+                if (element.attr("name") === "variant_id") {
+                    error.insertAfter(element.next('.select2'));
+                } else {
+                    error.insertAfter(element);
+                }
+            }
         });
         function showOrHideLoiDescription() {
             let variantId = $("#variant_id").val();

@@ -21,6 +21,7 @@
     #table-responsive {
       height: 100vh;
       overflow-y: auto;
+      position: relative;
     }
     #dtBasicSupplierInventory {
       width: 100%;
@@ -46,9 +47,9 @@
       border-style: solid;
       border-width: 5px 5px 0 5px;
       height: 0;
-      left: 50%;
-      margin-left: -4px;
-      margin-top: -2px;
+      /* left: 50%; */
+      /* margin-left: -4px; */
+      /* margin-top: -2px; */
       position: absolute;
       top: 50%;
       width: 100px;
@@ -69,6 +70,10 @@
       background-color: #e9ecef;
       border-color: #bbb;
     }
+    .select2-container--open .select2-dropdown--below {
+      width: fit-content !important;
+    }
+
   </style>
 @section('content')
     <div class="card-header">

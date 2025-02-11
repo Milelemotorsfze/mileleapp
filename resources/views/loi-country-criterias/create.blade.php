@@ -5,6 +5,9 @@
         {
             height:32px!important;
         }
+        .custom-error {
+            color: red;
+        }
     </style>
     @can('loi-restricted-country-create')
         @php
@@ -193,6 +196,14 @@
                     required: true,
                 },
             },
+            errorPlacement: function(error, element) {
+                error.addClass('custom-error');
+                if (element.attr("name") === "country_id") {
+                    error.insertAfter(element.next('.select2'));
+                } else {
+                    error.insertAfter(element);
+                }
+            }
         });
     </script>
 @endpush
