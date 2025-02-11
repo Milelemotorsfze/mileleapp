@@ -77,7 +77,7 @@
           <div class="col-lg-12">
             <div class="row">
               <div class="col-lg-6 col-md-6 col-sm-12">
-                <label for="choices-single-default" class="form-label">Current Selling Price:</label>
+                <label for="choices-single-default" class="form-label"><strong>Current Selling Price:</strong></label>
               </div>
               <div class="col-lg-6 col-md-6 col-sm-12">
               <span id="currentPrice"></span>
@@ -85,7 +85,7 @@
             </div>
             <div class="row">
               <div class="col-lg-4 col-md-12 col-sm-12">
-                <label class="form-label font-size-13 text-center">New Price</label>
+                <label class="form-label font-size-13 text-center"><strong>New Price</strong></label>
               </div>
               <div class="col-lg-8 col-md-12 col-sm-12">
                 <input type="text" name="price" />

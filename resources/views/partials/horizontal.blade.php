@@ -1278,6 +1278,20 @@
                                 @endcanany
                                             <!-- po end -->
 
+                                @can('view-po-details')
+                                @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po-details');
+                                @endphp
+                                @if ($hasPermission)
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('grn.index') }}" id="topnav-more" role="button">
+                                        <i data-feather="command"></i>
+                                        <span data-key="t-extra-pages">GRN</span>
+                                    </a>
+                                </li>
+                                @endif
+                                @endcan
+
                                               <!-- LOI -->
                                 @canany(['LOI-create','LOI-list','list-loi-expiry-conditions','loi-restricted-country-list'])
                                 @php
