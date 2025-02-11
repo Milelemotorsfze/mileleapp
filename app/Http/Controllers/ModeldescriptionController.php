@@ -20,7 +20,7 @@ class ModeldescriptionController extends Controller
      */
     public function index()
     {
-        $MasterModelDescription = MasterModelDescription::orderBy('id','DESC')->get();
+        $MasterModelDescription = MasterModelDescription::orderBy('updated_at','DESC')->get();
         (new UserActivityController)->createActivity('Open Master Model Lines Description');
         return view('modeldescription.index', compact('MasterModelDescription'));
     }
@@ -110,7 +110,11 @@ class ModeldescriptionController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $modelDescription = MasterModelDescription::find($id);
+        $modelDescription->delete();
+
+        return response(true);
+
     }
     public function getGrades($modelId)
     {
