@@ -1074,6 +1074,21 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                             <span>{{ucfirst(strtolower($vendorsname))}}</span>
                         </div>
                     </div>
+                    @canany(['send-transfer-copy-to-supplier','send-swift-copy-to-supplier'])
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-transfer-copy-to-supplier','send-swift-copy-to-supplier']);
+                    @endphp
+                    @if ($hasPermission)
+                    <div class="row">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
+                            <label for="choices-single-default" class="form-label"><strong>Vendor Email</strong></label>
+                        </div>
+                        <div class="col-lg-6 col-md-9 col-sm-12">
+                            <span>{{$purchasingOrder->supplier->email ?? ''}}</span>
+                        </div>
+                    </div>
+                    @endcanany
+                    @endif
                     <div class="row">
                         <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>Vendor Account Status</strong></label>

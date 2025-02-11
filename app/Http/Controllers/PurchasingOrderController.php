@@ -5768,7 +5768,13 @@ public function sendTransferCopy(Request $request) {
 
                 $supplierAccountTransaction->is_transfer_copy_email_send = 1;
                 $supplierAccountTransaction->save();
-                return response()->json(['success' => true, 'message' => 'Email sent to '.$purchasingOrder->supplier->supplier . " successfully."]);
+                $purchasingordereventsLog = new PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Payment Transfer Copy Send to Supplier";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+                $purchasingordereventsLog->description = 'The Email was sent to '.$purchasingOrder->supplier->supplier.' at '.$Torecipient;
+                $purchasingordereventsLog->save();
+                return response()->json(['success' => true, 'message' => 'The Email was sent to '.$purchasingOrder->supplier->supplier.' at '.$Torecipient . " successfully."]);
             } catch (\Exception $e) {
                 Log::error('Email sending failed', ['error' => $e->getMessage()]);
                 return response()->json(['success' => false, 'message' => 'Email sending failed',
@@ -5806,7 +5812,14 @@ public function sendTransferCopy(Request $request) {
 
                 $supplierAccountTransaction->is_swift_copy_email_send = 1;
                 $supplierAccountTransaction->save();
-                return response()->json(['success' => true, 'message' => 'Email sent to '.$purchasingOrder->supplier->supplier . " successfully."]);
+
+                $purchasingordereventsLog = new PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Swift Copy Send to Supplier";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+                $purchasingordereventsLog->description = 'The Email was sent to '.$purchasingOrder->supplier->supplier.' at '.$Torecipient;
+                $purchasingordereventsLog->save();
+                return response()->json(['success' => true, 'message' => 'The Email was sent to '.$purchasingOrder->supplier->supplier.' at '.$Torecipient .' successfully.']);
             } catch (\Exception $e) {
                 Log::error('Email sending failed', ['error' => $e->getMessage()]);
                 return response()->json(['success' => false, 'message' => 'Email sending failed',
