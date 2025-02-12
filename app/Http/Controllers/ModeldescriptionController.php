@@ -51,7 +51,10 @@ class ModeldescriptionController extends Controller
         'gearbox' => 'nullable|string',
         'drive_train' => 'nullable|string',
         'window_type' => 'nullable|string',
-        'model_description' => 'required|string'
+        'model_description' => 'required|string|unique:master_model_descriptions,model_description'
+    ],
+    [
+        'model_description.unique' => 'Model detail is already existing !'
     ]);
 
     try {

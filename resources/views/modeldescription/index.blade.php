@@ -57,15 +57,7 @@
             <th>Model Line</th>
             <th>Created By</th>
             <th>Created At</th>
-            @can('delete-model-description')
-                @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('delete-model-description');
-                @endphp
-                @if ($hasPermission) 
-                    <th>action</th>
-                 @endif
-            @endcan 
-
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -76,22 +68,19 @@
             <td>{{ $description->modelLine->model_line ?? 'N/A' }}</td>
             <td>{{ $description->user->name ?? 'System' }}</td>
             <td>{{ $description->created_at->format('d-m-Y H:i:s') }}</td>
+            <td>
             @can('delete-model-description')
                 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('delete-model-description');
                 @endphp
                 @if ($hasPermission)
-               
                     @if($description->is_deletable == true)
-                    <td>
                         <button data-url="{{ route('modeldescription.destroy', $description->id) }}" data-id="{{ $description->id }}"
                             class="btn btn-danger btn-sm btn-delete"><i class="fa fa-trash"></i></button>
-                    </td>
                     @endif
-             
                 @endif
             @endcan
-     
+            </td>
         </tr>
         @empty
         <tr>

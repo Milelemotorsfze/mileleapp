@@ -200,6 +200,13 @@
         }).on('change', function() {
             $('#model-error').remove();
         });
+        $.validator.addMethod("spaceCheck", function(value, element) {
+				return this.optional(element) || !/\s\s+/.test(value);
+			}, "No more than one consecutive space is allowed in the feild");
+
+        $.validator.addMethod("noSpaces", function(value, element) {
+            return this.optional(element) || /^[^\s]+(\s+[^\s]+)*$/.test(value);
+        }, "No leading or trailing spaces allowed");
 
         $("#form-create").validate({
             ignore: [],
@@ -210,8 +217,23 @@
                 master_model_lines_id: {
                     required: true,
                 },
+                model_description:{
+                    required: true,
+                    spaceCheck:true,
+                    maxlength:255,
+                    noSpaces:true
+                },
+                others:{
+                    spaceCheck:true,
+                    noSpaces:true
+                },
+                specialEditions:{
+                    spaceCheck:true,
+                    noSpaces:true
+                }
             },
         });
+       
 
         $('#brand').on('change', function() {
             var selectedBrandId = $(this).val();
