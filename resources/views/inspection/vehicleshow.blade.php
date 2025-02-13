@@ -1,4 +1,12 @@
 @extends('layouts.main')
+<style>
+   #interior_colour-error {
+        margin-top:10px !important;
+    }
+    #exterior_colour-error {
+        margin-top:10px !important;
+    }
+    </style>
 <script src="https://unpkg.com/konva@9.2.1/konva.min.js"></script>
 <div id="csrf-token" data-token="{{ csrf_token() }}"></div>
 @section('content')
@@ -12,9 +20,16 @@
     </h4>
     <br>
 </div>
-<div class="card-body">
-<div class="modal fade optionsmodal-modal" id="optionsmodal" tabindex="-1" aria-labelledby="optionsmodalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
+
+                @if (Session::has('error'))
+                    <div class="alert alert-danger mt-3 mb-0" id="success-alert">
+                        <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                        {{ Session::get('error') }}
+                    </div>
+                @endif
+                    <div class="card-body">
+                    <div class="modal fade optionsmodal-modal" id="optionsmodal" tabindex="-1" aria-labelledby="optionsmodalLabel" aria-hidden="true">
+                                                <div class="modal-dialog">
                                 <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="optionsmodalLabel">Update Options</h5>
@@ -131,13 +146,7 @@
 <div class="col-lg-2 col-md-6 col-sm-12">
     <div class="mb-3">
         <label for="production-date" class="form-label">Production Date</label>
-        <input 
-            type="month" 
-            id="production-date" 
-            name="ppmmyyy" 
-            class="form-control" 
-            value="{{ $formattedDate }}"
-        >
+        <input  type="month"  id="production-date" name="ppmmyyy"  class="form-control" value="{{ $formattedDate }}" >
     </div>
 </div>
                             <div class="col-lg-2 col-md-6 col-sm-12">
@@ -597,6 +606,10 @@
                 int_colour:{
                     required:true,
                 },
+                ppmmyyy:{
+                    required:true,
+                }
+
             }
         });
     </script>
