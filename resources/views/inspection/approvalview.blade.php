@@ -210,8 +210,8 @@
                 <td>{{$variant->gearbox}}</td>
                 <td>
                     <select class="form-control" name="gearbox">
-                    <option value="Auto" @if($variant_request->upholestry == 'Auto') selected @endif>Auto</option>
-                    <option value="Manual" @if($variant_request->upholestry == 'Manual') selected @endif>Manual</option>
+                    <option value="AT" @if($variant_request->gearbox == 'AT') selected @endif>Auto</option>
+                    <option value="MT" @if($variant_request->gearbox == 'MT') selected @endif>Manual</option>
                  </select>
                 </td>
                 <td>
