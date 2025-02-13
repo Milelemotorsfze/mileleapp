@@ -186,7 +186,7 @@
                         <center>
                             <div class="bg-overlay bg-primary">
                                 <div class="logo-container">
-                                    <img src="bgm.jpg" class="logo-img" alt="Responsive Logo">
+                                    <img src="{{ url('variantimages/bgm.jpg') }}" class="logo-img" alt="Responsive Logo">
                                 </div>
                             </div>
                         </center>
