@@ -1163,4 +1163,5 @@ Route::get('/d', function () {
     ->name('send-transfer-copy.email');
     Route::get('/swift_copy/send-email-to-supplier', [PurchasingOrderController::class, 'sendSwiftCopy'])
     ->name('send-swift-copy.email');
+Route::post('/check-vehicle-quantity', [VehiclesController::class, 'checkVehicleQuantity'])->name('check.vehicle.quantity');
 });

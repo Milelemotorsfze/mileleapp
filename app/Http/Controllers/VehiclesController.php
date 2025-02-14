@@ -3971,4 +3971,29 @@ COALESCE(
         $vehicle->save();
         return redirect()->route('vehicles.statuswise', ['status' => 'allstock']);
     }
+    public function checkVehicleQuantity(Request $request)
+    {
+        $quotationId = $request->input('quotation_id');  // Get the quotation ID from request
+    info($quotationId);
+        // Step 1: Find the Sales Order (SO) using the quotation_id
+        $so = So::where('quotation_id', $quotationId)->first();
+    
+        if ($so) {
+            // Step 2: Find the vehicle associated with this SO
+            $vehicle = Vehicles::where('so_id', $so->id)->first();
+    
+            if ($vehicle) {
+                // Step 3: Count how many GDN records exist for this vehicle
+                $gdnCount = GDN::where('vehicle_id', $vehicle->id)->count();
+    
+                return response()->json([
+                    'exists' => true,
+                    'vehicle_id' => $vehicle->id,
+                    'gdn_count' => $gdnCount
+                ]);
+            }
+        }
+    
+        return response()->json(['exists' => false]);
+    }    
     }

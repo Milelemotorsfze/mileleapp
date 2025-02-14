@@ -1419,6 +1419,37 @@
 @endsection
 @push('scripts')
 <script>
+function validateVehicleQuantity(input, quotationId, model_type) {
+    console.log(quotationId);
+    // If is_addon is 0, skip validation
+    if (model_type !== 'Vehicle') {
+        console.log("Validation skipped as is_addon is 0.");
+        return;
+    }
+    var newQty = parseInt(input.value);
+    $.ajax({
+        url: '{{ route("check.vehicle.quantity") }}',  // Laravel named route
+        type: 'POST',
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),  // Fetch CSRF token
+            quotation_id: quotationId,
+        },
+        success: function(response) {
+            if (response.exists) {
+                console.log(response.gdn_count);
+                var minQty = response.gdn_count; // Get the minimum required qty from DB
+                if (newQty < minQty) {
+                    alert('Quantity cannot be less than ' + minQty + ' as per existing GDN records.');
+                    input.value = minQty; // Reset to valid minimum
+                }
+            }
+        },
+        error: function(xhr) {
+            console.log(xhr.responseText);
+            alert('Error checking quantity constraints.');
+        }
+    });
+}
      function addAgentModal() {
         $('#addAgentModal').modal('show');
     }
@@ -2525,12 +2556,18 @@ $('#shipping_port').select2();
                            '</div>';
                 }
             },
-            {
+                        {
                 targets: -3,
                 render: function (data, type, row) {
-                var quantityValue = row.qty ? row.qty : 1;
-                return '<input type="number" min="0" value="' + quantityValue + '" step="1" class="qty-editable form-control" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)" required name="quantities[]" id="quantity-' + row['index'] + '" />';
-            }
+                    console.log();
+                    var quantityValue = row.qty ? row.qty : 1;
+                    return `<input type="number" min="0" value="${quantityValue}" step="1" 
+                                class="qty-editable form-control" 
+                            onchange="validateVehicleQuantity(this, '${row.quotation_id}', '${row.model_type}')"
+                                onkeypress="return /[0-9]/.test(event.key)" 
+                                required name="quantities[]" 
+                                id="quantity-${row.index}" />`;
+                }
             },
             {
                 targets: -7,

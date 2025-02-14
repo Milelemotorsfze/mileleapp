@@ -20,4 +20,13 @@ class Quotation extends Model
     {
         return $this->hasOne(QuotationDetail::class);
     }
+    public function so()
+    {
+        return $this->hasOne(So::class, 'quotation_id');
+    }
+
+    public function call()
+    {
+        return $this->belongsTo(Calls::class, 'calls_id');
+    }
 }
