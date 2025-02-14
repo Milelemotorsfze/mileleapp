@@ -10,9 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 class DpColorCodesController extends Controller
 {
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request)
     {
         $request->validate([
@@ -25,7 +23,6 @@ class DpColorCodesController extends Controller
 
         DB::beginTransaction();
         try {
-            // Step 1: Store data in color_codes table
             $colorCode = ColorCode::create([
                 'name' => $request->input('name'),
                 'belong_to' => $request->input('belong_to'),
@@ -33,7 +30,6 @@ class DpColorCodesController extends Controller
                 'created_by' => auth()->user()->id
             ]);
 
-            // Step 2: Store data in dp_color_codes table
             foreach ($request->input('color_codes') as $code) {
                 DpColorCode::create([
                     'color_code_id' => $colorCode->id,
