@@ -13,7 +13,7 @@
         {
             height:32px!important;
         }
-        .error {
+        .error, .custom-error {
             color: #fd625e;
         }
         .overlay
@@ -1012,7 +1012,22 @@
                     loi_signature:{
                         extension: "Please upload Image file format (png,jpeg,jpg,svg)"
                     }
+                },
+                errorPlacement: function(error, element) {
+                    error.addClass('custom-error');
+                    var name = element.attr("name");
+                    if (name === "country" || name === "client_id" || name === "category" || 
+                        name.match(/\bmodels\[\]\b/) || name.match(/\bsfx\[\]\b/) || name.match(/\btemplate_type\[\]\b/)) {
+                        if (element.data('select2')) {
+                            error.insertAfter(element.next('.select2'));
+                        } else {
+                            error.insertAfter(element.next('.select2'));
+                        }
+                    } else {
+                        error.insertAfter(element.next('.select2'));
+                    }
                 }
+
         });
 
         $.validator.prototype.checkForm = function (){

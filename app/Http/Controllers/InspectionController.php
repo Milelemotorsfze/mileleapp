@@ -31,6 +31,7 @@ use App\Models\ModelSpecification;
 use App\Models\ModelSpecificationOption;
 use App\Models\VariantItems;
 use App\Models\Variantlog;
+use Illuminate\Support\Facades\Log;
 
 class InspectionController extends Controller
 {
@@ -335,6 +336,9 @@ class InspectionController extends Controller
     }
     public function update(Request $request, $id)
     {
+        try{
+    
+        DB::beginTransaction();
         $useractivities =  New UserActivities();
         $useractivities->activity = "Update the Pending Inspection Submit for Approval";
         $useractivities->users_id = Auth::id();
@@ -447,7 +451,13 @@ class InspectionController extends Controller
             ];
             Incident::create($incidentData);
         }
+        DB::commit();
         return redirect()->route('inspection.index')->with('success', 'Vehicle Inspection successfully Done.');
+        } catch (\Exception $e) {
+            Log::error('Inspection Creation failed', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Vehicle Inspection Creation failed.');
+        }
+       
     }
     public function reshow($id)
     {

@@ -5,6 +5,9 @@
             height: 400px;
             margin-bottom: 10px;
         }
+        .custom-error {
+            color: red;
+        }
     </style>
     @can('edit-customer')
         @php
@@ -284,7 +287,7 @@
                 type: {
                     required: true,
                 },
-                country_id: {
+                "country_id[]": {
                     required: true,
                 },
                 passport_file:{
@@ -309,6 +312,19 @@
                     extension: "Please upload file format (png,jpeg,jpg)"
                 },
             },
+            errorPlacement: function(error, element) {
+                    error.addClass('custom-error');
+                    var name = element.attr("name");
+                    if (name.match(/\country_id\[\]\b/)) {
+                        if (element.data('select2')) {
+                            error.insertAfter(element.next('.select2'));
+                        } else {
+                            error.insertAfter(element.next('.select2'));
+                        }
+                    } else {
+                        error.insertAfter(element.next('.select2'));
+                    }
+            }
         });
 
         $('.remove-doc-button').click(function () {

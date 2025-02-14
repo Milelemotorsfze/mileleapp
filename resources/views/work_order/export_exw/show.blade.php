@@ -23,17 +23,18 @@
 	.nav-fill .nav-item .nav-link, .nav-justified .nav-item .nav-link {
 	width: 99%;
 	border: 1px solid #4ba6ef !important;
-	background-color: #c1e1fb !important;
+	/* background-color: #c1e1fb !important; */
 	}
-	.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
-	color: black!important;
-	background-image: linear-gradient(to right,#4ba6ef,#4ba6ef,#0065ac)!important;
+    .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+	/* color: black!important; */
+	/* background-image: linear-gradient(to right,#4ba6ef,#4ba6ef,#0065ac)!important; */
+	background: #072c47 !important;
 	}
 	.nav-link:focus{
-	color: black!important;
+	color: white !important;
 	}
 	.nav-link:hover {
-	color: black!important;
+	color: white !important;
 	}
     .form-label {
         font-size:12px!important;

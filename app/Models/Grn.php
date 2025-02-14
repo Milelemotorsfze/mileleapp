@@ -14,4 +14,9 @@ class Grn extends Model
         'grn_number',
     ];
     public $timestamps = false;
+
+    public function vehicles()
+    {
+        return $this->hasMany(Vehicles::class, 'grn_id');
+    }
 }

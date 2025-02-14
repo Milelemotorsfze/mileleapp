@@ -521,6 +521,8 @@ class ApprovalsController extends Controller
         return response()->json(['message' => 'Data saved successfully']);
     }
     public function approveInspection(Request $request) {
+
+        
         $currentDate = Carbon::now();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -1024,7 +1026,7 @@ class ApprovalsController extends Controller
                 $vehicleslog->new_value = $newVariantName;
                 $vehicleslog->created_by = auth()->user()->id;
                 $vehicleslog->save();
-                $vehicles = Vehicles::where('id', $inspection->vehicle_id);
+                $vehicles = Vehicles::where('id', $inspection->vehicle_id)->first();
                 $purchasingOrder = PurchasingOrder::where('id', $vehicles->purchasing_order_id)->first();
                 $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
                 $vehiclesVIN = $vehicles->vin;

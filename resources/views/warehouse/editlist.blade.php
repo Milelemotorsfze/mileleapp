@@ -1,5 +1,8 @@
 @extends('layouts.main')
 <style>
+.error {
+    color: red;
+}
     .heading-background {
   display: inline-block;
   background-color: #f2f2f2;
@@ -46,7 +49,7 @@
                     </div>
                 </div>
                 <div class="col-12 text-center">
-                    <button type="submit" class="btn btn-dark">Submit</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
             </div>
         </form>

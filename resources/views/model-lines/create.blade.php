@@ -1,4 +1,12 @@
 @extends('layouts.main')
+
+<style>
+    .custom-error {
+        color: red;
+        margin-top: 10px !important;
+    }
+</style>
+
 @section('content')
     @can('master-model-lines-create')
     @php
@@ -84,6 +92,14 @@
                     required:true
                 }
             },
+            errorPlacement: function(error, element) {
+                error.addClass('custom-error');
+                if (element.attr("name") === "brand_id") {
+                    error.insertAfter(element.next('.select2'));
+                } else {
+                    error.insertAfter(element);
+                }
+            }
         });
     </script>
 @endpush
