@@ -1419,28 +1419,31 @@
 @endsection
 @push('scripts')
 <script>
-function validateVehicleQuantity(input, quotationId, model_type) {
-    console.log(quotationId);
-    // If is_addon is 0, skip validation
+function validateVehicleQuantity(input, model_type, quotation_id, additionalData) {
+    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+    var quotationId = "{{ $quotation_details->quotation_id ?? '' }}";
     if (model_type !== 'Vehicle') {
-        console.log("Validation skipped as is_addon is 0.");
+        console.log("Validation skipped as model_type is not 'Vehicle'.");
         return;
     }
+
     var newQty = parseInt(input.value);
+
     $.ajax({
-        url: '{{ route("check.vehicle.quantity") }}',  // Laravel named route
+        url: '{{ route("check.vehicle.quantity") }}',
         type: 'POST',
         data: {
-            _token: $('meta[name="csrf-token"]').attr('content'),  // Fetch CSRF token
+            _token: csrfToken,
             quotation_id: quotationId,
+            additional_data: additionalData,
         },
         success: function(response) {
+            console.log(response.gdn_count);
             if (response.exists) {
-                console.log(response.gdn_count);
-                var minQty = response.gdn_count; // Get the minimum required qty from DB
+                var minQty = response.gdn_count;
                 if (newQty < minQty) {
                     alert('Quantity cannot be less than ' + minQty + ' as per existing GDN records.');
-                    input.value = minQty; // Reset to valid minimum
+                    input.value = minQty;
                 }
             }
         },
@@ -1538,7 +1541,6 @@ $(document).ready(function () {
                 url: '/get-agents/' + quotationId,
                 method: 'GET',
                 success: function (data) {
-                    console.log(data);
                     $('#selectedAgentsList').empty();
                     data.forEach(function (item) {
         var agent = item.agent;
@@ -1954,7 +1956,6 @@ $('#shipping_port').select2();
                         to_shipping_port_id: toShippingPortId,
                     },
                     success:function (response) {
-                        console.log(response);
                         var slNo = 0;
                         var data = response.map(function(response) {
                             
@@ -2014,7 +2015,6 @@ $('#shipping_port').select2();
 
         $('#dtBasicExample2 tbody').on('click', '.checkbox-hide', function(e) {
             var id = this.id;
-
             var tableType = $('#'+id).attr('data-table-type');
             if(tableType == "Vehicle") {
                 this.checked=!this.checked;
@@ -2556,19 +2556,18 @@ $('#shipping_port').select2();
                            '</div>';
                 }
             },
-                        {
-                targets: -3,
-                render: function (data, type, row) {
-                    console.log();
-                    var quantityValue = row.qty ? row.qty : 1;
-                    return `<input type="number" min="0" value="${quantityValue}" step="1" 
-                                class="qty-editable form-control" 
-                            onchange="validateVehicleQuantity(this, '${row.quotation_id}', '${row.model_type}')"
-                                onkeypress="return /[0-9]/.test(event.key)" 
-                                required name="quantities[]" 
-                                id="quantity-${row.index}" />`;
-                }
-            },
+            {
+    targets: -3,
+    render: function (data, type, row) {
+        var quantityValue = row.qty ? row.qty : 1;
+        return `<input type="number" min="0" value="${quantityValue}" step="1" 
+                    class="qty-editable form-control" 
+                    onchange="validateVehicleQuantity(this, '${row.model_type}', '${row.quotation_id}', '${row['6']}')"
+                    onkeypress="return /[0-9]/.test(event.key)" 
+                    required name="quantities[]" 
+                    id="quantity-${row.index}" />`;
+                    }
+                },
             {
                 targets: -7,
                 render: function (data, type, row) {
@@ -4243,7 +4242,6 @@ function updateSecondTable(RowId, savedVins) {
     var existingItemsJson = <?php echo $existingItemsJson; ?>;
     var secondTable = $('#dtBasicExample2').DataTable();
     existingItemsJson.forEach(function(existings) {
-        console.log(existings);
     var description =  existings.description; 
     var uniqueNumber = existings.uuid;
     var row = [];
@@ -4338,7 +4336,6 @@ function updateSecondTable(RowId, savedVins) {
         row['model_description_id'] = existings.model_description_id;
         row['qty'] = existings.quantity;
         row['systemcode'] = existings.system_code_amount;
-        console.log(existings.system_code_amount);
         row['agents_id'] = existings.agents_id;
         row['edit_page'] = 'editpage';
         row['itemid'] = existings.id;

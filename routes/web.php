@@ -1158,10 +1158,9 @@ Route::get('/d', function () {
     Route::resource('modeldescription', ModeldescriptionController::class);
     Route::resource('mastergrade', MasterGradeController::class);
     Route::resource('master-charges', MasterChargesController::class);
-    // 
     Route::get('/transfer_copy/send-email-to-supplier', [PurchasingOrderController::class, 'sendTransferCopy'])
     ->name('send-transfer-copy.email');
     Route::get('/swift_copy/send-email-to-supplier', [PurchasingOrderController::class, 'sendSwiftCopy'])
     ->name('send-swift-copy.email');
-Route::post('/check-vehicle-quantity', [VehiclesController::class, 'checkVehicleQuantity'])->name('check.vehicle.quantity');
+    Route::post('/check-vehicle-quantity', [VehiclesController::class, 'checkVehicleQuantity'])->name('check.vehicle.quantity');
 });

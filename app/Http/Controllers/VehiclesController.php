@@ -3973,27 +3973,20 @@ COALESCE(
     }
     public function checkVehicleQuantity(Request $request)
     {
-        $quotationId = $request->input('quotation_id');  // Get the quotation ID from request
-    info($quotationId);
-        // Step 1: Find the Sales Order (SO) using the quotation_id
+        $quotationId = $request->input('quotation_id');
         $so = So::where('quotation_id', $quotationId)->first();
-    
+        $additionalData = $request->input('additional_data');
+        $variant = Varaint::where('name', $additionalData )->first();
         if ($so) {
-            // Step 2: Find the vehicle associated with this SO
-            $vehicle = Vehicles::where('so_id', $so->id)->first();
-    
-            if ($vehicle) {
-                // Step 3: Count how many GDN records exist for this vehicle
-                $gdnCount = GDN::where('vehicle_id', $vehicle->id)->count();
-    
+            $gdnCount = Vehicles::where('so_id', $so->id)->where('varaints_id', $variant->id)->whereNotNull('gdn_id')->count();
+            info($gdnCount);
+            if ($gdnCount) {
                 return response()->json([
                     'exists' => true,
-                    'vehicle_id' => $vehicle->id,
                     'gdn_count' => $gdnCount
                 ]);
             }
         }
-    
         return response()->json(['exists' => false]);
     }    
     }
