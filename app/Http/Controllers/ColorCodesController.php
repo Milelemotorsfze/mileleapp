@@ -6,9 +6,10 @@ use App\Models\Colorlog;
 use Carbon\Carbon;
 use Carbon\CarbonTimeZone;
 use App\Http\Controllers\UserActivityController;
-
-
+use App\Models\DpColorCode;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ColorCodesController extends Controller
 {
@@ -16,11 +17,18 @@ class ColorCodesController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        (new UserActivityController)->createActivity('Open Colour Code Information Page');
-        $colorcodes = ColorCode::orderBy('id','DESC')->get();
-        return view('colours.index', compact('colorcodes'));
+{
+    (new UserActivityController)->createActivity('Open Colour Code Information Page');
+    $colorcodes = ColorCode::with(['dpColorCodes', 'createdBy'])->orderBy('id', 'DESC')->get();
+
+    foreach ($colorcodes as $colorcode) {
+        $dpCodes = $colorcode->dpColorCodes->pluck('color_code_values')->join(', ');
+        $colorcode->dpCodes = $dpCodes;
     }
+
+    return view('colours.index', compact('colorcodes'));
+}
+
 
     /**
      * Show the form for creating a new resource.
@@ -36,41 +44,44 @@ class ColorCodesController extends Controller
      */
     public function store(Request $request)
     {
-        (new UserActivityController)->createActivity('Create New Colour Code');
-        $this->validate($request, [
-            'name' => 'string|required|max:255',
-            'belong_to' => 'required',
-            'parent' => 'required',
-            // 'status' => 'required',
+        $request->validate([
+            'name' => 'required|string|max:255|unique:color_codes,name',
+            'belong_to' => 'required|string',
+            'parent' => 'required|string',
+            'color_codes' => 'required|array|min:1',
+            'color_codes.*' => 'string|distinct'
+        ], [
+            'name.unique' => 'The color name already exists.', 
         ]);
-        $name = $request->input('name');
-        $belong_to = $request->input('belong_to');
-        $existingColour = ColorCode::where('name', $name)->where('belong_to', $belong_to)
-            ->where('code', $request->input('code'))->first();
-        if ($existingColour) {
-            return redirect()->back()->with('error', 'Colour with the same name and Belong To already exists.');
+    
+        DB::beginTransaction();
+        try {
+            // Step 1: Store data in color_codes table
+            $colorCode = ColorCode::create([
+                'name' => $request->input('name'),
+                'belong_to' => $request->input('belong_to'),
+                'parent' => $request->input('parent'),
+                'created_by' => auth()->user()->id
+            ]);
+    
+            // Step 2: Store data in dp_color_codes table
+            foreach ($request->input('color_codes') as $code) {
+                DpColorCode::create([
+                    'color_code_id' => $colorCode->id,
+                    'color_code_values' => $code,
+                    'created_by' => auth()->user()->id
+                ]);
+            }
+    
+            DB::commit();
+            return redirect()->route('colourcode.index')->with('success', 'Color codes added successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error storing color codes: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to add color codes. Please try again.');
         }
-        $colourcodes = new ColorCode();
-        $colourcodes->name  = $name;
-        $colourcodes->code = $request->input('code');
-        $colourcodes->belong_to = $belong_to;
-        $colourcodes->parent = $request->input('parent');
-        // $colourcodes->status = $request->input('status');
-        $colourcodes->created_by = auth()->user()->id;
-        $colourcodes->save();
-        $colorcodeId = $colourcodes->id;
-        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-        $currentDateTime = Carbon::now($dubaiTimeZone);
-        $colorlog = new Colorlog();
-        $colorlog->time = $currentDateTime->toTimeString();
-        $colorlog->date = $currentDateTime->toDateString();
-        $colorlog->status = 'New Created';
-        $colorlog->colorcode_id = $colorcodeId;
-        $colorlog->created_by = auth()->user()->id;
-        $colorlog->save();
-        $colorcodes = ColorCode::orderBy('id', 'DESC')->get();
-        return view('colours.index')->with(compact('colorcodes'))->with('success', 'Variant added successfully.');
     }
+    
 
     /**
      * Display the specified resource.

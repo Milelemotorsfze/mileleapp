@@ -39,7 +39,7 @@
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
                 <thead class="bg-soft-secondary">
                 <tr>
-                    <th>Code</th>
+                    <th>Color Codes</th>
                     <th>Name</th>
                     <th>Belong To</th>
                     <th>Parent Colour</th>
@@ -54,41 +54,31 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach ($colorcodes as $key => $colorcodes)
+                @foreach ($colorcodes as $key => $colorcode)
                     <tr data-id="1">
-                        <td>{{ $colorcodes->code ?? ''}}</td>
-                        <td>{{ $colorcodes->name ?? ''}}</td>
+                        <td>{{ $colorcode->dpCodes }}</td>
+                        <td>{{ $colorcode->name ?? ''}}</td>
                         <td>
-                        @if ($colorcodes->belong_to == 'ex')
+                        @if ($colorcode->belong_to == 'ex')
                             Exterior
-                        @elseif ($colorcodes->belong_to == 'int')
+                        @elseif ($colorcode->belong_to == 'int')
                             Interior
                         @else
-                            {{ $colorcodes->belong_to ?? '' }}
+                            {{ $colorcode->belong_to ?? '' }}
                         @endif
                         </td>
-                        <td>{{ $colorcodes->parent ?? '' }}</td>
-                        <!-- <td>@if ($colorcodes->status == 'Active')
-                            <button class="btn btn-success">Active</button>
-                        @elseif ($colorcodes->status == 'De-Active')
-                            <button class="btn btn-danger">De-Active</button>
-                        @else
-                            {{ $colorcodes->status ?? '' }}
-                        @endif
-                        </td> -->
+                        <td>{{ $colorcode->parent ?? '' }}</td>
+                       
                         <td>
-                        @php
-                        $names = DB::table('users')->where('id', $colorcodes->created_by )->first();
-                        $created_bys = $names->name;
-                        @endphp
-                        {{ $created_bys ?? '' }}</td>
+                        {{ $colorcode->createdBy ? $colorcode->createdBy->name : 'N/A' }}
+                       </td>
 
-                        @php
+                            @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('colour-edit');
                             @endphp
                             @if ($hasPermission)
                             <td>
-                                <a data-placement="top" href="{{ route('colourcode.edit', $colorcodes->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i>
+                                <a data-placement="top" href="{{ route('colourcode.edit', $colorcode->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i>
                                 </a>
                             </td>
                             @endif
