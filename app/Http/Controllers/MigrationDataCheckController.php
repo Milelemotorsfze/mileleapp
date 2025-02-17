@@ -8,7 +8,9 @@ use App\Models\PFI;
 use App\Models\PfiItem;
 use App\Models\Supplier;
 use App\Models\LetterOfIndent;
+use App\Models\ParentColour;
 use App\Models\LetterOfIndentItem;
+use App\Models\ColorCode;
 use App\Models\LoiTemplate;
 use App\Models\LoiSoNumber;
 use App\Models\ClientCountry;
@@ -26,22 +28,21 @@ class MigrationDataCheckController extends Controller
       */
     public function index(Request $request)
     {
-        $allPfi = PFI::select('id','pfi_reference_number','pfi_date','amount')->get();
-        foreach($allPfi as $pfi) {
-            $pfiItemLatest =  PfiItem::where('pfi_id', $pfi->id)
-            ->where('is_parent', false)
-            ->first();
-
-                $pfi->is_toyota_pfi = 0;
-                if($pfiItemLatest) {
-                // only toyota PFI have child , so if child exist it will be toyota PO
-                    $pfi->is_toyota_pfi = 1;
-                }
-                $pfi->save();
-        }
-
-        return "all pfi updated with is toyota";
+     
     
+    }
+    public function ColourCodeParentIdReplacement() {
+        $parentColours = ParentColour::all();
+        foreach($parentColours as $parentColour) {
+          $colourCodes = ColorCode::where('parent', $parentColour->name)->get();
+  
+         foreach($colourCodes as $colourCode) {
+          $colourCode->parent_colour_id = $parentColour->id;
+          $colourCode->save();
+         }
+        }
+  
+      return 1;
     }
 
     public function PFIUniqueWithinYear() {
