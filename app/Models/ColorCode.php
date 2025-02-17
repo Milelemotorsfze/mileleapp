@@ -32,5 +32,9 @@ class ColorCode extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
-
+    public function parentColour()
+    {
+        return $this->belongsTo(ParentColour::class,'parent_colour_id','id');
+    }
+    
 }

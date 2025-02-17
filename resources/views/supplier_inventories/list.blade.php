@@ -71,7 +71,7 @@
                                 <td>{{ $supplierInventory->total_quantity }}</td>
                                 <td>{{ $supplierInventory->actual_quantity }}</td>
                                 <td>
-                                    @foreach($supplierInventory->color_codes as $row)
+                                    <!-- @foreach($supplierInventory->color_codes as $row)
                                         @php
                                             $color_code = $row->color_code;
                                             $color_codeqty = $row->color_code_count;
@@ -106,7 +106,7 @@
                                         @endphp
                                         {{  $code_nameex }} : {{$color_codeqty }}
                                         <br>
-                                    @endforeach
+                                    @endforeach -->
                                 </td>
                             </tr>
                         @endforeach

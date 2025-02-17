@@ -102,7 +102,7 @@
                         <td>{{ $supplierInventory->actual_quantity }}</td>
                         <td>{{ $supplierInventory->quantity_without_chasis }}</td>
                         <td>
-                            @foreach($supplierInventory->color_codes as $row)
+                            <!-- @foreach($supplierInventory->color_codes as $row)
                                 @php
                                     $color_code = $row->color_code;
                                     $color_codeqty = $row->color_code_count;
@@ -137,7 +137,7 @@
                                 @endphp
                                {{  $code_nameex }} : {{$color_codeqty }}
                                 <br>
-                            @endforeach
+                            @endforeach -->
                         </td>
                         <td>
                             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#view-details-{{$supplierInventory->master_model_id}}">
