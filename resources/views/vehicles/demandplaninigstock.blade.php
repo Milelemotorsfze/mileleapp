@@ -780,24 +780,38 @@ table.dataTable thead th select {
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'fuel_type', name: 'varaints.fuel_type' },
                 { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'ex_color.name' },
-                { data: 'interior_color', name: 'int_color.name' },
+                { 
+                    data: 'exterior_color', 
+                    name: 'ex_parent.name',
+                    render: function(data, type, row) {
+                    if (!data) return '';
+                        return `<span  title=" ${row.detail_ext_color ?? ''}">${data}</span>`;
+                    }
+                },
+                { 
+                data: 'interior_color', 
+                name: 'int_parent.name',
+                render: function(data, type, row) {
+                    if (!data) return '';
+                        return `<span  title=" ${row.detail_int_color ?? ''}">${data}</span>`;
+                    }
+                },
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 {
-    data: 'ppmmyyy',
-    name: 'vehicles.ppmmyyy',
-    render: function(data, type, row) {
-        if (data) {
-            var dateObj = new Date(data);
-            var formattedDate = dateObj.toLocaleDateString('en-GB', {
-                year: 'numeric',
-                month: 'long'
-            });
-            return formattedDate;  // Example: "January 2024"
-        }
-        return ''; // If no date, return empty
-    }
-},
+                    data: 'ppmmyyy',
+                    name: 'vehicles.ppmmyyy',
+                    render: function(data, type, row) {
+                        if (data) {
+                            var dateObj = new Date(data);
+                            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                                year: 'numeric',
+                                month: 'long'
+                            });
+                            return formattedDate;  // Example: "January 2024"
+                        }
+                        return ''; // If no date, return empty
+                    }
+                },
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'territory', name: 'vehicles.territory' },
                 { data: 'fd', name: 'countries.name' },
@@ -922,8 +936,8 @@ if (hasPricePermission) {
         24: 'varaints.steering',
         25: 'varaints.fuel_type',
         26: 'varaints.gear',
-        27: 'ex_color.name',
-        28: 'int_color.name',
+        27: 'ex_parent.name',
+        28: 'int_parent.name',
         29: 'varaints.upholestry',
         30: 'vehicles.ppmmyyy',
         31: 'warehouse.name',

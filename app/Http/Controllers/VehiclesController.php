@@ -2809,8 +2809,10 @@ foreach ($variants as $variant) {
                         'varaints.gearbox',
                         'so.so_number',
                         'master_model_lines.model_line',
-                        'int_color.name as interior_color',
-                        'ex_color.name as exterior_color',
+                        'int_parent.name as interior_color',
+                        'ex_parent.name as exterior_color',
+                        'int_color.name as detail_int_color',
+                        'ex_color.name as detail_ext_color',
                         'purchasing_order.po_number',
                         'documents.import_type',
                         'documents.owership',
@@ -2843,6 +2845,10 @@ foreach ($variants as $variant) {
                     ->leftJoin('users as bp', 'vehicles.booking_person_id', '=', 'bp.id') // Join for booking person
                     ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
                     ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+
+                    ->leftJoin('parent_colours as int_parent', 'int_color.parent_colour_id', '=', 'int_parent.id')
+                    ->leftJoin('parent_colours as ex_parent', 'ex_color.parent_colour_id', '=', 'ex_parent.id')
+
                     ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                     ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                     ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
@@ -3487,8 +3493,10 @@ public function availablevehicles(Request $request)
                         'varaints.fuel_type',
                         'varaints.gearbox',
                         'master_model_lines.model_line',
-                        'int_color.name as interior_color',
-                        'ex_color.name as exterior_color',
+                        'int_parent.name as interior_color',
+                        'ex_parent.name as exterior_color',
+                        'int_color.name as detail_int_color',
+                        'ex_color.name as detail_ext_color',
                         'so.so_number',
                         'purchasing_order.po_number',
                         'grn.grn_number',
@@ -3520,6 +3528,8 @@ public function availablevehicles(Request $request)
                     ->leftJoin('users as bp', 'vehicles.booking_person_id', '=', 'bp.id') // Join for booking person
                     ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
                     ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+                    ->leftJoin('parent_colours as int_parent', 'int_color.parent_colour_id', '=', 'int_parent.id')
+                    ->leftJoin('parent_colours as ex_parent', 'ex_color.parent_colour_id', '=', 'ex_parent.id')
                     ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                     ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                     ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
@@ -3663,8 +3673,10 @@ public function availablevehicles(Request $request)
                     'varaints.gearbox',
                     'so.so_number',
                     'master_model_lines.model_line',
-                    'int_color.name as interior_color',
-                    'ex_color.name as exterior_color',
+                    'int_parent.name as interior_color',
+                    'ex_parent.name as exterior_color',
+                    'int_color.name as detail_int_color',
+                    'ex_color.name as detail_ext_color',
                     'purchasing_order.po_number',
                     'documents.import_type',
                     'documents.owership',
@@ -3695,6 +3707,8 @@ COALESCE(
                 ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
                 ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
                 ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+                ->leftJoin('parent_colours as int_parent', 'int_color.parent_colour_id', '=', 'int_parent.id')
+                ->leftJoin('parent_colours as ex_parent', 'ex_color.parent_colour_id', '=', 'ex_parent.id')
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
@@ -3849,8 +3863,10 @@ COALESCE(
                     'varaints.gearbox',
                     'so.so_number',
                     'master_model_lines.model_line',
-                    'int_color.name as interior_color',
-                    'ex_color.name as exterior_color',
+                    'int_color.parent as interior_color',
+                    'ex_color.parent as exterior_color',
+                    'int_color.name as detail_int_color',
+                    'ex_color.name as detail_ext_color',
                     'purchasing_order.po_number',
                     'grn.grn_number',
                     'gdn.gdn_number',
@@ -3878,6 +3894,8 @@ COALESCE(
                 ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
                 ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
                 ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+                ->leftJoin('parent_colours as int_parent', 'int_color.parent_colour_id', '=', 'int_parent.id')
+                ->leftJoin('parent_colours as ex_parent', 'ex_color.parent_colour_id', '=', 'ex_parent.id')
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')

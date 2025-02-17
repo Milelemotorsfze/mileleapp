@@ -787,8 +787,22 @@ var columns6 = [
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'fuel_type', name: 'varaints.fuel_type' },
                 { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'ex_color.name' },
-                { data: 'interior_color', name: 'int_color.name' },
+                { 
+                    data: 'exterior_color', 
+                    name: 'ex_parent.name',
+                    render: function(data, type, row) {
+                    if (!data) return '';
+                        return `<span  title=" ${row.detail_ext_color ?? ''}">${data}</span>`;
+                    }
+                },
+                { 
+                data: 'interior_color', 
+                name: 'int_parent.name',
+                render: function(data, type, row) {
+                    if (!data) return '';
+                        return `<span  title=" ${row.detail_int_color ?? ''}">${data}</span>`;
+                    }
+                },
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 {
     data: 'ppmmyyy',
@@ -941,8 +955,8 @@ var columns6 = [
         22: 'varaints.steering',
         23: 'varaints.fuel_type',
         24: 'varaints.gear',
-        25: 'ex_color.name',
-        26: 'int_color.name',
+        25: 'ex_parent.name',
+        26: 'int_parent.name',
         27: 'varaints.upholestry',
         28: 'vehicles.ppmmyyy',
         29: 'warehouse.name',
@@ -982,7 +996,6 @@ if (hasManagementPermission) {
                     var columnIndex = $(this).parent().index(); // Get the column index
                     var columnName = columnMap[columnIndex]; // Map index to column name
                     var value = $(this).val();
-                        console.log(columnIndex);
                     // Send filter values using column names, including special `__NULL__` and `__Not EMPTY__`
                     if (value && columnName) {
                         if (value.includes('__NULL__') || value.includes('__Not EMPTY__')) {

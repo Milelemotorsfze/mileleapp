@@ -755,23 +755,21 @@ table.dataTable thead th select {
     }
 },
         { data: 'bpn', name: 'bp.name' },
-                { data: 'gdn_number', name: 'gdn.gdn_number' },
-                {
-    data: 'gdndate',
-    name: 'gdn.date',
-    render: function(data, type, row) {
-        if (data) {
-            // Assuming data is in Y-m-d format (default SQL date format)
-            var dateObj = new Date(data);
-            var formattedDate = dateObj.toLocaleDateString('en-GB', {
-                day: '2-digit', month: 'short', year: 'numeric'
-            });
-            return formattedDate;
-        }
-        return ''; // If no date, return empty
-    }
-},
-{ 
+        { data: 'gdn_number', name: 'gdn.gdn_number' },
+        { data: 'gdndate', name: 'gdn.date',
+            render: function(data, type, row) {
+                if (data) {
+                    // Assuming data is in Y-m-d format (default SQL date format)
+                    var dateObj = new Date(data);
+                    var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                        day: '2-digit', month: 'short', year: 'numeric'
+                    });
+                    return formattedDate;
+                }
+                return ''; // If no date, return empty
+            }
+        },
+    { 
         data: 'vehicle_document_status', 
         name: 'vehicles.vehicle_document_status',
         render: function(data, type, row) {
@@ -833,29 +831,31 @@ table.dataTable thead th select {
         { data: 'engine', name: 'vehicles.engine', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
-                { data: 'my', name: 'varaints.my' },
-                { data: 'steering', name: 'varaints.steering' },
-                { data: 'fuel_type', name: 'varaints.fuel_type' },
-                { data: 'gearbox', name: 'varaints.gearbox' },
-                { 
-        data: 'exterior_color', 
-        name: 'ex_color.name',
-        render: function(data, type, row) {
-            return data ? data : '';
-        }
-    },
-    { 
+        { data: 'my', name: 'varaints.my' },
+        { data: 'steering', name: 'varaints.steering' },
+        { data: 'fuel_type', name: 'varaints.fuel_type' },
+        { data: 'gearbox', name: 'varaints.gearbox' },
+        { 
+            data: 'exterior_color', 
+            name: 'ex_parent.name',
+            render: function(data, type, row) {
+            if (!data) return '';
+                return `<span  title=" ${row.detail_ext_color ?? ''}">${data}</span>`;
+            }
+        },
+        { 
         data: 'interior_color', 
-        name: 'int_color.name',
+        name: 'int_parent.name',
         render: function(data, type, row) {
-            return data ? data : '';
-        }
-    },
-                { data: 'upholestry', name: 'varaints.upholestry' },
-                {
-    data: 'ppmmyyy',
-    name: 'vehicles.ppmmyyy',
-    render: function(data, type, row) {
+            if (!data) return '';
+                return `<span  title=" ${row.detail_int_color ?? ''}">${data}</span>`;
+            }
+        },
+        { data: 'upholestry', name: 'varaints.upholestry' },
+        {
+        data: 'ppmmyyy',
+        name: 'vehicles.ppmmyyy',
+        render: function(data, type, row) {
         if (data) {
             var dateObj = new Date(data);
             var formattedDate = dateObj.toLocaleDateString('en-GB', {
@@ -1007,8 +1007,8 @@ var columnMap = {
         27: 'varaints.steering',
         28: 'varaints.fuel_type',
         29: 'varaints.gear',
-        30: 'ex_color.name',
-        31: 'int_color.name',
+        30: 'ex_parent.name',
+        31: 'int_parent.name',
         32: 'varaints.upholestry',
         33: 'vehicles.ppmmyyy',
         34: 'warehouse.name',
@@ -1048,7 +1048,6 @@ if (hasManagementPermission) {
                     var columnIndex = $(this).parent().index(); // Get the column index
                     var columnName = columnMap[columnIndex]; // Map index to column name
                     var value = $(this).val();
-                        console.log(columnIndex);
                     // Send filter values using column names, including special `__NULL__` and `__Not EMPTY__`
                     if (value && columnName) {
                         if (value.includes('__NULL__') || value.includes('__Not EMPTY__')) {

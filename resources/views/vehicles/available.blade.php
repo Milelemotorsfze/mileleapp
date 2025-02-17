@@ -865,23 +865,25 @@ table.dataTable thead th select {
         { data: 'gearbox', name: 'varaints.gearbox' },
         { 
         data: 'exterior_color', 
-        name: 'ex_color.name',
+        name: 'ex_parent.name',
         render: function(data, type, row) {
-            return data ? data : '';
-        }
-    },
-    { 
+                if (!data) return '';
+                return `<span  title=" ${row.detail_ext_color ?? ''}">${data}</span>`;
+            }
+        },
+        { 
         data: 'interior_color', 
-        name: 'int_color.name',
+        name: 'int_parent.name',
         render: function(data, type, row) {
-            return data ? data : '';
-        }
-    },
+            if (!data) return '';
+                return `<span  title=" ${row.detail_int_color ?? ''}">${data}</span>`;
+            }
+        },
         { data: 'upholestry', name: 'varaints.upholestry' },
         {
-    data: 'ppmmyyy',
-    name: 'vehicles.ppmmyyy',
-    render: function(data, type, row) {
+        data: 'ppmmyyy',
+        name: 'vehicles.ppmmyyy',
+        render: function(data, type, row) {
         if (data) {
             var dateObj = new Date(data);
             var formattedDate = dateObj.toLocaleDateString('en-GB', {
@@ -1034,8 +1036,8 @@ table.dataTable thead th select {
         26: 'varaints.steering',
         27: 'varaints.fuel_type',
         28: 'varaints.gear',
-        29: 'ex_color.name',
-        30: 'int_color.name',
+        29: 'ex_parent.name',
+        30: 'int_parent.name',
         31: 'varaints.upholestry',
         32: 'vehicles.ppmmyyy',
         33: 'warehouse.name',
