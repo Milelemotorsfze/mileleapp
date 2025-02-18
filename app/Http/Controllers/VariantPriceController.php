@@ -236,40 +236,63 @@ class VariantPriceController extends Controller
         foreach ($prices as $key => $price ) {
             $vehicle = Vehicles::find($vehicles[$key]);
 
-            $similarVehicles = Vehicles::where('varaints_id',$vehicle->varaints_id)->get();
-        if ($price != $vehicle->price) {
-            $available_color = AvailableColour::where('varaint_id', $vehicle->varaints_id)->first(); // CHANGED
+            $similarVehicles = Vehicles::where('varaints_id',$vehicle->varaints_id);
+            $available_color = AvailableColour::where('varaint_id', $vehicle->varaints_id);
+            if($vehicle->int_colour ) {
+                $similarVehicles = $similarVehicles->where('int_colour',$vehicle->int_colour);
+                $available_color = $available_color->where('int_colour', $vehicle->int_colour);
+            }else{
+                $similarVehicles = $similarVehicles->whereNull('int_colour');
 
-            if (empty($available_color)) {
-                $available_color = new AvailableColour();
-                $oldPrice = null;
-                $status = 'New';
-            } else {
-                $oldPrice = $available_color->price;
-                $status = 'Updated';
             }
-            $available_color->varaint_id = $vehicle->varaints_id;
-            $available_color->price = $price; // CHANGED
-            $available_color->updated_by = Auth::id();
-            $available_color->save();
-            $vehiclePriceHistory = new VehiclePriceHistory();
-            $vehiclePriceHistory->available_colour_id = $available_color->id;
-            $vehiclePriceHistory->old_price = $oldPrice;
-            $vehiclePriceHistory->new_price = $price;
-            $vehiclePriceHistory->updated_by = Auth::id();
-            $vehiclePriceHistory->status = $status;
-            $vehiclePriceHistory->save();
-        }
-        foreach ($similarVehicles as $simVehicle) { // CHANGED
-            if ($price != $simVehicle->price) {
-                $simVehicle->price = $price;
-                $simVehicle->save();
+            if($vehicle->ex_colour){
+                $similarVehicles = $similarVehicles->where('ex_colour', $vehicle->ex_colour);
+                $available_color = $available_color->where('ext_colour', $vehicle->ex_colour);
+            }else{
+                $similarVehicles = $similarVehicles->whereNull('ex_colour');
+
+            }
+            $similarVehicles = $similarVehicles->get();
+
+            if($price != $vehicle->price) {
+                $available_color = $available_color->first();
+
+                if(empty($available_color)) {
+                    $available_color = new AvailableColour();
+                    $oldPrice = Null;
+                    $status = 'New';
+                }else{
+                    $oldPrice = $available_color->price;
+                    $status = 'Updated';
+                }
+
+                $available_color->varaint_id = $vehicle->varaints_id;
+                $available_color->int_colour = $vehicle->int_colour;
+                $available_color->ext_colour = $vehicle->ex_colour;
+                $available_color->price = $price;
+                $available_color->updated_by = Auth::id();
+                $available_color->save();
+
+                $vehiclePriceHistory = new VehiclePriceHistory();
+                $vehiclePriceHistory->available_colour_id  = $available_color->id;
+                $vehiclePriceHistory->old_price = $oldPrice;
+                $vehiclePriceHistory->new_price = $price;
+                $vehiclePriceHistory->updated_by = Auth::id();
+                $vehiclePriceHistory->status = $status;
+                $vehiclePriceHistory->save();
+            }
+
+            foreach ($similarVehicles as $vehicle) {
+                if($price != $vehicle->price) {
+                    $vehicle->price = $price;
+                    $vehicle->save();
+                }
             }
         }
+
+        return redirect()->back()->with('success','Price Updated Successfully.');
+
     }
-
-    return redirect()->back()->with('success', 'Price Updated Successfully.');
-}
 
     /**
      * Remove the specified resource from storage.
