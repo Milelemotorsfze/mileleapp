@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('dp_color_codes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('color_code_id');
-            $table->string('color_code_values');
+            $table->string('color_code_values')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->unsignedBigInteger('deleted_by')->nullable();
