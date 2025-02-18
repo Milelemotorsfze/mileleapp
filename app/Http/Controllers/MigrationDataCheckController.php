@@ -28,7 +28,8 @@ class MigrationDataCheckController extends Controller
       */
     public function index(Request $request)
     {
-        $inspections = Inspection::all();
+        $inspections = Inspection::whereNot('stage','PDI')->get();
+        
         $missingIds = [];
         foreach($inspections as $inspection) {
            $isExist = VariantRequest::where('inspection_id', $inspection->id)->first();
