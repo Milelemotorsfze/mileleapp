@@ -15,6 +15,8 @@ use App\Models\ClientCountry;
 use App\Models\LetterOfIndentDocument;
 use Illuminate\Support\Facades\File;
 use App\Models\ClientDocument;
+use App\Models\Inspection;
+use App\Models\VariantRequest;
 use Carbon\Carbon;
 
 use Illuminate\Http\Request;
@@ -26,21 +28,15 @@ class MigrationDataCheckController extends Controller
       */
     public function index(Request $request)
     {
-        $allPfi = PFI::select('id','pfi_reference_number','pfi_date','amount')->get();
-        foreach($allPfi as $pfi) {
-            $pfiItemLatest =  PfiItem::where('pfi_id', $pfi->id)
-            ->where('is_parent', false)
-            ->first();
-
-                $pfi->is_toyota_pfi = 0;
-                if($pfiItemLatest) {
-                // only toyota PFI have child , so if child exist it will be toyota PO
-                    $pfi->is_toyota_pfi = 1;
-                }
-                $pfi->save();
+        $inspections = Inspection::all();
+        $missingIds = [];
+        foreach($inspections as $inspection) {
+           $isExist = VariantRequest::where('inspection_id', $inspection->id)->first();
+            if(!$isExist){
+                $missingIds[] = $inspection->id;
+            }
         }
-
-        return "all pfi updated with is toyota";
+        return $missingIds;
     
     }
 
