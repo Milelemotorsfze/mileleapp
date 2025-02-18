@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\File;
 use App\Models\ClientDocument;
 use App\Models\Inspection;
 use App\Models\VariantRequest;
+use App\Models\VariantRequestItems;
 use Carbon\Carbon;
 
 use Illuminate\Http\Request;
@@ -28,16 +29,28 @@ class MigrationDataCheckController extends Controller
       */
     public function index(Request $request)
     {
-        $inspections = Inspection::whereNot('stage','PDI')->get();
+        // $inspections = Inspection::whereNot('stage','PDI')->get();
+        
+        // $missingIds = [];
+        // foreach($inspections as $inspection) {
+        //    $isExist = VariantRequest::where('inspection_id', $inspection->id)->first();
+        //     if(!$isExist){
+        //         $missingIds[] = $inspection->id;
+        //     }
+        // }
+        // return $missingIds;
+
+        $variantRequests = VariantRequest::all();
         
         $missingIds = [];
-        foreach($inspections as $inspection) {
-           $isExist = VariantRequest::where('inspection_id', $inspection->id)->first();
+        foreach($variantRequests as $variantRequest) {
+           $isExist = VariantRequestItems::where('variant_request_id', $variantRequest->id)->first();
             if(!$isExist){
-                $missingIds[] = $inspection->id;
+                $missingIds[] = $variantRequest->id;
             }
         }
         return $missingIds;
+
     
     }
 
