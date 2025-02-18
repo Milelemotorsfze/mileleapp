@@ -196,6 +196,9 @@ class ApprovalsController extends Controller
     $extvehicle = ColorCode::find($vehicle->ex_colour);
     $extmaster = ColorCode::where('belong_to', 'ex')->get();
     $variant_request = VariantRequest::where('inspection_id', $id)->first();
+    info($id);
+    info("variant request");
+    info($variant_request);
     $variantRequestItems = VariantRequestItems::where('variant_request_id', $variant_request->id)->get();
     $data = [];
     foreach ($variantRequestItems as $item) {
