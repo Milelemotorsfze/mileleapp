@@ -206,7 +206,7 @@
                 name: "Please enter the color name",
                 belong_to: "Please select where the color belongs",
                 parent: "Please select a parent color",
-                'color_codes[]': "Color code is required"
+                'color_codes[]': "Color code is required."
             },
             errorPlacement: function(error, element) {
                 if (error.text() === "Color Code Duplication or Empty.") {
