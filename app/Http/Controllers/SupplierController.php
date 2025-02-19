@@ -1444,6 +1444,9 @@ class SupplierController extends Controller
             $isVendorExist = Supplier::select('contact_number','supplier','id')
                 ->whereIn('contact_number', [$contactNumber,Supplier::MIGRATED_SUPPLIER_DUMMY_CONTACT_NUMBER])
                 ->where('supplier', $request->name);
+                info("vendor");
+                info($isVendorExist);
+              
         }
         if($request->id) {
             $isVendorExist = $isVendorExist->whereNot('id', $request->id);
