@@ -1450,8 +1450,7 @@ class SupplierController extends Controller
             $isVendorExist = $isVendorExist->whereNot('id', $request->id);
         }
         $isVendorExist = $isVendorExist->first();
-        info("vendor");
-        info($isVendorExist);
+      
         $data = [];
         if($isVendorExist) {
             if(in_array(Supplier::SUPPLIER_TYPE_DEMAND_PLANNING, $request->supplierType)) {
