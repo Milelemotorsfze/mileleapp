@@ -210,8 +210,8 @@
                 <td>{{$variant->gearbox}}</td>
                 <td>
                     <select class="form-control" name="gearbox">
-                    <option value="Auto" @if($variant_request->upholestry == 'Auto') selected @endif>Auto</option>
-                    <option value="Manual" @if($variant_request->upholestry == 'Manual') selected @endif>Manual</option>
+                    <option value="Auto" @if($variant_request->gearbox == 'AT') selected @endif>Auto</option>
+                    <option value="Manual" @if($variant_request->gearbox == 'MT') selected @endif>Manual</option>
                  </select>
                 </td>
                 <td>
@@ -1035,6 +1035,11 @@ function saveincidents() {
   function setButtonValue(value) {
     document.getElementById('buttonValue').value = value;
 
+    const selectedRadioVariantOption = document.querySelector('input[name="variantoption"]:checked');
+    if (!selectedRadioVariantOption) {
+        alertify.confirm('Please select Variant compare option in Input Remarks section',function (e) {
+        }).set({title:"Error"});
+    }
     // Get the selected variant option
     const selectedVariantOption = document.querySelector('input[name="variantoption"]:checked').value;
 

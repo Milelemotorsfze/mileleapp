@@ -319,6 +319,12 @@
                                     <label for="text_area"><strong>Sales Notes</strong></label>
                                     <textarea class="form-control" id="notes" name="notes">{{$sodetails->notes}}</textarea>
                                 </div>
+                                <!-- <div class="col-12 mt-3">
+                                <a href="{{ route('qoutation.proforma_invoice_edit', ['callId' => $calls->id]) }}" 
+                                    class="btn btn-warning">
+                                        Reopen Quotation
+                                    </a>
+                                </div> -->
                             </div>
                         </div>
                     </div>

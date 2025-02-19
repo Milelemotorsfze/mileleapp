@@ -81,4 +81,8 @@ class Calls extends Model
     {
         return $this->hasOne(Closed::class, 'call_id', 'id');
     }
+    public function quotation()
+    {
+        return $this->hasOne(Quotation::class, 'calls_id');
+    }
     }
