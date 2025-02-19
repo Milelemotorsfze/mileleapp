@@ -17,6 +17,9 @@ use App\Models\ClientCountry;
 use App\Models\LetterOfIndentDocument;
 use Illuminate\Support\Facades\File;
 use App\Models\ClientDocument;
+use App\Models\Inspection;
+use App\Models\VariantRequest;
+use App\Models\VariantRequestItems;
 use Carbon\Carbon;
 
 use Illuminate\Http\Request;

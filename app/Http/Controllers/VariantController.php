@@ -111,6 +111,9 @@ class VariantController extends Controller
      */
 public function store(Request $request)
 {
+    DB::beginTransaction(); // Start transaction
+
+    try {
     $selectedSpecifications = json_decode(request('selected_specifications'), true);
     ksort($selectedSpecifications);
     $totalSpecifications = count($selectedSpecifications);
@@ -499,7 +502,14 @@ $existingspecifications = Varaint::with('VariantItems')
     $variantlog->variant_id = $variantId;
     $variantlog->created_by = auth()->user()->id;
     $variantlog->save();
+    DB::commit(); // Commit transaction if everything is successful
+
     return redirect()->route('variants.index')->with('success', 'Variant added successfully.');
+
+} catch (\Exception $e) {
+    DB::rollBack(); // Rollback in case of error
+    return redirect()->route('variants.index')->with('error', 'Error adding variant: ' . $e->getMessage());
+}
 }
     /**
      * Display the specified resource.

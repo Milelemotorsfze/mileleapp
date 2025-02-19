@@ -196,6 +196,9 @@ class ApprovalsController extends Controller
     $extvehicle = ColorCode::find($vehicle->ex_colour);
     $extmaster = ColorCode::where('belong_to', 'ex')->get();
     $variant_request = VariantRequest::where('inspection_id', $id)->first();
+    info($id);
+    info("variant request");
+    info($variant_request);
     $variantRequestItems = VariantRequestItems::where('variant_request_id', $variant_request->id)->get();
     $data = [];
     foreach ($variantRequestItems as $item) {
@@ -521,6 +524,8 @@ class ApprovalsController extends Controller
         return response()->json(['message' => 'Data saved successfully']);
     }
     public function approveInspection(Request $request) {
+
+        
         $currentDate = Carbon::now();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -1024,7 +1029,7 @@ class ApprovalsController extends Controller
                 $vehicleslog->new_value = $newVariantName;
                 $vehicleslog->created_by = auth()->user()->id;
                 $vehicleslog->save();
-                $vehicles = Vehicles::where('id', $inspection->vehicle_id);
+                $vehicles = Vehicles::where('id', $inspection->vehicle_id)->first();
                 $purchasingOrder = PurchasingOrder::where('id', $vehicles->purchasing_order_id)->first();
                 $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
                 $vehiclesVIN = $vehicles->vin;

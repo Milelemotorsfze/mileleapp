@@ -3989,4 +3989,22 @@ COALESCE(
         $vehicle->save();
         return redirect()->route('vehicles.statuswise', ['status' => 'allstock']);
     }
+    public function checkVehicleQuantity(Request $request)
+    {
+        $quotationId = $request->input('quotation_id');
+        $so = So::where('quotation_id', $quotationId)->first();
+        $additionalData = $request->input('additional_data');
+        $variant = Varaint::where('name', $additionalData )->first();
+        if ($so) {
+            $gdnCount = Vehicles::where('so_id', $so->id)->where('varaints_id', $variant->id)->whereNotNull('gdn_id')->count();
+            info($gdnCount);
+            if ($gdnCount) {
+                return response()->json([
+                    'exists' => true,
+                    'gdn_count' => $gdnCount
+                ]);
+            }
+        }
+        return response()->json(['exists' => false]);
+    }    
     }

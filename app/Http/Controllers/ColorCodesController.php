@@ -17,12 +17,14 @@ class ColorCodesController extends Controller
     public function index()
     {
         (new UserActivityController)->createActivity('Open Colour Code Information Page');
-        $colorcodes = ColorCode::with(['dpColorCodes', 'createdBy'])->orderBy('id', 'DESC')->get();
+        $colorcodes = ColorCode::with(['dpColorCodes', 'createdBy'])->orderBy('color_codes.id', 'DESC')->get();
 
         foreach ($colorcodes as $colorcode) {
             $dpCodes = $colorcode->dpColorCodes->pluck('color_code_values')->join(', ');
             $colorcode->dpCodes = $dpCodes;
         }
+        $ids = $colorcodes->pluck('id');
+        Log::info('Ordered IDs:', $ids->toArray());
 
         return view('colours.index', compact('colorcodes'));
     }
@@ -35,42 +37,49 @@ class ColorCodesController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:color_codes,name',
-            'belong_to' => 'required|string',
-            'parent' => 'required|string',
-            'color_codes' => 'required|array|min:1',
-            'color_codes.*' => 'string|distinct'
-        ], [
-            'name.unique' => 'The color name already exists.',
+{
+    Log::info('Received form data:', $request->all());
+    $request->validate([
+        'name' => 'required|string|max:255|unique:color_codes,name',
+        'belong_to' => 'required|string',
+        'parent' => 'required|string',
+        'color_codes' => 'nullable|array',
+        'color_codes.*' => 'string|distinct'
+    ], [
+        'name.unique' => 'The color name already exists.',
+    ]);
+
+    DB::beginTransaction();
+    try {
+        $colorCode = ColorCode::create([
+            'name' => $request->input('name'),
+            'belong_to' => $request->input('belong_to'),
+            'parent' => $request->input('parent'),
+            'created_by' => auth()->user()->id
         ]);
 
-        DB::beginTransaction();
-        try {
-            $colorCode = ColorCode::create([
-                'name' => $request->input('name'),
-                'belong_to' => $request->input('belong_to'),
-                'parent' => $request->input('parent'),
-                'created_by' => auth()->user()->id
-            ]);
-
-            foreach ($request->input('color_codes') as $code) {
-                DpColorCode::create([
-                    'color_code_id' => $colorCode->id,
-                    'color_code_values' => $code,
-                    'created_by' => auth()->user()->id
-                ]);
+        // Process color codes only if they are provided
+        if ($request->filled('color_codes')) {
+            foreach ($request->color_codes as $code) {
+                if (!empty($code)) {
+                    DpColorCode::create([
+                        'color_code_id' => $colorCode->id,
+                        'color_code_values' => $code,
+                        'created_by' => auth()->user()->id
+                    ]);
+                }
             }
-
-            DB::commit();
-            return redirect()->route('colourcode.index')->with('success', 'Color codes added successfully.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error storing color codes: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Failed to add color codes. Please try again.');
         }
+
+        DB::commit();
+        return redirect()->route('colourcode.index')->with('success', 'Color codes added successfully.');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()->with('error', 'Failed to add color codes. Please try again.');
     }
+}
+
+
 
     public function show(string $id)
     {
@@ -149,5 +158,11 @@ class ColorCodesController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function checkName(Request $request)
+    {
+        $exists = ColorCode::where('name', $request->name)->exists();
+        return response()->json(['exists' => $exists]);
     }
 }

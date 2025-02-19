@@ -783,6 +783,7 @@ Route::get('/d', function () {
     Route::get('users/update-role/{roleId}', [UserController::class, 'updateRole'])->name('users.updateRole');
     Route::get('/view-log-details/{id}', [VehiclesController::class, 'viewLogDetails'])->name('vehicleslog.viewdetails');
     Route::resource('colourcode', ColorCodesController::class);
+    Route::post('color-codes/check-name', [ColorCodesController::class, 'checkName'])->name('color-codes.check-name');
     Route::post('/update-purchasing-data', [PurchasingOrderController::class, 'updatepurchasingData'])->name('purchasing.updateData');
     Route::post('/update-purchasing-status', [PurchasingOrderController::class, 'purchasingupdateStatus'])->name('purchasing.updateStatus');
     Route::resource('warehouse', WarehouseController::class);
@@ -1164,9 +1165,9 @@ Route::get('/d', function () {
     Route::resource('modeldescription', ModeldescriptionController::class);
     Route::resource('mastergrade', MasterGradeController::class);
     Route::resource('master-charges', MasterChargesController::class);
-    // 
     Route::get('/transfer_copy/send-email-to-supplier', [PurchasingOrderController::class, 'sendTransferCopy'])
     ->name('send-transfer-copy.email');
     Route::get('/swift_copy/send-email-to-supplier', [PurchasingOrderController::class, 'sendSwiftCopy'])
     ->name('send-swift-copy.email');
+    Route::post('/check-vehicle-quantity', [VehiclesController::class, 'checkVehicleQuantity'])->name('check.vehicle.quantity');
 });

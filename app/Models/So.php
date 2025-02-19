@@ -35,4 +35,12 @@ class So extends Model
     {
         return $this->belongsTo(User::class,'sales_person_id');
     }
+    public function quotation()
+    {
+        return $this->belongsTo(Quotation::class, 'quotation_id');
+    }
+    public function call()
+    {
+        return $this->hasOneThrough(Calls::class, Quotation::class, 'id', 'id', 'quotation_id', 'calls_id');
+    }
 }

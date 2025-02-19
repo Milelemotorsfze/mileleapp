@@ -10,14 +10,13 @@ use Illuminate\Support\Facades\Log;
 
 class DpColorCodesController extends Controller
 {
-
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:color_codes,name',
             'belong_to' => 'required|string',
             'parent' => 'required|string',
-            'color_codes' => 'required|array|min:1',
+            'color_codes' => 'nullable|array',
             'color_codes.*' => 'string|distinct'
         ]);
 
@@ -30,12 +29,14 @@ class DpColorCodesController extends Controller
                 'created_by' => auth()->user()->id
             ]);
 
-            foreach ($request->input('color_codes') as $code) {
-                DpColorCode::create([
-                    'color_code_id' => $colorCode->id,
-                    'color_code_values' => $code,
-                    'created_by' => auth()->user()->id
-                ]);
+            foreach ($request->input('color_codes', []) as $code) {
+                if (!empty($code)) {
+                    DpColorCode::create([
+                        'color_code_id' => $colorCode->id,
+                        'color_code_values' => $code,
+                        'created_by' => auth()->user()->id
+                    ]);
+                }
             }
 
             DB::commit();
