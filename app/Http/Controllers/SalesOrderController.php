@@ -147,6 +147,8 @@ class SalesOrderController extends Controller
         //
     }
     public function createsalesorder($callId) {
+        info("reached");
+        info($request->all());
         $quotation = Quotation::where('calls_id', $callId)->first();
         $calls = Calls::find($callId);
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
@@ -175,6 +177,8 @@ class SalesOrderController extends Controller
                     $vehicles[$item->id] = $variantVehicles;
                     break;
                 case 'App\Models\MasterModelLines':
+                    info("get the id");
+                    info($item->reference_id);
                     $variants = Varaint::where('master_model_lines_id', $item->reference_id)->get();
                     foreach ($variants as $variant) {
                         $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
