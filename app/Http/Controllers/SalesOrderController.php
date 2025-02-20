@@ -148,7 +148,7 @@ class SalesOrderController extends Controller
     }
     public function createsalesorder($callId) {
         info("reached");
-        info($request->all());
+        info($callId);
         $quotation = Quotation::where('calls_id', $callId)->first();
         $calls = Calls::find($callId);
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
