@@ -18,7 +18,7 @@ class ColorCode extends Model
     protected $fillable = [
         'name',
         'belong_to',
-        'parent',
+        'parent_colour_id',
         'created_by'
     ];
 

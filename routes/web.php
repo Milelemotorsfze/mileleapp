@@ -137,7 +137,7 @@ use App\Http\Controllers\ModeldescriptionController;
 use App\Http\Controllers\MasterGradeController;
 use App\Http\Controllers\CompanyDomainController;
 use App\Http\Controllers\MasterChargesController;
-
+use App\Http\Controllers\ParentColourController;
 use App\Models\Grn;
 
 /*
@@ -784,6 +784,10 @@ Route::get('/d', function () {
     Route::get('/view-log-details/{id}', [VehiclesController::class, 'viewLogDetails'])->name('vehicleslog.viewdetails');
     Route::resource('colourcode', ColorCodesController::class);
     Route::post('color-codes/check-name', [ColorCodesController::class, 'checkName'])->name('color-codes.check-name');
+
+    Route::get('/parentColours/fetch', [ParentColourController::class, 'fetch'])->name('parentColours.fetch');
+    Route::post('/parentColours/store', [ParentColourController::class, 'store'])->name('parentColours.store');    
+
     Route::post('/update-purchasing-data', [PurchasingOrderController::class, 'updatepurchasingData'])->name('purchasing.updateData');
     Route::post('/update-purchasing-status', [PurchasingOrderController::class, 'purchasingupdateStatus'])->name('purchasing.updateStatus');
     Route::resource('warehouse', WarehouseController::class);

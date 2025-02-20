@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Carbon\CarbonTimeZone;
 use App\Http\Controllers\UserActivityController;
 use App\Models\DpColorCode;
+use App\Models\ParentColour;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -33,51 +34,67 @@ class ColorCodesController extends Controller
     public function create()
     {
         (new UserActivityController)->createActivity('Open Create New Colour Code Page');
-        return view('colours.create');
+        $parentColours = ParentColour::all();
+
+        return view('colours.create', compact('parentColours'));
     }
 
     public function store(Request $request)
-{
-    Log::info('Received form data:', $request->all());
-    $request->validate([
-        'name' => 'required|string|max:255|unique:color_codes,name',
-        'belong_to' => 'required|string',
-        'parent' => 'required|string',
-        'color_codes' => 'nullable|array',
-        'color_codes.*' => 'string|distinct'
-    ], [
-        'name.unique' => 'The color name already exists.',
-    ]);
-
-    DB::beginTransaction();
-    try {
-        $colorCode = ColorCode::create([
-            'name' => $request->input('name'),
-            'belong_to' => $request->input('belong_to'),
-            'parent' => $request->input('parent'),
-            'created_by' => auth()->user()->id
+    {
+        Log::info('Received form data:', $request->all());
+        
+        $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                function ($attribute, $value, $fail) use ($request) {
+                    if (ColorCode::where('name', $value)
+                        ->where('belong_to', $request->belong_to)
+                        ->exists()
+                    ) {
+                        $fail('The color name already exists for the selected category.');
+                    }
+                },
+            ],
+            'belong_to' => 'required|string',
+            'parent_colour_id' => 'required|exists:parent_colours,id',
+            'color_codes' => 'nullable|array',
+            'color_codes.*' => 'string|distinct'
+        ], [
+            'name.unique' => 'The color name already exists.',
+            'parent_colour_id.required' => 'Please select a valid parent color.',
+            'parent_colour_id.exists' => 'Invalid parent color selected.',
         ]);
 
-        // Process color codes only if they are provided
-        if ($request->filled('color_codes')) {
-            foreach ($request->color_codes as $code) {
-                if (!empty($code)) {
-                    DpColorCode::create([
-                        'color_code_id' => $colorCode->id,
-                        'color_code_values' => $code,
-                        'created_by' => auth()->user()->id
-                    ]);
+        DB::beginTransaction();
+        try {
+            $colorCode = ColorCode::create([
+                'name' => $request->input('name'),
+                'belong_to' => $request->input('belong_to'),
+                'parent_colour_id' => $request->input('parent_colour_id'),
+                'created_by' => auth()->user()->id
+            ]);
+
+            if ($request->filled('color_codes')) {
+                foreach ($request->color_codes as $code) {
+                    if (!empty($code)) {
+                        DpColorCode::create([
+                            'color_code_id' => $colorCode->id,
+                            'color_code_values' => $code,
+                            'created_by' => auth()->user()->id
+                        ]);
+                    }
                 }
             }
-        }
 
-        DB::commit();
-        return redirect()->route('colourcode.index')->with('success', 'Color codes added successfully.');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return redirect()->back()->with('error', 'Failed to add color codes. Please try again.');
+            DB::commit();
+            return redirect()->route('colourcode.index')->with('success', 'Color codes added successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to add color codes. Please try again.');
+        }
     }
-}
 
 
 
@@ -97,30 +114,34 @@ class ColorCodesController extends Controller
     public function update(Request $request, string $id)
     {
         (new UserActivityController)->createActivity('Edit Colour Code');
-        $this->validate($request, [
-            'name' => 'string|required|max:255',
+    
+        $request->validate([
+            'name' => [
+                'string',
+                'required',
+                'max:255',
+                function ($attribute, $value, $fail) use ($request, $id) {
+                    if (ColorCode::where('name', $value)
+                        ->where('belong_to', $request->belong_to) // Consider belong_to
+                        ->where('id', '!=', $id) // Ignore current color
+                        ->exists()
+                    ) {
+                        $fail('The color name already exists for the selected category.');
+                    }
+                },
+            ],
             'belong_to' => 'required',
             'parent' => 'required',
-            // 'status' => 'required',
         ]);
-        $name = $request->input('name');
-        $belong_to = $request->input('belong_to');
-        $existingColour = ColorCode::where('name', $name)
-            ->where('belong_to', $belong_to)
-            ->where('id', '!=', $id)
-            ->where('code', $request->input('code'))
-            ->first();
-        if ($existingColour) {
-            return redirect()->back()->with('error', 'Color with the same name and Belong To already exists.');
-        }
+    
         $colourcodes = ColorCode::findOrFail($id);
         $oldValues = $colourcodes->toArray();
-
-        $colourcodes->name  = $name;
+    
+        $colourcodes->name  = $request->input('name');
         $colourcodes->code = $request->input('code');
-        $colourcodes->belong_to = $belong_to;
+        $colourcodes->belong_to = $request->input('belong_to');
         $colourcodes->parent = $request->input('parent');
-        // $colourcodes->status = $request->input('status');
+    
         $changes = [];
         foreach ($oldValues as $field => $oldValue) {
             if ($field !== 'created_at' && $field !== 'updated_at') {
@@ -133,7 +154,7 @@ class ColorCodesController extends Controller
                 }
             }
         }
-
+    
         if (!empty($changes)) {
             $colourcodes->save();
             $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
@@ -151,9 +172,10 @@ class ColorCodesController extends Controller
                 $colorlog->save();
             }
         }
-        $colorcodes = ColorCode::orderBy('id', 'DESC')->get();
-        return view('colours.index')->with(compact('colorcodes'))->with('success', 'Variant added successfully.');
+    
+        return redirect()->route('colourcode.index')->with('success', 'Color updated successfully.');
     }
+    
 
     public function destroy(string $id)
     {
@@ -162,7 +184,10 @@ class ColorCodesController extends Controller
 
     public function checkName(Request $request)
     {
-        $exists = ColorCode::where('name', $request->name)->exists();
+        $exists = ColorCode::where('name', $request->name)
+            ->where('belong_to', $request->belong_to)
+            ->exists();
+
         return response()->json(['exists' => $exists]);
     }
 }

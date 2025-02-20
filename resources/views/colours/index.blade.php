@@ -69,7 +69,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-color-code');
                         {{ $colorcode->belong_to ?? '' }}
                         @endif
                     </td>
-                    <td>{{ $colorcode->parent ?? '' }}</td>
+                    <td>{{ $colorcode->parentColour ?  $colorcode->parentColour->name : 'N/A' }}</td>
 
                     <td>
                         {{ $colorcode->createdBy ? $colorcode->createdBy->name : 'N/A' }}

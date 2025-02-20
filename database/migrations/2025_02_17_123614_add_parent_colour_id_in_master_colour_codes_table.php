@@ -6,20 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('color_codes', function (Blueprint $table) {
-            $table->bigInteger('parent_colour_id')->unsigned()->index()->nullable()->after('parent');
-            $table->foreign('parent_colour_id')->references('id')->on('parent_colours');
+            $table->dropColumn('parent');
+            $table->bigInteger('parent_colour_id')->unsigned()->nullable()->after('belong_to');
+            $table->foreign('parent_colour_id')->references('id')->on('parent_colours')->onDelete('set null');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('color_codes', function (Blueprint $table) {
