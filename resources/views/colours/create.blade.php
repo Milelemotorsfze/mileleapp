@@ -181,6 +181,7 @@
                 .done(function(response) {
                     if (response.status === 'success') {
                         console.log("In success of submit parent color name")
+                        $('#parent_colour_id').val(null).trigger('change');
                         $('#parent_colour_id').append(new Option(response.name, response.id, false, true)).trigger('change');
 
                         $('#addParentColorModal').modal('hide');
