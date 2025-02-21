@@ -1,4 +1,5 @@
 @extends('layouts.table')
+
 @section('content')
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-color-code');
@@ -6,17 +7,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-color-code');
 @if ($hasPermission)
 <div class="card-header">
     <h4 class="card-title">
-        Master Colours Info
-    </h4>
-    @can('create-color-code')
-    @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-color-code');
-    @endphp
-    @if ($hasPermission)
-    <a class="btn btn-sm btn-info float-end" href="{{ route('colourcode.create') }}"><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
-    @endif
-    @endcan
+        PFI Lists
+        @can('PFI-create')
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-create');
+        @endphp
+        @if ($hasPermission)
+        <a class="btn btn-sm btn-info float-end mr-3" href="{{ route('colourcode.create') }}">
+            <i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+        @endif
+        @endcan
+        <a class="btn btn-sm btn-primary float-end pr-3" style="margin-right:5px;" href="{{ route('colourcode.create') }}" title="PFI Item Lists">
+            <i class="fa fa-table" aria-hidden="true"></i> Parent Color List</a>
 </div>
+
 <div class="card-body">
     @if (count($errors) > 0)
     <div class="alert alert-danger">
@@ -39,7 +43,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-color-code');
         <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
             <thead class="bg-soft-secondary">
                 <tr>
-                    <th>id</th>
+                    <th>S.No.</th>
                     <th>Color Codes</th>
                     <th>Name</th>
                     <th>Belong To</th>
