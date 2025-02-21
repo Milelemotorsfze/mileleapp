@@ -1,23 +1,14 @@
 @extends('layouts.table')
 
 @section('content')
-@php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole('list-color-code');
-@endphp
-@if ($hasPermission)
+
 <div class="card-header">
     <h4 class="card-title">
-        PFI Lists
-        @can('PFI-create')
-        @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-create');
-        @endphp
-        @if ($hasPermission)
+        Color Codes List
         <a class="btn btn-sm btn-info float-end mr-3" href="{{ route('colourcode.create') }}">
             <i class="fa fa-plus" aria-hidden="true"></i> Create</a>
-        @endif
-        @endcan
-        <a class="btn btn-sm btn-primary float-end pr-3" style="margin-right:5px;" href="{{ route('colourcode.create') }}" title="PFI Item Lists">
+
+        <a class="btn btn-sm btn-primary float-end pr-3" style="margin-right:5px;" href="{{ route('parentColours.index') }}" title="Parent Color List">
             <i class="fa fa-table" aria-hidden="true"></i> Parent Color List</a>
 </div>
 
@@ -95,7 +86,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-color-code');
         </table>
     </div>
 </div>
-@endif
+
 
 <script>
     $(document).ready(function() {

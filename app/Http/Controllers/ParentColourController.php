@@ -13,11 +13,18 @@ class ParentColourController extends Controller
         return view('parentColours.index', compact('parentColours'));
     }
 
+
     public function create()
     {
         $parentColours = ParentColour::all();
-        dd($parentColours); 
+        dd($parentColours);
         return view('colours.create', compact('parentColours'));
+    }
+
+    public function getParentColour($id)
+    {
+        $parentColour = ParentColour::findOrFail($id);
+        return response()->json($parentColour);
     }
 
     public function store(Request $request)
@@ -29,13 +36,13 @@ class ParentColourController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
-                'message' => $validator->errors()->first() 
-            ], 422); 
+                'message' => $validator->errors()->first()
+            ], 422);
         }
 
         $parentColour = new ParentColour();
         $parentColour->name = $request->name;
-        $parentColour->created_by = auth()->user()->id; 
+        $parentColour->created_by = auth()->user()->id;
         $parentColour->save();
 
         return response()->json([
@@ -53,14 +60,20 @@ class ParentColourController extends Controller
         return view('parentColours.edit', compact('parentColour'));
     }
 
-    public function update(Request $request, ParentColour $parentColour)
+    public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|string|unique:parent_colours,name,' . $parentColour->id,
+            'name' => 'required|string|unique:parent_colours,name,' . $id,
         ]);
 
-        $parentColour->update($request->all());
-        return redirect()->route('parentColours.index')->with('success', 'Parent Colour updated successfully.');
+        $parentColour = ParentColour::findOrFail($id);
+        $parentColour->name = $request->name;
+        $parentColour->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Parent Colour updated successfully!'
+        ]);
     }
 
     public function fetch()
@@ -69,9 +82,14 @@ class ParentColourController extends Controller
         return response()->json($parentColours);
     }
 
-    public function destroy(ParentColour $parentColour)
+    public function destroy(Request $request, $id)
     {
-        $parentColour->delete(); 
-        return redirect()->route('parentColours.index')->with('success', 'Parent Colour deleted successfully.');
+        $parentColour = ParentColour::findOrFail($id);
+        $parentColour->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Parent Colour deleted successfully.'
+        ]);
     }
 }

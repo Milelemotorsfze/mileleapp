@@ -785,8 +785,14 @@ Route::get('/d', function () {
     Route::resource('colourcode', ColorCodesController::class);
     Route::post('color-codes/check-name', [ColorCodesController::class, 'checkName'])->name('color-codes.check-name');
 
+    
+    Route::get('/parentColours', [ParentColourController::class, 'index'])->name('parentColours.index');
     Route::get('/parentColours/fetch', [ParentColourController::class, 'fetch'])->name('parentColours.fetch');
-    Route::post('/parentColours/store', [ParentColourController::class, 'store'])->name('parentColours.store');    
+    Route::post('/parentColours/store', [ParentColourController::class, 'store'])->name('parentColours.store');
+    Route::get('/parentColours/{id}/edit', [ParentColourController::class, 'getParentColour'])->name('parentColours.get');
+    Route::post('/parentColours/{id}/update', [ParentColourController::class, 'update'])->name('parentColours.update');
+    Route::delete('/parentColours/{id}', [ParentColourController::class, 'destroy'])->name('parentColours.destroy');
+
 
     Route::post('/update-purchasing-data', [PurchasingOrderController::class, 'updatepurchasingData'])->name('purchasing.updateData');
     Route::post('/update-purchasing-status', [PurchasingOrderController::class, 'purchasingupdateStatus'])->name('purchasing.updateStatus');
