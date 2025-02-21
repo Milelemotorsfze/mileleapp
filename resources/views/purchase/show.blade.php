@@ -4287,12 +4287,14 @@ function confirmPayment(status, orderId, current_amount, totalamount, remainingA
     ];
 }));
 $('.updatevariant-btn').click(function(e){
+    indo("clicked");
     e.preventDefault();
     var id = $(this).data('id');
     $.ajax({
         url: '{{ route("vehicles.vehiclesdatagettingvariants", ["id" => ":id"]) }}'.replace(':id', id),
         method: 'GET',
         success: function(response) {
+            console.log(response);
             var tableId = 'dtBasicExample8_' + id; // Unique table ID
             var tableHtml = '<div class="table-responsive"><table id="' + tableId + '" class="table table-striped table-editable table-edits table-bordered"><thead class="bg-soft-secondary"><tr><th>Ref No</th><th>VIN</th><th>Variant</th><th>New Variant</th></tr></thead><tbody>';
             $.each(response, function(index, vehicle) {
