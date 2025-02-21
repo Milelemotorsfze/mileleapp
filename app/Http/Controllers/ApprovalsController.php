@@ -1416,6 +1416,7 @@ class ApprovalsController extends Controller
                     'purchasing_order.po_number',
                     'vehicle_variant_histories.varaints_old',
                     'vehicle_variant_histories.varaints_new',
+                    DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as grn_date"),
                 ])
                 ->leftJoin('vehicle_variant_histories', 'vehicle_variant_histories.vehicles_id', '=', 'vehicles.id')
                 ->leftJoin('grn', 'grn.id', '=', 'vehicles.grn_id')
@@ -1445,7 +1446,8 @@ class ApprovalsController extends Controller
                 'purchasing_order.po_number',
                 'vehicle_variant_histories.varaints_old',
                 'vehicle_variant_histories.varaints_new',
-                'grn.grn_number'
+                'grn.grn_number',
+                DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as grn_date"),
             ])
             ->leftJoin('vehicle_variant_histories', 'vehicle_variant_histories.vehicles_id', '=', 'vehicles.id')
             ->leftJoin('grn', 'grn.id', '=', 'vehicles.grn_id')
