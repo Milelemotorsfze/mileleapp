@@ -1,5 +1,9 @@
 @extends('layouts.main')
 <style>
+.error {
+    color: red;
+}
+
     .heading-background {
   display: inline-block;
   background-color: #f2f2f2;

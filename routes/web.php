@@ -138,6 +138,7 @@ use App\Http\Controllers\MasterGradeController;
 use App\Http\Controllers\CompanyDomainController;
 use App\Http\Controllers\MasterChargesController;
 
+use App\Models\Grn;
 
 /*
 /*
@@ -523,7 +524,12 @@ Route::get('/d', function () {
     Route::put('companyDomains/{id}', [CompanyDomainController::class, 'update'])->name('companyDomains.update');
     Route::delete('companyDomains/{id}', [CompanyDomainController::class, 'destroy'])->name('companyDomains.destroy');
     Route::get('companyDomains', [CompanyDomainController::class, 'index'])->name('companyDomains.index');    
-    
+
+    // GRN List 
+    Route::get('/grn-list', function () {
+        $grns = Grn::with('vehicles')->get();
+        return view('grn_list.index', compact('grns'));
+    })->name('grn.index');   
     
     // Demand & Planning Module
 
@@ -1158,9 +1164,9 @@ Route::get('/d', function () {
     Route::resource('modeldescription', ModeldescriptionController::class);
     Route::resource('mastergrade', MasterGradeController::class);
     Route::resource('master-charges', MasterChargesController::class);
-    // 
     Route::get('/transfer_copy/send-email-to-supplier', [PurchasingOrderController::class, 'sendTransferCopy'])
     ->name('send-transfer-copy.email');
     Route::get('/swift_copy/send-email-to-supplier', [PurchasingOrderController::class, 'sendSwiftCopy'])
     ->name('send-swift-copy.email');
+    Route::post('/check-vehicle-quantity', [VehiclesController::class, 'checkVehicleQuantity'])->name('check.vehicle.quantity');
 });

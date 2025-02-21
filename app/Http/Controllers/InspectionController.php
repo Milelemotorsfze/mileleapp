@@ -31,6 +31,7 @@ use App\Models\ModelSpecification;
 use App\Models\ModelSpecificationOption;
 use App\Models\VariantItems;
 use App\Models\Variantlog;
+use Illuminate\Support\Facades\Log;
 
 class InspectionController extends Controller
 {
@@ -335,6 +336,9 @@ class InspectionController extends Controller
     }
     public function update(Request $request, $id)
     {
+        try{
+    
+        DB::beginTransaction();
         $useractivities =  New UserActivities();
         $useractivities->activity = "Update the Pending Inspection Submit for Approval";
         $useractivities->users_id = Auth::id();
@@ -359,6 +363,10 @@ class InspectionController extends Controller
         $newfeatures->vehicle_id = $id;
         $newfeatures->save();
         $selectedSpecifications = json_decode(request('selected_specifications'), true);
+
+        if (empty($selectedSpecifications)) {
+            return redirect()->back()->with('error', 'No specifications selected.');
+        }
         ksort($selectedSpecifications);
         $variant_request = new VariantRequest();
         $variant_request->brands_id = $request->input('brands_id');
@@ -376,12 +384,17 @@ class InspectionController extends Controller
         $variant_request->save(); 
         $variant_requestId = $variant_request->id;
         foreach ($selectedSpecifications as $specificationData) {
-        $specification = new VariantRequestItems();
-        $specification->variant_request_id = $variant_requestId;
-        $specification->model_specification_id = $specificationData['specification_id'];
-        $specification->model_specification_options_id = $specificationData['value'];
-        $specification->save();
-        }
+            $existingSpecification = VariantRequestItems::where('variant_request_id', $variant_requestId)
+                ->where('model_specification_id', $specificationData['specification_id'])
+                ->exists();
+            if (!$existingSpecification) {
+                $specification = new VariantRequestItems();
+                $specification->variant_request_id = $variant_requestId;
+                $specification->model_specification_id = $specificationData['specification_id'];
+                $specification->model_specification_options_id = $specificationData['value'];
+                $specification->save();
+            }
+        }        
             $extraItems = [
                 'packing',
                 'warningtriangle',
@@ -447,7 +460,15 @@ class InspectionController extends Controller
             ];
             Incident::create($incidentData);
         }
+        DB::commit();
         return redirect()->route('inspection.index')->with('success', 'Vehicle Inspection successfully Done.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Inspection Creation failed', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Vehicle Inspection Creation failed.');
+        }
+       
     }
     public function reshow($id)
     {

@@ -1,4 +1,12 @@
 @extends('layouts.main')
+
+<style>
+    .custom-error {
+        color: red;
+        margin-top: 10px !important;
+    }
+</style>
+
 @section('content')
     @can('edit-master-models')
     @php
@@ -58,6 +66,9 @@
                         <input type="text" class="form-control" id="model-year" @if($disableEdit == 1) disabled title="Not allowed to edit! model already used in LOI/PFI/PO" @endif 
                         name="model_year" placeholder="Enter Model Year">
                     </div>
+                    @if($disableEdit == 1)
+                            <input type="hidden" name="model_year" value="{{ $masterModel->model_year }}">
+                        @endif
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
@@ -86,12 +97,15 @@
                     <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">Variant</label>
                         <select class="form-control" name="variant_id" @if($disableVariantEdit == 1) disabled title="Not allowed to edit! already used in LOI/PFI/PO" @else 
-                        title="Variant" @endif id="variant_id">
+                        title="Variant is missing" @endif id="variant_id">
                             <option></option>
                             @foreach($variants as $variant)
                                 <option value="{{ $variant->id }}" {{$masterModel->variant_id == $variant->id ? 'selected' : " "}}>{{$variant->name}}</option>
                             @endforeach
                         </select>
+                        @if($disableEdit == 1)
+                            <input type="hidden" name="variant_id" value="{{ $masterModel->variant_id }}">
+                        @endif
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
@@ -318,6 +332,14 @@
                     required: true,
                 },
             },
+            errorPlacement: function(error, element) {
+                error.addClass('custom-error');
+                if (element.attr("name") === "variant_id") {
+                    error.insertAfter(element.next('.select2'));
+                } else {
+                    error.insertAfter(element);
+                }
+            }
         });
         function showOrHideLoiDescription() {
             let variantId = $("#variant_id").val();

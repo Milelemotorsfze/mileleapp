@@ -9,6 +9,10 @@
         max-width: 100%;
         object-fit: contain;
     }
+    #more-dropdown-menu .dropdown .dropdown-menu {
+        left: inherit !important;
+        right: 100% !important;
+    }
 
     @supports (-webkit-touch-callout: none) {
         .logo-img {
@@ -17,7 +21,29 @@
             object-fit: contain;
        }
     }
+
+    .dropdown-item:hover {
+        background-color: #1c6192 !important;
+        color: white !important;
+    }
     
+    .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+	/* color: black!important; */
+	/* background-image: linear-gradient(to right,#4ba6ef,#4ba6ef,#0065ac)!important; */
+	background: #072c47 !important;
+	}
+
+    .nav-item.dropdown.active {
+        background-color:rgba(7, 44, 71, 0.88);
+    }
+
+    .nav-item.dropdown.active .nav-link.dropdown-toggle.arrow-none.active {
+        color: white !important;
+    }
+    .nav-item.dropdown.active .nav-link.dropdown-toggle.arrow-none {
+        color: white !important;
+    }
+
     .badge-notification {
       top: -20;
       right: 0;
@@ -56,6 +82,16 @@
 
     .container, .main-wrapper, .navbar, .header {
         overflow: visible !important; 
+    }
+
+    .username-toggle {
+        background-color: #072c47 !important;
+    }
+
+    .rolename-toggle {
+        background-color: #072c47 !important;
+        border-color: #4ba6ef !important;
+
     }
 
     @media (max-width: 991.99px) {
@@ -149,7 +185,7 @@
     <div class="row topnav">
         <!-- <div class="topnav" style="overflow: unset;"> -->
 
-        <div class="col-9 col-sm-9 col-md-9 col-lg-9 col-xl-9 navbar-menus-main-div">
+        <div class="col-xl-9 col-lg-9 col-md-9 col-sm-9 col-6 navbar-menus-main-div">
 
             <button type="button" class="btn btn-sm px-2 font-size-16 d-lg-none header-item waves-effect waves-light text-dark" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
                 <i class="fa fa-fw fa-bars"></i>
@@ -1242,6 +1278,20 @@
                                 @endcanany
                                             <!-- po end -->
 
+                                @can('view-po-details')
+                                @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po-details');
+                                @endphp
+                                @if ($hasPermission)
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('grn.index') }}" id="topnav-more" role="button">
+                                        <i data-feather="command"></i>
+                                        <span data-key="t-extra-pages">GRN</span>
+                                    </a>
+                                </li>
+                                @endif
+                                @endcan
+
                                               <!-- LOI -->
                                 @canany(['LOI-create','LOI-list','list-loi-expiry-conditions','loi-restricted-country-list'])
                                 @php
@@ -2166,7 +2216,7 @@
         </div>
         <!-- </div> -->
 
-        <div class="col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3  rolename-username-main-div">
+        <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-6 rolename-username-main-div">
             <div class="dropdown d-flex align-items-center justify-content-center more-button-username-rolename-container">
 
                 <!-- First div with three dots -->
@@ -2200,7 +2250,7 @@
 
                 <!-- Third div with username -->
                 <div class="nav-item dropdown username-button" id="username-dropdown-button">
-                    <button class="btn username-toggle header-item bg-soft-light border-start border-end" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height: 55px;">
+                    <button class="btn username-toggle header-item bg-soft-light" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height: 55px;">
                         <img class="rounded-circle header-profile-user" src="{{ auth()->user()->empProfile && auth()->user()->empProfile->image_path ? asset(auth()->user()->empProfile->image_path) : asset('images/users/avatar-1.jpg') }}" alt="Header Avatar" style="float: left;padding: 0px!important;">
                         <span class="d-none d-xl-inline-block fw-medium user-textname-div" style="line-height: 35px;">
                             @php

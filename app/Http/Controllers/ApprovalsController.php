@@ -170,6 +170,7 @@ class ApprovalsController extends Controller
      */
     public function show($id)
     {
+      
     $useractivities =  New UserActivities();
     $useractivities->activity = "Open the Approval Page For Approval";
     $useractivities->users_id = Auth::id();
@@ -195,6 +196,7 @@ class ApprovalsController extends Controller
     $extvehicle = ColorCode::find($vehicle->ex_colour);
     $extmaster = ColorCode::where('belong_to', 'ex')->get();
     $variant_request = VariantRequest::where('inspection_id', $id)->first();
+  
     $variantRequestItems = VariantRequestItems::where('variant_request_id', $variant_request->id)->get();
     $data = [];
     foreach ($variantRequestItems as $item) {
@@ -209,14 +211,20 @@ class ApprovalsController extends Controller
             ];
         }
     }
+   
     $brands = Brand::find($variant_request->brands_id);
+
     $modal = MasterModelLines::find($variant_request->master_model_lines_id);
     $intrequest = ColorCode::find($variant_request->int_colour);
     $extrequest = ColorCode::find($variant_request->ex_colour);
     $extraItems = DB::table('vehicles_extra_items')
         ->where('vehicle_id', $inspection->vehicle_id)
         ->get(['item_name', 'qty']);
-    return view('inspection.approvalview', compact('extmaster','intmaster','intrequest','extrequest','modal','model_lines','data','allBrands','brands','variant_request','Incidentpicturelink','modificationpicturelink','PDIpicturelink', 'secgdnpicturelink', 'gdnpicturelink', 'secgrnpicturelink', 'grnpicturelink', 'extraItems','inspection', 'vehicle', 'variant', 'brand', 'model_line', 'vehiclecolour', 'extvehicle','Incident', 'extra_featuresvalue'));
+      
+    return view('inspection.approvalview', compact('extmaster','intmaster','intrequest','extrequest','modal','model_lines','data',
+    'allBrands','brands','variant_request','Incidentpicturelink','modificationpicturelink','PDIpicturelink',
+     'secgdnpicturelink', 'gdnpicturelink', 'secgrnpicturelink', 'grnpicturelink', 'extraItems','inspection', 
+     'vehicle', 'variant', 'brand', 'model_line', 'vehiclecolour', 'extvehicle','Incident', 'extra_featuresvalue'));
     }
 
     /**
@@ -514,6 +522,8 @@ class ApprovalsController extends Controller
         return response()->json(['message' => 'Data saved successfully']);
     }
     public function approveInspection(Request $request) {
+
+        
         $currentDate = Carbon::now();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -1017,7 +1027,7 @@ class ApprovalsController extends Controller
                 $vehicleslog->new_value = $newVariantName;
                 $vehicleslog->created_by = auth()->user()->id;
                 $vehicleslog->save();
-                $vehicles = Vehicles::where('id', $inspection->vehicle_id);
+                $vehicles = Vehicles::where('id', $inspection->vehicle_id)->first();
                 $purchasingOrder = PurchasingOrder::where('id', $vehicles->purchasing_order_id)->first();
                 $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
                 $vehiclesVIN = $vehicles->vin;

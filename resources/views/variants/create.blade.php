@@ -1,4 +1,13 @@
 @extends('layouts.main')
+
+<style>
+    .custom-error {
+        color: red;
+        margin-top: 10px !important;
+    }
+</style>
+
+
 @section('content')
     @can('variants-create')
         @php
@@ -306,6 +315,14 @@
                 brands_id:{
                     required:true,
                 },
+            },
+            errorPlacement: function(error, element) {
+                error.addClass('custom-error');
+                if (element.attr("name") === "master_model_lines_id") {
+                    error.insertAfter(element.next('.select2'));
+                } else {
+                    error.insertAfter(element);
+                }
             }
         });
     </script>

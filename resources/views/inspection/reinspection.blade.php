@@ -156,8 +156,8 @@
                 <td>Gear</td>
                 <td>
                     <select class="form-control" name="gearbox">
-                    <option value="Auto" @if($variant_request->upholestry == 'Auto') selected @endif>Auto</option>
-                    <option value="Manual" @if($variant_request->upholestry == 'Manual') selected @endif>Manual</option>
+                    <option value="Auto" @if($variant_request->gearbox == 'AT') selected @endif>Auto</option>
+                    <option value="Manual" @if($variant_request->gearbox == 'MT') selected @endif>Manual</option>
                  </select>
                 </td>
             </tr>
@@ -183,7 +183,7 @@
                 <td>
                     <select class="form-control" name="int_colour">
                     @foreach($intColorall as $intColorall)
-                    <option value="{{$intColorall->id}}" @if($intColorall->id == $intColorr->id) selected @endif>
+                    <option value="{{$intColorall->id}}" @if($intColorr && $intColorall->id == $intColorr->id) selected @endif>
                     {{$intColorall->name}}
                     </option>
                     @endforeach
@@ -195,7 +195,7 @@
                 <td>
                     <select class="form-control" name="ex_colour">
                     @foreach($extColorall as $exColorall)
-                    <option value="{{$exColorall->id}}" @if($exColorall->id == $extColorr->id) selected @endif>
+                    <option value="{{$exColorall->id}}" @if($extColorr && $exColorall->id == $extColorr->id) selected @endif>
                     {{$exColorall->name}}
                     </option>
                     @endforeach

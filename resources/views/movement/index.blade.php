@@ -103,7 +103,7 @@
                         <td>{{$vehicles}}</td>
                         @php
                         $created_bys = DB::table('users')->where('id', $movementreference->created_by)->first();
-                        $created_by = $created_bys->name;
+                        $created_by = $created_bys->name ?? '';
                         @endphp
                         <td>{{ $created_by }}</td>
                         <td class="createdDated">{{ date('d-M-Y', strtotime($movementreference->created_at)) }}</td>

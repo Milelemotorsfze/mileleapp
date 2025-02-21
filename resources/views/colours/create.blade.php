@@ -1,4 +1,11 @@
 @extends('layouts.main')
+
+<style>
+.error {
+    color: red;
+}
+</style>
+
 @section('content')
 @can('create-color-code')
     @php
