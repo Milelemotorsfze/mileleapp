@@ -4287,7 +4287,7 @@ function confirmPayment(status, orderId, current_amount, totalamount, remainingA
     ];
 }));
 $('.updatevariant-btn').click(function(e){
-    indo("clicked");
+    console.log("clicked");
     e.preventDefault();
     var id = $(this).data('id');
     $.ajax({
