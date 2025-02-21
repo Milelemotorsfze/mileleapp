@@ -35,20 +35,21 @@ class MovementController extends Controller
      */
     public function index(Request $request, Builder $builder)
 {
+  
     $movementreference = MovementsReference::get();
     $vehicles = Vehicles::whereNotNull('vin')
         ->where('status', '!=', 'cancel')
         ->pluck('vin', 'varaints_id');
 
-          // $movementstest = Movement::select('movements.*')
-        // ->join('movements_reference as mr', function ($join) {
-        //     $join->on('mr.id', '=', 'movements.reference_id')
-        //         ->whereRaw('mr.date = (SELECT MAX(date) FROM movements_reference WHERE id = movements.reference_id)');
-        // })
-        // ->orderByDesc('mr.date')
     $warehouses = Warehouse::select('id', 'name')->get();
     if ($request->ajax()) {
-        $movementsQuery = Movement::query();
+        $movementsQuery = Movement::select('movements.*')
+                        ->join('movements_reference as mr', function ($join) {
+                            $join->on('mr.id', '=', 'movements.reference_id')
+                                ->whereRaw('mr.date = (SELECT MAX(date) FROM movements_reference WHERE id = movements.reference_id)');
+                        })
+                        ->orderByDesc('mr.date');
+                        
         foreach ($request->input('columns') as $column) {
             $searchValue = $column['search']['value'];
             $columnName = $column['name'];
