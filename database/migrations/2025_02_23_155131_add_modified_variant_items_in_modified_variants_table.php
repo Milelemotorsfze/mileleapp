@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('modified_variants', function (Blueprint $table) {
-            $table->bigInteger('modified_variant_items')->unsigned()->index()->nullable()->after('base_variant_id');
+            $table->bigInteger('modified_variant_items')->unsigned()->index()->nullable()->after('base_varaint_id');
             $table->foreign('modified_variant_items')->references('id')->on('model_specification');
         });
     }
