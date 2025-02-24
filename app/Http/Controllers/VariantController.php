@@ -735,7 +735,6 @@ public function savespecification(Request $request)
     {
 
         DB::beginTransaction();
-        info($request->all());
         $matchingerror = "";
         $masterModelLineId = $request->input('master_model_lines_id');
         $variant = $request->input('varaint');
@@ -759,8 +758,7 @@ public function savespecification(Request $request)
             $attributesCount = 0;  
         }
         $modified_variant_ids = ModifiedVariants::where('base_varaint_id', $variant)->groupBy('modified_varaint_id')->pluck('modified_varaint_id');
-       info("modified variant id");
-       info($modified_variant_ids);
+
         $existingVariant = [];
         $maxExistingVariantCount = 0;
         if($modified_variant_ids)
@@ -795,7 +793,6 @@ public function savespecification(Request $request)
         }
         else
         {
-            info("count not equal");
             $existingVariantsname = ModifiedVariants::where('base_varaint_id', $variant)->latest()->first();
             if($existingVariantsname)
             {
@@ -827,10 +824,8 @@ public function savespecification(Request $request)
             $newvariant->created_by = auth()->user()->id;
             $newvariant->category = "Modified";
             $newvariant->save();
-            info($newvariant->id);
             if($attributes)
             {
-                info("attributes");
                 $count = count($attributes);
                 if($count >= 1)
                 {
@@ -863,7 +858,6 @@ public function savespecification(Request $request)
             }
             if(!$spareparts && !$attributes)
             {
-                info("not spare part and attribute");
             $newModifiedVariantvps = new ModifiedVariants();
             $newModifiedVariantvps->name = $nextVariantName;
             $newModifiedVariantvps->base_varaint_id = $variantfull->id;

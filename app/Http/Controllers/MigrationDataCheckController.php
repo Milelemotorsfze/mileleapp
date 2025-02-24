@@ -21,6 +21,8 @@ use App\Models\VariantRequestItems;
 use App\Models\VehicleApprovalRequests;
 use App\Models\VehicleExtraItems;
 use Carbon\Carbon;
+use App\Models\ModelSpecification;
+use App\Models\ModifiedVariants;
 
 use Illuminate\Http\Request;
 
@@ -31,20 +33,16 @@ class MigrationDataCheckController extends Controller
       */
     public function index(Request $request)
     {
-        // $inspections = Inspection::whereNot('stage','PDI')->get();
+        $modified_variants = ModifiedVariants::all();
         
-        // $missingIds = [];
-        // foreach($inspections as $inspection) {
-        //    $isExist = VariantRequest::where('inspection_id', $inspection->id)->first();
-        //     if(!$isExist){
-        //         $missingIds[] = $inspection->id;
-        //     }
-        // }
-        // return $missingIds;
-        
-      
-
-    
+        $missingIds = [];
+        foreach($modified_variants as $modified_variant) {
+           $isExist = ModelSpecification::where('id', $modified_variant->modified_variant_items)->first();
+            if(!$isExist){
+                $missingIds[] = $modified_variant->id;
+            }
+        }
+        return $missingIds;
     }
 
     public function PFIUniqueWithinYear() {
