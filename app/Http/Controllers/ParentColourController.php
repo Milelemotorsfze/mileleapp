@@ -9,7 +9,7 @@ class ParentColourController extends Controller
 {
     public function index()
     {
-        $parentColours = ParentColour::all();
+        $parentColours = ParentColour::orderBy('updated_at', 'desc')->get();
         return view('parentColours.index', compact('parentColours'));
     }
 
@@ -85,11 +85,21 @@ class ParentColourController extends Controller
     public function destroy(Request $request, $id)
     {
         $parentColour = ParentColour::findOrFail($id);
+
+        $linkedColorCodes = $parentColour->colourCodes()->exists();
+
+        if ($linkedColorCodes) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'This Parent Color is linked with other color codes. Please remove the associations before deleting.'
+            ], 422);
+        }
+
         $parentColour->delete();
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Parent Colour deleted successfully.'
+            'message' => 'Parent Color deleted successfully!'
         ]);
     }
 }

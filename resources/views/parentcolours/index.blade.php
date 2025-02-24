@@ -10,7 +10,7 @@
 
 <div class="card-header">
     <h4 class="card-title">
-        Parent Color List
+        Parent Colors List
         <a class="btn btn-sm btn-info float-end mr-3" href="#" data-bs-toggle="modal" data-bs-target="#addParentColorModal">
             <i class="fa fa-plus" aria-hidden="true"></i> Add Parent Color
         </a>
@@ -28,7 +28,7 @@
     @endif
 
     <div class="table-responsive">
-        <table id="parentColorsTable" class="table table-striped table-bordered">
+        <table id="parentColorsTable" class="table table-striped table-editable table-edits table">
             <thead class="bg-soft-secondary">
                 <tr>
                     <th>S.No.</th>
@@ -40,7 +40,7 @@
             <tbody>
                 @foreach ($parentColours as $key => $parentColour)
                 <tr>
-                    <td>{{ $key + 1 }}</td>
+                    <td>{{ $parentColour->id }}</td>
                     <td>{{ $parentColour->name }}</td>
                     <td>{{ $parentColour->createdBy ? $parentColour->createdBy->name : 'N/A' }}</td>
                     <td>
@@ -59,7 +59,6 @@
 
     @include('parentcolours.modal_add')
 
-    <!-- Edit Modal -->
     <div class="modal fade" id="editParentColorModal" tabindex="-1" role="dialog" aria-labelledby="editParentColorModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <form id="form-edit-parent-color" method="POST">
@@ -94,18 +93,7 @@
         $('#parentColorsTable').DataTable({
             "order": [],
             "paging": true,
-            "searching": true,
-            "columnDefs": [{
-                "orderable": false,
-                "targets": 3
-            }],
-            "language": {
-                "search": "Search Parent Color:",
-                "paginate": {
-                    "previous": "Previous",
-                    "next": "Next"
-                }
-            }
+            "searching": true
         });
     });
 </script>
@@ -142,7 +130,7 @@
     }
 
     function attachAutoFormat(inputSelector) {
-        $(inputSelector).on('input', function() {
+        $(inputSelector).on('blur', function() {
             let formatted = formatColorName($(this).val());
             $(this).val(formatted);
         });
@@ -178,7 +166,7 @@
             });
         });
 
-        $('.edit-parent-color').on('click', function() {
+        $(document).on('click', '.edit-parent-color', function() {
             let id = $(this).data('id');
 
             $.ajax({
@@ -190,6 +178,35 @@
                     $('#editParentColorModal').modal('show');
                 }
             });
+        });
+
+        $(document).on('click', '.delete-parent-color', function() {
+            let id = $(this).data('id');
+            let token = '{{ csrf_token() }}';
+
+            if (confirm('Are you sure you want to delete this Parent Color?')) {
+                $.ajax({
+                    url: '{{ route("parentColours.destroy", ":id") }}'.replace(':id', id),
+                    type: 'DELETE',
+                    data: {
+                        _token: token
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            alert(response.message);
+                            location.reload();
+                        }
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422) {
+                            let errorMessage = xhr.responseJSON.message;
+                            alert(errorMessage);
+                        } else {
+                            alert('An error occurred while deleting the parent color.');
+                        }
+                    }
+                });
+            }
         });
 
         $('#form-edit-parent-color').on('submit', function(e) {

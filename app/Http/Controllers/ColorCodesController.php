@@ -18,7 +18,7 @@ class ColorCodesController extends Controller
     public function index()
     {
         (new UserActivityController)->createActivity('Open Colour Code Information Page');
-        $colorcodes = ColorCode::with(['dpColorCodes', 'createdBy'])->orderBy('color_codes.id', 'DESC')->get();
+        $colorcodes = ColorCode::with(['dpColorCodes', 'createdBy'])->orderBy('updated_at', 'DESC')->get();
 
         foreach ($colorcodes as $colorcode) {
             $dpCodes = $colorcode->dpColorCodes->pluck('color_code_values')->join(', ');
