@@ -16,6 +16,7 @@ use App\Models\LetterOfIndentDocument;
 use Illuminate\Support\Facades\File;
 use App\Models\ClientDocument;
 use App\Models\Inspection;
+use App\Models\Varaint;
 use App\Models\VariantRequest;
 use App\Models\VariantRequestItems;
 use App\Models\VehicleApprovalRequests;
@@ -25,6 +26,7 @@ use App\Models\ModelSpecification;
 use App\Models\ModifiedVariants;
 use App\Models\MasterModelDescription;
 use App\Models\WOVehicles;
+use App\Models\Vehicles;
 
 use Illuminate\Http\Request;
 
@@ -47,14 +49,32 @@ class MigrationDataCheckController extends Controller
         // return $missingIds;
 
         // update model description in w_o_vehicles table
-        $w_o_vehicles = WOVehicles::all();
-        foreach($w_o_vehicles as $w_o_vehicle) {
-            $modelDescription = MasterModelDescription::where('model_description', $w_o_vehicle->model_description)->first();
-            if($modelDescription) {
-                $w_o_vehicle->model_description_id = $modelDescription->id;
-                $w_o_vehicle->save();
-            }else{
-                $missingIds[] = $w_o_vehicle->id;
+        // $w_o_vehicles = WOVehicles::all();
+        // foreach($w_o_vehicles as $w_o_vehicle) {
+        //     $vehicle = Vehicles::find($w_o_vehicle->vehicle_id);
+        //     if($vehicle) {
+        //        $variant = Varaint::find($vehicle->varaints_id);
+        //        if($variant) {
+        //             $modelDescription = MasterModelDescription::where('model_description', $variant->model_detail)->first();
+        //             if($modelDescription) {
+        //                 $w_o_vehicle->model_description_id = $modelDescription->id;
+        //                 $w_o_vehicle->save();
+        //             }else{
+        //                 $missingIds[] = $w_o_vehicle->id;
+        //             }
+                   
+        //        }
+                
+        //     }
+        //     // info($modelDescription);
+
+        // }
+
+        $variants = Varaint::all();
+        foreach($variants as $variant) {
+            $modelDescription = MasterModelDescription::where('model_description', $variant->model_detail)->first();
+            if(!$modelDescription) {
+                $missingIds[] = $variant->id;
             }
         }
 
