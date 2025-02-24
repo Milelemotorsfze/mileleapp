@@ -1530,11 +1530,11 @@ public function submitGrn(Request $request)
             'message' => 'Vehicle not found',
         ], 404);
     }
-
+    $oldgrn = Grn::where('id', $vehicle->grn_id)->first();
     // Create new GRN record
     $grnRecord = new Grn();
     $grnRecord->grn_number = $request->grn;
-    $grnRecord->date = now(); // Assuming you want to use the current date
+    $grnRecord->date = $oldgrn->date;
     $grnRecord->save();
 
     // Associate the GRN with the vehicle
