@@ -23,6 +23,8 @@ use App\Models\VehicleExtraItems;
 use Carbon\Carbon;
 use App\Models\ModelSpecification;
 use App\Models\ModifiedVariants;
+use App\Models\MasterModelDescription;
+use App\Models\WOVehicles;
 
 use Illuminate\Http\Request;
 
@@ -33,16 +35,31 @@ class MigrationDataCheckController extends Controller
       */
     public function index(Request $request)
     {
-        $modified_variants = ModifiedVariants::all();
+        // $modified_variants = ModifiedVariants::all();
         
         $missingIds = [];
-        foreach($modified_variants as $modified_variant) {
-           $isExist = ModelSpecification::where('id', $modified_variant->modified_variant_items)->first();
-            if(!$isExist){
-                $missingIds[] = $modified_variant->id;
+        // foreach($modified_variants as $modified_variant) {
+        //    $isExist = ModelSpecification::where('id', $modified_variant->modified_variant_items)->first();
+        //     if(!$isExist){
+        //         $missingIds[] = $modified_variant->id;
+        //     }
+        // }
+        // return $missingIds;
+
+        // update model description in w_o_vehicles table
+        $w_o_vehicles = WOVehicles::all();
+        foreach($w_o_vehicles as $w_o_vehicle) {
+            $modelDescription = MasterModelDescription::where('model_description', $w_o_vehicle->model_description)->first();
+            if($modelDescription) {
+                $w_o_vehicle->model_description_id = $modelDescription->id;
+                $w_o_vehicle->save();
+            }else{
+                $missingIds[] = $w_o_vehicle->id;
             }
         }
+
         return $missingIds;
+
     }
 
     public function PFIUniqueWithinYear() {
