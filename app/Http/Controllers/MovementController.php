@@ -35,13 +35,21 @@ class MovementController extends Controller
      */
     public function index(Request $request, Builder $builder)
 {
+  
     $movementreference = MovementsReference::get();
     $vehicles = Vehicles::whereNotNull('vin')
         ->where('status', '!=', 'cancel')
         ->pluck('vin', 'varaints_id');
+
     $warehouses = Warehouse::select('id', 'name')->get();
     if ($request->ajax()) {
-        $movementsQuery = Movement::query();
+        $movementsQuery = Movement::select('movements.*')
+                        ->join('movements_reference as mr', function ($join) {
+                            $join->on('mr.id', '=', 'movements.reference_id')
+                                ->whereRaw('mr.date = (SELECT MAX(date) FROM movements_reference WHERE id = movements.reference_id)');
+                        })
+                        ->orderByDesc('mr.date');
+                        
         foreach ($request->input('columns') as $column) {
             $searchValue = $column['search']['value'];
             $columnName = $column['name'];
@@ -85,10 +93,16 @@ class MovementController extends Controller
         }
         return DataTables::of($movementsQuery)
             ->addColumn('date', function ($movement) {
-                return date('d-M-Y', strtotime($movement->Movementrefernce->date));
+                if($movement->Movementrefernce->date) {
+                    return date('d-M-Y', strtotime($movement->Movementrefernce->date));
+                }
+                return "";
             })
             ->addColumn('created_at', function ($movement) {
-                return date('d-M-Y', strtotime($movement->Movementrefernce->created_at));
+                if($movement->Movementrefernce->created_at) {
+                    return date('d-M-Y', strtotime($movement->Movementrefernce->created_at));
+                }
+                return "";
             })
             ->addColumn('model_detail', function ($movement) {
                 return $movement->vehicle->variant->model_detail ?? '';
@@ -139,7 +153,7 @@ class MovementController extends Controller
             })
             ->where('status', '=', 'Approved')
             ->pluck('vin');
-    $purchasing_order = PurchasingOrder::where('status', 'Approved')
+            $purchasing_order = PurchasingOrder::where('status', 'Approved')
             ->whereHas('vehicles', function ($query) {
             $query->whereNotNull('vin')
             // ->where(function ($query) {
@@ -148,24 +162,24 @@ class MovementController extends Controller
             // })
             ->where('status', 'Approved');
             })
-    ->get();
-    $po = PurchasingOrder::where('status', 'Approved')
-    ->whereDoesntHave('vehicles', function ($query) {
-        $query->whereNull('grn_id')
-        ->where('status', 'Approved');
-    })
-    ->pluck('po_number');
-    $so_number = So::whereDoesntHave('vehicles', function ($query) {
-        $query->whereNull('grn_id')
-        ->whereNotNull('vin')
+            ->get();
+            $po = PurchasingOrder::where('status', 'Approved')
+            ->whereDoesntHave('vehicles', function ($query) {
+                $query->whereNull('grn_id')
                 ->where('status', 'Approved');
-    })
-    ->pluck('so_number');
-    $so = So::whereHas('vehicles', function ($query) {
-        $query->whereNull('grn_id')
-              ->where('status', 'Approved');
-    })
-    ->get();     
+            })
+            ->pluck('po_number');
+            $so_number = So::whereDoesntHave('vehicles', function ($query) {
+                $query->whereNull('grn_id')
+                ->whereNotNull('vin')
+                        ->where('status', 'Approved');
+            })
+            ->pluck('so_number');
+            $so = So::whereHas('vehicles', function ($query) {
+                $query->whereNull('grn_id')
+                    ->where('status', 'Approved');
+            })
+            ->get();     
         }
         else
         {

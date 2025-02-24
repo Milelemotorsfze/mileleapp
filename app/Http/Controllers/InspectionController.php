@@ -363,6 +363,10 @@ class InspectionController extends Controller
         $newfeatures->vehicle_id = $id;
         $newfeatures->save();
         $selectedSpecifications = json_decode(request('selected_specifications'), true);
+
+        if (empty($selectedSpecifications)) {
+            return redirect()->back()->with('error', 'No specifications selected.');
+        }
         ksort($selectedSpecifications);
         $variant_request = new VariantRequest();
         $variant_request->brands_id = $request->input('brands_id');
@@ -459,6 +463,8 @@ class InspectionController extends Controller
         DB::commit();
         return redirect()->route('inspection.index')->with('success', 'Vehicle Inspection successfully Done.');
         } catch (\Exception $e) {
+            DB::rollBack();
+
             Log::error('Inspection Creation failed', ['error' => $e->getMessage()]);
             return redirect()->back()->with('error', 'Vehicle Inspection Creation failed.');
         }

@@ -18,6 +18,8 @@ use App\Models\ClientDocument;
 use App\Models\Inspection;
 use App\Models\VariantRequest;
 use App\Models\VariantRequestItems;
+use App\Models\VehicleApprovalRequests;
+use App\Models\VehicleExtraItems;
 use Carbon\Carbon;
 
 use Illuminate\Http\Request;
@@ -39,17 +41,8 @@ class MigrationDataCheckController extends Controller
         //     }
         // }
         // return $missingIds;
-
-        $variantRequests = VariantRequest::all();
         
-        $missingIds = [];
-        foreach($variantRequests as $variantRequest) {
-           $isExist = VariantRequestItems::where('variant_request_id', $variantRequest->id)->first();
-            if(!$isExist){
-                $missingIds[] = $variantRequest->id;
-            }
-        }
-        return $missingIds;
+      
 
     
     }

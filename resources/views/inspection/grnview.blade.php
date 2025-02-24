@@ -126,6 +126,8 @@
                   <th>Variant Detail</th>
                   <th>Interior Colour</th>
                   <th>Exterior Colour</th>
+                  <th>PO Number</th>
+                  <th> GRN Date </th>
                   <th>Old Varaint</th>
                   <th>New Varaint</th>
                   <th>Action</th>
@@ -151,6 +153,8 @@
                   <th>Variant Detail</th>
                   <th>Interior Colour</th>
                   <th>Exterior Colour</th>
+                  <th>PO Number</th>
+                  <th> GRN Date </th>
                   <th>Old Varaint</th>
                   <th>New Varaint</th>
                   <th>Netsuite GRN Number</th>
@@ -181,6 +185,8 @@
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
+                { data: 'po_number', name: 'purchasing_order.po_number' },
+                { data: 'grn_date', name: 'grn.date' }, 
                 { data: 'varaints_old', name: 'vehicle_variant_histories.varaints_old' },
                 { data: 'varaints_new', name: 'vehicle_variant_histories.varaints_new' },
                 { data: null, render: function (data, type, row) {
@@ -202,6 +208,8 @@
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
+                { data: 'po_number', name: 'purchasing_order.po_number' },
+                { data: 'grn_date', name: 'grn.date' }, 
                 { data: 'varaints_old', name: 'vehicle_variant_histories.varaints_old' },
                 { data: 'varaints_new', name: 'vehicle_variant_histories.varaints_new' },
                 { data: 'grn_number', name: 'grn.grn_number' },
