@@ -46,7 +46,6 @@ class ModeldescriptionController extends Controller
         'brands_id' => 'required|exists:brands,id',
         'master_model_lines_id' => 'required|exists:master_model_lines,id',
         'grade' => 'nullable|string',
-        'engine' => 'required|string',
         'fuel_type' => 'required|string',
         'gearbox' => 'nullable|string',
         'drive_train' => 'nullable|string',

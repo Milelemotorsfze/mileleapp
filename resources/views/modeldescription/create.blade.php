@@ -85,6 +85,7 @@
                                     <label for="choices-single-default" class="form-label">Engine</label>
                                     <span class="error">* </span>
                                     <select class="form-control select2" autofocus name="engine" id="engine" required>
+                                    <option value="" disabled selected>Select Engine</option>
                                         <option value="0.8" {{ old('engine') == '0.8' ? 'selected' : '' }}>0.8</option>
                                         <option value="1.0" {{ old('engine') == '1.0' ? 'selected' : '' }}>1.0</option>
                                         <option value="1.2" {{ old('engine') == '1.2' ? 'selected' : '' }}>1.2</option>
@@ -334,5 +335,24 @@ $('#model').on('change', function() {
     }
     $('#steering, #brand, #model, #grade, #specialEditions, #engine, #fuel, #gear, #drive_train, #window_type, #others').on('change', updateSummary);
 });
+</script>
+<script>
+    $(document).ready(function () {
+        $('#fuel').on('change', function () {
+            const engineSelect = $('#engine');
+
+            if ($(this).val() === 'EV') {
+                // Reset and disable engine selection
+                engineSelect.val(null).trigger('change'); // Reset value and update select2 UI
+                engineSelect.prop('disabled', true); // Disable the dropdown
+                engineSelect.removeAttr('required'); // Remove required attribute
+            } else {
+                // Enable and make required
+                engineSelect.prop('disabled', false); // Enable the dropdown
+                engineSelect.attr('required', 'required'); // Add required attribute
+                engineSelect.val(null).trigger('change'); // Reset value and update select2 UI
+            }
+        });
+    });
 </script>
 @endpush
