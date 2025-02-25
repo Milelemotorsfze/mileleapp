@@ -7,7 +7,7 @@
 @if ($hasPermission)
   <div class="card-header">
     <h4 class="card-title">
-     Model Description
+     Model Descriptions
     </h4>
     <div class="d-flex justify-content-end">
   <!-- Back Button -->
@@ -67,7 +67,7 @@
             <td>{{ $description->modelLine->brand->brand_name ?? 'N/A' }}</td>
             <td>{{ $description->modelLine->model_line ?? 'N/A' }}</td>
             <td>{{ $description->user->name ?? 'System' }}</td>
-            <td>{{ $description->created_at->format('d-m-Y H:i:s') }}</td>
+            <td>{{\Illuminate\Support\Carbon::parse($description->created_at)->format('d M Y') ?? ''}}</td>
             <td>
             @can('delete-model-description')
                 @php

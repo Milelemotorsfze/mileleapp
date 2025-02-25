@@ -127,8 +127,8 @@
                                         <select class="form-control select2" autofocus name="fuel_type" id="fuel" required>
                                             <option value="Petrol" {{ old('fuel_type') == 'Petrol' ? 'selected' : '' }}>Petrol</option>
                                             <option value="Diesel" {{ old('fuel_type') == 'Diesel' ? 'selected' : '' }}>Diesel</option>
-                                            <option value="PH" {{ old('fuel_type') == 'PH' ? 'selected' : '' }}>PH</option>
-                                            <option value="P HEV" {{ old('fuel_type') == 'P HEV' ? 'selected' : '' }}>P HEV</option>
+                                            <option value="PH" {{ old('fuel_type') == 'PH' ? 'selected' : '' }}>P HEV (Petrol hybrid electrical)</option>
+                                            <option value="P HEV" {{ old('fuel_type') == 'P HEV' ? 'selected' : '' }}>PHEV (Plug in electrical hybrid)</option>
                                             <option value="M HEV" {{ old('fuel_type') == 'M HEV' ? 'selected' : '' }}>M HEV</option>
                                             <option value="EV" {{ old('fuel_type') == 'EV' ? 'selected' : '' }}>EV</option>
                                         </select>
@@ -172,9 +172,9 @@
                                         <input type="submit" name="submit" value="Submit" class="btn btn-success" />
                                     </div>
                                     <div class="col-lg-12 col-md-12 mb-3">
-                    <label for="summary" class="form-label">Model Detail</label>
-                    <input type="text" class="form-control" id="summary" name="model_description" readonly>
-                </div>
+                                    <label for="summary" class="form-label">Model Detail</label>
+                                    <input type="text" class="form-control" id="summary" name="model_description" readonly>
+                                </div>
                                 </div>
                             </form>
                         </div>
@@ -208,6 +208,14 @@
             return this.optional(element) || /^[^\s]+(\s+[^\s]+)*$/.test(value);
         }, "No leading or trailing spaces allowed");
 
+        $.validator.addMethod("alphanumeric", function(value, element) {
+            return this.optional(element) || /^[a-zA-Z0-9]+$/.test(value);
+        }, "Only alphanumeric characters are allowed.");
+
+        $.validator.addMethod("alphanumericDot", function(value, element) {
+            return this.optional(element) || /^[a-zA-Z0-9.]+$/.test(value);
+        }, "Only letters, numbers, and dots are allowed.");
+
         $("#form-create").validate({
             ignore: [],
             rules: {
@@ -225,11 +233,13 @@
                 },
                 others:{
                     spaceCheck:true,
-                    noSpaces:true
+                    noSpaces:true,
+                    alphanumericDot:true
                 },
                 specialEditions:{
                     spaceCheck:true,
-                    noSpaces:true
+                    noSpaces:true,
+                    alphanumeric:true
                 }
             },
         });
@@ -296,6 +306,9 @@ $('#model').on('change', function() {
             fuel = 'P';
         } else if (fuel === 'Diesel') {
             fuel = 'D';
+        }
+        else if (fuel === 'PH') {
+            fuel = 'P HEV';
         }
         var gear = $('#gear').val() ? $('#gear').val() : '';
         var driveTrain = $('#drive_train').val() ? $('#drive_train').val() : '';

@@ -143,7 +143,7 @@ class ModeldescriptionController extends Controller
             'master_vehicles_grades.grade_name as grade_name'
         )
         ->get();
-        info($models);
+    
     if ($models->isEmpty()) {
         return response()->json(['success' => false, 'message' => 'No details found for the selected model.'], 404);
     }
