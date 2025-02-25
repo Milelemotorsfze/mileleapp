@@ -20,7 +20,7 @@ class ModeldescriptionController extends Controller
      */
     public function index()
     {
-        $MasterModelDescription = MasterModelDescription::orderBy('id','DESC')->get();
+        $MasterModelDescription = MasterModelDescription::orderBy('updated_at','DESC')->get();
         (new UserActivityController)->createActivity('Open Master Model Lines Description');
         return view('modeldescription.index', compact('MasterModelDescription'));
     }
@@ -50,7 +50,10 @@ class ModeldescriptionController extends Controller
         'gearbox' => 'nullable|string',
         'drive_train' => 'nullable|string',
         'window_type' => 'nullable|string',
-        'model_description' => 'required|string'
+        'model_description' => 'required|string|unique:master_model_descriptions,model_description'
+    ],
+    [
+        'model_description.unique' => 'Model detail is already existing !'
     ]);
 
     try {
@@ -109,7 +112,11 @@ class ModeldescriptionController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $modelDescription = MasterModelDescription::find($id);
+        $modelDescription->delete();
+
+        return response(true);
+
     }
     public function getGrades($modelId)
     {

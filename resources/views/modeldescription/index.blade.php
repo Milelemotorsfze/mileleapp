@@ -57,6 +57,7 @@
             <th>Model Line</th>
             <th>Created By</th>
             <th>Created At</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -67,6 +68,19 @@
             <td>{{ $description->modelLine->model_line ?? 'N/A' }}</td>
             <td>{{ $description->user->name ?? 'System' }}</td>
             <td>{{ $description->created_at->format('d-m-Y H:i:s') }}</td>
+            <td>
+            @can('delete-model-description')
+                @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('delete-model-description');
+                @endphp
+                @if ($hasPermission)
+                    @if($description->is_deletable == true)
+                        <button data-url="{{ route('modeldescription.destroy', $description->id) }}" data-id="{{ $description->id }}"
+                            class="btn btn-danger btn-sm btn-delete"><i class="fa fa-trash"></i></button>
+                    @endif
+                @endif
+            @endcan
+            </td>
         </tr>
         @empty
         <tr>
@@ -85,3 +99,30 @@
     @endphp
 @endif
 @endsection
+@push('scripts')
+<script>
+ $('#dtBasicExample1').on('click', '.btn-delete', function (e) {
+        var url = $(this).data('url');
+        var id = $(this).data('id');
+        var confirm = alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
+            if (e) {
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        _method: 'DELETE',
+                        id: id,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success:function (data) {
+                        location.reload();
+                        alertify.success('Model Description Deleted successfully.');
+                    }
+                });
+            }
+        }).set({title:"Delete Item"})
+    });
+ </script>
+@endpush
+

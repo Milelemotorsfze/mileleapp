@@ -1,5 +1,13 @@
 @extends('layouts.main')
 @section('content')
+    <style>
+    .invalid-feedback {
+        margin-top:10px !important;
+    }
+    .error{
+        color:red;
+    }
+    </style>
 @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-description');
 @endphp
@@ -10,40 +18,55 @@
             <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
         </div>
         <div class="card-body">
-            <div id="flashMessage"></div>
-            @if (session('error'))
-    <div class="alert alert-danger">
-        {{ session('error') }}
-    </div>
-@endif
+                <div id="flashMessage"></div>
+                @if (session('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                @endif
 
-@if (session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-@endif
-            <form action="{{ route('modeldescription.store') }}" method="post" enctype="multipart/form-data">
+                @if (session('success'))
+                    <div class="alert alert-success">
+                        {{ session('success') }}
+                    </div>
+                @endif
+                @if (count($errors) > 0)    
+                    <div class="alert alert-danger">
+                        <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+               
+            <form id="form-create" action="{{ route('modeldescription.store') }}" method="post" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
                 <div class="col-lg-4 col-md-6 mb-3">
                     <label for="choices-single-default" class="form-label">Steering</label>
-                                    <select class="form-control select2" autofocus name="steering" id="steering" required>
-                                        <option value="LHD" {{ old('steering') == 'LHD' ? 'selected' : '' }}>LHD</option>
-                                        <option value="RHD" {{ old('steering') == 'RHD' ? 'selected' : '' }}>RHD</option>
-                                    </select>
+                        <span class="error">* </span>
+                        <select class="form-control select2" autofocus name="steering" id="steering" required>
+                            <option value="LHD" {{ old('steering') == 'LHD' ? 'selected' : '' }}>LHD</option>
+                            <option value="RHD" {{ old('steering') == 'RHD' ? 'selected' : '' }}>RHD</option>
+                        </select>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
-                    <label for="choices-single-default" class="form-label">Brand</label>
-                                    <select class="form-control select2" autofocus name="brands_id" id="brand" required>
-                                        @foreach($brands as $brand)
-                                            <option value="{{ $brand->id }}" {{ old('brands_id') == $brand->id ? 'selected' : '' }}>
-                                                {{ $brand->brand_name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                        <label for="choices-single-default" class="form-label">Brand</label>
+                            <span class="error">* </span>
+                        <select class="form-control select2 mb-2" autofocus name="brands_id" id="brand" required>
+                        <option ></option>
+                            @foreach($brands as $brand)
+                                <option value="{{ $brand->id }}" {{ old('brands_id') == $brand->id ? 'selected' : '' }}>
+                                    {{ $brand->brand_name }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
                     <label for="model" class="form-label">Model Line</label>
+                    <span class="error">* </span>
                         <select class="form-control select2" autofocus name="master_model_lines_id" id="model" required>
                             <option value="" disabled selected>Select a Model Line</option>
                         </select>
@@ -60,6 +83,7 @@
                                     </div>
                                     <div class="col-lg-4 col-md-6 mb-3">
                                     <label for="choices-single-default" class="form-label">Engine</label>
+                                    <span class="error">* </span>
                                     <select class="form-control select2" autofocus name="engine" id="engine" required>
                                     <option value="" disabled selected>Select Engine</option>
                                         <option value="0.8" {{ old('engine') == '0.8' ? 'selected' : '' }}>0.8</option>
@@ -99,43 +123,45 @@
                                     </select>
                                     </div>
                                     <div class="col-lg-4 col-md-6 mb-3">
-                                    <label for="choices-single-default" class="form-label">Fuel Type</label>
-                                                    <select class="form-control select2" autofocus name="fuel_type" id="fuel" required>
-                                                        <option value="Petrol" {{ old('fuel_type') == 'Petrol' ? 'selected' : '' }}>Petrol</option>
-                                                        <option value="Diesel" {{ old('fuel_type') == 'Diesel' ? 'selected' : '' }}>Diesel</option>
-                                                        <option value="PH" {{ old('fuel_type') == 'PH' ? 'selected' : '' }}>PH</option>
-                                                        <option value="P HEV" {{ old('fuel_type') == 'P HEV' ? 'selected' : '' }}>P HEV</option>
-                                                        <option value="M HEV" {{ old('fuel_type') == 'M HEV' ? 'selected' : '' }}>M HEV</option>
-                                                        <option value="EV" {{ old('fuel_type') == 'EV' ? 'selected' : '' }}>EV</option>
-                                                    </select>
+                                        <label for="choices-single-default" class="form-label">Fuel Type</label>
+                                        <span class="error">* </span>
+                                        <select class="form-control select2" autofocus name="fuel_type" id="fuel" required>
+                                            <option value="Petrol" {{ old('fuel_type') == 'Petrol' ? 'selected' : '' }}>Petrol</option>
+                                            <option value="Diesel" {{ old('fuel_type') == 'Diesel' ? 'selected' : '' }}>Diesel</option>
+                                            <option value="PH" {{ old('fuel_type') == 'PH' ? 'selected' : '' }}>PH</option>
+                                            <option value="P HEV" {{ old('fuel_type') == 'P HEV' ? 'selected' : '' }}>P HEV</option>
+                                            <option value="M HEV" {{ old('fuel_type') == 'M HEV' ? 'selected' : '' }}>M HEV</option>
+                                            <option value="EV" {{ old('fuel_type') == 'EV' ? 'selected' : '' }}>EV</option>
+                                        </select>
                                     </div>
                                     <div class="col-lg-4 col-md-6 mb-3">
-                                    <label for="choices-single-default" class="form-label">Gear</label>
-                                                    <select class="form-control select2" autofocus name="gearbox" id="gear" required>
-                                                        <option value="AT" {{ old('gearbox') == 'AT' ? 'selected' : '' }}>AT</option>
-                                                        <option value="MT" {{ old('gearbox') == 'MT' ? 'selected' : '' }}>MT</option>
-                                                    </select>
+                                        <label for="choices-single-default" class="form-label">Gear</label>
+                                        <span class="error">* </span>
+                                        <select class="form-control select2" autofocus name="gearbox" id="gear" required>
+                                            <option value="AT" {{ old('gearbox') == 'AT' ? 'selected' : '' }}>AT</option>
+                                            <option value="MT" {{ old('gearbox') == 'MT' ? 'selected' : '' }}>MT</option>
+                                        </select>
                                     </div>
                                     <div class="col-lg-4 col-md-6 mb-3">
-                                    <label for="choices-single-default" class="form-label">Drive Train</label>
-                                    <select class="form-control select2" autofocus name="drive_train" id="drive_train">
-                                    <option value="" disabled selected>Drive Train</option>
-                                    <option value="4X2" {{ old('geadrive_trainrbox') == '4X2' ? 'selected' : '' }}>4X2</option>
-                                    <option value="4X4" {{ old('geadrive_trainrbox') == '4X4' ? 'selected' : '' }}>4X4</option>
-                                        <option value="AWD" {{ old('drive_train') == 'AWD' ? 'selected' : '' }}>AWD</option>
-                                        <option value="4WD" {{ old('geadrive_trainrbox') == '4WD' ? 'selected' : '' }}>4WD</option>
-                                        <option value="FWD" {{ old('geadrive_trainrbox') == 'FWD' ? 'selected' : '' }}>FWD</option>
-                                        <option value="RWD" {{ old('geadrive_trainrbox') == 'RWD' ? 'selected' : '' }}>RWD</option>
+                                        <label for="choices-single-default" class="form-label">Drive Train</label>
+                                        <select class="form-control select2" autofocus name="drive_train" id="drive_train">
+                                        <option value="" disabled selected>Drive Train</option>
+                                        <option value="4X2" {{ old('geadrive_trainrbox') == '4X2' ? 'selected' : '' }}>4X2</option>
+                                        <option value="4X4" {{ old('geadrive_trainrbox') == '4X4' ? 'selected' : '' }}>4X4</option>
+                                            <option value="AWD" {{ old('drive_train') == 'AWD' ? 'selected' : '' }}>AWD</option>
+                                            <option value="4WD" {{ old('geadrive_trainrbox') == '4WD' ? 'selected' : '' }}>4WD</option>
+                                            <option value="FWD" {{ old('geadrive_trainrbox') == 'FWD' ? 'selected' : '' }}>FWD</option>
+                                            <option value="RWD" {{ old('geadrive_trainrbox') == 'RWD' ? 'selected' : '' }}>RWD</option>
 
-                                    </select>
+                                        </select>
                                     </div>
                                     <div class="col-lg-4 col-md-6 mb-3">
-                                    <label for="choices-single-default" class="form-label">Window Type</label>
-                                                    <select class="form-control select2" autofocus name="window_type" id="window_type">
-                                                    <option value="" disabled selected>Select Window Type</option>
-                                                        <option value="P.Window" {{ old('gearbox') == 'P.Window' ? 'selected' : '' }}>P.Window</option>
-                                                        <option value="M.Window" {{ old('gearbox') == 'M.Window' ? 'selected' : '' }}>M.Window</option>
-                                                    </select>
+                                        <label for="choices-single-default" class="form-label">Window Type</label>
+                                        <select class="form-control select2" autofocus name="window_type" id="window_type">
+                                        <option value="" disabled selected>Select Window Type</option>
+                                            <option value="P.Window" {{ old('gearbox') == 'P.Window' ? 'selected' : '' }}>P.Window</option>
+                                            <option value="M.Window" {{ old('gearbox') == 'M.Window' ? 'selected' : '' }}>M.Window</option>
+                                        </select>
                                     </div>
                                     <div class="col-lg-4 col-md-6 mb-3">
                                         <label for="specialEditions" class="form-label">Others Important Option</label>
@@ -163,7 +189,53 @@
 @push('scripts')
 <script>
     $(document).ready(function() {
-        $('.select2').select2();
+        $('.select2').select2({});
+
+        $('#brand').select2({
+            placeholder : 'Select Brand',
+        }).on('change', function() {
+            $('#brand-error').remove();
+        });
+        $('#model').select2({
+            placeholder : 'Select Model Line',
+        }).on('change', function() {
+            $('#model-error').remove();
+        });
+        $.validator.addMethod("spaceCheck", function(value, element) {
+				return this.optional(element) || !/\s\s+/.test(value);
+			}, "No more than one consecutive space is allowed in the feild");
+
+        $.validator.addMethod("noSpaces", function(value, element) {
+            return this.optional(element) || /^[^\s]+(\s+[^\s]+)*$/.test(value);
+        }, "No leading or trailing spaces allowed");
+
+        $("#form-create").validate({
+            ignore: [],
+            rules: {
+                brands_id: {
+                    required: true,
+                },
+                master_model_lines_id: {
+                    required: true,
+                },
+                model_description:{
+                    required: true,
+                    spaceCheck:true,
+                    maxlength:255,
+                    noSpaces:true
+                },
+                others:{
+                    spaceCheck:true,
+                    noSpaces:true
+                },
+                specialEditions:{
+                    spaceCheck:true,
+                    noSpaces:true
+                }
+            },
+        });
+       
+
         $('#brand').on('change', function() {
             var selectedBrandId = $(this).val();
             if (selectedBrandId) {
