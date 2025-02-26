@@ -8,14 +8,14 @@
     cursor: pointer;
   }
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
-  padding: 4px 8px 4px 8px;
+  /* padding: 4px 8px 4px 8px; */
   vertical-align: middle;
 }
 .table-wrapper {
       position: relative;
     }
     thead th {
-      position: sticky!important;
+      /* position: sticky!important; */
       top: 0;
       background-color: rgb(194, 196, 204)!important;
       z-index: 1;
@@ -232,7 +232,7 @@
 </div>
         <div id="pdiInspectionDetails">
           <table class="table table-bordered">
-            <thead>
+            <thead class="">
               <tr>
                 <th>Check List Items</th>
                 <th>Reciving</th>
