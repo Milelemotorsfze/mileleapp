@@ -1104,7 +1104,7 @@ class ApprovalsController extends Controller
             ->where('inspection_id', $vehicleId)
             ->get();
             $inspection = Inspection::find($vehicleId);
-            $additionalInfo = Vehicles::select('master_model_lines.model_line', 'vehicles.vin', 'color_codes.name as int_colour', 'color_codes.name as ext_colour', 'warehouse.name as location')
+            $additionalInfo = Vehicles::select('master_model_lines.model_line', 'vehicles.vin', 'color_codes.name as int_colour', 'ext_color.name as ext_colour', 'warehouse.name as location')
         ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
         ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
         ->leftJoin('color_codes', 'vehicles.int_colour', '=', 'color_codes.id')
@@ -1155,7 +1155,7 @@ class ApprovalsController extends Controller
                             ->where('inspection_id', $vehicleId)
                             ->get();
         $inspection = Inspection::find($vehicleId);
-        $additionalInfo = Vehicles::select('master_model_lines.model_line', 'vehicles.vin', 'color_codes.name as int_colour', 'color_codes.name as ext_colour', 'warehouse.name as location')
+        $additionalInfo = Vehicles::select('master_model_lines.model_line', 'vehicles.vin', 'color_codes.name as int_colour', 'ext_color.name as ext_colour', 'warehouse.name as location')
         ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
         ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
         ->leftJoin('color_codes', 'vehicles.int_colour', '=', 'color_codes.id')
@@ -1366,7 +1366,7 @@ class ApprovalsController extends Controller
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $inspection = Inspection::find($vehicleId);
-        $additionalInfo = Vehicles::select('master_model_lines.model_line', 'vehicles.vin', 'color_codes.name as int_colour', 'color_codes.name as ext_colour', 'warehouse.name as location')
+        $additionalInfo = Vehicles::select('master_model_lines.model_line', 'vehicles.vin', 'color_codes.name as int_colour', 'ext_color.name as ext_colour', 'warehouse.name as location')
         ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
         ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
         ->leftJoin('color_codes', 'vehicles.int_colour', '=', 'color_codes.id')

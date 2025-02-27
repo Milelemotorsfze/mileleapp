@@ -8,14 +8,14 @@
     cursor: pointer;
   }
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
-  padding: 4px 8px 4px 8px;
+  /* padding: 4px 8px 4px 8px; */
   vertical-align: middle;
 }
 .table-wrapper {
       position: relative;
     }
     thead th {
-      position: sticky!important;
+      /* position: sticky!important; */
       top: 0;
       background-color: rgb(194, 196, 204)!important;
       z-index: 1;
@@ -98,7 +98,7 @@
     </ul>      
   </div>
   <div class="modal fade works-modal" id="routineModal" tabindex="-1" aria-labelledby="routineModalLabel" aria-hidden="true" data-inspectionid="">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Routine Inspection Details</h5>
@@ -193,7 +193,7 @@
   </div>
 </div>
 <div class="modal fade pdi-modal" id="pdiModal" tabindex="-1" aria-labelledby="pdiModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">PDI Inspection Details</h5>
@@ -232,7 +232,7 @@
 </div>
         <div id="pdiInspectionDetails">
           <table class="table table-bordered">
-            <thead>
+            <thead class="">
               <tr>
                 <th>Check List Items</th>
                 <th>Reciving</th>
@@ -276,7 +276,7 @@
   </div>
 </div>
 <div class="modal fade pdi-modal" id="incidentModal" tabindex="-1" aria-labelledby="incidentModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Incident Inspection Details</h5>
@@ -338,7 +338,7 @@
   </div>
 </div>
   <div class="modal fade works-modal" id="works" tabindex="-1" aria-labelledby="worksLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="worksLabel">Incident Inspections</h5>
@@ -829,6 +829,7 @@ $('#reason').html(reasonsHTML);
       url: '/pdi-inspection/' + vehicleId,
       method: 'GET',
       success: function (response) { 
+      
         var additionalInfo = response.additionalInfo;
         var PdiInspectionData = response.PdiInspectionData;
         var grnpicturelink = response.grnpicturelink;
@@ -1075,7 +1076,6 @@ $('#dtBasicExample4 tbody').on('dblclick', 'tr', function () {
     }
     function savereincidentupdate() {
     var incidentId = $('#incidentId').val();
-    console.log(incidentId);
     $.ajax({
         type: 'POST',
         url: '{{route('incidentupdate.approvals')}}',

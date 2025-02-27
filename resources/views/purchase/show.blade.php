@@ -908,6 +908,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                         <option value="JPY" {{ $purchasingOrder->currency === 'JPY' ? 'selected' : '' }}>JPY</option>
                         <option value="AUD" {{ $purchasingOrder->currency === 'USD' ? 'selected' : '' }}>USD</option>
                         <option value="CAD" {{ $purchasingOrder->currency === 'CAD' ? 'selected' : '' }}>CAD</option>
+                        <option value="PHP" {{ $purchasingOrder->currency === 'PHP' ? 'selected' : '' }}>PHP</option>
                     </select>
                 </div>
             @endif
@@ -4287,18 +4288,15 @@ function confirmPayment(status, orderId, current_amount, totalamount, remainingA
     ];
 }));
 $('.updatevariant-btn').click(function(e){
-    console.log("clicked");
     e.preventDefault();
     var id = $(this).data('id');
     $.ajax({
         url: '{{ route("vehicles.vehiclesdatagettingvariants", ["id" => ":id"]) }}'.replace(':id', id),
         method: 'GET',
         success: function(response) {
-            console.log(response);
             var tableId = 'dtBasicExample8_' + id; // Unique table ID
             var tableHtml = '<div class="table-responsive"><table id="' + tableId + '" class="table table-striped table-editable table-edits table-bordered"><thead class="bg-soft-secondary"><tr><th>Ref No</th><th>VIN</th><th>Variant</th><th>New Variant</th></tr></thead><tbody>';
             $.each(response, function(index, vehicle) {
-                console.log(vehicle);
                 var vin = vehicle.vin ? vehicle.vin : '';
                 tableHtml += '<tr><td>' + vehicle.vehicle_id + '</td><td>' + vin + '</td><td>' + vehicle.variant_name + '</td><td><select class="form-control variant-select" data-vehicle-id="' + vehicle.vehicle_id + '">';
                 $.each(preloadedVariants, function(i, variant) {
