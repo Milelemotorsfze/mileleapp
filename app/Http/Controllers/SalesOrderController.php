@@ -9,6 +9,7 @@ use App\Models\Booking;
 use App\Models\UserActivities;
 use App\Models\BookingRequest;
 use App\Models\Closed;
+use App\Models\ModelHasRoles;
 use App\Models\Calls;
 use App\Models\Vehicles;
 use Yajra\DataTables\DataTables;
@@ -57,6 +58,7 @@ class SalesOrderController extends Controller
                 'quotations.file_path',
                 'users.name',
                 'so.so_number',
+                'so.id as soid',
                 'so.so_date',
                 'quotations.calls_id',
             ])
@@ -924,4 +926,33 @@ public function showSalespersonCommissions($sales_person_id, Request $request)
         'invoice_number' => $invoiceData->invoice_number
     ]);    
     }
+    public function getSalespersons()
+    {
+        // Fetch salespersons based on role_id (Assuming 7 is the role_id for Sales Person)
+        $salespersons = ModelHasRoles::where('role_id', 7)
+            ->join('users', 'users.id', '=', 'model_has_roles.model_id')
+            ->select('users.id', 'users.name')
+            ->get();
+    
+        return response()->json(['salespersons' => $salespersons]);
+    }
+
+    public function updateSalesperson(Request $request)
+{
+    $request->validate([
+        'sales_order_id' => 'required|exists:So,id', // Correct table name
+        'salesperson_id' => 'required|exists:users,id'
+    ]);
+
+    $salesOrder = So::find($request->sales_order_id);
+    info($salesOrder);
+    if ($salesOrder) {
+        $salesOrder->sales_person_id = $request->salesperson_id;
+        $salesOrder->save();
+        info($salesOrder);
+        return response()->json(['success' => true]);
+    }
+
+    return response()->json(['success' => false], 400);
+}
         }
