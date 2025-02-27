@@ -444,10 +444,7 @@ class SalesOrderController extends Controller
                         } 
                         $saleperson = User::find($quotation->created_by);
                         $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first(); 
-                        info("vehicles");
-                        info($vehicles);
-                        info("quotation items");
-                        info($quotationItems);
+                       
                         return view('salesorder.update', compact('vehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails','sodetails', 'soitems', 'empProfile', 'saleperson'));  
         }
         public function storesalesorderupdate(Request $request, $quotationId)

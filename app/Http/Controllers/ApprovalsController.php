@@ -572,6 +572,8 @@ class ApprovalsController extends Controller
             $vehicles = Vehicles::find($inspection->vehicle_id);
             if($inspection->stage == "GRN")
             {
+            // need to update inspection status
+            $vehicles->inspection_status = 'Approved';
             $vehicles->grn_remark = $comments;
             $vehicles->inspection_date = $currentDate;
             }
