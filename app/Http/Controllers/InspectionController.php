@@ -1282,7 +1282,7 @@ class InspectionController extends Controller
                 $vehicle->save();
                 return redirect()->route('inspection.index')->with('success', 'Variant details updated successfully');
             } else {
-                dd("de");
+                // dd("de");
                 foreach ($incomingSpecifications as $specificationId => $optionId) {
                     if (!array_key_exists($specificationId, $existingSpecifications) || $existingSpecifications[$specificationId] === $optionId) {
                         //Adding more options into current variant

@@ -1005,6 +1005,7 @@ public function getBrandsAndModelLines(Request $request)
      */
     public function store(Request $request)
     {
+        // return $request->all();
         $this->validate($request, [
             'payment_term_id' => 'required',
             'po_type' => 'required',
@@ -1244,7 +1245,7 @@ public function getBrandsAndModelLines(Request $request)
         $supplier_created = New SupplierAccount();
         $supplier_created->opening_balance = 0;
         $supplier_created->current_balance = 0;
-        $supplier_created->currency = "AED";
+        $supplier_created->currency = $request->currency;
         $supplier_created->suppliers_id = $vendors_id;
         $supplier_created->save();
         }
@@ -2578,6 +2579,7 @@ public function paymentreleasesrejected(Request $request, $id)
 }
 public function paymentrelconfirmdebited(Request $request, $id)
 {
+    // need to test
     $vehicle = Vehicles::find($id);
     $vehicleCount = $vehicle->count();
            if ($request->hasFile('paymentFile')) {
@@ -2596,7 +2598,7 @@ public function paymentrelconfirmdebited(Request $request, $id)
             $swiftcopy->batch_no = $batchNo;
             $swiftcopy->file_path = 'storage/swift_copies/' . $fileNameToStore;
             $swiftcopy->save();
-            $purchasedorder = PurchasingOrder::where('id', $vehicle->purchasing_order_id);
+            $purchasedorder = PurchasingOrder::where('id', $vehicle->purchasing_order_id)->first();
             $supplieraccountchange = SupplierAccount::where('suppliers_id', $purchasedorder->vendors_id)->first();
             $paymentad = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)
                 ->where('status', 'Approved')
@@ -2605,7 +2607,7 @@ public function paymentrelconfirmdebited(Request $request, $id)
             $supplieraccountchange = new SupplierAccount();
             $supplieraccountchange->suppliers_id = $purchasedorder->vendors_id;
             $supplieraccountchange->current_balance += $paymentad;
-            $supplieraccountchange->currency = $purchasedorder;
+            $supplieraccountchange->currency = $purchasedorder->currency;
             $supplieraccountchange->opening_balance = 0;
             $supplieraccountchange->save();
             }
@@ -3182,7 +3184,7 @@ if ($paymentOrderStatus->isNotEmpty()) {
             $supplieraccountchange = new SupplierAccount();
             $supplieraccountchange->suppliers_id = $purchasedorder->vendors_id;
             $supplieraccountchange->current_balance -= $totalcost;
-            $supplieraccountchange->currency = "AED";
+            $supplieraccountchange->currency = $purchasedorder->currency;
             $supplieraccountchange->opening_balance = 0;
             $supplieraccountchange->save();
             }
@@ -3193,7 +3195,7 @@ if ($paymentOrderStatus->isNotEmpty()) {
             case "USD":
                 $totalcostconverted = $totalcost * 3.67;
                 break;
-                case "AUD":
+            case "AUD":
                     $totalcostconverted = $totalcost * 2.29;
                     break;
             case "EUR":
@@ -3207,6 +3209,9 @@ if ($paymentOrderStatus->isNotEmpty()) {
                 break;
             case "CAD":
                 $totalcostconverted = $totalcost * 2.68;
+                break;
+            case "PHP":
+                $totalcostconverted = $totalcost * 0.063;
                 break;
             default:
                 $totalcostconverted = $totalcost;
@@ -5375,10 +5380,7 @@ public function submitPaymentDetails(Request $request)
             $remarks = $request->input('remarks');
             $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
                 if ($supplierAccountTransaction) {
-                    $supplierAccountTransaction->transaction_type = 'Rejected';
-                    $supplierAccountTransaction->status = 'Rejected';
-                    $supplierAccountTransaction->remarks = $remarks;
-                    $supplierAccountTransaction->save();
+                   
                     $supplierAccount = SupplierAccount::where('id', $supplierAccountTransaction->supplier_account_id)->first();
                     if ($supplierAccount) {
                         $conversionRates = [
@@ -5395,23 +5397,31 @@ public function submitPaymentDetails(Request $request)
                         $transactionCurrency = $supplierAccountTransaction->account_currency; // Assuming there's a 'currency' column
                         $accountCurrency = $supplierAccount->currency; // Assuming there's a 'currency' column in SupplierAccount
                         $transactionAmount = $supplierAccountTransaction->transaction_amount;
-                
-                        // Convert transaction amount if currencies differ
-                        if ($transactionCurrency !== $accountCurrency) {
-                            if (isset($conversionRates[$transactionCurrency]) && isset($conversionRates[$accountCurrency])) {
-                                $convertedAmount = $transactionAmount * ($conversionRates[$transactionCurrency] / $conversionRates[$accountCurrency]);
+                      
+                        if($supplierAccountTransaction->transaction_type !==  'Initiate Payment Request') {
+                            if ($transactionCurrency !== $accountCurrency) {
+                                if (isset($conversionRates[$transactionCurrency]) && isset($conversionRates[$accountCurrency])) {
+                                    $convertedAmount = $transactionAmount * ($conversionRates[$transactionCurrency] / $conversionRates[$accountCurrency]);
+                                } else {
+                                    // Handle missing conversion rate
+                                    throw new Exception("Conversion rate not found for one of the currencies.");
+                                }
                             } else {
-                                // Handle missing conversion rate
-                                throw new Exception("Conversion rate not found for one of the currencies.");
+                                $convertedAmount = $transactionAmount; // No conversion needed
                             }
-                        } else {
-                            $convertedAmount = $transactionAmount; // No conversion needed
+                    
+                            // Update the current balance of the supplier account
+                            $supplierAccount->current_balance += $convertedAmount;
+                            $supplierAccount->save();
                         }
-                
-                        // Update the current balance of the supplier account
-                        $supplierAccount->current_balance += $convertedAmount;
-                        $supplierAccount->save();
+                        // Convert transaction amount if currencies differ
+                       
                     }
+
+                    $supplierAccountTransaction->transaction_type = 'Rejected';
+                    $supplierAccountTransaction->status = 'Rejected';
+                    $supplierAccountTransaction->remarks = $remarks;
+                    $supplierAccountTransaction->save();
                 }
             $purchasingOrder = PurchasingOrder::find($supplierAccountTransaction->purchasing_order_id);    
 
