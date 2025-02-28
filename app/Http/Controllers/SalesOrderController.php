@@ -937,7 +937,7 @@ public function showSalespersonCommissions($sales_person_id, Request $request)
     public function updateSalesperson(Request $request)
 {
     $request->validate([
-        'sales_order_id' => 'required|exists:So,id', // Correct table name
+        'sales_order_id' => 'required|exists:so,id', // Correct table name
         'salesperson_id' => 'required|exists:users,id'
     ]);
 
