@@ -77,20 +77,31 @@ class MigrationDataCheckController extends Controller
         //         $missingIds[] = $variant->id;
         //     }
         // }
+        $checkedIds = [];
+        $variantRequestItems = VariantRequestItems::groupBy('model_specification_id','variant_request_id','model_specification_options_id')
+        ->get();
 
-        // return $missingIds;
+        // return $variantRequestItems;
 
-        $inspections = Inspection::where('stage','GRN')
-                            ->where('status', 'approved')
-                            ->get();
-        foreach($inspections as $inspection) {
-         $vehicle = Vehicles::find($inspection->vehicle_id);
+        foreach($variantRequestItems as $variantRequestItem) {
+            $isDuplicates = VariantRequestItems::where('variant_request_id', $variantRequestItem->variant_request_id)
+                        ->where('model_specification_id', $variantRequestItem->model_specification_id)
+                        ->where('model_specification_options_id', $variantRequestItem->model_specification_options_id)
+                        ->whereNotIn('id', $checkedIds)
+                        ->get();
 
-         if($vehicle->inspection_status != 'Approved') {
-            $missingIds[] = $vehicle->id;
-         }
+            if($isDuplicates->count() > 1) {
+                $missingIds[] = $variantRequestItem->id;
+                foreach($isDuplicates as $isDuplicate) {
+                    $checkedIds[] = $isDuplicate->id;
+                }
+            }
+           
         }
+
         return $missingIds;
+
+       
     }
 
     public function PFIUniqueWithinYear() {
