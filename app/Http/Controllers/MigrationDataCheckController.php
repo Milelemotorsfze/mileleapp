@@ -80,17 +80,7 @@ class MigrationDataCheckController extends Controller
 
         // return $missingIds;
 
-        $inspections = Inspection::where('stage','GRN')
-                            ->where('status', 'approved')
-                            ->get();
-        foreach($inspections as $inspection) {
-         $vehicle = Vehicles::find($inspection->vehicle_id);
-
-         if($vehicle->inspection_status != 'Approved') {
-            $missingIds[] = $vehicle->id;
-         }
-        }
-        return $missingIds;
+       
     }
 
     public function PFIUniqueWithinYear() {
