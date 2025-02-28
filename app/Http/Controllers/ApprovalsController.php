@@ -41,11 +41,6 @@ use App\Mail\QCUpdateNotification;
 use App\Models\DepartmentNotifications;
 use App\Models\Dnaccess;
 
-
-
-
-
-
 class ApprovalsController extends Controller
 {  
     /**

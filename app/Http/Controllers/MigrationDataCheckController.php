@@ -77,8 +77,27 @@ class MigrationDataCheckController extends Controller
         //         $missingIds[] = $variant->id;
         //     }
         // }
+        $checkedIds = [];
+        $variantRequestItems = VariantRequestItems::all();
 
-        // return $missingIds;
+        foreach($variantRequestItems as $variantRequestItem) {
+            $isDuplicates = VariantRequestItems::where('variant_request_id', $variantRequestItem->variant_request_id)
+                        ->where('model_specification_id', $variantRequestItem->model_specification_id)
+                        ->where('model_specification_options_id', $variantRequestItem->model_specification_options_id)
+                        ->whereNotIn('id', $checkedIds)
+                        ->get();
+
+            if($isDuplicates->count() > 1) {
+                $missingIds[] = $variantRequestItem->id;
+                foreach($isDuplicates as $isDuplicate) {
+                    $checkedIds[] = $isDuplicate->id;
+                }
+            }
+        
+           
+        }
+
+        return $missingIds;
 
        
     }
