@@ -78,7 +78,10 @@ class MigrationDataCheckController extends Controller
         //     }
         // }
         $checkedIds = [];
-        $variantRequestItems = VariantRequestItems::all();
+        $variantRequestItems = VariantRequestItems::groupBy('model_specification_id','variant_request_id','model_specification_options_id')
+        ->get();
+
+        // return $variantRequestItems;
 
         foreach($variantRequestItems as $variantRequestItem) {
             $isDuplicates = VariantRequestItems::where('variant_request_id', $variantRequestItem->variant_request_id)
@@ -93,7 +96,6 @@ class MigrationDataCheckController extends Controller
                     $checkedIds[] = $isDuplicate->id;
                 }
             }
-        
            
         }
 
