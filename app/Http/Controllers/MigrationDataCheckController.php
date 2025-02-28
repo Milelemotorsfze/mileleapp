@@ -70,16 +70,27 @@ class MigrationDataCheckController extends Controller
 
         // }
 
-        $variants = Varaint::all();
-        foreach($variants as $variant) {
-            $modelDescription = MasterModelDescription::where('model_description', $variant->model_detail)->first();
-            if(!$modelDescription) {
-                $missingIds[] = $variant->id;
-            }
+        // $variants = Varaint::all();
+        // foreach($variants as $variant) {
+        //     $modelDescription = MasterModelDescription::where('model_description', $variant->model_detail)->first();
+        //     if(!$modelDescription) {
+        //         $missingIds[] = $variant->id;
+        //     }
+        // }
+
+        // return $missingIds;
+
+        $inspections = Inspection::where('stage','GRN')
+                            ->where('status', 'approved')
+                            ->get();
+        foreach($inspections as $inspection) {
+         $vehicle = Vehicles::find($inspection->vehicle_id);
+
+         if($vehicle->inspection_status != 'Approved') {
+            $missingIds[] = $vehicle->id;
+         }
         }
-
         return $missingIds;
-
     }
 
     public function PFIUniqueWithinYear() {
