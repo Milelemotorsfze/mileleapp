@@ -898,7 +898,7 @@ if (hasPricePermission) {
         const buttonClass = messageCount > 0 ? 'btn-warning' : 'btn-primary';
 
         return `
-            <div style="position: relative; display: inline-block;">
+            <div style="display: inline-block;">
                 ${badgeHtml}
                 <button class="btn ${buttonClass} btn-sm" onclick="openChatModal(${row.id})">
                     Comments
