@@ -4,17 +4,13 @@
 
 <style>
     /* Allow Select2 dropdown to adjust dynamically based on content */
-.select2-container {
-    width: auto !important; /* Allow it to take the width of its container */
-    min-width: 150px !important; /* Ensures it doesn't become too small */
-    max-width: 100% !important; /* Prevents it from exceeding the container */
+    .select2-container {
+    width: 100% !important; /* Forces the width to match its parent */
 }
 
 .select2-dropdown {
-    width: auto !important; /* Adjust width dynamically */
-    min-width: 150px !important;
-    max-width: none !important;
-    box-sizing: border-box; /* Ensures correct width calculations */
+    min-width: auto !important; /* Allows dynamic resizing */
+    width: auto !important; /* Adjusts to content */
 }
 
 /* Make sure the dropdown appears above the modal */
@@ -341,7 +337,7 @@ table.dataTable thead th select {
                     <input type="hidden" id="salesOrderId" name="sales_order_id">
 
                     <label for="salespersonSelect">Select Sales Person:</label>
-                    <select class="form-control select2" id="salespersonSelect" name="salesperson_id">
+                    <select class="form-control" id="salespersonSelect" name="salesperson_id">
                         <option value="">Select Sales Person</option>
                     </select>
                 </form>
@@ -603,12 +599,6 @@ $(document).ready(function () {
             $.each(response.salespersons, function (key, salesperson) {
                 let selected = (salesperson.name === currentSalesperson) ? 'selected' : '';
                 dropdown.append(`<option value="${salesperson.id}" ${selected}>${salesperson.name}</option>`);
-            });
-
-            // Initialize Select2 Dropdown
-            dropdown.select2({
-                dropdownParent: $('#updateSalespersonModal'),
-                width: 'resolve'
             });
 
             // Show the modal
