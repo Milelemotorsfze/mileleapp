@@ -321,8 +321,10 @@ public function updatevehicledetails(Request $request)
     {
         $selectedVIN = $request->input('vin');
         $vehicle = Vehicles::where('vin', $selectedVIN)->first(); // Use first() to fetch a single result
-        
+        info("reached");
+        info($request->vin);
         if ($vehicle) {
+            info($vehicle);
             $variant = Varaint::find($vehicle->varaints_id);
             $vehicle = Varaint::find($vehicle->id);
             $interiorColor = ColorCode::find($vehicle->int_colour);
