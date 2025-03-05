@@ -26,6 +26,7 @@ use App\Models\CallsRequirement;
 use Carbon\Carbon;
 use App\Models\Varaint;
 use App\Models\AvailableColour;
+use App\Rules\ValidPhoneNumber;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Response;
 use League\Csv\Writer;
@@ -636,7 +637,7 @@ return view('calls.resultbrand', compact('data'));
     public function updatehol(Request $request)
     {
         $this->validate($request, [
-            'phone' => 'nullable|required_without:email',
+            'phone' => ['nullable', 'required_without:email', new ValidPhoneNumber('AE')],
             'email' => 'nullable|required_without:phone|email',           
             'location' => 'required',
             'milelemotors' => 'required',

@@ -34,6 +34,10 @@
   display: inline-block;
   margin-right: 10px;
 }
+.iti__flag {
+    background-size: 20px 15px !important; /* Adjust these dimensions based on the actual size of the flag icons in the sprite */
+}
+
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-outer-spin-button { 
@@ -71,7 +75,7 @@ input[type=number]::-webkit-outer-spin-button {
             <div class="row">
             <p><span style="float:right;" class="error">* Required Field</span></p>
 			</div>  
-			<form action="" method="post" enctype="multipart/form-data">
+			<form id="updateForm" action="{{ route('calls.updatehol') }}" method="post" enctype="multipart/form-data">
                 <div class="row"> 
 					<div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Customer Name : </label>
@@ -81,6 +85,7 @@ input[type=number]::-webkit-outer-spin-button {
     <span class="error">* </span>
     <label for="basicpill-firstname-input" class="form-label">Customer Phone:</label>
     <input type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number" value="{{ $calls->phone }}" autocomplete="off">
+    <div class="invalid-feedback">Please enter a valid phone number.</div>
 </div>
                     <div class="col-lg-4 col-md-6">
     <span class="error">*</span>
@@ -508,20 +513,47 @@ $brand_name = $brand->brand_name;
     var input = document.querySelector("#phone");
     var iti = window.intlTelInput(input, {
         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
-        autoFormat: false,
-        separateDialCode: false,
+        autoFormat: true,
+        separateDialCode: true,
         nationalMode: false
     });
 // Manually format the initial value
 var initialValue = input.value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
     input.value = "+" + initialValue; // Add '+' at the beginning
-    var originalValue = input.value; // Store the original value on page load
+    // var originalValue = input.value; 
+    iti.setNumber(input.value);
+
+    $('#updateForm').on('submit', function(e) {
+        e.preventDefault(); 
+
+        if (!iti.isValidNumber()) {
+            // Show an error if the number is invalid
+            $('#phone').siblings('.invalid-feedback').show();
+            return false; // Stop the form submission
+        } else {
+            $('#phone').siblings('.invalid-feedback').hide();
+        }
+
+        var formData = $(this).serialize(); // Serialize the form data
+
+        $.ajax({
+            url: $(this).attr('action'), // Get the action attribute from the form element
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                console.log('Form submitted successfully');
+                // Optionally update UI or redirect
+            },
+            error: function(xhr, status, error) {
+                console.log('Error: ' + error);
+                // Display an error message
+            }
+        });
+    });
 
     input.addEventListener('input', function() {
-        // Remove all non-numeric characters
         var newValue = input.value.replace(/[^0-9]/g, '');
 
-        // Add '+' at the beginning if not present
         if (newValue.charAt(0) !== '+') {
             newValue = '+' + newValue;
         }
@@ -534,7 +566,6 @@ var initialValue = input.value.replace(/[^0-9]/g, ''); // Remove non-numeric cha
     iti.events.on("countrychange", function() {
         var countryCode = iti.getSelectedCountryData().dialCode;
 
-        // Update the country code without adding spaces, only if user has interacted
         if (input.value && input.value.charAt(0) === '+') {
             input.value = "+" + countryCode + input.value.substr(4);
         } else {
@@ -542,7 +573,6 @@ var initialValue = input.value.replace(/[^0-9]/g, ''); // Remove non-numeric cha
         }
     });
 
-    // Set the original value back after initializing intlTelInput
     input.value = originalValue;
 });
    $(document).ready(function() {
@@ -591,6 +621,7 @@ var initialValue = input.value.replace(/[^0-9]/g, ''); // Remove non-numeric cha
       });
     });
   });
+
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"></script>
