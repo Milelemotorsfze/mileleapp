@@ -352,7 +352,7 @@ class CallsController extends Controller
     public function store(Request $request)
     { 
         $this->validate($request, [
-            'phone' => 'nullable|required_without:email',
+            'phone' => ['nullable', 'required_without:email', new ValidPhoneNumber('AE')],
             'email' => 'nullable|required_without:phone|email',           
             'location' => 'required',
             'milelemotors' => 'required',
@@ -1324,7 +1324,7 @@ public function addnewleads()
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $this->validate($request, [
-            'phone' => 'nullable|required_without:email',
+            'phone' => ['nullable', 'required_without:email', new ValidPhoneNumber('AE')],
             'email' => 'nullable|required_without:phone|email',           
             'location' => 'required',
             'milelemotors' => 'required',

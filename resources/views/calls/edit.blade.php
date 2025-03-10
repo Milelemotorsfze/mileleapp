@@ -84,7 +84,7 @@ input[type=number]::-webkit-outer-spin-button {
                     <div class="col-lg-4 col-md-6">
     <span class="error">* </span>
     <label for="basicpill-firstname-input" class="form-label">Customer Phone:</label>
-    <input type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number" value="{{ $calls->phone }}" autocomplete="off">
+    <input type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number" value="{{ $calls->phone }}" autocomplete="off" autofocus>
     <div class="invalid-feedback">Please enter a valid phone number.</div>
 </div>
                     <div class="col-lg-4 col-md-6">
@@ -260,6 +260,42 @@ $brand_name = $brand->brand_name;
 @endsection
 @push('scripts')
     <script type="text/javascript">
+
+
+    // var contact_number = window.intlTelInput(document.querySelector("#phone"),
+    //     {
+    //         separateDialCode: true,
+    //         preferredCountries:["ae"],
+    //         hiddenInput: "full",
+    //         utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+    //     });
+
+
+//         $(document).ready(function() {
+//     var input = document.querySelector("#phone");
+
+//     if (input) {
+//         var contact_number = window.intlTelInput(input, {
+//             separateDialCode: true,
+//             preferredCountries: ["ae"], 
+//             hiddenInput: "full",
+//             utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+//         });
+
+//         console.log("Intl-Tel-Input initialized successfully");
+
+//         // Ensure flag appears even if there is a default value
+//         setTimeout(function() {
+//             if (input.value.trim() !== "") {
+//                 contact_number.setNumber(input.value);
+//             }
+//         }, 500);
+//     } else {
+//         console.error("Phone input field not found!");
+//     }
+// });
+
+
     const autoAssignOption = document.getElementById('auto-assign-option');
     const manualAssignOption = document.getElementById('manual-assign-option');
     const manualSalesPersonList = document.getElementById('manual-sales-person-list');
@@ -509,72 +545,126 @@ $brand_name = $brand->brand_name;
             selectedBrandIdInput.value = '';
         }
     });
-    window.addEventListener('DOMContentLoaded', function() {
+
+document.addEventListener("DOMContentLoaded", function () {
     var input = document.querySelector("#phone");
+
+    if (!input) {
+        console.error("Phone input field not found!");
+        return;
+    }
+
+    let savedPhone = @json($calls->phone); // Get phone from backend
+    console.log("Phone from Backend:", savedPhone);
+
+    // Initialize intlTelInput
     var iti = window.intlTelInput(input, {
         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
-        autoFormat: true,
         separateDialCode: true,
-        nationalMode: false
+        nationalMode: false,
+        autoPlaceholder: "aggressive"
     });
-// Manually format the initial value
-var initialValue = input.value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
-    input.value = "+" + initialValue; // Add '+' at the beginning
-    // var originalValue = input.value; 
-    iti.setNumber(input.value);
 
-    $('#updateForm').on('submit', function(e) {
-        e.preventDefault(); 
+    // Ensure correct country is set based on stored number
+    setTimeout(() => {
+        let countryData = iti.getSelectedCountryData();
+        let currentDialCode = "+" + countryData.dialCode;
+
+        console.log("Initial Dial Code:", currentDialCode);
+
+        if (savedPhone.startsWith("+")) {
+            iti.setNumber(savedPhone);
+        } else {
+            iti.setNumber(currentDialCode + savedPhone);
+        }
+        input.value = iti.getNumber(intlTelInputUtils.numberFormat.E164);
+    }, 500);
+
+    // Prevent country code from changing when deleting numbers
+    // input.addEventListener("input", function () {
+    //     let currentNumber = iti.getNumber();
+    //     let countryData = iti.getSelectedCountryData();
+    //     let countryCode = "+" + countryData.dialCode;
+    //     let rawNumber = currentNumber.replace(countryCode, "").trim();
+
+    //     console.log("Updated Country Code:", countryCode);
+    //     console.log("Raw Number after Edit:", rawNumber);
+
+    //     if (!rawNumber.startsWith(countryCode)) {
+    //         input.value = rawNumber;
+    //     }
+    // });
+    input.addEventListener("input", function () {
+        let fullPhoneNumber = iti.getNumber(intlTelInputUtils.numberFormat.E164);
+        input.value = fullPhoneNumber;
+    });
+
+    // Prevent deletion of country code
+    input.addEventListener("keydown", function (event) {
+        let cursorPos = input.selectionStart;
+        let countryData = iti.getSelectedCountryData();
+        let countryCode = "+" + countryData.dialCode;
+
+        if (event.key === "Backspace" || event.key === "Delete") {
+            if (cursorPos <= countryCode.length) {
+                event.preventDefault();
+            }
+        }
+    });
+
+    // Prevent pasting without country code
+    input.addEventListener("paste", function (event) {
+        event.preventDefault();
+        let clipboardData = event.clipboardData.getData("text");
+        let countryData = iti.getSelectedCountryData();
+        let countryCode = "+" + countryData.dialCode;
+
+        if (clipboardData.startsWith("+")) {
+            input.value = clipboardData;
+        } else {
+            input.value = countryCode + clipboardData.replace(/\D/g, "");
+        }
+    });
+
+    // Ensure correct formatting when country changes
+    iti.events.on("countrychange", function () {
+        let selectedCountry = iti.getSelectedCountryData();
+        let newDialCode = "+" + selectedCountry.dialCode;
+        let newRawNumber = input.value.replace(newDialCode, "").trim();
+
+        console.log("New Dial Code on Country Change:", newDialCode);
+        input.value = newRawNumber;
+    });
+
+    $('#updateForm').on('submit', function (e) {
+        e.preventDefault();
 
         if (!iti.isValidNumber()) {
-            // Show an error if the number is invalid
             $('#phone').siblings('.invalid-feedback').show();
-            return false; // Stop the form submission
+            return false;
         } else {
             $('#phone').siblings('.invalid-feedback').hide();
         }
 
-        var formData = $(this).serialize(); // Serialize the form data
+        var formData = $(this).serialize();
+        console.log("formData is: --- ", formData )
+        e.preventDefault();
 
         $.ajax({
-            url: $(this).attr('action'), // Get the action attribute from the form element
+            url: $(this).attr('action'),
             type: 'POST',
             data: formData,
-            success: function(response) {
+            success: function (response) {
                 console.log('Form submitted successfully');
-                // Optionally update UI or redirect
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.log('Error: ' + error);
-                // Display an error message
             }
         });
     });
-
-    input.addEventListener('input', function() {
-        var newValue = input.value.replace(/[^0-9]/g, '');
-
-        if (newValue.charAt(0) !== '+') {
-            newValue = '+' + newValue;
-        }
-        if (newValue.length > 15) {
-            newValue = newValue.slice(0, 15);
-        }
-        input.value = newValue;
-    });
-
-    iti.events.on("countrychange", function() {
-        var countryCode = iti.getSelectedCountryData().dialCode;
-
-        if (input.value && input.value.charAt(0) === '+') {
-            input.value = "+" + countryCode + input.value.substr(4);
-        } else {
-            input.value = "+" + countryCode;
-        }
-    });
-
-    input.value = originalValue;
 });
+
+
    $(document).ready(function() {
    $('.remove-row-btn').click(function(e) {
     e.preventDefault();
