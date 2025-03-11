@@ -750,7 +750,6 @@ class CallsController extends Controller
     if ($request->hasFile('file') && $request->file('file')->isValid()) {
         $file = $request->file('file');
         $extension = $file->getClientOriginalExtension();
-        // Check if the file is an Excel file
         if (!in_array($extension, ['xls', 'xlsx'])) {
             return back()->with('error', 'Invalid file format. Only Excel files (XLS or XLSX) are allowed.');
         }
@@ -760,33 +759,61 @@ class CallsController extends Controller
         $acceptedCount = 0;
         $rejectedCount = 0;
         $headers = array_shift($rows);
+        $phoneUtil = PhoneNumberUtil::getInstance();
+
         foreach ($rows as $row) {
             $call = new Calls();
             $name = $row[0];
 
-            $phoneUtil = PhoneNumberUtil::getInstance();
             $phone = trim($row[1]); 
+            $email = trim($row[2]);
+            $errorDescription = '';
+            $isPhoneValid = false;
+            $isEmailValid = false;
 
-            try {
-                $numberProto = $phoneUtil->parse($phone, 'AE'); 
-            
-                if ($phoneUtil->isValidNumber($numberProto)) {
-                    $phone = $phoneUtil->format($numberProto, PhoneNumberFormat::E164);
-                } else {
+            if (!empty($phone) && substr($phone, 0, 1) !== '+') {
+                $phone = '+' . $phone;
+            }
+
+            if (!empty($phone)) {
+                try {
+                    $numberProto = $phoneUtil->parse($phone, 'null'); 
+                    if ($phoneUtil->isValidNumber($numberProto)) {
+                        $phone = $phoneUtil->format($numberProto, PhoneNumberFormat::E164);
+                        $isPhoneValid = true;
+                    } else {
+                        $errorDescription .= 'Invalid Phone Number. ';
+                        $phone = null;
+                    }
+                } catch (NumberParseException $e) {
+                    $errorDescription .= 'Invalid Phone Number. ';
                     $phone = null;
                 }
-            } catch (NumberParseException $e) {
-                $phone = null;
             }
 
-            $email = trim($row[2]); 
-            $emailValidator = Validator::make(['email' => $email], [
-                'email' => 'nullable|required_without:phone|email:rfc,dns'
-            ]);
-
-            if ($emailValidator->fails()) {
-                $email = null; 
+            if (!empty($email)) {
+                $emailValidator = Validator::make(['email' => $email], [
+                    'email' => 'email:rfc,dns'
+                ]);
+                if ($emailValidator->fails()) {
+                    $errorDescription .= 'Invalid Email Address. ';
+                    $email = null;
+                } else {
+                    $isEmailValid = true;
+                }
             }
+
+            if (!$isPhoneValid && !$isEmailValid) {
+                $errorDescription = 'Either a valid Email or Phone Number is required. ';
+            }
+
+            if (!empty($errorDescription)) {
+                $row[] = $errorDescription;
+                $rejectedRows[] = $row;
+                $rejectedCount++;
+                continue;
+            }
+
             $sales_person = $row[4];
             $source_name = $row[5];
             $language = $row[6];
@@ -1000,7 +1027,7 @@ class CallsController extends Controller
             }
             if ($lead_source_id === 1 || $salesPerson === 'not correct' || 
                 $language === 'Not Supported' || $location === 'Not Supported' || 
-                $strategies_id === 1 || !$phone || !$email) { 
+                $strategies_id === 1 || (!$phone && !$email)) { 
                 
                 $filteredRows[] = $row;
                 
@@ -1099,7 +1126,7 @@ class CallsController extends Controller
                 'Model Line Name',
                 'Custom Brand Model',
                 'Remarks',
-                'Error Description', // New column
+                'Error Description', 
             ];
             $sheet->fromArray($headers, null, 'A1');
             foreach ($rejectedRows as $row) {
