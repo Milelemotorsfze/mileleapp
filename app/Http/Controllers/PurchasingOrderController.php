@@ -4042,8 +4042,9 @@ public function updatePrices(Request $request)
             $vehicleCost->update(['unit_price' => $newPrice]);
 
             if(!empty($vehiclesalreadypaid) && !empty($vehicleAlreadyPaidOrRemainingInStatuses)) {
-                $supplierAccount->current_balance += $totalDifference;
-                $supplierAccount->save();
+                // $supplierAccount->current_balance += $totalDifference;
+                // $supplierAccount->save();
+
                 SupplierAccountTransaction::create([
                     'transaction_type' => $totalDifference > 0 ? 'Debit' : 'Credit',
                     'purchasing_order_id' => $purchasingOrderId,
@@ -4052,7 +4053,7 @@ public function updatePrices(Request $request)
                     'account_currency' => $accountCurrency,
                     'transaction_amount' => abs($totalDifference),
                 ]);
-}
+            }
 if($purchasingOrder->is_demand_planning_po == 1)
 {
     $recipients = [
@@ -5041,8 +5042,12 @@ public function submitPaymentDetails(Request $request)
                             $totalCostConverted = $transactionAmountInAED / $supplierAccountConversionRate; // Convert from AED to supplier account currency
                         } else {
                             $totalCostConverted = $supplierAccountTransaction->transaction_amount;
+                           
                         }
-                        $supplierAccount->current_balance -= $totalCostConverted;
+                     
+                        $account_balance = $supplierAccount->current_balance + $totalCostConverted;
+                        $supplierAccount->current_balance = $account_balance <= 0 ? 0 : $account_balance;
+                        
                         $supplierAccount->save();
                 }
             }
@@ -5343,7 +5348,8 @@ public function submitPaymentDetails(Request $request)
         }
 
         // Update the supplier account balance
-        $supplierAccount->current_balance += $totalCostConverted;
+        $account_balance = $supplierAccount->current_balance - $totalCostConverted;
+        $supplierAccount->current_balance = $account_balance <= 0 ? 0 : $account_balance;
         $supplierAccount->save();
         }
     }
@@ -5373,6 +5379,7 @@ public function submitPaymentDetails(Request $request)
     }
     public function rejectTransitionlinitiate(Request $request)
     {
+        // payment initiate reject
         try{
 
             DB::beginTransaction();
@@ -5382,41 +5389,41 @@ public function submitPaymentDetails(Request $request)
                 if ($supplierAccountTransaction) {
                    
                     $supplierAccount = SupplierAccount::where('id', $supplierAccountTransaction->supplier_account_id)->first();
-                    if ($supplierAccount) {
-                        $conversionRates = [
-                            "USD" => 3.67,
-                            "EUR" => 3.94,
-                            "GBP" => 4.67,
-                            "JPY" => 0.023,
-                            "AUD" => 2.29,
-                            "AED" => 1,
-                            "CAD" => 2.68,
-                            "PHP" => 0.063,
-                        ];
+                    // if ($supplierAccount) {
+                    //     $conversionRates = [
+                    //         "USD" => 3.67,
+                    //         "EUR" => 3.94,
+                    //         "GBP" => 4.67,
+                    //         "JPY" => 0.023,
+                    //         "AUD" => 2.29,
+                    //         "AED" => 1,
+                    //         "CAD" => 2.68,
+                    //         "PHP" => 0.063,
+                    //     ];
                 
-                        $transactionCurrency = $supplierAccountTransaction->account_currency; // Assuming there's a 'currency' column
-                        $accountCurrency = $supplierAccount->currency; // Assuming there's a 'currency' column in SupplierAccount
-                        $transactionAmount = $supplierAccountTransaction->transaction_amount;
+                    //     $transactionCurrency = $supplierAccountTransaction->account_currency; // Assuming there's a 'currency' column
+                    //     $accountCurrency = $supplierAccount->currency; // Assuming there's a 'currency' column in SupplierAccount
+                    //     $transactionAmount = $supplierAccountTransaction->transaction_amount;
                       
-                        if($supplierAccountTransaction->transaction_type !==  'Initiate Payment Request') {
-                            if ($transactionCurrency !== $accountCurrency) {
-                                if (isset($conversionRates[$transactionCurrency]) && isset($conversionRates[$accountCurrency])) {
-                                    $convertedAmount = $transactionAmount * ($conversionRates[$transactionCurrency] / $conversionRates[$accountCurrency]);
-                                } else {
-                                    // Handle missing conversion rate
-                                    throw new Exception("Conversion rate not found for one of the currencies.");
-                                }
-                            } else {
-                                $convertedAmount = $transactionAmount; // No conversion needed
-                            }
+                    //     // if($supplierAccountTransaction->transaction_type !==  'Initiate Payment Request') {
+                    //     //     if ($transactionCurrency !== $accountCurrency) {
+                    //     //         if (isset($conversionRates[$transactionCurrency]) && isset($conversionRates[$accountCurrency])) {
+                    //     //             $convertedAmount = $transactionAmount * ($conversionRates[$transactionCurrency] / $conversionRates[$accountCurrency]);
+                    //     //         } else {
+                    //     //             // Handle missing conversion rate
+                    //     //             throw new Exception("Conversion rate not found for one of the currencies.");
+                    //     //         }
+                    //     //     } else {
+                    //     //         $convertedAmount = $transactionAmount; // No conversion needed
+                    //     //     }
                     
-                            // Update the current balance of the supplier account
-                            $supplierAccount->current_balance += $convertedAmount;
-                            $supplierAccount->save();
-                        }
-                        // Convert transaction amount if currencies differ
+                    //     //     // Update the current balance of the supplier account
+                    //     //     $supplierAccount->current_balance += $convertedAmount;
+                    //     //     $supplierAccount->save();
+                    //     // }
+                    //     // Convert transaction amount if currencies differ
                        
-                    }
+                    // }
 
                     $supplierAccountTransaction->transaction_type = 'Rejected';
                     $supplierAccountTransaction->status = 'Rejected';
@@ -5565,8 +5572,9 @@ public function submitPaymentDetails(Request $request)
                     }
 
                         // Update the supplier account balance
-                        $supplierAccount->current_balance += $totalCostConverted;
-                        $supplierAccount->save();
+                      $account_balance = $supplierAccount->current_balance - $totalCostConverted;
+                      $supplierAccount->current_balance = $account_balance <= 0 ? 0 : $account_balance;
+                      $supplierAccount->save();
                                                     
                 }
             }
