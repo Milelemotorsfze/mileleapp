@@ -5225,6 +5225,7 @@ $(document).ready(function() {
         // Hide the buttons
         var buttonRow = $('button[data-transition-id="' + transitionId + '"]').closest('td');
         buttonRow.find('.btn').hide();
+        location.reload();
       },
       error: function(xhr, status, error) {
         // Handle any errors
