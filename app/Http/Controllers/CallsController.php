@@ -755,76 +755,77 @@ class CallsController extends Controller
         }
         $rows = Excel::toArray([], $file, null, \Maatwebsite\Excel\Excel::XLSX)[0];
         $filteredRows = [];
+        $acceptedRows = [];
         $rejectedRows = [];
+
         $acceptedCount = 0;
         $rejectedCount = 0;
         $headers = array_shift($rows);
         $phoneUtil = PhoneNumberUtil::getInstance();
 
         foreach ($rows as $row) {
-            $call = new Calls();
-            $name = $row[0];
-
-            $phone = trim($row[1]); 
-            $email = trim($row[2]);
             $errorDescription = '';
+            $errorMessages = [];
+
             $isPhoneValid = false;
             $isEmailValid = false;
-
+        
+            $name = $row[0];
+            $phone = trim($row[1]);
+            $email = trim($row[2]);
+            $sales_person = $row[4];
+            $source_name = $row[5];
+            $language = $row[6];
+            $location = $row[3];
+            $brand = $row[7];
+            $model_line_name = $row[8];
+            $custom_brand_model = $row[9];
+            $remarks = $row[10];
+            $strategies = $row[11];
+            $priority = $row[12];
+        
+            // **Phone Validation**
             if (!empty($phone) && substr($phone, 0, 1) !== '+') {
                 $phone = '+' . $phone;
             }
-
             if (!empty($phone)) {
                 try {
-                    $numberProto = $phoneUtil->parse($phone, 'null'); 
+                    $numberProto = $phoneUtil->parse($phone, 'null');
                     if ($phoneUtil->isValidNumber($numberProto)) {
                         $phone = $phoneUtil->format($numberProto, PhoneNumberFormat::E164);
                         $isPhoneValid = true;
                     } else {
-                        $errorDescription .= 'Invalid Phone Number. ';
+                        $errorMessages[] = 'Invalid Phone Number';
                         $phone = null;
                     }
                 } catch (NumberParseException $e) {
-                    $errorDescription .= 'Invalid Phone Number. ';
+                    $errorMessages[] = 'Invalid Phone Number';
                     $phone = null;
                 }
             }
-
+        
+            // **Email Validation**
             if (!empty($email)) {
-                $emailValidator = Validator::make(['email' => $email], [
-                    'email' => 'email:rfc,dns'
-                ]);
+                $emailValidator = Validator::make(['email' => $email], ['email' => 'email:rfc,dns']);
                 if ($emailValidator->fails()) {
-                    $errorDescription .= 'Invalid Email Address. ';
+                    $errorMessages[] = 'Invalid Email Address';
                     $email = null;
                 } else {
                     $isEmailValid = true;
                 }
             }
-
+        
             if (!$isPhoneValid && !$isEmailValid) {
-                $errorDescription = 'Either a valid Email or Phone Number is required. ';
+                $errorMessages[] = 'Either a valid Email or Phone Number is required';            
             }
 
-            if (!empty($errorDescription)) {
-                $row[] = $errorDescription;
+            if (!empty($errorMessages)) {
+                $row[] = implode(', ', array_unique($errorMessages)); 
                 $rejectedRows[] = $row;
                 $rejectedCount++;
                 continue;
             }
-
-            $sales_person = $row[4];
-            $source_name = $row[5];
-            $language = $row[6];
-            $location = $row[3];
-			$brand =  $row[7];
-			$model_line_name = $row[8];
-            $custom_brand_model = $row[9];
-            $remarks = $row[10];
-            $strategies = $row[11];
-            $priority = $row[12];
-            $errorDescription = '';
+        
             if ($sales_person == null) {
                 $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
 			                $sales_persons = ModelHasRoles::where('role_id', 7)->get();
@@ -1030,23 +1031,7 @@ class CallsController extends Controller
                 $strategies_id === 1 || (!$phone && !$email)) { 
                 
                 $filteredRows[] = $row;
-                
-                if (!$phone) {
-                    $errorDescription .= 'Invalid Phone No. ';
-                }
-
-                if (!$email) {
-                    $errorDescription .= 'Invalid Email Address ';
-                }
-
-                if (!empty($errorDescription)) {
-                    $row[] = $errorDescription;
-                    $rejectedRows[] = $row;
-                    $rejectedCount++;
-                    continue;
-                }
-
-                $filteredRows[] = $row;
+               
                 if ($salesPerson === 'not correct') {
                     $errorDescription .= 'Invalid sales person.';
                 }
@@ -1062,56 +1047,27 @@ class CallsController extends Controller
                 if ($location === 'Not Supported') {
                     $errorDescription .= 'Invalid Location';
                 }
-                if (!empty($errorDescription)) {
-                    $row[] = $errorDescription;
-                    $rejectedRows[] = $row;
-                    $rejectedCount++;
-                    continue;
-                }                
+                
             }
-            else{
-                $date = Carbon::now();
-                $date->setTimezone('Asia/Dubai');
-                $formattedDate = $date->format('Y-m-d H:i:s');
-                $call->name = $row[0];
-                // $call->phone = $row[1];
-                $call->phone = $phone;
-                $call->email = $email;
-                $call->assign_time = Carbon::now();
-                $call->custom_brand_model = $row[9];
-                $call->remarks = $row[10];
-                $call->source = $lead_source_id;
-                $call->strategies_id = $strategies_id;
-                $call->priority = $row[12];
-                $call->language = $row[6];
-                $call->sales_person = $sales_person_id;
-                $call->created_at = $formattedDate;
-                $call->assign_time = $formattedDate;
-                $call->created_by = Auth::id();
-                $call->status = "New";
-                $call->location = $row[3];
-                $call->save(); 
-                $leads_notifications = New LeadsNotifications();
-                $leads_notifications->calls_id =  $call->id;
-                $leads_notifications->remarks = "New Assign Lead";
-                $leads_notifications->status = "New";
-                $leads_notifications->user_id = $sales_person_id;
-                $leads_notifications->category = "New Assign Lead";
-                $leads_notifications->save();
-                if ($model_line_name !== null) {
-                    $modelLine = MasterModelLines::where('model_line', $model_line_name)->first();
-                    if ($modelLine) {
-                        $model_line_id = $modelLine->id;
-                        $callsRequirement = new CallsRequirement();
-                        $callsRequirement->lead_id = $call->id;
-                        $callsRequirement->model_line_id = $model_line_id;
-                        $callsRequirement->save();
-                    } 
-                }
-                $acceptedCount++;
-            }
+        
+            $acceptedRows[] = [
+                'name' => $name,
+                'phone' => $phone,
+                'email' => $email,
+                'sales_person_id' => $sales_person_id,
+                'lead_source_id' => $lead_source_id,
+                'strategies_id' => $strategies_id,
+                'language' => $language,
+                'location' => $location,
+                'custom_brand_model' => $custom_brand_model,
+                'model_line_name' => $model_line_name,
+                'remarks' => $remarks,
+                'priority' => $priority
+            ];
+            $acceptedCount++;
         }
-        if (count($rejectedRows) > 0) {
+
+        if ($rejectedCount > 0) {
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
             $headers = [
@@ -1148,25 +1104,70 @@ class CallsController extends Controller
             $tempFile = tempnam(sys_get_temp_dir(), 'rejected_excel_file');
             $writer->save($tempFile);
         
-            // Move the temporary file to storage
             $filename = 'rejected_records.xlsx';
             Storage::put($filename, file_get_contents($tempFile));
             unlink($tempFile);
         
-            // Generate the download link
             $downloadLink = route('download.rejected', ['filename' => $filename]);
-        
-            return redirect()->route('calls.createbulk')->with('success', [
-                'message' => "Data uploaded successfully! From the total " . (count($rows)) . " records, {$acceptedCount} records are accepted & {$rejectedCount} records are rejected.",
-                'fileLink' => route('download.rejected', ['filename' => 'rejected_records.xlsx']),
-            ]);                    
+
+            return back()->with('error', [
+                'message' => "Data upload failed! From the total " . count($rows) . " records, " . $acceptedCount . " were accepted & ". $rejectedCount . " were rejected. No data has been added.",
+                'fileLink' => $downloadLink,
+            ]);
+
+            // return redirect()->route('calls.createbulk')->with('error', [
+            //     'message' => "Data upload failed! From the total " . count($rows) . " records, " . $acceptedCount . " were accepted & ". $rejectedCount . " were rejected. No data has been added.",
+            //     'fileLink' => route('download.rejected', ['filename' => 'rejected_records.xlsx']),
+            // ]);            
         }
-        $useractivities =  New UserActivities();
-        $useractivities->activity = "Create Bulk Leads";
-        $useractivities->users_id = Auth::id();
-        $useractivities->save();
-        return redirect()->route('calls.index')
-            ->with('success', "Data uploaded successfully! From the total " . (count($rows)) . " records, {$acceptedCount} records are accepted & {$rejectedCount} records are rejected.");
+        
+        foreach ($acceptedRows as $row) {
+            $call = new Calls();
+            
+            $date = Carbon::now()->setTimezone('Asia/Dubai');
+            $formattedDate = $date->format('Y-m-d H:i:s');
+        
+            $call->name = $row['name'];
+            $call->phone = $row['phone'];  
+            $call->email = $row['email'];
+            $call->location = $row['location']; 
+            $call->sales_person = $row['sales_person_id']; 
+            $call->source = $row['lead_source_id']; 
+            $call->language = $row['language'];  
+            $call->custom_brand_model = $row['custom_brand_model']; 
+            $call->remarks = $row['remarks']; 
+            $call->strategies_id = $row['strategies_id'];  
+            $call->priority = $row['priority'];  
+        
+            $call->assign_time = $formattedDate;
+            $call->created_at = $formattedDate;
+            $call->created_by = Auth::id();
+            $call->status = "New";
+        
+            $call->save();
+        
+            $leads_notifications = new LeadsNotifications();
+            $leads_notifications->calls_id = $call->id;
+            $leads_notifications->remarks = "New Assign Lead";
+            $leads_notifications->status = "New";
+            $leads_notifications->user_id = $row['sales_person_id']; 
+            $leads_notifications->category = "New Assign Lead";
+            $leads_notifications->save();
+        
+            if (!empty($row['model_line_name'])) { 
+                $modelLine = MasterModelLines::where('model_line', $row['model_line_name'])->first();
+                if ($modelLine) {
+                    $callsRequirement = new CallsRequirement();
+                    $callsRequirement->lead_id = $call->id;
+                    $callsRequirement->model_line_id = $modelLine->id;
+                    $callsRequirement->save();
+                }
+            }
+        
+        }
+        
+        return redirect()->route('calls.index')->with('success', "Data uploaded successfully! From the total " . count($rows) . " records, {$acceptedCount} were accepted.");
+
     } else {
         return back()->with('error', 'Please Select The Correct File for Uploading');
     }
