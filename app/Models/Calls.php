@@ -15,6 +15,7 @@ class Calls extends Model
         'sales_person',
         'remarks',
         'phone',
+        'secondary_phone_number',
         'source',
         'status',
         'language',

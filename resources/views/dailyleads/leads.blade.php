@@ -2,6 +2,10 @@
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.6/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
+
 <style>
      #assignBy.select2-container {
         width: 300px !important; /* Adjust the width as needed */
@@ -625,6 +629,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                                         <tr>
                                             <th>Phone</th>
                                             <td id="phone-field" data-field="phone">{{ $lead->phone }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Secondary Phone</th>
+                                            <td id="secondary-phone-field" data-field="secondary_phone_number">{{ $lead->secondary_phone_number }}</td>
                                             @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
 @endphp
@@ -1101,11 +1109,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
     });
 </script>
 <script>
+
+
+
 $(document).ready(function() {
+    var itiSecondary;
+
     $('.edit-btn').on('click', function() {
     var td = $(this).closest('tr').find('td').first();
     var field = td.data('field');
     var currentValue = td.text().trim();
+    var editButton = $(this); 
 
     if (td.find('select').length === 0 && td.find('input').length === 0) {
         if (field === 'priority') {
@@ -1118,7 +1132,19 @@ $(document).ready(function() {
                     <option value="High" ${currentValue === 'High' ? 'selected' : ''}>High</option>
                 </select>`;
             td.html(dropdown);
-            $(this).html('<i class="fas fa-save"></i>');
+            editButton.html('<i class="fas fa-save"></i>');
+        } else if (field === 'secondary_phone_number') {
+            td.html('<input type="tel" id="secondary-phone-input" class="form-control" value="' + currentValue + '">');
+            editButton.html('<i class="fas fa-save"></i>');
+            setTimeout(function() {
+                var secondaryPhoneInputField = document.querySelector("#secondary-phone-input");
+                itiSecondary = window.intlTelInput(secondaryPhoneInputField, {
+                    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
+                    separateDialCode: false,
+                    autoFormat: false,
+                    nationalMode: false
+                });
+            }, 100);
         } else if (field === 'language') {
             var dropdown = '<select class="form-control">';
             @foreach($languages as $language)
@@ -1126,52 +1152,65 @@ $(document).ready(function() {
             @endforeach
             dropdown += '</select>';
             td.html(dropdown);
-            $(this).html('<i class="fas fa-save"></i>');
+            editButton.html('<i class="fas fa-save"></i>');
         } else if (field === 'location') {
             var dropdown = '<select class="form-control">';
             @foreach($countries as $country)
-dropdown += `<option value="{{ $country['name'] }}" ${currentValue === '{{ $country['name'] }}' ? 'selected' : ''}>{{ $country['name'] }}</option>`;
-@endforeach
-dropdown += '</select>';
-td.html(dropdown);
-$(this).html('<i class="fas fa-save"></i>');
+                dropdown += `<option value="{{ $country['name'] }}" ${currentValue === '{{ $country['name'] }}' ? 'selected' : ''}>{{ $country['name'] }}</option>`;
+                @endforeach
+                dropdown += '</select>';
+                td.html(dropdown);
+                editButton.html('<i class="fas fa-save"></i>');
+            } else {
+                var currentValue = td.text().trim();
+                td.html('<input type="text" class="form-control" value="' + currentValue + '">');
+                editButton.html('<i class="fas fa-save"></i>'); // Change icon to save
+            }
         } else {
-            var currentValue = td.text().trim();
-            td.html('<input type="text" class="form-control" value="' + currentValue + '">');
-            $(this).html('<i class="fas fa-save"></i>'); // Change icon to save
-        }
-    } else {
-        var newValue;
-        
-        if (td.find('select').length > 0) {
-            newValue = td.find('select').val();
-        } else if (td.find('input').length > 0) {
-            newValue = td.find('input').val().trim();
-        }
+            var newValue;
+            
+            if (td.find('select').length > 0) {
+                newValue = td.find('select').val();
+            } else if (td.find('input').length > 0) {
+                newValue = td.find('input').val().trim();
+                if (field === 'secondary_phone_number') {
+                    var secondaryPhoneInputField = document.querySelector("#secondary-phone-input");
 
-        if (newValue !== '') {
-            $.ajax({
-                url: '/leads/update',
-                type: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    field: field,
-                    value: newValue,
-                    lead_id: '{{ $lead->id }}'
-                },
-                success: function(response) {
-                    td.html(newValue);
-                    $(this).html('<i class="fas fa-edit"></i>');
-                },
-                error: function(xhr) {
-                    console.log('Error:', xhr.responseText);
+                    if (!itiSecondary) {
+                        itiSecondary = window.intlTelInputGlobals.getInstance(secondaryPhoneInputField);
+                    }
+
+                    if (newValue !== "" && (!itiSecondary || !itiSecondary.isValidNumber())) {
+                        alert("Invalid phone number! Please enter a valid number.");
+                        return;
+                    }
+                    newValue = itiSecondary.getNumber(); 
                 }
-            });
-        } else {
-            console.log('Input is empty');
+            }
+
+            if (newValue !== '') {
+                $.ajax({
+                    url: '/leads/update',
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        field: field,
+                        value: newValue,
+                        lead_id: '{{ $lead->id }}'
+                    },
+                    success: function(response) {
+                        td.html(newValue);
+                        editButton.html('<i class="fas fa-edit"></i>');
+                    },
+                    error: function(xhr) {
+                        console.log('Error:', xhr.responseText);
+                    }
+                });
+            } else {
+                console.log('Input is empty');
+            }
         }
-    }
-});
+    });
 });
 // Function to remove model line
 function removeModelLine(requirementId) {
