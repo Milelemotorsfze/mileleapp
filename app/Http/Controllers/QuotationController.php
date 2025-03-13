@@ -278,21 +278,16 @@ class QuotationController extends Controller
                $quotationItem->model_line_id = $request->model_line_ids[$key];
                $quotationItem->model_description_id = $request->model_description_ids[$key];
            }else if($request->types[$key] == 'Addon') {
-                // info($request->reference_ids[$key]);
                if($request->reference_ids[$key] != 'Other') {
-                //    info("not other");
 
                    $item = Addon::find($request->reference_ids[$key]);
-                //    info($item);
                }
                $quotationItem->addon_type = $request->addon_types[$key];
                $quotationItem->brand_id = $request->brand_ids[$key];
                $quotationItem->model_line_id = $request->model_line_ids[$key];
                $quotationItem->model_description_id = $request->model_description_ids[$key];
-            //    info($request->model_description_ids[$key]);
            }
             if($item) {
-                info("item not found");
                 $quotationItem->reference()->associate($item);
 
             }
