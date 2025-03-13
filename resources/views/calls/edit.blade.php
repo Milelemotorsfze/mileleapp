@@ -91,10 +91,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <label for="basicpill-firstname-input" class="form-label">Phone Number :</label>
                 <input type="tel" id="phone" name="phone" class="form-control" placeholder="Primary Phone Number" value="{{ $calls->phone }}" autocomplete="off">
             </div>
-            <div class="col-lg-4 col-md-6">
+            <!-- <div class="col-lg-4 col-md-6">
                 <label for="basicpill-firstname-input" class="form-label">Secondary Phone Number :</label>
                 <input type="tel" id="secondary_phone_number" name="secondary_phone_number" class="form-control" placeholder="Secondary Phone Number" value="{{ $calls->secondary_phone_number }}" autocomplete="off">
-            </div>
+            </div> -->
             <div class="col-lg-4 col-md-6">
                 <span class="error">*</span>
                 <label for="basicpill-firstname-input" class="form-label">Customer Email:</label>
@@ -518,110 +518,153 @@ redirect()->route('home')->send();
             selectedBrandIdInput.value = '';
         }
     });
-    window.addEventListener('DOMContentLoaded', function() {
-        var primaryInput = document.querySelector("#phone");
-        var secondaryInput = document.querySelector("#secondary_phone_number");
+    // window.addEventListener('DOMContentLoaded', function() {
+    //     var primaryInput = document.querySelector("#phone");
+    //     var secondaryInput = document.querySelector("#secondary_phone_number");
 
-        var itiPrimary = window.intlTelInput(primaryInput, {
-            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
-            autoFormat: false,
-            separateDialCode: false,
-            nationalMode: false
-        });
+    //     var itiPrimary = window.intlTelInput(primaryInput, {
+    //         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
+    //         autoFormat: false,
+    //         separateDialCode: false,
+    //         nationalMode: false
+    //     });
 
-        var itiSecondary = window.intlTelInput(secondaryInput, {
-            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
-            autoFormat: false,
-            separateDialCode: false,
-            nationalMode: false
-        });
+    //     var itiSecondary = window.intlTelInput(secondaryInput, {
+    //         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
+    //         autoFormat: false,
+    //         separateDialCode: false,
+    //         nationalMode: false
+    //     });
 
-        function formatPhoneNumber(input) {
-            var newValue = input.value.replace(/[^0-9]/g, '');
-            if (newValue.charAt(0) !== '+') {
-                newValue = '+' + newValue;
-            }
-            if (newValue.length > 15) {
-                newValue = newValue.slice(0, 15);
-            }
-            input.value = newValue;
-        }
+    //     function formatPhoneNumber(input) {
+    //         var newValue = input.value.replace(/[^0-9]/g, '');
+    //         if (newValue.charAt(0) !== '+') {
+    //             newValue = '+' + newValue;
+    //         }
+    //         if (newValue.length > 15) {
+    //             newValue = newValue.slice(0, 15);
+    //         }
+    //         input.value = newValue;
+    //     }
 
-        // Ensure initial values are properly formatted for both inputs
-        if (primaryInput.value) {
-            primaryInput.value = "+" + primaryInput.value.replace(/[^0-9]/g, '');
-            itiPrimary.setNumber(primaryInput.value);
-        }
+    //     // Ensure initial values are properly formatted for both inputs
+    //     if (primaryInput.value) {
+    //         primaryInput.value = "+" + primaryInput.value.replace(/[^0-9]/g, '');
+    //         itiPrimary.setNumber(primaryInput.value);
+    //     }
 
-        if (secondaryInput.value) {
-            secondaryInput.value = "+" + secondaryInput.value.replace(/[^0-9]/g, '');
-            itiSecondary.setNumber(secondaryInput.value);
-        }
+    //     if (secondaryInput.value) {
+    //         secondaryInput.value = "+" + secondaryInput.value.replace(/[^0-9]/g, '');
+    //         itiSecondary.setNumber(secondaryInput.value);
+    //     }
 
-        // Format phone numbers on input
-        primaryInput.addEventListener('input', function() {
-            formatPhoneNumber(primaryInput);
-        });
+    //     // Format phone numbers on input
+    //     primaryInput.addEventListener('input', function() {
+    //         formatPhoneNumber(primaryInput);
+    //     });
 
-        secondaryInput.addEventListener('input', function() {
-            formatPhoneNumber(secondaryInput);
-        });
+    //     secondaryInput.addEventListener('input', function() {
+    //         formatPhoneNumber(secondaryInput);
+    //     });
 
-        // Handle country change events for both inputs
-        itiPrimary.events.on("countrychange", function() {
-            var countryCode = itiPrimary.getSelectedCountryData().dialCode;
-            if (primaryInput.value && primaryInput.value.charAt(0) === '+') {
-                primaryInput.value = "+" + countryCode + primaryInput.value.substr(4);
-            } else {
-                primaryInput.value = "+" + countryCode;
-            }
-        });
+    //     // Handle country change events for both inputs
+    //     itiPrimary.events.on("countrychange", function() {
+    //         var countryCode = itiPrimary.getSelectedCountryData().dialCode;
+    //         if (primaryInput.value && primaryInput.value.charAt(0) === '+') {
+    //             primaryInput.value = "+" + countryCode + primaryInput.value.substr(4);
+    //         } else {
+    //             primaryInput.value = "+" + countryCode;
+    //         }
+    //     });
 
-        itiSecondary.events.on("countrychange", function() {
-            var countryCode = itiSecondary.getSelectedCountryData().dialCode;
-            if (secondaryInput.value && secondaryInput.value.charAt(0) === '+') {
-                secondaryInput.value = "+" + countryCode + secondaryInput.value.substr(4);
-            } else {
-                secondaryInput.value = "+" + countryCode;
-            }
-        });
+    //     itiSecondary.events.on("countrychange", function() {
+    //         var countryCode = itiSecondary.getSelectedCountryData().dialCode;
+    //         if (secondaryInput.value && secondaryInput.value.charAt(0) === '+') {
+    //             secondaryInput.value = "+" + countryCode + secondaryInput.value.substr(4);
+    //         } else {
+    //             secondaryInput.value = "+" + countryCode;
+    //         }
+    //     });
 
-        // Handle form submission
-        $('#updateForm').on('submit', function(e) {
-            e.preventDefault();
+    //     // Handle form submission
+    //     $('#updateForm').on('submit', function(e) {
+    //         e.preventDefault();
 
-            var isPrimaryValid = itiPrimary.isValidNumber();
-            var isSecondaryValid = secondaryInput.value.trim() === "" || itiSecondary.isValidNumber();
+    //         var isPrimaryValid = itiPrimary.isValidNumber();
+    //         var isSecondaryValid = secondaryInput.value.trim() === "" || itiSecondary.isValidNumber();
 
-            if (!isPrimaryValid) {
-                $('#phone').siblings('.invalid-feedback').show();
-                return false;
-            } else {
-                $('#phone').siblings('.invalid-feedback').hide();
-            }
+    //         if (!isPrimaryValid) {
+    //             $('#phone').siblings('.invalid-feedback').show();
+    //             return false;
+    //         } else {
+    //             $('#phone').siblings('.invalid-feedback').hide();
+    //         }
 
-            if (!isSecondaryValid) {
-                $('#secondary_phone_number').siblings('.invalid-feedback').show();
-                return false;
-            } else {
-                $('#secondary_phone_number').siblings('.invalid-feedback').hide();
-            }
+    //         if (!isSecondaryValid) {
+    //             $('#secondary_phone_number').siblings('.invalid-feedback').show();
+    //             return false;
+    //         } else {
+    //             $('#secondary_phone_number').siblings('.invalid-feedback').hide();
+    //         }
 
-            var formData = $(this).serialize();
+    //         var formData = $(this).serialize();
 
-            $.ajax({
-                url: $(this).attr('action'),
-                type: 'POST',
-                data: formData,
-                success: function(response) {
-                    console.log('Form submitted successfully');
-                },
-                error: function(xhr, status, error) {
-                    console.log('Error: ' + error);
-                }
-            });
-        });
+    //         $.ajax({
+    //             url: $(this).attr('action'),
+    //             type: 'POST',
+    //             data: formData,
+    //             success: function(response) {
+    //                 console.log('Form submitted successfully');
+    //             },
+    //             error: function(xhr, status, error) {
+    //                 console.log('Error: ' + error);
+    //             }
+    //         });
+    //     });
+    // });
+
+window.addEventListener('DOMContentLoaded', function() {
+    var input = document.querySelector("#phone");
+    var iti = window.intlTelInput(input, {
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
+        autoFormat: false,
+        separateDialCode: false,
+        nationalMode: false
     });
+    // Manually format the initial value
+    var initialValue = input.value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+    input.value = "+" + initialValue; // Add '+' at the beginning
+    var originalValue = input.value; // Store the original value on page load
+
+    input.addEventListener('input', function() {
+        // Remove all non-numeric characters
+        var newValue = input.value.replace(/[^0-9]/g, '');
+
+        // Add '+' at the beginning if not present
+        if (newValue.charAt(0) !== '+') {
+            newValue = '+' + newValue;
+        }
+        if (newValue.length > 15) {
+            newValue = newValue.slice(0, 15);
+        }
+        input.value = newValue;
+    });
+
+    iti.events.on("countrychange", function() {
+        var countryCode = iti.getSelectedCountryData().dialCode;
+
+        // Update the country code without adding spaces, only if user has interacted
+        if (input.value && input.value.charAt(0) === '+') {
+            input.value = "+" + countryCode + input.value.substr(4);
+        } else {
+            input.value = "+" + countryCode;
+        }
+    });
+
+    // Set the original value back after initializing intlTelInput
+    input.value = originalValue;
+});
+
 
     $(document).ready(function() {
         $('.remove-row-btn').click(function(e) {

@@ -359,7 +359,7 @@ class CallsController extends Controller
         { 
             $this->validate($request, [
                 'phone' => ['nullable', 'required_without:email', new ValidPhoneNumber('AE')],
-                'secondary_phone_number' => ['nullable', new ValidPhoneNumber('AE')],
+                // 'secondary_phone_number' => ['nullable', new ValidPhoneNumber('AE')],
                 'email' => 'nullable|required_without:phone|email',           
                 'location' => 'required',
                 'milelemotors' => 'required',
@@ -373,7 +373,7 @@ class CallsController extends Controller
                 $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
                 $email = $request->input('email');
                 $phone = $request->input('phone');
-                $secondaryPhone = $request->input('secondary_phone_number');
+                // $secondaryPhone = $request->input('secondary_phone_number');
                 $language = $request->input('language');
                 $sales_persons = ModelHasRoles::where('role_id', 7)
                 ->join('users', 'model_has_roles.model_id', '=', 'users.id')
@@ -545,7 +545,7 @@ class CallsController extends Controller
                 'assign_time' => Carbon::now(),
                 'location' => $request->input('location'),
                 'phone' => $request->input('phone'),
-                'secondary_phone_number' => $request->input('secondary_phone_number'),
+                // 'secondary_phone_number' => $request->input('secondary_phone_number'),
                 'strategies_id' => $strategies_id->id,
                 'priority' => $request->input('priority'),
                 'custom_brand_model' => $request->input('custom_brand_model'),
@@ -650,7 +650,7 @@ class CallsController extends Controller
     {
         $this->validate($request, [
             'phone' => ['nullable', 'required_without:email', new ValidPhoneNumber('AE')],
-            'secondary_phone_number' => ['nullable', new ValidPhoneNumber('AE')],
+            // 'secondary_phone_number' => ['nullable', new ValidPhoneNumber('AE')],
             'email' => 'nullable|required_without:phone|email',           
             'location' => 'required',
             'milelemotors' => 'required',
@@ -681,7 +681,7 @@ class CallsController extends Controller
 		$model->remarks = $request->input('remarks');
 		$model->location = $request->input('location');
 		$model->phone = $request->input('phone');
-		$model->secondary_phone_number = $request->input('secondary_phone_number');
+		// $model->secondary_phone_number = $request->input('secondary_phone_number');
 		$model->custom_brand_model = $request->input('custom_brand_model');
 		$model->language = $request->input('language');
 		$model->status = "New";

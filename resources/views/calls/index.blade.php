@@ -140,7 +140,7 @@
                   <th>Selling Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
-                  <th>Secondary Phone</th>
+                  <!-- <th>Secondary Phone</th> -->
                   <th>Customer Email</th>
                   <th>Sales Person</th>
                   <th>Brands & Models</th>
@@ -161,7 +161,7 @@
                     <td class="nowrap-td">{{ $calls->type }}</td>
                     <td class="nowrap-td">{{ $calls->name }}</td>     
                     <td class="nowrap-td">{{ $calls->phone }}</td>
-                    <td class="nowrap-td">{{ $calls->secondary_phone_number }}</td>
+                    <!-- <td class="nowrap-td">{{ $calls->secondary_phone_number }}</td> -->
                     <td class="nowrap-td">{{ $calls->email }}</td>
                      @php
                      $sales_persons_name = "";
