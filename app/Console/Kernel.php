@@ -21,7 +21,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('notificationspendingsignquotation:send')->everyMinute();
         $schedule->command('notificationspendingpeospecting:send')->everyMinute();
         $schedule->command('loi_expiry:check')->daily();
-        $schedule->command('send:wo_boe_status')->dailyAt('09:00');
+        // $schedule->command('send:wo_boe_status')->dailyAt('09:00');
         // $schedule->command('claim_submission_reminder')->dailyAt('09:00');
     }
 
