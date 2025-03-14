@@ -1,5 +1,8 @@
 @extends('layouts.main')
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
 <style>
 .select2-container {
   width: 100% !important;
@@ -86,24 +89,24 @@ input[type=number]::-webkit-outer-spin-button {
                 <div class="row"> 
 					<div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Customer Name : </label>
-                        {!! Form::text('name', null, array('placeholder' => 'Name','class' => 'form-control')) !!}
-                    </div>
+                        {!! Form::text('name', old('name'), ['placeholder' => 'Name', 'class' => 'form-control']) !!}
+                        </div>
                     <div class="col-lg-4 col-md-6">
     <span class="error">* </span>
     <label for="basicpill-firstname-input" class="form-label">Customer Phone:</label>
-    <input type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number" autocomplete="off">
+    <input type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number" autocomplete="off" value="{{ old('phone') }}">
 </div>
                     <div class="col-lg-4 col-md-6">
     <span class="error">*</span>
     <label for="basicpill-firstname-input" class="form-label">Customer Email:</label>
-    {!! Form::email('email', null, array('id' => 'email', 'placeholder' => 'Email','class' => 'form-control')) !!}
+    {!! Form::email('email', old('email'), ['id' => 'email', 'placeholder' => 'Email', 'class' => 'form-control']) !!}
     <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}" autocomplete="off">
     <div id="emailError" class="error-text"></div>
 </div>
                     <div class="col-lg-4 col-md-6">
                     <span class="error">* </span>
                     <label for="basicpill-firstname-input" class="form-label">Source:</label>
-                    <input type="text" placeholder="Source" name="milelemotors" list="milelemotorsList" class="form-control" id="milelemotorsInput" autocomplete="off">
+                    <input type="text" placeholder="Source" name="milelemotors" list="milelemotorsList" class="form-control" id="milelemotorsInput" autocomplete="off" value="{{ old('milelemotors') }}">
                     <datalist id="milelemotorsList">
                     @foreach ($LeadSource as $source)
                     <option value="{{ $source->source_name }}">{{ $source->source_name }}</option>
@@ -113,7 +116,7 @@ input[type=number]::-webkit-outer-spin-button {
                     <div class="col-lg-4 col-md-6">
                     <span class="error">*</span>
                     <label for="basicpill-firstname-input" class="form-label">Preferred Language:</label>
-                    <input type="text" placeholder="Language" name="language" list="laList" class="form-control" id="languageInput" autocomplete="off">
+                    <input type="text" placeholder="Language" name="language" list="laList" class="form-control" id="languageInput" autocomplete="off" value="{{ old('language') }}">
                     <datalist id="laList">
                     @foreach ($Language as $language)
                         <option value="{{ $language->name }}" data-value="{{ $language->name }}">{{ $language->name }}</option>
@@ -123,7 +126,7 @@ input[type=number]::-webkit-outer-spin-button {
                     <div class="col-xs-4 col-sm-12 col-md-4">
                     <span class="error">* </span>
                         <label for="basicpill-firstname-input" class="form-label">Destination : </label>
-                        <input type="text" placeholder="Location" name="location" list="loList" class="form-control" id="locationInput">
+                        <input type="text" placeholder="Location" name="location" list="loList" class="form-control" id="locationInput" value="{{ old('location') }}">
                     <datalist id="loList">
                     @foreach ($countries as $country)
                     <option value="{{ $country }}" data-value="{{ $country }}">{{ $country }}</option>
@@ -134,7 +137,7 @@ input[type=number]::-webkit-outer-spin-button {
                         <div class="col-lg-4 col-md-6">
                         <span class="error">* </span>
                         <label for="basicpill-firstname-input" class="form-label">Type : </label>
-                        <input type="text" placeholder="Type" name="type" list="typeList" class="form-control" id="typeInput">
+                        <input type="text" placeholder="Type" name="type" list="typeList" class="form-control" id="typeInput" value="{{ old('type') }}">
                     <datalist id="typeList">
                     <option value="Export" data-value="Export">Export</option>
                     <option value="Local" data-value="Export">Local</option>
@@ -144,20 +147,20 @@ input[type=number]::-webkit-outer-spin-button {
                     <div class="col-lg-4 col-md-6">
                         <span class="error">* </span>
                         <label for="basicpill-firstname-input" class="form-label">Strategies:</label>
-                        <select name="strategy" class="form-control" id="typeInput">
+                        <select name="strategy" class="form-control" id="typeInput" >
                             @foreach ($strategy as $strategies)
-                                <option value="{{ $strategies->name }}">{{ $strategies->name }}</option>
+                            <option value="{{ $strategies->name }}" {{ old('strategy') == $strategies->name ? 'selected' : '' }}>{{ $strategies->name }} </option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-lg-4 col-md-6">
                         <span class="error">* </span>
                         <label for="basicpill-firstname-input" class="form-label">Priority : </label>
-                        <input type="text" placeholder="Type" name="priority" list="priorityList" class="form-control" id="priorityInput">
+                        <input type="text" placeholder="Type" name="priority" list="priorityList" class="form-control" id="priorityInput" value="{{ old('priority') }}" required>
                     <datalist id="priorityList">
-                    <option value="Normal" data-value="Normal">Normal</option>
-                    <option value="Low" data-value="Low">Low</option>
-                    <option value="Hot" data-value="Hot">Hot</option>
+                        <option value="Normal">Normal</option>
+                        <option value="Low">Low</option>
+                        <option value="Hot">Hot</option>
                     </datalist>
                     </div>
                     </div>
@@ -167,16 +170,16 @@ input[type=number]::-webkit-outer-spin-button {
     <label for="sales-options" class="form-label">Sales Persons Options:</label>
     <div>
         <label>
-            <input type="radio" name="sales-option" id="auto-assign-option" value="auto-assign" checked> System Auto Assign
+            <input type="radio" name="sales-option" id="auto-assign-option"  value="auto-assign" {{ old('sales-option', 'auto-assign') == 'auto-assign' ? 'checked' : '' }}> System Auto Assign
         </label>
         <label>
-            <input type="radio" name="sales-option" id="manual-assign-option" value="manual-assign"> Manual Assign
+            <input type="radio" name="sales-option" id="manual-assign-option" value="manual-assign" {{ old('sales-option') == 'manual-assign' ? 'checked' : '' }}> Manual Assign
         </label>
     </div>
 </div>
 <div class="col-lg-4 col-md-6" id="manual-sales-person-list" style="display: none;">
     <label for="manual-sales-person" class="form-label">Sales Person:</label>
-    <input type="text" placeholder="Sales Persons" name="sales_person" list="salesList" class="form-control" id="salesPersonInput" autocomplete="off">
+    <input type="text" placeholder="Sales Persons" name="sales_person" list="salesList" class="form-control" id="salesPersonInput" autocomplete="off" value="{{ old('sales_person') }}">
 <datalist id="salesList">
     @foreach ($sales_persons as $sales_person)
         @php
@@ -186,7 +189,7 @@ input[type=number]::-webkit-outer-spin-button {
         <option value="{{ $sales_person_name }}" data-id="{{ $sales_person->model_id }}"></option>      
     @endforeach
 </datalist>
-<input type="hidden" name="sales_person_id" id="selectedSalesPersonId">
+<input type="hidden" name="sales_person_id" id="selectedSalesPersonId" value="{{ old('sales_person_id') }}">
                     </div>
                     </div>
                     <div class="maindd">
@@ -194,7 +197,7 @@ input[type=number]::-webkit-outer-spin-button {
         <div class="row">
             <div class="col-lg-4 col-md-6">
             <label for="brandInput" class="form-label">Brand & Models:</label>
-<input type="text" placeholder="Select Brand & Model" name="model_line_id[]" list="brandList" class="form-control mb-1" id="brandInput">
+<input type="text" placeholder="Select Brand & Model" name="model_line_id[]" list="brandList" class="form-control mb-1" id="brandInput" value="{{ old('model_line_id.0') }}">
 <datalist id="brandList">
     @foreach ($modelLineMasters as $modelLineMaster)
         @php
@@ -204,7 +207,7 @@ input[type=number]::-webkit-outer-spin-button {
         <option value="{{ $brand_name }} / {{ $modelLineMaster->model_line }}" data-value="{{ $modelLineMaster->id }}">{{ $brand_name }} / {{ $modelLineMaster->model_line }}</option>
     @endforeach
 </datalist>
-<input type="hidden" name="model_line_ids[]" id="selectedBrandId">
+<input type="hidden" name="model_line_ids[]" id="selectedBrandId" value="{{ old('model_line_ids.0') }}">
             </div>
         </div>
     </div>
@@ -220,7 +223,7 @@ input[type=number]::-webkit-outer-spin-button {
                     </div>
                     <div class="col-lg-12 col-md-12">
                         <label for="basicpill-firstname-input" class="form-label">Remarks : </label>
-                        <textarea name="remarks" id="editor"></textarea>
+                        <textarea name="remarks" id="editor">{{ old('remarks') }}</textarea>
                     </div>
 			        </div>  
                     </br>
@@ -238,7 +241,8 @@ input[type=number]::-webkit-outer-spin-button {
 @endif
 @endsection
 @push('scripts')
-    <script type="text/javascript">
+
+<script type="text/javascript">
     const autoAssignOption = document.getElementById('auto-assign-option');
     const manualAssignOption = document.getElementById('manual-assign-option');
     const manualSalesPersonList = document.getElementById('manual-sales-person-list');
@@ -438,7 +442,7 @@ input[type=number]::-webkit-outer-spin-button {
         var emailValue = emailInput.value;
         var emailError = document.getElementById('emailError');
 
-        if (!validateEmail(emailValue)) {
+        if (!validateEmail(emailValue) && emailValue !== null) {
             emailInput.classList.add('invalid');
             emailError.textContent = 'Please enter a valid email address.';
         } else {
@@ -487,35 +491,32 @@ input[type=number]::-webkit-outer-spin-button {
             selectedBrandIdInput.value = '';
         }
     });
-window.addEventListener('DOMContentLoaded', function() {
-    var input = document.querySelector("#phone");
-    var iti = window.intlTelInput(input, {
-        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
-        separateDialCode: false,
-        autoFormat: false,
-        nationalMode: false
-    });
-    input.addEventListener('input', function() {
-        var currentValue = input.value;
-        var newValue = currentValue.replace(/[^0-9]/g, '');
-        if (newValue.charAt(0) !== '+') {
-            newValue = '+' + newValue;
-        }
-        if (newValue.length > 15) {
-            newValue = newValue.slice(0, 15); // Truncate to 15 digits
-        }
-        input.value = newValue;
-    });
-    iti.events.on("countrychange", function() {
-        var countryCode = iti.getSelectedCountryData().dialCode;
-        if (input.value && input.value.charAt(0) === '+') {
-            input.value = "+" + countryCode + input.value.substr(4);
-        } else {
-            input.value = "+" + countryCode;
-        }
-    });
-});
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var input = document.querySelector("#phone");
+        var iti = window.intlTelInput(input, {
+            separateDialCode: true,
+            preferredCountries: ["ae"],
+            hiddenInput: "full",
+            utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+        });
+
+        $("#calls").on("submit", function () {
+            var fullNumber = iti.getNumber(); // Get full number in international format (+971509909090)
+            
+            // Set the formatted number in the phone input
+            $("<input>").attr({
+                type: "hidden",
+                name: "phone",
+                value: fullNumber
+            }).appendTo("#calls");
+
+            console.log("Submitting Phone Number:", fullNumber); // Debugging
+        });
+    });
+</script>
+
+
 @endpush
