@@ -1,5 +1,8 @@
 @extends('layouts.main')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"></script>
+
 <style>
 .error-text {
     color: red;
@@ -78,50 +81,50 @@ input[type=number]::-webkit-outer-spin-button {
                 <div class="row"> 
 					<div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Customer Name : </label>
-                        <input type="text" name="name" class="form-control" value="{{ $calls->name }}" autocomplete="off">
+                        <input type="text" name="name" class="form-control" value="{{ old('name', $calls->name) }}" autocomplete="off">
                     </div>
                     <div class="col-lg-4 col-md-6">
-    <span class="error">* </span>
-    <label for="basicpill-firstname-input" class="form-label">Customer Phone:</label>
-    <input type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number" value="{{ $calls->phone }}" autocomplete="off">
-</div>
-                    <div class="col-lg-4 col-md-6">
-    <span class="error">*</span>
-    <label for="basicpill-firstname-input" class="form-label">Customer Email:</label>
-    <input type="text" name="email" class="form-control" value="{{ $calls->email }}" id="email">
-    <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}" autocomplete="off">
-    <input type="hidden" name="call_id" value="{{ $calls->id }}" id="call_id">
-    <div id="emailError" class="error-text"></div>
-</div>
-@php
+                    <span class="error">* </span>
+                    <label for="basicpill-firstname-input" class="form-label">Customer Phone:</label>
+                    <input type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number" value="{{ old('phone', $calls->phone) }}" autocomplete="off">
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <span class="error">*</span>
+                    <label for="basicpill-firstname-input" class="form-label">Customer Email:</label>
+                    <input type="text" name="email" class="form-control" value="{{ old('email', $calls->email) }}" id="email">
+                    <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}" autocomplete="off">
+                    <input type="hidden" name="call_id" value="{{ $calls->id }}" id="call_id">
+                    <div id="emailError" class="error-text"></div>
+                </div>
+                @php
                     $leadsources = "";
                      $leadsource = DB::table('lead_source')->where('id', $calls->source)->first();
                      $leadsources = $leadsource->source_name;
                      @endphp
                     <div class="col-lg-4 col-md-6">
-                    <span class="error">* </span>
-                    <label for="basicpill-firstname-input" class="form-label">Source:</label>
-                    <input type="text" placeholder="Source" name="milelemotors" list="milelemotorsList" class="form-control" id="milelemotorsInput" value="{{ $leadsources }}">
-                    <datalist id="milelemotorsList">
-                    @foreach ($LeadSource as $source)
-                    <option value="{{ $source->source_name }}">{{ $source->source_name }}</option>
-                    @endforeach
-                    </datalist>
+                        <span class="error">* </span>
+                        <label for="basicpill-firstname-input" class="form-label">Source:</label>
+                        <input type="text" placeholder="Source" name="milelemotors" list="milelemotorsList" class="form-control" id="milelemotorsInput" value="{{ old('milelemotors', $leadsources) }}">
+                        <datalist id="milelemotorsList">
+                        @foreach ($LeadSource as $source)
+                            <option value="{{ $source->source_name }}">{{ $source->source_name }}</option>
+                        @endforeach
+                        </datalist>
                     </div>
                     <div class="col-lg-4 col-md-6">
-    <span class="error">*</span>
-    <label for="basicpill-firstname-input" class="form-label">Preferred Language:</label>
-    <input type="text" placeholder="Language" name="language" list="laList" class="form-control" id="languageInput" value="{{ $calls->language}}">
-    <datalist id="laList">
-    @foreach ($Language as $language)
-        <option value="{{ $language->name }}" data-value="{{ $language->name }}">{{ $language->name }}</option>
-    @endforeach
-    </datalist>
-</div>
+                        <span class="error">*</span>
+                        <label for="basicpill-firstname-input" class="form-label">Preferred Language:</label>
+                        <input type="text" placeholder="Language" name="language" list="laList" class="form-control" id="languageInput" value="{{ old('language', $calls->language) }}">
+                        <datalist id="laList">
+                        @foreach ($Language as $language)
+                            <option value="{{ $language->name }}" data-value="{{ $language->name }}">{{ $language->name }}</option>
+                        @endforeach
+                        </datalist>
+                    </div>
                     <div class="col-xs-4 col-sm-12 col-md-4">
                     <span class="error">* </span>
                     <label for="basicpill-firstname-input" class="form-label">Destination : </label>
-                    <input type="text" placeholder="Location" name="location" list="loList" class="form-control" id="locationInput" value="{{ $calls->location}}">
+                    <input type="text" placeholder="Location" name="location" list="loList" class="form-control" id="locationInput" value="{{ old('location', $calls->location) }}">
                     <datalist id="loList">
                     @foreach ($countries as $country)
                     <option value="{{ $country }}" data-value="{{ $country }}">{{ $country }}</option>
@@ -132,7 +135,7 @@ input[type=number]::-webkit-outer-spin-button {
                     <div class="col-lg-4 col-md-6">
                     <span class="error">* </span>
                     <label for="basicpill-firstname-input" class="form-label">Type : </label>
-                    <input type="text" placeholder="Type" name="type" list="typeList" class="form-control" id="typeInput" value="{{ $calls->type}}">
+                    <input type="text" placeholder="Type" name="type" list="typeList" class="form-control" id="typeInput" value="{{ old('type', $calls->type) }}">
                     <datalist id="typeList">
                     <option value="Export" data-value="Export">Export</option>
                     <option value="Local" data-value="Export">Local</option>
@@ -235,11 +238,11 @@ $brand_name = $brand->brand_name;
     </div>
                     <div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Custom Brand & Model : </label>
-                        <input type="text" placeholder="Custom Brand Model" name="custom_brand_model" class="form-control" value="{{ $calls->custom_brand_model}}">
+                        <input type="text" placeholder="Custom Brand Model" name="custom_brand_model" class="form-control" value="{{ old('custom_brand_model', $calls->custom_brand_model) }}">
                     </div>
                     <div class="col-lg-12 col-md-12">
                         <label for="basicpill-firstname-input" class="form-label">Remarks : </label>
-                        <textarea name="remarks" id="editor">{{ $calls->remarks}}</textarea>
+                        <textarea name="remarks" id="editor">{{ old('remarks', $calls->remarks) }}</textarea>
                     </div>
 			        </div>  
                     </br>
@@ -507,72 +510,7 @@ $brand_name = $brand->brand_name;
             selectedBrandIdInput.value = '';
         }
     });
-    window.addEventListener('DOMContentLoaded', function() {
-    var input = document.querySelector("#phone");
-    var iti = window.intlTelInput(input, {
-        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
-        autoFormat: false,
-        separateDialCode: false,
-        nationalMode: false
-    });
-// Manually format the initial value
-var initialValue = input.value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
-    input.value = "+" + initialValue; // Add '+' at the beginning
-    // var originalValue = input.value; 
-    iti.setNumber(input.value);
 
-    $('#updateForm').on('submit', function(e) {
-        e.preventDefault(); 
-
-        if (!iti.isValidNumber()) {
-            // Show an error if the number is invalid
-            $('#phone').siblings('.invalid-feedback').show();
-            return false; // Stop the form submission
-        } else {
-            $('#phone').siblings('.invalid-feedback').hide();
-        }
-
-        var formData = $(this).serialize(); // Serialize the form data
-
-        $.ajax({
-            url: $(this).attr('action'), // Get the action attribute from the form element
-            type: 'POST',
-            data: formData,
-            success: function(response) {
-                console.log('Form submitted successfully');
-                // Optionally update UI or redirect
-            },
-            error: function(xhr, status, error) {
-                console.log('Error: ' + error);
-                // Display an error message
-            }
-        });
-    });
-
-    input.addEventListener('input', function() {
-        var newValue = input.value.replace(/[^0-9]/g, '');
-
-        if (newValue.charAt(0) !== '+') {
-            newValue = '+' + newValue;
-        }
-        if (newValue.length > 15) {
-            newValue = newValue.slice(0, 15);
-        }
-        input.value = newValue;
-    });
-
-    iti.events.on("countrychange", function() {
-        var countryCode = iti.getSelectedCountryData().dialCode;
-
-        if (input.value && input.value.charAt(0) === '+') {
-            input.value = "+" + countryCode + input.value.substr(4);
-        } else {
-            input.value = "+" + countryCode;
-        }
-    });
-
-    input.value = originalValue;
-});
    $(document).ready(function() {
    $('.remove-row-btn').click(function(e) {
     e.preventDefault();
@@ -606,20 +544,43 @@ var initialValue = input.value.replace(/[^0-9]/g, ''); // Remove non-numeric cha
         data: {
           modelLineMasterId: modelLineMasterId,
           callRequirementId: callRequirementId,
-          _token: csrfToken // Include the CSRF token in the request data
+          _token: csrfToken
         },
         success: function(response) {
-          // Handle the response if needed
           console.log(response);
         },
         error: function(xhr, status, error) {
-          // Handle the error if needed
           console.log(error);
         }
       });
     });
   });
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"></script>
+
+<script>
+    $(document).ready(function () {
+        var input = document.querySelector("#phone");
+        var iti = window.intlTelInput(input, {
+            separateDialCode: true,
+            preferredCountries: ["ae"],
+            hiddenInput: "full",
+            utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+        });
+
+        $("#calls").on("submit", function () {
+            var fullNumber = iti.getNumber();
+            $("<input>").attr({
+                type: "hidden",
+                name: "phone",
+                value: fullNumber
+            }).appendTo("#calls");
+        });
+
+        $('.remove-row-btn').click(function(e) {
+            e.preventDefault();
+            $(this).closest('.row').remove();
+        });
+    });
+</script>
+
 @endpush
