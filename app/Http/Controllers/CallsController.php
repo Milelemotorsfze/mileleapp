@@ -633,7 +633,7 @@ class CallsController extends Controller
         $useractivities->activity = "View The Most Lead Brand And Models";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-    return view('calls.resultbrand', compact('data'));
+        return view('calls.resultbrand', compact('data'));
     }
     /**
      * Show the form for editing the specified resource.
@@ -644,13 +644,14 @@ class CallsController extends Controller
         $Language = Language::get();
         $countries = CountryListFacade::getList('en');
         $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
+        $strategy = Strategy::get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
         $sales_persons = ModelHasRoles::where('role_id', 7)->get();
         $useractivities =  New UserActivities();
         $useractivities->activity = "Open Edit Page of Leads";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-        return view('calls.edit', compact('calls','countries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'Language'));
+        return view('calls.edit', compact('calls','countries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'Language', 'strategy'));
     }
 
     /**
@@ -680,6 +681,15 @@ class CallsController extends Controller
 		else{
 		$sales_person_id = $request->input('old_sales_person_id');	
 		}
+
+        $strategyRecord = Strategy::where('name', $request->input('strategy'))->first();
+        $strategies_id = $strategyRecord ? $strategyRecord->id : null;
+
+        $phone = trim($request->input('phone'));
+        if (!empty($phone) && substr($phone, 0, 1) !== '+') {
+            $phone = '+' . $phone;
+        }
+
         $date = Carbon::now();
         $date->setTimezone('Asia/Dubai');
         $formattedDate = $date->format('Y-m-d H:i:s');
@@ -695,10 +705,12 @@ class CallsController extends Controller
 		$model->sales_person = $sales_person_id;
 		$model->remarks = $request->input('remarks');
 		$model->location = $request->input('location');
-		$model->phone = $request->input('phone');
+		$model->phone = $phone;
 		// $model->secondary_phone_number = $request->input('secondary_phone_number');
 		$model->custom_brand_model = $request->input('custom_brand_model');
 		$model->language = $request->input('language');
+        $model->strategies_id = $strategies_id;
+        $model->priority = $request->input('priority');
 		$model->status = "New";
 		$model->save();
 		}

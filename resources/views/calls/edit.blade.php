@@ -142,6 +142,28 @@ input[type=number]::-webkit-outer-spin-button {
                     <option value="Other" data-value="Export">Other</option>
                     </datalist>
                     </div>
+
+
+                    <div class="col-lg-4 col-md-6">
+                        <span class="error">* </span>
+                        <label for="basicpill-firstname-input" class="form-label">Strategies:</label>
+                        <select name="strategy" class="form-control" id="typeInput" >
+                            @foreach ($strategy as $strategies)
+                            <option value="{{ $strategies->name }}" {{ old('strategy') == $strategies->name ? 'selected' : '' }}>{{ $strategies->name }} </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <span class="error">* </span>
+                        <label for="basicpill-firstname-input" class="form-label">Priority : </label>
+                        <input type="text" placeholder="Type" name="priority" list="priorityList" class="form-control" id="priorityInput" value="{{ old('priority', $calls->priority) }}" required>
+                    <datalist id="priorityList">
+                        <option value="normal">Normal</option>
+                        <option value="low">Low</option>
+                        <option value="hot">Hot</option>
+                    </datalist>
+                    </div>
+
                     </div>
                     </br>
                     <div class="row">
