@@ -1116,17 +1116,33 @@ public function uploadingbulk(Request $request)
             else {
                 $language = 'Not Supported';
             }
-            if ($location !== null) {
-                $location = Country::where('name', $location)->first();
-                if ($location) {
-                    $location = $location->name;
+            if (!empty($language)) {
+                $languageRecord = Language::where('name', $language)->first();
+                if ($languageRecord) {
+                    $language = $languageRecord->name;
                 } else {
-                    $location = 'Not Supported';
+                    $errorDescription .= 'Invalid Language ';
+                    $language = null;
                 }
-            } 
-            else {
-                $location = 'Not Supported';
+            } else {
+                $errorDescription .= 'Language Missing ';
+                $language = null;
             }
+            
+            if (!empty($location)) {
+                $locationRecord = Country::where('name', $location)->first();
+                if ($locationRecord) {
+                    $location = $locationRecord->name;
+                } else {
+                    $errorDescription .= 'Invalid Location ';
+                    $location = null;
+                }
+            } else {
+                $errorDescription .= 'Location Missing ';
+                $location = null;
+            }
+
+            
             if($lead_source_id === 1 || $salesPerson === 'not correct' || $language === 'Not Supported' || $location === 'Not Supported' || $strategies_id === 1)
             {
                 $filteredRows[] = $row;
