@@ -212,51 +212,53 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
         <div class="maindd">
             <div id="row-container">
                 <div class="row">
-                <div class="col-lg-4 col-md-6">
-                    <label for="brandSelect" class="form-label">Brand & Models:</label>
-                    <select name="model_line_ids[]" class="form-control select2" id="brandSelect" multiple>
-                        <option value="">Select Brand & Model</option>
-                        @foreach ($modelLineMasters as $modelLineMaster)
-                            @php
-                                $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
-                                $brand_name = $brand ? $brand->brand_name : 'Unknown Brand';
-                                $full_value = $brand_name . ' / ' . $modelLineMaster->model_line;
-                            @endphp
-                            <option value="{{ $modelLineMaster->id }}" 
-                                {{ old('model_line_ids.0') == $modelLineMaster->id ? 'selected' : '' }}>
-                                {{ $full_value }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+                    <div class="col-lg-4 col-md-6">
+                        <label for="brandModelSelect" class="form-label">Brand & Model:</label>
+                        <select name="model_line_ids[]" class="form-control select2" id="brandModelSelect" multiple>
+                            <option value="">Select Brand & Model</option>
+                            @foreach ($modelLineMasters as $modelLineMaster)
+                                @php
+                                    $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
+                                    $brand_name = $brand->brand_name;
+                                    $combinedValue = $brand_name . ' / ' . $modelLineMaster->model_line;
+                                @endphp
+                                <option value="{{ $modelLineMaster->id }}"
+                                    {{ old('model_line_ids.0') == $modelLineMaster->id ? 'selected' : '' }}>
+                                    {{ $combinedValue }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
             </div>
+
             <div class="col-lg-12 col-md-12 mt-3 d-flex justify-content-start">
                 <div class="btn btn-primary add-row-btn">
                     <i class="fas fa-plus"></i> Add More
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 col-md-6">
-            <label for="basicpill-firstname-input" class="form-label">Custom Brand & Model : </label>
-            {!! Form::text('custom_brand_model', null, array('placeholder' => 'Custom Brand & Model','class' => 'form-control')) !!}
-        </div>
-        <div class="col-lg-12 col-md-12">
-            <label for="basicpill-firstname-input" class="form-label">Remarks : </label>
-            <textarea name="remarks" id="editor">{{ old('remarks') }}</textarea>
-        </div>
-</div>
-</br>
-</br>
-<div class="col-lg-12 col-md-12">
-    <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
-</div>
-{!! Form::close() !!}
-</br>
-</div>
-@else
-@php
-redirect()->route('home')->send();
+
+                    <div class="col-lg-4 col-md-6">
+                        <label for="basicpill-firstname-input" class="form-label">Custom Brand & Model : </label>
+                        {!! Form::text('custom_brand_model', null, array('placeholder' => 'Custom Brand & Model','class' => 'form-control')) !!}
+                    </div>
+                    <div class="col-lg-12 col-md-12">
+                        <label for="basicpill-firstname-input" class="form-label">Remarks : </label>
+                        <textarea name="remarks" id="editor"></textarea>
+                    </div>
+			        </div>  
+                    </br>
+                    </br> 
+			        <div class="col-lg-12 col-md-12">
+				    <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
+			        </div>  
+		{!! Form::close() !!}
+		</br>
+    </div>
+    @else
+    @php
+        redirect()->route('home')->send();
 @endphp
 @endif
 @endsection
