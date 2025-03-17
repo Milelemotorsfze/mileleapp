@@ -158,9 +158,9 @@ input[type=number]::-webkit-outer-spin-button {
                         <label for="basicpill-firstname-input" class="form-label">Priority : </label>
                         <input type="text" placeholder="Type" name="priority" list="priorityList" class="form-control" id="priorityInput" value="{{ old('priority') }}" required>
                     <datalist id="priorityList">
-                        <option value="Normal">Normal</option>
-                        <option value="Low">Low</option>
-                        <option value="Hot">Hot</option>
+                        <option value="normal">Normal</option>
+                        <option value="low">Low</option>
+                        <option value="hot">Hot</option>
                     </datalist>
                     </div>
                     </div>
