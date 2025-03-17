@@ -629,6 +629,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                                         <tr>
                                             <th>Phone</th>
                                             <td id="phone-field" data-field="phone">{{ $lead->phone }}</td>
+                                            @php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+@endphp
+@if ($hasPermission)
+                                            <td>
+                                                <button class="btn btn-sm btn-link edit-btn">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </td>
+                                            @endif
                                         </tr>
                                         <tr>
                                             <th>Email</th>
