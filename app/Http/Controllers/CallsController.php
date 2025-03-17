@@ -580,8 +580,8 @@ class CallsController extends Controller
                 $table_id = $lastRecord->id;
                 $modelLineIds = $request->input('model_line_ids');
 
-            if ($modelLineIds[0] !== null) {
-                foreach ($modelLineIds as $modelLineId) {
+            if (!empty($modelLineIds) && is_array($modelLineIds) && $modelLineIds[0] !== null) {
+                    foreach ($modelLineIds as $modelLineId) {
                     $datacalls = [
                         'lead_id' => $table_id,
                         'model_line_id' => $modelLineId,
