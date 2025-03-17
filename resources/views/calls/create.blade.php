@@ -126,7 +126,7 @@ input[type=number]::-webkit-outer-spin-button {
                     <div class="col-xs-4 col-sm-12 col-md-4">
                     <span class="error">* </span>
                         <label for="basicpill-firstname-input" class="form-label">Destination : </label>
-                        <input type="text" placeholder="Location" name="location" list="loList" class="form-control" id="locationInput" value="{{ old('location') }}">
+                        <input type="text" placeholder="Destination" name="location" list="loList" class="form-control" id="locationInput" value="{{ old('location') }}">
                     <datalist id="loList">
                     @foreach ($countries as $country)
                     <option value="{{ $country }}" data-value="{{ $country }}">{{ $country }}</option>
@@ -442,7 +442,10 @@ input[type=number]::-webkit-outer-spin-button {
         var emailValue = emailInput.value;
         var emailError = document.getElementById('emailError');
 
-        if (!validateEmail(emailValue) && emailValue !== null) {
+        if (emailValue === '') {
+            emailInput.classList.remove('invalid');
+            emailError.textContent = '';
+        } else if (!validateEmail(emailValue)) {
             emailInput.classList.add('invalid');
             emailError.textContent = 'Please enter a valid email address.';
         } else {
@@ -504,16 +507,14 @@ input[type=number]::-webkit-outer-spin-button {
         });
 
         $("#calls").on("submit", function () {
-            var fullNumber = iti.getNumber(); // Get full number in international format (+971509909090)
+            var fullNumber = iti.getNumber(); 
             
-            // Set the formatted number in the phone input
             $("<input>").attr({
                 type: "hidden",
                 name: "phone",
                 value: fullNumber
             }).appendTo("#calls");
 
-            console.log("Submitting Phone Number:", fullNumber); // Debugging
         });
     });
 </script>

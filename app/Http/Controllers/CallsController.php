@@ -367,6 +367,10 @@ class CallsController extends Controller
                 'model_line_ids.*' => 'distinct',
                 'type' => 'required',
                 'sales_person_id' => ($request->input('sales-option') == "manual-assign") ? 'required' : '',
+            ],
+            [
+                'milelemotors.required' => 'The Source field is required.',
+                'location.required' => 'The Destination field is required.',
             ]);
             
             if ($validator->fails()) {
@@ -374,7 +378,7 @@ class CallsController extends Controller
                     ->withErrors($validator)
                     ->withInput(); 
             }
-              
+            
             if ($request->input('sales-option') == "auto-assign") {
                 $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
                 $email = $request->input('email');
@@ -496,113 +500,113 @@ class CallsController extends Controller
                     elseif ($existing_language_count > 1) {
                         $sales_person_ids = $sales_person_languages->pluck('sales_person');
                         $lowest_lead_sales_person = ModelHasRoles::select('model_id')
-        ->where('role_id', 7)
-        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-        ->where('users.status', 'active')
-        ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
-        ->join('sales_person_laugauges', 'model_has_roles.model_id', '=', 'sales_person_laugauges.sales_person')
-        ->whereIn('model_has_roles.model_id', $excluded_user_ids)
-        ->whereIn('model_has_roles.model_id', $sales_person_ids)
-        ->where('calls.status', 'New')
-        ->where('sales_person_laugauges.language', $language)
-        ->groupBy('calls.sales_person')
-        ->orderByRaw('COUNT(calls.id) ASC')
-        ->first();
+            ->where('role_id', 7)
+            ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+            ->where('users.status', 'active')
+            ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
+            ->join('sales_person_laugauges', 'model_has_roles.model_id', '=', 'sales_person_laugauges.sales_person')
+            ->whereIn('model_has_roles.model_id', $excluded_user_ids)
+            ->whereIn('model_has_roles.model_id', $sales_person_ids)
+            ->where('calls.status', 'New')
+            ->where('sales_person_laugauges.language', $language)
+            ->groupBy('calls.sales_person')
+            ->orderByRaw('COUNT(calls.id) ASC')
+            ->first();
 
-        $sales_person_id = $lowest_lead_sales_person->model_id;
+            $sales_person_id = $lowest_lead_sales_person->model_id;
 
-                        break;
+                            break;
+                            }
+                        else{
+                            $lowest_lead_sales_person = ModelHasRoles::select('model_id')
+                            ->where('role_id', 7)
+                            ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+                            ->where('users.status', 'active')
+                            ->leftJoin('calls', function ($join) {
+                                $join->on('model_has_roles.model_id', '=', 'calls.sales_person')
+                                    ->where('calls.status', 'New');
+                            })
+                            ->whereIn('model_has_roles.model_id', $excluded_user_ids)
+                            ->groupBy('model_has_roles.model_id')
+                            ->orderByRaw('COALESCE(COUNT(calls.id), 0) ASC')
+                            ->first();
+                            $sales_person_id = $lowest_lead_sales_person->model_id;
                         }
-                    else{
-                        $lowest_lead_sales_person = ModelHasRoles::select('model_id')
-                        ->where('role_id', 7)
-                        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-                        ->where('users.status', 'active')
-                        ->leftJoin('calls', function ($join) {
-                            $join->on('model_has_roles.model_id', '=', 'calls.sales_person')
-                                ->where('calls.status', 'New');
-                        })
-                        ->whereIn('model_has_roles.model_id', $excluded_user_ids)
-                        ->groupBy('model_has_roles.model_id')
-                        ->orderByRaw('COALESCE(COUNT(calls.id), 0) ASC')
-                        ->first();
-                        $sales_person_id = $lowest_lead_sales_person->model_id;
+                        }
                     }
                     }
                 }
-                }
+            else{
+                $sales_person_id = $request->input('sales_person_id');
             }
-        else{
-            $sales_person_id = $request->input('sales_person_id');
-        }
-            $date = Carbon::now();
-            $date->setTimezone('Asia/Dubai');
-            $formattedDate = $date->format('Y-m-d H:i:s');
-            $straigy = $request->input('strategy');
-            $strategies_id = Strategy::where('name',$straigy)->first();
-            $dataValue = LeadSource::where('source_name', $request->input('milelemotors'))->value('id');
-            $data = [
-                'name' => $request->input('name'),
-                'source' => $dataValue,
-                'email' => $request->input('email'),
-                'type' => $request->input('type'),
-                'sales_person' => $sales_person_id,
-                'remarks' => $request->input('remarks'),
-                'assign_time' => Carbon::now(),
-                'location' => $request->input('location'),
-                'phone' => $request->input('phone'),
-                // 'secondary_phone_number' => $request->input('secondary_phone_number'),
-                'strategies_id' => $strategies_id->id,
-                'priority' => $request->input('priority'),
-                'custom_brand_model' => $request->input('custom_brand_model'),
-                'language' => $request->input('language'),
-                'created_at' => $formattedDate,
-                'assign_time' => $formattedDate,
-                'created_by' => Auth::id(),
-                'status' => "New",
-            ];
-            $model = new Calls($data);
-            $model->save();
-            $lastRecord = Calls::where('created_by', $data['created_by'])
-                    ->orderBy('id', 'desc')
-                    ->first();
-            $leads_notifications = New LeadsNotifications();
-            $leads_notifications->calls_id = $lastRecord->id;
-            $leads_notifications->remarks = "New Assign Lead";
-            $leads_notifications->status = "New";
-            $leads_notifications->user_id = $sales_person_id;
-            $leads_notifications->category = "New Assign Lead";
-            $leads_notifications->save();
-            $table_id = $lastRecord->id;
-            $modelLineIds = $request->input('model_line_ids');
-
-        if ($modelLineIds[0] !== null) {
-            foreach ($modelLineIds as $modelLineId) {
-                $datacalls = [
-                    'lead_id' => $table_id,
-                    'model_line_id' => $modelLineId,
-                    'created_at' => $formattedDate
+                $date = Carbon::now();
+                $date->setTimezone('Asia/Dubai');
+                $formattedDate = $date->format('Y-m-d H:i:s');
+                $straigy = $request->input('strategy');
+                $strategies_id = Strategy::where('name',$straigy)->first();
+                $dataValue = LeadSource::where('source_name', $request->input('milelemotors'))->value('id');
+                $data = [
+                    'name' => $request->input('name'),
+                    'source' => $dataValue,
+                    'email' => $request->input('email'),
+                    'type' => $request->input('type'),
+                    'sales_person' => $sales_person_id,
+                    'remarks' => $request->input('remarks'),
+                    'assign_time' => Carbon::now(),
+                    'location' => $request->input('location'),
+                    'phone' => $request->input('phone'),
+                    // 'secondary_phone_number' => $request->input('secondary_phone_number'),
+                    'strategies_id' => $strategies_id->id,
+                    'priority' => $request->input('priority'),
+                    'custom_brand_model' => $request->input('custom_brand_model'),
+                    'language' => $request->input('language'),
+                    'created_at' => $formattedDate,
+                    'assign_time' => $formattedDate,
+                    'created_by' => Auth::id(),
+                    'status' => "New",
                 ];
-
-                $model = new CallsRequirement($datacalls);
+                $model = new Calls($data);
                 $model->save();
+                $lastRecord = Calls::where('created_by', $data['created_by'])
+                        ->orderBy('id', 'desc')
+                        ->first();
+                $leads_notifications = New LeadsNotifications();
+                $leads_notifications->calls_id = $lastRecord->id;
+                $leads_notifications->remarks = "New Assign Lead";
+                $leads_notifications->status = "New";
+                $leads_notifications->user_id = $sales_person_id;
+                $leads_notifications->category = "New Assign Lead";
+                $leads_notifications->save();
+                $table_id = $lastRecord->id;
+                $modelLineIds = $request->input('model_line_ids');
+
+            if ($modelLineIds[0] !== null) {
+                foreach ($modelLineIds as $modelLineId) {
+                    $datacalls = [
+                        'lead_id' => $table_id,
+                        'model_line_id' => $modelLineId,
+                        'created_at' => $formattedDate
+                    ];
+
+                    $model = new CallsRequirement($datacalls);
+                    $model->save();
+                }
             }
+                $logdata = [
+                    'table_name' => "calls",
+                    'table_id' => $table_id,
+                    'user_id' => Auth::id(),
+                    'action' => "Create",
+                ];
+                $model = new Logs($logdata);
+                $model->save();
+                $useractivities =  New UserActivities();
+                $useractivities->activity = "Store New Lead";
+                $useractivities->users_id = Auth::id();
+                $useractivities->save();
+                return redirect()->route('calls.index')
+                ->with('success','Call Record created successfully');
         }
-            $logdata = [
-                'table_name' => "calls",
-                'table_id' => $table_id,
-                'user_id' => Auth::id(),
-                'action' => "Create",
-            ];
-            $model = new Logs($logdata);
-            $model->save();
-            $useractivities =  New UserActivities();
-            $useractivities->activity = "Store New Lead";
-            $useractivities->users_id = Auth::id();
-            $useractivities->save();
-            return redirect()->route('calls.index')
-            ->with('success','Call Record created successfully');
-    }
     public function showcalls(Request $request, $call, $brand_id, $model_line_id, $location, $days, $custom_brand_model = null)
     {   
         $brandId = $request->route('brand_id');
@@ -663,7 +667,12 @@ class CallsController extends Controller
             'language' => 'required',
             'type' => 'required',
             'sales_person_id' => ($request->input('sales-option') == "manual-assign") ? 'required' : '',
-        ]);      
+        ],
+        [
+            'milelemotors.required' => 'The Source field is required.',
+            'location.required' => 'The Destination field is required.',
+        ]);
+
         if ($request->input('sales-option') == "manual-assign") 
 		{
         $sales_person_id = $request->input('sales_person_id');
@@ -876,8 +885,8 @@ public function uploadingbulk(Request $request)
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $headers = [
-            'Name', 'Phone', 'Email', 'Sales Person', 'Source Name', 'Language',
-            'Location', 'Brand', 'Model Line Name', 'Custom Brand Model', 'Remarks', 'Error Description'
+            'Name', 'Phone', 'Email', 'Location', 'Sales Person', 'Source Name', 'Language',
+             'Brand', 'Model Line Name', 'Custom Brand Model', 'Remarks', 'Strategies', 'Priority','Error Description'
         ];
         $sheet->fromArray($headers, null, 'A1');
 
@@ -1148,7 +1157,12 @@ public function uploadingbulk(Request $request)
                 $date->setTimezone('Asia/Dubai');
                 $formattedDate = $date->format('Y-m-d H:i:s');
                 $call->name = $row[0];
-                $call->phone = $row[1];
+                // $call->phone = $row[1];
+                $cleanPhone = trim($row[1]);
+                if (!empty($cleanPhone) && substr($cleanPhone, 0, 1) !== '+') {
+                    $cleanPhone = '+' . $cleanPhone;
+                }
+                $call->phone = $cleanPhone;
                 $call->email = $row[2];
                 $call->assign_time = Carbon::now();
                 $call->custom_brand_model = $row[9];
