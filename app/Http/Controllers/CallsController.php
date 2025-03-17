@@ -1156,14 +1156,17 @@ public function uploadingbulk(Request $request)
                 $date = Carbon::now();
                 $date->setTimezone('Asia/Dubai');
                 $formattedDate = $date->format('Y-m-d H:i:s');
-                $call->name = $row[0];
-                // $call->phone = $row[1];
+                $call->name = !empty(trim($row[0])) ? trim($row[0]) : null;
                 $cleanPhone = trim($row[1]);
-                if (!empty($cleanPhone) && substr($cleanPhone, 0, 1) !== '+') {
-                    $cleanPhone = '+' . $cleanPhone;
+                if ($cleanPhone === '') {
+                    $call->phone = null;
+                } else {
+                    if (substr($cleanPhone, 0, 1) !== '+') {
+                        $cleanPhone = '+' . $cleanPhone;
+                    }
+                    $call->phone = $cleanPhone;
                 }
-                $call->phone = $cleanPhone;
-                $call->email = $row[2];
+                $call->email = !empty(trim($row[2])) ? trim($row[2]) : null;
                 $call->assign_time = Carbon::now();
                 $call->custom_brand_model = $row[9];
                 $call->remarks = $row[10];
