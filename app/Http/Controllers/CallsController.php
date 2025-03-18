@@ -805,6 +805,15 @@ public function uploadingbulk(Request $request)
     $phoneUtil = PhoneNumberUtil::getInstance();
 
     foreach ($rows as $row) {
+
+        $nonEmptyValues = array_filter($row, function ($value) {
+            return !is_null($value) && trim($value) !== '';
+        });
+    
+        if (empty($nonEmptyValues)) {
+            continue;
+        }
+
         $errorMessages = [];
         $isPhoneValid = false;
         $isEmailValid = false;
