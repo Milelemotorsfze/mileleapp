@@ -576,6 +576,7 @@ table.dataTable thead th select {
                   <th>Price</th>
                 @endif
                   <th>Document Owership</th>
+                  <th>Work Order Date</th>
                   <th>Comments</th>
                 </tr>
               </thead>
@@ -862,6 +863,20 @@ if (hasPricePermission) {
     }
                 columns9.push(
         { data: 'ownership_type', name: 'vehicles.ownership_type' },
+        {
+        data: 'work_order_date',
+        name: 'work_orders.date',
+        render: function(data, type, row) {
+            if (data) {
+                var dateObj = new Date(data);
+                var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                    day: '2-digit', month: 'short', year: 'numeric'
+                });
+                return formattedDate;
+            }
+            return '';
+        }
+    },
         {
     data: null,
     name: 'chat',
