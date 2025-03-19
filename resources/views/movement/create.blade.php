@@ -1,25 +1,25 @@
 @extends('layouts.main')
 @section('content')
 @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-daily-movemnets');
-                    @endphp
-                    @if ($hasPermission)
-<div class="card-header">
-        <h4 class="card-title">Add New Movement Transection</h4>
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-daily-movemnets');
+    @endphp
+    @if ($hasPermission)
+    <div class="card-header">
+        <h4 class="card-title">Add New Movement Transaction</h4>
         <div class="row">
             <p><span style="float:right;" class="error">* Required Field</span></p>
 			</div>
             @if ($lastIdExists)
-    <a class="btn btn-sm btn-info" href="{{ route('movement.lastReference', ['currentId' => ($movementsReferenceId - 1)]) }}">
-        <i class="fa fa-arrow-left" aria-hidden="true"></i>
-    </a>
-@endif
-<b>Ref No: {{$movementsReferenceId}}</b>
-@if ($NextIdExists)
-    <a class="btn btn-sm btn-info" href="{{ route('movement.lastReference', ['currentId' => ($movementsReferenceId + 1)]) }}">
-       <i class="fa fa-arrow-right" aria-hidden="true"></i>
-    </a>
-@endif
+                <a class="btn btn-sm btn-info" href="{{ route('movement.lastReference', ['currentId' => ($movementsReferenceId - 1)]) }}">
+                    <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                </a>
+            @endif
+        <b>Ref No: {{$movementsReferenceId}}</b>
+        @if ($NextIdExists)
+            <a class="btn btn-sm btn-info" href="{{ route('movement.lastReference', ['currentId' => ($movementsReferenceId + 1)]) }}">
+            <i class="fa fa-arrow-right" aria-hidden="true"></i>
+            </a>
+        @endif
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a> 
     </div>
     <div class="card-body">
@@ -50,7 +50,7 @@
             }
         }, 5000); // 5000 milliseconds = 5 seconds
     </script>
-@endif
+    @endif
         <form action="{{ route('movement.store') }}" method="POST" id="purchasing-order">
         @csrf
         <div class="row">
