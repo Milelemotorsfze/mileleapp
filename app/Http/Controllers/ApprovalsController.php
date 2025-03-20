@@ -1467,6 +1467,7 @@ class ApprovalsController extends Controller
 }
 public function submitGrn(Request $request)
     {
+        // info($request->all());
         // Validate the request data
         $validator = Validator::make($request->all(), [
             'vehicle_id' => 'required|exists:vehicles,id',
@@ -1487,6 +1488,7 @@ public function submitGrn(Request $request)
                 'message' => 'Vehicle not found',
             ], 404);
         }
+        // get po corresponding to the vin and update GRN number to the particular 
         // Retrieve the GRN record by grn_id in the vehicle record
         $grnRecord = Grn::find($vehicle->grn_id);
         if (!$grnRecord) {
