@@ -118,6 +118,11 @@ public function latestRemarkSales()
     {
         return $this->belongsTo(Warehouse::class, 'latest_location','id');
     }
+    public function woVehicle()
+    {
+        return $this->hasOne(WOVehicles::class, 'vehicle_id', 'id');
+    }
+
     // public function getSimilarVehiclesWithInactiveStockAttribute()
     // {
     //     // dd($this->varaints_id);
