@@ -66,12 +66,13 @@ class InspectionController extends Controller
                     'int_color.name as interior_color',
                     'ex_color.name as exterior_color',
                     'purchasing_order.po_number',
-                    'grn.grn_number',
-                    DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
+                    'movement_grns.grn_number',
+                    DB::raw("DATE_FORMAT(movements_reference.date, '%d-%b-%Y') as date"),
                 ])
                 ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
+                ->leftJoin('movements_reference', 'movement_grns.movement_reference_id', '=', 'movements_reference.id')
                 ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
                 ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
@@ -81,7 +82,9 @@ class InspectionController extends Controller
                 ->whereNull('inspection.id')
                 ->whereNull('vehicles.inspection_date')
                 ->whereNull('vehicles.gdn_id')
-                ->whereNotNull('vehicles.grn_id');
+                // ->whereNotNull('vehicles.grn_id')
+                ->whereNotNull('vehicles.movement_grn_id');
+                 
                 $data = $data->groupBy('vehicles.id');
             }
             else if($status === "Incoming")
@@ -141,12 +144,11 @@ class InspectionController extends Controller
                     'int_color.name as interior_color',
                     'ex_color.name as exterior_color',
                     'purchasing_order.po_number',
-                    'grn.grn_number',
-                    DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
+                    'movement_grns.grn_number',
                 ])
                 ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
                 ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
                 ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
@@ -195,14 +197,13 @@ class InspectionController extends Controller
                     'int_color.name as interior_color',
                     'ex_color.name as exterior_color',
                     'purchasing_order.po_number',
-                    'grn.grn_number',
+                    'movement_grns.grn_number',
                     'so.so_number',
-                    DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
                     DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
                 ])
                 ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
                 ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
                 ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
                 ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
@@ -253,11 +254,11 @@ class InspectionController extends Controller
                     'int_color.name as interior_color',
                     'ex_color.name as exterior_color',
                     'purchasing_order.po_number',
-                    'grn.grn_number',
+                    'movement_grns.grn_number',
                 ])
                 ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
                 ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
                 ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
                 ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
@@ -295,11 +296,12 @@ class InspectionController extends Controller
                     'int_color.name as interior_color',
                     'ex_color.name as exterior_color',
                     'purchasing_order.po_number',
-                    'grn.grn_number',
+                    'movement_grns.grn_number',
                 ])
                 ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                // ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
                 ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
                 ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
                 ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')

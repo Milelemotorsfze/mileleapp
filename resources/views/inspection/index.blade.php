@@ -325,8 +325,8 @@
             columns: [
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'date', name: 'grn.date' },
-                { data: 'grn_number', name: 'grn.grn_number' },
+                { data: 'date', name: 'movements_reference.date' },
+                { data: 'grn_number', name: 'movement_grns.grn_number' },
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
@@ -428,7 +428,7 @@
             ajax: "{{ route('inspection.index', ['status' => 'stock']) }}",
             columns: [
                 { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'grn_number', name: 'grn.grn_number' },
+                { data: 'grn_number', name: 'movement_grns.grn_number' },
                 { data: 'processing_date', name: 'inspection.processing_date' },
                 { data: 'process_remarks', name: 'inspection.process_remarks' },
                 { data: 'location', name: 'warehouse.name' },
@@ -479,7 +479,7 @@
             ajax: "{{ route('inspection.index', ['status' => 'Pending PDI']) }}",
             columns: [
                 { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'grn_number', name: 'grn.grn_number' },
+                { data: 'grn_number', name: 'movement_grns.grn_number' },
                 { data: 'inspection_date', name: 'vehicles.inspection_date' },
                 { data: 'grn_remark', name: 'vehicles.grn_remark' },
                 { data: 'so_date', name: 'so.so_date' },
@@ -532,7 +532,7 @@
             ajax: "{{ route('inspection.index', ['status' => 'Pending Re Inspection']) }}",
             columns: [
                 { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'grn_number', name: 'grn.grn_number' },
+                { data: 'grn_number', name: 'movement_grns.grn_number' },
                 { data: 'created_ats', name: 'inspection.created_at' },
                 { data: 'inspectionremark', name: 'inspection.remark' },  
                 { data: 'processing_date', name: 'inspection.processing_date' },
@@ -587,7 +587,7 @@
             ajax: "{{ route('inspection.index', ['status' => 'Spec Re Inspection']) }}",
             columns: [
                 { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'grn_number', name: 'grn.grn_number' },
+                { data: 'grn_number', name: 'movement_grns.grn_number' },
                 { data: 'so_date', name: 'so.so_date' },
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'location', name: 'warehouse.name' },
