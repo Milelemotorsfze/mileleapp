@@ -2822,6 +2822,7 @@ foreach ($variants as $variant) {
                         DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
                         'so.so_date',
                         'grn.date',
+                        DB::raw("DATE_FORMAT(work_orders.date, '%Y-%m-%d') as work_order_date"),
                         'gdn.date as gdndate',
                         DB::raw("
     COALESCE(
@@ -2833,6 +2834,8 @@ foreach ($variants as $variant) {
 ")
 
                     ])
+                    ->leftJoin('w_o_vehicles', 'vehicles.id', '=', 'w_o_vehicles.vehicle_id')
+                    ->leftJoin('work_orders', 'w_o_vehicles.work_order_id', '=', 'work_orders.id')
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                     ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
                     ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
@@ -3499,7 +3502,9 @@ public function availablevehicles(Request $request)
                         'bp.name as bpn',
                         'so.so_date',
                         'grn.date',
+                        // 'work_orders.date as work_order_date',
                         DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
+                        DB::raw("DATE_FORMAT(work_orders.date, '%Y-%m-%d') as work_order_date"),
                         DB::raw("
     COALESCE(
         (SELECT FORMAT(CAST(cost AS UNSIGNED), 0) FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
@@ -3510,6 +3515,8 @@ public function availablevehicles(Request $request)
 ")
 
                     ])
+                    ->leftJoin('w_o_vehicles', 'vehicles.id', '=', 'w_o_vehicles.vehicle_id')
+                    ->leftJoin('work_orders', 'w_o_vehicles.work_order_id', '=', 'work_orders.id')
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                     ->leftJoin('booking', 'vehicles.id', '=', 'booking.vehicle_id')
                     ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
@@ -3675,6 +3682,7 @@ public function availablevehicles(Request $request)
                     DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
                     'so.so_date',
                     'grn.date',
+                    DB::raw("DATE_FORMAT(work_orders.date, '%Y-%m-%d') as work_order_date"),
                     'gdn.date as gdndate',
                     DB::raw("
 COALESCE(
@@ -3686,6 +3694,8 @@ COALESCE(
 ")
 
                 ])
+                ->leftJoin('w_o_vehicles', 'vehicles.id', '=', 'w_o_vehicles.vehicle_id')
+                ->leftJoin('work_orders', 'w_o_vehicles.work_order_id', '=', 'work_orders.id')
                 ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                 ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
@@ -3858,6 +3868,7 @@ COALESCE(
                     DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
                    'so.so_date',
                     'grn.date',
+                    DB::raw("DATE_FORMAT(work_orders.date, '%Y-%m-%d') as work_order_date"),
                     'gdn.date as gdndate',
                     DB::raw("
 COALESCE(
@@ -3869,6 +3880,8 @@ COALESCE(
 ")
 
                 ])
+                ->leftJoin('w_o_vehicles', 'vehicles.id', '=', 'w_o_vehicles.vehicle_id')
+                ->leftJoin('work_orders', 'w_o_vehicles.work_order_id', '=', 'work_orders.id')
                 ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                 ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')

@@ -1,5 +1,8 @@
 @extends('layouts.main')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"></script>
+
 <style>
     .error-text {
         color: red;
@@ -84,21 +87,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
         <div class="row">
             <div class="col-lg-4 col-md-6">
                 <label for="basicpill-firstname-input" class="form-label">Customer Name : </label>
-                <input type="text" name="name" class="form-control" value="{{ $calls->name }}" autocomplete="off">
+                <input type="text" name="name" class="form-control" value="{{ old('name', $calls->name) }}" autocomplete="off">
             </div>
             <div class="col-lg-4 col-md-6">
                 <span class="error">* </span>
-                <label for="basicpill-firstname-input" class="form-label">Phone Number :</label>
-                <input type="tel" id="phone" name="phone" class="form-control" placeholder="Primary Phone Number" value="{{ $calls->phone }}" autocomplete="off">
+                <label for="basicpill-firstname-input" class="form-label">Customer Phone:</label>
+                <input type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number" value="{{ old('phone', $calls->phone) }}" autocomplete="off">
             </div>
-            <!-- <div class="col-lg-4 col-md-6">
-                <label for="basicpill-firstname-input" class="form-label">Secondary Phone Number :</label>
-                <input type="tel" id="secondary_phone_number" name="secondary_phone_number" class="form-control" placeholder="Secondary Phone Number" value="{{ $calls->secondary_phone_number }}" autocomplete="off">
-            </div> -->
             <div class="col-lg-4 col-md-6">
                 <span class="error">*</span>
                 <label for="basicpill-firstname-input" class="form-label">Customer Email:</label>
-                <input type="text" name="email" class="form-control" value="{{ $calls->email }}" id="email">
+                <input type="text" name="email" class="form-control" value="{{ old('email', $calls->email) }}" id="email">
                 <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}" autocomplete="off">
                 <input type="hidden" name="call_id" value="{{ $calls->id }}" id="call_id">
                 <div id="emailError" class="error-text"></div>
@@ -108,47 +107,94 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             $leadsource = DB::table('lead_source')->where('id', $calls->source)->first();
             $leadsources = $leadsource->source_name;
             @endphp
-            <div class="col-lg-4 col-md-6">
+            <div class="col-lg-4 col-md-6 pt-3">
                 <span class="error">* </span>
-                <label for="basicpill-firstname-input" class="form-label">Source:</label>
-                <input type="text" placeholder="Source" name="milelemotors" list="milelemotorsList" class="form-control" id="milelemotorsInput" value="{{ $leadsources }}">
-                <datalist id="milelemotorsList">
+                <label for="milelemotorsSelect" class="form-label">Source:</label>
+                <select name="milelemotors" class="form-control select2" id="milelemotorsSelect" multiple>
+                    <option value="">Select Source</option>
                     @foreach ($LeadSource as $source)
-                    <option value="{{ $source->source_name }}">{{ $source->source_name }}</option>
+                    <option value="{{ $source->source_name }}"
+                        {{ old('milelemotors', $leadsources) == $source->source_name ? 'selected' : '' }}>
+                        {{ $source->source_name }}
+                    </option>
                     @endforeach
-                </datalist>
+                </select>
             </div>
-            <div class="col-lg-4 col-md-6">
+
+
+            <div class="col-lg-4 col-md-6 pt-3">
                 <span class="error">*</span>
-                <label for="basicpill-firstname-input" class="form-label">Preferred Language:</label>
-                <input type="text" placeholder="Language" name="language" list="laList" class="form-control" id="languageInput" value="{{ $calls->language}}">
-                <datalist id="laList">
-                    @foreach ($Language as $language)
-                    <option value="{{ $language->name }}" data-value="{{ $language->name }}">{{ $language->name }}</option>
+                <label for="languageSelect" class="form-label">Preferred Language:</label>
+                <select name="language" class="form-control select2" id="languageSelect" multiple>
+                    <option value="">Select Language</option>
+                    @foreach ($Language as $lang)
+                    <option value="{{ $lang->name }}"
+                        {{ old('language', $calls->language) == $lang->name ? 'selected' : '' }}>
+                        {{ $lang->name }}
+                    </option>
                     @endforeach
-                </datalist>
+                </select>
             </div>
-            <div class="col-xs-4 col-sm-12 col-md-4">
+
+
+            <div class="col-xs-4 col-sm-12 col-md-4 pt-3">
                 <span class="error">* </span>
-                <label for="basicpill-firstname-input" class="form-label">Destination : </label>
-                <input type="text" placeholder="Location" name="location" list="loList" class="form-control" id="locationInput" value="{{ $calls->location}}">
-                <datalist id="loList">
+                <label for="locationSelect" class="form-label">Destination:</label>
+                <select name="location" class="form-control select2" id="locationSelect" multiple>
+                    <option value="">Select Destination</option>
                     @foreach ($countries as $country)
-                    <option value="{{ $country }}" data-value="{{ $country }}">{{ $country }}</option>
+                    <option value="{{ $country }}"
+                        {{ old('location', $calls->location) == $country ? 'selected' : '' }}>
+                        {{ $country }}
+                    </option>
                     @endforeach
-                    <option value="Not Mentioned" data-value="Not Mentioned">Not Mentioned</option>
-                </datalist>
+                    <option value="Not Mentioned"
+                        {{ old('location', $calls->location) == 'Not Mentioned' ? 'selected' : '' }}>
+                        Not Mentioned
+                    </option>
+                </select>
             </div>
-            <div class="col-lg-4 col-md-6">
+
+
+            <div class="col-lg-4 col-md-6 pt-3">
                 <span class="error">* </span>
-                <label for="basicpill-firstname-input" class="form-label">Type : </label>
-                <input type="text" placeholder="Type" name="type" list="typeList" class="form-control" id="typeInput" value="{{ $calls->type}}">
-                <datalist id="typeList">
-                    <option value="Export" data-value="Export">Export</option>
-                    <option value="Local" data-value="Export">Local</option>
-                    <option value="Other" data-value="Export">Other</option>
-                </datalist>
+                <label for="typeSelect" class="form-label">Type:</label>
+                <select name="type" class="form-control select2" id="typeSelect" multiple>
+                    <option value="">Select Type</option>
+                    <option value="Export" {{ old('type', $calls->type) == 'Export' ? 'selected' : '' }}>Export</option>
+                    <option value="Local" {{ old('type', $calls->type) == 'Local' ? 'selected' : '' }}>Local</option>
+                    <option value="Other" {{ old('type', $calls->type) == 'Other' ? 'selected' : '' }}>Other</option>
+                </select>
             </div>
+
+
+            <div class="col-lg-4 col-md-6 pt-3">
+                <span class="error">* </span>
+                <label for="strategySelect" class="form-label">Strategies:</label>
+                <select name="strategy" class="form-control select2" id="strategySelect" multiple>
+                    <option value="">Select Strategy</option>
+                    @foreach ($strategy as $strategies)
+                    <option value="{{ $strategies->name }}"
+                        {{ old('strategy', $currentStrategyName ?? '') == $strategies->name ? 'selected' : '' }}>
+                        {{ $strategies->name }}
+                    </option>
+                    @endforeach
+                </select>
+            </div>
+
+
+            <div class="col-lg-4 col-md-6 pt-3">
+                <span class="error">* </span>
+                <label for="prioritySelect" class="form-label">Priority:</label>
+                <select name="priority" id="prioritySelect" class="form-control select2" multiple>
+                    <option value="">Select Priority</option>
+                    <option value="normal" {{ old('priority', $calls->priority) == 'normal' ? 'selected' : '' }}>Normal</option>
+                    <option value="low" {{ old('priority', $calls->priority) == 'low' ? 'selected' : '' }}>Low</option>
+                    <option value="hot" {{ old('priority', $calls->priority) == 'hot' ? 'selected' : '' }}>Hot</option>
+                </select>
+            </div>
+
+
         </div>
         </br>
         <div class="row">
@@ -170,88 +216,98 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 </div>
             </div>
             <div class="col-lg-4 col-md-6" id="manual-sales-person-list" style="display: none;">
-                <label for="manual-sales-person" class="form-label">Sales Person:</label>
-                <input type="text" placeholder="Sales Persons" name="sales_person" list="salesList" class="form-control" id="salesPersonInput">
-                <datalist id="salesList">
+                <label for="salesPersonSelect" class="form-label">Sales Person:</label>
+                <select name="sales_person_id" id="salesPersonSelect" class="form-control select2" multiple>
+                    <option value="">Select Sales Person</option>
                     @foreach ($sales_persons as $sales_person)
                     @php
                     $sales_person_details = DB::table('users')->where('id', $sales_person->model_id)->first();
-                    $sales_person_name = $sales_person_details->name;
+                    $sales_person_name = $sales_person_details->name ?? '';
                     @endphp
-                    <option value="{{ $sales_person_name }}" data-id="{{ $sales_person->model_id }}"></option>
+                    <option value="{{ $sales_person->model_id }}" {{ old('sales_person_id') == $sales_person->model_id ? 'selected' : '' }}>
+                        {{ $sales_person_name }}
+                    </option>
                     @endforeach
-                </datalist>
-                <input type="hidden" name="sales_person_id" id="selectedSalesPersonId">
+                </select>
             </div>
+
         </div>
         <div class="maindd">
-            <div id="row-container">
-                <label for="brandInput" class="form-label">Brand & Models:</label>
-                @php
+        <div id="row-container">
+            @php
                 $model_line_idss = DB::table('calls_requirement')->where('lead_id', $calls->id)->get();
-                @endphp
-                @foreach ($model_line_idss as $model_line_idssss)
+            @endphp
+
+            @foreach ($model_line_idss as $model_line_idssss)
                 @php
-                $model_name = DB::table('master_model_lines')->where('id', $model_line_idssss->model_line_id)->first();
-                $model_names = $model_name->model_line;
-                $brand_ids = $model_name->brand_id;
-                $brand = DB::table('brands')->where('id', $brand_ids)->first();
-                $brand_name = $brand->brand_name;
+                    $model_name = DB::table('master_model_lines')->where('id', $model_line_idssss->model_line_id)->first();
+                    $brand = DB::table('brands')->where('id', $model_name->brand_id)->first();
                 @endphp
-                <div class="row">
+                <div class="row mb-2">
                     <div class="col-lg-4 col-md-6">
-                        <input type="text" placeholder="Select Brand & Model" name="model_line_id[]" list="brandList" class="form-control mb-1" id="brandInputs" value="{{ $brand_name }} / {{ $model_names }}">
-                        <datalist id="brandList">
+                        <label class="form-label">Brand & Model:</label>
+                        <select name="model_line_ids[]" class="form-control select2" multiple>
+                            <option value="">Select Brand & Model</option>
                             @foreach ($modelLineMasters as $modelLineMaster)
-                            @php
-                            $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
-                            $brand_name = $brand->brand_name;
-                            @endphp
-                            <option value="{{ $brand_name }} / {{ $modelLineMaster->model_line }}" data-value="{{ $modelLineMaster->id }}">{{ $brand_name }} / {{ $modelLineMaster->model_line }}</option>
+                                @php
+                                    $loopBrand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
+                                    $combinedName = $loopBrand->brand_name . ' / ' . $modelLineMaster->model_line;
+                                    $isSelected = ($modelLineMaster->id == $model_line_idssss->model_line_id) ? 'selected' : '';
+                                @endphp
+                                <option value="{{ $modelLineMaster->id }}" {{ $isSelected }}>{{ $combinedName }}</option>
                             @endforeach
-                            <input type="hidden" id="callRequirementId" value="{{ $model_line_idssss->id }}" />
-                        </datalist>
-                        <input type="hidden" name="model_line_ids[]" id="selectedBrandId" value="">
+                        </select>
+                        <input type="hidden" name="existing_call_requirement_ids[]" value="{{ $model_line_idssss->id }}" />
                     </div>
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-4 col-md-6 align-self-end">
                         <a href="#" class="remove-row-btn btn btn-danger" data-call-requirement-id="{{ $model_line_idssss->id }}">
                             <i class="fas fa-minus"></i> Remove
                         </a>
                     </div>
                 </div>
-                @endforeach
-                <div id="row-container">
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6">
-                            <input type="hidden" placeholder="Select Brand & Model" name="model_line_id[]" list="brandList" class="form-control mb-1" id="brandInput">
-                            <datalist id="brandList">
-                                @foreach ($modelLineMasters as $modelLineMaster)
-                                @php
+            @endforeach
+
+            {{-- Placeholder for adding new rows dynamically --}}
+            <div class="row mb-2 new-row-template d-none">
+                <div class="col-lg-4 col-md-6">
+                    <label class="form-label">Brand & Model:</label>
+                    <select name="model_line_ids[]" class="form-control select2">
+                        <option value="">Select Brand & Model</option>
+                        @foreach ($modelLineMasters as $modelLineMaster)
+                            @php
                                 $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
-                                $brand_name = $brand->brand_name;
-                                @endphp
-                                <option value="{{ $brand_name }} / {{ $modelLineMaster->model_line }}" data-value="{{ $modelLineMaster->id }}">{{ $brand_name }} / {{ $modelLineMaster->model_line }}</option>
-                                @endforeach
-                            </datalist>
-                            <input type="hidden" name="model_line_ids[]" id="selectedBrandId">
-                        </div>
-                    </div>
+                            @endphp
+                            <option value="{{ $modelLineMaster->id }}">{{ $brand->brand_name }} / {{ $modelLineMaster->model_line }}</option>
+                        @endforeach
+                    </select>
                 </div>
-            </div>
-            <div class="col-lg-12 col-md-12 mt-3 d-flex justify-content-start">
-                <div class="btn btn-primary add-row-btn">
-                    <i class="fas fa-plus"></i> Add More
+                <div class="col-lg-4 col-md-6 align-self-end">
+                    <a href="#" class="remove-row-btn btn btn-danger">
+                        <i class="fas fa-minus"></i> Remove
+                    </a>
                 </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <label for="basicpill-firstname-input" class="form-label">Custom Brand & Model : </label>
-                <input type="text" placeholder="Custom Brand Model" name="custom_brand_model" class="form-control" value="{{ $calls->custom_brand_model}}">
-            </div>
-            <div class="col-lg-12 col-md-12">
-                <label for="basicpill-firstname-input" class="form-label">Remarks : </label>
-                <textarea name="remarks" id="editor">{{ $calls->remarks}}</textarea>
             </div>
         </div>
+
+        {{-- Add More Button --}}
+        <div class="col-lg-12 col-md-12 mt-3 d-flex justify-content-start">
+            <div class="btn btn-primary add-row-btn">
+                <i class="fas fa-plus"></i> Add More
+            </div>
+        </div>
+
+        {{-- Custom Brand & Remarks --}}
+        <div class="col-lg-4 col-md-6 mt-3">
+            <label for="basicpill-firstname-input" class="form-label">Custom Brand & Model : </label>
+            <input type="text" placeholder="Custom Brand Model" name="custom_brand_model" class="form-control" value="{{ old('custom_brand_model', $calls->custom_brand_model) }}">
+        </div>
+
+        <div class="col-lg-12 col-md-12 mt-3">
+            <label for="basicpill-firstname-input" class="form-label">Remarks : </label>
+            <textarea name="remarks" id="editor">{{ old('remarks', $calls->remarks) }}</textarea>
+        </div>
+    </div>
+
         </br>
         </br>
         <div class="col-lg-12 col-md-12">
@@ -267,7 +323,15 @@ redirect()->route('home')->send();
 @endif
 @endsection
 @push('scripts')
+
 <script type="text/javascript">
+    $(document).ready(function() {
+        $('.select2').select2({
+            placeholder: "Select an option",
+            maximumSelectionLength: 1,
+        });
+    });
+
     const autoAssignOption = document.getElementById('auto-assign-option');
     const manualAssignOption = document.getElementById('manual-assign-option');
     const manualSalesPersonList = document.getElementById('manual-sales-person-list');
@@ -288,52 +352,52 @@ redirect()->route('home')->send();
         // Function to filter and update the dropdown list
         function updateDropdownList() {
             var selectedValues = $('input[name="model_line_id[]"]').map(function() {
-                return $(this).val();
+            return $(this).val();
             }).get();
 
             $('.new-select').each(function() {
-                var currentInput = $(this);
-                var datalistId = currentInput.attr('list');
-                var datalist = $('#' + datalistId);
-                var options = '';
+            var currentInput = $(this);
+            var datalistId = currentInput.attr('list');
+            var datalist = $('#' + datalistId);
+            var options = '';
 
-                $('#brandList option').each(function() {
-                    if (selectedValues.indexOf($(this).val()) === -1) {
-                        options += '<option value="' + $(this).val() + '" data-value="' + $(this).data('value') + '"></option>';
-                    }
-                });
+            $('#brandList option').each(function() {
+                if (selectedValues.indexOf($(this).val()) === -1) {
+                options += '<option value="' + $(this).val() + '" data-value="' + $(this).data('value') + '"></option>';
+                }
+            });
 
-                datalist.html(options);
+            datalist.html(options);
             });
         }
 
         $(add_button).click(function(e) {
             e.preventDefault();
             if (x < max_fields) {
-                x++;
-                var selectedValues = $('input[name="model_line_id[]"]').map(function() {
-                    return $(this).val();
-                }).get();
-                var datalist = $('<datalist id="brandList' + x + '"></datalist>');
-                var options = '';
-                $('#brandList option').each(function() {
-                    if (selectedValues.indexOf($(this).val()) === -1) {
-                        options += '<option value="' + $(this).val() + '" data-value="' + $(this).data('value') + '"></option>';
-                    }
-                });
-                datalist.html(options);
-                var newRow = $('<div class="row"></div>');
-                var col1 = $('<div class="col-lg-4 col-md-6"></div>');
-                var input = $('<input type="text" placeholder="Select Brand & Model" name="model_line_id[]" class="form-control mb-1 new-select" id="brandInput' + x + '" list="brandList' + x + '" autocomplete="off" /><input type="hidden" name="model_line_ids[]" id="selectedBrandId' + x + '">');
-                col1.append(input);
-                col1.append(datalist);
-                var col2 = $('<div class="col-lg-4 col-md-6 align-self-end"></div>');
-                var removeBtn = $('<a href="#" class="remove-row-btn btn btn-danger"><i class="fas fa-minus"></i> Remove</a>');
-                col2.append(removeBtn);
-                newRow.append(col1);
-                newRow.append(col2);
-                $(wrapper).append(newRow);
-                updateDropdownList();
+            x++;
+                    var selectedValues = $('input[name="model_line_id[]"]').map(function() {
+                        return $(this).val();
+                    }).get();
+                    var datalist = $('<datalist id="brandList' + x + '"></datalist>');
+                    var options = '';
+                    $('#brandList option').each(function() {
+                        if (selectedValues.indexOf($(this).val()) === -1) {
+                            options += '<option value="' + $(this).val() + '" data-value="' + $(this).data('value') + '"></option>';
+                        }
+                    });
+                    datalist.html(options);
+                    var newRow = $('<div class="row"></div>');
+                    var col1 = $('<div class="col-lg-4 col-md-6"></div>');
+                    var input = $('<input type="text" placeholder="Select Brand & Model" name="model_line_id[]" class="form-control mb-1 new-select" id="brandInput' + x + '" list="brandList' + x + '" autocomplete="off" /><input type="hidden" name="model_line_ids[]" id="selectedBrandId' + x + '">');
+                    col1.append(input);
+                    col1.append(datalist);
+                    var col2 = $('<div class="col-lg-4 col-md-6 align-self-end"></div>');
+                    var removeBtn = $('<a href="#" class="remove-row-btn btn btn-danger"><i class="fas fa-minus"></i> Remove</a>');
+                    col2.append(removeBtn);
+                    newRow.append(col1);
+                    newRow.append(col2);
+                    $(wrapper).append(newRow);
+                    updateDropdownList();
             }
         });
 
@@ -377,7 +441,7 @@ redirect()->route('home')->send();
                         message += 'Email Count: ' + response.emailCount;
                         var buttonHtml = '<a href="{{ route('repeatedcustomers') }}?phone=' + encodeURIComponent(phone) + '&email=' + email + '" class="btn btn-primary">See Details</a>';
                         message += '<br>' + buttonHtml;
-
+                        
                         $('#flashMessage').html('<div class="alert alert-info">' + message + '</div>');
                     } else {
                         $('#flashMessage').html('');
@@ -468,7 +532,10 @@ redirect()->route('home')->send();
         var emailValue = emailInput.value;
         var emailError = document.getElementById('emailError');
 
-        if (!validateEmail(emailValue)) {
+        if (emailValue === '') {
+            emailInput.classList.remove('invalid');
+            emailError.textContent = '';
+        } else if (!validateEmail(emailValue)) {
             emailInput.classList.add('invalid');
             emailError.textContent = 'Please enter a valid email address.';
         } else {
@@ -491,7 +558,6 @@ redirect()->route('home')->send();
         }
         input.setCustomValidity('Please select a valid Sales Person from the list.');
     });
-
     function validateEmail(email) {
         var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
@@ -511,208 +577,84 @@ redirect()->route('home')->send();
 
     brandInput.addEventListener('input', function() {
         const selectedOption = Array.from(document.querySelectorAll('#brandList option')).find(option => option.value === brandInput.value);
-
+        
         if (selectedOption) {
             selectedBrandIdInput.value = selectedOption.getAttribute('data-value');
         } else {
             selectedBrandIdInput.value = '';
         }
     });
-    // window.addEventListener('DOMContentLoaded', function() {
-    //     var primaryInput = document.querySelector("#phone");
-    //     var secondaryInput = document.querySelector("#secondary_phone_number");
 
-    //     var itiPrimary = window.intlTelInput(primaryInput, {
-    //         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
-    //         autoFormat: false,
-    //         separateDialCode: false,
-    //         nationalMode: false
-    //     });
-
-    //     var itiSecondary = window.intlTelInput(secondaryInput, {
-    //         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
-    //         autoFormat: false,
-    //         separateDialCode: false,
-    //         nationalMode: false
-    //     });
-
-    //     function formatPhoneNumber(input) {
-    //         var newValue = input.value.replace(/[^0-9]/g, '');
-    //         if (newValue.charAt(0) !== '+') {
-    //             newValue = '+' + newValue;
-    //         }
-    //         if (newValue.length > 15) {
-    //             newValue = newValue.slice(0, 15);
-    //         }
-    //         input.value = newValue;
-    //     }
-
-    //     // Ensure initial values are properly formatted for both inputs
-    //     if (primaryInput.value) {
-    //         primaryInput.value = "+" + primaryInput.value.replace(/[^0-9]/g, '');
-    //         itiPrimary.setNumber(primaryInput.value);
-    //     }
-
-    //     if (secondaryInput.value) {
-    //         secondaryInput.value = "+" + secondaryInput.value.replace(/[^0-9]/g, '');
-    //         itiSecondary.setNumber(secondaryInput.value);
-    //     }
-
-    //     // Format phone numbers on input
-    //     primaryInput.addEventListener('input', function() {
-    //         formatPhoneNumber(primaryInput);
-    //     });
-
-    //     secondaryInput.addEventListener('input', function() {
-    //         formatPhoneNumber(secondaryInput);
-    //     });
-
-    //     // Handle country change events for both inputs
-    //     itiPrimary.events.on("countrychange", function() {
-    //         var countryCode = itiPrimary.getSelectedCountryData().dialCode;
-    //         if (primaryInput.value && primaryInput.value.charAt(0) === '+') {
-    //             primaryInput.value = "+" + countryCode + primaryInput.value.substr(4);
-    //         } else {
-    //             primaryInput.value = "+" + countryCode;
-    //         }
-    //     });
-
-    //     itiSecondary.events.on("countrychange", function() {
-    //         var countryCode = itiSecondary.getSelectedCountryData().dialCode;
-    //         if (secondaryInput.value && secondaryInput.value.charAt(0) === '+') {
-    //             secondaryInput.value = "+" + countryCode + secondaryInput.value.substr(4);
-    //         } else {
-    //             secondaryInput.value = "+" + countryCode;
-    //         }
-    //     });
-
-    //     // Handle form submission
-    //     $('#updateForm').on('submit', function(e) {
-    //         e.preventDefault();
-
-    //         var isPrimaryValid = itiPrimary.isValidNumber();
-    //         var isSecondaryValid = secondaryInput.value.trim() === "" || itiSecondary.isValidNumber();
-
-    //         if (!isPrimaryValid) {
-    //             $('#phone').siblings('.invalid-feedback').show();
-    //             return false;
-    //         } else {
-    //             $('#phone').siblings('.invalid-feedback').hide();
-    //         }
-
-    //         if (!isSecondaryValid) {
-    //             $('#secondary_phone_number').siblings('.invalid-feedback').show();
-    //             return false;
-    //         } else {
-    //             $('#secondary_phone_number').siblings('.invalid-feedback').hide();
-    //         }
-
-    //         var formData = $(this).serialize();
-
-    //         $.ajax({
-    //             url: $(this).attr('action'),
-    //             type: 'POST',
-    //             data: formData,
-    //             success: function(response) {
-    //                 console.log('Form submitted successfully');
-    //             },
-    //             error: function(xhr, status, error) {
-    //                 console.log('Error: ' + error);
-    //             }
-    //         });
-    //     });
-    // });
-
-window.addEventListener('DOMContentLoaded', function() {
-    var input = document.querySelector("#phone");
-    var iti = window.intlTelInput(input, {
-        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
-        autoFormat: false,
-        separateDialCode: false,
-        nationalMode: false
-    });
-    // Manually format the initial value
-    var initialValue = input.value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
-    input.value = "+" + initialValue; // Add '+' at the beginning
-    var originalValue = input.value; // Store the original value on page load
-
-    input.addEventListener('input', function() {
-        // Remove all non-numeric characters
-        var newValue = input.value.replace(/[^0-9]/g, '');
-
-        // Add '+' at the beginning if not present
-        if (newValue.charAt(0) !== '+') {
-            newValue = '+' + newValue;
+   $(document).ready(function() {
+    $('.remove-row-btn').click(function(e) {
+        e.preventDefault();
+        var callRequirementId = $(this).data('call-requirement-id');
+        var csrfToken = $('meta[name="csrf-token"]').attr('content');
+        $.ajax({
+        url: '/calls/removerow',
+        method: 'POST',
+        data: {
+            call_requirement_id: callRequirementId,
+            _token: csrfToken
+        },
+        success: function(response) {
+            if (response.success) {
+            $(this).closest('.col-lg-4').remove();
+            }
         }
-        if (newValue.length > 15) {
-            newValue = newValue.slice(0, 15);
-        }
-        input.value = newValue;
-    });
-
-    iti.events.on("countrychange", function() {
-        var countryCode = iti.getSelectedCountryData().dialCode;
-
-        // Update the country code without adding spaces, only if user has interacted
-        if (input.value && input.value.charAt(0) === '+') {
-            input.value = "+" + countryCode + input.value.substr(4);
-        } else {
-            input.value = "+" + countryCode;
-        }
-    });
-
-    // Set the original value back after initializing intlTelInput
-    input.value = originalValue;
-});
-
-
-    $(document).ready(function() {
-        $('.remove-row-btn').click(function(e) {
-            e.preventDefault();
-            var callRequirementId = $(this).data('call-requirement-id');
-            var csrfToken = $('meta[name="csrf-token"]').attr('content');
-            $.ajax({
-                url: '/calls/removerow',
-                method: 'POST',
-                data: {
-                    call_requirement_id: callRequirementId,
-                    _token: csrfToken
-                },
-                success: function(response) {
-                    if (response.success) {
-                        $(this).closest('.col-lg-4').remove();
-                    }
-                }
-            });
         });
     });
-    $(document).ready(function() {
-        $('#brandInputs').on('change', function() {
-            var selectedOption = $(this).val();
-            var modelLineMasterId = document.querySelector(`#brandList option[value="${selectedOption}"]`).getAttribute('data-value');
-            var callRequirementId = $('#callRequirementId').val();
-            var csrfToken = $('meta[name="csrf-token"]').attr('content');
-            console.log(callRequirementId);
-            $.ajax({
-                url: '/calls/updaterow',
-                type: 'POST',
-                data: {
-                    modelLineMasterId: modelLineMasterId,
-                    callRequirementId: callRequirementId,
-                    _token: csrfToken // Include the CSRF token in the request data
-                },
-                success: function(response) {
-                    // Handle the response if needed
-                    console.log(response);
-                },
-                error: function(xhr, status, error) {
-                    // Handle the error if needed
-                    console.log(error);
-                }
-            });
+    });
+  $(document).ready(function() {
+    $('#brandInputs').on('change', function() {
+        var selectedOption = $(this).val();
+        var modelLineMasterId = document.querySelector(`#brandList option[value="${selectedOption}"]`).getAttribute('data-value');
+        var callRequirementId = $('#callRequirementId').val();
+        var csrfToken = $('meta[name="csrf-token"]').attr('content');
+      console.log(callRequirementId);
+      $.ajax({
+        url: '/calls/updaterow',
+        type: 'POST',
+        data: {
+          modelLineMasterId: modelLineMasterId,
+          callRequirementId: callRequirementId,
+          _token: csrfToken
+        },
+        success: function(response) {
+          console.log(response);
+        },
+        error: function(xhr, status, error) {
+          console.log(error);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+    $(document).ready(function () {
+        var input = document.querySelector("#phone");
+        var iti = window.intlTelInput(input, {
+            separateDialCode: true,
+            preferredCountries: ["ae"],
+            hiddenInput: "full",
+            utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+        });
+
+        $("#calls").on("submit", function () {
+            var fullNumber = iti.getNumber();
+            $("<input>").attr({
+                type: "hidden",
+                name: "phone",
+                value: fullNumber
+            }).appendTo("#calls");
+        });
+
+        $('.remove-row-btn').click(function(e) {
+            e.preventDefault();
+            $(this).closest('.row').remove();
         });
     });
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"></script>
+
 @endpush
