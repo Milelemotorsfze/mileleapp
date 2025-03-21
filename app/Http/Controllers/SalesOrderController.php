@@ -348,7 +348,6 @@ class SalesOrderController extends Controller
         {
             $quotation = Quotation::where('calls_id', $id)->first();
             $calls = Calls::find($id);
-            info($quotation->id);
 
             $sodetails = So::where('quotation_id', $quotation->id)->first();
            
@@ -388,8 +387,7 @@ class SalesOrderController extends Controller
                                          ->orWhere('booking_person_id', $sodetails->sales_person_id);
                             });
                         })->get()->toArray();
-                        info("vehicles");
-                        info($variantVehicles);
+                      
                         $vehicles[$item->id] = $variantVehicles;
                         break;
                     case 'App\Models\MasterModelLines':
@@ -449,8 +447,7 @@ class SalesOrderController extends Controller
                         } 
                         $saleperson = User::find($quotation->created_by);
                         $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first(); 
-                       info("last");
-                       info($vehicles);
+                      
                         return view('salesorder.update', compact('vehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails','sodetails', 'soitems', 'empProfile', 'saleperson'));  
         }
 public function storesalesorderupdate(Request $request, $quotationId)
@@ -615,7 +612,7 @@ public function cancel($id)
     $solog->role = Auth::user()->selectedRole;
     $solog->save();
     $so->delete();
-    
+
     return redirect()->back()->with('success', 'Sales Order and related items canceled successfully.');
 }
 public function showSalesSummary($sales_person_id, $count_type)
