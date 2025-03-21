@@ -52,6 +52,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Monarobase\CountryList\CountryListFacade;
+use Illuminate\Support\Facades\Log;
 
 class QuotationController extends Controller
 {
@@ -660,7 +661,9 @@ class QuotationController extends Controller
                             $vehicle = Vehicles::find($soitem->vehicles_id);
                             if ($vehicle) {
                                 $vehicle->so_id = null;
+                                \Log::info('Unassign SO id - Case 1');
                                 $vehicle->save();
+                                \Log::info('SO items deleted - Case 1');
                                 Soitems::where('vehicles_id', $vehicle->id)->delete();
                             }
                         }
@@ -713,7 +716,9 @@ class QuotationController extends Controller
                         $vehiclesToDelete = array_slice($vehicles, 0, $quantityDifference);
                         foreach ($vehiclesToDelete as $vehicle) {
                             $vehicle->so_id = null;
+                            \Log::info('Unassign SO id - Case 2');
                             $vehicle->save();
+                            \Log::info('SO items deleted - Case 2');
                             Soitems::where('vehicles_id', $vehicle->id)->delete();
                         }
                     }

@@ -474,8 +474,10 @@ public function storesalesorderupdate(Request $request, $quotationId)
     $so->save();
 
     // Delete existing Soitems records related to the Sales Order ID
+    \Log::info('SO items deleted - Case 3');
     Soitems::where('so_id', $so->id)->delete();
     Vehicles::where('so_id', $so->id)->update(['so_id' => null]);
+    \Log::info('Unassign SO id - Case 3');
     // Process the selected VINs
     $vins = $request->input('vehicle_vin');
     $selectedVinsWithNull = [];
@@ -591,9 +593,11 @@ public function cancel($id)
             $vehicle->reservation_end_date = null;
             $vehicle->booking_person_id = null;
             $vehicle->save();
+            \Log::info('Unassign SO id - Case 4');
         }
     }
     foreach ($soitems as $soitem) {
+        \Log::info('SO items deleted - Case 4');
         $soitem->delete();
     }
 
