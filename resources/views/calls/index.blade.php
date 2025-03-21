@@ -68,6 +68,19 @@
       background-color: #e9ecef;
       border-color: #bbb;
     }
+
+    .select2-container--default .select2-selection--single {
+        width: 150px !important; 
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap; 
+    }
+
+    .select2-container--default .select2-selection--multiple {
+        width: 150px !important; 
+        white-space: nowrap;
+    }
+
     .badge-notification {
     position: absolute;
     top: -7;
@@ -449,7 +462,7 @@ $(document).ready(function () {
       var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
         .appendTo(selectWrapper)
         .select2({
-          width: '100%',
+          width: '150px',
           dropdownCssClass: 'select2-blue'
         });
       select.on('change', function() {
@@ -577,7 +590,7 @@ function s2ab(s) {
       var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
         .appendTo(selectWrapper)
         .select2({
-          width: '100%',
+          width: '150px',
           dropdownCssClass: 'select2-blue'
         });
       select.on('change', function() {
@@ -615,7 +628,7 @@ function s2ab(s) {
       var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
         .appendTo(selectWrapper)
         .select2({
-          width: '100%',
+          width: '150px',
           dropdownCssClass: 'select2-blue'
         });
       select.on('change', function() {
@@ -653,7 +666,7 @@ function s2ab(s) {
       var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
         .appendTo(selectWrapper)
         .select2({
-          width: '100%',
+          width: '150px',
           dropdownCssClass: 'select2-blue'
         });
       select.on('change', function() {
