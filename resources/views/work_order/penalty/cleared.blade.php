@@ -11,6 +11,20 @@
             font-size:0.7rem!important;
             line-height: 0.1!important;
         }
+
+        select.form-control {
+            min-width: 150px;
+        }
+        .select2-container {
+            min-width: 150px !important;
+        }
+        .clear-all-filters-section {
+            width: 150px !important;  
+            min-width: 150px !important;
+            max-width: 150px !important;
+            padding-right: 25px !important;
+        }
+
     </style>
 </head>
 @section('content')
@@ -47,7 +61,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-vehicle-penal
                         </tr>
                         @if(isset($datas) && count($datas) > 0)
                         <tr>
-                            <th><button id="clear-filters" class="btn btn-info btn-sm">Clear All Filters</button></th>
+                            <th class="clear-all-filters-section"><button id="clear-filters" class="btn btn-info btn-sm">Clear All Filters</button></th>
                             <th>
                                 <select class="column-filter form-control" id="so-filter" multiple="multiple">
                                     <!-- Options will be dynamically added via JS -->
@@ -171,7 +185,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-vehicle-penal
             // Initialize Select2 for multi-select filters
             $('#so-filter, #wo-filter, #boe-filter, #declaration-number-filter, #invoice-number-filter, #created-by-filter').select2({
                 placeholder: "Select filter",
-                allowClear: true
+                allowClear: true,
+                width: 'resolve'
             });
 
             // Function to populate multi-select dropdowns with unique, sorted data
