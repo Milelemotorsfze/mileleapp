@@ -820,7 +820,7 @@ public function uploadingbulk(Request $request)
 
         // Extract data
         $name = $row[0];
-        $phone = trim($row[1]);
+        $rawPhone  = trim($row[1]);
         $email = trim($row[2]);
         $sales_person = $row[4];
         $source_name = $row[5];
@@ -834,9 +834,14 @@ public function uploadingbulk(Request $request)
         $priority = strtolower(trim($row[12]));
 
         // **Phone Validation**
-        if (!empty($phone) && substr($phone, 0, 1) !== '+') {
-            $phone = '+' . $phone;
+        $cleanPhone = preg_replace('/[^\d+]/', '', $rawPhone);
+
+        if (!empty($cleanPhone) && $cleanPhone[0] !== '+') {
+            $cleanPhone = '+' . $cleanPhone;
         }
+
+        $phone = $cleanPhone;
+
         if (!empty($phone)) {
             try {
                 $numberProto = $phoneUtil->parse($phone, 'null');
@@ -936,7 +941,6 @@ public function uploadingbulk(Request $request)
         foreach ($rows as $row) {
             $call = new Calls();
             $name = $row[0];
-            $phone = $row[1];
             $email = $row[2];
             $sales_person = $row[4];
             $source_name = $row[5];
@@ -1195,15 +1199,7 @@ public function uploadingbulk(Request $request)
                 $date->setTimezone('Asia/Dubai');
                 $formattedDate = $date->format('Y-m-d H:i:s');
                 $call->name = !empty(trim($row[0])) ? trim($row[0]) : null;
-                $cleanPhone = trim($row[1]);
-                if ($cleanPhone === '') {
-                    $call->phone = null;
-                } else {
-                    if (substr($cleanPhone, 0, 1) !== '+') {
-                        $cleanPhone = '+' . $cleanPhone;
-                    }
-                    $call->phone = $cleanPhone;
-                }
+                $call->phone = $phone ?? null;
                 $call->email = !empty(trim($row[2])) ? trim($row[2]) : null;
                 $call->assign_time = Carbon::now();
                 $call->custom_brand_model = $row[9];
