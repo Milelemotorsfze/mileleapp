@@ -2229,6 +2229,9 @@
                 </div>
 
                 <!-- Second div with role name -->
+                @php
+                    $assignedRoles = $assignedRoles->sortBy('name');
+                @endphp
                 <div class="nav-item rolename-button pb-2 pt-2" id="rolename-dropdown-button">
                     <button class="btn rolename-toggle btn-success" id="rolename-dropdown">
                         @php
