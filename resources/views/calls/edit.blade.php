@@ -641,6 +641,21 @@ redirect()->route('home')->send();
             utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
         });
 
+        input.addEventListener('input', function () {
+            let value = input.value;
+
+            value = value.replace(/[^\d+]/g, '');
+
+            if (value.indexOf('+') > 0) {
+                value = value.replace(/\+/g, ''); 
+            }
+            if (value.indexOf('+') !== 0) {
+                value = value.replace(/\+/g, '');
+            }
+
+            input.value = value;
+        });
+
         $("#calls").on("submit", function () {
             var fullNumber = iti.getNumber();
             $("<input>").attr({
