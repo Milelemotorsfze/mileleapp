@@ -363,6 +363,8 @@ class CallsController extends Controller
                 'location' => 'required',
                 'milelemotors' => 'required',
                 'language' => 'required',
+                'strategy' => 'required', 
+                'priority' => 'required', 
                 'model_line_ids' => 'array',
                 'model_line_ids.*' => 'distinct',
                 'type' => 'required',
@@ -371,6 +373,8 @@ class CallsController extends Controller
             [
                 'milelemotors.required' => 'The Source field is required.',
                 'location.required' => 'The Destination field is required.',
+                'strategy.required' => 'The Strategy field is required.',  
+                'priority.required' => 'The Priority field is required.',  
             ]);
             
             if ($validator->fails()) {
@@ -667,12 +671,16 @@ class CallsController extends Controller
             'location' => 'required',
             'milelemotors' => 'required',
             'language' => 'required',
+            'strategy' => 'required', 
+            'priority' => 'required',
             'type' => 'required',
             'sales_person_id' => ($request->input('sales-option') == "manual-assign") ? 'required' : '',
         ],
         [
             'milelemotors.required' => 'The Source field is required.',
             'location.required' => 'The Destination field is required.',
+            'strategy.required' => 'The Strategy field is required.',
+            'priority.required' => 'The Priority field is required.',
         ]);
 
         if ($request->input('sales-option') == "manual-assign") 
