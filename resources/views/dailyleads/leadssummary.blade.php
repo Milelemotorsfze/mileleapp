@@ -423,8 +423,8 @@ table.dataTable thead th select {
                 }
             },
             {
-                data: 'calls_id',
-                name: 'quotations.calls_id',
+                data: 'soid',
+                name: 'so.id',
                 searchable: false,
                 orderable: false,
                 render: function (data, type, row) {

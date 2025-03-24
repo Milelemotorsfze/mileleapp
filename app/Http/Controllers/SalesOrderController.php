@@ -571,16 +571,36 @@ public function storesalesorderupdate(Request $request, $quotationId)
 }
 public function cancel($id)
 {
-    $quotation = Quotation::where('calls_id', $id)->first();
-    $calls = Calls::find($id);
-    $calls->status = 'Quoted';
-    $calls->save();
-    $leadclosed = Closed::where('call_id', $id)->first();
-    if($leadclosed)
-    {
-    $leadclosed->delete();
+    // $quotation = Quotation::where('calls_id', $id)->first();
+    // $calls = Calls::find($id);
+    // $calls->status = 'Quoted';
+    // $calls->save();
+    // $leadclosed = Closed::where('call_id', $id)->first();
+    // if($leadclosed)
+    // {
+    // $leadclosed->delete();
+    // }
+    // $so = So::where('quotation_id', $quotation->id)->first();
+
+    DB::beginTransaction();
+
+    try {
+
+    $so = SO::find($id);
+    if($so->quotation_id  && $so->quotation_id  != 0) {
+        $quotation = Quotation::where('id', $so->quotation_id)->first();
+        if($quotation){
+            $calls = Calls::find($quotation->calls_id);
+            $calls->status = 'Quoted';
+            $calls->save();
+            $leadclosed = Closed::where('call_id', $quotation->calls_id)->first();
+            if($leadclosed)
+            {
+                $leadclosed->delete();
+            }
+        }
+           
     }
-    $so = So::where('quotation_id', $quotation->id)->first();
     $soitems = Soitems::where('so_id', $so->id)->get();
     foreach ($soitems as $soitem) {
         $vehicle = Vehicles::find($soitem->vehicles_id);
@@ -590,11 +610,11 @@ public function cancel($id)
             $vehicle->reservation_end_date = null;
             $vehicle->booking_person_id = null;
             $vehicle->save();
-            \Log::info('Unassign SO id - Case 4');
+            \Log::info('Unassign SO id - Case 4'.$so->id);
         }
     }
     foreach ($soitems as $soitem) {
-        \Log::info('SO items deleted - Case 4');
+        \Log::info('SO items deleted - Case 4'.$so->id);
         $soitem->delete();
     }
 
@@ -613,7 +633,14 @@ public function cancel($id)
     $solog->save();
     $so->delete();
 
+    DB::commit();
     return redirect()->back()->with('success', 'Sales Order and related items canceled successfully.');
+} catch (\Exception $e) {
+    DB::rollBack(); 
+
+    Log::error('Sales Order Cancellation failed', ['error' => $e->getMessage()]);
+    return redirect()->back()->with('error', 'Sales Order Cancellation failed.');
+}
 }
 public function showSalesSummary($sales_person_id, $count_type)
 {
