@@ -660,11 +660,14 @@ class QuotationController extends Controller
                         foreach ($soitems as $soitem) {
                             $vehicle = Vehicles::find($soitem->vehicles_id);
                             if ($vehicle) {
+                                $soId = $vehicle->so_id;
                                 $vehicle->so_id = null;
-                                \Log::info('Unassign SO id - Case 1');
+                                \Log::info('Unassign SO id - Case 1-'.$soId);
                                 $vehicle->save();
-                                \Log::info('SO items deleted - Case 1');
+                                \Log::info('SO items deleted - Case 1-'.$soId);
+                                Soitems::where('vehicles_id', $vehicle->id)->update(['deleted_by' => Auth::id()]);
                                 Soitems::where('vehicles_id', $vehicle->id)->delete();
+
                             }
                         }
                     }
@@ -715,10 +718,12 @@ class QuotationController extends Controller
                         }
                         $vehiclesToDelete = array_slice($vehicles, 0, $quantityDifference);
                         foreach ($vehiclesToDelete as $vehicle) {
+                            $soId = $vehicle->so_id;
                             $vehicle->so_id = null;
-                            \Log::info('Unassign SO id - Case 2');
+                            \Log::info('Unassign SO id - Case 2-'.$soId);
                             $vehicle->save();
-                            \Log::info('SO items deleted - Case 2');
+                            \Log::info('SO items deleted - Case 2-'.$soId);
+                            Soitems::where('vehicles_id', $vehicle->id)->update(['deleted_by' => Auth::id()]);
                             Soitems::where('vehicles_id', $vehicle->id)->delete();
                         }
                     }

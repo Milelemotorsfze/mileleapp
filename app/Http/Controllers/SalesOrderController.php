@@ -471,10 +471,11 @@ public function storesalesorderupdate(Request $request, $quotationId)
     $so->save();
 
     // Delete existing Soitems records related to the Sales Order ID
-    \Log::info('SO items deleted - Case 3');
+    \Log::info('SO items deleted - Case 3-'.$so->id);
+    Soitems::where('so_id', $so->id)->update(['deleted_by' => Auth::id()]);
     Soitems::where('so_id', $so->id)->delete();
     Vehicles::where('so_id', $so->id)->update(['so_id' => null]);
-    \Log::info('Unassign SO id - Case 3');
+    \Log::info('Unassign SO id - Case 3-'.$so->id);
     // Process the selected VINs
     $vins = $request->input('vehicle_vin');
     $selectedVinsWithNull = [];
@@ -610,11 +611,14 @@ public function cancel($id)
             $vehicle->reservation_end_date = null;
             $vehicle->booking_person_id = null;
             $vehicle->save();
-            \Log::info('Unassign SO id - Case 4'.$so->id);
+            \Log::info('Unassign SO id - Case 4-'.$so->id);
         }
     }
     foreach ($soitems as $soitem) {
-        \Log::info('SO items deleted - Case 4'.$so->id);
+        $soitem->deleted_by = Auth::id();
+        $soitem->save();
+        \Log::info('SO items deleted - Case 4-'.$so->id);
+
         $soitem->delete();
     }
 
@@ -631,7 +635,7 @@ public function cancel($id)
     $solog->so_id = $so->id;
     $solog->role = Auth::user()->selectedRole;
     $solog->save();
-    $so->delete();
+    // $so->delete();
 
     DB::commit();
     return redirect()->back()->with('success', 'Sales Order and related items canceled successfully.');
