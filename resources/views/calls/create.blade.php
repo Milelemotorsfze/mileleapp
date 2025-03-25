@@ -114,9 +114,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <select name="milelemotors" class="form-control select2" id="milelemotorsSelect" multiple>
                     <option value="">Select Source</option>
                     @foreach ($LeadSource as $source)
-                        <option value="{{ $source->source_name }}" {{ old('milelemotors') == $source->source_name ? 'selected' : '' }}>
-                            {{ $source->source_name }}
-                        </option>
+                    <option value="{{ $source->source_name }}" {{ old('milelemotors') == $source->source_name ? 'selected' : '' }}>
+                        {{ $source->source_name }}
+                    </option>
                     @endforeach
                 </select>
             </div>
@@ -126,9 +126,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <select name="language" class="form-control select2" id="languageSelect" multiple>
                     <option value="">Select Language</option>
                     @foreach ($Language as $language)
-                        <option value="{{ $language->name }}" {{ old('language') == $language->name ? 'selected' : '' }}>
-                            {{ $language->name }}
-                        </option>
+                    <option value="{{ $language->name }}" {{ old('language') == $language->name ? 'selected' : '' }}>
+                        {{ $language->name }}
+                    </option>
                     @endforeach
                 </select>
             </div>
@@ -139,9 +139,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <select name="location" class="form-control select2" id="locationSelect" multiple>
                     <option value="">Select Destination</option>
                     @foreach ($countries as $country)
-                        <option value="{{ $country }}" {{ old('location') == $country ? 'selected' : '' }}>
-                            {{ $country }}
-                        </option>
+                    <option value="{{ $country }}" {{ old('location') == $country ? 'selected' : '' }}>
+                        {{ $country }}
+                    </option>
                     @endforeach
                     <option value="Not Mentioned" {{ old('location') == 'Not Mentioned' ? 'selected' : '' }}>Not Mentioned</option>
                 </select>
@@ -194,17 +194,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 </div>
             </div>
             <div class="col-lg-4 col-md-6" id="manual-sales-person-list" style="display: none;">
+                <span class="error">* </span>
                 <label for="sales_person" class="form-label">Sales Person:</label>
                 <select name="sales_person_id" id="salesPersonSelect" class="form-control select2" multiple>
                     <option value="">Select Sales Person</option>
                     @foreach ($sales_persons as $sales_person)
-                        @php
-                            $sales_person_details = DB::table('users')->where('id', $sales_person->model_id)->first();
-                            $sales_person_name = $sales_person_details->name;
-                        @endphp
-                        <option value="{{ $sales_person->model_id }}" {{ old('sales_person_id') == $sales_person->model_id ? 'selected' : '' }}>
-                            {{ $sales_person_name }}
-                        </option>
+                    @php
+                    $sales_person_details = DB::table('users')->where('id', $sales_person->model_id)->first();
+                    $sales_person_name = $sales_person_details->name;
+                    @endphp
+                    <option value="{{ $sales_person->model_id }}" {{ old('sales_person_id') == $sales_person->model_id ? 'selected' : '' }}>
+                        {{ $sales_person_name }}
+                    </option>
                     @endforeach
                 </select>
             </div>
@@ -217,15 +218,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         <select name="model_line_ids[]" class="form-control select2" id="brandModelSelect" multiple>
                             <option value="">Select Brand & Model</option>
                             @foreach ($modelLineMasters as $modelLineMaster)
-                                @php
-                                    $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
-                                    $brand_name = $brand->brand_name;
-                                    $combinedValue = $brand_name . ' / ' . $modelLineMaster->model_line;
-                                @endphp
-                                <option value="{{ $modelLineMaster->id }}"
-                                    {{ old('model_line_ids.0') == $modelLineMaster->id ? 'selected' : '' }}>
-                                    {{ $combinedValue }}
-                                </option>
+                            @php
+                            $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
+                            $brand_name = $brand->brand_name;
+                            $combinedValue = $brand_name . ' / ' . $modelLineMaster->model_line;
+                            @endphp
+                            <option value="{{ $modelLineMaster->id }}"
+                                {{ old('model_line_ids.0') == $modelLineMaster->id ? 'selected' : '' }}>
+                                {{ $combinedValue }}
+                            </option>
                             @endforeach
                         </select>
                     </div>
@@ -239,26 +240,26 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             </div>
         </div>
 
-                    <div class="col-lg-4 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">Custom Brand & Model : </label>
-                        {!! Form::text('custom_brand_model', null, array('placeholder' => 'Custom Brand & Model','class' => 'form-control')) !!}
-                    </div>
-                    <div class="col-lg-12 col-md-12">
-                        <label for="basicpill-firstname-input" class="form-label">Remarks : </label>
-                        <textarea name="remarks" id="editor"></textarea>
-                    </div>
-			        </div>  
-                    </br>
-                    </br> 
-			        <div class="col-lg-12 col-md-12">
-				    <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
-			        </div>  
-		{!! Form::close() !!}
-		</br>
-    </div>
-    @else
-    @php
-        redirect()->route('home')->send();
+        <div class="col-lg-4 col-md-6">
+            <label for="basicpill-firstname-input" class="form-label">Custom Brand & Model : </label>
+            {!! Form::text('custom_brand_model', null, array('placeholder' => 'Custom Brand & Model','class' => 'form-control')) !!}
+        </div>
+        <div class="col-lg-12 col-md-12">
+            <label for="basicpill-firstname-input" class="form-label">Remarks : </label>
+            <textarea name="remarks" id="editor"></textarea>
+        </div>
+</div>
+</br>
+</br>
+<div class="col-lg-12 col-md-12">
+    <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
+</div>
+{!! Form::close() !!}
+</br>
+</div>
+@else
+@php
+redirect()->route('home')->send();
 @endphp
 @endif
 @endsection
@@ -277,14 +278,27 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
     const manualAssignOption = document.getElementById('manual-assign-option');
     const manualSalesPersonList = document.getElementById('manual-sales-person-list');
     const salesOptionValueField = document.getElementById('sales-option-value');
+
     autoAssignOption.addEventListener('change', () => {
         manualSalesPersonList.style.display = 'none';
         salesOptionValueField.value = autoAssignOption.value;
     });
+
     manualAssignOption.addEventListener('change', () => {
         manualSalesPersonList.style.display = 'block';
         salesOptionValueField.value = manualAssignOption.value;
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        if (manualAssignOption.checked) {
+            manualSalesPersonList.style.display = 'block';
+            salesOptionValueField.value = manualAssignOption.value;
+        } else {
+            manualSalesPersonList.style.display = 'none';
+            salesOptionValueField.value = autoAssignOption.value;
+        }
+    });
+
     $(document).ready(function() {
         var max_fields = 10;
         var wrapper = $("#row-container");
@@ -294,52 +308,52 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
         // Function to filter and update the dropdown list
         function updateDropdownList() {
             var selectedValues = $('input[name="model_line_id[]"]').map(function() {
-            return $(this).val();
+                return $(this).val();
             }).get();
 
             $('.new-select').each(function() {
-            var currentInput = $(this);
-            var datalistId = currentInput.attr('list');
-            var datalist = $('#' + datalistId);
-            var options = '';
+                var currentInput = $(this);
+                var datalistId = currentInput.attr('list');
+                var datalist = $('#' + datalistId);
+                var options = '';
 
-            $('#brandList option').each(function() {
-                if (selectedValues.indexOf($(this).val()) === -1) {
-                options += '<option value="' + $(this).val() + '" data-value="' + $(this).data('value') + '"></option>';
-                }
-            });
+                $('#brandList option').each(function() {
+                    if (selectedValues.indexOf($(this).val()) === -1) {
+                        options += '<option value="' + $(this).val() + '" data-value="' + $(this).data('value') + '"></option>';
+                    }
+                });
 
-            datalist.html(options);
+                datalist.html(options);
             });
         }
 
         $(add_button).click(function(e) {
             e.preventDefault();
             if (x < max_fields) {
-            x++;
-                    var selectedValues = $('input[name="model_line_id[]"]').map(function() {
-                        return $(this).val();
-                    }).get();
-                    var datalist = $('<datalist id="brandList' + x + '"></datalist>');
-                    var options = '';
-                    $('#brandList option').each(function() {
-                        if (selectedValues.indexOf($(this).val()) === -1) {
-                            options += '<option value="' + $(this).val() + '" data-value="' + $(this).data('value') + '"></option>';
-                        }
-                    });
-                    datalist.html(options);
-                    var newRow = $('<div class="row"></div>');
-                    var col1 = $('<div class="col-lg-4 col-md-6"></div>');
-                    var input = $('<input type="text" placeholder="Select Brand & Model" name="model_line_id[]" class="form-control mb-1 new-select" id="brandInput' + x + '" list="brandList' + x + '" autocomplete="off" /><input type="hidden" name="model_line_ids[]" id="selectedBrandId' + x + '">');
-                    col1.append(input);
-                    col1.append(datalist);
-                    var col2 = $('<div class="col-lg-4 col-md-6 align-self-end"></div>');
-                    var removeBtn = $('<a href="#" class="remove-row-btn btn btn-danger"><i class="fas fa-minus"></i> Remove</a>');
-                    col2.append(removeBtn);
-                    newRow.append(col1);
-                    newRow.append(col2);
-                    $(wrapper).append(newRow);
-            updateDropdownList();
+                x++;
+                var selectedValues = $('input[name="model_line_id[]"]').map(function() {
+                    return $(this).val();
+                }).get();
+                var datalist = $('<datalist id="brandList' + x + '"></datalist>');
+                var options = '';
+                $('#brandList option').each(function() {
+                    if (selectedValues.indexOf($(this).val()) === -1) {
+                        options += '<option value="' + $(this).val() + '" data-value="' + $(this).data('value') + '"></option>';
+                    }
+                });
+                datalist.html(options);
+                var newRow = $('<div class="row"></div>');
+                var col1 = $('<div class="col-lg-4 col-md-6"></div>');
+                var input = $('<input type="text" placeholder="Select Brand & Model" name="model_line_id[]" class="form-control mb-1 new-select" id="brandInput' + x + '" list="brandList' + x + '" autocomplete="off" /><input type="hidden" name="model_line_ids[]" id="selectedBrandId' + x + '">');
+                col1.append(input);
+                col1.append(datalist);
+                var col2 = $('<div class="col-lg-4 col-md-6 align-self-end"></div>');
+                var removeBtn = $('<a href="#" class="remove-row-btn btn btn-danger"><i class="fas fa-minus"></i> Remove</a>');
+                col2.append(removeBtn);
+                newRow.append(col1);
+                newRow.append(col2);
+                $(wrapper).append(newRow);
+                updateDropdownList();
             }
         });
 
@@ -390,144 +404,163 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             });
         });
     });
-    document.getElementById('languageInput').addEventListener('input', function(event) {
-        var input = event.target;
-        var list = input.getAttribute('list');
-        var options = document.querySelectorAll('#' + list + ' option');
-        var inputValue = input.value;
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
-            if (option.value === inputValue) {
-                input.setCustomValidity('');
-                return;
+    const languageInput = document.getElementById('languageInput');
+    if (languageInput) {
+        languageInput.addEventListener('input', function(event) {
+            var input = event.target;
+            var list = input.getAttribute('list');
+            var options = document.querySelectorAll('#' + list + ' option');
+            var inputValue = input.value;
+            for (var i = 0; i < options.length; i++) {
+                var option = options[i];
+                if (option.value === inputValue) {
+                    input.setCustomValidity('');
+                    return;
+                }
             }
-        }
-        input.setCustomValidity('Please select a valid Language from the list.');
-    });
-    document.getElementById('locationInput').addEventListener('input', function(event) {
-        var input = event.target;
-        var list = input.getAttribute('list');
-        var options = document.querySelectorAll('#' + list + ' option');
-        var inputValue = input.value;
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
+            input.setCustomValidity('Please select a valid Language from the list.');
+        });
+    }
 
-            if (option.value === inputValue) {
-                input.setCustomValidity('');
-                return;
+    const locationInput = document.getElementById('locationInput');
+    if (locationInput) {
+        locationInput.addEventListener('input', function(event) {
+            var input = event.target;
+            var list = input.getAttribute('list');
+            var options = document.querySelectorAll('#' + list + ' option');
+            var inputValue = input.value;
+            for (var i = 0; i < options.length; i++) {
+                var option = options[i];
+                if (option.value === inputValue) {
+                    input.setCustomValidity('');
+                    return;
+                }
             }
-        }
-        input.setCustomValidity('Please select a valid Location from the list.');
-    });
-    document.getElementById('milelemotorsInput').addEventListener('input', function(event) {
-        var input = event.target;
-        var list = input.getAttribute('list');
-        var options = document.querySelectorAll('#' + list + ' option');
-        var inputValue = input.value;
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
-            if (option.value === inputValue) {
-                input.setCustomValidity('');
-                return;
-            }
-        }
-        input.setCustomValidity('Please select a valid Source from the list.');
-    });
-    document.getElementById('typeInput').addEventListener('input', function(event) {
-        var input = event.target;
-        var list = input.getAttribute('list');
-        var options = document.querySelectorAll('#' + list + ' option');
-        var inputValue = input.value;
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
+            input.setCustomValidity('Please select a valid Location from the list.');
+        });
+    }
 
-            if (option.value === inputValue) {
-                input.setCustomValidity('');
-                return;
+    const milelemotorsInput = document.getElementById('milelemotorsInput');
+    if (milelemotorsInput) {
+        milelemotorsInput.addEventListener('input', function(event) {
+            var input = event.target;
+            var list = input.getAttribute('list');
+            var options = document.querySelectorAll('#' + list + ' option');
+            var inputValue = input.value;
+            for (var i = 0; i < options.length; i++) {
+                var option = options[i];
+                if (option.value === inputValue) {
+                    input.setCustomValidity('');
+                    return;
+                }
             }
-        }
-        input.setCustomValidity('Please select a valid Type from the list.');
-    });
-    document.getElementById('brandInput').addEventListener('input', function(event) {
-        var input = event.target;
-        var list = input.getAttribute('list');
-        var options = document.querySelectorAll('#' + list + ' option');
-        var inputValue = input.value;
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
+            input.setCustomValidity('Please select a valid Source from the list.');
+        });
+    }
 
-            if (option.value === inputValue) {
-                input.setCustomValidity('');
-                return;
+    const typeInput = document.getElementById('typeInput');
+    if (typeInput) {
+        typeInput.addEventListener('input', function(event) {
+            var input = event.target;
+            var list = input.getAttribute('list');
+            var options = document.querySelectorAll('#' + list + ' option');
+            var inputValue = input.value;
+            for (var i = 0; i < options.length; i++) {
+                var option = options[i];
+                if (option.value === inputValue) {
+                    input.setCustomValidity('');
+                    return;
+                }
             }
-        }
-        if (inputValue === '') {
-            input.setCustomValidity('');
-        } else {
-            input.setCustomValidity('Please select a valid Brand & Model from the list.');
-        }
-    });
-    document.getElementById('email').addEventListener('input', function(event) {
-        var emailInput = event.target;
-        var emailValue = emailInput.value;
-        var emailError = document.getElementById('emailError');
+            input.setCustomValidity('Please select a valid Type from the list.');
+        });
+    }
 
-        if (emailValue === '') {
-            emailInput.classList.remove('invalid');
-            emailError.textContent = '';
-        } else if (!validateEmail(emailValue)) {
-            emailInput.classList.add('invalid');
-            emailError.textContent = 'Please enter a valid email address.';
-        } else {
-            emailInput.classList.remove('invalid');
-            emailError.textContent = '';
-        }
-    });
-    document.getElementById('salesPersonInput').addEventListener('input', function(event) {
-        var input = event.target;
-        var list = input.getAttribute('list');
-        var options = document.querySelectorAll('#' + list + ' option');
-        var inputValue = input.value;
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
 
-            if (option.value === inputValue) {
-                input.setCustomValidity('');
-                return;
+    const emailInput = document.getElementById('email');
+    if (emailInput) {
+        emailInput.addEventListener('input', function(event) {
+            var emailValue = event.target.value;
+            var emailError = document.getElementById('emailError');
+
+            if (emailValue === '') {
+                emailInput.classList.remove('invalid');
+                if (emailError) emailError.textContent = '';
+            } else if (!validateEmail(emailValue)) {
+                emailInput.classList.add('invalid');
+                if (emailError) emailError.textContent = 'Please enter a valid email address.';
+            } else {
+                emailInput.classList.remove('invalid');
+                if (emailError) emailError.textContent = '';
             }
-        }
-        input.setCustomValidity('Please select a valid Sales Person from the list.');
-    });
+        });
+    }
+
+    // Reuse your email validation function safely
     function validateEmail(email) {
         var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     }
+
     const salesPersonInput = document.getElementById('salesPersonInput');
-    const selectedSalesPersonIdInput = document.getElementById('selectedSalesPersonId');
-    salesPersonInput.addEventListener('input', function() {
-        const selectedOption = Array.from(document.querySelectorAll('#salesList option')).find(option => option.value === salesPersonInput.value);
-        if (selectedOption) {
-            selectedSalesPersonIdInput.value = selectedOption.getAttribute('data-id');
-        } else {
-            selectedSalesPersonIdInput.value = '';
-        }
-    });
+    if (salesPersonInput) {
+        salesPersonInput.addEventListener('input', function(event) {
+            var input = event.target;
+            var list = input.getAttribute('list');
+            var options = document.querySelectorAll('#' + list + ' option');
+            var inputValue = input.value;
+            for (var i = 0; i < options.length; i++) {
+                var option = options[i];
+                if (option.value === inputValue) {
+                    input.setCustomValidity('');
+                    return;
+                }
+            }
+            input.setCustomValidity('Please select a valid Sales Person from the list.');
+        });
+
+        const selectedSalesPersonIdInput = document.getElementById('selectedSalesPersonId');
+        salesPersonInput.addEventListener('input', function() {
+            const selectedOption = Array.from(document.querySelectorAll('#salesList option')).find(option => option.value === salesPersonInput.value);
+            if (selectedOption && selectedSalesPersonIdInput) {
+                selectedSalesPersonIdInput.value = selectedOption.getAttribute('data-id');
+            } else if (selectedSalesPersonIdInput) {
+                selectedSalesPersonIdInput.value = '';
+            }
+        });
+    }
+
     const brandInput = document.getElementById('brandInput');
     const selectedBrandIdInput = document.getElementById('selectedBrandId');
 
-    brandInput.addEventListener('input', function() {
-        const selectedOption = Array.from(document.querySelectorAll('#brandList option')).find(option => option.value === brandInput.value);
-        
-        if (selectedOption) {
-            selectedBrandIdInput.value = selectedOption.getAttribute('data-value');
-        } else {
-            selectedBrandIdInput.value = '';
-        }
-    });
+    if (brandInput) {
+        brandInput.addEventListener('input', function(event) {
+            var input = event.target;
+            var list = input.getAttribute('list');
+            var options = document.querySelectorAll('#' + list + ' option');
+            var inputValue = input.value;
+            let valid = false;
+
+            for (var i = 0; i < options.length; i++) {
+                if (options[i].value === inputValue) {
+                    valid = true;
+                    break;
+                }
+            }
+
+            input.setCustomValidity(valid || inputValue === '' ? '' : 'Please select a valid Brand & Model from the list.');
+
+            // Handle hidden field update safely
+            if (selectedBrandIdInput) {
+                const selectedOption = Array.from(options).find(option => option.value === inputValue);
+                selectedBrandIdInput.value = selectedOption ? selectedOption.getAttribute('data-value') : '';
+            }
+        });
+    }
 </script>
 
 <script type="text/javascript">
-    $(document).ready(function () {
+    $(document).ready(function() {
         var input = document.querySelector("#phone");
         var iti = window.intlTelInput(input, {
             separateDialCode: true,
@@ -536,13 +569,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
         });
 
-        input.addEventListener('input', function () {
+        input.addEventListener('input', function() {
             let value = input.value;
 
             value = value.replace(/[^\d+]/g, '');
 
             if (value.indexOf('+') > 0) {
-                value = value.replace(/\+/g, ''); 
+                value = value.replace(/\+/g, '');
             }
             if (value.indexOf('+') !== 0) {
                 value = value.replace(/\+/g, '');
@@ -551,9 +584,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             input.value = value;
         });
 
-        $("#calls").on("submit", function () {
-            var fullNumber = iti.getNumber(); 
-            
+        $("#calls").on("submit", function() {
+            var fullNumber = iti.getNumber();
+
             $("<input>").attr({
                 type: "hidden",
                 name: "phone",
