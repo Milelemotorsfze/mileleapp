@@ -26,16 +26,13 @@ use App\Models\CallsRequirement;
 use Carbon\Carbon;
 use App\Models\Varaint;
 use App\Models\AvailableColour;
-use App\Rules\ValidPhoneNumber;
+use App\Rules\CountryCodes;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Response;
 use League\Csv\Writer;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use libphonenumber\PhoneNumberUtil;
-use libphonenumber\PhoneNumberFormat;
-use libphonenumber\NumberParseException;
 use Illuminate\Support\Facades\Validator; 
 
 class CallsController extends Controller
@@ -357,8 +354,41 @@ class CallsController extends Controller
      */
     public function store(Request $request)
         { 
+            $validCountryCodes = CountryCodes::list();
+
             $validator = Validator::make($request->all(), [
-                'phone' => ['nullable', 'required_without:email', new ValidPhoneNumber('AE')],
+                'phone' => ['nullable', 'required_without:email', function ($attribute, $value, $fail) use ($validCountryCodes) {
+                if (!empty($value)) {
+                    $value = preg_replace('/[^\d+]/', '', $value);
+
+                    if ($value[0] !== '+') {
+                        $value = '+' . $value;
+                    }
+
+                    $matchedCode = null;
+                    foreach ($validCountryCodes as $code) {
+                        if (strpos($value, $code) === 0) {
+                            $matchedCode = $code;
+                            break;
+                        }
+                    }
+
+                    if (!$matchedCode) {
+                        return $fail('Invalid country code in phone number.');
+                    }
+
+                    $localPart = substr($value, strlen($matchedCode));
+
+                    if (!ctype_digit($localPart)) {
+                        return $fail('Phone number can only contain digits after country code.');
+                    }
+
+                    $length = strlen($localPart);
+                    if ($length < 5 || $length > 20) {
+                        return $fail('Phone number must be between 5 to 20 digits (excluding country code).');
+                    }
+                }
+                }],
                 'email' => 'nullable|required_without:phone|email',
                 'location' => 'required',
                 'milelemotors' => 'required',
@@ -375,6 +405,7 @@ class CallsController extends Controller
                 'location.required' => 'The Destination field is required.',
                 'strategy.required' => 'The Strategy field is required.',  
                 'priority.required' => 'The Priority field is required.',  
+                'phone.regex' => 'Invalid Phone Number.',
             ]);
             
             if ($validator->fails()) {
@@ -664,24 +695,59 @@ class CallsController extends Controller
      */
     public function updatehol(Request $request)
     {
-        $this->validate($request, [
-            'phone' => ['nullable', 'required_without:email', new ValidPhoneNumber('AE')],
-            // 'secondary_phone_number' => ['nullable', new ValidPhoneNumber('AE')],
-            'email' => 'nullable|required_without:phone|email',           
+        $validCountryCodes = CountryCodes::list();
+
+        $validator = Validator::make($request->all(), [
+            'phone' => ['nullable', 'required_without:email', function ($attribute, $value, $fail) use ($validCountryCodes) {
+                if (!empty($value)) {
+                    $value = preg_replace('/[^\d+]/', '', $value);
+    
+                    if ($value[0] !== '+') {
+                        $value = '+' . $value;
+                    }
+    
+                    $matchedCode = null;
+                    foreach ($validCountryCodes as $code) {
+                        if (strpos($value, $code) === 0) {
+                            $matchedCode = $code;
+                            break;
+                        }
+                    }
+    
+                    if (!$matchedCode) {
+                        return $fail('Invalid country code in phone number.');
+                    }
+    
+                    $localPart = substr($value, strlen($matchedCode));
+    
+                    if (!ctype_digit($localPart)) {
+                        return $fail('Phone number can only contain digits after country code.');
+                    }
+    
+                    $length = strlen($localPart);
+                    if ($length < 5 || $length > 20) {
+                        return $fail('Phone number must be between 5 to 20 digits (excluding country code).');
+                    }
+                }
+            }],
+            'email' => 'nullable|required_without:phone|email',
             'location' => 'required',
             'milelemotors' => 'required',
             'language' => 'required',
-            'strategy' => 'required', 
+            'strategy' => 'required',
             'priority' => 'required',
             'type' => 'required',
             'sales_person_id' => ($request->input('sales-option') == "manual-assign") ? 'required' : '',
-        ],
-        [
+        ], [
             'milelemotors.required' => 'The Source field is required.',
             'location.required' => 'The Destination field is required.',
             'strategy.required' => 'The Strategy field is required.',
             'priority.required' => 'The Priority field is required.',
         ]);
+    
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         if ($request->input('sales-option') == "manual-assign") 
 		{
@@ -791,6 +857,9 @@ class CallsController extends Controller
 
 public function uploadingbulk(Request $request)
 {
+
+    $validCountryCodes = CountryCodes::list();
+    
     if (!$request->hasFile('file') || !$request->file('file')->isValid()) {
         return back()->with('error', 'Please Select The Correct File for Uploading');
     }
@@ -810,7 +879,6 @@ public function uploadingbulk(Request $request)
     $rejectedCount = 0;
 
     $headers = array_shift($rows);
-    $phoneUtil = PhoneNumberUtil::getInstance();
 
     foreach ($rows as $row) {
 
@@ -821,7 +889,7 @@ public function uploadingbulk(Request $request)
         if (empty($nonEmptyValues)) {
             continue;
         }
-
+        $phone = null;
         $errorMessages = [];
         $isPhoneValid = false;
         $isEmailValid = false;
@@ -841,30 +909,47 @@ public function uploadingbulk(Request $request)
         $strategies = $row[11];
         $priority = strtolower(trim($row[12]));
 
-        // **Phone Validation**
-        $cleanPhone = preg_replace('/[^\d+]/', '', $rawPhone);
-
-        if (!empty($cleanPhone) && $cleanPhone[0] !== '+') {
-            $cleanPhone = '+' . $cleanPhone;
-        }
-
-        $phone = $cleanPhone;
-
-        if (!empty($phone)) {
-            try {
-                $numberProto = $phoneUtil->parse($phone, 'null');
-                if ($phoneUtil->isValidNumber($numberProto)) {
-                    $phone = $phoneUtil->format($numberProto, PhoneNumberFormat::E164);
-                    $isPhoneValid = true;
-                } else {
-                    $errorMessages[] = 'Invalid Phone Number';
-                    $phone = null;
-                }
-            } catch (NumberParseException $e) {
-                $errorMessages[] = 'Invalid Phone Number';
-                $phone = null;
+        $cleanPhone = preg_replace('/[\s\-]/', '', $rawPhone); 
+        
+        if (!empty($cleanPhone)) {
+            if ($cleanPhone[0] !== '+') {
+                $cleanPhone = '+' . $cleanPhone;
             }
-        }
+        
+            if (!preg_match('/^\+\d{5,20}$/', $cleanPhone)) {
+                $errorMessages[] = 'Phone number must start with + and contain only digits, 5 to 20 digits total.';
+                $phone = null;
+            } else {
+                $matchedCode = false;
+                $matchedCodeLength = 0;
+        
+                foreach ($validCountryCodes as $code) {
+                    if (strpos($cleanPhone, $code) === 0) {
+                        $matchedCode = true;
+                        $matchedCodeLength = strlen($code);
+                        break;
+                    }
+                }
+        
+                if (!$matchedCode) {
+                    $errorMessages[] = 'Invalid country code in phone number.';
+                    $phone = null;
+                } else {
+                    $digitsAfterCode = substr($cleanPhone, $matchedCodeLength);
+                    if (!ctype_digit($digitsAfterCode)) {
+                        $errorMessages[] = 'Phone number can only contain digits after country code.';
+                        $phone = null;
+                    } elseif (strlen($digitsAfterCode) < 5 || strlen($digitsAfterCode) > 20) {
+                        $errorMessages[] = 'Phone number after country code must be 5 to 20 digits.';
+                        $phone = null;
+                    } else {
+                        $phone = $cleanPhone;
+                        $isPhoneValid = true;
+                    }
+                }
+            }
+        }        
+        
 
         // **Email Validation**
         if (!empty($email)) {
@@ -940,7 +1025,7 @@ public function uploadingbulk(Request $request)
         $downloadLink = route('download.rejected', ['filename' => $filename]);
 
         return back()->with('error', [
-            'message' => "Data upload failed! From the total " . count($rows) . " records, " . $acceptedCount . " were accepted & " . $rejectedCount . " were rejected. No data has been added.",
+            'message' => "Data upload failed! From the total " . (count($rows)) . " records, " . $acceptedCount . " were accepted & " . $rejectedCount . " were rejected. No data has been added.",
             'fileLink' => $downloadLink,
         ]);
     }
@@ -959,7 +1044,7 @@ public function uploadingbulk(Request $request)
             $custom_brand_model = $row[9];
             $remarks = $row[10];
             $strategies = $row[11];
-            $priority = $row[12];
+            $priority = strtolower(trim($row[12]));
             $errorDescription = '';
             if ($sales_person == null) {
                 $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
@@ -1207,14 +1292,18 @@ public function uploadingbulk(Request $request)
                 $date->setTimezone('Asia/Dubai');
                 $formattedDate = $date->format('Y-m-d H:i:s');
                 $call->name = !empty(trim($row[0])) ? trim($row[0]) : null;
-                $call->phone = $phone ?? null;
+                $rawPhoneForDb = trim($row[1]);
+                if (!empty($rawPhoneForDb) && $rawPhoneForDb[0] !== '+') {
+                    $rawPhoneForDb = '+' . $rawPhoneForDb;
+                }
+                $call->phone = $rawPhoneForDb ?? null;
                 $call->email = !empty(trim($row[2])) ? trim($row[2]) : null;
                 $call->assign_time = Carbon::now();
                 $call->custom_brand_model = $row[9];
                 $call->remarks = $row[10];
                 $call->source = $lead_source_id;
                 $call->strategies_id = $strategies_id;
-                $call->priority = $row[12];
+                $call->priority = $priority;
                 $call->language = $row[6];
                 $call->sales_person = $sales_person_id;
                 $call->created_at = $formattedDate;
@@ -1483,7 +1572,7 @@ public function addnewleads()
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $this->validate($request, [
-            'phone' => ['nullable', 'required_without:email', new ValidPhoneNumber('AE')],            
+            'phone' => 'nullable|required_without:email',          
             'email' => 'nullable|required_without:phone|email',           
             'location' => 'required',
             'milelemotors' => 'required',

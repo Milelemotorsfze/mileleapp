@@ -207,15 +207,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         $sales_personsss = DB::table('users')->where('id', $calls->sales_person)->first();
                         $sales_persons_namess = $sales_personsss->name;
                         @endphp
-                        <input type="radio" name="sales-option" id="auto-assign-option" value="auto-assign" checked> {{ $sales_persons_namess }}
+                        <input type="radio" name="sales-option" id="auto-assign-option" value="auto-assign" 
+                            {{ old('sales-option', 'auto-assign') === 'auto-assign' ? 'checked' : '' }}> {{ $sales_persons_namess }}
                     </label>
                     <input type="hidden" name="old_sales_person_id" value="{{ $calls->sales_person }}">
                     <label>
-                        <input type="radio" name="sales-option" id="manual-assign-option" value="manual-assign"> Manual Assign
+                    <input type="radio" name="sales-option" id="manual-assign-option" value="manual-assign" 
+                        {{ old('sales-option') === 'manual-assign' ? 'checked' : '' }}> Manual Assign
                     </label>
                 </div>
             </div>
             <div class="col-lg-4 col-md-6" id="manual-sales-person-list" style="display: none;">
+                <span class="error">* </span>
                 <label for="salesPersonSelect" class="form-label">Sales Person:</label>
                 <select name="sales_person_id" id="salesPersonSelect" class="form-control select2" multiple>
                     <option value="">Select Sales Person</option>
@@ -336,14 +339,27 @@ redirect()->route('home')->send();
     const manualAssignOption = document.getElementById('manual-assign-option');
     const manualSalesPersonList = document.getElementById('manual-sales-person-list');
     const salesOptionValueField = document.getElementById('sales-option-value');
+
     autoAssignOption.addEventListener('change', () => {
         manualSalesPersonList.style.display = 'none';
         salesOptionValueField.value = autoAssignOption.value;
     });
+
     manualAssignOption.addEventListener('change', () => {
         manualSalesPersonList.style.display = 'block';
         salesOptionValueField.value = manualAssignOption.value;
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        if (manualAssignOption.checked) {
+            manualSalesPersonList.style.display = 'block';
+            salesOptionValueField.value = manualAssignOption.value;
+        } else {
+            manualSalesPersonList.style.display = 'none';
+            salesOptionValueField.value = autoAssignOption.value;
+        }
+    });
+
     $(document).ready(function() {
         var max_fields = 10;
         var wrapper = $("#row-container");
