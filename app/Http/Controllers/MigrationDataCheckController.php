@@ -40,93 +40,93 @@ class MigrationDataCheckController extends Controller
     public function index(Request $request)
     {
     //    get all duplicates in varaint request items table
-    $varaintModelSpecNotExist = [];
-    $affectedIds = [];
+//     $varaintModelSpecNotExist = [];
+//     $affectedIds = [];
 
-//    get all variant requestItems with approved inspection
-       $all = VariantRequestItems::select('*', DB::raw('COUNT(*) as duplicate_count'))
-       ->groupBy('variant_request_id', 'model_specification_id')
-       ->whereNotIn('id', $affectedIds)
-       ->having('duplicate_count', '>', 1)
-       ->get();
+// //    get all variant requestItems with approved inspection
+//        $all = VariantRequestItems::select('*', DB::raw('COUNT(*) as duplicate_count'))
+//        ->groupBy('variant_request_id', 'model_specification_id')
+//        ->whereNotIn('id', $affectedIds)
+//        ->having('duplicate_count', '>', 1)
+//        ->get();
 
        
-       foreach($all as $item) {
+//        foreach($all as $item) {
        
-        // chcek the vehicle model specification id specification option having this option
-        // foreach($variantRequestItems as $variantRequestItem)
-            $variantRequest = VariantRequest::where('id', $item->variant_request_id)->first();
-          if($variantRequest) {
-            $inspection =  Inspection::where('id', $variantRequest->inspection_id)->first();
+//         // chcek the vehicle model specification id specification option having this option
+//         // foreach($variantRequestItems as $variantRequestItem)
+//             $variantRequest = VariantRequest::where('id', $item->variant_request_id)->first();
+//           if($variantRequest) {
+//             $inspection =  Inspection::where('id', $variantRequest->inspection_id)->first();
 
-            if($inspection) {
-                if($inspection->status == 'approved') {
-                    // get the variant of vehicle
+//             if($inspection) {
+//                 if($inspection->status == 'approved') {
+//                     // get the variant of vehicle
         
-                        $vehicle = Vehicles::find($inspection->vehicle_id);
-                       $vaiantModelSpecification = VariantItems::where('varaint_id', $vehicle->varaints_id)
-                        ->where('model_specification_id', $item->model_specification_id)
-                        ->first();
+//                         $vehicle = Vehicles::find($inspection->vehicle_id);
+//                        $vaiantModelSpecification = VariantItems::where('varaint_id', $vehicle->varaints_id)
+//                         ->where('model_specification_id', $item->model_specification_id)
+//                         ->first();
                        
-                        if($vaiantModelSpecification) {
-                            $variantRequestItems = VariantRequestItems::where('variant_request_id',$item->variant_request_id)
-                                                ->where('model_specification_id', $item->model_specification_id);
-                            if($variantRequestItems->count() > 1) {
-                                // duplicate found
+//                         if($vaiantModelSpecification) {
+//                             $variantRequestItems = VariantRequestItems::where('variant_request_id',$item->variant_request_id)
+//                                                 ->where('model_specification_id', $item->model_specification_id);
+//                             if($variantRequestItems->count() > 1) {
+//                                 // duplicate found
         
-                                $issameExist = VariantRequestItems::where('variant_request_id',$item->variant_request_id)
-                                                    ->where('model_specification_id', $item->model_specification_id)
-                                                    ->where('model_specification_options_id', $vaiantModelSpecification->model_specification_options_id)
-                                                    ->first();
-                                if($issameExist) {
-                                    // same existing, keep exisiting and update deleted at of another
-                                    VariantRequestItems::where('variant_request_id',$item->variant_request_id)
-                                    ->where('model_specification_id', $item->model_specification_id)
-                                    ->whereNot('id',$issameExist->id)
-                                    ->update(['deleted_at' => Carbon::now()]);
+//                                 $issameExist = VariantRequestItems::where('variant_request_id',$item->variant_request_id)
+//                                                     ->where('model_specification_id', $item->model_specification_id)
+//                                                     ->where('model_specification_options_id', $vaiantModelSpecification->model_specification_options_id)
+//                                                     ->first();
+//                                 if($issameExist) {
+//                                     // same existing, keep exisiting and update deleted at of another
+//                                     VariantRequestItems::where('variant_request_id',$item->variant_request_id)
+//                                     ->where('model_specification_id', $item->model_specification_id)
+//                                     ->whereNot('id',$issameExist->id)
+//                                     ->update(['deleted_at' => Carbon::now()]);
                                 
-                                }else{
-                                    // update one and remove other
+//                                 }else{
+//                                     // update one and remove other
         
-                                    $toKeep = VariantRequestItems::where('variant_request_id', $item->variant_request_id)
-                                    ->where('model_specification_id', $item->model_specification_id)
-                                    ->orderBy('id', 'asc') // Change as per requirement
-                                    ->first();
+//                                     $toKeep = VariantRequestItems::where('variant_request_id', $item->variant_request_id)
+//                                     ->where('model_specification_id', $item->model_specification_id)
+//                                     ->orderBy('id', 'asc') // Change as per requirement
+//                                     ->first();
                             
-                                VariantRequestItems::where('variant_request_id', $item->variant_request_id)
-                                    ->where('model_specification_id', $item->model_specification_id)
-                                    ->whereNot('id', $toKeep->id) // Exclude the one to keep
-                                    ->update(['deleted_at' => Carbon::now()]);
-                                }
-                                foreach($variantRequestItems as $variantRequestItem) {
-                                    $affectedIds[] = $variantRequestItem->id;
-                                }
+//                                 VariantRequestItems::where('variant_request_id', $item->variant_request_id)
+//                                     ->where('model_specification_id', $item->model_specification_id)
+//                                     ->whereNot('id', $toKeep->id) // Exclude the one to keep
+//                                     ->update(['deleted_at' => Carbon::now()]);
+//                                 }
+//                                 foreach($variantRequestItems as $variantRequestItem) {
+//                                     $affectedIds[] = $variantRequestItem->id;
+//                                 }
                             
-                                // same 
-                            }else{
-                                // only one
-                               $isExist = $variantRequestItems = $variantRequestItems->first();
-                                $isExist->model_specification_options_id = $vaiantModelSpecification->model_specification_options_id;
-                                $isExist->save();
-                                // update existing one
-                            }                    
+//                                 // same 
+//                             }else{
+//                                 // only one
+//                                $isExist = $variantRequestItems = $variantRequestItems->first();
+//                                 $isExist->model_specification_options_id = $vaiantModelSpecification->model_specification_options_id;
+//                                 $isExist->save();
+//                                 // update existing one
+//                             }                    
                                                 
-                        }else{
-                            $varaintModelSpecNotExist[] = $item->id;
-                        }
-                    }
-            }
-          }
+//                         }else{
+//                             $varaintModelSpecNotExist[] = $item->id;
+//                         }
+//                     }
+//             }
+//           }
            
-       }
+//        }
 
-        info("affected rows");
-        info($affectedIds);
+//         info("affected rows");
+//         info($affectedIds);
 
-        info("model spec not exist");
-        info($varaintModelSpecNotExist);
+//         info("model spec not exist");
+//         info($varaintModelSpecNotExist);
 
-        return 1;
+//         return 1;
     }
 
     public function PFIUniqueWithinYear() {
