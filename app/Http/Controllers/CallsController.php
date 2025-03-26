@@ -811,7 +811,7 @@ class CallsController extends Controller
 		$model->status = "New";
 		$model->save();
 		}
-        $modelLineIds = $request->input('model_line_ids');
+        $modelLineIds = $request->input('model_line_ids') ?? [];
 
         CallsRequirement::where('lead_id', $call_id)->delete();
 

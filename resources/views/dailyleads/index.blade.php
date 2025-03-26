@@ -9,6 +9,9 @@
   <div class="card-header">
   <style>
 
+    #remarksModalBody img {
+        width: 100% !important;
+    }
     .nav-fill .nav-item .nav-link, .nav-justified .nav-item .nav-link {
       width: 100% !important;     
       padding: 8px 30px !important; 
@@ -314,11 +317,16 @@ input[type=number]::-webkit-outer-spin-button
                     <td>{{ $calls->custom_brand_model }}</td>
                     <td>{{ $calls->language }}</td>
                     <td>{{ $calls->location }}</td>
-                    @php
-                    $text = $calls->remarks;
-                    $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
-                    @endphp
-                    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>
+                    <td class="nowrap-td">
+                      @php
+                          $stripped = strip_tags($calls->remarks);
+                          $shortText = Str::limit($stripped, 20);
+                      @endphp
+                      {!! $shortText !!}
+                      @if(strlen($stripped) > 20)
+                          <a href="#" class="text-primary read-more-link" data-remarks="{!! htmlspecialchars($calls->remarks, ENT_QUOTES) !!}">Read More</a>
+                      @endif
+                    </td>
                     <td>
     @php
         $colorClass = '';
@@ -1231,9 +1239,31 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
           </div>
         </div>
       </div>
+      <div class="modal fade" id="remarksModal" tabindex="-1" aria-labelledby="remarksModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="remarksModalLabel">Full Remarks</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body" id="remarksModalBody">
+              </div>
+            </div>
+          </div>
+        </div>
       </div><!-- end tab-content-->
     </div>
   </div>
+
+  <script>
+    $(document).on('click', '.read-more-link', function(e) {
+        e.preventDefault();
+        var remarks = $(this).data('remarks');
+        $('#remarksModalBody').html(remarks);
+        $('#remarksModal').modal('show');
+    });
+</script>
+
   <script>
     function uploadingQuotations() {
   var formData = new FormData();
