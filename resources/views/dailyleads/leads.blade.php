@@ -17,6 +17,10 @@
     padding: 10px;
     background-color: #f9f9f9;
 }
+
+.rich-text-content img{
+    width: 100% !important;
+}
 #log-content {
     height: 400px;
     overflow-y: auto;
@@ -743,6 +747,28 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                     </div>
                 </div>
             </div>
+            @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+            @endphp
+            @if ($hasPermission)
+            <div class="col-md-6 col-sm-12 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="text-center">Remarks</h5>
+                        </br>
+
+                        @php
+                            $text = $lead->remarks;
+                            $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
+                        @endphp
+
+                        <div class="rich-text-content">
+                            {!! $remarks !!}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
         @endforeach
     </div>
 </div>

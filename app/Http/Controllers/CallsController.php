@@ -34,6 +34,7 @@ use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Validator; 
+use Illuminate\Support\Facades\File;
 
 class CallsController extends Controller
 {
@@ -642,6 +643,27 @@ class CallsController extends Controller
                 return redirect()->route('calls.index')
                 ->with('success','Call Record created successfully');
         }
+
+        public function upload(Request $request)
+        {
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                $filename = time().'_'.$file->getClientOriginalName();
+        
+                $destinationPath = public_path('uploads/summernote');
+        
+                if (!\File::isDirectory($destinationPath)) {
+                    \File::makeDirectory($destinationPath, 0777, true, true);
+                }
+        
+                $file->move($destinationPath, $filename);
+        
+                return asset('uploads/summernote/'.$filename); 
+            }
+        
+            return response()->json(['error' => 'No file uploaded.'], 400);
+        }        
+        
     public function showcalls(Request $request, $call, $brand_id, $model_line_id, $location, $days, $custom_brand_model = null)
     {   
         $brandId = $request->route('brand_id');
@@ -790,6 +812,9 @@ class CallsController extends Controller
 		$model->save();
 		}
         $modelLineIds = $request->input('model_line_ids');
+
+        CallsRequirement::where('lead_id', $call_id)->delete();
+
             foreach ($modelLineIds as $modelLineId) {
                 if ($modelLineId !== null) {
                     $datacalls = [
