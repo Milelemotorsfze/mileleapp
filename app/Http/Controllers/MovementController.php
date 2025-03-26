@@ -239,220 +239,231 @@ class MovementController extends Controller
         $request->validate([
             'vin' => 'required',
         ]);
-        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-        $currentDateTime = Carbon::now($dubaiTimeZone);
-        $vin = $request->input('vin');
-        $from = $request->input('from');
-        $to = $request->input('to');
-        $date = $request->input('date');
-        $createdBy = $request->user()->id;
-    // foreach ($vin as $index => $value) {
-    //     if (array_key_exists($index, $from) && array_key_exists($index, $to)) {
-    //         $vehicle = Vehicles::where('vin', $vin[$index])->first();
-    //         if ($vehicle && $to[$index] === '2' && is_null($vehicle->inspection_date)) {
-    //             return redirect()->back()->withErrors([
-    //                 'error' => "Movement for VIN {$vin[$index]} cannot proceed because the inspection date is not set.",
-    //             ]);
-    //         }
-    //     }
-    // }
-        $movementsReference = new MovementsReference();
-        $movementsReference->date = $date;
-        $movementsReference->created_by = $createdBy;
-        $movementsReference->save();
-        $movementsReferenceId = $movementsReference->id;
-        $grnVins = [];
-        $gdnVins = [];
-        $otherVins = [];
-        foreach ($vin as $index => $value) {
-            if (array_key_exists($index, $from) && array_key_exists($index, $to)) {
-            $vehicle = Vehicles::where('vin', $vin[$index])->first();
-            $ownershipType = is_array($request->input('ownership_type')) 
-                ? $request->input('ownership_type')[$index] 
-                : $request->input('ownership_type');
-            $vehicle->ownership_type = $ownershipType;
-            $vehicle->save();
-            if ($vehicle) {
-                if (($from[$index] === '1' && $to[$index] !== '3')) {
-                    $grnVins[] = $vin[$index];
-                } elseif ($to[$index] === '2') {
-                    $gdnVins[] = $vin[$index];
-                } else {
-                    $otherVins[] = $vin[$index];
+
+        DB::beginTransaction();    
+
+        try{
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $currentDateTime = Carbon::now($dubaiTimeZone);
+            $vin = $request->input('vin');
+            $from = $request->input('from');
+            $to = $request->input('to');
+            $date = $request->input('date');
+            $createdBy = $request->user()->id;
+        // foreach ($vin as $index => $value) {
+        //     if (array_key_exists($index, $from) && array_key_exists($index, $to)) {
+        //         $vehicle = Vehicles::where('vin', $vin[$index])->first();
+        //         if ($vehicle && $to[$index] === '2' && is_null($vehicle->inspection_date)) {
+        //             return redirect()->back()->withErrors([
+        //                 'error' => "Movement for VIN {$vin[$index]} cannot proceed because the inspection date is not set.",
+        //             ]);
+        //         }
+        //     }
+        // }
+            $movementsReference = new MovementsReference();
+            $movementsReference->date = $date;
+            $movementsReference->created_by = $createdBy;
+            $movementsReference->save();
+            $movementsReferenceId = $movementsReference->id;
+            $grnVins = [];
+            $gdnVins = [];
+            $otherVins = [];
+            foreach ($vin as $index => $value) {
+                if (array_key_exists($index, $from) && array_key_exists($index, $to)) {
+                $vehicle = Vehicles::where('vin', $vin[$index])->first();
+                $ownershipType = is_array($request->input('ownership_type')) 
+                    ? $request->input('ownership_type')[$index] 
+                    : $request->input('ownership_type');
+                $vehicle->ownership_type = $ownershipType;
+                $vehicle->save();
+                if ($vehicle) {
+                    if (($from[$index] === '1' && $to[$index] !== '3')) {
+                        $grnVins[] = $vin[$index];
+                    } elseif ($to[$index] === '2') {
+                        $gdnVins[] = $vin[$index];
+                    } else {
+                        $otherVins[] = $vin[$index];
+                    }
                 }
             }
-        }
-        }
-        if (!empty($grnVins)) {
-            // remove this entry and 
-            // $grn = new Grn();
-            // $grn->date = $date;
-            // $grn->save();
-            // $grnNumber = $grn->id;
-            // $grn->save();
+            }
+            if (!empty($grnVins)) {
+                // remove this entry and 
+                // $grn = new Grn();
+                // $grn->date = $date;
+                // $grn->save();
+                // $grnNumber = $grn->id;
+                // $grn->save();
+
+                
+                // Vehicles::whereIn('vin', $grnVins)->update(['grn_id' => $grnNumber]);
+                $vehicleIds = Vehicles::whereIn('vin', $grnVins)->pluck('id')->toArray();
+                foreach($vehicleIds as $vehicleId) {
+                    $vehicleslog = new Vehicleslog();
+                    $vehicleslog->time = $currentDateTime->toTimeString();
+                    $vehicleslog->date = $currentDateTime->toDateString();
+                    $vehicleslog->status = 'GRN Done';
+                    $vehicleslog->vehicles_id = $vehicleId;
+                    $vehicleslog->field = "GRN";
+                    $vehicleslog->old_value = "";
+                    $vehicleslog->new_value = "Vehicle Recived GRN Done";
+                    $vehicleslog->created_by = auth()->user()->id;
+                    $vehicleslog->save();
+                }
+            
+
+                $vehicleCount = count($grnVins);
+                // $grnDate = Carbon::parse($grn->date)->format('d M Y');
+                $grnDate = Carbon::parse($date)->format('d M Y');
+                $groupedVehicles = Vehicles::whereIn('vin', $grnVins)->with([
+                    'variant.master_model_lines.brand',
+                    'variant.brand',
+                    'interior',
+                    'exterior'
+                ])->get()->groupBy('purchasing_order_id');
+                foreach ($groupedVehicles as $purchasingOrderId => $vehicles) {
+                    $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
+                    if($purchasingOrder->is_demand_planning_po == 1)
+                    {
+                    $recipients = config('mail.custom_recipients.dp'); 
+                    }
+                    else
+                    {
+                    $recipients = config('mail.custom_recipients.cso');
+                    }
+                    $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
+                    $vehicleDetails = $vehicles->map(function ($vehicle) use ($grnDate) {
+                        return [
+                            'vin' => $vehicle->vin,
+                            // 'grn' => $grnNumber,
+                            'grn_date' => $grnDate,
+                            'brand' => $vehicle->variant->brand->brand_name ?? '',
+                            'model_line' => $vehicle->variant->master_model_lines->model_line ?? '',
+                            'variant' => $vehicle->variant->name ?? '',
+                            'int_colour' => $vehicle->interior->name ?? '',
+                            'ext_colour' => $vehicle->exterior->name ?? '',
+                        ];
+                    });
+                    Mail::to($recipients)->send(new GRNEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $orderUrl, $vehicleCount, $grnDate, $vehicleDetails));
+                    $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+                    "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+                    "Stage: " . "Goods Received Note\n" .
+                    "Number of Units: " . $vehicleCount . "\n" .
+                    "GRN Date: " . $grnDate . " Vehicles\n" .
+                    "Order URL: " . $orderUrl;
+                            $notification = New DepartmentNotifications();
+                            $notification->module = 'Logistics';
+                            $notification->type = 'Information';
+                            $notification->detail = $detailText;
+                            $notification->save();
+                                }
+            }
+            if (!empty($gdnVins)) {
+                $gdn = new Gdn();
+                $gdn->date = $date;
+                $gdn->save();
+                Vehicles::whereIn('vin', $gdnVins)->update(['gdn_id' => $gdn->id]);
+                $vehicleIds = Vehicles::whereIn('vin', $gdnVins)->pluck('id')->toArray();
+                foreach($vehicleIds as $vehicleId) {
+                    $vehicleslog = new Vehicleslog();
+                    $vehicleslog->time = $currentDateTime->toTimeString();
+                    $vehicleslog->date = $currentDateTime->toDateString();
+                    $vehicleslog->status = 'GDN Done';
+                    $vehicleslog->vehicles_id = $vehicleId;
+                    $vehicleslog->field = "GDN";
+                    $vehicleslog->old_value = "";
+                    $vehicleslog->new_value = "Vehicle Delivered to the Client";
+                    $vehicleslog->created_by = auth()->user()->id;
+                    $vehicleslog->save();
+                }
+            }
+            $newvin = $request->input('newvin');
+            $vin = $request->input('vin');
+
+            $movementVehicleByPurchaseOrders = Vehicles::select('vin','purchasing_order_id')->whereIn('vin', $grnVins)
+                        ->groupBy('purchasing_order_id')
+                        ->get();
+
+            foreach($movementVehicleByPurchaseOrders as $movementVehicleByPurchaseOrder) {
+                $movementgrn = new MovementGrn();
+                $movementgrn->movement_reference_id = $movementsReferenceId;
+                $movementgrn->purchase_order_id = $movementVehicleByPurchaseOrder->purchasing_order_id ?? '';
+                $movementgrn->save();
+            }
+
+            foreach ($vin as $index => $value) {
+                if (array_key_exists($index, $from) && array_key_exists($index, $to)) {    
+                $movement = new Movement();
+                $movement->vin = $vin[$index];
+                $movement->from = $from[$index];
+                $movement->to = $to[$index];
+                $movement->reference_id = $movementsReferenceId;
+                if (isset($newvin[$index]) && $newvin[$index] !== null && $newvin[$index] !== '') {
+                    $movement->vin = $newvin[$index];
+                }
+                // check for new vin coming case
+                // update movementgrnid  movements table under this po
+
+                $vehicle = Vehicles::where('vin', $vin[$index])->first();
+                if($vehicle) {
+                    $movementgrn = MovementGrn::where('purchase_order_id', $vehicle->purchasing_order_id)
+                                ->where('movement_reference_id', $movementsReferenceId)->first();
+                    if($movementgrn) {
+                        $movement->movement_grn_id = $movementgrn->id;
+
+                        // update movementgrnid in vehicle table under this po with this movement
+
+                        $vehicle->movement_grn_id =  $movementgrn->id;
+                        $vehicle->save();
+
+                    }
+                }
+                $movement->save();
+
+                Vehicles::where('vin', $vin[$index])->update(['latest_location' => $to[$index]]);
+            }
 
             
-            // Vehicles::whereIn('vin', $grnVins)->update(['grn_id' => $grnNumber]);
-            $vehicleIds = Vehicles::whereIn('vin', $grnVins)->pluck('id')->toArray();
-            foreach($vehicleIds as $vehicleId) {
-                $vehicleslog = new Vehicleslog();
-                $vehicleslog->time = $currentDateTime->toTimeString();
-                $vehicleslog->date = $currentDateTime->toDateString();
-                $vehicleslog->status = 'GRN Done';
-                $vehicleslog->vehicles_id = $vehicleId;
-                $vehicleslog->field = "GRN";
-                $vehicleslog->old_value = "";
-                $vehicleslog->new_value = "Vehicle Recived GRN Done";
-                $vehicleslog->created_by = auth()->user()->id;
-                $vehicleslog->save();
-            }
-           
-
-            $vehicleCount = count($grnVins);
-            // $grnDate = Carbon::parse($grn->date)->format('d M Y');
-            $grnDate = Carbon::parse($date)->format('d M Y');
-            $groupedVehicles = Vehicles::whereIn('vin', $grnVins)->with([
-                'variant.master_model_lines.brand',
-                'variant.brand',
-                'interior',
-                'exterior'
-            ])->get()->groupBy('purchasing_order_id');
-            foreach ($groupedVehicles as $purchasingOrderId => $vehicles) {
-                $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
-                if($purchasingOrder->is_demand_planning_po == 1)
-                {
-                $recipients = config('mail.custom_recipients.dp'); 
-                }
-                else
-                {
-                $recipients = config('mail.custom_recipients.cso');
-                }
-                $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
-                $vehicleDetails = $vehicles->map(function ($vehicle) use ($grnDate) {
-                    return [
-                        'vin' => $vehicle->vin,
-                        // 'grn' => $grnNumber,
-                        'grn_date' => $grnDate,
-                        'brand' => $vehicle->variant->brand->brand_name ?? '',
-                        'model_line' => $vehicle->variant->master_model_lines->model_line ?? '',
-                        'variant' => $vehicle->variant->name ?? '',
-                        'int_colour' => $vehicle->interior->name ?? '',
-                        'ext_colour' => $vehicle->exterior->name ?? '',
-                    ];
-                });
-                Mail::to($recipients)->send(new GRNEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $orderUrl, $vehicleCount, $grnDate, $vehicleDetails));
-                $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
-                "PFI Number: " . $purchasingOrder->pl_number . "\n" .
-                "Stage: " . "Goods Received Note\n" .
-                "Number of Units: " . $vehicleCount . "\n" .
-                "GRN Date: " . $grnDate . " Vehicles\n" .
-                "Order URL: " . $orderUrl;
-                          $notification = New DepartmentNotifications();
-                          $notification->module = 'Logistics';
-                          $notification->type = 'Information';
-                          $notification->detail = $detailText;
-                          $notification->save();
-                            }
+        
         }
-        if (!empty($gdnVins)) {
-            $gdn = new Gdn();
-            $gdn->date = $date;
-            $gdn->save();
-            Vehicles::whereIn('vin', $gdnVins)->update(['gdn_id' => $gdn->id]);
-            $vehicleIds = Vehicles::whereIn('vin', $gdnVins)->pluck('id')->toArray();
-            foreach($vehicleIds as $vehicleId) {
-                $vehicleslog = new Vehicleslog();
-                $vehicleslog->time = $currentDateTime->toTimeString();
-                $vehicleslog->date = $currentDateTime->toDateString();
-                $vehicleslog->status = 'GDN Done';
-                $vehicleslog->vehicles_id = $vehicleId;
-                $vehicleslog->field = "GDN";
-                $vehicleslog->old_value = "";
-                $vehicleslog->new_value = "Vehicle Delivered to the Client";
-                $vehicleslog->created_by = auth()->user()->id;
-                $vehicleslog->save();
-            }
-        }
-        $newvin = $request->input('newvin');
-        $vin = $request->input('vin');
-
-        $movementVehicleByPurchaseOrders = Vehicles::select('vin','purchasing_order_id')->whereIn('vin', $grnVins)
-                    ->groupBy('purchasing_order_id')
-                    ->get();
-
-        foreach($movementVehicleByPurchaseOrders as $movementVehicleByPurchaseOrder) {
-            $movementgrn = new MovementGrn();
-            $movementgrn->movement_reference_id = $movementsReferenceId;
-            $movementgrn->purchase_order_id = $movementVehicleByPurchaseOrder->purchasing_order_id ?? '';
-            $movementgrn->save();
-        }
-
-        foreach ($vin as $index => $value) {
-            if (array_key_exists($index, $from) && array_key_exists($index, $to)) {    
-            $movement = new Movement();
-            $movement->vin = $vin[$index];
-            $movement->from = $from[$index];
-            $movement->to = $to[$index];
-            $movement->reference_id = $movementsReferenceId;
-            if (isset($newvin[$index]) && $newvin[$index] !== null && $newvin[$index] !== '') {
-                $movement->vin = $newvin[$index];
-            }
-            // check for new vin coming case
-            // update movementgrnid  movements table under this po
-
-            $vehicle = Vehicles::where('vin', $vin[$index])->first();
-            if($vehicle) {
-                $movementgrn = MovementGrn::where('purchase_order_id', $vehicle->purchasing_order_id)
-                            ->where('movement_reference_id', $movementsReferenceId)->first();
-                if($movementgrn) {
-                    $movement->movement_grn_id = $movementgrn->id;
-
-                    // update movementgrnid in vehicle table under this po with this movement
-
-                    $vehicle->movement_grn_id =  $movementgrn->id;
-                    $vehicle->save();
-
+        if($newvin){
+            foreach ($newvin as $index => $value) {
+                if ($value !== null && $value !== '' && isset($vin[$index])) {
+                    $vehicle = Vehicles::where('vin', $vin[$index])->first();
+                    $movements = Movement::where('vin', $value)->first();
+                    if ($vehicle) {
+                        $vinchange = New VinChange();
+                        $vinchange->old_vin = $vehicle->vin;
+                        $vinchange->new_vin = $value;
+                        $vinchange->vehicles_id = $vehicle->id;
+                        $vinchange->movements_id = $movements->id;
+                        $vinchange->created_by = auth()->user()->id;
+                        $vinchange->save();
+                        $vehicleslog = new Vehicleslog();
+                        $vehicleslog->time = $currentDateTime->toTimeString();
+                        $vehicleslog->date = $currentDateTime->toDateString();
+                        $vehicleslog->status = 'VIN Change';
+                        $vehicleslog->vehicles_id = $vehicle->id;
+                        $vehicleslog->field = "VIN Change";
+                        $vehicleslog->old_value = $vehicle->vin;
+                        $vehicleslog->new_value = $value;
+                        $vehicleslog->created_by = auth()->user()->id;
+                        $vehicleslog->save();
+                        $updatevin = Vehicles::find($vehicle->id);
+                        $updatevin->vin = $value;
+                        $updatevin->save();
+                    }
                 }
             }
-            $movement->save();
+        }   
+        (new UserActivityController)->createActivity('Movement Created');
+        DB::commit();
+        return redirect()->back()->with('success', 'Transition has been successfully Saved!');
+    } catch (\Exception $e) {
+        DB::rollBack(); 
 
-            Vehicles::where('vin', $vin[$index])->update(['latest_location' => $to[$index]]);
-        }
-
-           
-            
+        return response()->view('errors.generic', [], 500); // Return a 500 error page
     }
-    if($newvin){
-    foreach ($newvin as $index => $value) {
-        if ($value !== null && $value !== '' && isset($vin[$index])) {
-            $vehicle = Vehicles::where('vin', $vin[$index])->first();
-            $movements = Movement::where('vin', $value)->first();
-            if ($vehicle) {
-                $vinchange = New VinChange();
-                $vinchange->old_vin = $vehicle->vin;
-                $vinchange->new_vin = $value;
-                $vinchange->vehicles_id = $vehicle->id;
-                $vinchange->movements_id = $movements->id;
-                $vinchange->created_by = auth()->user()->id;
-                $vinchange->save();
-                $vehicleslog = new Vehicleslog();
-                $vehicleslog->time = $currentDateTime->toTimeString();
-                $vehicleslog->date = $currentDateTime->toDateString();
-                $vehicleslog->status = 'VIN Change';
-                $vehicleslog->vehicles_id = $vehicle->id;
-                $vehicleslog->field = "VIN Change";
-                $vehicleslog->old_value = $vehicle->vin;
-                $vehicleslog->new_value = $value;
-                $vehicleslog->created_by = auth()->user()->id;
-                $vehicleslog->save();
-                $updatevin = Vehicles::find($vehicle->id);
-                $updatevin->vin = $value;
-                $updatevin->save();
-            }
-        }
-    }
-}    
-return redirect()->back()->with('success', 'Transition has been successfully Saved!');
     }    
     /**
      * Display the specified resource.
