@@ -73,38 +73,38 @@
     </div>
 <br>
         <div id ="rows-containertitle">
-        <div class="row">
-        <div class="col-lg-1 col-md-6" style="width:12%;">
-        <label for="basicpill-firstname-input" class="form-label">Vin</label>
-        </div>
-        <div class="col-lg-1 col-md-6" style="width:6%;">
-        <label for="basicpill-firstname-input" class="form-label">PO</label>
-        </div>
-        <div class="col-lg-1 col-md-6" style="width:6%;">
-        <label for="basicpill-firstname-input" class="form-label">SO</label>
-        </div>
-        <div class="col-lg-1 col-md-6" style="width:6%;">
-        <label for="basicpill-firstname-input" class="form-label">Ownership</label>
-        </div>
-        <div class="col-lg-1 col-md-6">
-        <label for="basicpill-firstname-input" class="form-label">From</label>
-        </div>
-        <div class="col-lg-2 col-md-6">
-        <label for="basicpill-firstname-input" class="form-label">To </label>
-        </div>
-        <div class="col-lg-1 col-md-6">
-        <label for="QTY" class="form-label">Brand</label>
-        </div>
-        <div class="col-lg-1 col-md-6">
-        <label for="QTY" class="form-label">Model Line</label>
-        </div>
-        <div class="col-lg-1 col-md-6">
-        <label for="QTY" class="form-label">Variant</label>
-        </div>
-        <div class="col-lg-2 col-md-6">
-            <label for="basicpill-firstname-input" class="form-label">New VIN & Remarks</label>
-        </div>
-        </div>
+            <div class="row">
+                <div class="col-lg-1 col-md-6" style="width:12%;">
+                    <label for="basicpill-firstname-input" class="form-label">Vin</label>
+                </div>
+                <div class="col-lg-1 col-md-6" style="width:6%;">
+                    <label for="basicpill-firstname-input" class="form-label">PO</label>
+                </div>
+                <div class="col-lg-1 col-md-6" style="width:6%;">
+                    <label for="basicpill-firstname-input" class="form-label">SO</label>
+                </div>
+                <div class="col-lg-1 col-md-6" style="width:6%;">
+                    <label for="basicpill-firstname-input" class="form-label">Ownership</label>
+                </div>
+                <div class="col-lg-1 col-md-6">
+                    <label for="basicpill-firstname-input" class="form-label">From</label>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <label for="basicpill-firstname-input" class="form-label">To </label>
+                </div>
+                <div class="col-lg-1 col-md-6">
+                    <label for="QTY" class="form-label">Brand</label>
+                </div>
+                <div class="col-lg-1 col-md-6">
+                    <label for="QTY" class="form-label">Model Line</label>
+                </div>
+                <div class="col-lg-1 col-md-6">
+                    <label for="QTY" class="form-label">Variant</label>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <label for="basicpill-firstname-input" class="form-label">New VIN & Remarks</label>
+                </div>
+            </div>
         </div>
         <div id ="rows-containerpo">
         </div>
@@ -118,18 +118,20 @@
         </div>
         </div>
         <div class="col-lg-4 col-md-6">
-    <div class="input-group">
-        <select name="po_number" class="form-control mb-1" id="po_number">
-            <option value="" selected disabled>Select PO</option>
-            @foreach ($purchasing_order as $purchasing_order)
-            <option value="{{ $purchasing_order->id }}">{{ $purchasing_order->po_number }}</option>
-            @endforeach
-        </select>
-        <button class="btn btn-outline-secondary" type="button" id="generate-button">
-    <i class="fas fa-cogs"></i> Add PO Vehicles
-</button>
-    </div>
-</div>
+            <div class="input-group">
+                <select name="po_number" class="form-control mb-1" id="po_number">
+                    <option value="" selected disabled>Select PO</option>
+                    @foreach ($purchasing_order as $purchasing_order)
+                    <option value="{{ $purchasing_order->id }}">{{ $purchasing_order->po_number }}</option>
+                    @endforeach
+                </select>
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" id="generate-button">
+                    <i class="fas fa-cogs"></i> Add PO Vehicles
+                    </button>
+                </div>
+            </div>
+        </div>
 <div class="col-lg-4 col-md-6">
     <div class="input-group">
         <select name="so_number" class="form-control mb-1" id="so_number">
@@ -286,7 +288,7 @@
                     response.forEach(function (vehicle) {
                         var rowHtml = `
                             <div class="row">
-                            <div class="col-lg-2 col-md-6" style="width: 12%;">
+                                <div class="col-lg-2 col-md-6" style="width: 12%;">
                                     <input type="text" name="vin[]" class="form-control" placeholder="VIN" readonly value="${vehicle.vin}">
                                 </div>
                                 <div class="col-lg-1 col-md-6" style="width: 6%;">
@@ -296,20 +298,20 @@
                                     <input type="text" class="form-control" placeholder="SO #" readonly value="${vehicle.so_number}">
                                 </div>
                                 <div class="col-lg-1 col-md-6" style="width: 6%;">
-                <select class="form-control" id="ownership_type" name="ownership_type[]">
-                    <option value="">Select Ownership</option>
-                    <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
-                    <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
-                    <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
-                    <option value="Supplier Docs" ${vehicle.ownership_type === 'Supplier Docs' ? 'selected' : ''}>Supplier Docs</option>
-                    <option value="Supplier Docs + VCC + BOE" ${vehicle.ownership_type === 'Supplier Docs + VCC + BOE' ? 'selected' : ''}>Supplier Docs + VCC + BOE</option>
-                    <option value="RTA Possesion Cert/BOD" ${vehicle.ownership_type === 'RTA Possesion Cert/BOD' ? 'selected' : ''}>RTA Possesion Cert/BOD</option>
-                    <option value="RTA Possession Cert/Milele Cars Trading" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Cars Trading' ? 'selected' : ''}>RTA Possession Cert/Milele Cars Trading</option>
-                    <option value="RTA Possession Cert/Milele Car Rental" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Car Rental' ? 'selected' : ''}>RTA Possession Cert/Milele Car Rental</option>
-                </select>
-            </div>
+                                    <select class="form-control" id="ownership_type" name="ownership_type[]">
+                                        <option value="">Select Ownership</option>
+                                        <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
+                                        <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
+                                        <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
+                                        <option value="Supplier Docs" ${vehicle.ownership_type === 'Supplier Docs' ? 'selected' : ''}>Supplier Docs</option>
+                                        <option value="Supplier Docs + VCC + BOE" ${vehicle.ownership_type === 'Supplier Docs + VCC + BOE' ? 'selected' : ''}>Supplier Docs + VCC + BOE</option>
+                                        <option value="RTA Possesion Cert/BOD" ${vehicle.ownership_type === 'RTA Possesion Cert/BOD' ? 'selected' : ''}>RTA Possesion Cert/BOD</option>
+                                        <option value="RTA Possession Cert/Milele Cars Trading" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Cars Trading' ? 'selected' : ''}>RTA Possession Cert/Milele Cars Trading</option>
+                                        <option value="RTA Possession Cert/Milele Car Rental" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Car Rental' ? 'selected' : ''}>RTA Possession Cert/Milele Car Rental</option>
+                                    </select>
+                                </div>
                                 <div class="col-lg-1 col-md-6">
-                                <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
+                                    <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
                                     <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
                                 </div>
                                 <div class="col-lg-2 col-md-6">
@@ -331,33 +333,34 @@
                                     <input type="text" name="variant" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.variant}">
                                 </div>
                                 `;
-        if (vehicle.warehouseNames == 'Supplier') {
-            rowHtml += `
-                <div class="col-lg-1 col-md-6">
-                    <div class="d-flex align-items-center">
-                        <input type="text" name="newvin[]" class="form-control mr-2" placeholder="New VIN">
-                    </div>
-                </div>
-                <div class="col-lg-1 col-md-6">
-                                <div class="d-flex align-items-center">
-                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
-                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
-                                </div>
-                                </div>
-                            </div>
-            `;
-        }
-        else{
-            rowHtml += `
-                                <div class="col-lg-2 col-md-6">
-                                <div class="d-flex align-items-center">
-                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
-                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
-                                </div>
-                                </div>
-                            </div>
-                        `;
-        }
+                                if (vehicle.warehouseNames == 'Supplier') {
+                                    rowHtml += `
+                                        <div class="col-lg-1 col-md-6">
+                                            <div class="d-flex align-items-center">
+                                                <input type="text" name="newvin[]" class="form-control mr-2" placeholder="New VIN">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-1 col-md-6">
+                                            <div class="d-flex align-items-center">
+                                                <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                                <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                            </div>
+                                          
+                                        </div>
+                                    `;
+                                }
+                                else{
+                                    rowHtml += `
+                                                <div class="col-lg-2 col-md-6">
+                                                    <div class="d-flex align-items-center">
+                                                        <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                                        <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                                    </div>
+                                               
+                                                </div>
+                                                `;
+                                }
+                                 rowHtml += `</div>`;
                         $("#rows-containerpo").append(rowHtml);
                     });
 
