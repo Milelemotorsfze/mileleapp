@@ -223,6 +223,7 @@ class MovementController extends Controller
     })
     ->get();
         }      
+
     $lastIdExists = MovementsReference::where('id', $movementsReferenceId - 1)->exists();
     $NextIdExists = MovementsReference::where('id', $movementsReferenceId + 1)->exists();
     return view('movement.create', [
@@ -239,7 +240,9 @@ class MovementController extends Controller
         $request->validate([
             'vin' => 'required',
         ]);
+        // all vin should exist in the system, 
 
+       
         DB::beginTransaction();    
 
         try{
@@ -250,6 +253,20 @@ class MovementController extends Controller
             $to = $request->input('to');
             $date = $request->input('date');
             $createdBy = $request->user()->id;
+
+            $vinNotExist = [];
+            foreach ($vin as $index => $vehicleVin) {
+                $vehicle = Vehicles::where('vin', $vehicleVin)->first();
+                if(!$vehicle) {
+                    $vinNotExist[] = $vehicleVin;
+                }
+            }
+
+            if(count($vinNotExist > 0)) {
+                return redirect()->back()->with('error', 'Some of the VIN is not exist in system, please update this vin to create the movement');
+            }
+            
+           
         // foreach ($vin as $index => $value) {
         //     if (array_key_exists($index, $from) && array_key_exists($index, $to)) {
         //         $vehicle = Vehicles::where('vin', $vin[$index])->first();
@@ -398,10 +415,9 @@ class MovementController extends Controller
                 $movement->from = $from[$index];
                 $movement->to = $to[$index];
                 $movement->reference_id = $movementsReferenceId;
-                if (isset($newvin[$index]) && $newvin[$index] !== null && $newvin[$index] !== '') {
-                    $movement->vin = $newvin[$index];
-                }
-                // check for new vin coming case
+                // if (isset($newvin[$index]) && $newvin[$index] !== null && $newvin[$index] !== '') {
+                //     $movement->vin = $newvin[$index];
+                // }
                 // update movementgrnid  movements table under this po
 
                 $vehicle = Vehicles::where('vin', $vin[$index])->first();
@@ -423,8 +439,6 @@ class MovementController extends Controller
                 Vehicles::where('vin', $vin[$index])->update(['latest_location' => $to[$index]]);
             }
 
-            
-        
         }
         if($newvin){
             foreach ($newvin as $index => $value) {
@@ -461,6 +475,7 @@ class MovementController extends Controller
         return redirect()->back()->with('success', 'Transition has been successfully Saved!');
     } catch (\Exception $e) {
         DB::rollBack(); 
+        Log::error('Movement Creation Failed', ['error' => $e->getMessage()]);
 
         return response()->view('errors.generic', [], 500); // Return a 500 error page
     }
@@ -798,6 +813,24 @@ public function uploadVinFile(Request $request)
             }
             fclose($handle);
         }
+
+        // chcek all vin is existing or not
+
+            $vinNotExist = [];
+            foreach ($vinData as $index => $vinData) {
+                $vehicle = Vehicles::where('vin', $vinData['vin'])
+                         ->where('status', '!=', 'cancel')->first();
+                if(!$vehicle) {
+                    $vinNotExist[] = $vinData['vin'];
+                }
+            }
+
+            if(count($vinNotExist) > 0) {
+                return response()->json([
+                    'error' => false, 
+                    'message' => 'Some of the VIN not existing in the system: ' . implode(', ', $vinNotExist)
+                ]);
+            }
 
         // Same permission check logic as before
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');

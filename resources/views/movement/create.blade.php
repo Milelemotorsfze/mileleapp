@@ -102,7 +102,7 @@
                     <label for="QTY" class="form-label">Variant</label>
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <label for="basicpill-firstname-input" class="form-label">New VIN & Remarks</label>
+                    <label for="basicpill-firstname-input" class="form-label">Remarks</label>
                 </div>
             </div>
         </div>
@@ -222,18 +222,14 @@
                 <div class="col-lg-1 col-md-6">
                     <input type="text" id="variant${row}" name="variant[]" class="form-control" placeholder="Variant" readonly>
                 </div>
-                <div class="col-lg-1 col-md-6">
+               
+                <div class="col-lg-2 col-md-6">
                     <div class="d-flex align-items-center">
-                        <input type="text" name="newvin[]" class="form-control mr-2" placeholder="New VIN">
+                        <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                        <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                    </div>
                     </div>
                 </div>
-                <div class="col-lg-1 col-md-6">
-                                <div class="d-flex align-items-center">
-                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
-                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
-                                </div>
-                                </div>
-                            </div>
             `;
             $('#rows-container').append(newRow);
             $('#vin' + row).select2();
@@ -332,35 +328,41 @@
                                 <div class="col-lg-1 col-md-6">
                                     <input type="text" name="variant" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.variant}">
                                 </div>
+                                 <div class="col-lg-2 col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                        <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                    </div>
+                                </div>
                                 `;
-                                if (vehicle.warehouseNames == 'Supplier') {
-                                    rowHtml += `
-                                        <div class="col-lg-1 col-md-6">
-                                            <div class="d-flex align-items-center">
-                                                <input type="text" name="newvin[]" class="form-control mr-2" placeholder="New VIN">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-1 col-md-6">
-                                            <div class="d-flex align-items-center">
-                                                <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
-                                                <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
-                                            </div>
+                                // if (vehicle.warehouseNames == 'Supplier') {
+                                //     rowHtml += `
+                                //         <div class="col-lg-1 col-md-6">
+                                //             <div class="d-flex align-items-center">
+                                //                 <input type="text" name="newvin[]" class="form-control mr-2" placeholder="New VIN">
+                                //             </div>
+                                //         </div>
+                                //         <div class="col-lg-1 col-md-6">
+                                //             <div class="d-flex align-items-center">
+                                //                 <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                //                 <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                //             </div>
                                           
-                                        </div>
-                                    `;
-                                }
-                                else{
-                                    rowHtml += `
-                                                <div class="col-lg-2 col-md-6">
-                                                    <div class="d-flex align-items-center">
-                                                        <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
-                                                        <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
-                                                    </div>
+                                //         </div>
+                                //     `;
+                                // }
+                                // else{
+                                //     rowHtml += `
+                                //                 <div class="col-lg-2 col-md-6">
+                                //                     <div class="d-flex align-items-center">
+                                //                         <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                //                         <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                //                     </div>
                                                
-                                                </div>
-                                                `;
-                                }
-                                 rowHtml += `</div>`;
+                                //                 </div>
+                                //                 `;
+                                // }
+                               
                         $("#rows-containerpo").append(rowHtml);
                     });
 
@@ -408,18 +410,18 @@
                                     <input type="text" class="form-control" placeholder="SO #" readonly value="${vehicle.so_number}">
                                 </div>
                                 <div class="col-lg-1 col-md-6" style="width: 6%;">
-                <select class="form-control" id="ownership_type" name="ownership_type[]">
-                    <option value="">Select Ownership</option>
-                    <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
-                    <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
-                    <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
-                    <option value="Supplier Docs" ${vehicle.ownership_type === 'Supplier Docs' ? 'selected' : ''}>Supplier Docs</option>
-                    <option value="Supplier Docs + VCC + BOE" ${vehicle.ownership_type === 'Supplier Docs + VCC + BOE' ? 'selected' : ''}>Supplier Docs + VCC + BOE</option>
-                    <option value="RTA Possesion Cert/BOD" ${vehicle.ownership_type === 'RTA Possesion Cert/BOD' ? 'selected' : ''}>RTA Possesion Cert/BOD</option>
-                    <option value="RTA Possession Cert/Milele Cars Trading" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Cars Trading' ? 'selected' : ''}>RTA Possession Cert/Milele Cars Trading</option>
-                    <option value="RTA Possession Cert/Milele Car Rental" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Car Rental' ? 'selected' : ''}>RTA Possession Cert/Milele Car Rental</option>
-                </select>
-            </div>
+                                    <select class="form-control" id="ownership_type" name="ownership_type[]">
+                                        <option value="">Select Ownership</option>
+                                        <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
+                                        <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
+                                        <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
+                                        <option value="Supplier Docs" ${vehicle.ownership_type === 'Supplier Docs' ? 'selected' : ''}>Supplier Docs</option>
+                                        <option value="Supplier Docs + VCC + BOE" ${vehicle.ownership_type === 'Supplier Docs + VCC + BOE' ? 'selected' : ''}>Supplier Docs + VCC + BOE</option>
+                                        <option value="RTA Possesion Cert/BOD" ${vehicle.ownership_type === 'RTA Possesion Cert/BOD' ? 'selected' : ''}>RTA Possesion Cert/BOD</option>
+                                        <option value="RTA Possession Cert/Milele Cars Trading" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Cars Trading' ? 'selected' : ''}>RTA Possession Cert/Milele Cars Trading</option>
+                                        <option value="RTA Possession Cert/Milele Car Rental" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Car Rental' ? 'selected' : ''}>RTA Possession Cert/Milele Car Rental</option>
+                                    </select>
+                                </div>
                                 <div class="col-lg-1 col-md-6">
                                 <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
                                     <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
@@ -442,34 +444,41 @@
                                 <div class="col-lg-1 col-md-6">
                                     <input type="text" name="variant" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.variant}">
                                 </div>
-                                `;
-        if (vehicle.warehouseNames == 'Supplier') {
-            rowHtml += `
-                <div class="col-lg-1 col-md-6">
-                    <div class="d-flex align-items-center">
-                        <input type="text" name="newvin[]" class="form-control mr-2" placeholder="New VIN">
-                    </div>
-                </div>
-                <div class="col-lg-1 col-md-6">
-                                <div class="d-flex align-items-center">
-                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
-                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
-                                </div>
-                                </div>
-                            </div>
-            `;
-        }
-        else{
-            rowHtml += `
                                 <div class="col-lg-2 col-md-6">
-                                <div class="d-flex align-items-center">
-                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
-                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                    <div class="d-flex align-items-center">
+                                        <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                        <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                    </div>
                                 </div>
-                                </div>
-                            </div>
-                        `;
-        }
+                            </div>`;
+
+                        // if (vehicle.warehouseNames == 'Supplier') {
+                        //     rowHtml += `
+                        //         <div class="col-lg-1 col-md-6">
+                        //             <div class="d-flex align-items-center">
+                        //                 <input type="text" name="newvin[]" class="form-control mr-2" placeholder="New VIN">
+                        //             </div>
+                        //         </div>
+                        //         <div class="col-lg-1 col-md-6">
+                        //                         <div class="d-flex align-items-center">
+                        //                             <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                        //                             <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                        //                         </div>
+                        //                         </div>
+                        //                     </div>
+                        //     `;
+                        // }
+                        // else{
+                        //     rowHtml += `
+                        //         <div class="col-lg-2 col-md-6">
+                        //         <div class="d-flex align-items-center">
+                        //             <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                        //             <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                        //         </div>
+                        //         </div>
+                        //     </div>
+                        // `;
+                        // }
                         $("#rows-containerpo").append(rowHtml);
                     });
                     $(".remove-row-btn").on("click", function () {
@@ -526,32 +535,32 @@
                                     <input type="text" class="form-control" placeholder="SO #" readonly value="${vehicle.so_number}">
                                 </div>
                                 <div class="col-lg-1 col-md-6" style="width: 6%;">
-            <select class="form-control" id="ownership_type" name="ownership_type[]">
-                <option value=""${!vehicle.ownership_type ? 'selected' : ''}>Select Ownership</option>
-                <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
-                <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
-                <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
-                <option value="Supplier Docs" ${vehicle.ownership_type === 'Supplier Docs' ? 'selected' : ''}>Supplier Docs</option>
-                <option value="Supplier Docs + VCC + BOE" ${vehicle.ownership_type === 'Supplier Docs + VCC + BOE' ? 'selected' : ''}>Supplier Docs + VCC + BOE</option>
-                <option value="RTA Possesion Cert/BOD" ${vehicle.ownership_type === 'RTA Possesion Cert/BOD' ? 'selected' : ''}>RTA Possesion Cert/BOD</option>
-                <option value="RTA Possession Cert/Milele Cars Trading" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Cars Trading' ? 'selected' : ''}>RTA Possession Cert/Milele Cars Trading</option>
-                <option value="RTA Possession Cert/Milele Car Rental" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Car Rental' ? 'selected' : ''}>RTA Possession Cert/Milele Car Rental</option>
-            </select>
-        </div>
+                                    <select class="form-control" id="ownership_type" name="ownership_type[]">
+                                        <option value=""${!vehicle.ownership_type ? 'selected' : ''}>Select Ownership</option>
+                                        <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
+                                        <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
+                                        <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
+                                        <option value="Supplier Docs" ${vehicle.ownership_type === 'Supplier Docs' ? 'selected' : ''}>Supplier Docs</option>
+                                        <option value="Supplier Docs + VCC + BOE" ${vehicle.ownership_type === 'Supplier Docs + VCC + BOE' ? 'selected' : ''}>Supplier Docs + VCC + BOE</option>
+                                        <option value="RTA Possesion Cert/BOD" ${vehicle.ownership_type === 'RTA Possesion Cert/BOD' ? 'selected' : ''}>RTA Possesion Cert/BOD</option>
+                                        <option value="RTA Possession Cert/Milele Cars Trading" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Cars Trading' ? 'selected' : ''}>RTA Possession Cert/Milele Cars Trading</option>
+                                        <option value="RTA Possession Cert/Milele Car Rental" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Car Rental' ? 'selected' : ''}>RTA Possession Cert/Milele Car Rental</option>
+                                    </select>
+                                </div>
                                 <div class="col-lg-1 col-md-6">
                                 <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
                                     <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
                                 </div>
                                 <div class="col-lg-2 col-md-6">
-            <select name="to[]" class="form-control mb-1" id="to" required>
-                <option value="">Select</option>
-                @foreach ($warehouses as $warehouse)
-                    <option value="{{ $warehouse->id }}" ${vehicle.matchedWarehouseId == {{ $warehouse->id }} ? 'selected' : ''}>
-                        {{ $warehouse->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+                                    <select name="to[]" class="form-control mb-1" id="to" required>
+                                        <option value="">Select</option>
+                                        @foreach ($warehouses as $warehouse)
+                                            <option value="{{ $warehouse->id }}" ${vehicle.matchedWarehouseId == {{ $warehouse->id }} ? 'selected' : ''}>
+                                                {{ $warehouse->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 <div class="col-lg-1 col-md-6">
                                     <input type="text" name="brand" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.brand}">
                                 </div>
@@ -561,42 +570,50 @@
                                 <div class="col-lg-1 col-md-6">
                                     <input type="text" name="variant" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.variant}">
                                 </div>
-                                `;
-        if (vehicle.warehouseNames == 'Supplier') {
-            rowHtml += `
-                <div class="col-lg-1 col-md-6">
-                    <div class="d-flex align-items-center">
-                        <input type="text" name="newvin[]" class="form-control mr-2" placeholder="New VIN">
-                    </div>
-                </div>
-                <div class="col-lg-1 col-md-6">
-                                <div class="d-flex align-items-center">
-                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
-                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
-                                </div>
-                                </div>
-                            </div>
-            `;
-        }
-        else{
-            rowHtml += `
                                 <div class="col-lg-2 col-md-6">
-                                <div class="d-flex align-items-center">
-                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
-                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
-                                </div>
+                                    <div class="d-flex align-items-center">
+                                        <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                        <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                    </div>
                                 </div>
                             </div>
-                            `;
-                        }
-                        rowHtml += `</div>`;
+                                `;
+                                // if (vehicle.warehouseNames == 'Supplier') {
+                                //     rowHtml += `
+                                //         <div class="col-lg-1 col-md-6">
+                                //             <div class="d-flex align-items-center">
+                                //                 <input type="text" name="newvin[]" class="form-control mr-2" placeholder="New VIN">
+                                //             </div>
+                                //         </div>
+                                //         <div class="col-lg-1 col-md-6">
+                                //                         <div class="d-flex align-items-center">
+                                //                             <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                //                             <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                //                         </div>
+                                //                         </div>
+                                //                     </div>
+                                //     `;
+                                // }
+                                // else{
+                                //     rowHtml += `
+                                //                         <div class="col-lg-2 col-md-6">
+                                //                         <div class="d-flex align-items-center">
+                                //                             <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                //                             <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                //                         </div>
+                                //                         </div>
+                                //                     </div>
+                                //                     `;
+                                //                 }
+                        // rowHtml += `</div>`;
                         $("#rows-containerpo").append(rowHtml);
                     });
 
                     // Attach the remove-row event handler
                     attachRemoveRowHandler();
                 } else {
-                    alert("VIN comparison failed: " + response.message);
+                    var confirm = alertify.confirm(response.message ,function (e) {
+                    }).set({title:"VIN Not Existing !"})
                 }
             },
             error: function (error) {
