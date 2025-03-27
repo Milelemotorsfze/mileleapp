@@ -635,7 +635,7 @@ public function cancel($id)
     $solog->so_id = $so->id;
     $solog->role = Auth::user()->selectedRole;
     $solog->save();
-    // $so->delete();
+    $so->delete();
 
     DB::commit();
     return redirect()->back()->with('success', 'Sales Order and related items canceled successfully.');
