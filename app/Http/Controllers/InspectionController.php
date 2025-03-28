@@ -82,7 +82,6 @@ class InspectionController extends Controller
                 ->whereNull('inspection.id')
                 ->whereNull('vehicles.inspection_date')
                 ->whereNull('vehicles.gdn_id')
-                // ->whereNotNull('vehicles.grn_id')
                 ->whereNotNull('vehicles.movement_grn_id');
                  
                 $data = $data->groupBy('vehicles.id');
@@ -115,7 +114,7 @@ class InspectionController extends Controller
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                ->whereNull('vehicles.grn_id');
+                ->whereNull('vehicles.movement_grn_id');
                 $data = $data->groupBy('vehicles.id');
             }
             else if($status === "stock")
@@ -300,7 +299,6 @@ class InspectionController extends Controller
                 ])
                 ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                // ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
                 ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
                 ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
                 ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')

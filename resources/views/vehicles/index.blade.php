@@ -819,7 +819,7 @@ Clear Filters
                                      $name = $variants->name;
 
                                      }
-                                     $grn = $vehicles->grn_id ? DB::table('grn')->where('id', $vehicles->grn_id)->first() : null;
+                                     $grn = $vehicles->movement_grn_id ? DB::table('grn')->where('id', $vehicles->movement_grn_id)->first() : null;
                                      $grn_date = $grn ? $grn->date : null;
                                      $grn_number = $grn ? $grn->grn_number : null;
                                      $gdn = $vehicles->gdn_id ? DB::table('gdn')->where('id', $vehicles->gdn_id)->first() : null;
@@ -963,7 +963,7 @@ Clear Filters
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
                                     @endphp
                                     @if ($hasPermission)
-                                    @if ($vehicles->grn_id && $vehicles->so_id === null)
+                                    @if ($vehicles->movement_grn_id && $vehicles->so_id === null)
                                     <td class="editable-field grn_remark" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->grn_remark }}</td>
                                     <td class="editable-field qc_remarks" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->qc_remarks }}</td>
 									                  @else
@@ -1172,7 +1172,7 @@ Clear Filters
                                      <td class="nowrap-td" id="model-description-{{$vehicles->id}}">
                                      {{ ucfirst(strtolower($vehicles->variant->model_detail ?? '')) }}
                                      </td>
-                                     @if($vehicles->grn_id === null || $vehicles->gdn_id !== null)
+                                     @if($vehicles->movement_grn_id === null || $vehicles->gdn_id !== null)
                                      <td>
                                     <select name="varaints_id" class="form-control" placeholder="varaints_id" disabled>
                                     @foreach($varaint as $variantItem)
@@ -1248,7 +1248,7 @@ Clear Filters
                                       $hasPermission = Auth::user()->hasPermissionForSelectedRole('enginee-edit');
                                       @endphp
                                       @if ($hasPermission)
-                                      @if($vehicles->grn_id === null || $vehicles->gdn_id !== null)
+                                      @if($vehicles->movement_grn_id === null || $vehicles->gdn_id !== null)
                                       <td>{{ $vehicles->engine }}</td>
                                       @else
                                       <td class="editable-field engine" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
@@ -1280,7 +1280,7 @@ Clear Filters
                                         <td class="nowrap-td" id="gearbox-{{ $vehicles->id }}">
                                         {{ ucfirst(strtolower($vehicles->variant->gearbox ?? 'null' )) }}
                                         </td>
-                                        @if($vehicles->grn_id === null || $vehicles->gdn_id !== null)
+                                        @if($vehicles->movement_grn_id === null || $vehicles->gdn_id !== null)
                                         <td>
                                         <select name="ex_colour" class="form-control" placeholder="ex_colour" disabled>
                                                 <option value=""></option>
@@ -1322,7 +1322,7 @@ Clear Filters
                                         <td class="nowrap-td Upholestry" id="upholestry-{{ $vehicles->id }}">
                                         {{ ucfirst(strtolower($vehicles->variant->upholestry ?? '' )) }}
                                         </td>
-                                        @if($vehicles->grn_id === null || $vehicles->gdn_id !== null)
+                                        @if($vehicles->movement_grn_id === null || $vehicles->gdn_id !== null)
                                         <td class="nowrap-td">{{ ucfirst(strtolower($vehicles->extra_features)) }}</td>
                                         @else
                                         <td class="editable-field extra_features" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->extra_features)) }}</td>
@@ -1375,7 +1375,7 @@ Clear Filters
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
                                         @endphp
                                         @if ($hasPermission)
-                                        @if($vehicles->grn_id === null || $vehicles->gdn_id !== null)
+                                        @if($vehicles->movement_grn_id === null || $vehicles->gdn_id !== null)
                                         <td>{{ $vehicles->ppmmyyy }}</td>
                                         @else
                                         <td class="editable-field ppmmyyy" data-is-date="true" data-type="month" contenteditable="false" data-field-name="ppmmyyy" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
@@ -1395,7 +1395,7 @@ Clear Filters
                                         @endphp
                                         @if ($hasPermission)
                                         @if ($warehouses === null)
-                                        @if($vehicles->grn_id === null)
+                                        @if($vehicles->movement_grn_id === null)
                                         <td class="nowrap-td">Supplier</td>
                                         @elseif($vehicles->gdn_id !== null)
                                         <td class="nowrap-td">Customer</td>

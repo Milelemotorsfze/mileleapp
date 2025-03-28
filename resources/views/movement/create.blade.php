@@ -112,39 +112,39 @@
         </div>
         <br>
         <div class="row">
-        <div class="col-lg-1 col-md-6">
-        <div class="btn btn-primary add-row-btn" data-row="1">
-         <i class="fas fa-plus"></i> Add Vehicles
-        </div>
-        </div>
-        <div class="col-lg-4 col-md-6">
-            <div class="input-group">
-                <select name="po_number" class="form-control mb-1" id="po_number">
-                    <option value="" selected disabled>Select PO</option>
-                    @foreach ($purchasing_order as $purchasing_order)
-                    <option value="{{ $purchasing_order->id }}">{{ $purchasing_order->po_number }}</option>
-                    @endforeach
-                </select>
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button" id="generate-button">
-                    <i class="fas fa-cogs"></i> Add PO Vehicles
+            <div class="col-lg-1 col-md-6">
+                <div class="btn btn-primary add-row-btn" data-row="1">
+                    <i class="fas fa-plus"></i> Add Vehicles
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="input-group">
+                    <select name="po_number" class="form-control mb-1" id="po_number">
+                        <option value="" selected disabled>Select PO</option>
+                        @foreach ($purchasing_order as $purchasing_order)
+                        <option value="{{ $purchasing_order->id }}">{{ $purchasing_order->po_number }}</option>
+                        @endforeach
+                    </select>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="generate-button">
+                        <i class="fas fa-cogs"></i> Add PO Vehicles
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="input-group">
+                    <select name="so_number" class="form-control mb-1" id="so_number">
+                        <option value="" selected disabled>Select SO</option>
+                        @foreach ($so as $so)
+                        <option value="{{ $so->id }}">{{ $so->so_number }}</option>
+                        @endforeach
+                    </select>
+                    <button class="btn btn-outline-secondary" type="button" id="generate-sobutton">
+                        <i class="fas fa-cogs"></i> Add SO Vehicles
                     </button>
                 </div>
             </div>
-        </div>
-<div class="col-lg-4 col-md-6">
-    <div class="input-group">
-        <select name="so_number" class="form-control mb-1" id="so_number">
-            <option value="" selected disabled>Select SO</option>
-            @foreach ($so as $so)
-            <option value="{{ $so->id }}">{{ $so->so_number }}</option>
-            @endforeach
-        </select>
-        <button class="btn btn-outline-secondary" type="button" id="generate-sobutton">
-    <i class="fas fa-cogs"></i> Add SO Vehicles
-</button>
-    </div>
-</div>
         </div>
         </br>
         <div class="col-lg-12 col-md-12">
@@ -400,10 +400,10 @@
                     response.forEach(function (vehicle) {
                         var rowHtml = `
                             <div class="row">
-                            <div class="col-lg-2 col-md-6" style="width: 12%;">
-                                    <input type="text" name="vin[]" class="form-control" placeholder="VIN" readonly value="${vehicle.vin}">
-                                </div>
-                            <div class="col-lg-1 col-md-6" style="width: 6%;">
+                                <div class="col-lg-2 col-md-6" style="width: 12%;">
+                                        <input type="text" name="vin[]" class="form-control" placeholder="VIN" readonly value="${vehicle.vin}">
+                                    </div>
+                                <div class="col-lg-1 col-md-6" style="width: 6%;">
                                     <input type="text" class="form-control" placeholder="PO #" readonly value="${vehicle.po_number}">
                                 </div>
                                 <div class="col-lg-1 col-md-6" style="width: 6%;">
@@ -423,7 +423,7 @@
                                     </select>
                                 </div>
                                 <div class="col-lg-1 col-md-6">
-                                <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
+                                    <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
                                     <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
                                 </div>
                                 <div class="col-lg-2 col-md-6">
@@ -518,7 +518,10 @@
             processData: false,
             contentType: false,
             success: function (response) {
+                console.log(response);
                 if (response.success) {
+
+                    console.log(response.vehicleDetails);
                     // Clear any existing rows before inserting new ones
                     $("#rows-containerpo").html("");
                     

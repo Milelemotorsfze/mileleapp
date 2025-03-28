@@ -166,18 +166,18 @@ class MovementController extends Controller
             ->get();
             $po = PurchasingOrder::where('status', 'Approved')
             ->whereDoesntHave('vehicles', function ($query) {
-                $query->whereNull('grn_id')
+                $query->whereNull('movement_grn_id')
                 ->where('status', 'Approved');
             })
             ->pluck('po_number');
             $so_number = So::whereDoesntHave('vehicles', function ($query) {
-                $query->whereNull('grn_id')
+                $query->whereNull('movement_grn_id')
                 ->whereNotNull('vin')
                         ->where('status', 'Approved');
             })
             ->pluck('so_number');
             $so = So::whereHas('vehicles', function ($query) {
-                $query->whereNull('grn_id')
+                $query->whereNull('movement_grn_id')
                     ->where('status', 'Approved');
             })
             ->get();     
@@ -254,15 +254,20 @@ class MovementController extends Controller
             $date = $request->input('date');
             $createdBy = $request->user()->id;
 
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
+
             $vinNotExist = [];
             foreach ($vin as $index => $vehicleVin) {
-                $vehicle = Vehicles::where('vin', $vehicleVin)->first();
+                $vehicle = Vehicles::where('vin', $vehicleVin)
+                                ->where('status', 'Approved')
+                                ->whereNull($hasPermission ? 'movement_grn_id' : 'gdn_id')
+                                ->first();
                 if(!$vehicle) {
                     $vinNotExist[] = $vehicleVin;
                 }
             }
 
-            if(count($vinNotExist > 0)) {
+            if(count($vinNotExist) > 0) {
                 return redirect()->back()->with('error', 'Some of the VIN is not exist in system, please update this vin to create the movement');
             }
             
@@ -621,7 +626,7 @@ public function grnfilepost(Request $request)
             $grnNumber = $row[2];
             $vehicle = Vehicles::where('vin', $vin)->first();
             if ($vehicle) {
-                $grn = grn::find($vehicle->grn_id);
+                $grn = grn::find($vehicle->movement_grn_id);
                 if ($grn) {
                     $grn->date = $grnDate;
                     $grn->save();
@@ -785,7 +790,7 @@ public function grnfilepost(Request $request)
     $revisedmovement->save();
     if ($movementlast->from === 1) {
         if ($vehicle) {
-            $vehicle->grn_id = null;
+            $vehicle->movement_grn_id = null;
             $vehicle->save();
         }
     } else if ($movementlast->to === 2) {
@@ -813,49 +818,54 @@ public function uploadVinFile(Request $request)
             }
             fclose($handle);
         }
-
+     
         // chcek all vin is existing or not
 
-            $vinNotExist = [];
-            foreach ($vinData as $index => $vinData) {
-                $vehicle = Vehicles::where('vin', $vinData['vin'])
-                         ->where('status', '!=', 'cancel')->first();
-                if(!$vehicle) {
-                    $vinNotExist[] = $vinData['vin'];
-                }
+        // Same permission check logic as before
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
+        $vinNotExist = [];
+        foreach ($vinData as $index => $data) {
+            $vehicle = Vehicles::where('vin', $data['vin'])
+                                ->where('status', 'Approved')
+                                ->whereNull($hasPermission ? 'movement_grn_id' : 'gdn_id')
+                                ->first();
+            if(!$vehicle) {
+                $vinNotExist[] = $data['vin'];
             }
-
-            if(count($vinNotExist) > 0) {
-                return response()->json([
-                    'error' => false, 
-                    'message' => 'Some of the VIN not existing in the system: ' . implode(', ', $vinNotExist)
-                ]);
-            }
+        }
+        
+        if(count($vinNotExist) > 0) {
+            return response()->json([
+                'error' => false, 
+                'message' => 'Some of the VIN not existing in the system: ' . implode(', ', $vinNotExist)
+            ]);
+        }
 
         // Same permission check logic as before
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
         $vinNumbers = array_column($vinData, 'vin');
 
-        // Retrieve vehicles based on permissions
+        // // Retrieve vehicles based on permissions
         $query = Vehicles::whereIn('vin', $vinNumbers)
             ->whereNotNull('vin')
             // ->where(function ($query) {
             //     $query->whereNull('grn_id');
             //         //   ->orWhereNotNull('inspection_date');
             // })
-            ->where('status', '!=', 'cancel')
+            // ->where('status', '!=', 'cancel')
             ->whereNull($hasPermission ? 'grn_id' : 'gdn_id')
             ->where('status', '=', 'Approved');
 
         $vehicles = $query->get()->keyBy('vin'); // Retrieve vehicles and key them by VIN
 
-        if ($vehicles->isEmpty()) {
-            return response()->json(['success' => false, 'message' => 'No matching VINs found']);
-        }
+        // if ($vehicles->isEmpty()) {
+        //     return response()->json(['success' => false, 'message' => 'No matching VINs found']);
+        // }
 
         // Prepare vehicle details in the same order as vinData
         $vehicleDetails = [];
         foreach ($vinData as $entry) {
+            info($entry);
             $vin = $entry['vin'];
             $toWarehouse = $entry['to'];
             $ownership_type = $entry['ownership_type'];
@@ -889,6 +899,8 @@ public function uploadVinFile(Request $request)
                 ];
             }
         }
+
+        info($vehicleDetails);
 
         return response()->json(['success' => true, 'vehicleDetails' => $vehicleDetails]);
     } else {

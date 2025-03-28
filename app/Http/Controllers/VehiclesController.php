@@ -13,6 +13,7 @@ use App\Models\WordpressPostMeta;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Brand;
 use App\Models\Grn;
+use App\Models\MovementGrn;
 use App\Models\Gdn;
 use App\Models\Document;
 use App\Models\Documentlog;
@@ -318,13 +319,13 @@ class VehiclesController extends Controller
                                                 foreach ($grn_number as $grn_number) {
                                                     if($grn_number == "null")
                                             {
-                                                $query->orWhere('grn_id', null);
+                                                $query->orWhere('movement_grn_id', null);
                                             }
                                             else{
                                                     // Find the purchasing_order_id based on the po_number
                                                     $grn = Grn::where('grn_number', 'LIKE', '%' . trim($grn_number) . '%')->first();
                                                     if ($grn) {
-                                                        $query->orWhere('grn_id', $grn->id);
+                                                        $query->orWhere('movement_grn_id', $grn->id);
                                                     }
                                                 }
                                                 }
@@ -336,13 +337,13 @@ class VehiclesController extends Controller
                                                     foreach ($grn_date as $grn_date) {
                                                         if($grn_date == "null")
                                             {
-                                                $query->orWhere('grn_id', null);
+                                                $query->orWhere('movement_grn_id', null);
                                             }
                                             else{
                                                         // Find the purchasing_order_id based on the po_number
                                                         $grn = Grn::where('date', 'LIKE', '%' . trim($grn_date) . '%')->first();
                                                         if ($grn) {
-                                                            $query->orWhere('grn_id', $grn->id);
+                                                            $query->orWhere('movement_grn_id', $grn->id);
                                                         }
                                                     }
                                                     }
@@ -923,8 +924,8 @@ class VehiclesController extends Controller
         $data = \Illuminate\Support\Facades\DB::table('vehicles')
             ->whereExists(function ($query) use ($startDate, $endDate) {
                 $query->select(DB::raw(1))
-                    ->from('grn')
-                    ->whereColumn('grn.id', '=', 'vehicles.grn_id')
+                    ->from('movement_grns')
+                    ->whereColumn('movement_grns.id', '=', 'vehicles.movement_grn_id')
                     ->whereBetween('grn.date', [$startDate, $endDate]);
             })
             ->paginate(100);
@@ -1893,7 +1894,7 @@ class VehiclesController extends Controller
     public function deletes($id)
     {
     $vehicle = Vehicles::find($id);
-    if ($vehicle->grn_id === null) {
+    if ($vehicle->movement_grn_id === null) {
         $vehicle->status = 'cancel';
         $vehicle->save();
         return redirect()->back()->with('success', 'Vehicle status updated to "cancel" successfully.');
@@ -2401,6 +2402,8 @@ class VehiclesController extends Controller
 }
 public function viewalls(Request $request)
     {
+        // testing needed
+        info("testing grn");
         $offset = $request->input('offset', 0);
         $length = $request->input('length', 40);
         $searchParams = $request->input('columns', []);
@@ -2428,12 +2431,12 @@ public function viewalls(Request $request)
                     $query->where('estimation_date', 'LIKE', '%' . $searchValue . '%');
                 }
                 if ($column === "grn_number") {
-                    $query->whereHas('Grn', function ($subQuery) use ($searchValue) {
+                    $query->whereHas('movementGrn', function ($subQuery) use ($searchValue) {
                         $subQuery->where('grn_number', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
                 if ($column === "grn_date") {
-                    $query->whereHas('Grn', function ($subQuery) use ($searchValue) {
+                    $query->whereHas('movementGrn.Movementrefernce', function ($subQuery) use ($searchValue) {
                         $subQuery->where('date', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
@@ -2772,7 +2775,7 @@ foreach ($variants as $variant) {
                 {
                     $data = Vehicles::select( [
                         'vehicles.id',
-                        'vehicles.grn_id',
+                        'vehicles.movement_grn_id',
                         'vehicles.gdn_id',
                         'vehicles.gp',
                         'vehicles.sales_remarks',
@@ -2815,13 +2818,13 @@ foreach ($variants as $variant) {
                         'documents.import_type',
                         'documents.owership',
                         'documents.document_with',
-                        'grn.grn_number',
+                        'movement_grns.grn_number',
                         'gdn.gdn_number',
                         'bp.name as bpn',
                         'sp.name as spn',
                         DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
                         'so.so_date',
-                        'grn.date',
+                        'movements_reference.date',
                         'gdn.date as gdndate',
                         DB::raw("
     COALESCE(
@@ -2836,7 +2839,9 @@ foreach ($variants as $variant) {
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                     ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
                     ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                    ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                    // ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                    ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
+                    ->leftJoin('movements_reference', 'movement_grns.movement_reference_id', '=', 'movements_reference.id')
                     ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
                     ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
                     ->leftJoin('users as sp', 'so.sales_person_id', '=', 'sp.id') // Join for sales person
@@ -2877,7 +2882,7 @@ foreach ($variants as $variant) {
     {
     $vehicleId = $request->vehicle_id;
     $vehicle = Vehicles::with(['interior', 'exterior'])->where('id', $vehicleId)->first();
-    $grn = Grn::where('id', $vehicle->grn_id)->first();
+    $grn = MovementGrn::where('id', $vehicle->movement_grn_id)->first();
     $variant = Varaint::with(['master_model_lines', 'brand'])->where('id', $vehicle->varaints_id)->first();
     $variantitems = VariantItems::with(['model_specification', 'model_specification_option'])->where('varaint_id', $variant->id)->get();
     $vehicleitems = VehicleExtraItems::where('vehicle_id', $vehicleId)->get();
@@ -2889,7 +2894,7 @@ foreach ($variants as $variant) {
     }
     $data = [
         'vehicle' => $vehicle,
-        'grn' => $grn,
+        'grn_date' => $grn->Movementrefernce->date ?? '',
         'variant' => $variant,
         'inspection' => $inspection,
         'variantitems' => $variantitems,
@@ -3010,12 +3015,12 @@ private function fetchPost($variant, $exteriorColor)
                     $current_status = 'Request to CEO Office for Payment Release';
                     $next_stage = 'CEO Office Payment Released';
                 }
-                if ($vehicle->status == 'Approved' && $vehicle->grn_id == NULL) {
+                if ($vehicle->status == 'Approved' && $vehicle->movement_grn_id == NULL) {
                     $previous_status = 'Vehicle Procurement Executive Will Confirm Vendor Received Payment and Vehicle is Incoming';
                     $current_status = 'Incoming Vehicles / Pending GRN';
                     $next_stage = 'GRN Done';
                 }
-                if ($vehicle->grn_id != NULL && $vehicle->inspection_date == null) {
+                if ($vehicle->movement_grn_id != NULL && $vehicle->inspection_date == null) {
                     $previous_status = 'GRN Done';
                     $current_status = 'Pending Inspection';
                     $next_stage = 'Available Stock';
@@ -3491,14 +3496,14 @@ public function availablevehicles(Request $request)
                         'ex_color.name as exterior_color',
                         'so.so_number',
                         'purchasing_order.po_number',
-                        'grn.grn_number',
+                        'movement_grns.grn_number',
                         'sp.name as spn',
                         'documents.import_type',
                         'documents.owership',
                         'documents.document_with',
                         'bp.name as bpn',
                         'so.so_date',
-                        'grn.date',
+                        'movements_reference.date',
                         DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
                         DB::raw("
     COALESCE(
@@ -3514,7 +3519,9 @@ public function availablevehicles(Request $request)
                     ->leftJoin('booking', 'vehicles.id', '=', 'booking.vehicle_id')
                     ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
                     ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                    ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                    // ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                    ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
+                    ->leftJoin('movements_reference', 'movement_grns.movement_reference_id', '=', 'movements_reference.id')
                     ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
                     ->leftJoin('users as sp', 'so.sales_person_id', '=', 'sp.id') // Join for sales person
                     ->leftJoin('users as bp', 'vehicles.booking_person_id', '=', 'bp.id') // Join for booking person
@@ -3532,7 +3539,7 @@ public function availablevehicles(Request $request)
                         $join->on('vehicles.id', '=', 'inspection_pdi.vehicle_id')
                              ->where('inspection_pdi.stage', '=', 'PDI');
                     })
-                    ->whereNull('vehicles.gdn_id')
+                    ->whereNull('vehicles.movement_grn_id')
                     ->where('vehicles.status', 'Approved');
                     foreach ($filters as $columnName => $values) {
                         if (in_array('__NULL__', $values)) {
@@ -3669,12 +3676,12 @@ public function availablevehicles(Request $request)
                     'documents.import_type',
                     'documents.owership',
                     'documents.document_with',
-                    'grn.grn_number',
+                    'movement_grns.grn_number',
                     'gdn.gdn_number',
                     'users.name',
                     DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
                     'so.so_date',
-                    'grn.date',
+                    'movements_reference.date',
                     'gdn.date as gdndate',
                     DB::raw("
 COALESCE(
@@ -3689,7 +3696,9 @@ COALESCE(
                 ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                 ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                // ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
+                ->leftJoin('movements_reference', 'movement_grns.movement_reference_id', '=', 'movements_reference.id')
                 ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
                 ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
                 ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
@@ -3709,7 +3718,7 @@ COALESCE(
                 })
                 ->whereNotNull('vehicles.inspection_date')
                 ->whereNotNull('vehicles.gdn_id')
-                ->whereNotNull('vehicles.grn_id')
+                ->whereNotNull('vehicles.movement_grn_id')
                 ->where('vehicles.status', 'Approved');
                 foreach ($filters as $columnName => $values) {
                     if (in_array('__NULL__', $values)) {
@@ -3810,7 +3819,7 @@ COALESCE(
             {
                 $data = Vehicles::select( [
                     'vehicles.id',
-                    'vehicles.grn_id',
+                    'vehicles.movement_grn_id',
                     'vehicles.gdn_id',
                     'vehicles.estimation_date',
                     'vehicles.sales_remarks',
@@ -3852,12 +3861,12 @@ COALESCE(
                     'int_color.name as interior_color',
                     'ex_color.name as exterior_color',
                     'purchasing_order.po_number',
-                    'grn.grn_number',
+                    'movement_grns.grn_number',
                     'gdn.gdn_number',
                     'users.name',
                     DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
                    'so.so_date',
-                    'grn.date',
+                    'movements_reference.date',
                     'gdn.date as gdndate',
                     DB::raw("
 COALESCE(
@@ -3872,7 +3881,9 @@ COALESCE(
                 ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                 ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                // ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
+                ->leftJoin('movements_reference', 'movement_grns.movement_reference_id', '=', 'movements_reference.id')
                 ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
                 ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
                 ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
