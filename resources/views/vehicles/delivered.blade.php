@@ -605,6 +605,7 @@ table.dataTable thead th select {
                   <th>Document Owership</th>
                   <th>Custom Inspection Number</th>
                   <th>Custom Inspection Status</th>
+                  <th>Work Order Date</th>
                   <th>Comments</th>
                 </tr>
               </thead>
@@ -880,6 +881,20 @@ var columns6 = [
         name: 'vehicles.custom_inspection_status',
         render: function(data, type, row) {
             return data ? data : '';
+        }
+    },
+    {
+        data: 'work_order_date',
+        name: 'work_orders.date',
+        render: function(data, type, row) {
+            if (data) {
+                var dateObj = new Date(data);
+                var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                    day: '2-digit', month: 'short', year: 'numeric'
+                });
+                return formattedDate;
+            }
+            return '';
         }
     },
         {

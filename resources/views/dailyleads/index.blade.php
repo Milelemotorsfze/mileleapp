@@ -9,6 +9,9 @@
   <div class="card-header">
   <style>
 
+    #remarksModalBody img {
+        width: 100% !important;
+    }
     .nav-fill .nav-item .nav-link, .nav-justified .nav-item .nav-link {
       width: 100% !important;     
       padding: 8px 30px !important; 
@@ -314,11 +317,16 @@ input[type=number]::-webkit-outer-spin-button
                     <td>{{ $calls->custom_brand_model }}</td>
                     <td>{{ $calls->language }}</td>
                     <td>{{ $calls->location }}</td>
-                    @php
-                    $text = $calls->remarks;
-                    $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
-                    @endphp
-                    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>
+                    <td class="nowrap-td">
+                      @php
+                          $stripped = strip_tags($calls->remarks);
+                          $shortText = Str::limit($stripped, 20);
+                      @endphp
+                      {!! $shortText !!}
+                      @if(strlen($stripped) > 20)
+                          <a href="#" class="text-primary read-more-link" data-remarks="{!! htmlspecialchars($calls->remarks, ENT_QUOTES) !!}">Read More</a>
+                      @endif
+                    </td>
                     <td>
     @php
         $colorClass = '';
@@ -1231,9 +1239,31 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
           </div>
         </div>
       </div>
+      <div class="modal fade" id="remarksModal" tabindex="-1" aria-labelledby="remarksModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="remarksModalLabel">Full Remarks</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body" id="remarksModalBody">
+              </div>
+            </div>
+          </div>
+        </div>
       </div><!-- end tab-content-->
     </div>
   </div>
+
+  <script>
+    $(document).on('click', '.read-more-link', function(e) {
+        e.preventDefault();
+        var remarks = $(this).data('remarks');
+        $('#remarksModalBody').html(remarks);
+        $('#remarksModal').modal('show');
+    });
+</script>
+
   <script>
     function uploadingQuotations() {
   var formData = new FormData();
@@ -1914,6 +1944,47 @@ function saveRejection() {
     window.open(whatsappURL, '_blank');
 }
 </script>
+
+<script>
+  function applyColumnFilters(dataTableId, excludeColumns = []) {
+    console.log("1- Data is: ", dataTableId);
+    var table = $(dataTableId).DataTable();
+    table.columns().every(function (index) {
+      if (excludeColumns.includes(index)) return;
+
+      var column = this;
+      var selectWrapper = $('<div class="select-wrapper"></div>');
+      var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
+        .appendTo(selectWrapper)
+        .select2({
+          width: '100%',
+          dropdownCssClass: 'select2-blue'
+        });
+
+      select.on('change', function () {
+        var selectedValues = $(this).val();
+        if (selectedValues && selectedValues.length) {
+          var escaped = selectedValues.map(function (val) {
+            return '^' + val.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '$';
+          }).join('|');
+          column.search(escaped, true, false).draw();
+        } else {
+          column.search('', true, false).draw();
+        }
+      });
+
+      selectWrapper.appendTo($(column.header()));
+      $(column.header()).addClass('nowrap-td');
+
+      column.data().unique().sort().each(function (d, j) {
+        if (typeof d === 'string') {
+          let textVal = $('<div>').html(d).text().trim();
+          select.append('<option value="' + textVal + '">' + textVal + '</option>');
+        }
+      });
+    });
+  }
+</script>
 <script type="text/javascript">
 $(document).ready(function () {
   $('.select2').select2();
@@ -1924,48 +1995,8 @@ $(document).ready(function () {
   ],
   order: [[0, 'desc']],
   orderCellsTop: true,
-  initComplete: function() {
-    this.api().columns().every(function(d) {
-      var column = this;
-      var columnId = column.index();
-      var columnName = $(column.header()).attr('id');
-      if (d === 10 || d === 11 || d === 0 ) {
-        return;
-      }
-
-      var selectWrapper = $('<div class="select-wrapper"></div>');
-      var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
-        .appendTo(selectWrapper)
-        .select2({
-          width: '100%',
-          dropdownCssClass: 'select2-blue'
-        });
-      select.on('change', function() {
-        var selectedValues = $(this).val();
-        column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw();
-      });
-
-      selectWrapper.appendTo($(column.header()));
-      $(column.header()).addClass('nowrap-td');
-
-      column.data().unique().sort().each(function(d, j) {
-        if (columnId === 5) {  // Assuming the phone column is at index 2
-          var phoneNumber = $(d).text().trim();  // Extract phone number
-        select.append('<option value="' + phoneNumber + '">' + phoneNumber + '</option>');
-    }
-    else  if (columnId === 4) {  // Assuming the phone column is at index 2
-          var phoneNumber = $(d).text().trim();  // Extract phone number
-        select.append('<option value="' + phoneNumber + '">' + phoneNumber + '</option>');
-    }
-    else if (columnId === 6) {  // Assuming the phone column is at index 2
-          var Email = $(d).text().trim();  // Extract phone number
-        select.append('<option value="' + Email + '">' + Email + '</option>');
-    }
-    else {
-        select.append('<option value="' + d + '">' + d + '</option>');
-    }
-      });
-    });
+  initComplete: function () {
+    applyColumnFilters('#dtBasicExample1', []); 
   }
 });
 $('#my-table_filter').hide();
@@ -2045,26 +2076,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
                 {
-                data: 'remarks',
-                name: 'remarks',
-    searchable: false,
-    render: function (data, type, row) {
-        // Set the maximum length for remarks before adding "Read More" link
-        const maxLength = 20;
-        const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
-
-        if (data && data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
-            return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-            `;
-        } else {
-            return `<span class="remarks-text">${data}</span>`;
-        }
-    }
-},
+                  data: 'remarks',
+                  name: 'calls.remarks',
+                  title: 'Remarks & Messages',
+                  render: function (data, type, row) {
+                    if (!data) return '';
+                      let stripped = $('<div>').html(data).text(); 
+                      let shortText = stripped.substring(0, 20);
+                      let fullText = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;'); 
+                      if (stripped.length > 20) {
+                          return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+                      }
+                      return stripped;
+                  }
+                },
 {
             data: 'date',
             name: 'date',
@@ -2234,26 +2259,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
                 {
-    data: 'remarks',
-    name: 'remarks',
-    searchable: false,
-    render: function (data, type, row) {
-        // Set the maximum length for remarks before adding "Read More" link
-        const maxLength = 20;
-        const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
-
-        if (data && data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
-            return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-            `;
-        } else {
-            return `<span class="remarks-text">${data}</span>`;
-        }
-    }
-},
+                  data: 'remarks',
+                  name: 'calls.remarks',
+                  title: 'Remarks & Messages',
+                  render: function (data, type, row) {
+                    if (!data) return '';
+                      let stripped = $('<div>').html(data).text(); 
+                      let shortText = stripped.substring(0, 20);
+                      let fullText = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;'); 
+                      if (stripped.length > 20) {
+                          return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+                      }
+                      return stripped;
+                  }
+                },
 {
             data: 'date',
             name: 'date',
@@ -2373,40 +2392,34 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'language', name: 'language' },
                 { data: 'location', name: 'location' },
                 {
-    data: 'remarks',
-    name: 'remarks',
-    searchable: false,
-    render: function (data, type, row) {
-        // Set the maximum length for remarks before adding "Read More" link
-        const maxLength = 20;
-        const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
-
-        if (data && data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
-            return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-            `;
-        } else {
-            return `<span class="remarks-text">${data}</span>`;
-        }
-    }
-},
-{
-            data: 'date',
-            name: 'date',
-             render: function (data, type, row) {
-        if (type === 'display' || type === 'filter') {
-            if (!data || !moment(data).isValid()) {
-                return '';
-            }
-            // Convert the date to your desired format
-            return moment(data).format('DD-MMM-YYYY');
-        }
-        return data;
-    }
-        },
+                  data: 'remarks',
+                  name: 'calls.remarks',
+                  title: 'Remarks & Messages',
+                  render: function (data, type, row) {
+                    if (!data) return '';
+                      let stripped = $('<div>').html(data).text(); 
+                      let shortText = stripped.substring(0, 20);
+                      let fullText = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;'); 
+                      if (stripped.length > 20) {
+                          return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+                      }
+                      return stripped;
+                  }
+                },
+                {
+                    data: 'date',
+                    name: 'date',
+                    render: function (data, type, row) {
+                      if (type === 'display' || type === 'filter') {
+                        if (!data || !moment(data).isValid()) {
+                            return '';
+                        }
+                          // Convert the date to your desired format
+                          return moment(data).format('DD-MMM-YYYY');
+                      }
+                        return data;
+                    }
+                },
                 {
     data: 'salesnotes',
     name: 'salesnotes',
@@ -2567,6 +2580,9 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
 },
 @endif
             ],
+            initComplete: function () {
+              applyColumnFilters('#dtBasicExample4', []);
+            },
             createdRow: function (row, data, dataIndex) {
         console.log(data.created_by);
         if (data.created_by === {{ Auth::id() }}) {
@@ -2602,26 +2618,20 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                 { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
                 {
-    data: 'remarks',
-    name: 'remarks',
-    searchable: false,
-    render: function (data, type, row) {
-        // Set the maximum length for remarks before adding "Read More" link
-        const maxLength = 20;
-        const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
-
-        if (data && data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
-            return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-            `;
-        } else {
-            return `<span class="remarks-text">${data}</span>`;
-        }
-    }
-},
+                  data: 'remarks',
+                  name: 'calls.remarks',
+                  title: 'Remarks & Messages',
+                  render: function (data, type, row) {
+                    if (!data) return '';
+                      let stripped = $('<div>').html(data).text(); 
+                      let shortText = stripped.substring(0, 20);
+                      let fullText = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;'); 
+                      if (stripped.length > 20) {
+                          return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+                      }
+                      return stripped;
+                  }
+                },
 {
             data: 'date',
             name: 'date',
@@ -2836,26 +2846,20 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                 { data: 'location', name: 'location'},
                 { data: 'language', name: 'language'},
                 {
-    data: 'remarks',
-    name: 'remarks',
-    searchable: false,
-    render: function (data, type, row) {
-        // Set the maximum length for remarks before adding "Read More" link
-        const maxLength = 20;
-        const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
-
-        if (data && data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
-            return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-            `;
-        } else {
-            return `<span class="remarks-text">${data}</span>`;
-        }
-    }
-},
+                  data: 'remarks',
+                  name: 'calls.remarks',
+                  title: 'Remarks & Messages',
+                  render: function (data, type, row) {
+                    if (!data) return '';
+                      let stripped = $('<div>').html(data).text(); 
+                      let shortText = stripped.substring(0, 20);
+                      let fullText = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;'); 
+                      if (stripped.length > 20) {
+                          return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+                      }
+                      return stripped;
+                  }
+                },
 {
             data: 'date',
             name: 'date',
@@ -3010,6 +3014,9 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
     }
 },
             ],
+            initComplete: function () {
+              applyColumnFilters('#dtBasicExample7', []);
+            },
             createdRow: function (row, data, dataIndex) {
         console.log(data.created_by);
         if (data.created_by === {{ Auth::id() }}) {
@@ -3050,6 +3057,9 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         { data: 'salesperson', name: 'salesperson' },
         { data: 'status', name: 'status' },
     ],
+    initComplete: function () {
+      applyColumnFilters('#dtBasicExample8', []);
+    },
     createdRow: function (row, data, dataIndex) {
         console.log(data.created_by);
         if (data.created_by === {{ Auth::id() }}) {
@@ -3191,9 +3201,19 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
             title: 'Location'
         },
         {
-            data: 'remarks',
-            name: 'calls.remarks',
-            title: 'Remarks & Messages'
+          data: 'remarks',
+          name: 'calls.remarks',
+          title: 'Remarks & Messages',
+          render: function (data, type, row) {
+            if (!data) return '';
+              let stripped = $('<div>').html(data).text(); 
+              let shortText = stripped.substring(0, 20);
+              let fullText = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;'); 
+              if (stripped.length > 20) {
+                  return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+              }
+              return stripped;
+          }
         },
         {
             data: 'status',
@@ -3238,6 +3258,9 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
             title: 'Assigned To'
         }
     ],
+    initComplete: function () {
+      applyColumnFilters('#dtBasicExample11', []); 
+    },
     createdRow: function (row, data, dataIndex) {
         console.log(data.created_by);
         if (data.created_by === {{ Auth::id() }}) {
@@ -3285,6 +3308,9 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
             },
         { data: 'createdby', name: 'users.name' },
     ],
+    initComplete: function () {
+      applyColumnFilters('#dtBasicExample10', []);
+    },
     createdRow: function (row, data, dataIndex) {
         console.log(data.created_by);
         if (data.created_by === {{ Auth::id() }}) {

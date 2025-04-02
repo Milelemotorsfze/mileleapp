@@ -68,7 +68,7 @@
         @if ($hasPermission)
         
         <div class="card">
-        <div class="card-body px-0">
+        <div class="card-body px-3">
         <div class="text-right mb-3">
     <a href="{{ url('/export-uae-vehicle-stock') }}" class="btn btn-success">
         Export to Excel

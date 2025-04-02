@@ -493,10 +493,21 @@
       </div> 
       @endcan
       </div>
+      <div class="modal fade" id="variantDetailModal" tabindex="-1" aria-labelledby="variantDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="variantDetailModalLabel">Full Detail</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="variantDetailModalBody" style="white-space: pre-wrap;"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  <script>
-              function showFullText(button) {
+<script>
+  function showFullText(button) {
         var fullText = button.getAttribute('data-fulltext');
         alert(fullText);
     }
@@ -509,7 +520,22 @@
                 { data: 'created_at_formte', name: 'inspection.created_at' },
                 { data: 'created_by_name', name: 'users.name' },
                 { data: 'stage', name: 'inspection.stage' },
-                { data: 'remark', name: 'inspection.remark' },
+                {
+                  data: 'remark',
+                  name: 'inspection.remark',
+                  render: function (data, type, row) {
+                    if (type === 'display' && data) {
+                      let words = data.split(/\s+/);
+                      if (words.length > 5) {
+                        let shortText = words.slice(0, 5).join(' ') + '...';
+                        return `${shortText} <a href="#" class="read-more-link" data-title="QC Remarks" data-detail="${encodeURIComponent(data)}">Read More</a>`;
+                      } else {
+                        return data;
+                      }
+                    }
+                    return '';
+                  }
+                },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'grn_number', name: 'movement_grns.grn_number' },
                 { data: 'so_number', name: 'so.so_number' },
@@ -520,22 +546,20 @@
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
                 {
-                    data: 'detail', // Updated to use the alias
-                    name: 'varaints.detail',
-                    render: function(data, type, row) {
-                        if (!data) {
-                            return ''; // Return an empty string if data is undefined or null
-                        }
-                        var words = data.split(' ');
-                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-                        var fullText = data;
-                        return `
-                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                ${firstFiveWords}
-                            </div>
-                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-                        `;
+                  data: 'detail',
+                  name: 'varaints.detail',
+                  render: function (data, type, row) {
+                    if (type === 'display' && data) {
+                      let words = data.split(/\s+/);
+                      if (words.length > 5) {
+                        let shortText = words.slice(0, 5).join(' ') + '...';
+                        return `${shortText} <a href="#" class="read-more-link" data-title="Variant Detail" data-detail="${encodeURIComponent(data)}">Read More</a>`;
+                      } else {
+                        return data;
+                      }
                     }
+                    return '';
+                  }
                 },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
@@ -549,8 +573,23 @@
             columns: [
               { data: 'created_at_formte', name: 'inspection.created_at' },
               { data: 'created_by_name', name: 'users.name' },
-                { data: 'stage', name: 'inspection.stage' },
-                { data: 'remark', name: 'inspection.remark' },
+              { data: 'stage', name: 'inspection.stage' },
+              {
+                  data: 'remark',
+                  name: 'inspection.remark',
+                  render: function (data, type, row) {
+                    if (type === 'display' && data) {
+                      let words = data.split(/\s+/);
+                      if (words.length > 5) {
+                        let shortText = words.slice(0, 5).join(' ') + '...';
+                        return `${shortText} <a href="#" class="read-more-link" data-title="QC Remarks" data-detail="${encodeURIComponent(data)}">Read More</a>`;
+                      } else {
+                        return data;
+                      }
+                    }
+                    return '';
+                  }
+                },                
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'grn_number', name: 'movement_grns.grn_number' },
                 { data: 'so_number', name: 'so.so_number' },
@@ -560,7 +599,22 @@
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'detail', name: 'varaints.detail' },
+                {
+                  data: 'detail',
+                  name: 'varaints.detail',
+                  render: function (data, type, row) {
+                    if (type === 'display' && data) {
+                      let words = data.split(/\s+/);
+                      if (words.length > 5) {
+                        let shortText = words.slice(0, 5).join(' ') + '...';
+                        return `${shortText} <a href="#" class="read-more-link" data-title="Variant Detail" data-detail="${encodeURIComponent(data)}">Read More</a>`;
+                      } else {
+                        return data;
+                      }
+                    }
+                    return '';
+                  }
+                },                
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'approval_date', name: 'inspection.approval_date' },
@@ -575,7 +629,22 @@
               { data: 'reinspection_date', name: 'inspection.reinspection_date' },
               { data: 'created_by_name', name: 'users.name' },
                 { data: 'stage', name: 'inspection.stage' },
-                { data: 'reinspection_remarks', name: 'inspection.reinspection_remarks' },
+                {
+                  data: 'reinspection_remarks',
+                  name: 'inspection.reinspection_remarks',
+                  render: function (data, type, row) {
+                    if (type === 'display' && data) {
+                      let words = data.split(/\s+/);
+                      if (words.length > 5) {
+                        let shortText = words.slice(0, 5).join(' ') + '...';
+                        return `${shortText} <a href="#" class="read-more-link" data-title="QC Remarks" data-detail="${encodeURIComponent(data)}">Read More</a>`;
+                      } else {
+                        return data;
+                      }
+                    }
+                    return '';
+                  }
+                },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'grn_number', name: 'movement_grns.grn_number' },
                 { data: 'so_number', name: 'so.so_number' },
@@ -585,7 +654,22 @@
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'detail', name: 'varaints.detail' },
+                {
+                  data: 'detail',
+                  name: 'varaints.detail',
+                  render: function (data, type, row) {
+                    if (type === 'display' && data) {
+                      let words = data.split(/\s+/);
+                      if (words.length > 5) {
+                        let shortText = words.slice(0, 5).join(' ') + '...';
+                        return `${shortText} <a href="#" class="read-more-link" data-title="Variant Detail" data-detail="${encodeURIComponent(data)}">Read More</a>`;
+                      } else {
+                        return data;
+                      }
+                    }
+                    return '';
+                  }
+                },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
             ]
@@ -610,7 +694,22 @@
                 { data: 'responsivity', name: 'incident.responsivity' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'detail', name: 'varaints.detail' },
+                {
+                  data: 'detail',
+                  name: 'varaints.detail',
+                  render: function (data, type, row) {
+                    if (type === 'display' && data) {
+                      let words = data.split(/\s+/);
+                      if (words.length > 5) {
+                        let shortText = words.slice(0, 5).join(' ') + '...';
+                        return `${shortText} <a href="#" class="read-more-link" data-title="Variant Detail" data-detail="${encodeURIComponent(data)}">Read More</a>`;
+                      } else {
+                        return data;
+                      }
+                    }
+                    return '';
+                  }
+                },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'seat', name: 'varaints.seat' },
@@ -1158,6 +1257,16 @@ $('#dtBasicExample4 tbody').on('dblclick', 'tr', function () {
     }
     </script>
     <script>
+
+    $('body').on('click', '.read-more-link', function (e) {
+      e.preventDefault();
+      const fullText = decodeURIComponent($(this).data('detail'));
+      const title = $(this).data('title') || 'Full Text';
+      $('#variantDetailModalLabel').text(title);
+      $('#variantDetailModalBody').html(fullText); 
+      $('#variantDetailModal').modal('show');
+    });
+
     $(document).ready(function() {
         $("#reworkButton").click(function() { 
         var incidentId = $("#incidentId").val();
