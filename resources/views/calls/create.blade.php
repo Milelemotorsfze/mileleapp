@@ -166,8 +166,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <option value="{{ $strategies->name }}" {{ old('strategy') == $strategies->name ? 'selected' : '' }}>{{ $strategies->name }} </option>
                     @endforeach
                 </select>
-
             </div>
+            
             <div class="col-lg-4 col-md-6 pt-3">
                 <span class="error">* </span>
                 <label for="prioritySelect" class="form-label">Priority:</label>
@@ -193,6 +193,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </label>
                 </div>
             </div>
+
+            <input type="hidden" id="sales-option-value" name="sales-option" value="{{ old('sales-option', 'auto-assign') }}">
+            
             <div class="col-lg-4 col-md-6" id="manual-sales-person-list" style="display: none;">
                 <span class="error">* </span>
                 <label for="sales_person" class="form-label">Sales Person:</label>
@@ -212,25 +215,46 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
         </div>
         <div class="maindd">
             <div id="row-container">
-                <div class="row">
-                    <div class="col-lg-4 col-md-6">
-                        <label for="brandModelSelect" class="form-label">Brand & Model:</label>
-                        <select name="model_line_ids[]" class="form-control select2" id="brandModelSelect" multiple>
-                            <option value="">Select Brand & Model</option>
-                            @foreach ($modelLineMasters as $modelLineMaster)
-                            @php
-                            $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
-                            $brand_name = $brand->brand_name;
-                            $combinedValue = $brand_name . ' / ' . $modelLineMaster->model_line;
-                            @endphp
-                            <option value="{{ $modelLineMaster->id }}"
-                                {{ old('model_line_ids.0') == $modelLineMaster->id ? 'selected' : '' }}>
-                                {{ $combinedValue }}
-                            </option>
-                            @endforeach
-                        </select>
+
+                @if(old('model_line_ids'))
+                    @foreach(old('model_line_ids') as $id)
+                        <div class="row">
+                            <div class="col-lg-4 col-md-6">
+                                <label for="brandModelSelect" class="form-label">Brand & Model:</label>
+                                <select name="model_line_ids[]" class="form-control select2" multiple>
+                                    <option value="">Select Brand & Model</option>
+                                    @foreach ($modelLineMasters as $modelLineMaster)
+                                        @php
+                                            $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
+                                            $combinedValue = $brand->brand_name . ' / ' . $modelLineMaster->model_line;
+                                        @endphp
+                                        <option value="{{ $modelLineMaster->id }}" {{ $id == $modelLineMaster->id ? 'selected' : '' }}>
+                                            {{ $combinedValue }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    <div class="row">
+                        <div class="col-lg-4 col-md-6">
+                            <label for="brandModelSelect" class="form-label">Brand & Model:</label>
+                            <select name="model_line_ids[]" class="form-control select2" multiple>
+                                <option value="">Select Brand & Model</option>
+                                @foreach ($modelLineMasters as $modelLineMaster)
+                                    @php
+                                        $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
+                                        $combinedValue = $brand->brand_name . ' / ' . $modelLineMaster->model_line;
+                                    @endphp
+                                    <option value="{{ $modelLineMaster->id }}" {{ old('model_line_ids.0') == $modelLineMaster->id ? 'selected' : '' }}>
+                                        {{ $combinedValue }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
-                </div>
+                @endif
             </div>
 
             <div class="col-lg-12 col-md-12 mt-3 d-flex justify-content-start">
@@ -246,11 +270,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
         </div>
         <div class="col-lg-12 col-md-12">
             <label for="basicpill-firstname-input" class="form-label">Remarks : </label>
-            <textarea name="remarks" id="editor"></textarea>
+            <textarea id="summernote" name="remarks">{{ old('remarks') }}</textarea>
         </div>
-</div>
-</br>
-</br>
+    </div>
+    </br>
+    </br>
 <div class="col-lg-12 col-md-12">
     <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
 </div>
@@ -265,6 +289,52 @@ redirect()->route('home')->send();
 @endsection
 @push('scripts')
 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('#summernote').summernote({
+        height: 300,
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline', 'clear']],
+            ['font', ['strikethrough', 'superscript', 'subscript']],
+            ['fontsize', ['fontsize']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['insert', ['picture', 'link', 'video']],
+            ['view', ['fullscreen', 'codeview', 'help']]
+        ],
+        callbacks: {
+            onImageUpload: function(files) {
+                uploadImage(files[0]);
+            }
+        }
+    });
+
+    function uploadImage(file) {
+        let data = new FormData();
+        data.append("file", file);
+        data.append("_token", "{{ csrf_token() }}");
+
+        $.ajax({
+            url: "{{ route('summernote.upload') }}",
+            method: "POST",
+            data: data,
+            contentType: false,
+            processData: false,
+            success: function(url) {
+                $('#summernote').summernote('insertImage', url);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert("Image upload failed.");
+                console.error(textStatus + " " + errorThrown);
+            }
+        });
+    }
+});
+
+</script>
 
 <script type="text/javascript">
     $(document).ready(function() {
@@ -344,8 +414,20 @@ redirect()->route('home')->send();
                 datalist.html(options);
                 var newRow = $('<div class="row"></div>');
                 var col1 = $('<div class="col-lg-4 col-md-6"></div>');
-                var input = $('<input type="text" placeholder="Select Brand & Model" name="model_line_id[]" class="form-control mb-1 new-select" id="brandInput' + x + '" list="brandList' + x + '" autocomplete="off" /><input type="hidden" name="model_line_ids[]" id="selectedBrandId' + x + '">');
-                col1.append(input);
+                var select = $('<select name="model_line_ids[]" class="form-control select2" multiple><option value="">Select Brand & Model</option></select>');
+                    @foreach ($modelLineMasters as $modelLineMaster)
+                        @php
+                            $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
+                            $combinedValue = $brand->brand_name . ' / ' . $modelLineMaster->model_line;
+                        @endphp
+                        select.append('<option value="{{ $modelLineMaster->id }}">{{ $combinedValue }}</option>');
+                    @endforeach
+
+                col1.append(select);
+                select.select2({
+                    placeholder: "Select an option",
+                    maximumSelectionLength: 1
+                });
                 col1.append(datalist);
                 var col2 = $('<div class="col-lg-4 col-md-6 align-self-end"></div>');
                 var removeBtn = $('<a href="#" class="remove-row-btn btn btn-danger"><i class="fas fa-minus"></i> Remove</a>');
