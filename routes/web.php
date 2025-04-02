@@ -771,9 +771,9 @@ Route::get('/d', function () {
     Route::get('/vehicles/getVehicleDetails', [VehiclesController::class, 'getVehicleDetails'])->name('vehicles.getVehicleDetails');
 
     Route::get('vehiclesde/{id}', [VehiclesController::class, 'deletes'])->name('vehiclesde.deletes');
-    Route::get('grnlist/netsuitgrn', [MovementController::class, 'grnlist'])->name('grnlist.create'); // not using anywhere
-    Route::get('grnlist/grnsimplefile', [MovementController::class,'grnsimplefile'])->name('grnlist.grnsimplefile');
-    Route::post('grnlist/post-file', [MovementController::class, 'grnfilepost'])->name('grnlist.grnfilepost'); // not using anywhere
+    // Route::get('grnlist/netsuitgrn', [MovementController::class, 'grnlist'])->name('grnlist.create'); // not using anywhere
+    // Route::get('grnlist/grnsimplefile', [MovementController::class,'grnsimplefile'])->name('grnlist.grnsimplefile');
+    // Route::post('grnlist/post-file', [MovementController::class, 'grnfilepost'])->name('grnlist.grnfilepost'); // not using anywhere
     Route::post('/check-create-vins', [PurchasingOrderController::class, 'checkcreatevins'])->name('vehicles.check-create-vins');
     Route::post('/check-create-vins-inside', [PurchasingOrderController::class, 'checkcreatevinsinside'])->name('vehicles.check-create-vins-inside');
     Route::patch('/check-edit-vins', [PurchasingOrderController::class, 'checkeditvins'])->name('vehicles.check-edit-vins');
@@ -853,6 +853,8 @@ Route::get('/d', function () {
     Route::get('vehicles/viewalls', [VehiclesController::class, 'viewalls'])->name('vehicles.viewalls');
     Route::get('/get-updated-vehicle/{id}', [VehiclesController::class, 'getUpdatedVehicle'])->name('getUpdatedVehicle');
     Route::get('/getBrandsAndModelLines', [PurchasingOrderController::class, 'getBrandsAndModelLines']);
+    Route::post('movement/unique-check',[MovementController::class,'checkDuplicateMovement'])->name('movement.unique-check');
+
     //booking
     Route::get('booking/create/{call_id}', [BookingController::class, 'create'])->name('booking.create');
     Route::get('/get-model-lines/booking/{brandId}', [BookingController::class, 'getModelLines'])->name('booking.getmodel');
@@ -1168,5 +1170,6 @@ Route::get('/d', function () {
     ->name('send-swift-copy.email');
     Route::post('/check-vehicle-quantity', [VehiclesController::class, 'checkVehicleQuantity'])->name('check.vehicle.quantity');
     Route::get('/salespersons/list', [SalesOrderController::class, 'getSalespersons'])->name('salespersons.list');
-Route::post('/salesorder/updateSalesperson', [SalesOrderController::class, 'updateSalesperson'])->name('salesorder.updateSalesperson');
+    Route::post('/salesorder/updateSalesperson', [SalesOrderController::class, 'updateSalesperson'])->name('salesorder.updateSalesperson');
+
 });

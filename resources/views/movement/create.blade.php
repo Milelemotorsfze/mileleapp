@@ -51,7 +51,7 @@
         }, 5000); // 5000 milliseconds = 5 seconds
     </script>
     @endif
-        <form action="{{ route('movement.store') }}" method="POST" id="purchasing-order">
+        <form id="form-create" action="{{ route('movement.store') }}" method="POST" >
         @csrf
         <div class="row">
         <div class="col-lg-2 col-md-6">
@@ -74,16 +74,16 @@
 <br>
         <div id ="rows-containertitle">
             <div class="row">
-                <div class="col-lg-1 col-md-6" style="width:12%;">
+                <div class="col-lg-2 col-md-6">
                     <label for="basicpill-firstname-input" class="form-label">Vin</label>
                 </div>
-                <div class="col-lg-1 col-md-6" style="width:6%;">
+                <div class="col-lg-1 col-md-6">
                     <label for="basicpill-firstname-input" class="form-label">PO</label>
                 </div>
-                <div class="col-lg-1 col-md-6" style="width:6%;">
+                <div class="col-lg-1 col-md-6" >
                     <label for="basicpill-firstname-input" class="form-label">SO</label>
                 </div>
-                <div class="col-lg-1 col-md-6" style="width:6%;">
+                <div class="col-lg-1 col-md-6" >
                     <label for="basicpill-firstname-input" class="form-label">Ownership</label>
                 </div>
                 <div class="col-lg-1 col-md-6">
@@ -101,7 +101,7 @@
                 <div class="col-lg-1 col-md-6">
                     <label for="QTY" class="form-label">Variant</label>
                 </div>
-                <div class="col-lg-2 col-md-6">
+                <div class="col-lg-1 col-md-6">
                     <label for="basicpill-firstname-input" class="form-label">Remarks</label>
                 </div>
             </div>
@@ -148,7 +148,7 @@
         </div>
         </br>
         <div class="col-lg-12 col-md-12">
-        <input type="submit" name="submit" value="Submit" onclick="return validateForm();" class="btn btn-success btncenter" />
+        <input type="submit" name="submit" value="Submit" id="btn-submit" class="btn btn-success btncenter" />
     </div>
 </form>
 		</br>
@@ -169,7 +169,7 @@
             row++;
             var newRow = `
             <div class="row" data-row="${row}">
-                <div class="col-md-2 col-md-6" style="width: 12%;">
+                <div class="col-lg-2 col-md-6">
                     <select name="vin[]" class="form-control mb-1 vin" id="vin${row}">
                         <option value="" selected disabled>Select VIN</option>
                         @foreach ($vehicles as $vin)
@@ -177,13 +177,13 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                <div class="col-lg-1 col-md-6" >
                     <input type="text" id="po${row}" class="form-control" placeholder="PO #" readonly>
                 </div>
-                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                <div class="col-lg-1 col-md-6" >
                     <input type="text" id="so_number${row}" class="form-control" placeholder="SO #" readonly>
                 </div>
-                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                <div class="col-lg-1 col-md-6">
                     <select id="ownership_type${row}" class="form-control" name="ownership_type[]">
                         <option value="">Select Ownership</option>
                         <option value="Incoming">Incoming</option>
@@ -223,7 +223,7 @@
                     <input type="text" id="variant${row}" name="variant[]" class="form-control" placeholder="Variant" readonly>
                 </div>
                
-                <div class="col-lg-2 col-md-6">
+                <div class="col-lg-1 col-md-6">
                     <div class="d-flex align-items-center">
                         <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
                         <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
@@ -284,16 +284,16 @@
                     response.forEach(function (vehicle) {
                         var rowHtml = `
                             <div class="row">
-                                <div class="col-lg-2 col-md-6" style="width: 12%;">
+                                <div class="col-lg-2 col-md-6">
                                     <input type="text" name="vin[]" class="form-control" placeholder="VIN" readonly value="${vehicle.vin}">
                                 </div>
-                                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                                <div class="col-lg-1 col-md-6" >
                                     <input type="text" class="form-control" placeholder="PO #" readonly value="${vehicle.po_number}">
                                 </div>
-                                <div class="col-lg-1 col-md-6"style="width: 6%;"> 
+                                <div class="col-lg-1 col-md-6"> 
                                     <input type="text" class="form-control" placeholder="SO #" readonly value="${vehicle.so_number}">
                                 </div>
-                                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                                <div class="col-lg-1 col-md-6" >
                                     <select class="form-control" id="ownership_type" name="ownership_type[]">
                                         <option value="">Select Ownership</option>
                                         <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
@@ -328,7 +328,7 @@
                                 <div class="col-lg-1 col-md-6">
                                     <input type="text" name="variant" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.variant}">
                                 </div>
-                                 <div class="col-lg-2 col-md-6">
+                                 <div class="col-lg-1 col-md-6">
                                     <div class="d-flex align-items-center">
                                         <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
                                         <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
@@ -390,7 +390,7 @@
  $(document).ready(function () {
         $("#generate-sobutton").click(function () {  // Bind to the Generate button's click event
             var selectedSOId = $("#so_number").val();  // Get the selected PO ID
-            console.log(selectedSOId);
+          
             $.ajax({
                 type: "GET",
                 url: "{{ route('vehicles.getVehiclesDataformovementso') }}",
@@ -400,16 +400,16 @@
                     response.forEach(function (vehicle) {
                         var rowHtml = `
                             <div class="row">
-                                <div class="col-lg-2 col-md-6" style="width: 12%;">
+                                <div class="col-lg-2 col-md-6">
                                         <input type="text" name="vin[]" class="form-control" placeholder="VIN" readonly value="${vehicle.vin}">
                                     </div>
-                                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                                <div class="col-lg-1 col-md-6" >
                                     <input type="text" class="form-control" placeholder="PO #" readonly value="${vehicle.po_number}">
                                 </div>
-                                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                                <div class="col-lg-1 col-md-6" >
                                     <input type="text" class="form-control" placeholder="SO #" readonly value="${vehicle.so_number}">
                                 </div>
-                                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                                <div class="col-lg-1 col-md-6" >
                                     <select class="form-control" id="ownership_type" name="ownership_type[]">
                                         <option value="">Select Ownership</option>
                                         <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
@@ -444,7 +444,7 @@
                                 <div class="col-lg-1 col-md-6">
                                     <input type="text" name="variant" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.variant}">
                                 </div>
-                                <div class="col-lg-2 col-md-6">
+                                <div class="col-lg-1 col-md-6">
                                     <div class="d-flex align-items-center">
                                         <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
                                         <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
@@ -518,26 +518,25 @@
             processData: false,
             contentType: false,
             success: function (response) {
-                console.log(response);
+                // console.log(response);
                 if (response.success) {
 
-                    console.log(response.vehicleDetails);
                     // Clear any existing rows before inserting new ones
                     $("#rows-containerpo").html("");
                     
                     response.vehicleDetails.forEach(function (vehicle) {
                         var rowHtml = `
                             <div class="row">
-                            <div class="col-lg-2 col-md-6" style="width: 12%;">
+                            <div class="col-lg-2 col-md-6" >
                                     <input type="text" name="vin[]" class="form-control" placeholder="VIN" readonly value="${vehicle.vin}">
                                 </div>
-                                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                                <div class="col-lg-1 col-md-6" >
                                     <input type="text" class="form-control" placeholder="PO #" readonly value="${vehicle.po_number}">
                                 </div>
-                                <div class="col-lg-1 col-md-6"style="width: 6%;"> 
+                                <div class="col-lg-1 col-md-6"> 
                                     <input type="text" class="form-control" placeholder="SO #" readonly value="${vehicle.so_number}">
                                 </div>
-                                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                                <div class="col-lg-1 col-md-6" >
                                     <select class="form-control" id="ownership_type" name="ownership_type[]">
                                         <option value=""${!vehicle.ownership_type ? 'selected' : ''}>Select Ownership</option>
                                         <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
@@ -573,7 +572,7 @@
                                 <div class="col-lg-1 col-md-6">
                                     <input type="text" name="variant" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.variant}">
                                 </div>
-                                <div class="col-lg-2 col-md-6">
+                                <div class="col-lg-1 col-md-6">
                                     <div class="d-flex align-items-center">
                                         <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
                                         <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
@@ -630,6 +629,63 @@
             $(this).closest(".row").remove();
         });
     }
+
+    $('#btn-submit').click(function (e) {
+        e.preventDefault();
+        let formValid = true;
+        let vinArray = [];
+        let fromArray = [];
+        let toArray = [];
+        console.log("test");
+        $("input[name='vin[]']").each(function () {
+            vinArray.push($(this).val());
+        });
+        if(vinArray.length <= 0) {
+            $("select[name='vin[]']").each(function () {
+                let vinValue = $(this).val();
+                vinArray.push(vinValue);
+            });
+        }
+        $("input[name='from[]']").each(function () {
+            fromArray.push($(this).val());
+        });
+        $("select[name='to[]']").each(function () {
+            toArray.push($(this).val());
+        });
+
+        console.log(vinArray);
+        console.log(fromArray);
+        console.log(toArray);
+
+        let url = '{{ route('movement.unique-check') }}';
+            $.ajax({
+                type:"POST",
+                url: url, 
+                data: {
+                    vin: vinArray,
+                    from: fromArray,
+                    to: toArray,
+                },
+                success: function(data) {
+                    console.log(data);
+                 if(data.length > 0) {
+                    e.preventDefault();
+                    let message = "The following duplicate entries were found:\n\n";
+            
+                    // Loop through each duplicate entry and format the message
+                    data.forEach(function(duplicate) {
+                        message += duplicate + "\n";
+                    });
+                    alertify.confirm(message,function (e) {
+                    }).set({title:"Invalid Data"});
+                    return false;
+                 }else{
+                    $('#form-create').unbind('submit').submit();
+                 }
+
+                }
+        });
+    });
 });
 </script>
 @else

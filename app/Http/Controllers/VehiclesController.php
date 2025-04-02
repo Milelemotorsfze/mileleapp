@@ -15,6 +15,7 @@ use App\Models\Brand;
 use App\Models\Grn;
 use App\Models\Movement;
 use App\Models\MovementGrn;
+use App\Models\MovementsReference;
 use App\Models\Gdn;
 use App\Models\Document;
 use App\Models\Documentlog;
@@ -343,7 +344,7 @@ class VehiclesController extends Controller
                                             }
                                             else{
                                                         // Find the purchasing_order_id based on the po_number
-                                                        $grn = Grn::where('date', 'LIKE', '%' . trim($grn_date) . '%')->first();
+                                                        $grn = MovementsReference::where('date', 'LIKE', '%' . trim($grn_date) . '%')->first();
                                                         if ($grn) {
                                                             $query->orWhere('movement_grn_id', $grn->id);
                                                         }
@@ -2621,8 +2622,8 @@ public function viewalls(Request $request)
             $vehicle->so_date = $vehicle->so ? $vehicle->so->so_date : '';
             $vehicle->po_number = $vehicle->purchasingOrder ? $vehicle->purchasingOrder->po_number : '';
             $vehicle->po_date = $vehicle->purchasingOrder ? $vehicle->purchasingOrder->po_date : '';
-            $vehicle->grn_date = $vehicle->grn ? $vehicle->grn->date : '';
-            $vehicle->grn_number = $vehicle->grn ? $vehicle->grn->grn_number : '';
+            $vehicle->grn_date = $vehicle->grn ? $vehicle->movementGrn->Movementrefernce->date : '';
+            $vehicle->grn_number = $vehicle->grn ? $vehicle->movementGrn->grn_number : '';
             $vehicle->gdn_date = $vehicle->gdn ? $vehicle->gdn->date : '';
             $vehicle->gdn_number = $vehicle->gdn ? $vehicle->gdn->gdn_number : '';
             $vehicle->variantname = $vehicle->variant ? $vehicle->variant->name : '';
@@ -2670,8 +2671,8 @@ public function viewalls(Request $request)
         $vehicle->so_date = $vehicle->so ? $vehicle->so->so_date : '';
         $vehicle->po_number = $vehicle->purchasingOrder ? $vehicle->purchasingOrder->po_number : '';
         $vehicle->po_date = $vehicle->purchasingOrder ? $vehicle->purchasingOrder->po_date : '';
-        $vehicle->grn_date = $vehicle->grn ? $vehicle->grn->date : '';
-        $vehicle->grn_number = $vehicle->grn ? $vehicle->grn->grn_number : '';
+        $vehicle->grn_date = $vehicle->grn ? $vehicle->movementGrn->Movementrefernce->date : '';
+        $vehicle->grn_number = $vehicle->grn ? $vehicle->movementGrn->grn_number : '';
         $vehicle->gdn_date = $vehicle->gdn ? $vehicle->gdn->date : '';
         $vehicle->gdn_number = $vehicle->gdn ? $vehicle->gdn->gdn_number : '';
         $vehicle->variantname = $vehicle->variant ? $vehicle->variant->name : '';

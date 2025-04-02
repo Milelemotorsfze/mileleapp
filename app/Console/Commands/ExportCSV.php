@@ -32,7 +32,6 @@ class ExportCSV extends Command
             )
             ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
             ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
-            // ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
             ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
             ->leftJoin('movements_reference', 'movement_grns.movement_reference_id', '=', 'movements_reference.id')
             ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')

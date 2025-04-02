@@ -21,6 +21,7 @@ use App\Models\DepartmentNotifications;
 use App\Models\VinChange;
 use Carbon\CarbonTimeZone;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use App\Models\PurchasingOrder;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -244,7 +245,7 @@ class MovementController extends Controller
 
        
         DB::beginTransaction();    
-
+        info($request->all());
         try{
             $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
             $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -257,6 +258,7 @@ class MovementController extends Controller
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
 
             $vinNotExist = [];
+            $uniqueCombinations = [];
             foreach ($vin as $index => $vehicleVin) {
                 $vehicle = Vehicles::where('vin', $vehicleVin)
                                 ->where('status', 'Approved')
@@ -265,12 +267,51 @@ class MovementController extends Controller
                 if(!$vehicle) {
                     $vinNotExist[] = $vehicleVin;
                 }
+
+               $isExist = Movement::where('vin', $vehicleVin)
+                    ->where('from', $from[$index])
+                    ->where('to', $to[$index])
+                    ->first();
+
+                if ($isExist) {
+                    $fromLocation = Warehouse::find($from);
+                    $toLocation = Warehouse::find($to);
+                    $uniqueCombinations[] = "Movement for VIN: $vin, From: $fromLocation->name , To: $toLocation->name is already done in the system.";
+                }
             }
 
+            $combined = [];
+            $duplicateCombinations = [];
+            
+            for ($i = 0; $i < count($vin); $i++) {
+                $key = $vin[$i] . '|' . $from[$i] . '|' . $to[$i]; // Create unique key
+                $combined[] = $key;
+            }
+            $counts = array_count_values($combined);
+            foreach ($counts as $key => $count) {
+                if ($count > 1) {
+                    [$vin, $from, $to] = explode('|', $key);
+                    $fromLocation = Warehouse::find($from);
+                    $toLocation = Warehouse::find($to);
+                    $duplicateCombinations[] = "Duplicate entry found for VIN: $vin, From: $fromLocation->name, To: $toLocation->name";
+                }
+            }
+            
+            if (count($duplicateCombinations) > 0) {
+                return redirect()->back()->withErrors($duplicateCombinations);
+            }
+          
             if(count($vinNotExist) > 0) {
                 return redirect()->back()->with('error', 'Some of the VIN is not exist in system, please update this vin to create the movement');
             }
+            if(count($uniqueCombinations) > 0) {
+                return redirect()->back()->with('error', 'Some movement is already done in the same location'.$uniqueCombinations);
+            }
+
+            // duplicate data checking
+
             
+            return 1;
            
         // foreach ($vin as $index => $value) {
         //     if (array_key_exists($index, $from) && array_key_exists($index, $to)) {
@@ -592,63 +633,64 @@ class MovementController extends Controller
     ]);
     }
     
-    public function grnlist(){
-        return view('movement.grnlist');   
-    }
-    public function grnsimplefile()
-{
-    $filePath = storage_path('app/public/sample/gdnlist.xlsx'); // Path to the Excel file
-    if (file_exists($filePath)) {
-        // Generate a response with appropriate headers
-        return Response::download($filePath, 'gdnlist.xlsx', [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        ]);
-    } else {
-        return redirect()->back()->with('error', 'The requested file does not exist.');
-    }
-}
-public function grnfilepost(Request $request)
-{
-    if ($request->hasFile('file') && $request->file('file')->isValid()) {
-        $file = $request->file('file');
-        $extension = $file->getClientOriginalExtension();
-        if (!in_array($extension, ['xls', 'xlsx'])) {
-            return back()->with('error', 'Invalid file format. Only Excel files (XLS or XLSX) are allowed.');
-        }
-        $rows = Excel::toArray([], $file, null, \Maatwebsite\Excel\Excel::XLSX)[0];
-        $headers = array_shift($rows);
-        $existingVins = [];
-        $missingVins = [];
-        foreach ($rows as $row) {
-            $vin = $row[0];
-            $grnDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[1])->format('Y-m-d');
-            $grnNumber = $row[2];
-            $grnNumber = $row[2];
-            $vehicle = Vehicles::where('vin', $vin)->first();
-            if ($vehicle) {
-                $grn = MovementGrn::find($vehicle->movement_grn_id);
-                if ($grn) {
-                    $grn->date = $grnDate;
-                    $grn->save();
-                    $existingVins[] = $vin;
-                }
-            } else {
-                $missingVins[] = $vin;
-            }
-        }
-        if (!empty($missingVins)) {
-            $missingVinsData = [['VIN']];
-            foreach ($missingVins as $vin) {
-                $missingVinsData[] = [$vin];
-            }
-            $missingVinsFilePath = storage_path('app/public/missing_vins.xlsx');
-            Excel::store($missingVinsData, 'missing_vins.xlsx');
-            return response()->download($missingVinsFilePath)->deleteFileAfterSend(true);
-        }
-        return back()->with('success', 'GRN information updated successfully.');
-    }
-    return back()->with('error', 'No valid file found.');
-    }
+    // public function grnlist(){
+    //     return view('movement.grnlist');   
+    // }
+//     public function grnsimplefile()
+// {
+//     $filePath = storage_path('app/public/sample/gdnlist.xlsx'); // Path to the Excel file
+//     if (file_exists($filePath)) {
+//         // Generate a response with appropriate headers
+//         return Response::download($filePath, 'gdnlist.xlsx', [
+//             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+//         ]);
+//     } else {
+//         return redirect()->back()->with('error', 'The requested file does not exist.');
+//     }
+// }
+// public function grnfilepost(Request $request)
+// {
+//     // Not uisng and this function is not updated with latest logic
+//     if ($request->hasFile('file') && $request->file('file')->isValid()) {
+//         $file = $request->file('file');
+//         $extension = $file->getClientOriginalExtension();
+//         if (!in_array($extension, ['xls', 'xlsx'])) {
+//             return back()->with('error', 'Invalid file format. Only Excel files (XLS or XLSX) are allowed.');
+//         }
+//         $rows = Excel::toArray([], $file, null, \Maatwebsite\Excel\Excel::XLSX)[0];
+//         $headers = array_shift($rows);
+//         $existingVins = [];
+//         $missingVins = [];
+//         foreach ($rows as $row) {
+//             $vin = $row[0];
+//             $grnDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[1])->format('Y-m-d');
+//             $grnNumber = $row[2];
+//             $grnNumber = $row[2];
+//             $vehicle = Vehicles::where('vin', $vin)->first();
+//             if ($vehicle) {
+//                 $grn = MovementGrn::find($vehicle->movement_grn_id);
+//                 if ($grn) {
+//                     $grn->date = $grnDate;
+//                     $grn->save();
+//                     $existingVins[] = $vin;
+//                 }
+//             } else {
+//                 $missingVins[] = $vin;
+//             }
+//         }
+//         if (!empty($missingVins)) {
+//             $missingVinsData = [['VIN']];
+//             foreach ($missingVins as $vin) {
+//                 $missingVinsData[] = [$vin];
+//             }
+//             $missingVinsFilePath = storage_path('app/public/missing_vins.xlsx');
+//             Excel::store($missingVinsData, 'missing_vins.xlsx');
+//             return response()->download($missingVinsFilePath)->deleteFileAfterSend(true);
+//         }
+//         return back()->with('success', 'GRN information updated successfully.');
+//     }
+//     return back()->with('error', 'No valid file found.');
+//     }
     public function getVehiclesDataformovement(Request $request)
     {
         $selectedPOId = $request->input('po_id');
@@ -657,7 +699,7 @@ public function grnfilepost(Request $request)
         {
             $vehicles = Vehicles::where('purchasing_order_id', $selectedPOId)
             ->whereNotNull('vin')
-            ->where('status', '!=', 'cancel')
+            // ->where('status', '!=', 'cancel')
             // ->where(function ($query) {
             //     $query->whereNull('grn_id');
             //         //   ->orWhereNotNull('inspection_date');
@@ -669,7 +711,7 @@ public function grnfilepost(Request $request)
         {
         $vehicles = Vehicles::where('purchasing_order_id', $selectedPOId)
             ->whereNotNull('vin')
-            ->where('status', '!=', 'cancel')
+            // ->where('status', '!=', 'cancel')
             ->whereNull('gdn_id')
             // ->where(function ($query) {
             //     $query->whereNull('grn_id');
@@ -818,17 +860,15 @@ public function uploadVinFile(Request $request)
             }
             fclose($handle);
         }
-     
-        // chcek all vin is existing or not
 
-        // Same permission check logic as before
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
+        // $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
         $vinNotExist = [];
         foreach ($vinData as $index => $data) {
             $vehicle = Vehicles::where('vin', $data['vin'])
                                 ->where('status', 'Approved')
-                                ->whereNull($hasPermission ? 'movement_grn_id' : 'gdn_id')
+                                // ->whereNull($hasPermission ? 'movement_grn_id' : 'gdn_id')
                                 ->first();
+         
             if(!$vehicle) {
                 $vinNotExist[] = $data['vin'];
             }
@@ -842,19 +882,20 @@ public function uploadVinFile(Request $request)
         }
 
         // Same permission check logic as before
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
+        // $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
         $vinNumbers = array_column($vinData, 'vin');
 
         // // Retrieve vehicles based on permissions
         $query = Vehicles::whereIn('vin', $vinNumbers)
             ->whereNotNull('vin')
+            ->where('status', 'Approved');
             // ->where(function ($query) {
             //     $query->whereNull('grn_id');
             //         //   ->orWhereNotNull('inspection_date');
             // })
             // ->where('status', '!=', 'cancel')
-            ->whereNull($hasPermission ? 'movement_grn_id' : 'gdn_id')
-            ->where('status', '=', 'Approved');
+            // ->whereNull($hasPermission ? 'movement_grn_id' : 'gdn_id')
+            // ->where('status', 'Approved');
 
         $vehicles = $query->get()->keyBy('vin'); // Retrieve vehicles and key them by VIN
 
@@ -906,5 +947,32 @@ public function uploadVinFile(Request $request)
     } else {
         return response()->json(['success' => false, 'message' => 'No file uploaded']);
     }
-}
+    }
+
+    public function checkDuplicateMovement(Request $request) {
+        info($request->all());
+        info("test function");
+        $combined = [];
+        $duplicateCombinations = [];
+        $vin = $request->vin;
+        $to = $request->to;
+        $from = $request->from;
+        
+        for ($i = 0; $i < count($vin); $i++) {
+            $key = $vin[$i] . '|' . $from[$i] . '|' . $to[$i]; // Create unique key
+            $combined[] = $key;
+        }
+        $counts = array_count_values($combined);
+        foreach ($counts as $key => $count) {
+            if ($count > 1) {
+                [$vin, $from, $to] = explode('|', $key);
+                $fromLocation = Warehouse::find($from);
+                $toLocation = Warehouse::find($to);
+                $duplicateCombinations[] = "Duplicate entry found for VIN: $vin, From: $fromLocation->name , To: $toLocation->name";
+            }
+        }
+        
+        return response()->json($duplicateCombinations);
+
+        }
     }
