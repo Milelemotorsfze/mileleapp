@@ -90,7 +90,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
     <div class="row">
         <p><span style="float:right;" class="error">* Required Field</span></p>
     </div>
-    <form action="" method="post" enctype="multipart/form-data">
         <div class="row">
             <div class="col-lg-4 col-md-6">
                 <label for="basicpill-firstname-input" class="form-label">Customer Name : </label>
