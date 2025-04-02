@@ -26,6 +26,7 @@ use App\Http\Controllers\HRM\Employee\SeparationController;
 use App\Http\Controllers\HRM\OnBoarding\JoiningReportController;
 use App\Http\Controllers\HRM\OnBoarding\AssetAllocationController;
 use App\Http\Controllers\WorkOrderController;
+use App\Http\Controllers\WorkOrderExportController;
 use App\Http\Controllers\WOApprovalsController;
 use App\Http\Controllers\WoDocsStatusController;
 use App\Http\Controllers\WoStatusController;
@@ -454,6 +455,7 @@ Route::get('/d', function () {
     Route::resource('work-order', WorkOrderController::class)->only([
         'show','store','edit','update','create'
     ]);
+    Route::get('/export-work-orders', [WorkOrderExportController::class, 'export']);
     // Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments']);
     Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments'])->name('comments.get');
     Route::delete('/workorder/{id}', [WorkOrderController::class, 'destroy'])->name('workorder.destroy');

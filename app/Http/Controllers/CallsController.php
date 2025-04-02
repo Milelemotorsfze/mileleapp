@@ -342,7 +342,7 @@ class CallsController extends Controller
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
         $sales_persons = ModelHasRoles::where('role_id', 7)
         ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-        ->whereNot('users.id', 20)->get();
+        ->get();
         $useractivities =  New UserActivities();
         $useractivities->activity = "Create New Lead";
         $useractivities->users_id = Auth::id();
@@ -423,7 +423,6 @@ class CallsController extends Controller
                 $sales_persons = ModelHasRoles::where('role_id', 7)
                 ->join('users', 'model_has_roles.model_id', '=', 'users.id')
                 ->where('users.status', 'active')
-                ->whereNot('users.id', 20)
                 ->get();
 
                 $sales_person_id = null;
