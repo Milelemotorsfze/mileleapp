@@ -2703,6 +2703,7 @@ public function viewalls(Request $request)
             $query->where('model_has_roles.role_id', 7)
                   ->orWhere('model_has_roles.model_id', 17);
         })
+        ->orderBy('users.name', 'asc')
         ->get();
 $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
 ->orderBy('id', 'DESC')
@@ -3386,12 +3387,13 @@ public function availablevehicles(Request $request)
         $useractivities->save();
         // Variant detail computation
         $sales_persons = ModelHasRoles::join('users', 'model_has_roles.model_id', '=', 'users.id')
-            ->where('users.status', 'active')
-            ->where(function ($query) {
-                $query->where('model_has_roles.role_id', 7)
-                    ->orWhere('model_has_roles.model_id', 17);
-            })
-            ->get();
+        ->where('users.status', 'active')
+        ->where(function ($query) {
+            $query->where('model_has_roles.role_id', 7)
+                  ->orWhere('model_has_roles.model_id', 17);
+        })
+        ->orderBy('users.name', 'asc')
+        ->get();
 
         $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
         ->orderBy('id', 'DESC')
@@ -3573,12 +3575,13 @@ public function availablevehicles(Request $request)
         $useractivities->save();
         // Variant detail computation
         $sales_persons = ModelHasRoles::join('users', 'model_has_roles.model_id', '=', 'users.id')
-            ->where('users.status', 'active')
-            ->where(function ($query) {
-                $query->where('model_has_roles.role_id', 7)
-                    ->orWhere('model_has_roles.model_id', 17);
-            })
-            ->get();
+        ->where('users.status', 'active')
+        ->where(function ($query) {
+            $query->where('model_has_roles.role_id', 7)
+                  ->orWhere('model_has_roles.model_id', 17);
+        })
+        ->orderBy('users.name', 'asc')
+        ->get();
     
 
         $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
@@ -3759,12 +3762,13 @@ COALESCE(
         $useractivities->save();
         // Variant detail computation
         $sales_persons = ModelHasRoles::join('users', 'model_has_roles.model_id', '=', 'users.id')
-            ->where('users.status', 'active')
-            ->where(function ($query) {
-                $query->where('model_has_roles.role_id', 7)
-                    ->orWhere('model_has_roles.model_id', 17);
-            })
-            ->get();
+        ->where('users.status', 'active')
+        ->where(function ($query) {
+            $query->where('model_has_roles.role_id', 7)
+                  ->orWhere('model_has_roles.model_id', 17);
+        })
+        ->orderBy('users.name', 'asc')
+        ->get();
         $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
         ->orderBy('id', 'DESC')
         ->whereNot('category', 'Modified')
