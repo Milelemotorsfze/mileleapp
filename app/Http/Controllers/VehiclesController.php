@@ -2697,10 +2697,11 @@ public function viewalls(Request $request)
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         // Variant detail computation
-        $sales_persons = ModelHasRoles::where('role_id', 7)
-        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-        ->where('users.status', 'active')
-        ->get();
+        $sales_persons = User::select('id', 'name') 
+            ->where('manual_lead_assign', 1)
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
 $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
 ->orderBy('id', 'DESC')
 ->whereNot('category', 'Modified')
@@ -3382,10 +3383,12 @@ public function availablevehicles(Request $request)
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         // Variant detail computation
-        $sales_persons = ModelHasRoles::where('role_id', 7)
-        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-        ->where('users.status', 'active')
-        ->get();
+        $sales_persons = User::select('id', 'name') 
+            ->where('manual_lead_assign', 1)
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
+
         $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
         ->orderBy('id', 'DESC')
         ->whereNot('category', 'Modified')
@@ -3565,10 +3568,11 @@ public function availablevehicles(Request $request)
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         // Variant detail computation
-        $sales_persons = ModelHasRoles::where('role_id', 7)
-        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-        ->where('users.status', 'active')
-        ->get();
+        $sales_persons = User::select('id', 'name') 
+            ->where('manual_lead_assign', 1)
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
         $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
         ->orderBy('id', 'DESC')
         ->whereNot('category', 'Modified')
@@ -3746,10 +3750,11 @@ COALESCE(
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         // Variant detail computation
-        $sales_persons = ModelHasRoles::where('role_id', 7)
-        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-        ->where('users.status', 'active')
-        ->get();
+        $sales_persons = User::select('id', 'name') 
+            ->where('manual_lead_assign', 1)
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
         $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
         ->orderBy('id', 'DESC')
         ->whereNot('category', 'Modified')

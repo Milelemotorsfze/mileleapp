@@ -703,9 +703,11 @@ class CallsController extends Controller
         $strategy = Strategy::get();
         $currentStrategyName = optional(Strategy::find($calls->strategies_id))->name;
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
-        $sales_persons = User::where('manual_lead_assign', 1)
-        ->orderBy('name', 'asc')
-        ->get();
+        $sales_persons = User::select('id', 'name') 
+            ->where('manual_lead_assign', 1)
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
         $useractivities =  New UserActivities();
         $useractivities->activity = "Open Edit Page of Leads";
         $useractivities->users_id = Auth::id();
