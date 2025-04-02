@@ -181,7 +181,7 @@
     </thead>
     <tbody>
     @php
-    $incomingvehicless = DB::table('vehicles')->where('payment_status', 'Incoming Stock')->whereNull('grn_id')->count();
+    $incomingvehicless = DB::table('vehicles')->where('payment_status', 'Incoming Stock')->whereNull('movement_grn_id')->count();
     @endphp
 	<tr>
         <td style="font-size: 12px;">
@@ -260,7 +260,7 @@ $countpendingsinspectionso = DB::table('vehicles')
                         </thead>
                         <tbody>
 						@php
-    $incomingvehicless = DB::table('vehicles')->where('payment_status', 'Incoming Stock')->whereNull('grn_id')->count();
+    $incomingvehicless = DB::table('vehicles')->where('payment_status', 'Incoming Stock')->whereNull('movement_grn_id')->count();
     @endphp
                             <tr  onclick="window.location.href = '{{ route('vehiclesincoming.stock') }}'">
                                 <td style="font-size: 12px;">
@@ -291,7 +291,7 @@ $countpendingsinspectionso = DB::table('vehicles')
     </thead>
     <tbody>
     @php
-    $incomingvehicless = DB::table('vehicles')->where('payment_status', 'Incoming Stock')->whereNull('grn_id')->count();
+    $incomingvehicless = DB::table('vehicles')->where('payment_status', 'Incoming Stock')->whereNull('movement_grn_id')->count();
     @endphp
 	<tr>
         <td style="font-size: 12px;">
@@ -306,7 +306,7 @@ $countpendingsinspectionso = DB::table('vehicles')
         @foreach ($warehousessold as $warehousessold)
         @php
         $pendinggrnnetsuilt = DB::table('vehicles')->where('latest_location', $warehousessold->id)
-        ->whereNotNull('grn_id')
+        ->whereNotNull('movement_grn_id')
 		    ->whereNull('netsuit_grn_number')
         ->count();
         @endphp
@@ -337,7 +337,7 @@ $countpendingsinspectionso = DB::table('vehicles')
     </thead>
     <tbody>
     @php
-    $incomingvehicless = DB::table('vehicles')->where('payment_status', 'Incoming Stock')->whereNull('grn_id')->count();
+    $incomingvehicless = DB::table('vehicles')->where('payment_status', 'Incoming Stock')->whereNull('movement_grn_id')->count();
     @endphp
 	<tr>
         <td style="font-size: 12px;">
@@ -352,7 +352,7 @@ $countpendingsinspectionso = DB::table('vehicles')
         @foreach ($warehousesveh as $warehousesveh)
         @php
         $pendinginspection = DB::table('vehicles')->where('latest_location', $warehousesveh->id)
-            ->whereNotNull('grn_id')
+            ->whereNotNull('movement_grn_id')
             ->whereNull('inspection_date')
             ->count();
         @endphp
@@ -428,7 +428,7 @@ $countpendingsinspectionso = DB::table('vehicles')
     </thead>
     <tbody>
     @php
-    $incomingvehicless = DB::table('vehicles')->where('payment_status', 'Incoming Stock')->whereNull('grn_id')->count();
+    $incomingvehicless = DB::table('vehicles')->where('payment_status', 'Incoming Stock')->whereNull('movement_grn_id')->count();
     @endphp
     <tr style="background-color: yellow !important;">
         <td style="font-size: 12px;">
@@ -437,7 +437,7 @@ $countpendingsinspectionso = DB::table('vehicles')
         @foreach ($warehousesveh as $warehousesveh)
         @php
         $pendinginspection = DB::table('vehicles')->where('latest_location', $warehousesveh->id)
-            ->whereNotNull('grn_id')
+            ->whereNotNull('movement_grn_id')
             ->whereNull('inspection_date')
             ->count();
         @endphp
@@ -819,7 +819,7 @@ Clear Filters
                                      $name = $variants->name;
 
                                      }
-                                     $grn = $vehicles->movement_grn_id ? DB::table('grn')->where('id', $vehicles->movement_grn_id)->first() : null;
+                                     $grn = $vehicles->movement_grn_id ? DB::table('movement_grns')->where('id', $vehicles->movement_grn_id)->first() : null;
                                      $grn_date = $grn ? $grn->date : null;
                                      $grn_number = $grn ? $grn->grn_number : null;
                                      $gdn = $vehicles->gdn_id ? DB::table('gdn')->where('id', $vehicles->gdn_id)->first() : null;

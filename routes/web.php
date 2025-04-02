@@ -769,9 +769,9 @@ Route::get('/d', function () {
     Route::get('/vehicles/getVehicleDetails', [VehiclesController::class, 'getVehicleDetails'])->name('vehicles.getVehicleDetails');
 
     Route::get('vehiclesde/{id}', [VehiclesController::class, 'deletes'])->name('vehiclesde.deletes');
-    Route::get('grnlist/netsuitgrn', [MovementController::class, 'grnlist'])->name('grnlist.create');
+    Route::get('grnlist/netsuitgrn', [MovementController::class, 'grnlist'])->name('grnlist.create'); // not using anywhere
     Route::get('grnlist/grnsimplefile', [MovementController::class,'grnsimplefile'])->name('grnlist.grnsimplefile');
-    Route::post('grnlist/post-file', [MovementController::class, 'grnfilepost'])->name('grnlist.grnfilepost');
+    Route::post('grnlist/post-file', [MovementController::class, 'grnfilepost'])->name('grnlist.grnfilepost'); // not using anywhere
     Route::post('/check-create-vins', [PurchasingOrderController::class, 'checkcreatevins'])->name('vehicles.check-create-vins');
     Route::post('/check-create-vins-inside', [PurchasingOrderController::class, 'checkcreatevinsinside'])->name('vehicles.check-create-vins-inside');
     Route::patch('/check-edit-vins', [PurchasingOrderController::class, 'checkeditvins'])->name('vehicles.check-edit-vins');

@@ -626,7 +626,7 @@ public function grnfilepost(Request $request)
             $grnNumber = $row[2];
             $vehicle = Vehicles::where('vin', $vin)->first();
             if ($vehicle) {
-                $grn = grn::find($vehicle->movement_grn_id);
+                $grn = MovementGrn::find($vehicle->movement_grn_id);
                 if ($grn) {
                     $grn->date = $grnDate;
                     $grn->save();
@@ -853,7 +853,7 @@ public function uploadVinFile(Request $request)
             //         //   ->orWhereNotNull('inspection_date');
             // })
             // ->where('status', '!=', 'cancel')
-            ->whereNull($hasPermission ? 'grn_id' : 'gdn_id')
+            ->whereNull($hasPermission ? 'movement_grn_id' : 'gdn_id')
             ->where('status', '=', 'Approved');
 
         $vehicles = $query->get()->keyBy('vin'); // Retrieve vehicles and key them by VIN

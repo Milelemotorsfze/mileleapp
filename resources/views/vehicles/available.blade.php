@@ -1094,17 +1094,17 @@ if (hasManagementPermission) {
         {
             targets: 1,
             render: function (data, type, row) {
-                if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id == null) {
+                if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.movement_grn_id == null) {
                     return 'Incoming';
-                } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id != null) {
+                } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.movement_grn_id != null) {
                     return 'Pending Inspection';
                 } else if (row.inspection_date != null && row.so_id == null && (row.reservation_end_date == null || new Date(row.reservation_end_date) < now)) {
                     return 'Available Stock';
                   } else if (row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) >= now ) {
                     return 'Booked';
-                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.grn_id != null) {
+                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.movement_grn_id != null) {
                     return 'Sold';
-                } else if (row.inspection_date != null && row.gdn_id != null && row.grn_id != null) {
+                } else if (row.inspection_date != null && row.gdn_id != null && row.movement_grn_id != null) {
                     return 'Delivered';
                 } else {
                     return '';

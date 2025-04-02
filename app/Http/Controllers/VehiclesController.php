@@ -927,8 +927,10 @@ class VehiclesController extends Controller
             ->whereExists(function ($query) use ($startDate, $endDate) {
                 $query->select(DB::raw(1))
                     ->from('movement_grns')
+                    ->join('movements_reference', 'movements_reference.id', '=', 'movement_grns.movement_reference_id') 
                     ->whereColumn('movement_grns.id', '=', 'vehicles.movement_grn_id')
-                    ->whereBetween('grn.date', [$startDate, $endDate]);
+                    ->whereBetween('movements_reference.date', [$startDateLastMonth, $endDateLastMonth]);
+                    // ->whereBetween('grn.date', [$startDate, $endDate]);
             })
             ->paginate(100);
 
@@ -942,9 +944,10 @@ class VehiclesController extends Controller
         $data = \Illuminate\Support\Facades\DB::table('vehicles')
             ->whereExists(function ($query) use ($startDateLastMonth, $endDateLastMonth) {
                 $query->select(DB::raw(1))
-                    ->from('grn')
-                    ->whereColumn('grn.id', '=', 'vehicles.grn_id')
-                    ->whereBetween('grn.date', [$startDateLastMonth, $endDateLastMonth]);
+                    ->from('movement_grns')
+                    ->join('movements_reference', 'movements_reference.id', '=', 'movement_grns.movement_reference_id') 
+                    ->whereColumn('movement_grns.id', '=', 'vehicles.movement_grn_id')
+                    ->whereBetween('movements_reference.date', [$startDateLastMonth, $endDateLastMonth]);
             })
             ->paginate(100);
 
@@ -956,9 +959,12 @@ class VehiclesController extends Controller
         $data = \Illuminate\Support\Facades\DB::table('vehicles')
             ->whereExists(function ($query) use ($yesterday) {
                 $query->select(DB::raw(1))
-                    ->from('grn')
-                    ->whereColumn('grn.id', '=', 'vehicles.grn_id')
-                    ->whereDate('grn.date', $yesterday);
+                    // ->from('grn')
+                    // ->whereColumn('grn.id', '=', 'vehicles.grn_id')
+                    ->from('movement_grns')
+                    ->join('movements_reference', 'movements_reference.id', '=', 'movement_grns.movement_reference_id') 
+                    ->whereColumn('movement_grns.id', '=', 'vehicles.movement_grn_id')
+                    ->whereDate('movements_reference.date', $yesterday);
             })
             ->paginate(100);
 
@@ -1155,7 +1161,7 @@ class VehiclesController extends Controller
             $statuss = "Approved";
             $data = Vehicles::where('status', $statuss)
             ->where('latest_location', $warehouseId)
-            ->whereNotNull('grn_id')
+            ->whereNotNull('movement_grn_id')
             ->whereNull('inspection_date');
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             if ($hasEditSOPermission) {
@@ -1198,7 +1204,7 @@ class VehiclesController extends Controller
         if ($hasPermission) {
             $statuss = "Approved";
             $data = Vehicles::where('status', $statuss)
-            ->whereNull('grn_id')
+            ->whereNull('movement_grn_id')
             ->whereNull('gdn_id');
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             if ($hasEditSOPermission) {
@@ -2265,7 +2271,7 @@ class VehiclesController extends Controller
             $statuss = "Approved";
             $data = Vehicles::where('status', $statuss)
             ->where('latest_location', $warehouseId)
-            ->whereNotNull('grn_id')
+            ->whereNotNull('movement_grn_id')
 		    ->whereNull('netsuit_grn_number');
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             if ($hasEditSOPermission) {
@@ -2609,7 +2615,7 @@ public function viewalls(Request $request)
                 }
             }
         }
-        $vehicles = $query->select('id', 'status', 'vin', 'latest_location', 'ex_colour', 'int_colour','varaints_id', 'so_id', 'purchasing_order_id', 'grn_id', 'gdn_id', 'documents_id', 'estimation_date', 'inspection_date', 'grn_remark', 'qc_remarks', 'reservation_start_date', 'reservation_start_date', 'pdi_date', 'pdi_remarks', 'conversion', 'engine', 'extra_features', 'ppmmyyy', 'territory', 'price' )->skip($offset)->take($length)->get();
+        $vehicles = $query->select('id', 'status', 'vin', 'latest_location', 'ex_colour', 'int_colour','varaints_id', 'so_id', 'purchasing_order_id', 'grn_id','movement_grn_id', 'gdn_id', 'documents_id', 'estimation_date', 'inspection_date', 'grn_remark', 'qc_remarks', 'reservation_start_date', 'reservation_start_date', 'pdi_date', 'pdi_remarks', 'conversion', 'engine', 'extra_features', 'ppmmyyy', 'territory', 'price' )->skip($offset)->take($length)->get();
             $modifiedVehicles = $vehicles->map(function ($vehicle) {
             $vehicle->so_number = $vehicle->so ? $vehicle->so->so_number : '';
             $vehicle->so_date = $vehicle->so ? $vehicle->so->so_date : '';
@@ -2650,8 +2656,8 @@ public function viewalls(Request $request)
     }
     public function getUpdatedVehicle($id)
     {
-        $query = Vehicles::with(['So', 'PurchasingOrder', 'Grn', 'Gdn', 'variant', 'document', 'warehouse', 'interior', 'exterior', 'variant.brand', 'variant.master_model_lines', 'So.salesperson', 'latestRemarkSales', 'latestRemarkWarehouse'])
-            ->select('id', 'status', 'vin', 'latest_location', 'ex_colour', 'int_colour', 'varaints_id', 'so_id', 'purchasing_order_id', 'grn_id', 'gdn_id', 'documents_id', 'estimation_date', 'netsuit_grn_number', 'netsuit_grn_date', 'inspection_date', 'grn_remark', 'qc_remarks', 'reservation_start_date', 'reservation_start_date', 'pdi_date', 'pdi_remarks', 'conversion', 'engine', 'extra_features', 'ppmmyyy', 'territory', 'price')
+        $query = Vehicles::with(['So', 'PurchasingOrder', 'Grn', 'Gdn','MovementGrn', 'variant', 'document', 'warehouse', 'interior', 'exterior', 'variant.brand', 'variant.master_model_lines', 'So.salesperson', 'latestRemarkSales', 'latestRemarkWarehouse'])
+            ->select('id', 'status', 'vin', 'latest_location', 'ex_colour', 'int_colour', 'varaints_id', 'so_id', 'purchasing_order_id', 'grn_id','movement_grn_id', 'gdn_id', 'documents_id', 'estimation_date', 'netsuit_grn_number', 'netsuit_grn_date', 'inspection_date', 'grn_remark', 'qc_remarks', 'reservation_start_date', 'reservation_start_date', 'pdi_date', 'pdi_remarks', 'conversion', 'engine', 'extra_features', 'ppmmyyy', 'territory', 'price')
             ->where('id', $id);
 
         $vehicle = $query->first();
