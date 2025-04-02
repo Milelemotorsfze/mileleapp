@@ -202,12 +202,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <select name="sales_person_id" id="salesPersonSelect" class="form-control select2" multiple>
                     <option value="">Select Sales Person</option>
                     @foreach ($sales_persons as $sales_person)
-                    @php
-                    $sales_person_details = DB::table('users')->where('id', $sales_person->model_id)->first();
-                    $sales_person_name = $sales_person_details->name;
-                    @endphp
-                    <option value="{{ $sales_person->model_id }}" {{ old('sales_person_id') == $sales_person->model_id ? 'selected' : '' }}>
-                        {{ $sales_person_name }}
+                    <option value="{{ $sales_person->id }}" {{ old('sales_person_id') == $sales_person->id ? 'selected' : '' }}>
+                        {{ $sales_person->name }}
                     </option>
                     @endforeach
                 </select>

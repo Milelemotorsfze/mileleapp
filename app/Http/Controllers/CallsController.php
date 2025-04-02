@@ -341,8 +341,8 @@ class CallsController extends Controller
         $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
         $strategy = Strategy::get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
-        $sales_persons = ModelHasRoles::where('role_id', 7)
-        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+        $sales_persons = User::where('manual_lead_assign', 1)
+        ->orderBy('name', 'asc')
         ->get();
         $useractivities =  New UserActivities();
         $useractivities->activity = "Create New Lead";
@@ -703,7 +703,9 @@ class CallsController extends Controller
         $strategy = Strategy::get();
         $currentStrategyName = optional(Strategy::find($calls->strategies_id))->name;
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
-        $sales_persons = ModelHasRoles::where('role_id', 7)->get();
+        $sales_persons = User::where('manual_lead_assign', 1)
+        ->orderBy('name', 'asc')
+        ->get();
         $useractivities =  New UserActivities();
         $useractivities->activity = "Open Edit Page of Leads";
         $useractivities->users_id = Auth::id();
