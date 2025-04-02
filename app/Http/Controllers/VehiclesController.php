@@ -13,6 +13,7 @@ use App\Models\WordpressPostMeta;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Brand;
 use App\Models\Grn;
+use App\Models\Movement;
 use App\Models\MovementGrn;
 use App\Models\Gdn;
 use App\Models\Document;
@@ -46,6 +47,7 @@ class VehiclesController extends Controller
      */
     public function index(Request $request)
     {
+
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
         if ($hasPermission) {
             $statuss = "Approved";
@@ -323,7 +325,7 @@ class VehiclesController extends Controller
                                             }
                                             else{
                                                     // Find the purchasing_order_id based on the po_number
-                                                    $grn = Grn::where('grn_number', 'LIKE', '%' . trim($grn_number) . '%')->first();
+                                                    $grn = MovementGrn::where('grn_number', 'LIKE', '%' . trim($grn_number) . '%')->first();
                                                     if ($grn) {
                                                         $query->orWhere('movement_grn_id', $grn->id);
                                                     }
@@ -2407,7 +2409,7 @@ public function viewalls(Request $request)
         $offset = $request->input('offset', 0);
         $length = $request->input('length', 40);
         $searchParams = $request->input('columns', []);
-        $query = Vehicles::with(['So', 'PurchasingOrder', 'Grn', 'Gdn', 'variant', 'document', 'warehouse', 'interior', 'exterior', 'variant.brand', 'variant.master_model_lines', 'So.salesperson', 'latestRemarkSales', 'latestRemarkWarehouse'])->where(function ($subQuery) {
+        $query = Vehicles::with(['So', 'PurchasingOrder', 'Grn','movementGrn', 'Gdn', 'variant', 'document', 'warehouse', 'interior', 'exterior', 'variant.brand', 'variant.master_model_lines', 'So.salesperson', 'latestRemarkSales', 'latestRemarkWarehouse'])->where(function ($subQuery) {
             $subQuery->where('status', 'Approved')
                      ->whereNull('gdn_id');
             $subQuery->orWhereHas('Gdn', function ($gdnSubQuery) {
@@ -3990,7 +3992,7 @@ COALESCE(
         $variant = Varaint::where('name', $additionalData )->first();
         if ($so) {
             $gdnCount = Vehicles::where('so_id', $so->id)->where('varaints_id', $variant->id)->whereNotNull('gdn_id')->count();
-            info($gdnCount);
+            // info($gdnCount);
             if ($gdnCount) {
                 return response()->json([
                     'exists' => true,
@@ -3999,5 +4001,15 @@ COALESCE(
             }
         }
         return response()->json(['exists' => false]);
-    }    
+    }   
+    public function Grnlist(Request $request) {
+
+        $grns = Movement::select('id','vin','reference_id','movement_grn_id')
+        ->with(['movementGrn:id,grn_number'])
+        ->whereHas('MovementGrn', function($query) {
+            $query->select('id','grn_number')->whereNotNull('grn_number');
+        })->get();
+
+        return view('grn_list.index', compact('grns'));
     }
+}

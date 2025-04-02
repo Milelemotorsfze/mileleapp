@@ -526,11 +526,7 @@ Route::get('/d', function () {
     Route::get('companyDomains', [CompanyDomainController::class, 'index'])->name('companyDomains.index');    
 
     // GRN List 
-    Route::get('/grn-list', function () {
-        $grns = Grn::with('vehicles')->get();
-        return view('grn_list.index', compact('grns'));
-    })->name('grn.index');   
-    
+    Route::get('/grn-list', [VehiclesController::class, 'Grnlist'])->name('grn.index');   
     // Demand & Planning Module
 
     // Demands
