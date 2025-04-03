@@ -21,6 +21,7 @@ use App\Models\DepartmentNotifications;
 use App\Models\VinChange;
 use Carbon\CarbonTimeZone;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\Log;
 use App\Models\PurchasingOrder;
 use Illuminate\Http\Request;
@@ -241,12 +242,11 @@ class MovementController extends Controller
         $request->validate([
             'vin' => 'required',
         ]);
-        // all vin should exist in the system, 
 
-       
-        DB::beginTransaction();    
-        info($request->all());
+        DB::beginTransaction(); 
+
         try{
+
             $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
             $currentDateTime = Carbon::now($dubaiTimeZone);
             $vin = $request->input('vin');
@@ -262,7 +262,7 @@ class MovementController extends Controller
             foreach ($vin as $index => $vehicleVin) {
                 $vehicle = Vehicles::where('vin', $vehicleVin)
                                 ->where('status', 'Approved')
-                                ->whereNull($hasPermission ? 'movement_grn_id' : 'gdn_id')
+                                // ->whereNull($hasPermission ? 'movement_grn_id' : 'gdn_id')
                                 ->first();
                 if(!$vehicle) {
                     $vinNotExist[] = $vehicleVin;
@@ -276,7 +276,9 @@ class MovementController extends Controller
                 if ($isExist) {
                     $fromLocation = Warehouse::find($from);
                     $toLocation = Warehouse::find($to);
-                    $uniqueCombinations[] = "Movement for VIN: $vin, From: $fromLocation->name , To: $toLocation->name is already done in the system.";
+                    $from = $fromLocation->name ?? '';
+                    $to = $toLocation->name ?? '';
+                    $uniqueCombinations[] = "Movement for VIN: $vin, From: $from , To: $to is already done in the system.";
                 }
             }
 
@@ -293,25 +295,26 @@ class MovementController extends Controller
                     [$vin, $from, $to] = explode('|', $key);
                     $fromLocation = Warehouse::find($from);
                     $toLocation = Warehouse::find($to);
-                    $duplicateCombinations[] = "Duplicate entry found for VIN: $vin, From: $fromLocation->name, To: $toLocation->name";
+                    $from = $fromLocation->name ?? '';
+                    $to = $toLocation->name ?? '';
+                    $duplicateCombinations[] = "Duplicate entry found for VIN: $vin, From: $from, To: $to";
                 }
             }
             
             if (count($duplicateCombinations) > 0) {
+                dd("duplicate error");
                 return redirect()->back()->withErrors($duplicateCombinations);
             }
           
             if(count($vinNotExist) > 0) {
+                dd("2");
                 return redirect()->back()->with('error', 'Some of the VIN is not exist in system, please update this vin to create the movement');
             }
             if(count($uniqueCombinations) > 0) {
+                dd("3");
                 return redirect()->back()->with('error', 'Some movement is already done in the same location'.$uniqueCombinations);
             }
 
-            // duplicate data checking
-
-            
-            return 1;
            
         // foreach ($vin as $index => $value) {
         //     if (array_key_exists($index, $from) && array_key_exists($index, $to)) {
@@ -440,7 +443,7 @@ class MovementController extends Controller
                     $vehicleslog->save();
                 }
             }
-            $newvin = $request->input('newvin');
+            // $newvin = $request->input('newvin');
             $vin = $request->input('vin');
 
             $movementVehicleByPurchaseOrders = Vehicles::select('vin','purchasing_order_id')->whereIn('vin', $grnVins)
@@ -486,41 +489,43 @@ class MovementController extends Controller
             }
 
         }
-        if($newvin){
-            foreach ($newvin as $index => $value) {
-                if ($value !== null && $value !== '' && isset($vin[$index])) {
-                    $vehicle = Vehicles::where('vin', $vin[$index])->first();
-                    $movements = Movement::where('vin', $value)->first();
-                    if ($vehicle) {
-                        $vinchange = New VinChange();
-                        $vinchange->old_vin = $vehicle->vin;
-                        $vinchange->new_vin = $value;
-                        $vinchange->vehicles_id = $vehicle->id;
-                        $vinchange->movements_id = $movements->id;
-                        $vinchange->created_by = auth()->user()->id;
-                        $vinchange->save();
-                        $vehicleslog = new Vehicleslog();
-                        $vehicleslog->time = $currentDateTime->toTimeString();
-                        $vehicleslog->date = $currentDateTime->toDateString();
-                        $vehicleslog->status = 'VIN Change';
-                        $vehicleslog->vehicles_id = $vehicle->id;
-                        $vehicleslog->field = "VIN Change";
-                        $vehicleslog->old_value = $vehicle->vin;
-                        $vehicleslog->new_value = $value;
-                        $vehicleslog->created_by = auth()->user()->id;
-                        $vehicleslog->save();
-                        $updatevin = Vehicles::find($vehicle->id);
-                        $updatevin->vin = $value;
-                        $updatevin->save();
-                    }
-                }
-            }
-        }   
+        // if($newvin){
+        //     foreach ($newvin as $index => $value) {
+        //         if ($value !== null && $value !== '' && isset($vin[$index])) {
+        //             $vehicle = Vehicles::where('vin', $vin[$index])->first();
+        //             $movements = Movement::where('vin', $value)->first();
+        //             if ($vehicle) {
+        //                 $vinchange = New VinChange();
+        //                 $vinchange->old_vin = $vehicle->vin;
+        //                 $vinchange->new_vin = $value;
+        //                 $vinchange->vehicles_id = $vehicle->id;
+        //                 $vinchange->movements_id = $movements->id;
+        //                 $vinchange->created_by = auth()->user()->id;
+        //                 $vinchange->save();
+        //                 $vehicleslog = new Vehicleslog();
+        //                 $vehicleslog->time = $currentDateTime->toTimeString();
+        //                 $vehicleslog->date = $currentDateTime->toDateString();
+        //                 $vehicleslog->status = 'VIN Change';
+        //                 $vehicleslog->vehicles_id = $vehicle->id;
+        //                 $vehicleslog->field = "VIN Change";
+        //                 $vehicleslog->old_value = $vehicle->vin;
+        //                 $vehicleslog->new_value = $value;
+        //                 $vehicleslog->created_by = auth()->user()->id;
+        //                 $vehicleslog->save();
+        //                 $updatevin = Vehicles::find($vehicle->id);
+        //                 $updatevin->vin = $value;
+        //                 $updatevin->save();
+        //             }
+        //         }
+        //     }
+        // } 
+          
         (new UserActivityController)->createActivity('Movement Created');
         DB::commit();
-        return redirect()->back()->with('success', 'Transition has been successfully Saved!');
+        return redirect()->back()->with('success', 'Movement has been successfully Saved!');
     } catch (\Exception $e) {
         DB::rollBack(); 
+     
         Log::error('Movement Creation Failed', ['error' => $e->getMessage()]);
 
         return response()->view('errors.generic', [], 500); // Return a 500 error page
@@ -578,16 +583,26 @@ class MovementController extends Controller
     }
     public function vehiclesdetails(Request $request)
     {
+
+    info($request->all());
     $vin = $request->input('vin');
     $vehicle = Vehicles::where('vin', $vin)->first();
-    $variant = Varaint::find($vehicle->varaints_id)->name;
-    $modelLine = MasterModelLines::find($vehicle->variant->master_model_lines_id)->model_line;
-    $po_number = PurchasingOrder::find($vehicle->purchasing_order_id)->po_number;
-    $so_number = $vehicle->so_id ? So::find($vehicle->so_id)->so_number : '';
-    $brand = Brand::find($vehicle->variant->brands_id)->brand_name;
+    info($vehicle);
+    $variant = Varaint::find($vehicle->varaints_id)->first();
+    $modelLine = MasterModelLines::find($vehicle->variant->master_model_lines_id)->first();
+    $po_number = PurchasingOrder::find($vehicle->purchasing_order_id)->first();
+    
+    $so_number = '';
+    if($vehicle->so_id) {
+        $so_number = So::find($vehicle->so_id)->first();
+        $so_number = $so_number->so_number ?? '';
+    }
+
+    $brand = Brand::find($vehicle->variant->brands_id)->first();
     $ownership_type = $vehicle->ownership_type;
     $movement = Movement::where('vin', $vin)->pluck('to')->last();
     $warehouseName = Warehouse::where('id', $movement)->pluck('id')->first();
+
     if (empty($warehouseName)) {
         if($vehicle->latest_location){
         $warehouseName = Warehouse::where('id', $vehicle->latest_location)->pluck('id')->first();
@@ -597,13 +612,13 @@ class MovementController extends Controller
         }
         }
     return response()->json([
-        'variant' => $variant,
-        'brand' => $brand,
+        'variant' => $variant->name ?? '',
+        'brand' => $brand->brand_name ?? '',
         'ownership_type' => $ownership_type,
         'movement' => $warehouseName,
-        'po_number' => $po_number,
+        'po_number' => $po_number->po_number ?? '',
         'so_number' => $so_number,
-        'modelLine' => $modelLine
+        'modelLine' => $modelLine->model_line ?? ''
     ]);
     }
     public function vehiclesdetailsaspo(Request $request)
@@ -906,7 +921,6 @@ public function uploadVinFile(Request $request)
         // Prepare vehicle details in the same order as vinData
         $vehicleDetails = [];
         foreach ($vinData as $entry) {
-            info($entry);
             $vin = $entry['vin'];
             $toWarehouse = $entry['to'];
             $ownership_type = $entry['ownership_type'];
@@ -941,7 +955,6 @@ public function uploadVinFile(Request $request)
             }
         }
 
-        info($vehicleDetails);
 
         return response()->json(['success' => true, 'vehicleDetails' => $vehicleDetails]);
     } else {
@@ -950,8 +963,7 @@ public function uploadVinFile(Request $request)
     }
 
     public function checkDuplicateMovement(Request $request) {
-        info($request->all());
-        info("test function");
+      
         $combined = [];
         $duplicateCombinations = [];
         $vin = $request->vin;
@@ -968,7 +980,9 @@ public function uploadVinFile(Request $request)
                 [$vin, $from, $to] = explode('|', $key);
                 $fromLocation = Warehouse::find($from);
                 $toLocation = Warehouse::find($to);
-                $duplicateCombinations[] = "Duplicate entry found for VIN: $vin, From: $fromLocation->name , To: $toLocation->name";
+                $from = $fromLocation->name ?? '';
+                $to = $$toLocation->name ?? '';
+                $duplicateCombinations[] = "VIN: $vin, From: $from, To: $to.";
             }
         }
         

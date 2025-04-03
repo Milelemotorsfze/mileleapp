@@ -2831,18 +2831,19 @@ foreach ($variants as $variant) {
                         'gdn.gdn_number',
                         'bp.name as bpn',
                         'sp.name as spn',
+                        DB::raw("DATE_FORMAT(work_orders.date, '%Y-%m-%d') as work_order_date"),
                         DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
                         'so.so_date',
-                        'grn.date',
+                        'movements_reference.date',
                         'gdn.date as gdndate',
                         DB::raw("
-    COALESCE(
-        (SELECT FORMAT(CAST(cost AS UNSIGNED), 0) FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
-        (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
-        ''
-    ) as costprice,
-    (SELECT netsuite_link FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1) as netsuite_link
-")
+                        COALESCE(
+                            (SELECT FORMAT(CAST(cost AS UNSIGNED), 0) FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
+                            (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
+                            ''
+                        ) as costprice,
+                        (SELECT netsuite_link FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1) as netsuite_link
+                    ")
 
                     ])
                     ->leftJoin('w_o_vehicles', 'vehicles.id', '=', 'w_o_vehicles.vehicle_id')
@@ -3693,10 +3694,10 @@ public function availablevehicles(Request $request)
                     'movement_grns.grn_number',
                     'gdn.gdn_number',
                     'users.name',
-                    DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
                     'so.so_date',
                     'movements_reference.date',
                     DB::raw("DATE_FORMAT(work_orders.date, '%Y-%m-%d') as work_order_date"),
+                    DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
                     'gdn.date as gdndate',
                     DB::raw("
                     COALESCE(
@@ -3882,9 +3883,10 @@ public function availablevehicles(Request $request)
                     'gdn.gdn_number',
                     'users.name',
                     DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
-                   'so.so_date',
+                    'so.so_date',
                     'movements_reference.date',
                     'gdn.date as gdndate',
+                    DB::raw("DATE_FORMAT(work_orders.date, '%Y-%m-%d') as work_order_date"),
                     DB::raw("COALESCE(
                         (SELECT FORMAT(CAST(cost AS UNSIGNED), 0) FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
                         (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),

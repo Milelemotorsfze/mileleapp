@@ -1,5 +1,10 @@
 @extends('layouts.main')
 @section('content')
+<style>
+    .is-invalid.invalid-feedback {
+    margin-top: 10px;
+}
+</style>
 @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-daily-movemnets');
     @endphp
@@ -36,22 +41,20 @@
                 </ul>
             </div>
         @endif
-        @if(session('success'))
-    <div class="alert alert-success" id="success-message">
-        {{ session('success') }}
-    </div>
+        @if (Session::has('error'))
+            <div class="alert alert-danger" >
+                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                {{ Session::get('error') }}
+            </div>
+        @endif
+        @if (Session::has('success'))
+            <div class="alert alert-success" id="success-alert">
+                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                {{ Session::get('success') }}
+            </div>
+        @endif
 
-    <script>
-        // Set a timeout to remove the success message after 5 seconds
-        setTimeout(function() {
-            var successMessage = document.getElementById('success-message');
-            if (successMessage) {
-                successMessage.style.display = 'none';
-            }
-        }, 5000); // 5000 milliseconds = 5 seconds
-    </script>
-    @endif
-        <form id="form-create" action="{{ route('movement.store') }}" method="POST" >
+        <form id="formCreate" action="{{ route('movement.store') }}" method="POST"  enctype="multipart/form-data" >
         @csrf
         <div class="row">
         <div class="col-lg-2 col-md-6">
@@ -65,7 +68,7 @@
         <div class="col-lg-2 col-md-6">
         <div class="form-group">
     <label for="vin_file">Upload VIN File:</label>
-    <input type="file" id="vin_file" class="form-control" accept=".csv, .txt" />
+    <input type="file" id="vin_file" name="file" class="form-control" />
 </div>
 <br>
 <button id="upload-vin-button" class="btn btn-primary">Upload VIN File</button>
@@ -148,7 +151,7 @@
         </div>
         </br>
         <div class="col-lg-12 col-md-12">
-        <input type="submit" name="submit" value="Submit" id="btn-submit" class="btn btn-success btncenter" />
+        <input type="submit" value="Submit" id="btn-submit" class="btn btn-success btncenter" />
     </div>
 </form>
 		</br>
@@ -226,7 +229,7 @@
                 <div class="col-lg-1 col-md-6">
                     <div class="d-flex align-items-center">
                         <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
-                        <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                        <button type="button" class="btn btn-danger btn-sm remove-row-btn "><i class="fa fa-times"></i></button>
                     </div>
                     </div>
                 </div>
@@ -236,6 +239,8 @@
             $('#to' + row).select2();
         });
         $('#rows-container').on('change', '.vin', function() {
+            let id = $(this).attr('id');
+            $('#'+id+"-error").remove();
             var selectedVin = $(this).val();
             var row = $(this).closest('.row').data('row');
             var brandField = $('#brand' + row);
@@ -629,64 +634,106 @@
             $(this).closest(".row").remove();
         });
     }
+    $("#formCreate").validate({
+            ignore: [],
+            rules: {
+                "vin[]": {
+                    required: true
+                },
+                file: {
+                    extension: "csv",
+                },
+            },
+            messages: {
+                file: {
+                    extension: "Please upload file in .csv format "
+                },
+                
+            },
+            
+        });
+
+        $.validator.prototype.checkForm = function (){
+            this.prepareForm();
+            for ( var i = 0, elements = (this.currentElements = this.elements()); elements[i]; i++ ) {
+                if (this.findByName( elements[i].name ).length != undefined && this.findByName( elements[i].name ).length > 1) {
+                    for (var cnt = 0; cnt < this.findByName( elements[i].name ).length; cnt++) {
+                        this.check( this.findByName( elements[i].name )[cnt] );
+                    }
+                }
+                else {
+                    this.check( elements[i] );
+                }
+            }
+            return this.valid();
+        };
 
     $('#btn-submit').click(function (e) {
         e.preventDefault();
-        let formValid = true;
+      
         let vinArray = [];
         let fromArray = [];
         let toArray = [];
-        console.log("test");
-        $("input[name='vin[]']").each(function () {
-            vinArray.push($(this).val());
-        });
-        if(vinArray.length <= 0) {
-            $("select[name='vin[]']").each(function () {
-                let vinValue = $(this).val();
-                vinArray.push(vinValue);
+            $("input[name='vin[]']").each(function () {
+                vinArray.push($(this).val());
             });
-        }
-        $("input[name='from[]']").each(function () {
-            fromArray.push($(this).val());
-        });
-        $("select[name='to[]']").each(function () {
-            toArray.push($(this).val());
-        });
+            if(vinArray.length <= 0) {
+                $("select[name='vin[]']").each(function () {
+                    let vinValue = $(this).val();
+                    vinArray.push(vinValue);
+                });
+            }
+            $("input[name='from[]']").each(function () {
+                fromArray.push($(this).val());
+            });
+            $("select[name='to[]']").each(function () {
+                toArray.push($(this).val());
+            });
+        if($("#formCreate").valid()) {
 
-        console.log(vinArray);
-        console.log(fromArray);
-        console.log(toArray);
-
-        let url = '{{ route('movement.unique-check') }}';
+            let url = '{{ route('movement.unique-check') }}';
             $.ajax({
                 type:"POST",
                 url: url, 
+                headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // CSRF token for security
+                },
                 data: {
                     vin: vinArray,
                     from: fromArray,
                     to: toArray,
+
                 },
                 success: function(data) {
-                    console.log(data);
                  if(data.length > 0) {
-                    e.preventDefault();
-                    let message = "The following duplicate entries were found:\n\n";
-            
-                    // Loop through each duplicate entry and format the message
+                    
+                    let message = "The following duplicate entries were found:<br>";
                     data.forEach(function(duplicate) {
-                        message += duplicate + "\n";
+                        message += duplicate + "<br>";
                     });
                     alertify.confirm(message,function (e) {
                     }).set({title:"Invalid Data"});
+                    
                     return false;
                  }else{
-                    $('#form-create').unbind('submit').submit();
-                 }
-
+                        document.getElementById("formCreate").submit();
+                    }
+                },
+                error: function (xhr, status, error) {
+                console.log("Error:", error);
+                alert("An error occurred. Please try again.");
                 }
-        });
+            });
+       }else{
+        console.log("Form validation failed");
+       }
+       
     });
+
+   
 });
+
+
 </script>
 @else
     @php
