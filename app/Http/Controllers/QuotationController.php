@@ -470,7 +470,7 @@ class QuotationController extends Controller
     public function pdfMerge($quotationId)
     {
         info("pdf merge");
-        info($qoutationId);
+        info($quotationId);
         $quotation = Quotation::find($quotationId);
         $filename = 'quotation_'.$quotationId.'.pdf';
 
