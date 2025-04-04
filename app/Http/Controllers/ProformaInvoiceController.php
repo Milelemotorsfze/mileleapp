@@ -489,6 +489,8 @@ class ProformaInvoiceController extends Controller {
 
         $filePath = public_path('Quotations/quotation_attachment_withparty_documents.pdf');
             info(public_path('Quotations/quotation_attachment_withparty_documents.pdf'));
+            info("asset path");
+            info(asset('Quotations/quotation_attachment_withparty_documents.pdf'));
             if (file_exists($filePath)) {
                 // File exists, proceed with logic
 
