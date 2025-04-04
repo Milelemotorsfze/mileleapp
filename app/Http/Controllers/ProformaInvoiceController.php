@@ -518,7 +518,11 @@ class ProformaInvoiceController extends Controller {
         $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
         $usd_to_eru_rate = Setting::where('key', 'usd_to_euro_convertion_rate')->first();
-        $sales_persons = ModelHasRoles::where('role_id', 7)->get();
+        $sales_persons = ModelHasRoles::with('user')->where('role_id', 7)
+                            ->orwhereHas('user', function($query) {
+                                $query->where('id', 17);
+                            })
+                            ->get();
         $existingItemsJson = json_encode($quotationitems);
         return view('proforma.invoice_edit', compact('callDetails', 'brands','assessoriesDesc',
             'sparePartsDesc','kitsDesc','shippings','certifications','countries','shippingPorts',
