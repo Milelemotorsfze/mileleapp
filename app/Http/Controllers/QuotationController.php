@@ -481,7 +481,7 @@ class QuotationController extends Controller
         if($quotation->third_party_payment === "Yes")
         {
             info(" add sales contract");
-            $files[] = 'https://ferozriaz.com/Quotations/quotation_attachment_documents.pdf';
+            $files[] = public_path('Quotations/quotation_attachment_documents.pdf');
         }
         else
         {
