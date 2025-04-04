@@ -478,7 +478,7 @@ class QuotationController extends Controller
         $files[] = 'Quotations/'.$filename;
         if($quotation->third_party_payment === "Yes")
         {
-            $files[] = public_path('Quotations/quotation_attachment_withparty_documents.pdf');
+            $files[] = 'https://ferozriaz.com/Quotations/quotation_attachment_documents_test.pdf';
         }
         else
         {
