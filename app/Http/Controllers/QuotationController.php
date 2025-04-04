@@ -469,6 +469,8 @@ class QuotationController extends Controller
     }
     public function pdfMerge($quotationId)
     {
+        info("pdf merge");
+        info($qoutationId);
         $quotation = Quotation::find($quotationId);
         $filename = 'quotation_'.$quotationId.'.pdf';
 
@@ -478,12 +480,14 @@ class QuotationController extends Controller
         $files[] = 'Quotations/'.$filename;
         if($quotation->third_party_payment === "Yes")
         {
+            info(" add sales contract");
             $files[] = 'https://ferozriaz.com/Quotations/quotation_attachment_documents_test.pdf';
         }
         else
         {
             $files[] = 'Quotations/quotation_attachment_documents.pdf';
         }
+        info($files);
         foreach ($files as $file) {
             $pageCount = $pdf->setSourceFile($file);
             for ($i=0; $i < $pageCount; $i++)
@@ -1008,7 +1012,7 @@ class QuotationController extends Controller
         $directory = public_path('storage/quotation_files');
         \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
         $pdfFile->save($generatedPdfDirectory . '/' . $filename);
-        
+        info($quotation->id);
         $pdf = $this->pdfMerge($quotation->id);
         $file = 'Quotation_'.$quotation->id.'_'.date('Y_m_d_H_i_s').'.pdf';
         $pdf->Output($directory.'/'.$file,'F');
