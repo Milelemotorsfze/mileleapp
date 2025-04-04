@@ -89,7 +89,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-questionnair
 		{{ Session::get('success') }}
 	</div>
 	@endif
-	<!-- {!! Form::open(array('route' => 'calls.store','method'=>'POST', 'id' => 'calls')) !!} -->
 	@include('hrm.hiring.hiring_request.details')
 	<div class="row">
 		<p><span style="float:right;" class="error">* Required Field</span></p>
