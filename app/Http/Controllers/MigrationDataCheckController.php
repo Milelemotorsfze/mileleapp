@@ -49,12 +49,12 @@ class MigrationDataCheckController extends Controller
     //    return $movements;
         foreach($movements as $movement) {
             $grnVins = Movement::where('from',1)->where('reference_id',$movement->reference_id)->pluck('vin')->toArray();
-            $movementVehicleByPurchaseOrders = Vehicles::select('vin','purchasing_order_id')->whereIn('vin', $grnVins)
+            $movementVehicleByPurchaseOrders = Vehicles::whereIn('vin', $grnVins)
             ->groupBy('purchasing_order_id')
             ->get();
             info("grnvin");
             info($grnVins);
-            info("po");
+            info("po ids");
             info($movementVehicleByPurchaseOrders);
 
             foreach($movementVehicleByPurchaseOrders as $movementVehicleByPurchaseOrder) {
@@ -64,20 +64,22 @@ class MigrationDataCheckController extends Controller
                 $movementgrn->save();
                 // update this movement grn id against the vin in movement table
                 
-                    $mov = Movement::where('vin', $movementVehicleByPurchaseOrder->vin)
-                                ->where('reference_id', $movement->reference_id)->first();
+                    $mov =  MovementGrn::where('purchase_order_id', $movementVehicleByPurchaseOrder->purchasing_order_id)
+                                ->where('movement_reference_id', $movement->reference_id)->first();
                                 info($mov->id);
-                    if($mov) {
-                       info($mov);
-                        $mov->movement_grn_id = $movementgrn->id;
-                        $mov->save();
+                                // get the movement data under particular po and particular movement with vins
+                    $vindata =  Vehicles::whereIn('vin', $grnVins)
+                                     ->where('purchasing_order_id', $movementVehicleByPurchaseOrder->purchasing_order_id)
+                                     ->pluck('vin')->toArray();
+                                
+                    if($vindata) {
+                       info($vindata);
+                       Movement::whereIn('vin', $vindata)->update(['movement_grn_id' => $movementgrn->id]);
+                     
 
                         // update movementgrnid in vehicle table under this po with this movement
-                        $vehicle = Vehicles::where('vin', $movementVehicleByPurchaseOrder->vin)->first();
-                        if($vehicle) {
-                            $vehicle->movement_grn_id =  $movementgrn->id;
-                            $vehicle->save();
-                        }
+                        $vehicle = Vehicles::whereIn('vin', $vindata)->update(['movement_grn_id' => $movementgrn->id]);
+                       
                 }else{
                     info("not existing movement");
                     info($movement->reference_id);
