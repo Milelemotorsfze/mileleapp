@@ -478,7 +478,7 @@ class QuotationController extends Controller
         $files[] = 'Quotations/'.$filename;
         if($quotation->third_party_payment === "Yes")
         {
-            $files[] = 'Quotations/quotation_attachment_withparty_documents.pdf';
+            $files[] = public_path('Quotations/quotation_attachment_withparty_documents.pdf');
         }
         else
         {
@@ -1008,6 +1008,7 @@ class QuotationController extends Controller
         $directory = public_path('storage/quotation_files');
         \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
         $pdfFile->save($generatedPdfDirectory . '/' . $filename);
+        
         $pdf = $this->pdfMerge($quotation->id);
         $file = 'Quotation_'.$quotation->id.'_'.date('Y_m_d_H_i_s').'.pdf';
         $pdf->Output($directory.'/'.$file,'F');
