@@ -470,7 +470,7 @@ class QuotationController extends Controller
     public function pdfMerge($quotationId)
     {
         info("pdf merge");
-        info($quotationId);
+        info($qoutationId);
         $quotation = Quotation::find($quotationId);
         $filename = 'quotation_'.$quotationId.'.pdf';
 
@@ -481,7 +481,7 @@ class QuotationController extends Controller
         if($quotation->third_party_payment === "Yes")
         {
             info(" add sales contract");
-            $files[] = 'https://ferozriaz.com/Quotations/quotation_attachment_documents_test.pdf';
+            $files[] = 'https://ferozriaz.com/Quotations/quotation_attachment_documents.pdf';
         }
         else
         {
