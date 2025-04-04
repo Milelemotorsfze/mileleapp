@@ -48,7 +48,11 @@ class ProformaInvoiceController extends Controller {
         $kitsDesc = AddonDescription::whereHas('Addon', function($q) {
             $q->where('addon_type','K');
         })->get();
-        $sales_persons = ModelHasRoles::where('role_id', 7)->get();
+        $sales_persons = ModelHasRoles::with('user')->where('role_id', 7)
+                ->orwhereHas('user', function($query) {
+                    $query->where('id', 17);
+                })
+                ->get();
         $countries = Country::all();
         $shippingPorts = MasterShippingPorts::all();
         $shippings = ShippingMedium::all();
