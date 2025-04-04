@@ -486,6 +486,21 @@ class ProformaInvoiceController extends Controller {
     }
     }
     public function proforma_invoice_edit($callId) {
+
+        $filePath = public_path('Quotations/quotation_attachment_withparty_documents.pdf');
+ 
+            if (file_exists($filePath)) {
+                // File exists, proceed with logic
+
+                info('File exists');
+            } else {
+
+                // File does not exist
+                info('File not found');
+
+            }
+ 
+
         $quotation = Quotation::where('calls_id', $callId)->first();
         $salespersoncalls = Calls::where('id', $callId)->first();
         $currentUser = Auth::user();
