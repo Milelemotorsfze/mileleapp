@@ -302,16 +302,16 @@ class MovementController extends Controller
             }
             
             if (count($duplicateCombinations) > 0) {
-                dd("duplicate error");
+             
                 return redirect()->back()->withErrors($duplicateCombinations);
             }
           
             if(count($vinNotExist) > 0) {
-                dd("2");
+               
                 return redirect()->back()->with('error', 'Some of the VIN is not exist in system, please update this vin to create the movement');
             }
             if(count($uniqueCombinations) > 0) {
-                dd("3");
+              
                 return redirect()->back()->with('error', 'Some movement is already done in the same location'.$uniqueCombinations);
             }
 

@@ -27,6 +27,9 @@ use App\Models\ModifiedVariants;
 use App\Models\MasterModelDescription;
 use App\Models\WOVehicles;
 use App\Models\Vehicles;
+use App\Models\Movement;
+use App\Models\MovementGrn;
+use App\Models\MovementsReference;
 
 use Illuminate\Http\Request;
 
@@ -37,7 +40,66 @@ class MigrationDataCheckController extends Controller
       */
     public function index(Request $request)
     {
-       
+       // get all the grn vins groupby referenceid
+      $movements = Movement::where('from',1)
+       ->groupBy('reference_id')
+       ->get();
+        info("movement group by referece id");
+        info($movements);
+    //    return $movements;
+        foreach($movements as $movement) {
+            $grnVins = Movement::where('from',1)->where('reference_id',$movement->reference_id)->pluck('vin')->toArray();
+            $movementVehicleByPurchaseOrders = Vehicles::select('vin','purchasing_order_id')->whereIn('vin', $grnVins)
+            ->groupBy('purchasing_order_id')
+            ->get();
+            info("grnvin");
+            info($grnVins);
+            info("po");
+            info($movementVehicleByPurchaseOrders);
+
+            foreach($movementVehicleByPurchaseOrders as $movementVehicleByPurchaseOrder) {
+                $movementgrn = new MovementGrn();
+                $movementgrn->movement_reference_id = $movement->reference_id;
+                $movementgrn->purchase_order_id = $movementVehicleByPurchaseOrder->purchasing_order_id ?? '';
+                $movementgrn->save();
+                // update this movement grn id against the vin in movement table
+                
+                    $mov = Movement::where('vin', $movementVehicleByPurchaseOrder->vin)
+                                ->where('reference_id', $movement->reference_id)->first();
+                                info($mov->id);
+                    if($mov) {
+                       info($mov);
+                        $mov->movement_grn_id = $movementgrn->id;
+                        $mov->save();
+
+                        // update movementgrnid in vehicle table under this po with this movement
+                        $vehicle = Vehicles::where('vin', $movementVehicleByPurchaseOrder->vin)->first();
+                        if($vehicle) {
+                            $vehicle->movement_grn_id =  $movementgrn->id;
+                            $vehicle->save();
+                        }
+                }else{
+                    info("not existing movement");
+                    info($movement->reference_id);
+                    info($movementVehicleByPurchaseOrder->vin);
+                }
+                
+            }
+             
+        }
+
+        return 1;
+    //    $movementVehicleByPurchaseOrders = Vehicles::select('vin','purchasing_order_id')->whereIn('vin', $grnVins)
+    //    ->groupBy('purchasing_order_id')
+    //    ->get();
+
+    //     foreach($movementVehicleByPurchaseOrders as $movementVehicleByPurchaseOrder) {
+    //     $movementgrn = new MovementGrn();
+    //     $movementgrn->movement_reference_id = $movementsReferenceId;
+    //     $movementgrn->purchase_order_id = $movementVehicleByPurchaseOrder->purchasing_order_id ?? '';
+    //     $movementgrn->save();
+    //     }
+
     }
 
     public function PFIUniqueWithinYear() {
