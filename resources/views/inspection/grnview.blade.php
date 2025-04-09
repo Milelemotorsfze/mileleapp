@@ -223,8 +223,8 @@
                     table1.ajax.reload();
                     table2.ajax.reload();
                 },
-                error: function(xhr) {
-                    alert('An error occurred. Please try again.');
+                error: function(response) {
+                    alert(response.responseJSON.message);
                 }
             });
         });

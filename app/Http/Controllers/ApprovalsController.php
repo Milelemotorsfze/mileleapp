@@ -1495,6 +1495,14 @@ public function submitGrn(Request $request)
         // Retrieve the GRN record by grn_id in the vehicle record
         // take data from Movement GRN table to update the GRN Numebr
         // $grnRecord = Grn::find($vehicle->grn_id);
+        $isGrnNumberExist = MovementGrn::where('grn_number', $request->grn)->first();
+        if($isGrnNumberExist) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This GRN Number is already existing in system',
+            ], 422);
+        }
+
         $grnRecord = MovementGrn::find($vehicle->movement_grn_id);
         if (!$grnRecord) {
             return response()->json([
@@ -1502,6 +1510,7 @@ public function submitGrn(Request $request)
                 'message' => 'GRN record not found',
             ], 404);
         }
+
         // Update the GRN record with the new GRN number
         $grnRecord->grn_number = $request->grn;
         $grnRecord->save();
