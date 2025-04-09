@@ -37,6 +37,7 @@ use App\Models\VariantItems;
 use Carbon\CarbonTimeZone;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class VehiclesController extends Controller
 {
@@ -3163,6 +3164,7 @@ public function allvariantprice(Request $request)
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
                 ->wherenotnull('vehicles.int_colour')
+                ->wherenotnull('vehicles.ex_colour')
                 ->groupBy('varaints.name', 'int_color.name', 'ex_color.name');
                 return DataTables::of($data)
         ->editColumn('price', function($data) {
@@ -3177,13 +3179,21 @@ public function allvariantprice(Request $request)
     }
     public function allvariantpriceupdate(Request $request)
 {
+    info($request->all());
 // Validate the incoming request
-$request->validate([
-    'varaints_id' => 'required|integer|exists:varaints,id',
-    'field' => 'required|string|in:price,gp,minimum_commission',
-    'value' => 'required|string'
-]);
+$validator = Validator::make($request->all(), [
+        'varaints_id' => 'required|integer|exists:varaints,id',
+        'field' => 'required|string|in:price,gp,minimum_commission',
+        'value' => 'required|string'
+        ],
+        ['value.required' => 'The price is required']);
 
+if ($validator->fails()) {
+    return response()->json([
+        'success' => false,
+        'errors' => $validator->errors(),
+    ], 422);
+}
 // Find the vehicle by varaints_id, and optionally by int_colour and ex_colour
 $query = Vehicles::where('varaints_id', $request->varaints_id);
 
@@ -3195,36 +3205,40 @@ if (!empty($request->ex_colour)) {
     $query->where('ex_colour', $request->ex_colour);
 }
 
-$vehicle = $query->first();
+$vehicles = $query->get();
 
-if (!$vehicle) {
-    return response()->json(['error' => 'Vehicle not found'], 404);
-}
-$oldValue = $vehicle->{$request->field};
-$field = $request->field;
-$value = $request->value;
-if ($field == 'price') {
-    $value = str_replace(',', '', $value);
-}
-if ($field == 'minimum_commission') {
-    $value = str_replace(',', '', $value);
-}
-$vehicle->$field = $value;
-$vehicle->save();
-$currentDateTime = Carbon::now();
-$vehicleslog = new Vehicleslog();
-$vehicleslog->time = $currentDateTime->toTimeString();
-$vehicleslog->date = $currentDateTime->toDateString();
-$vehicleslog->status = 'Update Vehicles Selling Price / GP';
-$vehicleslog->vehicles_id = $vehicle->id;
-$vehicleslog->field = $field;
-$vehicleslog->old_value = $oldValue;
-$vehicleslog->new_value = $value;
-$vehicleslog->category = "Sales";
-$vehicleslog->created_by = auth()->user()->id;
-$vehicleslog->role = Auth::user()->selectedRole;
-$vehicleslog->save();
-return response()->json(['success' => 'Vehicle updated successfully']);
+    if ($vehicles->count() <= 0) {
+        return response()->json(['error' => 'Vehicle not found'], 404);
+    }
+
+    foreach($vehicles as $vehicle) {
+        $oldValue = $vehicle->{$request->field};
+        $field = $request->field;
+        $value = $request->value;
+        if ($field == 'price') {
+            $value = str_replace(',', '', $value);
+        }
+        if ($field == 'minimum_commission') {
+            $value = str_replace(',', '', $value);
+        }
+        $vehicle->$field = $value ?? 0;
+        $vehicle->save();
+        $currentDateTime = Carbon::now();
+        $vehicleslog = new Vehicleslog();
+        $vehicleslog->time = $currentDateTime->toTimeString();
+        $vehicleslog->date = $currentDateTime->toDateString();
+        $vehicleslog->status = 'Update Vehicles Selling Price / GP';
+        $vehicleslog->vehicles_id = $vehicle->id;
+        $vehicleslog->field = $field;
+        $vehicleslog->old_value = $oldValue;
+        $vehicleslog->new_value = $value;
+        $vehicleslog->category = "Sales";
+        $vehicleslog->created_by = auth()->user()->id;
+        $vehicleslog->role = Auth::user()->selectedRole;
+        $vehicleslog->save();
+    }
+    
+    return response()->json(['success' => 'Vehicle updated successfully']);
     }
     public function custominspectionupdate(Request $request)
     {
