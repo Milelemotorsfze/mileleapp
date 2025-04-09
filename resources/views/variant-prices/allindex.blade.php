@@ -233,11 +233,11 @@
                 errorMessages += errors[field].join(', ') + '\n';
             }
             var confirm = alertify.confirm(''+errorMessages+'',function (e) {
-            }).set({title:"Validation Error:"});
+            }).set({title:"Validation Error"});
             table.ajax.reload(null, false);
         } else {
             var confirm = alertify.confirm('Something went wrong',function (e) {
-            }).set({title:"Something went wrong:"});
+            }).set({title:"Something went wrong"});
             table.ajax.reload(null, false);
         }
             console.log('Error:', xhr.responseText);
