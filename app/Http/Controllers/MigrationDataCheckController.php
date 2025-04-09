@@ -130,20 +130,7 @@ class MigrationDataCheckController extends Controller
 //         return 1;
 
         // get all intColur
-        $notExist = [];
-      $vehicles =   Vehicles::all();
-      foreach($vehicles as $vehicle) {
-       
-       $isExist = ColorCode::find($vehicle->int_colour);
-       info($vehicle->int_colour);
-       if(empty($isExist)) {
-        info("not exist");
-        $notExist[] = $vehicle->int_colour;
-       }
-      }
-
-    return $notExist;
-
+     
     }
 
     public function PFIUniqueWithinYear() {

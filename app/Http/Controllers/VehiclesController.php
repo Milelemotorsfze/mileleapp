@@ -3158,14 +3158,13 @@ public function allvariantprice(Request $request)
                     'int_color.name as interior_color',
                     'ex_color.name as exterior_color',
                 ])
-                ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
-                ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+                ->Join('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+                ->Join('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                ->wherenotnull('vehicles.int_colour')
-                ->wherenotnull('vehicles.ex_colour')
                 ->groupBy('varaints.name', 'int_color.name', 'ex_color.name');
+          
                 return DataTables::of($data)
         ->editColumn('price', function($data) {
             return number_format($data->price, 0, '.', ',');
