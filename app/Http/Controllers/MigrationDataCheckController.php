@@ -29,6 +29,7 @@ use App\Models\ModifiedVariants;
 use App\Models\MasterModelDescription;
 use App\Models\WOVehicles;
 use App\Models\Vehicles;
+use App\Models\ColorCode;
 
 use Illuminate\Http\Request;
 
@@ -127,6 +128,22 @@ class MigrationDataCheckController extends Controller
 //         info($varaintModelSpecNotExist);
 
 //         return 1;
+
+        // get all intColur
+        $notExist = [];
+      $vehicles =   Vehicles::all();
+      foreach($vehicles as $vehicle) {
+       
+       $isExist = ColorCode::find($vehicle->int_colour);
+       info($vehicle->int_colour);
+       if(empty($isExist)) {
+        info("not exist");
+        $notExist[] = $vehicle->int_colour;
+       }
+      }
+
+    return $notExist;
+
     }
 
     public function PFIUniqueWithinYear() {
