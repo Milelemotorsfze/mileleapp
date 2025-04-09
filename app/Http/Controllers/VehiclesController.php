@@ -3185,7 +3185,7 @@ $validator = Validator::make($request->all(), [
         'field' => 'required|string|in:price,gp,minimum_commission',
         'value' => 'required|string'
         ],
-        ['value.required' => 'The price is required']);
+        ['value.required' => 'Valid amount value is required']);
 
 if ($validator->fails()) {
     return response()->json([
