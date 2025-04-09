@@ -3145,14 +3145,6 @@ public function allvariantprice(Request $request)
                     'vehicles.ex_colour',
                     'vehicles.price',
                     'varaints.name',
-                    'varaints.model_detail',
-                    'varaints.detail',
-                    'varaints.seat',
-                    'varaints.upholestry',
-                    'varaints.steering',
-                    'varaints.my',
-                    'varaints.fuel_type',
-                    'varaints.gearbox',
                     'master_model_lines.model_line',
                     'int_color.name as interior_color',
                     'ex_color.name as exterior_color',
@@ -3162,7 +3154,7 @@ public function allvariantprice(Request $request)
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                ->groupBy('varaints.name', 'int_color.name', 'ex_color.name');
+                ->groupBy('varaints.id', 'int_color.id', 'ex_color.id');
           
                 return DataTables::of($data)
         ->editColumn('price', function($data) {
