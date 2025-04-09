@@ -1732,8 +1732,9 @@ public function checkcreatevins(Request $request)
         return response()->json('unique');
     }
     public function updatepurchasingData(Request $request)
-{
-
+    {
+        info("test update");
+        info($request->all());
     $updatedData = $request->json()->all();
     $updatedVins = [];
     foreach ($updatedData as $data) {
@@ -1742,9 +1743,29 @@ public function checkcreatevins(Request $request)
         $fieldValue = $data['value'];
         $vehicle = Vehicles::find($vehicleId);
         if ($vehicle) {
+            // make the price null and update the price with latest combination;
             $oldValues = $vehicle->getAttributes();
             $vehicle->setAttribute($fieldName, $fieldValue);
             $vehicle->save();
+                
+            if($fieldName == 'int_colour' || $fieldName == 'ex_colour') {
+                $vehicle->price = NULL;
+                $vehicle->save();
+
+                $vehicleWithSellingPrice = Vehicles::where('varaints_id',$vehicle->varaints_id)
+                        ->where('int_colour', $vehicle->int_colour)
+                        ->where('ex_colour', $vehicle->ex_colour)
+                        ->whereNotNull('price')
+                        ->first();
+   
+                if($vehicleWithSellingPrice) {
+                   $vehicle->price = $vehicleWithSellingPrice->price;
+                   $vehicle->save();
+                }
+   
+            }
+            // get the similar vehicle cprice
+
             $changes = [];
             foreach ($oldValues as $field => $oldValue) {
                 if ($field !== 'created_at' && $field !== 'updated_at') {
@@ -1788,6 +1809,7 @@ public function checkcreatevins(Request $request)
                         $oldvalue = $oldval ? $oldval->name : "";
                         $newval = ColorCode::find($change['new_value']);
                         $namevalue = $newval->name;
+                        // check the 
                     } elseif ($field == 'ex_colour') {
                         $newfield = "Exterior Colour";
                         $oldval = ColorCode::find($change['old_value']);

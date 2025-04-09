@@ -210,39 +210,41 @@
         field: fieldName,
         value: newValue
     });
-
-    $.ajax({
-        url: "{{ route('variantprices.allvariantpriceupdate') }}",
-        method: "POST",
-        data: {
-            _token: "{{ csrf_token() }}",
-            varaints_id: varaints_id,
-            int_colour: int_colour,
-            ex_colour: ex_colour,
-            field: fieldName,
-            value: newValue
-        },
-        success: function(response) {
-            table.ajax.reload(null, false); // Reload the table data
-        },
-        error: function(xhr) {
-            if (xhr.status === 422) {
-            const errors = xhr.responseJSON.errors;
-            let errorMessages = '';
-            for (let field in errors) {
-                errorMessages += errors[field].join(', ') + '\n';
+    if(newValue.length > 0) {
+        $.ajax({
+            url: "{{ route('variantprices.allvariantpriceupdate') }}",
+            method: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                varaints_id: varaints_id,
+                int_colour: int_colour,
+                ex_colour: ex_colour,
+                field: fieldName,
+                value: newValue
+            },
+            success: function(response) {
+                table.ajax.reload(null, false); // Reload the table data
+            },
+            error: function(xhr) {
+                if (xhr.status === 422) {
+                const errors = xhr.responseJSON.errors;
+                let errorMessages = '';
+                for (let field in errors) {
+                    errorMessages += errors[field].join(', ') + '\n';
+                }
+                var confirm = alertify.confirm(''+errorMessages+'',function (e) {
+                }).set({title:"Validation Error"});
+                table.ajax.reload(null, false);
+            } else {
+                var confirm = alertify.confirm('Something went wrong',function (e) {
+                }).set({title:"Something went wrong"});
+                table.ajax.reload(null, false);
             }
-            var confirm = alertify.confirm(''+errorMessages+'',function (e) {
-            }).set({title:"Validation Error"});
-            table.ajax.reload(null, false);
-        } else {
-            var confirm = alertify.confirm('Something went wrong',function (e) {
-            }).set({title:"Something went wrong"});
-            table.ajax.reload(null, false);
-        }
-            console.log('Error:', xhr.responseText);
-        }
-    });
+                console.log('Error:', xhr.responseText);
+            }
+        });
+    } 
+   
 }
 
 // Handling the GP input blur event

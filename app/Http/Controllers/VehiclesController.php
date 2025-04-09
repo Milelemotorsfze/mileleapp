@@ -2772,7 +2772,6 @@ foreach ($variants as $variant) {
         if ($request->ajax()) {
             $status = $request->input('status');
             $filters = $request->input('filters', []);
-            info($filters);
             if($status === "allstock")
                 {
                     $data = Vehicles::select( [
@@ -3158,8 +3157,8 @@ public function allvariantprice(Request $request)
                     'int_color.name as interior_color',
                     'ex_color.name as exterior_color',
                 ])
-                ->Join('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
-                ->Join('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+                ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+                ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
@@ -3176,35 +3175,39 @@ public function allvariantprice(Request $request)
             }
         return view('variant-prices.allindex');
     }
-    public function allvariantpriceupdate(Request $request)
+public function allvariantpriceupdate(Request $request)
 {
-    info($request->all());
-// Validate the incoming request
-$validator = Validator::make($request->all(), [
-        'varaints_id' => 'required|integer|exists:varaints,id',
-        'field' => 'required|string|in:price,gp,minimum_commission',
-        'value' => 'required|string'
-        ],
-        ['value.required' => 'Valid amount value is required']);
+    // Validate the incoming request
+    $validator = Validator::make($request->all(), [
+            'varaints_id' => 'required|integer|exists:varaints,id',
+            'field' => 'required|string|in:price,gp,minimum_commission',
+            'value' => 'required|string'
+            ],
+            ['value.required' => 'Valid amount value is required']);
 
-if ($validator->fails()) {
-    return response()->json([
-        'success' => false,
-        'errors' => $validator->errors(),
-    ], 422);
-}
-// Find the vehicle by varaints_id, and optionally by int_colour and ex_colour
-$query = Vehicles::where('varaints_id', $request->varaints_id);
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'errors' => $validator->errors(),
+        ], 422);
+    }
+    // Find the vehicle by varaints_id, and optionally by int_colour and ex_colour
+    $query = Vehicles::where('varaints_id', $request->varaints_id);
 
-if (!empty($request->int_colour)) {
-    $query->where('int_colour', $request->int_colour);
-}
+            
+    if (!empty($request->int_colour)) {
+        $query->where('int_colour', $request->int_colour);
+    }else{
+        $query->whereNull('int_colour');
+    }
 
-if (!empty($request->ex_colour)) {
-    $query->where('ex_colour', $request->ex_colour);
-}
-
-$vehicles = $query->get();
+    if (!empty($request->ex_colour)) {
+        $query->where('ex_colour', $request->ex_colour);
+    }else{
+        $query->whereNull('ex_colour');
+    }
+    
+    $vehicles = $query->get();
 
     if ($vehicles->count() <= 0) {
         return response()->json(['error' => 'Vehicle not found'], 404);
@@ -3751,7 +3754,7 @@ COALESCE(
                 ->where('vehicles.status', 'Approved');
                 foreach ($filters as $columnName => $values) {
                     if (in_array('__NULL__', $values)) {
-                        info($columnName);
+                        // info($columnName);
                         $data->whereNull($columnName); // Filter for NULL values
                     } elseif (in_array('__Not EMPTY__', $values)) {
                         $data->whereNotNull($columnName); // Filter for non-empty values
@@ -3939,7 +3942,7 @@ COALESCE(
                 ->where('purchasing_order.is_demand_planning_po', '=', '1');
                 foreach ($filters as $columnName => $values) {
                     if (in_array('__NULL__', $values)) {
-                        info($columnName);
+                        // info($columnName);
                         $data->whereNull($columnName); // Filter for NULL values
                     } elseif (in_array('__Not EMPTY__', $values)) {
                         $data->whereNotNull($columnName); // Filter for non-empty values
@@ -4024,7 +4027,6 @@ COALESCE(
         $variant = Varaint::where('name', $additionalData )->first();
         if ($so) {
             $gdnCount = Vehicles::where('so_id', $so->id)->where('varaints_id', $variant->id)->whereNotNull('gdn_id')->count();
-            info($gdnCount);
             if ($gdnCount) {
                 return response()->json([
                     'exists' => true,
