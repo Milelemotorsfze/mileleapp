@@ -232,11 +232,13 @@
             for (let field in errors) {
                 errorMessages += errors[field].join(', ') + '\n';
             }
-            var confirm = alertify.confirm('errorMessages',function (e) {
+            var confirm = alertify.confirm(''+errorMessages+'',function (e) {
             }).set({title:"Validation Error:"});
+            table.ajax.reload(null, false);
         } else {
             var confirm = alertify.confirm('Something went wrong',function (e) {
             }).set({title:"Something went wrong:"});
+            table.ajax.reload(null, false);
         }
             console.log('Error:', xhr.responseText);
         }
