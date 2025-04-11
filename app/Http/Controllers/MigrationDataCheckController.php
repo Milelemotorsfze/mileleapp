@@ -29,6 +29,7 @@ use App\Models\ModifiedVariants;
 use App\Models\MasterModelDescription;
 use App\Models\WOVehicles;
 use App\Models\Vehicles;
+use App\Models\ColorCode;
 
 use Illuminate\Http\Request;
 
@@ -127,6 +128,9 @@ class MigrationDataCheckController extends Controller
 //         info($varaintModelSpecNotExist);
 
 //         return 1;
+
+        // get all intColur
+     
     }
 
     public function PFIUniqueWithinYear() {

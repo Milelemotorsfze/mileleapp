@@ -469,6 +469,7 @@ class QuotationController extends Controller
     }
     public function pdfMerge($quotationId)
     {
+       
         $quotation = Quotation::find($quotationId);
         $filename = 'quotation_'.$quotationId.'.pdf';
 
@@ -478,7 +479,7 @@ class QuotationController extends Controller
         $files[] = 'Quotations/'.$filename;
         if($quotation->third_party_payment === "Yes")
         {
-            $files[] = 'Quotations/quotation_attachment_withparty_documents.pdf';
+            $files[] = public_path('Quotations/quotation_attachment_documents.pdf');
         }
         else
         {
@@ -1119,13 +1120,11 @@ public function addqaddone(Request $request)
         return $shippingPorts;
     }
     public function getShippingCharges(Request $request) {
-        // info($request->from_shipping_port_id);
-        // info($request->to_shipping_port_id);
+      
         $shippingCharges =Shipping::with('shippingMedium')
                             ->where('from_port', $request->from_shipping_port_id)
                             ->where('to_port', $request->to_shipping_port_id)
                             ->get();
-                            // info($shippingCharges);               
         return $shippingCharges;
     }
     public function getvinsqoutation(Request $request)
@@ -1235,7 +1234,7 @@ public function getVehiclesvins(Request $request)
 {
     $RowId = $request->input('RowId');
     $quotationItem = QuotationItem::where('uuid', $RowId)->first();
-    // info($quotationItem);
+
     switch ($quotationItem->reference_type) {
         case 'App\Models\Varaint':
             $vehicles = Vehicles::where('varaints_id', $quotationItem->reference_id)
