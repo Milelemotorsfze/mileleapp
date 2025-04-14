@@ -2896,6 +2896,7 @@ foreach ($variants as $variant) {
     $vehicle = Vehicles::with(['interior', 'exterior'])->where('id', $vehicleId)->first();
     $grn = MovementGrn::where('id', $vehicle->movement_grn_id)->first();
     $variant = Varaint::with(['master_model_lines', 'brand'])->where('id', $vehicle->varaints_id)->first();
+    // get the data from variant request
     $variantitems = VariantItems::with(['model_specification', 'model_specification_option'])->where('varaint_id', $variant->id)->get();
     $vehicleitems = VehicleExtraItems::where('vehicle_id', $vehicleId)->get();
     $inspection = Inspection::where('vehicle_id', $vehicleId)->where('stage', 'GRN')->first();
@@ -3096,6 +3097,12 @@ private function fetchPost($variant, $exteriorColor)
     $modificationpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'Modification')->pluck('vehicle_picture_link')->first();
     $Incidentpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'Incident')->pluck('vehicle_picture_link')->first();
     $createdby = User::where('id', $inspection->created_by)->pluck('name')->first();
+    $variantitems = [];
+    if($vehicle) {
+        $variantitems = VariantItems::with(['model_specification', 'model_specification_option'])
+        ->where('varaint_id', $vehicle->varaints_id)->get();
+
+    }
     $data = [
         'inspection' => $inspection,
         'PdiInspectionData' => $PdiInspectionData,
@@ -3108,6 +3115,7 @@ private function fetchPost($variant, $exteriorColor)
         'incident' => $incident,
         'remarks' => $inspection->remarks,
         'created_by' => $createdby,
+        'variantitems' => $variantitems
     ];
 
     $pdf = PDF::loadView('Reports.pdi', $data);

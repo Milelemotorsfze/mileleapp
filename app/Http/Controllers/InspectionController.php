@@ -1189,6 +1189,7 @@ class InspectionController extends Controller
     }
     public function pdiinspectionf($id) 
     {
+       
         (new UserActivityController)->createActivity('View Edit PDI Report');
     $itemsWithQuantities = VehicleExtraItems::where('vehicle_id', $id)
             ->select('item_name', 'qty')
@@ -1200,9 +1201,15 @@ class InspectionController extends Controller
             ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
             ->join('brands', 'varaints.brands_id', '=', 'brands.id')
             ->where('vehicles.id', $id)
-            ->select('vehicles.id', 'vehicles.vin', 'vehicles.varaints_id', 'master_model_lines.model_line', 'int_color.name as int_colour_name','ex_color.name as ex_colour_name', 'brands.brand_name')
+            ->select('vehicles.id', 'vehicles.vin', 'vehicles.varaints_id', 'master_model_lines.model_line', 
+            'int_color.name as int_colour_name','ex_color.name as ex_colour_name', 'brands.brand_name','varaints.model_detail',
+            'varaints.name as variant_name', 'varaints.my','varaints.steering','varaints.steering','varaints.seat','varaints.detail',
+            'varaints.fuel_type','varaints.gearbox','vehicles.ppmmyyy')
             ->first();
-    return view('inspection.pdivehicleview', compact('itemsWithQuantities', 'vehicleDetails'));
+    $variantitems = VariantItems::with(['model_specification', 'model_specification_option'])
+                        ->where('varaint_id', $vehicleDetails->varaints_id)->get();
+           
+    return view('inspection.pdivehicleview', compact('itemsWithQuantities', 'vehicleDetails','variantitems'));
     }
     public function reinspectionspec($id) 
 {
