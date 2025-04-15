@@ -40,6 +40,7 @@ use App\Models\VariantItems;
 use Carbon\CarbonTimeZone;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class VehiclesController extends Controller
 {
@@ -2709,9 +2710,13 @@ public function viewalls(Request $request)
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         // Variant detail computation
-        $sales_persons = ModelHasRoles::where('role_id', 7)
-        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+        $sales_persons = ModelHasRoles::join('users', 'model_has_roles.model_id', '=', 'users.id')
         ->where('users.status', 'active')
+        ->where(function ($query) {
+            $query->where('model_has_roles.role_id', 7)
+                  ->orWhere('model_has_roles.model_id', 17);
+        })
+        ->orderBy('users.name', 'asc')
         ->get();
 $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
 ->orderBy('id', 'DESC')
@@ -2779,7 +2784,6 @@ foreach ($variants as $variant) {
         if ($request->ajax()) {
             $status = $request->input('status');
             $filters = $request->input('filters', []);
-            info($filters);
             if($status === "allstock")
                 {
                     $data = Vehicles::select( [
@@ -3163,14 +3167,6 @@ public function allvariantprice(Request $request)
                     'vehicles.ex_colour',
                     'vehicles.price',
                     'varaints.name',
-                    'varaints.model_detail',
-                    'varaints.detail',
-                    'varaints.seat',
-                    'varaints.upholestry',
-                    'varaints.steering',
-                    'varaints.my',
-                    'varaints.fuel_type',
-                    'varaints.gearbox',
                     'master_model_lines.model_line',
                     'int_color.name as interior_color',
                     'ex_color.name as exterior_color',
@@ -3180,8 +3176,8 @@ public function allvariantprice(Request $request)
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                ->wherenotnull('vehicles.int_colour')
-                ->groupBy('varaints.name', 'int_color.name', 'ex_color.name');
+                ->groupBy('varaints.id', 'int_color.id', 'ex_color.id');
+          
                 return DataTables::of($data)
         ->editColumn('price', function($data) {
             return number_format($data->price, 0, '.', ',');
@@ -3193,56 +3189,72 @@ public function allvariantprice(Request $request)
             }
         return view('variant-prices.allindex');
     }
-    public function allvariantpriceupdate(Request $request)
+public function allvariantpriceupdate(Request $request)
 {
-// Validate the incoming request
-$request->validate([
-    'varaints_id' => 'required|integer|exists:varaints,id',
-    'field' => 'required|string|in:price,gp,minimum_commission',
-    'value' => 'required|string'
-]);
+    // Validate the incoming request
+    $validator = Validator::make($request->all(), [
+            'varaints_id' => 'required|integer|exists:varaints,id',
+            'field' => 'required|string|in:price,gp,minimum_commission',
+            'value' => 'required|string'
+            ],
+            ['value.required' => 'Valid amount value is required']);
 
-// Find the vehicle by varaints_id, and optionally by int_colour and ex_colour
-$query = Vehicles::where('varaints_id', $request->varaints_id);
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'errors' => $validator->errors(),
+        ], 422);
+    }
+    // Find the vehicle by varaints_id, and optionally by int_colour and ex_colour
+    $query = Vehicles::where('varaints_id', $request->varaints_id);
 
-if (!empty($request->int_colour)) {
-    $query->where('int_colour', $request->int_colour);
-}
+            
+    if (!empty($request->int_colour)) {
+        $query->where('int_colour', $request->int_colour);
+    }else{
+        $query->whereNull('int_colour');
+    }
 
-if (!empty($request->ex_colour)) {
-    $query->where('ex_colour', $request->ex_colour);
-}
+    if (!empty($request->ex_colour)) {
+        $query->where('ex_colour', $request->ex_colour);
+    }else{
+        $query->whereNull('ex_colour');
+    }
+    
+    $vehicles = $query->get();
 
-$vehicle = $query->first();
+    if ($vehicles->count() <= 0) {
+        return response()->json(['error' => 'Vehicle not found'], 404);
+    }
 
-if (!$vehicle) {
-    return response()->json(['error' => 'Vehicle not found'], 404);
-}
-$oldValue = $vehicle->{$request->field};
-$field = $request->field;
-$value = $request->value;
-if ($field == 'price') {
-    $value = str_replace(',', '', $value);
-}
-if ($field == 'minimum_commission') {
-    $value = str_replace(',', '', $value);
-}
-$vehicle->$field = $value;
-$vehicle->save();
-$currentDateTime = Carbon::now();
-$vehicleslog = new Vehicleslog();
-$vehicleslog->time = $currentDateTime->toTimeString();
-$vehicleslog->date = $currentDateTime->toDateString();
-$vehicleslog->status = 'Update Vehicles Selling Price / GP';
-$vehicleslog->vehicles_id = $vehicle->id;
-$vehicleslog->field = $field;
-$vehicleslog->old_value = $oldValue;
-$vehicleslog->new_value = $value;
-$vehicleslog->category = "Sales";
-$vehicleslog->created_by = auth()->user()->id;
-$vehicleslog->role = Auth::user()->selectedRole;
-$vehicleslog->save();
-return response()->json(['success' => 'Vehicle updated successfully']);
+    foreach($vehicles as $vehicle) {
+        $oldValue = $vehicle->{$request->field};
+        $field = $request->field;
+        $value = $request->value;
+        if ($field == 'price') {
+            $value = str_replace(',', '', $value);
+        }
+        if ($field == 'minimum_commission') {
+            $value = str_replace(',', '', $value);
+        }
+        $vehicle->$field = $value ?? 0;
+        $vehicle->save();
+        $currentDateTime = Carbon::now();
+        $vehicleslog = new Vehicleslog();
+        $vehicleslog->time = $currentDateTime->toTimeString();
+        $vehicleslog->date = $currentDateTime->toDateString();
+        $vehicleslog->status = 'Update Vehicles Selling Price / GP';
+        $vehicleslog->vehicles_id = $vehicle->id;
+        $vehicleslog->field = $field;
+        $vehicleslog->old_value = $oldValue;
+        $vehicleslog->new_value = $value;
+        $vehicleslog->category = "Sales";
+        $vehicleslog->created_by = auth()->user()->id;
+        $vehicleslog->role = Auth::user()->selectedRole;
+        $vehicleslog->save();
+    }
+    
+    return response()->json(['success' => 'Vehicle updated successfully']);
     }
     public function custominspectionupdate(Request $request)
     {
@@ -3404,10 +3416,15 @@ public function availablevehicles(Request $request)
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         // Variant detail computation
-        $sales_persons = ModelHasRoles::where('role_id', 7)
-        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+        $sales_persons = ModelHasRoles::join('users', 'model_has_roles.model_id', '=', 'users.id')
         ->where('users.status', 'active')
+        ->where(function ($query) {
+            $query->where('model_has_roles.role_id', 7)
+                  ->orWhere('model_has_roles.model_id', 17);
+        })
+        ->orderBy('users.name', 'asc')
         ->get();
+
         $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
         ->orderBy('id', 'DESC')
         ->whereNot('category', 'Modified')
@@ -3588,10 +3605,16 @@ public function availablevehicles(Request $request)
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         // Variant detail computation
-        $sales_persons = ModelHasRoles::where('role_id', 7)
-        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+        $sales_persons = ModelHasRoles::join('users', 'model_has_roles.model_id', '=', 'users.id')
         ->where('users.status', 'active')
+        ->where(function ($query) {
+            $query->where('model_has_roles.role_id', 7)
+                  ->orWhere('model_has_roles.model_id', 17);
+        })
+        ->orderBy('users.name', 'asc')
         ->get();
+    
+
         $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
         ->orderBy('id', 'DESC')
         ->whereNot('category', 'Modified')
@@ -3748,7 +3771,7 @@ public function availablevehicles(Request $request)
                 ->where('vehicles.status', 'Approved');
                 foreach ($filters as $columnName => $values) {
                     if (in_array('__NULL__', $values)) {
-                        info($columnName);
+                        // info($columnName);
                         $data->whereNull($columnName); // Filter for NULL values
                     } elseif (in_array('__Not EMPTY__', $values)) {
                         $data->whereNotNull($columnName); // Filter for non-empty values
@@ -3771,9 +3794,13 @@ public function availablevehicles(Request $request)
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         // Variant detail computation
-        $sales_persons = ModelHasRoles::where('role_id', 7)
-        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+        $sales_persons = ModelHasRoles::join('users', 'model_has_roles.model_id', '=', 'users.id')
         ->where('users.status', 'active')
+        ->where(function ($query) {
+            $query->where('model_has_roles.role_id', 7)
+                  ->orWhere('model_has_roles.model_id', 17);
+        })
+        ->orderBy('users.name', 'asc')
         ->get();
         $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
         ->orderBy('id', 'DESC')
@@ -3933,7 +3960,7 @@ public function availablevehicles(Request $request)
                 ->where('purchasing_order.is_demand_planning_po', '=', '1');
                 foreach ($filters as $columnName => $values) {
                     if (in_array('__NULL__', $values)) {
-                        info($columnName);
+                        // info($columnName);
                         $data->whereNull($columnName); // Filter for NULL values
                     } elseif (in_array('__Not EMPTY__', $values)) {
                         $data->whereNotNull($columnName); // Filter for non-empty values

@@ -348,7 +348,9 @@ class SalesOrderController extends Controller
         {
             $quotation = Quotation::where('calls_id', $id)->first();
             $calls = Calls::find($id);
+
             $sodetails = So::where('quotation_id', $quotation->id)->first();
+           
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') 
                  || Auth::user()->hasPermissionForSelectedRole('sales-view');
             $soitems = Soitems::with('vehicle') // Ensure that vehicle is eager loaded
@@ -379,12 +381,13 @@ class SalesOrderController extends Controller
                             // Apply gdn_id condition only if so_id is not the same
                             $query->whereNull('gdn_id');
                         })
-                        ->when(!$hasPermission, function ($query) {
-                            $query->where(function ($subQuery) {
+                        ->when(!$hasPermission, function ($query) use($sodetails){
+                            $query->where(function ($subQuery) use($sodetails) {
                                 $subQuery->whereNull('booking_person_id')
                                          ->orWhere('booking_person_id', $sodetails->sales_person_id);
                             });
                         })->get()->toArray();
+                      
                         $vehicles[$item->id] = $variantVehicles;
                         break;
                     case 'App\Models\MasterModelLines':
@@ -403,8 +406,8 @@ class SalesOrderController extends Controller
                                 // Apply gdn_id condition only if so_id is not the same
                                 $query->whereNull('gdn_id');
                             })
-                            ->when(!$hasPermission, function ($query) {
-                                $query->where(function ($subQuery) {
+                            ->when(!$hasPermission, function ($query) use($sodetails) {
+                                $query->where(function ($subQuery) use($sodetails){
                                     $subQuery->whereNull('booking_person_id')
                                              ->orWhere('booking_person_id', $sodetails->sales_person_id);
                                 });
@@ -428,8 +431,8 @@ class SalesOrderController extends Controller
                                 // Apply gdn_id condition only if so_id is not the same
                                 $query->whereNull('gdn_id');
                             })
-                            ->when(!$hasPermission, function ($query) {
-                                $query->where(function ($subQuery) {
+                            ->when(!$hasPermission, function ($query) use($sodetails){
+                                $query->where(function ($subQuery)use($sodetails) {
                                     $subQuery->whereNull('booking_person_id')
                                              ->orWhere('booking_person_id', $sodetails->sales_person_id);
                                 });
@@ -444,11 +447,13 @@ class SalesOrderController extends Controller
                         } 
                         $saleperson = User::find($quotation->created_by);
                         $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first(); 
-                       
+                      
                         return view('salesorder.update', compact('vehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails','sodetails', 'soitems', 'empProfile', 'saleperson'));  
         }
-        public function storesalesorderupdate(Request $request, $quotationId)
+public function storesalesorderupdate(Request $request, $quotationId)
 {
+    DB::beginTransaction();
+    try {
     // Validate and retrieve the Sales Order ID
     $so_id = $request->input('so_id');
     $so = So::findOrFail($so_id);
@@ -466,8 +471,11 @@ class SalesOrderController extends Controller
     $so->save();
 
     // Delete existing Soitems records related to the Sales Order ID
+    \Log::info('SO items deleted - Case 3-'.$so->id);
+    Soitems::where('so_id', $so->id)->update(['deleted_by' => Auth::id()]);
     Soitems::where('so_id', $so->id)->delete();
     Vehicles::where('so_id', $so->id)->update(['so_id' => null]);
+    \Log::info('Unassign SO id - Case 3-'.$so->id);
     // Process the selected VINs
     $vins = $request->input('vehicle_vin');
     $selectedVinsWithNull = [];
@@ -551,21 +559,49 @@ class SalesOrderController extends Controller
     $solog->so_id = $so->id;
     $solog->role = Auth::user()->selectedRole;
     $solog->save();
+
+    DB::commit();
     return redirect()->route('dailyleads.index')->with('success', 'Sales Order updated successfully.');
+} catch (\Exception $e) {
+    DB::rollBack(); // Rollback transaction in case of error
+     Log::error('Sales order updte faisls', ['error' => $e->getMessage()]);
+
+    return redirect()->back()->withErrors('An error occurred while updating sales order.');
+}
+  
 }
 public function cancel($id)
 {
-    info($id);
-    $quotation = Quotation::where('calls_id', $id)->first();
-    $calls = Calls::find($id);
-    $calls->status = 'Quoted';
-    $calls->save();
-    $leadclosed = Closed::where('call_id', $id)->first();
-    if($leadclosed)
-    {
-    $leadclosed->delete();
+    // $quotation = Quotation::where('calls_id', $id)->first();
+    // $calls = Calls::find($id);
+    // $calls->status = 'Quoted';
+    // $calls->save();
+    // $leadclosed = Closed::where('call_id', $id)->first();
+    // if($leadclosed)
+    // {
+    // $leadclosed->delete();
+    // }
+    // $so = So::where('quotation_id', $quotation->id)->first();
+
+    DB::beginTransaction();
+
+    try {
+
+    $so = SO::find($id);
+    if($so->quotation_id  && $so->quotation_id  != 0) {
+        $quotation = Quotation::where('id', $so->quotation_id)->first();
+        if($quotation){
+            $calls = Calls::find($quotation->calls_id);
+            $calls->status = 'Quoted';
+            $calls->save();
+            $leadclosed = Closed::where('call_id', $quotation->calls_id)->first();
+            if($leadclosed)
+            {
+                $leadclosed->delete();
+            }
+        }
+           
     }
-    $so = So::where('quotation_id', $quotation->id)->first();
     $soitems = Soitems::where('so_id', $so->id)->get();
     foreach ($soitems as $soitem) {
         $vehicle = Vehicles::find($soitem->vehicles_id);
@@ -575,11 +611,17 @@ public function cancel($id)
             $vehicle->reservation_end_date = null;
             $vehicle->booking_person_id = null;
             $vehicle->save();
+            \Log::info('Unassign SO id - Case 4-'.$so->id);
         }
     }
     foreach ($soitems as $soitem) {
+        $soitem->deleted_by = Auth::id();
+        $soitem->save();
+        \Log::info('SO items deleted - Case 4-'.$so->id);
+
         $soitem->delete();
     }
+
     $bookingrequest = BookingRequest::where('calls_id', $id)->first();
     if ($bookingrequest) {
         $bookingrequest->status = 'Rejected';
@@ -594,7 +636,15 @@ public function cancel($id)
     $solog->role = Auth::user()->selectedRole;
     $solog->save();
     $so->delete();
+
+    DB::commit();
     return redirect()->back()->with('success', 'Sales Order and related items canceled successfully.');
+} catch (\Exception $e) {
+    DB::rollBack(); 
+
+    Log::error('Sales Order Cancellation failed', ['error' => $e->getMessage()]);
+    return redirect()->back()->with('error', 'Sales Order Cancellation failed.');
+}
 }
 public function showSalesSummary($sales_person_id, $count_type)
 {

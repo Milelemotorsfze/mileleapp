@@ -1197,6 +1197,10 @@
 			var workOrder = {!! json_encode($workOrder) !!};
 		@else
 			var workOrder = null;
+			document.addEventListener("DOMContentLoaded", function() {
+				var today = new Date().toISOString().split('T')[0]; 
+				document.getElementById("delivery_date").setAttribute("min", today);
+			});
 		@endif
 
 		const mentions = ["@Alice", "@Bob", "@Charlie"]; 
@@ -1787,6 +1791,10 @@
 						submitFromTopButton.disabled = true;
 						submitFromTopButton.classList.add('disabled'); 
 					}
+					// document.addEventListener("DOMContentLoaded", function() {
+						var today = new Date().toISOString().split('T')[0]; 
+						document.getElementById("delivery_date").setAttribute("min", today);
+					// });
 				}
 			}
 			initializeMentions('#new-comment');
@@ -1835,10 +1843,6 @@
 				const commentId = $(this).closest('.comment').data('comment-id');
 				initializeMentions(`#reply-input-${commentId}`);
 			});
-		});
-		document.addEventListener("DOMContentLoaded", function() {
-			var today = new Date().toISOString().split('T')[0]; 
-			document.getElementById("delivery_date").setAttribute("min", today);
 		});
 			$.validator.addMethod("customEmail", function(value, element) {
 				return this.optional(element) || /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(value);

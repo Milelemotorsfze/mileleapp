@@ -52,6 +52,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Monarobase\CountryList\CountryListFacade;
+use Illuminate\Support\Facades\Log;
 
 class QuotationController extends Controller
 {
@@ -468,6 +469,7 @@ class QuotationController extends Controller
     }
     public function pdfMerge($quotationId)
     {
+       
         $quotation = Quotation::find($quotationId);
         $filename = 'quotation_'.$quotationId.'.pdf';
 
@@ -477,7 +479,7 @@ class QuotationController extends Controller
         $files[] = 'Quotations/'.$filename;
         if($quotation->third_party_payment === "Yes")
         {
-            $files[] = 'Quotations/quotation_attachment_withparty_documents.pdf';
+            $files[] = public_path('Quotations/quotation_attachment_documents.pdf');
         }
         else
         {
@@ -659,9 +661,14 @@ class QuotationController extends Controller
                         foreach ($soitems as $soitem) {
                             $vehicle = Vehicles::find($soitem->vehicles_id);
                             if ($vehicle) {
+                                $soId = $vehicle->so_id;
                                 $vehicle->so_id = null;
+                                \Log::info('Unassign SO id - Case 1-'.$soId);
                                 $vehicle->save();
+                                \Log::info('SO items deleted - Case 1-'.$soId);
+                                Soitems::where('vehicles_id', $vehicle->id)->update(['deleted_by' => Auth::id()]);
                                 Soitems::where('vehicles_id', $vehicle->id)->delete();
+
                             }
                         }
                     }
@@ -712,8 +719,12 @@ class QuotationController extends Controller
                         }
                         $vehiclesToDelete = array_slice($vehicles, 0, $quantityDifference);
                         foreach ($vehiclesToDelete as $vehicle) {
+                            $soId = $vehicle->so_id;
                             $vehicle->so_id = null;
+                            \Log::info('Unassign SO id - Case 2-'.$soId);
                             $vehicle->save();
+                            \Log::info('SO items deleted - Case 2-'.$soId);
+                            Soitems::where('vehicles_id', $vehicle->id)->update(['deleted_by' => Auth::id()]);
                             Soitems::where('vehicles_id', $vehicle->id)->delete();
                         }
                     }
@@ -1109,13 +1120,11 @@ public function addqaddone(Request $request)
         return $shippingPorts;
     }
     public function getShippingCharges(Request $request) {
-        // info($request->from_shipping_port_id);
-        // info($request->to_shipping_port_id);
+      
         $shippingCharges =Shipping::with('shippingMedium')
                             ->where('from_port', $request->from_shipping_port_id)
                             ->where('to_port', $request->to_shipping_port_id)
                             ->get();
-                            // info($shippingCharges);               
         return $shippingCharges;
     }
     public function getvinsqoutation(Request $request)
@@ -1225,7 +1234,7 @@ public function getVehiclesvins(Request $request)
 {
     $RowId = $request->input('RowId');
     $quotationItem = QuotationItem::where('uuid', $RowId)->first();
-    // info($quotationItem);
+
     switch ($quotationItem->reference_type) {
         case 'App\Models\Varaint':
             $vehicles = Vehicles::where('varaints_id', $quotationItem->reference_id)
