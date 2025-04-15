@@ -2716,6 +2716,7 @@ public function viewalls(Request $request)
             $query->where('model_has_roles.role_id', 7)
                   ->orWhere('model_has_roles.model_id', 17);
         })
+        ->orwhere('users.id', 40)
         ->orderBy('users.name', 'asc')
         ->get();
 $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
