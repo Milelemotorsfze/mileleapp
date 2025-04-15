@@ -164,6 +164,7 @@ class VehiclePicturesController extends Controller
                 'inspection.id',
                 'vehicles.id as vehicle_id', // Include the vehicle ID
                 'vehicles.vin',
+                'vehicles.inspection_status',
                 DB::raw('GROUP_CONCAT(inspection.stage SEPARATOR ", ") as stages'),
                 DB::raw('GROUP_CONCAT(DATE_FORMAT(inspection.created_at, "%d-%b-%Y") SEPARATOR ", ") as created_at_formatted'),
                 'varaints.name as variant',

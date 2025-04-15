@@ -661,7 +661,17 @@ var columns6 = [
         return ''; // If no date, return empty
     }
 },
-{ data: 'grn_number', name: 'movement_grns.grn_number' },
+{
+    data: 'grn_number',
+    name: 'movement_grns.grn_number',
+    render: function(data, type, row) {
+        if (row.inspection_status == 'Approved') {
+           
+            return data;
+        }
+        return ''; // If no data, return empty
+    }
+},
 {
     data: 'date',
     name: 'movements_reference.date',

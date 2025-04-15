@@ -5,7 +5,7 @@
                     @endphp
                     @if ($hasPermission)
 <div class="card-header">
-        <h4 class="card-title">Movements Transtion</h4>
+        <h4 class="card-title">Movements Transition</h4>
     @if ($previousId)
     <a class="btn btn-sm btn-info" href="{{ route('movement.lastReference', ['currentId' => ($previousId)]) }}">
         <i class="fa fa-arrow-left" aria-hidden="true"></i>
@@ -101,11 +101,11 @@
                     @if($movementref->created_by == auth()->id())
                         @if ($latestMovement && $latestMovement->id == $movements->id)
                         <form action="{{ route('movement.revised', ['id' => $movements->id]) }}" method="POST" style="display:inline;">
-    @csrf
-    <button type="submit" class="btn btn-sm btn-danger">
-        Revise
-    </button>
-</form>
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                Revise
+                            </button>
+                        </form>
                         @endif
                         @endif
                     </td>
