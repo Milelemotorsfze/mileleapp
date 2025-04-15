@@ -43,6 +43,7 @@ class MigrationDataCheckController extends Controller
       */
     public function index(Request $request)
     {
+        
     //    get all duplicates in varaint request items table
 //     $varaintModelSpecNotExist = [];
 //     $affectedIds = [];
