@@ -31,6 +31,7 @@ use App\Models\WOVehicles;
 use App\Models\Vehicles;
 use App\Models\Movement;
 use App\Models\MovementGrn;
+use App\Models\Grn;
 use App\Models\MovementsReference;
 use App\Models\ColorCode;
 
@@ -153,10 +154,20 @@ class MigrationDataCheckController extends Controller
             info($movementVehicleByPurchaseOrders);
 
             foreach($movementVehicleByPurchaseOrders as $movementVehicleByPurchaseOrder) {
+               
                 $movementgrn = new MovementGrn();
+                if($movementVehicleByPurchaseOrder->grn_id) {
+                    $grn = Grn::find($movementVehicleByPurchaseOrder->grn_id);
+                  
+                    if($grn) {
+                        $movementgrn->grn_number = $grn->grn_number ?? '';
+                    }
+                }
                 $movementgrn->movement_reference_id = $movement->reference_id;
                 $movementgrn->purchase_order_id = $movementVehicleByPurchaseOrder->purchasing_order_id ?? '';
                 $movementgrn->save();
+
+                // chcek if any vehiccle have grn number and chcek all are same
                 // update this movement grn id against the vin in movement table
                 
                     $mov =  MovementGrn::where('purchase_order_id', $movementVehicleByPurchaseOrder->purchasing_order_id)
