@@ -1206,7 +1206,7 @@ class InspectionController extends Controller
             'varaints.name as variant_name', 'varaints.my','varaints.steering','varaints.steering','varaints.seat','varaints.detail',
             'varaints.fuel_type','varaints.gearbox','vehicles.ppmmyyy')
             ->first();
-    $variantitems = VariantItems::with(['model_specification', 'model_specification_option'])
+        $variantitems = VariantItems::with(['model_specification', 'model_specification_option'])
                         ->where('varaint_id', $vehicleDetails->varaints_id)->get();
            
     return view('inspection.pdivehicleview', compact('itemsWithQuantities', 'vehicleDetails','variantitems'));
