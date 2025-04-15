@@ -110,6 +110,7 @@ class ApprovalsController extends Controller
                     DB::raw('REPLACE(REPLACE(inspection.remark, "<p>", ""), "</p>", "") as remark'),
                     'vehicle_detail_approval_requests.action_at',    
                     'warehouse.name as location',
+                    'vehicles.inspection_status',
                     'vehicles.vin',
                     DB::raw("DATE_FORMAT(inspection.created_at, '%d-%b-%Y') as created_at_formte"),  
                     'vehicles.qc_remarks',

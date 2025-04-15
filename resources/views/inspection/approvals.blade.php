@@ -399,7 +399,7 @@
                   <th>Stage</th>
                   <th>QC Remarks</th>
                   <th>PO Number</th>
-                  <!-- <th>GRN Number</th> -->
+                  <th>GRN Number</th>
                   <th>SO Number</th>
                   <th>Location</th>
                   <th>VIN</th>
@@ -591,7 +591,17 @@
                   }
                 },                
                 { data: 'po_number', name: 'purchasing_order.po_number' },
-                // { data: 'grn_number', name: 'movement_grns.grn_number' },
+                {
+                    data: 'grn_number',
+                    name: 'movement_grns.grn_number',
+                    render: function(data, type, row) {
+                        if (row.inspection_status == 'Approved') {
+                          
+                            return data;
+                        }
+                        return ''; 
+                    }
+                },
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'vin', name: 'vehicles.vin' },
