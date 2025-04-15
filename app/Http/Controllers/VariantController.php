@@ -702,7 +702,7 @@ public function savespecification(Request $request)
     foreach ($variants as $variant) {
         $vehicles = Vehicles::where('varaints_id', $variant->id)
         ->whereNull('gdn_id')
-        ->whereNotNull('grn_id')
+        ->whereNotNull('movement_grn_id')
         ->get();
         foreach ($vehicles as $vehicle) {
             $vehicle->inspection_status = "Pending";

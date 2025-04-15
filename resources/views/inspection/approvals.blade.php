@@ -537,7 +537,7 @@
                   }
                 },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'grn_number', name: 'grn.grn_number' },
+                { data: 'grn_number', name: 'movement_grns.grn_number' },
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'vin', name: 'vehicles.vin' },
@@ -591,7 +591,7 @@
                   }
                 },                
                 { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'grn_number', name: 'grn.grn_number' },
+                { data: 'grn_number', name: 'movement_grns.grn_number' },
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'vin', name: 'vehicles.vin' },
@@ -646,7 +646,7 @@
                   }
                 },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'grn_number', name: 'grn.grn_number' },
+                { data: 'grn_number', name: 'movement_grns.grn_number' },
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'vin', name: 'vehicles.vin' },

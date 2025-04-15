@@ -66,12 +66,13 @@ class InspectionController extends Controller
                     'int_color.name as interior_color',
                     'ex_color.name as exterior_color',
                     'purchasing_order.po_number',
-                    'grn.grn_number',
-                    DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
+                    'movement_grns.grn_number',
+                    DB::raw("DATE_FORMAT(movements_reference.date, '%d-%b-%Y') as date"),
                 ])
                 ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
+                ->leftJoin('movements_reference', 'movement_grns.movement_reference_id', '=', 'movements_reference.id')
                 ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
                 ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
@@ -81,7 +82,8 @@ class InspectionController extends Controller
                 ->whereNull('inspection.id')
                 ->whereNull('vehicles.inspection_date')
                 ->whereNull('vehicles.gdn_id')
-                ->whereNotNull('vehicles.grn_id');
+                ->whereNotNull('vehicles.movement_grn_id');
+                 
                 $data = $data->groupBy('vehicles.id');
             }
             else if($status === "Incoming")
@@ -112,7 +114,7 @@ class InspectionController extends Controller
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                ->whereNull('vehicles.grn_id');
+                ->whereNull('vehicles.movement_grn_id');
                 $data = $data->groupBy('vehicles.id');
             }
             else if($status === "stock")
@@ -141,12 +143,11 @@ class InspectionController extends Controller
                     'int_color.name as interior_color',
                     'ex_color.name as exterior_color',
                     'purchasing_order.po_number',
-                    'grn.grn_number',
-                    DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
+                    'movement_grns.grn_number',
                 ])
                 ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
                 ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
                 ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
@@ -195,14 +196,13 @@ class InspectionController extends Controller
                     'int_color.name as interior_color',
                     'ex_color.name as exterior_color',
                     'purchasing_order.po_number',
-                    'grn.grn_number',
+                    'movement_grns.grn_number',
                     'so.so_number',
-                    DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
                     DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
                 ])
                 ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
                 ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
                 ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
                 ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
@@ -253,11 +253,11 @@ class InspectionController extends Controller
                     'int_color.name as interior_color',
                     'ex_color.name as exterior_color',
                     'purchasing_order.po_number',
-                    'grn.grn_number',
+                    'movement_grns.grn_number',
                 ])
                 ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
                 ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
                 ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
                 ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
@@ -295,11 +295,11 @@ class InspectionController extends Controller
                     'int_color.name as interior_color',
                     'ex_color.name as exterior_color',
                     'purchasing_order.po_number',
-                    'grn.grn_number',
+                    'movement_grns.grn_number',
                 ])
                 ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
                 ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
                 ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
                 ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
@@ -1189,6 +1189,7 @@ class InspectionController extends Controller
     }
     public function pdiinspectionf($id) 
     {
+       
         (new UserActivityController)->createActivity('View Edit PDI Report');
     $itemsWithQuantities = VehicleExtraItems::where('vehicle_id', $id)
             ->select('item_name', 'qty')
@@ -1200,9 +1201,15 @@ class InspectionController extends Controller
             ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
             ->join('brands', 'varaints.brands_id', '=', 'brands.id')
             ->where('vehicles.id', $id)
-            ->select('vehicles.id', 'vehicles.vin', 'vehicles.varaints_id', 'master_model_lines.model_line', 'int_color.name as int_colour_name','ex_color.name as ex_colour_name', 'brands.brand_name')
+            ->select('vehicles.id', 'vehicles.vin', 'vehicles.varaints_id', 'master_model_lines.model_line', 
+            'int_color.name as int_colour_name','ex_color.name as ex_colour_name', 'brands.brand_name','varaints.model_detail',
+            'varaints.name as variant_name', 'varaints.my','varaints.steering','varaints.steering','varaints.seat','varaints.detail',
+            'varaints.fuel_type','varaints.gearbox','vehicles.ppmmyyy')
             ->first();
-    return view('inspection.pdivehicleview', compact('itemsWithQuantities', 'vehicleDetails'));
+        $variantitems = VariantItems::with(['model_specification', 'model_specification_option'])
+                        ->where('varaint_id', $vehicleDetails->varaints_id)->get();
+           
+    return view('inspection.pdivehicleview', compact('itemsWithQuantities', 'vehicleDetails','variantitems'));
     }
     public function reinspectionspec($id) 
 {

@@ -39,15 +39,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-grn-list']);
                         </tr>
                     </thead>
                     <tbody>
+                    <div hidden>{{$i=0;}}
+                    </div>
                         @foreach($grns as $grn)
-                        @foreach($grn->vehicles as $vehicle)
                         <tr>
-                            <td>{{ $loop->parent->iteration }}</td>
-                            <td class="date">{{ $grn->date }}</td>
-                            <td class="grn-number">{{ $grn->grn_number }}</td>
-                            <td class="vin-number">{{ $vehicle->vin }}</td>
+                            <td>{{ ++$i }}</td>
+                            <td class="date">{{ $grn->Movementrefernce->date ?? '' }}</td>
+                            <td class="grn-number">{{ $grn->MovementGrn->grn_number ?? ''}}</td>
+                            <td class="vin-number">{{ $grn->vin }}</td>
                         </tr>
-                        @endforeach
                         @endforeach
                     </tbody>
                 </table>

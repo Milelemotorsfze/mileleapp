@@ -102,6 +102,10 @@ public function latestRemarkSales()
     {
         return $this->belongsTo(Grn::class, 'grn_id');
     }
+    public function movementGrn()
+    {
+        return $this->belongsTo(MovementGrn::class, 'movement_grn_id');
+    }
     public function gdn()
     {
         return $this->belongsTo(Gdn::class, 'gdn_id');
