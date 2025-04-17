@@ -1073,7 +1073,7 @@ if (hasManagementPermission) {
                     var columnIndex = $(this).parent().index(); // Get the column index
                     var columnName = columnMap[columnIndex]; // Map index to column name
                     var value = $(this).val();
-                        console.log(columnIndex);
+                        // console.log(columnIndex);
                     // Send filter values using column names, including special `__NULL__` and `__Not EMPTY__`
                     if (value && columnName) {
                         if (value.includes('__NULL__') || value.includes('__Not EMPTY__')) {
@@ -1643,7 +1643,6 @@ $('#remarksForm').on('submit', function(e) {
     }
         },
         error: function(xhr) {
-    console.log(xhr.responseText); // Log full response for debugging
     var errors = xhr.responseJSON.errors;
     var errorMessages = '';
     for (var key in errors) {
@@ -1752,7 +1751,7 @@ function openeditingcolorModal(vehicleId) {
     }
         },
         error: function(xhr) {
-    console.log(xhr.responseText); // Log full response for debugging
+   // Log full response for debugging
 
     var errors = xhr.responseJSON.errors;
     var errorMessages = '';
@@ -1779,7 +1778,6 @@ $('#enhancementForm').on('submit', function(e) {
             location.reload();
         },
         error: function(xhr) {
-    console.log(xhr.responseText); // Log full response for debugging
 
     var errors = xhr.responseJSON.errors;
     var errorMessages = '';
@@ -1822,7 +1820,6 @@ $('#editColorForm').on('submit', function(e) {
     }
         },
         error: function(xhr) {
-    console.log(xhr.responseText); // Log full response for debugging
 
     var errors = xhr.responseJSON.errors;
     var errorMessages = '';
@@ -1849,7 +1846,6 @@ $('#custominspectionForm').on('submit', function(e) {
            // Update the corresponding row in the DataTable (assuming table7 is your DataTable variable)
            var table7 = $('#dtBasicExample7').DataTable();
            var vehicleId = $('#vehicle_idinspection').val();
-    console.log("Vehicle ID from form:", vehicleId);
 
     // Find the row in the DataTable using the 'id' field (since it's the unique identifier)
     var row = table7.row(function(idx, data, node) {
@@ -1869,7 +1865,6 @@ $('#custominspectionForm').on('submit', function(e) {
     }
         },
         error: function(xhr) {
-    console.log(xhr.responseText); // Log full response for debugging
 
     var errors = xhr.responseJSON.errors;
     var errorMessages = '';
