@@ -3582,7 +3582,7 @@ public function availablevehicles(Request $request)
                         $join->on('vehicles.id', '=', 'inspection_pdi.vehicle_id')
                              ->where('inspection_pdi.stage', '=', 'PDI');
                     })
-                    ->whereNull('vehicles.movement_grn_id')
+                    ->whereNull('vehicles.gdn_id')
                     ->where('vehicles.status', 'Approved');
                     foreach ($filters as $columnName => $values) {
                         if (in_array('__NULL__', $values)) {
