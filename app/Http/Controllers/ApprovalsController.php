@@ -48,7 +48,7 @@ class ApprovalsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(RRequest $request)
+    public function index(Request $request)
     {
         $useractivities =  New UserActivities();
         $useractivities->activity = "Open The Approval Section";
