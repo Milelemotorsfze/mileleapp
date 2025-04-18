@@ -209,6 +209,7 @@
 
             var vehicleId = $('#vehicleId').val();
             var grn = $('#grnInput').val();
+            var grn = $('#grnInput').val();
 
             $.ajax({
                 url: "{{ route('netsuitegrn.submit') }}",
