@@ -27,6 +27,7 @@ use App\Models\RoutineInspection;
 use App\Models\Incident;
 use App\Models\MasterModelLines;
 use App\Models\IncidentWork;
+use App\Models\MovementsReference;
 use App\Models\VariantRequest;
 use App\Models\VariantRequestItems;
 use App\Models\ModelSpecification;
@@ -47,7 +48,7 @@ class ApprovalsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(RRequest $request)
     {
         $useractivities =  New UserActivities();
         $useractivities->activity = "Open The Approval Section";
