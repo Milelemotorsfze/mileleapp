@@ -428,8 +428,8 @@ class QuotationController extends Controller
         $data['company'] = $call->company_name;
         $data['document_date'] = Carbon::parse($quotation->date)->format('M d,Y');
         if($salesPersonDetail) {
-            $data['sales_office'] = $salesPersonDetail->location->name;
-            $data['sales_phone'] = $salesPersonDetail->contact_number;
+            $data['sales_office'] = $salesPersonDetail->location->name ?? '';
+            $data['sales_phone'] = $salesPersonDetail->contact_number ?? '';
         }
         $shippingHidedItemAmount = QuotationItem::where('is_enable', false)
             ->where('quotation_id', $quotation->id)

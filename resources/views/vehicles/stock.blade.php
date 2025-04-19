@@ -676,10 +676,20 @@ table.dataTable thead th select {
         return ''; // If no date, return empty
     }
 },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                {
+{
+    data: 'grn_number',
+    name: 'movement_grns.grn_number',
+    render: function(data, type, row) {
+        if (row.inspection_status == 'Approved') {
+           
+            return data;
+        }
+        return ''; // If no data, return empty
+    }
+},
+{
     data: 'date',
-    name: 'grn.date',
+    name: 'movements_reference.date',
     render: function(data, type, row) {
         if (data) {
             // Assuming data is in Y-m-d format (default SQL date format)
@@ -999,8 +1009,8 @@ var columnMap = {
         2: 'purchasing_order.po_number',
         3: 'purchasing_order.po_date',
         4: 'vehicles.estimation_date',
-        5: 'grn.grn_number',
-        6: 'grn.date',
+        5: 'movement_grns.grn_number',
+        6: 'movements_reference.date',
         9: 'so.so_date',
         10: 'so.so_number',
         11: 'sp.name',
@@ -1063,7 +1073,7 @@ if (hasManagementPermission) {
                     var columnIndex = $(this).parent().index(); // Get the column index
                     var columnName = columnMap[columnIndex]; // Map index to column name
                     var value = $(this).val();
-                        console.log(columnIndex);
+                        // console.log(columnIndex);
                     // Send filter values using column names, including special `__NULL__` and `__Not EMPTY__`
                     if (value && columnName) {
                         if (value.includes('__NULL__') || value.includes('__Not EMPTY__')) {
@@ -1084,17 +1094,17 @@ if (hasManagementPermission) {
         {
             targets: 1,
             render: function (data, type, row) {
-                if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id == null) {
+                if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.movement_grn_id == null) {
                     return 'Incoming';
-                } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id != null) {
+                } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.movement_grn_id != null) {
                     return 'Pending Inspection';
-                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && row.grn_id != null && (row.reservation_end_date == null || new Date(row.reservation_end_date) < now)) {
+                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && row.movement_grn_id != null && (row.reservation_end_date == null || new Date(row.reservation_end_date) < now)) {
                     return 'Available Stock';
                   } else if (row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) >= now ) {
                     return 'Booked';
-                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.grn_id != null) {
+                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.movement_grn_id != null) {
                     return 'Sold';
-                } else if (row.inspection_date != null && row.gdn_id != null && row.grn_id != null) {
+                } else if (row.inspection_date != null && row.gdn_id != null && row.movement_grn_id != null) {
                     return 'Delivered';
                 } else {
                     return '';
@@ -1633,7 +1643,6 @@ $('#remarksForm').on('submit', function(e) {
     }
         },
         error: function(xhr) {
-    console.log(xhr.responseText); // Log full response for debugging
     var errors = xhr.responseJSON.errors;
     var errorMessages = '';
     for (var key in errors) {
@@ -1742,7 +1751,7 @@ function openeditingcolorModal(vehicleId) {
     }
         },
         error: function(xhr) {
-    console.log(xhr.responseText); // Log full response for debugging
+   // Log full response for debugging
 
     var errors = xhr.responseJSON.errors;
     var errorMessages = '';
@@ -1769,7 +1778,6 @@ $('#enhancementForm').on('submit', function(e) {
             location.reload();
         },
         error: function(xhr) {
-    console.log(xhr.responseText); // Log full response for debugging
 
     var errors = xhr.responseJSON.errors;
     var errorMessages = '';
@@ -1812,7 +1820,6 @@ $('#editColorForm').on('submit', function(e) {
     }
         },
         error: function(xhr) {
-    console.log(xhr.responseText); // Log full response for debugging
 
     var errors = xhr.responseJSON.errors;
     var errorMessages = '';
@@ -1839,7 +1846,6 @@ $('#custominspectionForm').on('submit', function(e) {
            // Update the corresponding row in the DataTable (assuming table7 is your DataTable variable)
            var table7 = $('#dtBasicExample7').DataTable();
            var vehicleId = $('#vehicle_idinspection').val();
-    console.log("Vehicle ID from form:", vehicleId);
 
     // Find the row in the DataTable using the 'id' field (since it's the unique identifier)
     var row = table7.row(function(idx, data, node) {
@@ -1859,7 +1865,6 @@ $('#custominspectionForm').on('submit', function(e) {
     }
         },
         error: function(xhr) {
-    console.log(xhr.responseText); // Log full response for debugging
 
     var errors = xhr.responseJSON.errors;
     var errorMessages = '';

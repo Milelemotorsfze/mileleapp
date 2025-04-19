@@ -528,11 +528,7 @@ Route::get('/d', function () {
     Route::get('companyDomains', [CompanyDomainController::class, 'index'])->name('companyDomains.index');    
 
     // GRN List 
-    Route::get('/grn-list', function () {
-        $grns = Grn::with('vehicles')->get();
-        return view('grn_list.index', compact('grns'));
-    })->name('grn.index');   
-    
+    Route::get('/grn-list', [VehiclesController::class, 'Grnlist'])->name('grn.index');   
     // Demand & Planning Module
 
     // Demands
@@ -777,9 +773,9 @@ Route::get('/d', function () {
     Route::get('/vehicles/getVehicleDetails', [VehiclesController::class, 'getVehicleDetails'])->name('vehicles.getVehicleDetails');
 
     Route::get('vehiclesde/{id}', [VehiclesController::class, 'deletes'])->name('vehiclesde.deletes');
-    Route::get('grnlist/netsuitgrn', [MovementController::class, 'grnlist'])->name('grnlist.create');
-    Route::get('grnlist/grnsimplefile', [MovementController::class,'grnsimplefile'])->name('grnlist.grnsimplefile');
-    Route::post('grnlist/post-file', [MovementController::class, 'grnfilepost'])->name('grnlist.grnfilepost');
+    // Route::get('grnlist/netsuitgrn', [MovementController::class, 'grnlist'])->name('grnlist.create'); // not using anywhere
+    // Route::get('grnlist/grnsimplefile', [MovementController::class,'grnsimplefile'])->name('grnlist.grnsimplefile');
+    // Route::post('grnlist/post-file', [MovementController::class, 'grnfilepost'])->name('grnlist.grnfilepost'); // not using anywhere
     Route::post('/check-create-vins', [PurchasingOrderController::class, 'checkcreatevins'])->name('vehicles.check-create-vins');
     Route::post('/check-create-vins-inside', [PurchasingOrderController::class, 'checkcreatevinsinside'])->name('vehicles.check-create-vins-inside');
     Route::patch('/check-edit-vins', [PurchasingOrderController::class, 'checkeditvins'])->name('vehicles.check-edit-vins');
@@ -859,6 +855,8 @@ Route::get('/d', function () {
     Route::get('vehicles/viewalls', [VehiclesController::class, 'viewalls'])->name('vehicles.viewalls');
     Route::get('/get-updated-vehicle/{id}', [VehiclesController::class, 'getUpdatedVehicle'])->name('getUpdatedVehicle');
     Route::get('/getBrandsAndModelLines', [PurchasingOrderController::class, 'getBrandsAndModelLines']);
+    Route::post('movement/unique-check',[MovementController::class,'checkDuplicateMovement'])->name('movement.unique-check');
+
     //booking
     Route::get('booking/create/{call_id}', [BookingController::class, 'create'])->name('booking.create');
     Route::get('/get-model-lines/booking/{brandId}', [BookingController::class, 'getModelLines'])->name('booking.getmodel');
@@ -1067,7 +1065,7 @@ Route::get('/d', function () {
     Route::post('/update-purchasing-additionalpaymentcomplete', [PurchasingOrderController::class, 'completedadditionalpayment'])->name('purchasing.completedadditionalpayment');
     Route::get('netsuitegrn/addingnetsuitegrn', [ApprovalsController::class, 'addingnetsuitegrn'])->name('netsuitegrn.addingnetsuitegrn');
     Route::post('netsuitegrn/submit', [ApprovalsController::class, 'submitGrn'])->name('netsuitegrn.submit');
-    Route::post('netsuitegrn/add', [ApprovalsController::class, 'addGrn'])->name('netsuitegrn.add');
+    // Route::post('netsuitegrn/add', [ApprovalsController::class, 'addGrn'])->name('netsuitegrn.add');
     Route::get('/get-vehicles/{purchaseOrderId}', [PurchasingOrderController::class, 'getVehiclesByPurchaseOrderId']);
     Route::get('/getVehicles/{purchaseOrderId}', [PurchasingOrderController::class, 'getVehicles']);
     Route::get('/getVehicleDetails/{vehicleId}', [PurchasingOrderController::class, 'getVehicleDetails']);
@@ -1174,5 +1172,6 @@ Route::get('/d', function () {
     ->name('send-swift-copy.email');
     Route::post('/check-vehicle-quantity', [VehiclesController::class, 'checkVehicleQuantity'])->name('check.vehicle.quantity');
     Route::get('/salespersons/list', [SalesOrderController::class, 'getSalespersons'])->name('salespersons.list');
-Route::post('/salesorder/updateSalesperson', [SalesOrderController::class, 'updateSalesperson'])->name('salesorder.updateSalesperson');
+    Route::post('/salesorder/updateSalesperson', [SalesOrderController::class, 'updateSalesperson'])->name('salesorder.updateSalesperson');
+
 });

@@ -1,25 +1,30 @@
 @extends('layouts.main')
 @section('content')
+<style>
+    .is-invalid.invalid-feedback {
+    margin-top: 10px;
+}
+</style>
 @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-daily-movemnets');
-                    @endphp
-                    @if ($hasPermission)
-<div class="card-header">
-        <h4 class="card-title">Add New Movement Transection</h4>
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-daily-movemnets');
+    @endphp
+    @if ($hasPermission)
+    <div class="card-header">
+        <h4 class="card-title">Add New Movement Transaction</h4>
         <div class="row">
             <p><span style="float:right;" class="error">* Required Field</span></p>
 			</div>
             @if ($lastIdExists)
-    <a class="btn btn-sm btn-info" href="{{ route('movement.lastReference', ['currentId' => ($movementsReferenceId - 1)]) }}">
-        <i class="fa fa-arrow-left" aria-hidden="true"></i>
-    </a>
-@endif
-<b>Ref No: {{$movementsReferenceId}}</b>
-@if ($NextIdExists)
-    <a class="btn btn-sm btn-info" href="{{ route('movement.lastReference', ['currentId' => ($movementsReferenceId + 1)]) }}">
-       <i class="fa fa-arrow-right" aria-hidden="true"></i>
-    </a>
-@endif
+                <a class="btn btn-sm btn-info" href="{{ route('movement.lastReference', ['currentId' => ($movementsReferenceId - 1)]) }}">
+                    <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                </a>
+            @endif
+        <b>Ref No: {{$movementsReferenceId}}</b>
+        @if ($NextIdExists)
+            <a class="btn btn-sm btn-info" href="{{ route('movement.lastReference', ['currentId' => ($movementsReferenceId + 1)]) }}">
+            <i class="fa fa-arrow-right" aria-hidden="true"></i>
+            </a>
+        @endif
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a> 
     </div>
     <div class="card-body">
@@ -36,22 +41,20 @@
                 </ul>
             </div>
         @endif
-        @if(session('success'))
-    <div class="alert alert-success" id="success-message">
-        {{ session('success') }}
-    </div>
+        @if (Session::has('error'))
+            <div class="alert alert-danger" >
+                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                {{ Session::get('error') }}
+            </div>
+        @endif
+        @if (Session::has('success'))
+            <div class="alert alert-success" id="success-alert">
+                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                {{ Session::get('success') }}
+            </div>
+        @endif
 
-    <script>
-        // Set a timeout to remove the success message after 5 seconds
-        setTimeout(function() {
-            var successMessage = document.getElementById('success-message');
-            if (successMessage) {
-                successMessage.style.display = 'none';
-            }
-        }, 5000); // 5000 milliseconds = 5 seconds
-    </script>
-@endif
-        <form action="{{ route('movement.store') }}" method="POST" id="purchasing-order">
+        <form id="formCreate" action="{{ route('movement.store') }}" method="POST"  enctype="multipart/form-data" >
         @csrf
         <div class="row">
         <div class="col-lg-2 col-md-6">
@@ -65,7 +68,7 @@
         <div class="col-lg-2 col-md-6">
         <div class="form-group">
     <label for="vin_file">Upload VIN File:</label>
-    <input type="file" id="vin_file" class="form-control" accept=".csv, .txt" />
+    <input type="file" id="vin_file" name="file" class="form-control" />
 </div>
 <br>
 <button id="upload-vin-button" class="btn btn-primary">Upload VIN File</button>
@@ -73,38 +76,38 @@
     </div>
 <br>
         <div id ="rows-containertitle">
-        <div class="row">
-        <div class="col-lg-1 col-md-6" style="width:12%;">
-        <label for="basicpill-firstname-input" class="form-label">Vin</label>
-        </div>
-        <div class="col-lg-1 col-md-6" style="width:6%;">
-        <label for="basicpill-firstname-input" class="form-label">PO</label>
-        </div>
-        <div class="col-lg-1 col-md-6" style="width:6%;">
-        <label for="basicpill-firstname-input" class="form-label">SO</label>
-        </div>
-        <div class="col-lg-1 col-md-6" style="width:6%;">
-        <label for="basicpill-firstname-input" class="form-label">Ownership</label>
-        </div>
-        <div class="col-lg-1 col-md-6">
-        <label for="basicpill-firstname-input" class="form-label">From</label>
-        </div>
-        <div class="col-lg-2 col-md-6">
-        <label for="basicpill-firstname-input" class="form-label">To </label>
-        </div>
-        <div class="col-lg-1 col-md-6">
-        <label for="QTY" class="form-label">Brand</label>
-        </div>
-        <div class="col-lg-1 col-md-6">
-        <label for="QTY" class="form-label">Model Line</label>
-        </div>
-        <div class="col-lg-1 col-md-6">
-        <label for="QTY" class="form-label">Variant</label>
-        </div>
-        <div class="col-lg-2 col-md-6">
-            <label for="basicpill-firstname-input" class="form-label">New VIN & Remarks</label>
-        </div>
-        </div>
+            <div class="row">
+                <div class="col-lg-2 col-md-6">
+                    <label for="basicpill-firstname-input" class="form-label">Vin</label>
+                </div>
+                <div class="col-lg-1 col-md-6">
+                    <label for="basicpill-firstname-input" class="form-label">PO</label>
+                </div>
+                <div class="col-lg-1 col-md-6" >
+                    <label for="basicpill-firstname-input" class="form-label">SO</label>
+                </div>
+                <div class="col-lg-1 col-md-6" >
+                    <label for="basicpill-firstname-input" class="form-label">Ownership</label>
+                </div>
+                <div class="col-lg-1 col-md-6">
+                    <label for="basicpill-firstname-input" class="form-label">From</label>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <label for="basicpill-firstname-input" class="form-label">To </label>
+                </div>
+                <div class="col-lg-1 col-md-6">
+                    <label for="QTY" class="form-label">Brand</label>
+                </div>
+                <div class="col-lg-1 col-md-6">
+                    <label for="QTY" class="form-label">Model Line</label>
+                </div>
+                <div class="col-lg-1 col-md-6">
+                    <label for="QTY" class="form-label">Variant</label>
+                </div>
+                <div class="col-lg-1 col-md-6">
+                    <label for="basicpill-firstname-input" class="form-label">Remarks</label>
+                </div>
+            </div>
         </div>
         <div id ="rows-containerpo">
         </div>
@@ -112,41 +115,43 @@
         </div>
         <br>
         <div class="row">
-        <div class="col-lg-1 col-md-6">
-        <div class="btn btn-primary add-row-btn" data-row="1">
-         <i class="fas fa-plus"></i> Add Vehicles
-        </div>
-        </div>
-        <div class="col-lg-4 col-md-6">
-    <div class="input-group">
-        <select name="po_number" class="form-control mb-1" id="po_number">
-            <option value="" selected disabled>Select PO</option>
-            @foreach ($purchasing_order as $purchasing_order)
-            <option value="{{ $purchasing_order->id }}">{{ $purchasing_order->po_number }}</option>
-            @endforeach
-        </select>
-        <button class="btn btn-outline-secondary" type="button" id="generate-button">
-    <i class="fas fa-cogs"></i> Add PO Vehicles
-</button>
-    </div>
-</div>
-<div class="col-lg-4 col-md-6">
-    <div class="input-group">
-        <select name="so_number" class="form-control mb-1" id="so_number">
-            <option value="" selected disabled>Select SO</option>
-            @foreach ($so as $so)
-            <option value="{{ $so->id }}">{{ $so->so_number }}</option>
-            @endforeach
-        </select>
-        <button class="btn btn-outline-secondary" type="button" id="generate-sobutton">
-    <i class="fas fa-cogs"></i> Add SO Vehicles
-</button>
-    </div>
-</div>
+            <div class="col-lg-1 col-md-6">
+                <div class="btn btn-primary add-row-btn" data-row="1">
+                    <i class="fas fa-plus"></i> Add Vehicles
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="input-group">
+                    <select name="po_number" class="form-control mb-1" id="po_number">
+                        <option value="" selected disabled>Select PO</option>
+                        @foreach ($purchasing_order as $purchasing_order)
+                        <option value="{{ $purchasing_order->id }}">{{ $purchasing_order->po_number }}</option>
+                        @endforeach
+                    </select>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="generate-button">
+                        <i class="fas fa-cogs"></i> Add PO Vehicles
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="input-group">
+                    <select name="so_number" class="form-control mb-1" id="so_number">
+                        <option value="" selected disabled>Select SO</option>
+                        @foreach ($so as $so)
+                        <option value="{{ $so->id }}">{{ $so->so_number }}</option>
+                        @endforeach
+                    </select>
+                    <button class="btn btn-outline-secondary" type="button" id="generate-sobutton">
+                        <i class="fas fa-cogs"></i> Add SO Vehicles
+                    </button>
+                </div>
+            </div>
         </div>
         </br>
         <div class="col-lg-12 col-md-12">
-        <input type="submit" name="submit" value="Submit" onclick="return validateForm();" class="btn btn-success btncenter" />
+        <input type="submit" value="Submit" id="btn-submit" class="btn btn-success btncenter" />
     </div>
 </form>
 		</br>
@@ -167,7 +172,7 @@
             row++;
             var newRow = `
             <div class="row" data-row="${row}">
-                <div class="col-md-2 col-md-6" style="width: 12%;">
+                <div class="col-lg-2 col-md-6">
                     <select name="vin[]" class="form-control mb-1 vin" id="vin${row}">
                         <option value="" selected disabled>Select VIN</option>
                         @foreach ($vehicles as $vin)
@@ -175,13 +180,13 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                <div class="col-lg-1 col-md-6" >
                     <input type="text" id="po${row}" class="form-control" placeholder="PO #" readonly>
                 </div>
-                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                <div class="col-lg-1 col-md-6" >
                     <input type="text" id="so_number${row}" class="form-control" placeholder="SO #" readonly>
                 </div>
-                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                <div class="col-lg-1 col-md-6">
                     <select id="ownership_type${row}" class="form-control" name="ownership_type[]">
                         <option value="">Select Ownership</option>
                         <option value="Incoming">Incoming</option>
@@ -220,24 +225,22 @@
                 <div class="col-lg-1 col-md-6">
                     <input type="text" id="variant${row}" name="variant[]" class="form-control" placeholder="Variant" readonly>
                 </div>
+               
                 <div class="col-lg-1 col-md-6">
                     <div class="d-flex align-items-center">
-                        <input type="text" name="newvin[]" class="form-control mr-2" placeholder="New VIN">
+                        <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                        <button type="button" class="btn btn-danger btn-sm remove-row-btn "><i class="fa fa-times"></i></button>
+                    </div>
                     </div>
                 </div>
-                <div class="col-lg-1 col-md-6">
-                                <div class="d-flex align-items-center">
-                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
-                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
-                                </div>
-                                </div>
-                            </div>
             `;
             $('#rows-container').append(newRow);
             $('#vin' + row).select2();
             $('#to' + row).select2();
         });
         $('#rows-container').on('change', '.vin', function() {
+            let id = $(this).attr('id');
+            $('#'+id+"-error").remove();
             var selectedVin = $(this).val();
             var row = $(this).closest('.row').data('row');
             var brandField = $('#brand' + row);
@@ -286,30 +289,30 @@
                     response.forEach(function (vehicle) {
                         var rowHtml = `
                             <div class="row">
-                            <div class="col-lg-2 col-md-6" style="width: 12%;">
+                                <div class="col-lg-2 col-md-6">
                                     <input type="text" name="vin[]" class="form-control" placeholder="VIN" readonly value="${vehicle.vin}">
                                 </div>
-                                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                                <div class="col-lg-1 col-md-6" >
                                     <input type="text" class="form-control" placeholder="PO #" readonly value="${vehicle.po_number}">
                                 </div>
-                                <div class="col-lg-1 col-md-6"style="width: 6%;"> 
+                                <div class="col-lg-1 col-md-6"> 
                                     <input type="text" class="form-control" placeholder="SO #" readonly value="${vehicle.so_number}">
                                 </div>
-                                <div class="col-lg-1 col-md-6" style="width: 6%;">
-                <select class="form-control" id="ownership_type" name="ownership_type[]">
-                    <option value="">Select Ownership</option>
-                    <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
-                    <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
-                    <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
-                    <option value="Supplier Docs" ${vehicle.ownership_type === 'Supplier Docs' ? 'selected' : ''}>Supplier Docs</option>
-                    <option value="Supplier Docs + VCC + BOE" ${vehicle.ownership_type === 'Supplier Docs + VCC + BOE' ? 'selected' : ''}>Supplier Docs + VCC + BOE</option>
-                    <option value="RTA Possesion Cert/BOD" ${vehicle.ownership_type === 'RTA Possesion Cert/BOD' ? 'selected' : ''}>RTA Possesion Cert/BOD</option>
-                    <option value="RTA Possession Cert/Milele Cars Trading" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Cars Trading' ? 'selected' : ''}>RTA Possession Cert/Milele Cars Trading</option>
-                    <option value="RTA Possession Cert/Milele Car Rental" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Car Rental' ? 'selected' : ''}>RTA Possession Cert/Milele Car Rental</option>
-                </select>
-            </div>
+                                <div class="col-lg-1 col-md-6" >
+                                    <select class="form-control" id="ownership_type" name="ownership_type[]">
+                                        <option value="">Select Ownership</option>
+                                        <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
+                                        <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
+                                        <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
+                                        <option value="Supplier Docs" ${vehicle.ownership_type === 'Supplier Docs' ? 'selected' : ''}>Supplier Docs</option>
+                                        <option value="Supplier Docs + VCC + BOE" ${vehicle.ownership_type === 'Supplier Docs + VCC + BOE' ? 'selected' : ''}>Supplier Docs + VCC + BOE</option>
+                                        <option value="RTA Possesion Cert/BOD" ${vehicle.ownership_type === 'RTA Possesion Cert/BOD' ? 'selected' : ''}>RTA Possesion Cert/BOD</option>
+                                        <option value="RTA Possession Cert/Milele Cars Trading" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Cars Trading' ? 'selected' : ''}>RTA Possession Cert/Milele Cars Trading</option>
+                                        <option value="RTA Possession Cert/Milele Car Rental" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Car Rental' ? 'selected' : ''}>RTA Possession Cert/Milele Car Rental</option>
+                                    </select>
+                                </div>
                                 <div class="col-lg-1 col-md-6">
-                                <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
+                                    <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
                                     <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
                                 </div>
                                 <div class="col-lg-2 col-md-6">
@@ -330,34 +333,41 @@
                                 <div class="col-lg-1 col-md-6">
                                     <input type="text" name="variant" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.variant}">
                                 </div>
+                                 <div class="col-lg-1 col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                        <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                    </div>
+                                </div>
                                 `;
-        if (vehicle.warehouseNames == 'Supplier') {
-            rowHtml += `
-                <div class="col-lg-1 col-md-6">
-                    <div class="d-flex align-items-center">
-                        <input type="text" name="newvin[]" class="form-control mr-2" placeholder="New VIN">
-                    </div>
-                </div>
-                <div class="col-lg-1 col-md-6">
-                                <div class="d-flex align-items-center">
-                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
-                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
-                                </div>
-                                </div>
-                            </div>
-            `;
-        }
-        else{
-            rowHtml += `
-                                <div class="col-lg-2 col-md-6">
-                                <div class="d-flex align-items-center">
-                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
-                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
-                                </div>
-                                </div>
-                            </div>
-                        `;
-        }
+                                // if (vehicle.warehouseNames == 'Supplier') {
+                                //     rowHtml += `
+                                //         <div class="col-lg-1 col-md-6">
+                                //             <div class="d-flex align-items-center">
+                                //                 <input type="text" name="newvin[]" class="form-control mr-2" placeholder="New VIN">
+                                //             </div>
+                                //         </div>
+                                //         <div class="col-lg-1 col-md-6">
+                                //             <div class="d-flex align-items-center">
+                                //                 <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                //                 <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                //             </div>
+                                          
+                                //         </div>
+                                //     `;
+                                // }
+                                // else{
+                                //     rowHtml += `
+                                //                 <div class="col-lg-2 col-md-6">
+                                //                     <div class="d-flex align-items-center">
+                                //                         <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                //                         <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                //                     </div>
+                                               
+                                //                 </div>
+                                //                 `;
+                                // }
+                               
                         $("#rows-containerpo").append(rowHtml);
                     });
 
@@ -385,7 +395,7 @@
  $(document).ready(function () {
         $("#generate-sobutton").click(function () {  // Bind to the Generate button's click event
             var selectedSOId = $("#so_number").val();  // Get the selected PO ID
-            console.log(selectedSOId);
+          
             $.ajax({
                 type: "GET",
                 url: "{{ route('vehicles.getVehiclesDataformovementso') }}",
@@ -395,30 +405,30 @@
                     response.forEach(function (vehicle) {
                         var rowHtml = `
                             <div class="row">
-                            <div class="col-lg-2 col-md-6" style="width: 12%;">
-                                    <input type="text" name="vin[]" class="form-control" placeholder="VIN" readonly value="${vehicle.vin}">
-                                </div>
-                            <div class="col-lg-1 col-md-6" style="width: 6%;">
+                                <div class="col-lg-2 col-md-6">
+                                        <input type="text" name="vin[]" class="form-control" placeholder="VIN" readonly value="${vehicle.vin}">
+                                    </div>
+                                <div class="col-lg-1 col-md-6" >
                                     <input type="text" class="form-control" placeholder="PO #" readonly value="${vehicle.po_number}">
                                 </div>
-                                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                                <div class="col-lg-1 col-md-6" >
                                     <input type="text" class="form-control" placeholder="SO #" readonly value="${vehicle.so_number}">
                                 </div>
-                                <div class="col-lg-1 col-md-6" style="width: 6%;">
-                <select class="form-control" id="ownership_type" name="ownership_type[]">
-                    <option value="">Select Ownership</option>
-                    <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
-                    <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
-                    <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
-                    <option value="Supplier Docs" ${vehicle.ownership_type === 'Supplier Docs' ? 'selected' : ''}>Supplier Docs</option>
-                    <option value="Supplier Docs + VCC + BOE" ${vehicle.ownership_type === 'Supplier Docs + VCC + BOE' ? 'selected' : ''}>Supplier Docs + VCC + BOE</option>
-                    <option value="RTA Possesion Cert/BOD" ${vehicle.ownership_type === 'RTA Possesion Cert/BOD' ? 'selected' : ''}>RTA Possesion Cert/BOD</option>
-                    <option value="RTA Possession Cert/Milele Cars Trading" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Cars Trading' ? 'selected' : ''}>RTA Possession Cert/Milele Cars Trading</option>
-                    <option value="RTA Possession Cert/Milele Car Rental" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Car Rental' ? 'selected' : ''}>RTA Possession Cert/Milele Car Rental</option>
-                </select>
-            </div>
+                                <div class="col-lg-1 col-md-6" >
+                                    <select class="form-control" id="ownership_type" name="ownership_type[]">
+                                        <option value="">Select Ownership</option>
+                                        <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
+                                        <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
+                                        <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
+                                        <option value="Supplier Docs" ${vehicle.ownership_type === 'Supplier Docs' ? 'selected' : ''}>Supplier Docs</option>
+                                        <option value="Supplier Docs + VCC + BOE" ${vehicle.ownership_type === 'Supplier Docs + VCC + BOE' ? 'selected' : ''}>Supplier Docs + VCC + BOE</option>
+                                        <option value="RTA Possesion Cert/BOD" ${vehicle.ownership_type === 'RTA Possesion Cert/BOD' ? 'selected' : ''}>RTA Possesion Cert/BOD</option>
+                                        <option value="RTA Possession Cert/Milele Cars Trading" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Cars Trading' ? 'selected' : ''}>RTA Possession Cert/Milele Cars Trading</option>
+                                        <option value="RTA Possession Cert/Milele Car Rental" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Car Rental' ? 'selected' : ''}>RTA Possession Cert/Milele Car Rental</option>
+                                    </select>
+                                </div>
                                 <div class="col-lg-1 col-md-6">
-                                <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
+                                    <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
                                     <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
                                 </div>
                                 <div class="col-lg-2 col-md-6">
@@ -439,34 +449,41 @@
                                 <div class="col-lg-1 col-md-6">
                                     <input type="text" name="variant" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.variant}">
                                 </div>
-                                `;
-        if (vehicle.warehouseNames == 'Supplier') {
-            rowHtml += `
-                <div class="col-lg-1 col-md-6">
-                    <div class="d-flex align-items-center">
-                        <input type="text" name="newvin[]" class="form-control mr-2" placeholder="New VIN">
-                    </div>
-                </div>
-                <div class="col-lg-1 col-md-6">
-                                <div class="d-flex align-items-center">
-                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
-                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                <div class="col-lg-1 col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                        <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                    </div>
                                 </div>
-                                </div>
-                            </div>
-            `;
-        }
-        else{
-            rowHtml += `
-                                <div class="col-lg-2 col-md-6">
-                                <div class="d-flex align-items-center">
-                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
-                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
-                                </div>
-                                </div>
-                            </div>
-                        `;
-        }
+                            </div>`;
+
+                        // if (vehicle.warehouseNames == 'Supplier') {
+                        //     rowHtml += `
+                        //         <div class="col-lg-1 col-md-6">
+                        //             <div class="d-flex align-items-center">
+                        //                 <input type="text" name="newvin[]" class="form-control mr-2" placeholder="New VIN">
+                        //             </div>
+                        //         </div>
+                        //         <div class="col-lg-1 col-md-6">
+                        //                         <div class="d-flex align-items-center">
+                        //                             <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                        //                             <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                        //                         </div>
+                        //                         </div>
+                        //                     </div>
+                        //     `;
+                        // }
+                        // else{
+                        //     rowHtml += `
+                        //         <div class="col-lg-2 col-md-6">
+                        //         <div class="d-flex align-items-center">
+                        //             <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                        //             <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                        //         </div>
+                        //         </div>
+                        //     </div>
+                        // `;
+                        // }
                         $("#rows-containerpo").append(rowHtml);
                     });
                     $(".remove-row-btn").on("click", function () {
@@ -506,49 +523,51 @@
             processData: false,
             contentType: false,
             success: function (response) {
+                // console.log(response);
                 if (response.success) {
+
                     // Clear any existing rows before inserting new ones
                     $("#rows-containerpo").html("");
                     
                     response.vehicleDetails.forEach(function (vehicle) {
                         var rowHtml = `
                             <div class="row">
-                            <div class="col-lg-2 col-md-6" style="width: 12%;">
+                            <div class="col-lg-2 col-md-6" >
                                     <input type="text" name="vin[]" class="form-control" placeholder="VIN" readonly value="${vehicle.vin}">
                                 </div>
-                                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                                <div class="col-lg-1 col-md-6" >
                                     <input type="text" class="form-control" placeholder="PO #" readonly value="${vehicle.po_number}">
                                 </div>
-                                <div class="col-lg-1 col-md-6"style="width: 6%;"> 
+                                <div class="col-lg-1 col-md-6"> 
                                     <input type="text" class="form-control" placeholder="SO #" readonly value="${vehicle.so_number}">
                                 </div>
-                                <div class="col-lg-1 col-md-6" style="width: 6%;">
-            <select class="form-control" id="ownership_type" name="ownership_type[]">
-                <option value=""${!vehicle.ownership_type ? 'selected' : ''}>Select Ownership</option>
-                <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
-                <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
-                <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
-                <option value="Supplier Docs" ${vehicle.ownership_type === 'Supplier Docs' ? 'selected' : ''}>Supplier Docs</option>
-                <option value="Supplier Docs + VCC + BOE" ${vehicle.ownership_type === 'Supplier Docs + VCC + BOE' ? 'selected' : ''}>Supplier Docs + VCC + BOE</option>
-                <option value="RTA Possesion Cert/BOD" ${vehicle.ownership_type === 'RTA Possesion Cert/BOD' ? 'selected' : ''}>RTA Possesion Cert/BOD</option>
-                <option value="RTA Possession Cert/Milele Cars Trading" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Cars Trading' ? 'selected' : ''}>RTA Possession Cert/Milele Cars Trading</option>
-                <option value="RTA Possession Cert/Milele Car Rental" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Car Rental' ? 'selected' : ''}>RTA Possession Cert/Milele Car Rental</option>
-            </select>
-        </div>
+                                <div class="col-lg-1 col-md-6" >
+                                    <select class="form-control" id="ownership_type" name="ownership_type[]">
+                                        <option value=""${!vehicle.ownership_type ? 'selected' : ''}>Select Ownership</option>
+                                        <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
+                                        <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
+                                        <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
+                                        <option value="Supplier Docs" ${vehicle.ownership_type === 'Supplier Docs' ? 'selected' : ''}>Supplier Docs</option>
+                                        <option value="Supplier Docs + VCC + BOE" ${vehicle.ownership_type === 'Supplier Docs + VCC + BOE' ? 'selected' : ''}>Supplier Docs + VCC + BOE</option>
+                                        <option value="RTA Possesion Cert/BOD" ${vehicle.ownership_type === 'RTA Possesion Cert/BOD' ? 'selected' : ''}>RTA Possesion Cert/BOD</option>
+                                        <option value="RTA Possession Cert/Milele Cars Trading" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Cars Trading' ? 'selected' : ''}>RTA Possession Cert/Milele Cars Trading</option>
+                                        <option value="RTA Possession Cert/Milele Car Rental" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Car Rental' ? 'selected' : ''}>RTA Possession Cert/Milele Car Rental</option>
+                                    </select>
+                                </div>
                                 <div class="col-lg-1 col-md-6">
                                 <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
                                     <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
                                 </div>
                                 <div class="col-lg-2 col-md-6">
-            <select name="to[]" class="form-control mb-1" id="to" required>
-                <option value="">Select</option>
-                @foreach ($warehouses as $warehouse)
-                    <option value="{{ $warehouse->id }}" ${vehicle.matchedWarehouseId == {{ $warehouse->id }} ? 'selected' : ''}>
-                        {{ $warehouse->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+                                    <select name="to[]" class="form-control mb-1" id="to" required>
+                                        <option value="">Select</option>
+                                        @foreach ($warehouses as $warehouse)
+                                            <option value="{{ $warehouse->id }}" ${vehicle.matchedWarehouseId == {{ $warehouse->id }} ? 'selected' : ''}>
+                                                {{ $warehouse->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 <div class="col-lg-1 col-md-6">
                                     <input type="text" name="brand" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.brand}">
                                 </div>
@@ -558,42 +577,50 @@
                                 <div class="col-lg-1 col-md-6">
                                     <input type="text" name="variant" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.variant}">
                                 </div>
+                                <div class="col-lg-1 col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                        <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                    </div>
+                                </div>
+                            </div>
                                 `;
-        if (vehicle.warehouseNames == 'Supplier') {
-            rowHtml += `
-                <div class="col-lg-1 col-md-6">
-                    <div class="d-flex align-items-center">
-                        <input type="text" name="newvin[]" class="form-control mr-2" placeholder="New VIN">
-                    </div>
-                </div>
-                <div class="col-lg-1 col-md-6">
-                                <div class="d-flex align-items-center">
-                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
-                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
-                                </div>
-                                </div>
-                            </div>
-            `;
-        }
-        else{
-            rowHtml += `
-                                <div class="col-lg-2 col-md-6">
-                                <div class="d-flex align-items-center">
-                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
-                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
-                                </div>
-                                </div>
-                            </div>
-                            `;
-                        }
-                        rowHtml += `</div>`;
+                                // if (vehicle.warehouseNames == 'Supplier') {
+                                //     rowHtml += `
+                                //         <div class="col-lg-1 col-md-6">
+                                //             <div class="d-flex align-items-center">
+                                //                 <input type="text" name="newvin[]" class="form-control mr-2" placeholder="New VIN">
+                                //             </div>
+                                //         </div>
+                                //         <div class="col-lg-1 col-md-6">
+                                //                         <div class="d-flex align-items-center">
+                                //                             <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                //                             <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                //                         </div>
+                                //                         </div>
+                                //                     </div>
+                                //     `;
+                                // }
+                                // else{
+                                //     rowHtml += `
+                                //                         <div class="col-lg-2 col-md-6">
+                                //                         <div class="d-flex align-items-center">
+                                //                             <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                //                             <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                //                         </div>
+                                //                         </div>
+                                //                     </div>
+                                //                     `;
+                                //                 }
+                        // rowHtml += `</div>`;
                         $("#rows-containerpo").append(rowHtml);
                     });
 
                     // Attach the remove-row event handler
                     attachRemoveRowHandler();
                 } else {
-                    alert("VIN comparison failed: " + response.message);
+                    var confirm = alertify.confirm(response.message ,function (e) {
+                    }).set({title:"VIN Not Existing !"})
                 }
             },
             error: function (error) {
@@ -607,7 +634,106 @@
             $(this).closest(".row").remove();
         });
     }
+    $("#formCreate").validate({
+            ignore: [],
+            rules: {
+                "vin[]": {
+                    required: true
+                },
+                file: {
+                    extension: "csv",
+                },
+            },
+            messages: {
+                file: {
+                    extension: "Please upload file in .csv format "
+                },
+                
+            },
+            
+        });
+
+        $.validator.prototype.checkForm = function (){
+            this.prepareForm();
+            for ( var i = 0, elements = (this.currentElements = this.elements()); elements[i]; i++ ) {
+                if (this.findByName( elements[i].name ).length != undefined && this.findByName( elements[i].name ).length > 1) {
+                    for (var cnt = 0; cnt < this.findByName( elements[i].name ).length; cnt++) {
+                        this.check( this.findByName( elements[i].name )[cnt] );
+                    }
+                }
+                else {
+                    this.check( elements[i] );
+                }
+            }
+            return this.valid();
+        };
+
+    $('#btn-submit').click(function (e) {
+        e.preventDefault();
+      
+        let vinArray = [];
+        let fromArray = [];
+        let toArray = [];
+            $("input[name='vin[]']").each(function () {
+                vinArray.push($(this).val());
+            });
+            if(vinArray.length <= 0) {
+                $("select[name='vin[]']").each(function () {
+                    let vinValue = $(this).val();
+                    vinArray.push(vinValue);
+                });
+            }
+            $("input[name='from[]']").each(function () {
+                fromArray.push($(this).val());
+            });
+            $("select[name='to[]']").each(function () {
+                toArray.push($(this).val());
+            });
+        if($("#formCreate").valid()) {
+
+            let url = '{{ route('movement.unique-check') }}';
+            $.ajax({
+                type:"POST",
+                url: url, 
+                headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // CSRF token for security
+                },
+                data: {
+                    vin: vinArray,
+                    from: fromArray,
+                    to: toArray,
+
+                },
+                success: function(data) {
+                 if(data.length > 0) {
+                    
+                    let message = "The following duplicate entries were found:<br>";
+                    data.forEach(function(duplicate) {
+                        message += duplicate + "<br>";
+                    });
+                    alertify.confirm(message,function (e) {
+                    }).set({title:"Invalid Data"});
+                    
+                    return false;
+                 }else{
+                        document.getElementById("formCreate").submit();
+                    }
+                },
+                error: function (xhr, status, error) {
+                console.log("Error:", error);
+                alert("An error occurred. Please try again.");
+                }
+            });
+       }else{
+        console.log("Form validation failed");
+       }
+       
+    });
+
+   
 });
+
+
 </script>
 @else
     @php

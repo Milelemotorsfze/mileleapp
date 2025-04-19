@@ -29,6 +29,10 @@ use App\Models\ModifiedVariants;
 use App\Models\MasterModelDescription;
 use App\Models\WOVehicles;
 use App\Models\Vehicles;
+use App\Models\Movement;
+use App\Models\MovementGrn;
+use App\Models\Grn;
+use App\Models\MovementsReference;
 use App\Models\ColorCode;
 
 use Illuminate\Http\Request;
@@ -40,6 +44,7 @@ class MigrationDataCheckController extends Controller
       */
     public function index(Request $request)
     {
+        
     //    get all duplicates in varaint request items table
 //     $varaintModelSpecNotExist = [];
 //     $affectedIds = [];
@@ -131,6 +136,78 @@ class MigrationDataCheckController extends Controller
 
         // get all intColur
      
+       // get all the grn vins groupby referenceid
+      $movements = Movement::where('from',1)
+       ->groupBy('reference_id')
+       ->get();
+        info("movement group by referece id");
+        info($movements);
+    //    return $movements;
+        foreach($movements as $movement) {
+            $grnVins = Movement::where('from',1)->where('reference_id',$movement->reference_id)->pluck('vin')->toArray();
+            $movementVehicleByPurchaseOrders = Vehicles::whereIn('vin', $grnVins)
+            ->groupBy('purchasing_order_id')
+            ->get();
+            info("grnvin");
+            info($grnVins);
+            info("po ids");
+            info($movementVehicleByPurchaseOrders);
+
+            foreach($movementVehicleByPurchaseOrders as $movementVehicleByPurchaseOrder) {
+               
+                $movementgrn = new MovementGrn();
+                if($movementVehicleByPurchaseOrder->grn_id) {
+                    $grn = Grn::find($movementVehicleByPurchaseOrder->grn_id);
+                  
+                    if($grn) {
+                        $movementgrn->grn_number = $grn->grn_number ?? '';
+                    }
+                }
+                $movementgrn->movement_reference_id = $movement->reference_id;
+                $movementgrn->purchase_order_id = $movementVehicleByPurchaseOrder->purchasing_order_id ?? '';
+                $movementgrn->save();
+
+                // chcek if any vehiccle have grn number and chcek all are same
+                // update this movement grn id against the vin in movement table
+                
+                    $mov =  MovementGrn::where('purchase_order_id', $movementVehicleByPurchaseOrder->purchasing_order_id)
+                                ->where('movement_reference_id', $movement->reference_id)->first();
+                                info($mov->id);
+                                // get the movement data under particular po and particular movement with vins
+                    $vindata =  Vehicles::whereIn('vin', $grnVins)
+                                     ->where('purchasing_order_id', $movementVehicleByPurchaseOrder->purchasing_order_id)
+                                     ->pluck('vin')->toArray();
+                                
+                    if($vindata) {
+                       info($vindata);
+                       Movement::whereIn('vin', $vindata)->update(['movement_grn_id' => $movementgrn->id]);
+                     
+
+                        // update movementgrnid in vehicle table under this po with this movement
+                        $vehicle = Vehicles::whereIn('vin', $vindata)->update(['movement_grn_id' => $movementgrn->id]);
+                       
+                }else{
+                    info("not existing movement");
+                    info($movement->reference_id);
+                    info($movementVehicleByPurchaseOrder->vin);
+                }
+                
+            }
+             
+        }
+
+        return 1;
+    //    $movementVehicleByPurchaseOrders = Vehicles::select('vin','purchasing_order_id')->whereIn('vin', $grnVins)
+    //    ->groupBy('purchasing_order_id')
+    //    ->get();
+
+    //     foreach($movementVehicleByPurchaseOrders as $movementVehicleByPurchaseOrder) {
+    //     $movementgrn = new MovementGrn();
+    //     $movementgrn->movement_reference_id = $movementsReferenceId;
+    //     $movementgrn->purchase_order_id = $movementVehicleByPurchaseOrder->purchasing_order_id ?? '';
+    //     $movementgrn->save();
+    //     }
+
     }
 
     public function PFIUniqueWithinYear() {

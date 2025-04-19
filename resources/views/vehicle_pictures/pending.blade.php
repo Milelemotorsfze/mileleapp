@@ -203,7 +203,17 @@
                 { data: 'created_at_formatted', name: 'inspection.created_at' },
                 { data: 'stages', name: 'inspection.stage' },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'grn_number', name: 'grn.grn_number' },
+                {
+                    data: 'grn_number',
+                    name: 'movement_grns.grn_number',
+                    render: function(data, type, row) {
+                        if (row.inspection_status == 'Approved') {
+                          
+                            return data;
+                        }
+                        return ''; 
+                    }
+                },
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
@@ -238,7 +248,17 @@
                 { data: 'created_at_formatted', name: 'inspection.created_at' },
                 { data: 'stages', name: 'inspection.stage' },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'grn_number', name: 'grn.grn_number' },
+                {
+                    data: 'grn_number',
+                    name: 'movement_grns.grn_number',
+                    render: function(data, type, row) {
+                        if (row.inspection_status == 'Approved') {
+                          
+                            return data;
+                        }
+                        return ''; 
+                    }
+                },
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
@@ -265,7 +285,7 @@
             ],
             drawCallback: function(settings) {
         var api = this.api();
-        console.log(api.rows().data().toArray());
+        // console.log(api.rows().data().toArray());
     }
         });
 });

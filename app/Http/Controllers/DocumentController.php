@@ -42,7 +42,7 @@ class DocumentController extends Controller
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
-                ->whereNull('vehicles.grn_id');
+                ->whereNull('vehicles.movement_grn_id');
                 $data = $data->groupBy('purchasing_order.id');
             } 
             if($status === "Pending")
@@ -58,7 +58,7 @@ class DocumentController extends Controller
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
-                ->whereNotNull('vehicles.grn_id')
+                ->whereNotNull('vehicles.movement_grn_id')
                 ->whereNull('vehicles.documents_id');
                 $data = $data->groupBy('vehicles.id');
             }
@@ -82,7 +82,7 @@ class DocumentController extends Controller
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
-                ->whereNotNull('vehicles.grn_id')
+                ->whereNotNull('vehicles.movement_grn_id')
                 ->whereNotNull('vehicles.documents_id')
                 ->whereNull('vehicles.so_id')
                 ->whereNull('vehicles.gdn_id');
@@ -109,7 +109,7 @@ class DocumentController extends Controller
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
-                ->whereNotNull('vehicles.grn_id')
+                ->whereNotNull('vehicles.movement_grn_id')
                 ->whereNotNull('vehicles.documents_id')
                 ->whereNotNull('vehicles.so_id')
                 ->whereNull('documents.bl_number');
@@ -136,7 +136,7 @@ class DocumentController extends Controller
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
-                ->whereNotNull('vehicles.grn_id')
+                ->whereNotNull('vehicles.movement_grn_id')
                 ->whereNotNull('vehicles.documents_id')
                 ->whereNotNull('vehicles.so_id')
                 ->whereNotNull('documents.bl_number');

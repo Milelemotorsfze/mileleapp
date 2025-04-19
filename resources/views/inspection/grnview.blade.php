@@ -82,35 +82,7 @@
     </div>
   </div>
 </div>
-<div class="modal fade" id="modalupdateModal" tabindex="-1" role="dialog" aria-labelledby="modalupdateModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalupdateModalLabel">Enter Netsuite GRN</h5>
-        <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <form id="modalupdateForm">
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="actionSelect">Action</label>
-            <select class="form-control" id="actionSelect" required>
-              <option value="update">Update</option>
-              <option value="add">Add New</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="grnInputupdate">Netsuite GRN</label>
-            <input type="text" class="form-control" id="grnInputupdate" required>
-          </div>
-        </div>
-        <input type="hidden" id="vehicleIdupdate">
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Submit</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+
   <div class="tab-content">
       <div class="tab-pane fade show active" id="tab1"> 
         <div class="card-body">
@@ -186,7 +158,7 @@
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'grn_date', name: 'grn.date' }, 
+                { data: 'grn_date', name: 'movements_reference.date' }, 
                 { data: 'varaints_old', name: 'vehicle_variant_histories.varaints_old' },
                 { data: 'varaints_new', name: 'vehicle_variant_histories.varaints_new' },
                 { data: null, render: function (data, type, row) {
@@ -209,10 +181,10 @@
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'grn_date', name: 'grn.date' }, 
+                { data: 'grn_date', name: 'movements_reference.date' }, 
                 { data: 'varaints_old', name: 'vehicle_variant_histories.varaints_old' },
                 { data: 'varaints_new', name: 'vehicle_variant_histories.varaints_new' },
-                { data: 'grn_number', name: 'grn.grn_number' },
+                { data: 'grn_number', name: 'movement_grns.grn_number' },
                 { data: null, render: function (data, type, row) {
                     return '<button class="btn btn-sm btn-info modalupdate" data-id="'+row.id+'"><i class="fa fa-edit" aria-hidden="true"></i> Update</button>';
                 }}
@@ -227,14 +199,16 @@
 
         $('#dtBasicExample2 tbody').on('click', '.modalupdate', function() {
             var data = table2.row($(this).parents('tr')).data();
-            $('#vehicleIdupdate').val(data.id);
-            $('#modalupdateModal').modal('show');
+          
+            $('#vehicleId').val(data.id);
+            $('#netsuiteModal').modal('show');
         });
 
         $('#netsuiteForm').on('submit', function(e) {
             e.preventDefault();
 
             var vehicleId = $('#vehicleId').val();
+            var grn = $('#grnInput').val();
             var grn = $('#grnInput').val();
 
             $.ajax({
@@ -248,37 +222,14 @@
                 success: function(response) {
                     $('#netsuiteModal').modal('hide');
                     table1.ajax.reload();
-                },
-                error: function(xhr) {
-                    alert('An error occurred. Please try again.');
-                }
-            });
-        });
-
-        $('#modalupdateForm').on('submit', function(e) {
-            e.preventDefault();
-
-            var vehicleId = $('#vehicleIdupdate').val();
-            var grn = $('#grnInputupdate').val();
-            var action = $('#actionSelect').val();
-            var url = action === 'update' ? "{{ route('netsuitegrn.submit') }}" : "{{ route('netsuitegrn.add') }}";
-            $.ajax({
-                url: url,
-                method: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    vehicle_id: vehicleId,
-                    grn: grn
-                },
-                success: function(response) {
-                    $('#modalupdateModal').modal('hide');
                     table2.ajax.reload();
                 },
-                error: function(xhr) {
-                    alert('An error occurred. Please try again.');
+                error: function(response) {
+                    alert(response.responseJSON.message);
                 }
             });
         });
+
     });
 </script>
 @endsection
