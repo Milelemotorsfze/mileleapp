@@ -1507,17 +1507,24 @@ public function submitGrn(Request $request)
 
         $grnDate = MovementsReference::find($grnRecord->movement_reference_id);
         $sameGrnDates = MovementsReference::whereDate('date', $grnDate)->pluck('id')->toArray();
-
-        $isGrnNumberExist = MovementGrn::where('grn_number', $request->grn)
-                            ->whereIn('movement_reference_id', $sameGrnDates)->first();
+        // chcek grn number is existing in the syttem
+      
+        $isGrnNumberExist = MovementGrn::where('grn_number', $request->grn)->first();
+        $conflictExists = 0;
         if($isGrnNumberExist) {
+            // if yes make sure it existing with the data which is requesting 
+            $conflictExists = MovementGrn::where('grn_number', $request->grn)
+            ->whereNotIn('movement_reference_id', $sameGrnDates)
+            ->exists();
+        }
+                                    
+        if ($conflictExists) {
+            // Handle the case: GRN number exists but doesn't match the required data
             return response()->json([
                 'success' => false,
-                'message' => 'This GRN Number is already existing in system',
+                'message' => 'This GRN Number is already existing in system with another movement date',
             ], 422);
         }
-
-       
 
         // Update the GRN record with the new GRN number
         $grnRecord->grn_number = $request->grn;
