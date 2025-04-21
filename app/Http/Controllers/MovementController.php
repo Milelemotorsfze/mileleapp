@@ -274,11 +274,13 @@ class MovementController extends Controller
                     ->first();
 
                 if ($isExist) {
-                    $fromLocation = Warehouse::find($from);
-                    $toLocation = Warehouse::find($to);
-                    $from = $fromLocation->name ?? '';
-                    $to = $toLocation->name ?? '';
-                    $uniqueCombinations[] = "Movement for VIN: $vin, From: $from , To: $to is already done in the system.";
+                   
+                    $fromLocation = Warehouse::find($from[$index]);
+                    $toLocation = Warehouse::find($to[$index]);
+                    $fromPlace = $fromLocation->name ?? '';
+                    $toPlace = $toLocation->name ?? '';
+                  
+                    $uniqueCombinations[] = "Movement for VIN: $vehicleVin, From: $fromPlace , To: $toPlace is already done in the system.";
                 }
             }
 
@@ -295,9 +297,9 @@ class MovementController extends Controller
                     [$vin, $from, $to] = explode('|', $key);
                     $fromLocation = Warehouse::find($from);
                     $toLocation = Warehouse::find($to);
-                    $from = $fromLocation->name ?? '';
-                    $to = $toLocation->name ?? '';
-                    $duplicateCombinations[] = "Duplicate entry found for VIN: $vin, From: $from, To: $to";
+                    $fromPlace = $fromLocation->name ?? '';
+                    $toPlace = $toLocation->name ?? '';
+                    $duplicateCombinations[] = "Duplicate entry found for VIN: $vin, From: $fromPlace, To: $toPlace";
                 }
             }
             
@@ -312,7 +314,7 @@ class MovementController extends Controller
             }
             if(count($uniqueCombinations) > 0) {
               
-                return redirect()->back()->with('error', 'Some movement is already done in the same location'.$uniqueCombinations);
+                return redirect()->back()->withErrors($uniqueCombinations);
             }
 
            
