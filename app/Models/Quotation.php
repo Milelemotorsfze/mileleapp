@@ -29,4 +29,8 @@ class Quotation extends Model
     {
         return $this->belongsTo(Calls::class, 'calls_id');
     }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class,'created_by','id');
+    }
 }
