@@ -909,6 +909,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                         <option value="AUD" {{ $purchasingOrder->currency === 'AUD' ? 'selected' : '' }}>AUD</option>
                         <option value="CAD" {{ $purchasingOrder->currency === 'CAD' ? 'selected' : '' }}>CAD</option>
                         <option value="PHP" {{ $purchasingOrder->currency === 'PHP' ? 'selected' : '' }}>PHP</option>
+                        <option value="SAR" {{ $purchasingOrder->currency === 'SAR' ? 'selected' : '' }}>SAR</option>
                     </select>
                 </div>
             @endif

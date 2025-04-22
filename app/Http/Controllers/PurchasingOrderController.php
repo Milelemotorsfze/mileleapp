@@ -86,6 +86,7 @@ class PurchasingOrderController extends Controller
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -196,6 +197,7 @@ class PurchasingOrderController extends Controller
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -226,6 +228,7 @@ class PurchasingOrderController extends Controller
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -256,6 +259,7 @@ class PurchasingOrderController extends Controller
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
             
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
@@ -322,6 +326,7 @@ class PurchasingOrderController extends Controller
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -401,6 +406,7 @@ class PurchasingOrderController extends Controller
         'CAD' => 2.89,
         'AED' => 1,
         'PHP' => 0.063,
+        'SAR' => 0.98,
     ];
     $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
         return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -469,6 +475,7 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -519,6 +526,7 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -569,6 +577,7 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -623,6 +632,7 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -677,6 +687,7 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -731,6 +742,7 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -782,6 +794,7 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -845,6 +858,7 @@ public function filterconfirmation($status)
         'CAD' => 2.89,
         'AED' => 1,
         'PHP' => 0.063,
+        'SAR' => 0.98,
     ];
     $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
         return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -906,6 +920,7 @@ public function paymentinitiation($status)
         'CAD' => 2.89,
         'AED' => 1,
         'PHP' => 0.063,
+        'SAR' => 0.98,
     ];
     $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
         return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -3213,6 +3228,9 @@ if ($paymentOrderStatus->isNotEmpty()) {
             case "PHP":
                 $totalcostconverted = $totalcost * 0.063;
                 break;
+            case "SAR":
+                $totalcostconverted = $totalcost * 0.98;
+                break;
             default:
                 $totalcostconverted = $totalcost;
                 }
@@ -3637,6 +3655,7 @@ if($purchasingOrder->is_demand_planning_po == 1)
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -3954,7 +3973,8 @@ public function updatePrices(Request $request)
         'GBP' => 4.66,
         'JPY' => 0.023,
         'CAD' => 2.69,
-        "PHP" => 0.063
+        "PHP" => 0.063,
+        'SAR' => 0.98,
     ];
 
     $totalDifference = 0;
@@ -5030,6 +5050,7 @@ public function submitPaymentDetails(Request $request)
                             "AED" => 1,
                             "CAD" => 2.68,
                             "PHP" => 0.063,
+                            'SAR' => 0.98,
                         ];
                         // Check if the currencies are different
                         if ($purchasingOrder->currency != $supplierAccount->currency) {
@@ -5332,6 +5353,7 @@ public function submitPaymentDetails(Request $request)
                     "AED" => 1,
                     "CAD" => 2.68,
                     "PHP" => 0.063,
+                    'SAR' => 0.98,
                 ];
                 // Check if the currencies are different
         if ($purchasingOrder->currency != $supplierAccount->currency) {
@@ -5402,6 +5424,7 @@ public function submitPaymentDetails(Request $request)
                             "AED" => 1,
                             "CAD" => 2.68,
                             "PHP" => 0.063,
+                            'SAR' => 0.98,
                         ];
                         if($supplierAccountTransaction->transaction_type == 'Released') {
 
@@ -5554,6 +5577,7 @@ public function submitPaymentDetails(Request $request)
                         "AUD" => 2.29,
                         "CAD" => 2.68,
                         "PHP" => 0.063,
+                        "SAR" => 0.98,
                     ];
                     // Check if the currencies are different
                     if ($purchasingOrder->currency != $supplierAccount->currency) {

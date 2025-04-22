@@ -1022,6 +1022,7 @@ $pendingvendorfol = DB::table('purchasing_order')
                 'JPY': 0.034,
                 'CAD': 2.85,
                 'PHP' : 0.063,
+                'SAR' : 0.98,
                 // Add other currencies and their conversion rates here
             };
 
