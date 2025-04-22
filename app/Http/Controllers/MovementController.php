@@ -258,7 +258,6 @@ class MovementController extends Controller
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
 
             $vinNotExist = [];
-            $uniqueCombinations = [];
             foreach ($vin as $index => $vehicleVin) {
                 $vehicle = Vehicles::where('vin', $vehicleVin)
                                 ->where('status', 'Approved')
@@ -266,21 +265,6 @@ class MovementController extends Controller
                                 ->first();
                 if(!$vehicle) {
                     $vinNotExist[] = $vehicleVin;
-                }
-
-               $isExist = Movement::where('vin', $vehicleVin)
-                    ->where('from', $from[$index])
-                    ->where('to', $to[$index])
-                    ->first();
-
-                if ($isExist) {
-                   
-                    $fromLocation = Warehouse::find($from[$index]);
-                    $toLocation = Warehouse::find($to[$index]);
-                    $fromPlace = $fromLocation->name ?? '';
-                    $toPlace = $toLocation->name ?? '';
-                  
-                    $uniqueCombinations[] = "Movement for VIN: $vehicleVin, From: $fromPlace , To: $toPlace is already done in the system.";
                 }
             }
 
@@ -312,11 +296,6 @@ class MovementController extends Controller
                
                 return redirect()->back()->with('error', 'Some of the VIN is not exist in system, please update this vin to create the movement');
             }
-            if(count($uniqueCombinations) > 0) {
-              
-                return redirect()->back()->withErrors($uniqueCombinations);
-            }
-
            
         // foreach ($vin as $index => $value) {
         //     if (array_key_exists($index, $from) && array_key_exists($index, $to)) {
@@ -586,10 +565,10 @@ class MovementController extends Controller
     public function vehiclesdetails(Request $request)
     {
 
-    info($request->all());
+    // info($request->all());
     $vin = $request->input('vin');
     $vehicle = Vehicles::where('vin', $vin)->first();
-    info($vehicle);
+    // info($vehicle);
     $variant = Varaint::find($vehicle->varaints_id)->first();
     $modelLine = MasterModelLines::find($vehicle->variant->master_model_lines_id)->first();
     $po_number = PurchasingOrder::find($vehicle->purchasing_order_id)->first();
@@ -983,7 +962,7 @@ public function uploadVinFile(Request $request)
                 $fromLocation = Warehouse::find($from);
                 $toLocation = Warehouse::find($to);
                 $from = $fromLocation->name ?? '';
-                $to = $$toLocation->name ?? '';
+                $to = $toLocation->name ?? '';
                 $duplicateCombinations[] = "VIN: $vin, From: $from, To: $to.";
             }
         }
