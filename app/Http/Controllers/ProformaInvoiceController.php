@@ -50,7 +50,7 @@ class ProformaInvoiceController extends Controller {
         })->get();
         $sales_persons = ModelHasRoles::with('user')->where('role_id', 7)
                 ->orwhereHas('user', function($query) {
-                    $query->whereIn('id', [17,20,168]);
+                    $query->whereIn('id', [17,20,168,40]);
                 })
                 ->get();
         $countries = Country::all();
