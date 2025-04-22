@@ -5073,8 +5073,8 @@ public function submitPaymentDetails(Request $request)
             $currency = $supplierAccountTransaction->account_currency;
             if($purchasingOrder->is_demand_planning_po == 1)
             {
-            $recipients = config('mail.custom_recipients.dp');
-            Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+            // $recipients = config('mail.custom_recipients.dp');
+            // Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
             }
             else
             {
