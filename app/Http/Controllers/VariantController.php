@@ -697,18 +697,18 @@ public function savespecification(Request $request)
     $specificationoptions->name = $request->input('newSpecificationName');
     $specificationoptions->master_model_lines_id = $request->input('model_line_id');
     $specificationoptions->save();
-    $masterModelLineId = $request->input('model_line_id');
-    $variants = Varaint::where('master_model_lines_id', $masterModelLineId)->get();
-    foreach ($variants as $variant) {
-        $vehicles = Vehicles::where('varaints_id', $variant->id)
-        ->whereNull('gdn_id')
-        ->whereNotNull('movement_grn_id')
-        ->get();
-        foreach ($vehicles as $vehicle) {
-            $vehicle->inspection_status = "Pending";
-            $vehicle->save();
-        }
-    }
+    // $masterModelLineId = $request->input('model_line_id');
+    // $variants = Varaint::where('master_model_lines_id', $masterModelLineId)->get();
+    // foreach ($variants as $variant) {
+    //     $vehicles = Vehicles::where('varaints_id', $variant->id)
+    //     ->whereNull('gdn_id')
+    //     ->whereNotNull('movement_grn_id')
+    //     ->get();
+    //     foreach ($vehicles as $vehicle) {
+    //         $vehicle->inspection_status = "Pending";
+    //         $vehicle->save();
+    //     }
+    // }
     return response()->json(['message' => 'Option added successfully'], 200);
 }
     public function variantsaddons(string $id)
