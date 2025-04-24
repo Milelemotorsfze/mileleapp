@@ -2,6 +2,10 @@
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.6/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script> -->
+
 <style>
      #assignBy.select2-container {
         width: 300px !important; /* Adjust the width as needed */
@@ -12,6 +16,10 @@
     border: 1px solid #ddd;
     padding: 10px;
     background-color: #f9f9f9;
+}
+
+.rich-text-content img{
+    width: 100% !important;
 }
 #log-content {
     height: 400px;
@@ -709,118 +717,138 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
 
                 <!-- Vehicle Details tab -->
                 <div class="tab-pane fade" id="marketing" role="tabpanel" aria-labelledby="marketing-tab">
-    <h5 class="mt-3">Vehicle Details</h5>
-    <div id="existing-models" class="container my-3">
-    <div class="row">
-        @foreach($requirements as $requirement)
-            <div class="col-md-6 mb-3" id="requirement-{{ $requirement->id }}">
-                <div class="card shadow-sm position-relative">
-                    <div class="card-body">
-                        <!-- Buttons in the top-right corner -->
-                        @php
-                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
-                        @endphp
-                        @if ($hasPermission)
-                        <div class="position-absolute top-0 end-0 p-2">
-                            <button class="btn btn-danger btn-sm me-1" onclick="removeModelLine({{ $requirement->id }})">
-                                <i class="fas fa-trash-alt"></i> Remove
-                            </button>
-                        </div>
-                        @endif
-                        <!-- Main content -->
-                        <h5 class="card-title mb-0">{{ $requirement->masterModelLine->brand->brand_name }}</h5>
-                        <p class="card-text text-muted">{{ $requirement->masterModelLine->model_line }}</p>
-                        <p class="card-text text-muted"><strong>Trim:</strong> {{ $requirement->trim }}</p>
-                        <p class="card-text text-muted"><strong>Variant:</strong> {{ $requirement->variant }}</p>
-                        <p class="card-text text-muted"><strong>Quantity:</strong> {{ $requirement->qty }}</p>
-                        <p class="card-text text-muted"><strong>Final Destination:</strong> {{ $requirement->country->name ?? 'N/A' }}</p>
-                        <p class="card-text text-muted"><strong>Asking Price:</strong> {{ $requirement->asking_price }}</p>
-                        <p class="card-text text-muted"><strong>Offer Price:</strong> {{ $requirement->offer_price }}</p>
+                    <h5 class="mt-3">Vehicle Details</h5>
+                    <div id="existing-models" class="container my-3">
+                    <div class="row">
+                        @foreach($requirements as $requirement)
+                            <div class="col-md-6 mb-3" id="requirement-{{ $requirement->id }}">
+                                <div class="card shadow-sm position-relative">
+                                    <div class="card-body">
+                                        <!-- Buttons in the top-right corner -->
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="position-absolute top-0 end-0 p-2">
+                                            <button class="btn btn-danger btn-sm me-1" onclick="removeModelLine({{ $requirement->id }})">
+                                                <i class="fas fa-trash-alt"></i> Remove
+                                            </button>
+                                        </div>
+                                        @endif
+                                        <!-- Main content -->
+                                        <h5 class="card-title mb-0">{{ $requirement->masterModelLine->brand->brand_name }}</h5>
+                                        <p class="card-text text-muted">{{ $requirement->masterModelLine->model_line }}</p>
+                                        <p class="card-text text-muted"><strong>Trim:</strong> {{ $requirement->trim }}</p>
+                                        <p class="card-text text-muted"><strong>Variant:</strong> {{ $requirement->variant }}</p>
+                                        <p class="card-text text-muted"><strong>Quantity:</strong> {{ $requirement->qty }}</p>
+                                        <p class="card-text text-muted"><strong>Final Destination:</strong> {{ $requirement->country->name ?? 'N/A' }}</p>
+                                        <p class="card-text text-muted"><strong>Asking Price:</strong> {{ $requirement->asking_price }}</p>
+                                        <p class="card-text text-muted"><strong>Offer Price:</strong> {{ $requirement->offer_price }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                            <div class="col-md-6 col-sm-12 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="text-center">Remarks</h5>
+                                        </br>
+                                        @php
+                                            $text = $lead->remarks;
+                                            $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
+                                        @endphp
+
+                                        <div class="rich-text-content">
+                                            @if (!empty(trim(strip_tags($remarks))))
+                                                {!! $remarks !!}
+                                            @else
+                                                <p class="text-muted">No remarks.</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                     </div>
                 </div>
-            </div>
-        @endforeach
-    </div>
-</div>
-<hr>
-@php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
-@endphp
-@if ($hasPermission)
-<div class="add-model-line mt-4">
-    <h6>Add More Model Line</h6>
-    <form id="addModelLineForm">
-        <input type="hidden" name="lead_id" value="{{ $lead->id }}">
+                <hr>
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+                @endphp
+                @if ($hasPermission)
+                <div class="add-model-line mt-4">
+                    <h6>Add More Model Line</h6>
+                    <form id="addModelLineForm">
+                        <input type="hidden" name="lead_id" value="{{ $lead->id }}">
 
-        <!-- One row for all inputs: Brand, Model Line, Trim, and Variant -->
-        <div class="row">
-            <!-- Brand input -->
-            <div class="col-md-3">
-                <select name="brand" class="form-control select2" id="brand" required>
-                    <option value="" disabled selected>Select Brand</option>
-                    @foreach($brands as $brand)
-                        <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
-                    @endforeach
-                </select>
-            </div>
+                        <!-- One row for all inputs: Brand, Model Line, Trim, and Variant -->
+                        <div class="row">
+                            <!-- Brand input -->
+                            <div class="col-md-3">
+                                <select name="brand" class="form-control select2" id="brand" required>
+                                    <option value="" disabled selected>Select Brand</option>
+                                    @foreach($brands as $brand)
+                                        <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-            <!-- Model Line input -->
-            <div class="col-md-3">
-                <select name="model_line" class="form-control select2" id="model_line" required disabled>
-                    <option value="" disabled selected>Select Model Line</option>
-                </select>
-            </div>
+                            <!-- Model Line input -->
+                            <div class="col-md-3">
+                                <select name="model_line" class="form-control select2" id="model_line" required disabled>
+                                    <option value="" disabled selected>Select Model Line</option>
+                                </select>
+                            </div>
 
-            <!-- Trim dropdown -->
-            <div class="col-md-3">
-                <select name="trim" class="form-control select2" id="trim" required disabled>
-                    <option value="" disabled selected>Select Trim</option>
-                </select>
-            </div>
+                            <!-- Trim dropdown -->
+                            <div class="col-md-3">
+                                <select name="trim" class="form-control select2" id="trim" required disabled>
+                                    <option value="" disabled selected>Select Trim</option>
+                                </select>
+                            </div>
 
-            <!-- Variant dropdown -->
-            <div class="col-md-3">
-                <select name="variant" class="form-control select2" id="variant" required disabled>
-                    <option value="" disabled selected>Select Variant</option>
-                </select>
-            </div>
-            <div class="col-md-3 mt-4">
-        <input type="number" name="asking_price" class="form-control" id="asking_price" placeholder="Enter asking price" required>
-    </div>
+                            <!-- Variant dropdown -->
+                            <div class="col-md-3">
+                                <select name="variant" class="form-control select2" id="variant" required disabled>
+                                    <option value="" disabled selected>Select Variant</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mt-4">
+                        <input type="number" name="asking_price" class="form-control" id="asking_price" placeholder="Enter asking price" required>
+                    </div>
 
-    <!-- Offer Price input -->
-    <div class="col-md-3 mt-4">
-        <input type="number" name="offer_price" class="form-control" id="offer_price" placeholder="Enter offer price" required>
-    </div>
-    <div class="col-md-3 mt-4">
-        <input type="number" name="qty" class="form-control" id="qty" placeholder="Enter Quanity" required>
-    </div>
-    <div class="col-md-3 mt-4">
-    <select name="countries_id" class="form-control select2" id="countries_id" required>
-        <option value="" disabled selected>Select Final Destination</option>
-        @foreach($countries as $country)
-    <option value="{{ $country->id }}">{{ $country->name }}</option> <!-- 'id' should match the foreign key -->
-@endforeach
-    </select>
-</div>
-    <div id="custom_trim_container" style="display:none;" class="col-md-3 mt-4">
-    <input type="text" id="custom_trim" name="custom_trim" placeholder="Enter custom trim">
-</div>
+                    <!-- Offer Price input -->
+                    <div class="col-md-3 mt-4">
+                        <input type="number" name="offer_price" class="form-control" id="offer_price" placeholder="Enter offer price" required>
+                    </div>
+                    <div class="col-md-3 mt-4">
+                        <input type="number" name="qty" class="form-control" id="qty" placeholder="Enter Quanity" required>
+                    </div>
+                    <div class="col-md-3 mt-4">
+                    <select name="countries_id" class="form-control select2" id="countries_id" required>
+                        <option value="" disabled selected>Select Final Destination</option>
+                        @foreach($countries as $country)
+                    <option value="{{ $country->id }}">{{ $country->name }}</option> <!-- 'id' should match the foreign key -->
+                @endforeach
+                    </select>
+                </div>
+                    <div id="custom_trim_container" style="display:none;" class="col-md-3 mt-4">
+                    <input type="text" id="custom_trim" name="custom_trim" placeholder="Enter custom trim">
+                </div>
 
-<div id="custom_variant_container" style="display:none;" class="col-md-3 mt-4">
-    <input type="text" id="custom_variant" name="custom_variant" placeholder="Enter custom variant">
-</div>
-        </div>
-        <!-- Submit button in a new row -->
-        <div class="form-row mt-3">
-            <div class="col-md-12">
-                <button type="submit" class="btn btn-primary btn-block">Add Vehicles</button>
+                <div id="custom_variant_container" style="display:none;" class="col-md-3 mt-4">
+                    <input type="text" id="custom_variant" name="custom_variant" placeholder="Enter custom variant">
+                </div>
+                        </div>
+                        <!-- Submit button in a new row -->
+                        <div class="form-row mt-3">
+                            <div class="col-md-12">
+                                <button type="submit" class="btn btn-primary btn-block">Add Vehicles</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                @endif
             </div>
-        </div>
-    </form>
-</div>
-@endif
-</div>
 <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
     <h5 class="mt-3">Documents & Files</h5>
     @php
@@ -1101,11 +1129,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
     });
 </script>
 <script>
+
+
+
 $(document).ready(function() {
+    // var itiSecondary;
+
     $('.edit-btn').on('click', function() {
     var td = $(this).closest('tr').find('td').first();
     var field = td.data('field');
     var currentValue = td.text().trim();
+    var editButton = $(this); 
 
     if (td.find('select').length === 0 && td.find('input').length === 0) {
         if (field === 'priority') {
@@ -1118,7 +1152,20 @@ $(document).ready(function() {
                     <option value="High" ${currentValue === 'High' ? 'selected' : ''}>High</option>
                 </select>`;
             td.html(dropdown);
-            $(this).html('<i class="fas fa-save"></i>');
+            editButton.html('<i class="fas fa-save"></i>');
+            // } else if (field === 'secondary_phone_number') {
+            //     td.html('<input type="tel" id="secondary-phone-input" class="form-control" value="' + currentValue + '">');
+            //     editButton.html('<i class="fas fa-save"></i>');
+            //     setTimeout(function() {
+            //         var secondaryPhoneInputField = document.querySelector("#secondary-phone-input");
+            //         itiSecondary = window.intlTelInput(secondaryPhoneInputField, {
+            //             utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
+            //             separateDialCode: false,
+            //             autoFormat: false,
+            //             nationalMode: false
+            //         });
+            //     }, 100);
+
         } else if (field === 'language') {
             var dropdown = '<select class="form-control">';
             @foreach($languages as $language)
@@ -1126,21 +1173,22 @@ $(document).ready(function() {
             @endforeach
             dropdown += '</select>';
             td.html(dropdown);
-            $(this).html('<i class="fas fa-save"></i>');
+            editButton.html('<i class="fas fa-save"></i>');
         } else if (field === 'location') {
             var dropdown = '<select class="form-control">';
             @foreach($countries as $country)
-dropdown += `<option value="{{ $country['name'] }}" ${currentValue === '{{ $country['name'] }}' ? 'selected' : ''}>{{ $country['name'] }}</option>`;
-@endforeach
-dropdown += '</select>';
-td.html(dropdown);
-$(this).html('<i class="fas fa-save"></i>');
+                dropdown += `<option value="{{ $country['name'] }}" ${currentValue === '{{ $country['name'] }}' ? 'selected' : ''}>{{ $country['name'] }}</option>`;
+                @endforeach
+                dropdown += '</select>';
+                td.html(dropdown);
+                editButton.html('<i class="fas fa-save"></i>');
         } else {
             var currentValue = td.text().trim();
             td.html('<input type="text" class="form-control" value="' + currentValue + '">');
             $(this).html('<i class="fas fa-save"></i>'); // Change icon to save
         }
-    } else {
+    } 
+    else {
         var newValue;
         
         if (td.find('select').length > 0) {
@@ -1171,7 +1219,7 @@ $(this).html('<i class="fas fa-save"></i>');
             console.log('Input is empty');
         }
     }
-});
+    });
 });
 // Function to remove model line
 function removeModelLine(requirementId) {

@@ -26,6 +26,7 @@ use App\Http\Controllers\HRM\Employee\SeparationController;
 use App\Http\Controllers\HRM\OnBoarding\JoiningReportController;
 use App\Http\Controllers\HRM\OnBoarding\AssetAllocationController;
 use App\Http\Controllers\WorkOrderController;
+use App\Http\Controllers\WorkOrderExportController;
 use App\Http\Controllers\WOApprovalsController;
 use App\Http\Controllers\WoDocsStatusController;
 use App\Http\Controllers\WoStatusController;
@@ -454,6 +455,7 @@ Route::get('/d', function () {
     Route::resource('work-order', WorkOrderController::class)->only([
         'show','store','edit','update','create'
     ]);
+    Route::get('/export-work-orders', [WorkOrderExportController::class, 'export']);
     // Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments']);
     Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments'])->name('comments.get');
     Route::delete('/workorder/{id}', [WorkOrderController::class, 'destroy'])->name('workorder.destroy');
@@ -526,11 +528,7 @@ Route::get('/d', function () {
     Route::get('companyDomains', [CompanyDomainController::class, 'index'])->name('companyDomains.index');    
 
     // GRN List 
-    Route::get('/grn-list', function () {
-        $grns = Grn::with('vehicles')->get();
-        return view('grn_list.index', compact('grns'));
-    })->name('grn.index');   
-    
+    Route::get('/grn-list', [VehiclesController::class, 'Grnlist'])->name('grn.index');   
     // Demand & Planning Module
 
     // Demands
@@ -638,6 +636,8 @@ Route::get('/d', function () {
     Route::resource('lead_source', LeadSourceController::class);
     Route::get('calls-bulk/createbulk', [CallsController::class,'createbulk'])->name('calls.createbulk');
     Route::post('/uploadingbulk', [CallsController::class, 'uploadingbulk'])->name('calls.uploadingbulk');
+    Route::post('/summernote/upload', [CallsController::class, 'upload'])->name('summernote.upload');
+
     Route::resource('strategy', StrategyController::class);
     Route::post('calls/check-existence', [CallsController::class, 'checkExistence'])->name('checkExistence');
     Route::post('calls/check-checkExistenceupdatecalls', [CallsController::class, 'checkExistenceupdatecalls'])->name('checkExistenceupdatecalls');
@@ -773,9 +773,9 @@ Route::get('/d', function () {
     Route::get('/vehicles/getVehicleDetails', [VehiclesController::class, 'getVehicleDetails'])->name('vehicles.getVehicleDetails');
 
     Route::get('vehiclesde/{id}', [VehiclesController::class, 'deletes'])->name('vehiclesde.deletes');
-    Route::get('grnlist/netsuitgrn', [MovementController::class, 'grnlist'])->name('grnlist.create');
-    Route::get('grnlist/grnsimplefile', [MovementController::class,'grnsimplefile'])->name('grnlist.grnsimplefile');
-    Route::post('grnlist/post-file', [MovementController::class, 'grnfilepost'])->name('grnlist.grnfilepost');
+    // Route::get('grnlist/netsuitgrn', [MovementController::class, 'grnlist'])->name('grnlist.create'); // not using anywhere
+    // Route::get('grnlist/grnsimplefile', [MovementController::class,'grnsimplefile'])->name('grnlist.grnsimplefile');
+    // Route::post('grnlist/post-file', [MovementController::class, 'grnfilepost'])->name('grnlist.grnfilepost'); // not using anywhere
     Route::post('/check-create-vins', [PurchasingOrderController::class, 'checkcreatevins'])->name('vehicles.check-create-vins');
     Route::post('/check-create-vins-inside', [PurchasingOrderController::class, 'checkcreatevinsinside'])->name('vehicles.check-create-vins-inside');
     Route::patch('/check-edit-vins', [PurchasingOrderController::class, 'checkeditvins'])->name('vehicles.check-edit-vins');
@@ -855,6 +855,8 @@ Route::get('/d', function () {
     Route::get('vehicles/viewalls', [VehiclesController::class, 'viewalls'])->name('vehicles.viewalls');
     Route::get('/get-updated-vehicle/{id}', [VehiclesController::class, 'getUpdatedVehicle'])->name('getUpdatedVehicle');
     Route::get('/getBrandsAndModelLines', [PurchasingOrderController::class, 'getBrandsAndModelLines']);
+    Route::post('movement/unique-check',[MovementController::class,'checkDuplicateMovement'])->name('movement.unique-check');
+
     //booking
     Route::get('booking/create/{call_id}', [BookingController::class, 'create'])->name('booking.create');
     Route::get('/get-model-lines/booking/{brandId}', [BookingController::class, 'getModelLines'])->name('booking.getmodel');
@@ -1063,7 +1065,7 @@ Route::get('/d', function () {
     Route::post('/update-purchasing-additionalpaymentcomplete', [PurchasingOrderController::class, 'completedadditionalpayment'])->name('purchasing.completedadditionalpayment');
     Route::get('netsuitegrn/addingnetsuitegrn', [ApprovalsController::class, 'addingnetsuitegrn'])->name('netsuitegrn.addingnetsuitegrn');
     Route::post('netsuitegrn/submit', [ApprovalsController::class, 'submitGrn'])->name('netsuitegrn.submit');
-    Route::post('netsuitegrn/add', [ApprovalsController::class, 'addGrn'])->name('netsuitegrn.add');
+    // Route::post('netsuitegrn/add', [ApprovalsController::class, 'addGrn'])->name('netsuitegrn.add');
     Route::get('/get-vehicles/{purchaseOrderId}', [PurchasingOrderController::class, 'getVehiclesByPurchaseOrderId']);
     Route::get('/getVehicles/{purchaseOrderId}', [PurchasingOrderController::class, 'getVehicles']);
     Route::get('/getVehicleDetails/{vehicleId}', [PurchasingOrderController::class, 'getVehicleDetails']);
@@ -1169,4 +1171,7 @@ Route::get('/d', function () {
     Route::get('/swift_copy/send-email-to-supplier', [PurchasingOrderController::class, 'sendSwiftCopy'])
     ->name('send-swift-copy.email');
     Route::post('/check-vehicle-quantity', [VehiclesController::class, 'checkVehicleQuantity'])->name('check.vehicle.quantity');
+    Route::get('/salespersons/list', [SalesOrderController::class, 'getSalespersons'])->name('salespersons.list');
+    Route::post('/salesorder/updateSalesperson', [SalesOrderController::class, 'updateSalesperson'])->name('salesorder.updateSalesperson');
+
 });

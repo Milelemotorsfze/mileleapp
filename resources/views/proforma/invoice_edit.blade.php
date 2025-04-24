@@ -361,19 +361,20 @@
                         Sales Person :
                     </div>
                     <div class="col-sm-6">
-    <select id="salespersons" name="salespersons" class="form-select" required>
-        @foreach ($sales_persons as $sales_person)
-            @php
-                $sales_person_details = DB::table('users')->where('id', $sales_person->model_id)->first();
-                $sales_person_name = $sales_person_details->name;
-                $selected = ($sales_person->model_id == $quotation->created_by) ? 'selected' : '';
-            @endphp
-            <option value="{{ $sales_person->model_id }}" {{ $selected }}>{{ $sales_person_name }}</option>      
-        @endforeach
-    </select>
-</div>
+                  
+                        <select id="salespersons" name="salespersons" class="form-select" required>
+                            @foreach ($sales_persons as $sales_person)
+                                @php
+                                    $sales_person_details = DB::table('users')->where('id', $sales_person->model_id)->first();
+                                    $sales_person_name = $sales_person_details->name;
+                                    $selected = ($sales_person->model_id == $quotation->created_by) ? 'selected' : '';
+                                @endphp
+                                <option value="{{ $sales_person->model_id }}" {{ $selected }}>{{ $sales_person_name }}</option>      
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
-                    @else
+                @else
                 @php
                 $user = \Illuminate\Support\Facades\Auth::user();
                 $empProfile = $user->empProfile;
@@ -383,7 +384,7 @@
                         Sales Person :
                     </div>
                     <div class="col-sm-6">
-                        {{ Auth::user()->name }}
+                    {{ $quotation->createdBy->name ?? ''}}
                     </div>
                 </div>
                 <div class="row mt-2">

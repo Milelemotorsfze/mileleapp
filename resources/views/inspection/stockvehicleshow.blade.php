@@ -12,143 +12,143 @@
     <br>
 </div>
 <div class="card-body">
-        <div class="row">
+    <div class="row">
         <div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
+            <div class="row">
+                <div class="col-md-4">
                     <label><strong>Brand</strong></label>
-</div>
-<div class="col-md-8">
+                </div>
+                <div class="col-md-8">
                     {{$brand->brand_name ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="row">
+                <div class="col-md-4">
                     <label><strong>Model Line</strong></label>
-</div>
-<div class="col-md-8">
+                </div>
+                <div class="col-md-8">
                     {{$model_line->model_line ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-6">
-<div class="row">
-<div class="col-md-4">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-4">
                     <label><strong>Model Detail</strong></label>
-</div>
-<div class="col-md-8">
+                </div>
+                <div class="col-md-8">
                     {{$variant->model_detail ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="row">
+                <div class="col-md-4">
                     <label><strong>Variant</strong></label>
-</div>
-<div class="col-md-8">
+                </div>
+                <div class="col-md-8">
                     {{$variant->name ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="row">
+                <div class="col-md-4">
                     <label><strong>Model Year</strong></label>
-</div>
-<div class="col-md-8">
+                </div>
+                <div class="col-md-8">
                     {{$variant->my ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-6">
-<div class="row">
-<div class="col-md-4">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-4">
                     <label><strong>Variant Detail</strong></label>
-</div>
-<div class="col-md-8">
+                </div>
+                <div class="col-md-8">
                     {{$variant->detail ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="row">
+                <div class="col-md-4">
                     <label><strong>Steering</strong></label>
-</div>
-<div class="col-md-8">
+                </div>
+                <div class="col-md-8">
                     {{$variant->steering ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="row">
+                <div class="col-md-4">
                     <label><strong>Seats</strong></label>
-</div>
-<div class="col-md-8">
+                </div>
+                <div class="col-md-8">
                     {{$variant->seat ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-6">
-<div class="row">
-<div class="col-md-4">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-4">
                     <label><strong>Fuel Type</strong></label>
-</div>
-<div class="col-md-8">
+                </div>
+                <div class="col-md-8">
                     {{$variant->fuel_type ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="row">
+                <div class="col-md-4">
                     <label><strong>Transmission</strong></label>
-</div>
-<div class="col-md-8">
+                </div>
+                <div class="col-md-8">
                     {{$variant->gearbox ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="row">
+                <div class="col-md-4">
                     <label><strong>Production Year</strong></label>
-</div>
-<div class="col-md-8">
+                </div>
+                <div class="col-md-8">
                     {{$vehicle->ppmmyyy ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-6">
-<div class="row">
-<div class="col-md-4">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-4">
                     <label><strong>Interior Color</strong></label>
-</div>
-<div class="col-md-8">
+                </div>
+                <div class="col-md-8">
                     {{$intColor->name ?? ''}}
-</div>
-</div>
-</div>
-            <div class="col-md-3">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
             <div class="row">
-            <div class="col-md-4">
-                                <label><strong>Exterior Color</strong></label>
+                <div class="col-md-4">
+                    <label><strong>Exterior Color</strong></label>
+                </div>
+                <div class="col-md-8">
+                    {{$extColor->name ?? ''}}
+                </div>
             </div>
-            <div class="col-md-8">
-                            {{$extColor->name ?? ''}}
-            </div>
-            </div>
-            </div>
-            </div>
-            <hr>
-            <form id="inspection-form" action="{{ route('dailyinspection.routainupdate', $vehicle->id) }}" method="POST" enctype="multipart/form-data">
-             @method('PUT')
-            @csrf
-            <div class="row">
+        </div>
+    </div>
+    <hr>
+    <form id="inspection-form" action="{{ route('dailyinspection.routainupdate', $vehicle->id) }}" method="POST" enctype="multipart/form-data">
+        @method('PUT')
+    @csrf
+    <div class="row">
         <div class="col-md-12">
             <div class="table-responsive">
                 <table class="table table-bordered">

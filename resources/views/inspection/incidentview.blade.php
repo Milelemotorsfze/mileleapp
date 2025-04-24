@@ -202,6 +202,17 @@
         </div>  
       </div> 
       </div>
+      <div class="modal fade" id="variantDetailModal" tabindex="-1" aria-labelledby="variantDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="variantDetailModalLabel">Variant Detail</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="variantDetailModalBody" style="white-space: pre-wrap;"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <script>
@@ -222,13 +233,41 @@
                 { data: 'created_at_pending', name: 'inspection.created_at' },
                 { data: 'remark', name: 'inspection.remark' },
                 { data: 'type', name: 'incident.type' },
-                { data: 'narration', name: 'incident.narration' },
+                {
+                  data: 'narration',
+                  name: 'incident.narration',
+                  render: function (data, type, row) {
+                    if (type === 'display' && data) {
+                      let words = data.split(/\s+/);
+                      if (words.length > 10) {
+                        let shortText = words.slice(0, 10).join(' ') + '...';
+                        return `${shortText} <a href="#" class="read-more-link" data-title="Narration" data-detail="${encodeURIComponent(data)}">Read More</a>`;
+                      } else {
+                        return data;
+                      }
+                    }
+                    return data;
+                  }
+                },
                 { data: 'reason', name: 'incident.reason' },
                 { data: 'driven_by', name: 'incident.driven_by' },
                 { data: 'responsivity', name: 'incident.responsivity' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'detail', name: 'varaints.detail' },
+                { data: 'detail', name: 'varaints.detail',
+                  render: function (data, type, row) {
+                    if (type === 'display' && data) {
+                      let words = data.split(/\s+/);
+                      if (words.length > 10) {
+                        let shortText = words.slice(0, 10).join(' ') + '...';
+                        return `${shortText} <a href="#" class="read-more-link" data-detail="${encodeURIComponent(data)}">Read More</a>`;
+                      } else {
+                        return data;
+                      }
+                    }
+                    return data;
+                  }
+                },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'seat', name: 'varaints.seat' },
@@ -265,13 +304,40 @@
                 { data: 'created_at_repaired', name: 'inspection.created_at' },
                 { data: 'remark', name: 'inspection.remark' },
                 { data: 'type', name: 'incident.type' },
-                { data: 'narration', name: 'incident.narration' },
-                { data: 'reason', name: 'incident.reason' },
+                {
+                  data: 'narration',
+                  name: 'incident.narration',
+                  render: function (data, type, row) {
+                    if (type === 'display' && data) {
+                      let words = data.split(/\s+/);
+                      if (words.length > 10) {
+                        let shortText = words.slice(0, 10).join(' ') + '...';
+                        return `${shortText} <a href="#" class="read-more-link" data-title="Narration" data-detail="${encodeURIComponent(data)}">Read More</a>`;
+                      } else {
+                        return data;
+                      }
+                    }
+                    return data;
+                  }
+                },                { data: 'reason', name: 'incident.reason' },
                 { data: 'driven_by', name: 'incident.driven_by' },
                 { data: 'responsivity', name: 'incident.responsivity' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'detail', name: 'varaints.detail' },
+                { data: 'detail', name: 'varaints.detail',
+                  render: function (data, type, row) {
+                    if (type === 'display' && data) {
+                      let words = data.split(/\s+/);
+                      if (words.length > 10) {
+                        let shortText = words.slice(0, 10).join(' ') + '...';
+                        return `${shortText} <a href="#" class="read-more-link" data-detail="${encodeURIComponent(data)}">Read More</a>`;
+                      } else {
+                        return data;
+                      }
+                    }
+                    return data;
+                  }
+                },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'seat', name: 'varaints.seat' },
@@ -295,13 +361,41 @@
                 { data: 'created_at', name: 'inspection.created_at' },
                 { data: 'remark', name: 'inspection.remark' },
                 { data: 'type', name: 'incident.type' },
-                { data: 'narration', name: 'incident.narration' },
+                {
+                  data: 'narration',
+                  name: 'incident.narration',
+                  render: function (data, type, row) {
+                    if (type === 'display' && data) {
+                      let words = data.split(/\s+/);
+                      if (words.length > 10) {
+                        let shortText = words.slice(0, 10).join(' ') + '...';
+                        return `${shortText} <a href="#" class="read-more-link" data-title="Narration" data-detail="${encodeURIComponent(data)}">Read More</a>`;
+                      } else {
+                        return data;
+                      }
+                    }
+                    return data;
+                  }
+                },                
                 { data: 'reason', name: 'incident.reason' },
                 { data: 'driven_by', name: 'incident.driven_by' },
                 { data: 'responsivity', name: 'incident.responsivity' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'detail', name: 'varaints.detail' },
+                { data: 'detail', name: 'varaints.detail' ,
+                  render: function (data, type, row) {
+                    if (type === 'display' && data) {
+                      let words = data.split(/\s+/);
+                      if (words.length > 10) {
+                        let shortText = words.slice(0, 10).join(' ') + '...';
+                        return `${shortText} <a href="#" class="read-more-link" data-detail="${encodeURIComponent(data)}">Read More</a>`;
+                      } else {
+                        return data;
+                      }
+                    }
+                    return data;
+                }
+                },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'seat', name: 'varaints.seat' },
@@ -438,6 +532,12 @@ function saveincidentupdate() {
     });
 </script>
 <script>
+  $('body').on('click', '.read-more-link', function (e) {
+      e.preventDefault();
+      var fullDetail = decodeURIComponent($(this).data('detail'));
+      $('#variantDetailModalBody').html(fullDetail);
+      $('#variantDetailModal').modal('show');
+  });
     const successMessage = document.getElementById('success-message');
     if (successMessage) {
         setTimeout(() => {

@@ -637,6 +637,7 @@ table.dataTable thead th select {
                   <th>Document Owership</th>
                   <th>Custom Inspection Number</th>
                   <th>Custom Inspection Status</th>
+                  <th>Work Order Date</th>
                   <th>Comments</th>
                 </tr>
               </thead>
@@ -663,7 +664,7 @@ table.dataTable thead th select {
       </div>
     </div>
   </div>
-  <script>
+<script>
         $(document).ready(function () {
         var now = new Date();
     var columns3 = [
@@ -708,10 +709,20 @@ table.dataTable thead th select {
         return ''; // If no date, return empty
     }
 },
-        { data: 'grn_number', name: 'grn.grn_number' },
-        {
+{
+    data: 'grn_number',
+    name: 'movement_grns.grn_number',
+    render: function(data, type, row) {
+        if (row.inspection_status == 'Approved') {
+           
+            return data;
+        }
+        return ''; // If no data, return empty
+    }
+},
+    {
     data: 'date',
-    name: 'grn.date',
+    name: 'movements_reference.date',
     render: function(data, type, row) {
         if (data) {
             // Assuming data is in Y-m-d format (default SQL date format)
@@ -970,6 +981,20 @@ table.dataTable thead th select {
             return data ? data : '';
         }
     },
+    {
+        data: 'work_order_date',
+        name: 'work_orders.date',
+        render: function(data, type, row) {
+            if (data) {
+                var dateObj = new Date(data);
+                var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                    day: '2-digit', month: 'short', year: 'numeric'
+                });
+                return formattedDate;
+            }
+            return '';
+        }
+    },
         {
     data: null,
     name: 'chat',
@@ -992,7 +1017,7 @@ table.dataTable thead th select {
         const buttonClass = messageCount > 0 ? 'btn-warning' : 'btn-primary';
 
         return `
-            <div style="position: relative; display: inline-block;">
+            <div style="display: inline-block;">
                 ${badgeHtml}
                 <button class="btn ${buttonClass} btn-sm" onclick="openChatModal(${row.id})">
                     Comments
@@ -1010,8 +1035,8 @@ table.dataTable thead th select {
         2: 'purchasing_order.po_number',
         3: 'purchasing_order.po_date',
         4: 'vehicles.estimation_date',
-        5: 'grn.grn_number',
-        6: 'grn.date',
+        5: 'movement_grns.grn_number',
+        6: 'movements_reference.date',
         7: 'vehicles.inspection_date',
         8: 'vehicles.grn_remark',
         9: 'grn_inspectionid',
@@ -1094,17 +1119,17 @@ if (hasManagementPermission) {
         {
             targets: 1,
             render: function (data, type, row) {
-                if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id == null) {
+                if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.movement_grn_id == null) {
                     return 'Incoming';
-                } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id != null) {
+                } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.movement_grn_id != null) {
                     return 'Pending Inspection';
                 } else if (row.inspection_date != null && row.so_id == null && (row.reservation_end_date == null || new Date(row.reservation_end_date) < now)) {
                     return 'Available Stock';
                   } else if (row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) >= now ) {
                     return 'Booked';
-                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.grn_id != null) {
+                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.movement_grn_id != null) {
                     return 'Sold';
-                } else if (row.inspection_date != null && row.gdn_id != null && row.grn_id != null) {
+                } else if (row.inspection_date != null && row.gdn_id != null && row.movement_grn_id != null) {
                     return 'Delivered';
                 } else {
                     return '';
@@ -1266,7 +1291,6 @@ $('#dtBasicExample3 tbody').on('click', 'td', function () {
         $hasonwershipPermission = Auth::user()->hasPermissionForSelectedRole('ownership-type');
         @endphp
         @if ($hasonwershipPermission)
-        console.log("inside");
             var dataownership = table3.row(this).data();
             openownershipModal(dataownership.id);
         @endif

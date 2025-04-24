@@ -605,6 +605,7 @@ table.dataTable thead th select {
                   <th>Document Owership</th>
                   <th>Custom Inspection Number</th>
                   <th>Custom Inspection Status</th>
+                  <th>Work Order Date</th>
                   <th>Comments</th>
                 </tr>
               </thead>
@@ -660,10 +661,20 @@ var columns6 = [
         return ''; // If no date, return empty
     }
 },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                {
+{
+    data: 'grn_number',
+    name: 'movement_grns.grn_number',
+    render: function(data, type, row) {
+        if (row.inspection_status == 'Approved') {
+           
+            return data;
+        }
+        return ''; // If no data, return empty
+    }
+},
+{
     data: 'date',
-    name: 'grn.date',
+    name: 'movements_reference.date',
     render: function(data, type, row) {
         if (data) {
             // Assuming data is in Y-m-d format (default SQL date format)
@@ -882,6 +893,20 @@ var columns6 = [
             return data ? data : '';
         }
     },
+    {
+        data: 'work_order_date',
+        name: 'work_orders.date',
+        render: function(data, type, row) {
+            if (data) {
+                var dateObj = new Date(data);
+                var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                    day: '2-digit', month: 'short', year: 'numeric'
+                });
+                return formattedDate;
+            }
+            return '';
+        }
+    },
         {
     data: null,
     name: 'chat',
@@ -904,7 +929,7 @@ var columns6 = [
         const buttonClass = messageCount > 0 ? 'btn-warning' : 'btn-primary';
 
         return `
-            <div style="position: relative; display: inline-block;">
+            <div style="display: inline-block;">
                 ${badgeHtml}
                 <button class="btn ${buttonClass} btn-sm" onclick="openChatModal(${row.id})">
                     Comments
@@ -920,8 +945,8 @@ var columns6 = [
         0: 'id',
         1: 'purchasing_order.po_number',
         2: 'purchasing_order.po_date',
-        3: 'grn.grn_number',
-        4: 'grn.date',
+        3: 'movement_grns.grn_number',
+        4: 'movements_reference.date',
         6: 'so.so_date',
         7: 'so.so_number',
         8: 'users.name',

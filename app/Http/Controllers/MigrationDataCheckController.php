@@ -16,11 +16,24 @@ use App\Models\LetterOfIndentDocument;
 use Illuminate\Support\Facades\File;
 use App\Models\ClientDocument;
 use App\Models\Inspection;
+use App\Models\Varaint;
+use App\Models\VariantItems;
 use App\Models\VariantRequest;
 use App\Models\VariantRequestItems;
 use App\Models\VehicleApprovalRequests;
 use App\Models\VehicleExtraItems;
+use App\Models\ModelSpecificationOption;
 use Carbon\Carbon;
+use App\Models\ModelSpecification;
+use App\Models\ModifiedVariants;
+use App\Models\MasterModelDescription;
+use App\Models\WOVehicles;
+use App\Models\Vehicles;
+use App\Models\Movement;
+use App\Models\MovementGrn;
+use App\Models\Grn;
+use App\Models\MovementsReference;
+use App\Models\ColorCode;
 
 use Illuminate\Http\Request;
 
@@ -31,20 +44,170 @@ class MigrationDataCheckController extends Controller
       */
     public function index(Request $request)
     {
-        // $inspections = Inspection::whereNot('stage','PDI')->get();
         
-        // $missingIds = [];
-        // foreach($inspections as $inspection) {
-        //    $isExist = VariantRequest::where('inspection_id', $inspection->id)->first();
-        //     if(!$isExist){
-        //         $missingIds[] = $inspection->id;
-        //     }
-        // }
-        // return $missingIds;
-        
-      
+    //    get all duplicates in varaint request items table
+//     $varaintModelSpecNotExist = [];
+//     $affectedIds = [];
 
-    
+// //    get all variant requestItems with approved inspection
+//        $all = VariantRequestItems::select('*', DB::raw('COUNT(*) as duplicate_count'))
+//        ->groupBy('variant_request_id', 'model_specification_id')
+//        ->whereNotIn('id', $affectedIds)
+//        ->having('duplicate_count', '>', 1)
+//        ->get();
+
+       
+//        foreach($all as $item) {
+       
+//         // chcek the vehicle model specification id specification option having this option
+//         // foreach($variantRequestItems as $variantRequestItem)
+//             $variantRequest = VariantRequest::where('id', $item->variant_request_id)->first();
+//           if($variantRequest) {
+//             $inspection =  Inspection::where('id', $variantRequest->inspection_id)->first();
+
+//             if($inspection) {
+//                 if($inspection->status == 'approved') {
+//                     // get the variant of vehicle
+        
+//                         $vehicle = Vehicles::find($inspection->vehicle_id);
+//                        $vaiantModelSpecification = VariantItems::where('varaint_id', $vehicle->varaints_id)
+//                         ->where('model_specification_id', $item->model_specification_id)
+//                         ->first();
+                       
+//                         if($vaiantModelSpecification) {
+//                             $variantRequestItems = VariantRequestItems::where('variant_request_id',$item->variant_request_id)
+//                                                 ->where('model_specification_id', $item->model_specification_id);
+//                             if($variantRequestItems->count() > 1) {
+//                                 // duplicate found
+        
+//                                 $issameExist = VariantRequestItems::where('variant_request_id',$item->variant_request_id)
+//                                                     ->where('model_specification_id', $item->model_specification_id)
+//                                                     ->where('model_specification_options_id', $vaiantModelSpecification->model_specification_options_id)
+//                                                     ->first();
+//                                 if($issameExist) {
+//                                     // same existing, keep exisiting and update deleted at of another
+//                                     VariantRequestItems::where('variant_request_id',$item->variant_request_id)
+//                                     ->where('model_specification_id', $item->model_specification_id)
+//                                     ->whereNot('id',$issameExist->id)
+//                                     ->update(['deleted_at' => Carbon::now()]);
+                                
+//                                 }else{
+//                                     // update one and remove other
+        
+//                                     $toKeep = VariantRequestItems::where('variant_request_id', $item->variant_request_id)
+//                                     ->where('model_specification_id', $item->model_specification_id)
+//                                     ->orderBy('id', 'asc') // Change as per requirement
+//                                     ->first();
+                            
+//                                 VariantRequestItems::where('variant_request_id', $item->variant_request_id)
+//                                     ->where('model_specification_id', $item->model_specification_id)
+//                                     ->whereNot('id', $toKeep->id) // Exclude the one to keep
+//                                     ->update(['deleted_at' => Carbon::now()]);
+//                                 }
+//                                 foreach($variantRequestItems as $variantRequestItem) {
+//                                     $affectedIds[] = $variantRequestItem->id;
+//                                 }
+                            
+//                                 // same 
+//                             }else{
+//                                 // only one
+//                                $isExist = $variantRequestItems = $variantRequestItems->first();
+//                                 $isExist->model_specification_options_id = $vaiantModelSpecification->model_specification_options_id;
+//                                 $isExist->save();
+//                                 // update existing one
+//                             }                    
+                                                
+//                         }else{
+//                             $varaintModelSpecNotExist[] = $item->id;
+//                         }
+//                     }
+//             }
+//           }
+           
+//        }
+
+//         info("affected rows");
+//         info($affectedIds);
+
+//         info("model spec not exist");
+//         info($varaintModelSpecNotExist);
+
+//         return 1;
+
+        // get all intColur
+     
+       // get all the grn vins groupby referenceid
+      $movements = Movement::where('from',1)
+       ->groupBy('reference_id')
+       ->get();
+        info("movement group by referece id");
+        info($movements);
+    //    return $movements;
+        foreach($movements as $movement) {
+            $grnVins = Movement::where('from',1)->where('reference_id',$movement->reference_id)->pluck('vin')->toArray();
+            $movementVehicleByPurchaseOrders = Vehicles::whereIn('vin', $grnVins)
+            ->groupBy('purchasing_order_id')
+            ->get();
+            info("grnvin");
+            info($grnVins);
+            info("po ids");
+            info($movementVehicleByPurchaseOrders);
+
+            foreach($movementVehicleByPurchaseOrders as $movementVehicleByPurchaseOrder) {
+               
+                $movementgrn = new MovementGrn();
+                if($movementVehicleByPurchaseOrder->grn_id) {
+                    $grn = Grn::find($movementVehicleByPurchaseOrder->grn_id);
+                  
+                    if($grn) {
+                        $movementgrn->grn_number = $grn->grn_number ?? '';
+                    }
+                }
+                $movementgrn->movement_reference_id = $movement->reference_id;
+                $movementgrn->purchase_order_id = $movementVehicleByPurchaseOrder->purchasing_order_id ?? '';
+                $movementgrn->save();
+
+                // chcek if any vehiccle have grn number and chcek all are same
+                // update this movement grn id against the vin in movement table
+                
+                    $mov =  MovementGrn::where('purchase_order_id', $movementVehicleByPurchaseOrder->purchasing_order_id)
+                                ->where('movement_reference_id', $movement->reference_id)->first();
+                                info($mov->id);
+                                // get the movement data under particular po and particular movement with vins
+                    $vindata =  Vehicles::whereIn('vin', $grnVins)
+                                     ->where('purchasing_order_id', $movementVehicleByPurchaseOrder->purchasing_order_id)
+                                     ->pluck('vin')->toArray();
+                                
+                    if($vindata) {
+                       info($vindata);
+                       Movement::whereIn('vin', $vindata)->update(['movement_grn_id' => $movementgrn->id]);
+                     
+
+                        // update movementgrnid in vehicle table under this po with this movement
+                        $vehicle = Vehicles::whereIn('vin', $vindata)->update(['movement_grn_id' => $movementgrn->id]);
+                       
+                }else{
+                    info("not existing movement");
+                    info($movement->reference_id);
+                    info($movementVehicleByPurchaseOrder->vin);
+                }
+                
+            }
+             
+        }
+
+        return 1;
+    //    $movementVehicleByPurchaseOrders = Vehicles::select('vin','purchasing_order_id')->whereIn('vin', $grnVins)
+    //    ->groupBy('purchasing_order_id')
+    //    ->get();
+
+    //     foreach($movementVehicleByPurchaseOrders as $movementVehicleByPurchaseOrder) {
+    //     $movementgrn = new MovementGrn();
+    //     $movementgrn->movement_reference_id = $movementsReferenceId;
+    //     $movementgrn->purchase_order_id = $movementVehicleByPurchaseOrder->purchasing_order_id ?? '';
+    //     $movementgrn->save();
+    //     }
+
     }
 
     public function PFIUniqueWithinYear() {

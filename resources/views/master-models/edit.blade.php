@@ -92,6 +92,9 @@
                             <option value="RHD"  {{ $masterModel->steering == "RHD" ? 'selected' : " "}} >RHD</option>
                         </select>
                     </div>
+                    @if($disableEdit == 1)
+                        <input type="hidden" name="steering" value="{{ $masterModel->steering }}">
+                    @endif
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">

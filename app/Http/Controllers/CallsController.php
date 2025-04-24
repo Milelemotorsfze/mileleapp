@@ -26,12 +26,15 @@ use App\Models\CallsRequirement;
 use Carbon\Carbon;
 use App\Models\Varaint;
 use App\Models\AvailableColour;
+use App\Rules\CountryCodes;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Response;
 use League\Csv\Writer;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Illuminate\Support\Facades\Validator; 
+use Illuminate\Support\Facades\File;
 
 class CallsController extends Controller
 {
@@ -338,7 +341,9 @@ class CallsController extends Controller
         $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
         $strategy = Strategy::get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
-        $sales_persons = ModelHasRoles::where('role_id', 7)->get();
+        $sales_persons = User::where('manual_lead_assign', 1)
+        ->orderBy('name', 'asc')
+        ->get();
         $useractivities =  New UserActivities();
         $useractivities->activity = "Create New Lead";
         $useractivities->users_id = Auth::id();
@@ -350,68 +355,120 @@ class CallsController extends Controller
      */
     public function store(Request $request)
     { 
-        $this->validate($request, [
-            'phone' => 'nullable|required_without:email',
-            'email' => 'nullable|required_without:phone|email',           
+        $validCountryCodes = CountryCodes::list();
+
+        $validator = Validator::make($request->all(), [
+            'phone' => ['nullable', 'required_without:email', function ($attribute, $value, $fail) use ($validCountryCodes) {
+            if (!empty($value)) {
+                $value = preg_replace('/[^\d+]/', '', $value);
+
+                if ($value[0] !== '+') {
+                    $value = '+' . $value;
+                }
+
+                $matchedCode = null;
+                foreach ($validCountryCodes as $code) {
+                    if (strpos($value, $code) === 0) {
+                        $matchedCode = $code;
+                        break;
+                    }
+                }
+
+                if (!$matchedCode) {
+                    return $fail('Invalid country code in phone number.');
+                }
+
+                $localPart = substr($value, strlen($matchedCode));
+
+                if (!ctype_digit($localPart)) {
+                    return $fail('Phone number can only contain digits after country code.');
+                }
+
+                $length = strlen($localPart);
+                if ($length < 5 || $length > 20) {
+                    return $fail('Phone number must be between 5 to 20 digits (excluding country code).');
+                }
+            }
+            }],
+            'email' => 'nullable|required_without:phone|email',
             'location' => 'required',
             'milelemotors' => 'required',
             'language' => 'required',
+            'strategy' => 'required', 
+            'priority' => 'required', 
             'model_line_ids' => 'array',
             'model_line_ids.*' => 'distinct',
             'type' => 'required',
             'sales_person_id' => ($request->input('sales-option') == "manual-assign") ? 'required' : '',
-        ]);      
+        ],
+        [
+            'milelemotors.required' => 'The Source field is required.',
+            'location.required' => 'The Destination field is required.',
+            'strategy.required' => 'The Strategy field is required.',  
+            'priority.required' => 'The Priority field is required.',  
+            'phone.regex' => 'Invalid Phone Number.',
+        ]);
+        
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput(); 
+        }
+        
         if ($request->input('sales-option') == "auto-assign") {
-        $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
-        $email = $request->input('email');
-        $phone = $request->input('phone');
-        $language = $request->input('language');
-        $sales_persons = ModelHasRoles::where('role_id', 7)
-        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-        ->where('users.status', 'active')
-        ->get();
-        $sales_person_id = null;
-        $existing_email_count = null;
-        $existing_phone_count = null;
-        $existing_language_count = null;
-        foreach ($sales_persons as $sales_person) {
-            if ($language == "English") {
-                $existing_email_count = Calls::where('email', $email)
-                ->whereIn('sales_person', $excluded_user_ids)
-                ->whereNotNull('email')
-                ->count();
-                $cleanedPhone = ltrim($phone, '+');
-                $existing_phone_count = Calls::where('phone', 'LIKE', '%' . $cleanedPhone)
-                ->whereIn('sales_person', $excluded_user_ids)
-                ->whereNotNull('phone')
-                ->count();
-                if ($existing_email_count > 0 || $existing_phone_count > 0) {
-                if($existing_email_count > 0)
-                {
-                    $sales_person = Calls::where(function ($query) use ($cleanedPhone, $email, $excluded_user_ids) {
-                        $query->where('phone', 'LIKE', '%' . $cleanedPhone)
-                              ->whereIn('sales_person', $excluded_user_ids)
-                              ->orWhere('email', $email);
-                    })
-                    ->where(function ($query) {
-                        $query->WhereNotNull('email');
-                    })
-                    ->orderBy('created_at', 'desc')
-                    ->first();
-                $sales_person_id = $sales_person->sales_person;
-                break;
-                }else
-                {
-                    $sales_person = Calls::where(function ($query) use ($cleanedPhone, $email, $excluded_user_ids) {
-                        $query->where('phone', 'LIKE', '%' . $cleanedPhone)->whereIn('sales_person', $excluded_user_ids);
-                    })
-                    ->orderBy('created_at', 'desc')
-                    ->first();
-                $sales_person_id = $sales_person->sales_person;
-                break;
+            $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
+            $email = $request->input('email');
+            $phone = $request->input('phone');
+            // $secondaryPhone = $request->input('secondary_phone_number');
+            $language = $request->input('language');
+            $sales_persons = ModelHasRoles::where('role_id', 7)
+            ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+            ->where('users.status', 'active')
+            ->get();
+
+            $sales_person_id = null;
+            $existing_email_count = null;
+            $existing_phone_count = null;
+            $existing_language_count = null;
+
+            foreach ($sales_persons as $sales_person) {
+                if ($language == "English") {
+                    $existing_email_count = Calls::where('email', $email)
+                    ->whereIn('sales_person', $excluded_user_ids)
+                    ->whereNotNull('email')
+                    ->count();
+                    $cleanedPhone = ltrim($phone, '+');
+                    $existing_phone_count = Calls::where('phone', 'LIKE', '%' . $cleanedPhone)
+                    ->whereIn('sales_person', $excluded_user_ids)
+                    ->whereNotNull('phone')
+                    ->count();
+                    if ($existing_email_count > 0 || $existing_phone_count > 0) {
+                    if($existing_email_count > 0)
+                    {
+                        $sales_person = Calls::where(function ($query) use ($cleanedPhone, $email, $excluded_user_ids) {
+                            $query->where('phone', 'LIKE', '%' . $cleanedPhone)
+                                ->whereIn('sales_person', $excluded_user_ids)
+                                ->orWhere('email', $email);
+                        })
+                        ->where(function ($query) {
+                            $query->WhereNotNull('email');
+                        })
+                        ->orderBy('created_at', 'desc')
+                        ->first();
+                    $sales_person_id = $sales_person->sales_person;
+                    break;
+                    }else
+                    {
+                        $sales_person = Calls::where(function ($query) use ($cleanedPhone, $email, $excluded_user_ids) {
+                            $query->where('phone', 'LIKE', '%' . $cleanedPhone)->whereIn('sales_person', $excluded_user_ids);
+                        })
+                        ->orderBy('created_at', 'desc')
+                        ->first();
+                    $sales_person_id = $sales_person->sales_person;
+                    break;
+                    }
                 }
-            }
-                else
+            else
                 {
                     $lowest_lead_sales_person = ModelHasRoles::select('model_id')
                                         ->where('role_id', 7)
@@ -444,7 +501,7 @@ class CallsController extends Controller
                     $sales_person = Calls::where(function ($query) use ($cleanedPhone, $email, $excluded_user_ids) {
                         $query->where('phone', 'LIKE', '%' . $cleanedPhone)
                                 ->whereIn('sales_person', $excluded_user_ids)
-                              ->orWhere('email', $email);
+                            ->orWhere('email', $email);
                     })
                     ->where(function ($query) {
                         $query->WhereNotNull('email');
@@ -478,140 +535,162 @@ class CallsController extends Controller
                 elseif ($existing_language_count > 1) {
                     $sales_person_ids = $sales_person_languages->pluck('sales_person');
                     $lowest_lead_sales_person = ModelHasRoles::select('model_id')
-    ->where('role_id', 7)
-    ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-    ->where('users.status', 'active')
-    ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
-    ->join('sales_person_laugauges', 'model_has_roles.model_id', '=', 'sales_person_laugauges.sales_person')
-    ->whereIn('model_has_roles.model_id', $excluded_user_ids)
-    ->whereIn('model_has_roles.model_id', $sales_person_ids)
-    ->where('calls.status', 'New')
-    ->where('sales_person_laugauges.language', $language)
-    ->groupBy('calls.sales_person')
-    ->orderByRaw('COUNT(calls.id) ASC')
-    ->first();
+                        ->where('role_id', 7)
+                        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+                        ->where('users.status', 'active')
+                        ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
+                        ->join('sales_person_laugauges', 'model_has_roles.model_id', '=', 'sales_person_laugauges.sales_person')
+                        ->whereIn('model_has_roles.model_id', $excluded_user_ids)
+                        ->whereIn('model_has_roles.model_id', $sales_person_ids)
+                        ->where('calls.status', 'New')
+                        ->where('sales_person_laugauges.language', $language)
+                        ->groupBy('calls.sales_person')
+                        ->orderByRaw('COUNT(calls.id) ASC')
+                        ->first();
 
-$sales_person_id = $lowest_lead_sales_person->model_id;
+                $sales_person_id = $lowest_lead_sales_person->model_id;
 
-                    break;
+                        break;
+                        }
+                    else{
+                        $lowest_lead_sales_person = ModelHasRoles::select('model_id')
+                        ->where('role_id', 7)
+                        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+                        ->where('users.status', 'active')
+                        ->leftJoin('calls', function ($join) {
+                            $join->on('model_has_roles.model_id', '=', 'calls.sales_person')
+                                ->where('calls.status', 'New');
+                        })
+                        ->whereIn('model_has_roles.model_id', $excluded_user_ids)
+                        ->groupBy('model_has_roles.model_id')
+                        ->orderByRaw('COALESCE(COUNT(calls.id), 0) ASC')
+                        ->first();
+                        $sales_person_id = $lowest_lead_sales_person->model_id;
                     }
-                else{
-                    $lowest_lead_sales_person = ModelHasRoles::select('model_id')
-                    ->where('role_id', 7)
-                    ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-                    ->where('users.status', 'active')
-                    ->leftJoin('calls', function ($join) {
-                        $join->on('model_has_roles.model_id', '=', 'calls.sales_person')
-                            ->where('calls.status', 'New');
-                    })
-                    ->whereIn('model_has_roles.model_id', $excluded_user_ids)
-                    ->groupBy('model_has_roles.model_id')
-                    ->orderByRaw('COALESCE(COUNT(calls.id), 0) ASC')
-                    ->first();
-                    $sales_person_id = $lowest_lead_sales_person->model_id;
+                    }
                 }
                 }
             }
+        else{
+            $sales_person_id = $request->input('sales_person_id');
+        }
+            $date = Carbon::now();
+            $date->setTimezone('Asia/Dubai');
+            $formattedDate = $date->format('Y-m-d H:i:s');
+            $straigy = $request->input('strategy');
+            $strategies_id = Strategy::where('name',$straigy)->first();
+            $dataValue = LeadSource::where('source_name', $request->input('milelemotors'))->value('id');
+            $data = [
+                'name' => $request->input('name'),
+                'source' => $dataValue,
+                'email' => $request->input('email'),
+                'type' => $request->input('type'),
+                'sales_person' => $sales_person_id,
+                'remarks' => $request->input('remarks'),
+                'assign_time' => Carbon::now(),
+                'location' => $request->input('location'),
+                'phone' => $request->input('phone'),
+                // 'secondary_phone_number' => $request->input('secondary_phone_number'),
+                'strategies_id' => $strategies_id->id,
+                'priority' => $request->input('priority'),
+                'custom_brand_model' => $request->input('custom_brand_model'),
+                'language' => $request->input('language'),
+                'created_at' => $formattedDate,
+                'assign_time' => $formattedDate,
+                'created_by' => Auth::id(),
+                'status' => "New",
+            ];
+            $model = new Calls($data);
+            $model->save();
+            $lastRecord = Calls::where('created_by', $data['created_by'])
+                    ->orderBy('id', 'desc')
+                    ->first();
+            $leads_notifications = New LeadsNotifications();
+            $leads_notifications->calls_id = $lastRecord->id;
+            $leads_notifications->remarks = "New Assign Lead";
+            $leads_notifications->status = "New";
+            $leads_notifications->user_id = $sales_person_id;
+            $leads_notifications->category = "New Assign Lead";
+            $leads_notifications->save();
+            $table_id = $lastRecord->id;
+            $modelLineIds = $request->input('model_line_ids');
+
+        if (!empty($modelLineIds) && is_array($modelLineIds) && $modelLineIds[0] !== null) {
+                foreach ($modelLineIds as $modelLineId) {
+                $datacalls = [
+                    'lead_id' => $table_id,
+                    'model_line_id' => $modelLineId,
+                    'created_at' => $formattedDate
+                ];
+
+                $model = new CallsRequirement($datacalls);
+                $model->save();
             }
         }
-    else{
-        $sales_person_id = $request->input('sales_person_id');
+            $logdata = [
+                'table_name' => "calls",
+                'table_id' => $table_id,
+                'user_id' => Auth::id(),
+                'action' => "Create",
+            ];
+            $model = new Logs($logdata);
+            $model->save();
+            $useractivities =  New UserActivities();
+            $useractivities->activity = "Store New Lead";
+            $useractivities->users_id = Auth::id();
+            $useractivities->save();
+            return redirect()->route('calls.index')
+            ->with('success','Call Record created successfully');
     }
-        $date = Carbon::now();
-        $date->setTimezone('Asia/Dubai');
-        $formattedDate = $date->format('Y-m-d H:i:s');
-        $straigy = $request->input('strategy');
-        $strategies_id = Strategy::where('name',$straigy)->first();
-        $dataValue = LeadSource::where('source_name', $request->input('milelemotors'))->value('id');
-        $data = [
-            'name' => $request->input('name'),
-            'source' => $dataValue,
-            'email' => $request->input('email'),
-            'type' => $request->input('type'),
-            'sales_person' => $sales_person_id,
-            'remarks' => $request->input('remarks'),
-            'assign_time' => Carbon::now(),
-            'location' => $request->input('location'),
-            'phone' => $request->input('phone'),
-            'strategies_id' => $strategies_id->id,
-            'priority' => $request->input('priority'),
-            'custom_brand_model' => $request->input('custom_brand_model'),
-            'language' => $request->input('language'),
-            'created_at' => $formattedDate,
-            'assign_time' => $formattedDate,
-            'created_by' => Auth::id(),
-            'status' => "New",
-        ];
-        $model = new Calls($data);
-        $model->save();
-        $lastRecord = Calls::where('created_by', $data['created_by'])
-                   ->orderBy('id', 'desc')
-                   ->first();
-        $leads_notifications = New LeadsNotifications();
-        $leads_notifications->calls_id = $lastRecord->id;
-        $leads_notifications->remarks = "New Assign Lead";
-        $leads_notifications->status = "New";
-        $leads_notifications->user_id = $sales_person_id;
-        $leads_notifications->category = "New Assign Lead";
-        $leads_notifications->save();
-        $table_id = $lastRecord->id;
-        $modelLineIds = $request->input('model_line_ids');
 
-if ($modelLineIds[0] !== null) {
-foreach ($modelLineIds as $modelLineId) {
-    $datacalls = [
-        'lead_id' => $table_id,
-        'model_line_id' => $modelLineId,
-        'created_at' => $formattedDate
-    ];
-
-    $model = new CallsRequirement($datacalls);
-    $model->save();
-}
-}
-        $logdata = [
-            'table_name' => "calls",
-            'table_id' => $table_id,
-            'user_id' => Auth::id(),
-            'action' => "Create",
-        ];
-        $model = new Logs($logdata);
-        $model->save();
+        public function upload(Request $request)
+        {
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                $filename = time().'_'.$file->getClientOriginalName();
+        
+                $destinationPath = public_path('uploads/summernote');
+        
+                if (!\File::isDirectory($destinationPath)) {
+                    \File::makeDirectory($destinationPath, 0777, true, true);
+                }
+        
+                $file->move($destinationPath, $filename);
+        
+                return asset('uploads/summernote/'.$filename); 
+            }
+        
+            return response()->json(['error' => 'No file uploaded.'], 400);
+        }        
+        
+    public function showcalls(Request $request, $call, $brand_id, $model_line_id, $location, $days, $custom_brand_model = null)
+    {   
+        $brandId = $request->route('brand_id');
+        $location = $request->route('location');
+        $modelLineId = $request->route('model_line_id');
+        $days = $request->route('days');
+        $startDate = Carbon::now()->subDays($days)->startOfDay();
+        $endDate = Carbon::now()->endOfDay();
+        $callIds = DB::table('calls')
+            ->join('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+            ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+            ->where('master_model_lines.brand_id', $brandId)
+            ->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})
+            ->where('master_model_lines.id', $modelLineId)
+            ->where('calls.location', $location)
+            ->whereBetween('calls.created_at', [$startDate, $endDate])
+            ->pluck('calls.id');   
+        $data = Calls::orderBy('status', 'DESC')
+        ->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})
+        ->whereIn('id', $callIds)
+        ->whereIn('status', ['new', 'active'])
+        ->get();
         $useractivities =  New UserActivities();
-        $useractivities->activity = "Store New Lead";
+        $useractivities->activity = "View The Most Lead Brand And Models";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-        return redirect()->route('calls.index')
-        ->with('success','Call Record created successfully');
+        return view('calls.resultbrand', compact('data'));
     }
-    public function showcalls(Request $request, $call, $brand_id, $model_line_id, $location, $days, $custom_brand_model = null)
-{   
-    $brandId = $request->route('brand_id');
-    $location = $request->route('location');
-    $modelLineId = $request->route('model_line_id');
-    $days = $request->route('days');
-    $startDate = Carbon::now()->subDays($days)->startOfDay();
-    $endDate = Carbon::now()->endOfDay();
-    $callIds = DB::table('calls')
-        ->join('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
-        ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
-        ->where('master_model_lines.brand_id', $brandId)
-        ->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})
-        ->where('master_model_lines.id', $modelLineId)
-        ->where('calls.location', $location)
-        ->whereBetween('calls.created_at', [$startDate, $endDate])
-        ->pluck('calls.id');   
-$data = Calls::orderBy('status', 'DESC')
-    ->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})
-    ->whereIn('id', $callIds)
-    ->whereIn('status', ['new', 'active'])
-    ->get();
-    $useractivities =  New UserActivities();
-    $useractivities->activity = "View The Most Lead Brand And Models";
-    $useractivities->users_id = Auth::id();
-    $useractivities->save();
-return view('calls.resultbrand', compact('data'));
-}
     /**
      * Show the form for editing the specified resource.
      */
@@ -621,13 +700,19 @@ return view('calls.resultbrand', compact('data'));
         $Language = Language::get();
         $countries = CountryListFacade::getList('en');
         $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
+        $strategy = Strategy::get();
+        $currentStrategyName = optional(Strategy::find($calls->strategies_id))->name;
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
-        $sales_persons = ModelHasRoles::where('role_id', 7)->get();
+        $sales_persons = User::select('id', 'name') 
+            ->where('manual_lead_assign', 1)
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
         $useractivities =  New UserActivities();
         $useractivities->activity = "Open Edit Page of Leads";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-        return view('calls.edit', compact('calls','countries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'Language'));
+        return view('calls.edit', compact('calls','countries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'Language', 'strategy', 'currentStrategyName'));
     }
 
     /**
@@ -635,15 +720,60 @@ return view('calls.resultbrand', compact('data'));
      */
     public function updatehol(Request $request)
     {
-        $this->validate($request, [
-            'phone' => 'nullable|required_without:email',
-            'email' => 'nullable|required_without:phone|email',           
+        $validCountryCodes = CountryCodes::list();
+
+        $validator = Validator::make($request->all(), [
+            'phone' => ['nullable', 'required_without:email', function ($attribute, $value, $fail) use ($validCountryCodes) {
+                if (!empty($value)) {
+                    $value = preg_replace('/[^\d+]/', '', $value);
+    
+                    if ($value[0] !== '+') {
+                        $value = '+' . $value;
+                    }
+    
+                    $matchedCode = null;
+                    foreach ($validCountryCodes as $code) {
+                        if (strpos($value, $code) === 0) {
+                            $matchedCode = $code;
+                            break;
+                        }
+                    }
+    
+                    if (!$matchedCode) {
+                        return $fail('Invalid country code in phone number.');
+                    }
+    
+                    $localPart = substr($value, strlen($matchedCode));
+    
+                    if (!ctype_digit($localPart)) {
+                        return $fail('Phone number can only contain digits after country code.');
+                    }
+    
+                    $length = strlen($localPart);
+                    if ($length < 5 || $length > 20) {
+                        return $fail('Phone number must be between 5 to 20 digits (excluding country code).');
+                    }
+                }
+            }],
+            'email' => 'nullable|required_without:phone|email',
             'location' => 'required',
             'milelemotors' => 'required',
             'language' => 'required',
+            'strategy' => 'required',
+            'priority' => 'required',
             'type' => 'required',
             'sales_person_id' => ($request->input('sales-option') == "manual-assign") ? 'required' : '',
-        ]);      
+        ], [
+            'milelemotors.required' => 'The Source field is required.',
+            'location.required' => 'The Destination field is required.',
+            'strategy.required' => 'The Strategy field is required.',
+            'priority.required' => 'The Priority field is required.',
+        ]);
+    
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         if ($request->input('sales-option') == "manual-assign") 
 		{
         $sales_person_id = $request->input('sales_person_id');
@@ -651,6 +781,15 @@ return view('calls.resultbrand', compact('data'));
 		else{
 		$sales_person_id = $request->input('old_sales_person_id');	
 		}
+
+        $strategyRecord = Strategy::where('name', $request->input('strategy'))->first();
+        $strategies_id = $strategyRecord ? $strategyRecord->id : null;
+
+        $phone = trim($request->input('phone'));
+        if (!empty($phone) && substr($phone, 0, 1) !== '+') {
+            $phone = '+' . $phone;
+        }
+
         $date = Carbon::now();
         $date->setTimezone('Asia/Dubai');
         $formattedDate = $date->format('Y-m-d H:i:s');
@@ -666,13 +805,19 @@ return view('calls.resultbrand', compact('data'));
 		$model->sales_person = $sales_person_id;
 		$model->remarks = $request->input('remarks');
 		$model->location = $request->input('location');
-		$model->phone = $request->input('phone');
+		$model->phone = $phone;
+		// $model->secondary_phone_number = $request->input('secondary_phone_number');
 		$model->custom_brand_model = $request->input('custom_brand_model');
 		$model->language = $request->input('language');
+        $model->strategies_id = $strategies_id;
+        $model->priority = $request->input('priority');
 		$model->status = "New";
 		$model->save();
 		}
-        $modelLineIds = $request->input('model_line_ids');
+        $modelLineIds = $request->input('model_line_ids') ?? [];
+
+        CallsRequirement::where('lead_id', $call_id)->delete();
+
             foreach ($modelLineIds as $modelLineId) {
                 if ($modelLineId !== null) {
                     $datacalls = [
@@ -737,40 +882,201 @@ return view('calls.resultbrand', compact('data'));
         $useractivities->save();
         return view('calls.createbulk', compact('countries','LeadSource'));
     }
-    public function uploadingbulk(Request $request)
+
+public function uploadingbulk(Request $request)
 {
-    if ($request->hasFile('file') && $request->file('file')->isValid()) {
-        $file = $request->file('file');
-        $extension = $file->getClientOriginalExtension();
-        // Check if the file is an Excel file
-        if (!in_array($extension, ['xls', 'xlsx'])) {
-            return back()->with('error', 'Invalid file format. Only Excel files (XLS or XLSX) are allowed.');
+
+    $validCountryCodes = CountryCodes::list();
+    
+    if (!$request->hasFile('file') || !$request->file('file')->isValid()) {
+        return back()->with('error', 'Please Select The Correct File for Uploading');
+    }
+
+    $file = $request->file('file');
+    $extension = $file->getClientOriginalExtension();
+
+    if (!in_array($extension, ['xls', 'xlsx'])) {
+        return back()->with('error', 'Invalid file format. Only Excel files (XLS or XLSX) are allowed.');
+    }
+
+    $rows = Excel::toArray([], $file, null, \Maatwebsite\Excel\Excel::XLSX)[0];
+
+    // Initialize arrays
+    $rejectedRows = [];
+    $acceptedCount = 0;
+    $rejectedCount = 0;
+
+    $headers = array_shift($rows);
+
+    foreach ($rows as $row) {
+
+        $nonEmptyValues = array_filter($row, function ($value) {
+            return !is_null($value) && trim($value) !== '';
+        });
+    
+        if (empty($nonEmptyValues)) {
+            continue;
         }
-        $rows = Excel::toArray([], $file, null, \Maatwebsite\Excel\Excel::XLSX)[0];
-        $filteredRows = [];
-        $rejectedRows = [];
-        $acceptedCount = 0;
-        $rejectedCount = 0;
-        $headers = array_shift($rows);
+        $phone = null;
+        $errorMessages = [];
+        $isPhoneValid = false;
+        $isEmailValid = false;
+
+        // Extract data
+        $name = $row[0];
+        $rawPhone  = trim($row[1]);
+        $email = trim($row[2]);
+        $sales_person = $row[4];
+        $source_name = $row[5];
+        $language = $row[6];
+        $location = $row[3];
+        $brand = $row[7];
+        $model_line_name = $row[8];
+        $custom_brand_model = $row[9];
+        $remarks = $row[10];
+        $strategies = $row[11];
+        $priority = strtolower(trim($row[12]));
+
+        $cleanPhone = preg_replace('/[\s\-]/', '', $rawPhone); 
+        
+        if (!empty($cleanPhone)) {
+            if ($cleanPhone[0] !== '+') {
+                $cleanPhone = '+' . $cleanPhone;
+            }
+        
+            if (!preg_match('/^\+\d{5,20}$/', $cleanPhone)) {
+                $errorMessages[] = 'Phone number must start with + and contain only digits, 5 to 20 digits total.';
+                $phone = null;
+            } else {
+                $matchedCode = false;
+                $matchedCodeLength = 0;
+        
+                foreach ($validCountryCodes as $code) {
+                    if (strpos($cleanPhone, $code) === 0) {
+                        $matchedCode = true;
+                        $matchedCodeLength = strlen($code);
+                        break;
+                    }
+                }
+        
+                if (!$matchedCode) {
+                    $errorMessages[] = 'Invalid country code in phone number.';
+                    $phone = null;
+                } else {
+                    $digitsAfterCode = substr($cleanPhone, $matchedCodeLength);
+                    if (!ctype_digit($digitsAfterCode)) {
+                        $errorMessages[] = 'Phone number can only contain digits after country code.';
+                        $phone = null;
+                    } elseif (strlen($digitsAfterCode) < 5 || strlen($digitsAfterCode) > 20) {
+                        $errorMessages[] = 'Phone number after country code must be 5 to 20 digits.';
+                        $phone = null;
+                    } else {
+                        $phone = $cleanPhone;
+                        $isPhoneValid = true;
+                    }
+                }
+            }
+        }        
+        
+
+        // **Email Validation**
+        if (!empty($email)) {
+            $emailValidator = Validator::make(['email' => $email], ['email' => 'email:rfc,dns']);
+            if ($emailValidator->fails()) {
+                $errorMessages[] = 'Invalid Email Address';
+                $email = null;
+            } else {
+                $isEmailValid = true;
+            }
+        }
+
+        if (!$isPhoneValid && !$isEmailValid) {
+            $errorMessages[] = 'Either a valid Email or Phone Number is required';
+        }
+
+        if (!$isPhoneValid && !$isEmailValid) {
+            $errorMessages[] = 'Either a valid Email or Phone Number is required';
+        }
+    
+        $leadSource = LeadSource::where('source_name', $source_name)->first();
+        if (!$leadSource) {
+            $errorMessages[] = 'Invalid or Missing Source';
+            $lead_source_id = null;
+        } else {
+            $lead_source_id = $leadSource->id;
+        }
+
+        $strategyRecord = Strategy::where('name', $strategies)->first();
+        if (!$strategyRecord) {
+            $errorMessages[] = 'Invalid or Missing Strategy';
+            $strategies_id = null;
+        } else {
+            $strategies_id = $strategyRecord->id;
+        }
+
+        $validPriorities = ['hot', 'low', 'normal'];
+            if (!in_array($priority, $validPriorities)) {
+                $errorMessages[] = 'Invalid Priority Value (Allowed: hot, low, normal)';
+        }
+
+        if (!empty($errorMessages)) {
+            $row[] = implode(', ', array_unique($errorMessages));
+            $rejectedRows[] = $row;
+            $rejectedCount++;
+            continue;
+        }
+
+        $acceptedCount++;
+    }
+
+    if ($rejectedCount > 0) {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $headers = [
+            'Name', 'Phone', 'Email', 'Location', 'Sales Person', 'Source Name', 'Language',
+             'Brand', 'Model Line Name', 'Custom Brand Model', 'Remarks', 'Strategies', 'Priority','Error Description'
+        ];
+        $sheet->fromArray($headers, null, 'A1');
+
+        foreach ($rejectedRows as $row) {
+            $sheet->fromArray($row, null, 'A' . ($sheet->getHighestRow() + 1));
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $tempFile = tempnam(sys_get_temp_dir(), 'rejected_excel_file');
+        $writer->save($tempFile);
+
+        $filename = 'rejected_records.xlsx';
+        Storage::put($filename, file_get_contents($tempFile));
+        unlink($tempFile);
+
+        $downloadLink = route('download.rejected', ['filename' => $filename]);
+
+        return back()->with('error', [
+            'message' => "Data upload failed! From the total " . (count($rows)) . " records, " . $acceptedCount . " were accepted & " . $rejectedCount . " were rejected. No data has been added.",
+            'fileLink' => $downloadLink,
+        ]);
+    }
+
+    else {
         foreach ($rows as $row) {
             $call = new Calls();
             $name = $row[0];
-            $phone = $row[1];
             $email = $row[2];
             $sales_person = $row[4];
             $source_name = $row[5];
             $language = $row[6];
             $location = $row[3];
-			$brand =  $row[7];
-			$model_line_name = $row[8];
+            $brand =  $row[7];
+            $model_line_name = $row[8];
             $custom_brand_model = $row[9];
             $remarks = $row[10];
             $strategies = $row[11];
-            $priority = $row[12];
+            $priority = strtolower(trim($row[12]));
             $errorDescription = '';
             if ($sales_person == null) {
                 $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
-			                $sales_persons = ModelHasRoles::where('role_id', 7)->get();
+                            $sales_persons = ModelHasRoles::where('role_id', 7)->get();
                             $sales_person_id = null;
                             $existing_email_count = null;
                             $existing_phone_count = null;
@@ -792,7 +1098,7 @@ return view('calls.resultbrand', compact('data'));
                                         $sales_person = Calls::where(function ($query) use ($cleanedPhone, $email, $excluded_user_ids) {
                                             $query->where('phone', 'LIKE', '%' . $cleanedPhone)
                                                     ->whereIn('sales_person', $excluded_user_ids)
-                                                  ->orWhere('email', $email);
+                                                ->orWhere('email', $email);
                                         })
                                         ->where(function ($query) {
                                             $query->WhereNotNull('email');
@@ -845,7 +1151,7 @@ return view('calls.resultbrand', compact('data'));
                                         $sales_person = Calls::where(function ($query) use ($cleanedPhone, $email, $excluded_user_ids) {
                                             $query->where('phone', 'LIKE', '%' . $cleanedPhone)
                                             ->whereIn('sales_person', $excluded_user_ids)
-                                                  ->orWhere('email', $email);
+                                                ->orWhere('email', $email);
                                         })
                                         ->where(function ($query) {
                                             $query->WhereNotNull('email');
@@ -914,7 +1220,7 @@ return view('calls.resultbrand', compact('data'));
                                 }
                                 $salesPerson = $sales_person_id;
                                 }
-             else {
+            else {
                 $salesPerson = User::where('name', $sales_person)->first();
                 if($salesPerson)
                 { 
@@ -932,7 +1238,7 @@ return view('calls.resultbrand', compact('data'));
                     $lead_source_id = 1;
                 }
             } 
-			else {
+            else {
                 $lead_source_id = 1;
             }
             if ($strategies !== null) {
@@ -943,7 +1249,7 @@ return view('calls.resultbrand', compact('data'));
                     $strategies_id = 1;
                 }
             } 
-			else {
+            else {
                 $strategies_id = 1;
             }
             if ($language !== null) {
@@ -954,20 +1260,36 @@ return view('calls.resultbrand', compact('data'));
                     $language = 'Not Supported';
                 }
             } 
-			else {
+            else {
                 $language = 'Not Supported';
             }
-            if ($location !== null) {
-                $location = Country::where('name', $location)->first();
-                if ($location) {
-                    $location = $location->name;
+            if (!empty($language)) {
+                $languageRecord = Language::where('name', $language)->first();
+                if ($languageRecord) {
+                    $language = $languageRecord->name;
                 } else {
-                    $location = 'Not Supported';
+                    $errorDescription .= 'Invalid Language ';
+                    $language = null;
                 }
-            } 
-			else {
-                $location = 'Not Supported';
+            } else {
+                $errorDescription .= 'Language Missing ';
+                $language = null;
             }
+            
+            if (!empty($location)) {
+                $locationRecord = Country::where('name', $location)->first();
+                if ($locationRecord) {
+                    $location = $locationRecord->name;
+                } else {
+                    $errorDescription .= 'Invalid Location ';
+                    $location = null;
+                }
+            } else {
+                $errorDescription .= 'Location Missing ';
+                $location = null;
+            }
+
+            
             if($lead_source_id === 1 || $salesPerson === 'not correct' || $language === 'Not Supported' || $location === 'Not Supported' || $strategies_id === 1)
             {
                 $filteredRows[] = $row;
@@ -997,15 +1319,19 @@ return view('calls.resultbrand', compact('data'));
                 $date = Carbon::now();
                 $date->setTimezone('Asia/Dubai');
                 $formattedDate = $date->format('Y-m-d H:i:s');
-                $call->name = $row[0];
-                $call->phone = $row[1];
-                $call->email = $row[2];
+                $call->name = !empty(trim($row[0])) ? trim($row[0]) : null;
+                $rawPhoneForDb = trim($row[1]);
+                if (!empty($rawPhoneForDb) && $rawPhoneForDb[0] !== '+') {
+                    $rawPhoneForDb = '+' . $rawPhoneForDb;
+                }
+                $call->phone = $rawPhoneForDb ?? null;
+                $call->email = !empty(trim($row[2])) ? trim($row[2]) : null;
                 $call->assign_time = Carbon::now();
                 $call->custom_brand_model = $row[9];
                 $call->remarks = $row[10];
                 $call->source = $lead_source_id;
                 $call->strategies_id = $strategies_id;
-                $call->priority = $row[12];
+                $call->priority = $priority;
                 $call->language = $row[6];
                 $call->sales_person = $sales_person_id;
                 $call->created_at = $formattedDate;
@@ -1034,67 +1360,18 @@ return view('calls.resultbrand', compact('data'));
                 $acceptedCount++;
             }
         }
-        if (count($rejectedRows) > 0) {
-            $spreadsheet = new Spreadsheet();
-            $sheet = $spreadsheet->getActiveSheet();
-            $headers = [
-                'Name',
-                'Phone',
-                'Email',
-                'Sales Person',
-                'Source Name',
-                'Language',
-                'Location',
-                'Brand',
-                'Model Line Name',
-                'Custom Brand Model',
-                'Remarks',
-                'Error Description', // New column
-            ];
-            $sheet->fromArray($headers, null, 'A1');
-            foreach ($rejectedRows as $row) {
-                $sheet->setCellValue('A' . ($sheet->getHighestRow() + 1), $row[0]); 
-                $sheet->setCellValue('B' . ($sheet->getHighestRow()), $row[1]);
-                $sheet->setCellValue('C' . ($sheet->getHighestRow()), $row[2]);
-                $sheet->setCellValue('D' . ($sheet->getHighestRow()), $row[4]);
-                $sheet->setCellValue('E' . ($sheet->getHighestRow()), $row[5]);
-                $sheet->setCellValue('F' . ($sheet->getHighestRow()), $row[6]);
-                $sheet->setCellValue('G' . ($sheet->getHighestRow()), $row[3]);
-                $sheet->setCellValue('H' . ($sheet->getHighestRow()), $row[7]);
-                $sheet->setCellValue('I' . ($sheet->getHighestRow()), $row[8]);
-                $sheet->setCellValue('J' . ($sheet->getHighestRow()), $row[9]);
-                $sheet->setCellValue('K' . ($sheet->getHighestRow()), $row[10]);
-                $errorDescriptionCell = 'L' . ($sheet->getHighestRow());
-                $sheet->setCellValue($errorDescriptionCell, end($row)); 
-                }
-            $writer = new Xlsx($spreadsheet);
-            $tempFile = tempnam(sys_get_temp_dir(), 'rejected_excel_file');
-            $writer->save($tempFile);
-        
-            // Move the temporary file to storage
-            $filename = 'rejected_records.xlsx';
-            Storage::put($filename, file_get_contents($tempFile));
-            unlink($tempFile);
-        
-            // Generate the download link
-            $downloadLink = route('download.rejected', ['filename' => $filename]);
-        
-            return redirect()->route('calls.createbulk')->with('success', [
-                'message' => "Data uploaded successfully! From the total " . (count($rows)) . " records, {$acceptedCount} records are accepted & {$rejectedCount} records are rejected.",
-                'fileLink' => route('download.rejected', ['filename' => 'rejected_records.xlsx']),
-            ]);                    
-        }
-        $useractivities =  New UserActivities();
-        $useractivities->activity = "Create Bulk Leads";
-        $useractivities->users_id = Auth::id();
-        $useractivities->save();
-        return redirect()->route('calls.index')
-            ->with('success', "Data uploaded successfully! From the total " . (count($rows)) . " records, {$acceptedCount} records are accepted & {$rejectedCount} records are rejected.");
-    } else {
-        return back()->with('error', 'Please Select The Correct File for Uploading');
     }
+
+    $useractivities =  New UserActivities();
+    $useractivities->activity = "Create Bulk Leads";
+    $useractivities->users_id = Auth::id();
+    $useractivities->save();
+
+    return redirect()->route('calls.index')->with('success', "Data uploaded successfully! From the total " . count($rows) . " records, {$acceptedCount} were accepted.");
 }
-    public function checkExistence(Request $request)
+
+
+public function checkExistence(Request $request)
 {
     $emailCount = 0;
     $phoneCount = 0;
@@ -1185,7 +1462,7 @@ public function simplefile()
         $useractivities->activity = "Export Simple File for Bulk Leads";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-    $filePath = storage_path('app/public/sample/calls.xlsx'); // Path to the Excel file
+    $filePath = storage_path('app/calls.xlsx'); // Path to the Excel file
 
     if (file_exists($filePath)) {
         // Generate a response with appropriate headers
@@ -1323,7 +1600,7 @@ public function addnewleads()
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $this->validate($request, [
-            'phone' => 'nullable|required_without:email',
+            'phone' => 'nullable|required_without:email',          
             'email' => 'nullable|required_without:phone|email',           
             'location' => 'required',
             'milelemotors' => 'required',

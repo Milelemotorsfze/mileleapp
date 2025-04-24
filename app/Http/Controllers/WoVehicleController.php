@@ -57,7 +57,7 @@ class WoVehicleController extends Controller
             $subject = "Work Order Vehicle Modification Status changed to $statusName for Vehicle VIN: " . $woVehicle->vin . " under Work Order " . $workOrder->wo_number;
             // Retrieve the authenticated user's name
             $authUserName = auth()->user()->name;
-            // Define a quick access link (adjust the route as needed)
+            // Define quick access links
             $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
             $statusLogLink = env('BASE_URL') . '/vehicle-modification-status-log/' . $woVehicle->id;
             // Retrieve email addresses from the users table where can_send_wo_email is true
@@ -68,15 +68,15 @@ class WoVehicleController extends Controller
             $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL);
             $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
             $salesPersonEmail = filter_var(optional($workOrder->salesPerson)->email, FILTER_VALIDATE_EMAIL);
-            // $customerEmail = filter_var($workOrder->customer_email, FILTER_VALIDATE_EMAIL);
-            $customerEmail = '';
+            // Fetch `DONT_SEND_EMAIL` and `REDIRECT_SALES_EMAIL_TO` from .env
+            $dontSendEmail = env('DONT_SEND_EMAIL');
+            $redirectSalesEmailTo = filter_var(env('REDIRECT_SALES_EMAIL_TO'), FILTER_VALIDATE_EMAIL);
             // Log email addresses to debug
             \Log::info('Email Recipients:', [
                 'managementEmails' => $managementEmails,
                 'operationsEmail' => $operationsEmail,
                 'createdByEmail' => $createdByEmail,
                 'salesPersonEmail' => $salesPersonEmail,
-                'customerEmail' => $customerEmail,
             ]);
             // Check if the salesPerson exists before trying to access properties
             $shouldSendToSalesPerson = false;
@@ -91,21 +91,21 @@ class WoVehicleController extends Controller
             if ($createdByEmail) {
                 $recipients[] = $createdByEmail;
             }
-            // Add salesPersonEmail only if the condition is met
-            if ($shouldSendToSalesPerson && $salesPersonEmail) {
-                $recipients[] = $salesPersonEmail;
-            }
-            // Add customerEmail if valid
-            if ($customerEmail) {
-                $recipients[] = $customerEmail;
+            // Handle salesPersonEmail conditions
+            if ($shouldSendToSalesPerson) {
+                if ($salesPersonEmail && $salesPersonEmail !== $dontSendEmail) {
+                    // If salesperson's email is not blocked, add it
+                    $recipients[] = $salesPersonEmail;
+                } elseif ($salesPersonEmail === $dontSendEmail && $redirectSalesEmailTo) {
+                    // Redirect email if salesPersonEmail matches DONT_SEND_EMAIL
+                    $recipients[] = $redirectSalesEmailTo;
+                }
             }
             // If no valid recipients, skip sending the email and log the issue
             if (empty($recipients)) {
                 \Log::info('No valid recipients found. Skipping email sending for WO-' . $workOrder->wo_number);
                 return; // Exit the function without throwing an exception
             }
-            // Determine if the email is being sent to the customer
-            $isCustomerEmail = in_array($customerEmail, $recipients);
             // Send email using a Blade template
             Mail::send('work_order.emails.modification_status_update', [
                 'workOrder' => $workOrder,
@@ -117,7 +117,6 @@ class WoVehicleController extends Controller
                 'userName' => $authUserName,
                 'status' => $statusName,
                 'datetime' => Carbon::now(),
-                'isCustomerEmail' => $isCustomerEmail,  // Pass this flag to the email template
             ], function ($message) use ($subject, $recipients, $template) {
                 $message->from($template['from'], $template['from_name'])
                         ->to($recipients)

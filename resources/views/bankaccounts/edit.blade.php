@@ -50,6 +50,8 @@
                             <option value="JPY" {{ $bankAccount->currency == 'JPY' ? 'selected' : '' }}>JPY</option>
                             <option value="CAD" {{ $bankAccount->currency == 'CAD' ? 'selected' : '' }}>CAD</option>
                             <option value="AED" {{ $bankAccount->currency == 'AED' ? 'selected' : '' }}>AED</option>
+                            <option value="PHP" {{ $bankAccount->currency == 'PHP' ? 'selected' : '' }}>PHP</option>
+                            <option value="SAR" {{ $bankAccount->currency == 'SAR' ? 'selected' : '' }}>SAR</option>
                         </select>
                     </div>
                 </div>

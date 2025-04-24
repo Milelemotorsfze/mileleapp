@@ -447,7 +447,12 @@ class DailyleadsController extends Controller
         $clients = SalespersonOfClients::with('client')
         ->where('sales_person_id', $salespersonId)
         ->get();
-        $sales_persons = ModelHasRoles::where('role_id', 7)->get();
+        $sales_persons = User::select('id', 'name') 
+            ->where('manual_lead_assign', 1)
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
+    
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
         return view('dailyleads.create', compact('modelLineMasters', 'clients', 'countries','sales_persons'));
     }

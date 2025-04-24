@@ -8,14 +8,14 @@
     cursor: pointer;
   }
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
-  padding: 4px 8px 4px 8px;
+  /* padding: 4px 8px 4px 8px; */
   vertical-align: middle;
 }
 .table-wrapper {
       position: relative;
     }
     thead th {
-      position: sticky!important;
+      /* position: sticky!important; */
       top: 0;
       background-color: rgb(194, 196, 204)!important;
       z-index: 1;
@@ -98,7 +98,7 @@
     </ul>      
   </div>
   <div class="modal fade works-modal" id="routineModal" tabindex="-1" aria-labelledby="routineModalLabel" aria-hidden="true" data-inspectionid="">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Routine Inspection Details</h5>
@@ -193,7 +193,7 @@
   </div>
 </div>
 <div class="modal fade pdi-modal" id="pdiModal" tabindex="-1" aria-labelledby="pdiModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">PDI Inspection Details</h5>
@@ -232,7 +232,7 @@
 </div>
         <div id="pdiInspectionDetails">
           <table class="table table-bordered">
-            <thead>
+            <thead class="">
               <tr>
                 <th>Check List Items</th>
                 <th>Reciving</th>
@@ -276,7 +276,7 @@
   </div>
 </div>
 <div class="modal fade pdi-modal" id="incidentModal" tabindex="-1" aria-labelledby="incidentModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Incident Inspection Details</h5>
@@ -338,7 +338,7 @@
   </div>
 </div>
   <div class="modal fade works-modal" id="works" tabindex="-1" aria-labelledby="worksLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="worksLabel">Incident Inspections</h5>
@@ -369,7 +369,7 @@
                   <th>Stage</th>
                   <th>QC Remarks</th>
                   <th>PO Number</th>
-                  <th>GRN Number</th>
+                  <!-- <th>GRN Number</th> -->
                   <th>SO Number</th>
                   <th>Location</th>
                   <th>VIN</th>
@@ -433,7 +433,7 @@
                   <th>Stage</th>
                   <th>QC Remarks</th>
                   <th>PO Number</th>
-                  <th>GRN Number</th>
+                  <!-- <th>GRN Number</th> -->
                   <th>SO Number</th>
                   <th>Location</th>
                   <th>VIN</th>
@@ -493,10 +493,21 @@
       </div> 
       @endcan
       </div>
+      <div class="modal fade" id="variantDetailModal" tabindex="-1" aria-labelledby="variantDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="variantDetailModalLabel">Full Detail</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="variantDetailModalBody" style="white-space: pre-wrap;"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  <script>
-              function showFullText(button) {
+<script>
+  function showFullText(button) {
         var fullText = button.getAttribute('data-fulltext');
         alert(fullText);
     }
@@ -509,9 +520,24 @@
                 { data: 'created_at_formte', name: 'inspection.created_at' },
                 { data: 'created_by_name', name: 'users.name' },
                 { data: 'stage', name: 'inspection.stage' },
-                { data: 'remark', name: 'inspection.remark' },
+                {
+                  data: 'remark',
+                  name: 'inspection.remark',
+                  render: function (data, type, row) {
+                    if (type === 'display' && data) {
+                      let words = data.split(/\s+/);
+                      if (words.length > 5) {
+                        let shortText = words.slice(0, 5).join(' ') + '...';
+                        return `${shortText} <a href="#" class="read-more-link" data-title="QC Remarks" data-detail="${encodeURIComponent(data)}">Read More</a>`;
+                      } else {
+                        return data;
+                      }
+                    }
+                    return '';
+                  }
+                },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'grn_number', name: 'grn.grn_number' },
+                // { data: 'grn_number', name: 'movement_grns.grn_number' },
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'vin', name: 'vehicles.vin' },
@@ -520,22 +546,20 @@
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
                 {
-                    data: 'detail', // Updated to use the alias
-                    name: 'varaints.detail',
-                    render: function(data, type, row) {
-                        if (!data) {
-                            return ''; // Return an empty string if data is undefined or null
-                        }
-                        var words = data.split(' ');
-                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-                        var fullText = data;
-                        return `
-                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                ${firstFiveWords}
-                            </div>
-                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-                        `;
+                  data: 'detail',
+                  name: 'varaints.detail',
+                  render: function (data, type, row) {
+                    if (type === 'display' && data) {
+                      let words = data.split(/\s+/);
+                      if (words.length > 5) {
+                        let shortText = words.slice(0, 5).join(' ') + '...';
+                        return `${shortText} <a href="#" class="read-more-link" data-title="Variant Detail" data-detail="${encodeURIComponent(data)}">Read More</a>`;
+                      } else {
+                        return data;
+                      }
                     }
+                    return '';
+                  }
                 },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
@@ -549,10 +573,35 @@
             columns: [
               { data: 'created_at_formte', name: 'inspection.created_at' },
               { data: 'created_by_name', name: 'users.name' },
-                { data: 'stage', name: 'inspection.stage' },
-                { data: 'remark', name: 'inspection.remark' },
+              { data: 'stage', name: 'inspection.stage' },
+              {
+                  data: 'remark',
+                  name: 'inspection.remark',
+                  render: function (data, type, row) {
+                    if (type === 'display' && data) {
+                      let words = data.split(/\s+/);
+                      if (words.length > 5) {
+                        let shortText = words.slice(0, 5).join(' ') + '...';
+                        return `${shortText} <a href="#" class="read-more-link" data-title="QC Remarks" data-detail="${encodeURIComponent(data)}">Read More</a>`;
+                      } else {
+                        return data;
+                      }
+                    }
+                    return '';
+                  }
+                },                
                 { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'grn_number', name: 'grn.grn_number' },
+                {
+                    data: 'grn_number',
+                    name: 'movement_grns.grn_number',
+                    render: function(data, type, row) {
+                        if (row.inspection_status == 'Approved') {
+                          
+                            return data;
+                        }
+                        return ''; 
+                    }
+                },
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'vin', name: 'vehicles.vin' },
@@ -560,7 +609,22 @@
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'detail', name: 'varaints.detail' },
+                {
+                  data: 'detail',
+                  name: 'varaints.detail',
+                  render: function (data, type, row) {
+                    if (type === 'display' && data) {
+                      let words = data.split(/\s+/);
+                      if (words.length > 5) {
+                        let shortText = words.slice(0, 5).join(' ') + '...';
+                        return `${shortText} <a href="#" class="read-more-link" data-title="Variant Detail" data-detail="${encodeURIComponent(data)}">Read More</a>`;
+                      } else {
+                        return data;
+                      }
+                    }
+                    return '';
+                  }
+                },                
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'approval_date', name: 'inspection.approval_date' },
@@ -575,9 +639,24 @@
               { data: 'reinspection_date', name: 'inspection.reinspection_date' },
               { data: 'created_by_name', name: 'users.name' },
                 { data: 'stage', name: 'inspection.stage' },
-                { data: 'reinspection_remarks', name: 'inspection.reinspection_remarks' },
+                {
+                  data: 'reinspection_remarks',
+                  name: 'inspection.reinspection_remarks',
+                  render: function (data, type, row) {
+                    if (type === 'display' && data) {
+                      let words = data.split(/\s+/);
+                      if (words.length > 5) {
+                        let shortText = words.slice(0, 5).join(' ') + '...';
+                        return `${shortText} <a href="#" class="read-more-link" data-title="QC Remarks" data-detail="${encodeURIComponent(data)}">Read More</a>`;
+                      } else {
+                        return data;
+                      }
+                    }
+                    return '';
+                  }
+                },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'grn_number', name: 'grn.grn_number' },
+                // { data: 'grn_number', name: 'movement_grns.grn_number' },
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'vin', name: 'vehicles.vin' },
@@ -585,7 +664,22 @@
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'detail', name: 'varaints.detail' },
+                {
+                  data: 'detail',
+                  name: 'varaints.detail',
+                  render: function (data, type, row) {
+                    if (type === 'display' && data) {
+                      let words = data.split(/\s+/);
+                      if (words.length > 5) {
+                        let shortText = words.slice(0, 5).join(' ') + '...';
+                        return `${shortText} <a href="#" class="read-more-link" data-title="Variant Detail" data-detail="${encodeURIComponent(data)}">Read More</a>`;
+                      } else {
+                        return data;
+                      }
+                    }
+                    return '';
+                  }
+                },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
             ]
@@ -610,7 +704,22 @@
                 { data: 'responsivity', name: 'incident.responsivity' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'detail', name: 'varaints.detail' },
+                {
+                  data: 'detail',
+                  name: 'varaints.detail',
+                  render: function (data, type, row) {
+                    if (type === 'display' && data) {
+                      let words = data.split(/\s+/);
+                      if (words.length > 5) {
+                        let shortText = words.slice(0, 5).join(' ') + '...';
+                        return `${shortText} <a href="#" class="read-more-link" data-title="Variant Detail" data-detail="${encodeURIComponent(data)}">Read More</a>`;
+                      } else {
+                        return data;
+                      }
+                    }
+                    return '';
+                  }
+                },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'seat', name: 'varaints.seat' },
@@ -829,6 +938,7 @@ $('#reason').html(reasonsHTML);
       url: '/pdi-inspection/' + vehicleId,
       method: 'GET',
       success: function (response) { 
+      
         var additionalInfo = response.additionalInfo;
         var PdiInspectionData = response.PdiInspectionData;
         var grnpicturelink = response.grnpicturelink;
@@ -1075,7 +1185,6 @@ $('#dtBasicExample4 tbody').on('dblclick', 'tr', function () {
     }
     function savereincidentupdate() {
     var incidentId = $('#incidentId').val();
-    console.log(incidentId);
     $.ajax({
         type: 'POST',
         url: '{{route('incidentupdate.approvals')}}',
@@ -1158,6 +1267,16 @@ $('#dtBasicExample4 tbody').on('dblclick', 'tr', function () {
     }
     </script>
     <script>
+
+    $('body').on('click', '.read-more-link', function (e) {
+      e.preventDefault();
+      const fullText = decodeURIComponent($(this).data('detail'));
+      const title = $(this).data('title') || 'Full Text';
+      $('#variantDetailModalLabel').text(title);
+      $('#variantDetailModalBody').html(fullText); 
+      $('#variantDetailModal').modal('show');
+    });
+
     $(document).ready(function() {
         $("#reworkButton").click(function() { 
         var incidentId = $("#incidentId").val();

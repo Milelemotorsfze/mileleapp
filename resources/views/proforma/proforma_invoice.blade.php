@@ -540,7 +540,7 @@
                 Account Name : MlLELE MOTORS FZE<br>
                 IBAN : AE890290190210501040608<br>
                 Account No : 02-01-01-020311-105-1040608<br>
-                Swift Code : HABZUAEADXXX<br>
+                Swift Code : HBZUAEADXXX<br>
                 Bank Name : HBZ BANK<br>
                 Branch Name : Main Branch, Dubai<br>
                 Bank Address : DUBAI UAE<br>
@@ -548,7 +548,7 @@
                 Account Name : MlLELE MOTORS FZE<br>
                 IBAN : AE330290190233301040608<br>
                 Account No : 02-01-01-020311-333-1040608<br>
-                Swift Code : HABZUAEADXXX<br>
+                Swift Code : HBZUAEADXXX<br>
                 Bank Name : HBZ BANK<br>
                 Branch Name : Main Branch, Dubai<br>
                 Bank Address : DUBAI UAE<br>
@@ -556,7 +556,7 @@
                 Account Name : MlLELE MOTORS FZE<br>
                 IBAN : AE100290190297401040608<br>
                 Account No : 02-01-01-020311-974-1040608<br>
-                Swift Code : HABZUAEADXXX<br>
+                Swift Code : HBZUAEADXXX<br>
                 Bank Name : HBZ BANK<br>
                 Branch Name : Main Branch, Dubai<br>
                 Bank Address : DUBAI UAE<br>
@@ -564,7 +564,7 @@
                 Account Name : MlLELE MOTORS FZE<br>
                 IBAN : AE500290190253401040608<br>
                 Account No : 02-01-01-020311-534-1040608<br>
-                Swift Code : HABZUAEADXXX<br>
+                Swift Code : HBZUAEADXXX<br>
                 Bank Name : HBZ BANK<br>
                 Branch Name : Main Branch, Dubai<br>
                 Bank Address : DUBAI UAE<br>

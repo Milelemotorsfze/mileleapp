@@ -2723,7 +2723,6 @@ class WorkOrderController extends Controller
 
                             // Prepare email data
                             $subject = "Finance approved the work order " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
-
                             // Define a quick access link (adjust the route as needed)
                             $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
                             $approvalHistoryLink = env('BASE_URL') . '/coo-approval-history/' . $workOrder->id;
@@ -2731,16 +2730,26 @@ class WorkOrderController extends Controller
                             $rolesWithPermission = Role::whereHas('permissions', function ($query) {
                                 $query->where('name', 'do-coo-office-approval');
                             })->pluck('id')->toArray();                   
-                            $recipients = \App\Models\User::role($rolesWithPermission)->whereIn('status',['new','active'])->where('password','!=','')->whereHas('roles')
-                            ->pluck('email')->filter(function($email) {
-                                return filter_var($email, FILTER_VALIDATE_EMAIL);
-                            })->toArray(); 
+                            // Get users with the required roles and valid email addresses
+                            $recipients = \App\Models\User::role($rolesWithPermission)
+                                ->whereIn('status', ['new', 'active'])
+                                ->where('password', '!=', '')
+                                ->whereHas('roles')
+                                ->pluck('email')
+                                ->filter(function($email) {
+                                    return filter_var($email, FILTER_VALIDATE_EMAIL);
+                                })->toArray(); 
+                            // Get the emails to exclude from the environment variable
+                            $excludedEmails = explode(',', env('DONT_SEND_EMAIL', ''));
+                        
+                            // Filter out the excluded emails
+                            $filteredRecipients = array_diff($recipients, $excludedEmails);                      
                             // Log email addresses to help with debugging
                             \Log::info('Email Recipients:', [
-                                'recipients' => implode(', ', $recipients) ?: 'none found',
+                                'recipients' => implode(', ', $filteredRecipients) ?: 'none found',
                             ]);
                             // Log and handle invalid email addresses (but do not throw an exception, just log)
-                            if (empty($recipients)) {
+                            if (empty($filteredRecipients)) {
                                 \Log::info('No valid recipients found. Skipping email sending for Work Order: ' . $workOrder->wo_number);
                                 return;
                             }
@@ -2749,9 +2758,9 @@ class WorkOrderController extends Controller
                                 'workOrder' => $workOrder,
                                 'accessLink' => $accessLink,
                                 'approvalHistoryLink' => $approvalHistoryLink,
-                            ], function ($message) use ($subject, $recipients, $template) {
+                            ], function ($message) use ($subject, $filteredRecipients, $template) {
                                 $message->from($template['from'], $template['from_name'])
-                                        ->to($recipients)
+                                        ->to($filteredRecipients)
                                         ->subject($subject);
                             });                            
                         } 
@@ -3121,46 +3130,49 @@ class WorkOrderController extends Controller
         $soNumber = $request->input('so_number');  
         $workOrderId = $request->input('work_order_id'); // In case of edit 
     
-        // Proceed with the rest of the logic
+        // Helper closure to extract the numeric batch
+        $extractNumericBatch = function ($batch) {
+            return (int) filter_var($batch, FILTER_SANITIZE_NUMBER_INT);
+        };    
         if ($workOrderId) {
             $workOrders = WorkOrder::where('id',$workOrderId)->first(); 
             if($workOrders->so_number == $soNumber) {
-                $largestBatch = $workOrders->batch; // Get the max batch number
-                $isBatch = $workOrders->is_batch; // Get the is_batch status from the first result
+                $largestBatch = $extractNumericBatch($workOrders->batch);
+                $isBatch = $workOrders->is_batch;
                 return response()->json([
                     'exists' => true,
-                    'largest_batch' => $largestBatch ? (int) str_replace('Batch ', '', $largestBatch) : 0,
+                    'largest_batch' => $largestBatch,
                     'is_batch' => $isBatch,
                 ]);
             } else {
-                // Find work orders with the same SO number, excluding the current one in edit mode
-                $query = WorkOrder::where('so_number', $soNumber);                
-                $workOrders = $query->get();
+                $workOrders = WorkOrder::where('so_number', $soNumber)->get();
                 if ($workOrders->isEmpty()) {
                     return response()->json(['exists' => false]); // SO number doesn't exist
                 }
-                // Get the largest batch number and check is_batch status
-                $largestBatch = $workOrders->where('is_batch', 1)->max('batch'); // Get the max batch number
-                $isBatch = $workOrders->first()->is_batch; // Get the is_batch status from the first result
+                $numericBatches = $workOrders->where('is_batch', 1)
+                    ->pluck('batch')
+                    ->map($extractNumericBatch);               
+                $largestBatch = $numericBatches->max() ?? 0;
+                $isBatch = $workOrders->first()->is_batch;
                 return response()->json([
                     'exists' => true,
-                    'largest_batch' => $largestBatch ? (int) str_replace('Batch ', '', $largestBatch) : 0,
+                    'largest_batch' => $largestBatch,
                     'is_batch' => $isBatch,
                 ]);
             }
         } else {
-            // Find work orders with the same SO number, excluding the current one in edit mode
-            $query = WorkOrder::where('so_number', $soNumber);           
-            $workOrders = $query->get();
+            $workOrders = WorkOrder::where('so_number', $soNumber)->get();
             if ($workOrders->isEmpty()) {
                 return response()->json(['exists' => false]); // SO number doesn't exist
             }
-            // Get the largest batch number and check is_batch status
-            $largestBatch = $workOrders->where('is_batch', 1)->max('batch'); // Get the max batch number
+            $numericBatches = $workOrders->where('is_batch', 1)
+                ->pluck('batch')
+                ->map($extractNumericBatch);
+            $largestBatch = $numericBatches->max() ?? 0;
             $isBatch = $workOrders->first()->is_batch; // Get the is_batch status from the first result
             return response()->json([
                 'exists' => true,
-                'largest_batch' => $largestBatch ? (int) str_replace('Batch ', '', $largestBatch) : 0,
+                'largest_batch' => $largestBatch,
                 'is_batch' => $isBatch,
             ]);
         }

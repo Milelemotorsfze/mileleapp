@@ -1448,7 +1448,7 @@
                                                     @if ($hasPermission)
                                                     <div class="dropdown">
                                                         <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                            <span data-key="t-utility">DP Vendor Model</span>
+                                                            <span data-key="t-utility">@if(Auth::user()->empProfile->department->is_demand_planning == 1) DP @endif Vendor Model</span>
                                                             <div class="arrow-down"></div>
                                                         </a>
                                                         <div class="dropdown-menu" aria-labelledby="topnav-auth">
@@ -2229,6 +2229,9 @@
                 </div>
 
                 <!-- Second div with role name -->
+                @php
+                    $assignedRoles = $assignedRoles->sortBy('name');
+                @endphp
                 <div class="nav-item rolename-button pb-2 pt-2" id="rolename-dropdown-button">
                     <button class="btn rolename-toggle btn-success" id="rolename-dropdown">
                         @php

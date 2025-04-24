@@ -296,7 +296,7 @@ thead th {
                      $int_colours = $intColour ? $intColour->name : null;
                      $variants = DB::table('varaints')->where('id', $vehicles->varaints_id)->first();
                      $name = $variants->name;
-                     $grn = $vehicles->grn_id ? DB::table('grn')->where('id', $vehicles->grn_id)->first() : null;
+                     $grn = $vehicles->movement_grn_id ? DB::table('movement_grns')->where('id', $vehicles->movement_grn_id)->first() : null;
                      $grn_date = $grn ? $grn->date : null;
                      $grn_number = $grn ? $grn->grn_number : null;
                      $gdn = $vehicles->gdn_id ? DB::table('gdn')->where('id', $vehicles->gdn_id)->first() : null;
