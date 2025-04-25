@@ -3486,7 +3486,7 @@ function postUpdateStatus(status, orderId, remarks = '') {
 $(document).ready(function() {
     var cancelUrl;
 
-    $('.cancelButtonveh').click(function(event) {
+    $(document).on('click', '.cancelButtonveh', function(event) {
         event.preventDefault(); // Prevent the default action (navigation)
         cancelUrl = $(this).data('url'); // Store the URL to redirect to after confirmation
         $('#confirmationvehModal').modal('show'); // Show the modal
