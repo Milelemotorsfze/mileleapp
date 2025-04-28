@@ -205,7 +205,7 @@
 				<div class="col-12 d-flex justify-content-end align-items-end flex-wrap gap-2">
 					<div>
 						<label for="dateRange" class="col-form-label">Date</label>
-						<input type="text" id="dateRange" class="form-control form-control-sm" placeholder="date range" />
+						<input type="text" id="dateRange" class="form-control form-control-sm" placeholder="Select Date Range" />
 					</div>
 					<div>
 						<label for="search" class="col-form-label">Search</label>
