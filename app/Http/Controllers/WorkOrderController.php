@@ -380,13 +380,13 @@ class WorkOrderController extends Controller
                         'Batch' => $data->is_batch == 0 ? 'Single' : $data->batch ?? '',
                         'Customer Name' => $data->customer_name ?? '',
                         'Customer Email' => $data->customer_email ?? '', 
-                        // 'Customer Contact Number' =>  $this->formatPhoneForExcel($data->customer_company_number ?? ''),
+                        'Customer Contact Number' => $data->customer_company_number ?? '',
                         'Customer Representative Name' => $data->customer_representative_name ?? '',
                         'Customer Representative Email' => $data->customer_representative_email ?? '',
-                        // 'Customer Representative Number' =>  $this->formatPhoneForExcel($data->customer_representative_contact ?? ''),
+                        'Customer Representative Number' =>  $data->customer_representative_contact ?? '',
                         'Freight Agent Name' => $data->freight_agent_name ?? '',
                         'Freight Agent Email' => $data->freight_agent_email ?? '',
-                        // 'Freight Agent Conatct Number' =>  $this->formatPhoneForExcel($data->freight_agent_contact_number ?? ''),
+                        'Freight Agent Conatct Number' => $data->freight_agent_contact_number ?? '',
                         'Delivery Advise' => $data->delivery_advise ?? '',
                         'Transfer Of Ownership' => $data->showroom_transfer ?? '',
                         'Cross Trade' => $data->cross_trade ?? '',
@@ -396,6 +396,10 @@ class WorkOrderController extends Controller
                         'Port Of Discharge' => $data->port_of_discharge ?? '',
                         'Final Destination' => $data->final_destination ?? '',
                         'Transport Type' => $data->transport_type ?? '',
+                        'Airline/Shipping Line/Trailer No.' => $data->getTransportField('name'),
+                        'AWB/Container No./Transportation Company' => $data->getTransportField('id'),
+                        'Airway Info/Fwd Import Code/Driver Contact No.' => $data->getTransportField('details'),
+                        'BRN/Transportation Com. Info' => $data->getTransportField('additional'),
                         'SO Vehicle Quantity' => $data->so_vehicle_quantity ?? '',
                         'SO Currency' => $data->currency ?? '',
                         'SO Amount' => $data->so_total_amount != 0.00 ? $data->so_total_amount : '',
@@ -403,7 +407,7 @@ class WorkOrderController extends Controller
                         'Balance' => $data->balance_amount != 0.00 ? $data->balance_amount : '',
                         'Delivery Location' => $data->delivery_location ?? '',
                         'Delivery Contact Person' => $data->delivery_contact_person ?? '',
-                        // 'Delivery Contact Number' =>  $this->formatPhoneForExcel($data->delivery_contact_person_number ?? ''),
+                        'Delivery Contact Number' => $data->delivery_contact_person_number ?? '',
                         'Delivery Date' => $data->delivery_date ? Carbon::parse($data->delivery_date)->format('d M Y') : '',
                         'Preferred Shipping Line' => $data->preferred_shipping_line_of_customer ?? '',
                         'Bill of Lading' => $data->bill_of_loading_details ?? '',
@@ -426,7 +430,7 @@ class WorkOrderController extends Controller
 
         // Pagination parameters
         $page = request()->get('page', 1);
-        $perPage = 100;
+        $perPage = 10;
 
         // Slice the collection to get items for the current page
         $pagedData = $filteredDatas->slice(($page - 1) * $perPage, $perPage)->values();
