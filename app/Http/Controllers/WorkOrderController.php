@@ -399,7 +399,7 @@ class WorkOrderController extends Controller
                         'Airline/Shipping Line/Trailer No.' => $data->transport_type ? $data->getTransportField('name') ?? '' : '',
                         'AWB/Container No./Transportation Company' => $data->transport_type ? $data->getTransportField('id') ?? '': '',
                         'Airway Info/Fwd Import Code/Driver Contact No.' => $data->transport_type ? $data->getTransportField('details') ?? '' : '',
-                        'BRN/Transportation Com. Info' => $data->transport_type ? $data->getTransportField('additional') ?? '': '',
+                        'BRN/Transportation Com. Info' => $data->transport_type === 'sea' || $data->transport_type === 'road' ? $data->getTransportField('additional') ?? '': '',
                         'SO Vehicle Quantity' => $data->so_vehicle_quantity ?? '',
                         'SO Currency' => $data->currency ?? '',
                         'SO Amount' => $data->so_total_amount != 0.00 ? $data->so_total_amount : '',

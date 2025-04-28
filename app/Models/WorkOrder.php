@@ -722,7 +722,7 @@ class WorkOrder extends Model
 
     public function getTransportField($field)
     {
-        info($this->transport_type);
+  
         return match ($this->transport_type) {
             'air' => match ($field) {
                 'name' => $this->airline,
