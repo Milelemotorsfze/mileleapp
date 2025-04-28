@@ -370,7 +370,10 @@ class AddonController extends Controller {
                                 $html .= ' All Model Lines';
                             }
                             info("addon data");
-                            info($addon);
+
+                            info($addon->addon_code);
+                            info("ok");
+                            info("test");
                             // info($AddonTypes);
                             $html .= '</div>
                                     <div class="testtransform divcolor labellist databack1 addon-'.$addon->id.'-model-number-'.$key.' col-xxl-5 col-lg-5 col-md-5 col-sm-5 col-5">
