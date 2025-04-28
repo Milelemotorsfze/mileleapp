@@ -1363,7 +1363,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                 <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <iframe src="{{ asset($oldPlFile->file_path) }}" frameborder="0" style="height: 500px;"></iframe>
+                <iframe src="{{ url($oldPlFile->file_path) }}" frameborder="0" style="height: 500px;"></iframe>
             </div>
         </div>
     </div>
