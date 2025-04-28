@@ -430,7 +430,7 @@ class WorkOrderController extends Controller
 
         // Pagination parameters
         $page = request()->get('page', 1);
-        $perPage = 10;
+        $perPage = 100;
 
         // Slice the collection to get items for the current page
         $pagedData = $filteredDatas->slice(($page - 1) * $perPage, $perPage)->values();
