@@ -202,14 +202,33 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-xxl-2 col-lg-6 col-md-6 ms-auto d-flex justify-content-end align-items-end select-button-main-div">
-					<div class="dropdown-option-div me-2"> <!-- Add spacing between input and button -->
-						<label for="search" class="col-form-label text-md-end">Search</label>
-						<input id="search" name="search" type="text" class="form-control widthinput" placeholder="Search" autocomplete="search" value="{{ isset($search) ? $search : '' }}">
+				<div class="col-12 d-flex justify-content-end align-items-end flex-wrap gap-2">
+					<div>
+						<label for="dateRange" class="col-form-label">Date</label>
+						<input type="text" id="dateRange" class="form-control form-control-sm" placeholder="date range" />
 					</div>
-					<button id="apply_search" type="button" class="btn btn-info btn-sm">
-						Search
-					</button>
+					<div>
+						<label for="search" class="col-form-label">Search</label>
+						<input id="search" name="search" type="text" class="form-control form-control-sm" placeholder="Search" value="{{ $search ?? '' }}">
+					</div>
+					<div class="d-flex align-items-end gap-2">
+						<button id="apply_search" type="button" class="btn btn-info btn-sm">
+							Search
+						</button>
+						<button id="clear-search" type="button" class="btn btn-secondary btn-sm">
+							Clear
+						</button>
+						@can('work-order-export')
+						@php
+							$hasPermission = Auth::user()->hasPermissionForSelectedRole('work-order-export');
+						@endphp
+							@if ($hasPermission)
+							<button id="export" type="button" class="btn btn-primary btn-sm" onclick="exportData()">
+								Export
+							</button>
+							@endif
+						@endcan
+					</div>
 				</div>
 			</div>
 			<br/>
@@ -571,8 +590,35 @@
 @endif
 @endsection
 @push('scripts')
+
 <script type="text/javascript">
     $(document).ready(function() {
+
+		let startDate = "{{ request('start_date') }}";
+		let endDate = "{{ request('end_date') }}";
+
+    $('#dateRange').daterangepicker({
+        autoUpdateInput: false,
+        locale: {
+            cancelLabel: 'Clear',
+            format: 'YYYY-MM-DD'
+        }
+    });
+
+    if (startDate && endDate) {
+        $('#dateRange').data('daterangepicker').setStartDate(startDate);
+        $('#dateRange').data('daterangepicker').setEndDate(endDate);
+        $('#dateRange').val(`${startDate} - ${endDate}`);
+    }
+
+    $('#dateRange').on('apply.daterangepicker', function (ev, picker) {
+        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+    });
+
+    $('#dateRange').on('cancel.daterangepicker', function (ev, picker) {
+        $(this).val('');
+    });
+
         $('.tooltip-container').hover(
             function() {
                 $(this).find('.tooltip-text').css({ visibility: 'visible', opacity: '1' });
@@ -687,9 +733,46 @@
 	document.getElementById('apply_search').addEventListener('click', function() {
 		const searchValue = document.getElementById('search').value;
 		const type = 'all';  // Modify this if 'type' should be dynamically set based on other input
+		const dateRange = $('#dateRange').val();
 
+		let startDate = '';
+		let endDate = '';
+
+		if (dateRange.includes(' - ')) {
+			const dates = dateRange.split(' - ');
+			startDate = dates[0];
+			endDate = dates[1];
+		}
+
+		const queryParams = new URLSearchParams({
+			search: searchValue,
+			start_date: startDate,
+			end_date: endDate
+		});
+
+		window.location.href = `/work-order-info/${type}?${queryParams.toString()}`;
 		// Redirect to the URL with both 'type' and 'search' parameters
-		window.location.href = `/work-order-info/${type}?search=${encodeURIComponent(searchValue)}`;
+		// window.location.href = `/work-order-info/${type}?search=${encodeURIComponent(searchValue)}`;
 	});
+	document.getElementById('clear-search').addEventListener('click', function() {
+		const type = 'all';  // Modify this if 'type' should be dynamically set based on other input
+		window.location.href = `/work-order-info/${type}`;
+	});
+	function exportData() {
+            let search = $('#search').val(); 
+			let startDate = '';
+			let endDate = '';
+			const dateRange = $('#dateRange').val();
+			if (dateRange.includes(' - ')) {
+				const dates = dateRange.split(' - ');
+				startDate = dates[0];
+				endDate = dates[1];
+			}
+         
+            var exportUrl = "{{ url('work-order-info/all')}}"+"?search="+search+"&end_date="+endDate+"&start_date="+startDate+
+                   "&export=EXCEL";
+           
+            window.location.href = exportUrl;
+        }
 </script>
 @endpush
