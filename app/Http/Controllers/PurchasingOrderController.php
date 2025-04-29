@@ -67,6 +67,7 @@ use App\Models\VehicleDn;
 use Illuminate\Support\Facades\Crypt;
 use setasign\Fpdi\PdfReader\Page;
 use setasign\Fpdi\Tcpdf\Fpdi;
+use Illuminate\Support\Str;
 use File;
 use Exception;
 
@@ -3484,8 +3485,10 @@ if ($paymentOrderStatus->isNotEmpty()) {
             $vehicle->delete();
             return redirect()->back()->with('success', 'Vehicle cancellation request submitted successfully.');
         }
-        public function updatebasicdetails(Request $request)
+public function updatebasicdetails(Request $request)
 {
+
+  info("update basci details");
     $purchasingOrder = PurchasingOrder::find($request->input('purchasing_order_id'));
     if (!$purchasingOrder) {
         return response()->json(['error' => 'Purchasing order not found'], 404);
@@ -3534,6 +3537,8 @@ if ($paymentOrderStatus->isNotEmpty()) {
         $fileNameWithExt = $request->file('uploadPL')->getClientOriginalName();
         // Get just the filename
         $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+        $filename = Str::slug($filename);
+     
         // Get just the extension
         $extension = $request->file('uploadPL')->getClientOriginalExtension();
         // Create a unique filename to store
@@ -3542,6 +3547,7 @@ if ($paymentOrderStatus->isNotEmpty()) {
         $path = $request->file('uploadPL')->move(public_path('storage/PL_Documents'), $fileNameToStore);
         // Update the file path in the purchasing order
         $purchasingOrder->pl_file_path = 'storage/PL_Documents/' . $fileNameToStore;
+       
     }
     // Save the purchasing order
     $purchasingOrder->save();
