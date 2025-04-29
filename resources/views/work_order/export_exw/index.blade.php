@@ -1,6 +1,37 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}" />
 <style>
+	#loading-overlay {
+		position: fixed;
+		top: 0; left: 0;
+		width: 100%; height: 100%;
+		background: rgba(0,0,0,0.5);
+		z-index: 9999;
+		display: none; /* start hidden */
+		align-items: center;
+		justify-content: center;
+		opacity: 0; /* for smooth fade */
+		transition: opacity 0.3s ease; /* smooth transition */
+	}
+
+	#loading-overlay.active {
+		display: flex; /* flex centering */
+		opacity: 1; /* fully visible */
+	}
+
+	.loader {
+		width: 50px;
+		height: 50px;
+		border: 5px solid #f3f3f3;
+		border-top: 5px solid #3498db;
+		border-radius: 50%;
+		animation: spin 1s linear infinite;
+	}
+
+	@keyframes spin {
+		0% { transform: rotate(0deg); }
+		100% { transform: rotate(360deg); }
+	}
 	.widthinput {
         height: 32px !important;
     }
@@ -71,6 +102,9 @@
 	}
 </style>
 @section('content')
+<div id="loading-overlay" style="display: none;">
+    <div class="loader"></div>
+</div>
 <div class="card-header">
 	@php
 		$canViewWOList = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','view-current-user-export-exw-wo-list',
@@ -599,7 +633,9 @@
         $('#apply-filters').on('click', function(e) {
             e.preventDefault();
 
-            const filterData = {
+            // Show the overlay
+			$('#loading-overlay').css('display', 'flex').addClass('active');
+			const filterData = {
                 status_filter: $('#status-filter').val(),
                 sales_support_filter: $('#sales-support-filter').val(),
                 finance_approval_filter: $('#finance-approval-filter').val(),
@@ -611,11 +647,24 @@
 
             $.post("{{ route('save.filters') }}", filterData)
                 .done(function() {
+					// Show loader again before redirect
+					$('#loading-overlay').css('display', 'flex').addClass('active');
+
+					// Small timeout to allow the overlay to appear
+					setTimeout(function() {
                     window.location.href = "{{ route('work-order.index', '') }}/" + filterData.type;
+    				}, 300); // 300ms delay
                 })
                 .fail(function() {
                     alert("Failed to apply filters. Please try again.");
-                });
+			})
+			.always(function() {
+				// Hide the overlay whether success or fail
+				$('#loading-overlay').removeClass('active');
+				setTimeout(() => {
+					$('#loading-overlay').css('display', 'none');
+				}, 300); // Wait for the opacity transition to finish
+			});
         });
 
 		$('.my-datatable tbody').on('dblclick', 'tr td:not(.no-click)', function() {
