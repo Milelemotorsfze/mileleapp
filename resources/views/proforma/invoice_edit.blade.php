@@ -352,12 +352,16 @@
                     </select>
                 </div>
                 </div>
-            
+                @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+                    @endphp
+                    @if ($hasPermission)
                     <div class="row mt-2">
                     <div class="col-sm-6">
                         Sales Person :
                     </div>
                     <div class="col-sm-6">
+                  
                         <select id="salespersons" name="salespersons" class="form-select" required>
                             @foreach ($sales_persons as $sales_person)
                                 @php
@@ -370,7 +374,7 @@
                         </select>
                     </div>
                 </div>
-                   
+                @else
                 @php
                 $user = \Illuminate\Support\Facades\Auth::user();
                 $empProfile = $user->empProfile;
@@ -380,7 +384,7 @@
                         Sales Person :
                     </div>
                     <div class="col-sm-6">
-                        {{ Auth::user()->name }}
+                    {{ $quotation->createdBy->name ?? ''}}
                     </div>
                 </div>
                 <div class="row mt-2">
@@ -407,7 +411,7 @@
                     {{ isset($empProfile->phone) ? $empProfile->phone : '' }}
                     </div>
                 </div>
-              
+                @endif
             </div>
             <div class="col-sm-4">
                 <div class="row mt-2">

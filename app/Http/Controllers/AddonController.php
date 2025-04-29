@@ -369,6 +369,7 @@ class AddonController extends Controller {
                             if($AddonTypes->is_all_model_lines == 'yes') {
                                 $html .= ' All Model Lines';
                             }
+  
                             $html .= '</div>
                                     <div class="testtransform divcolor labellist databack1 addon-'.$addon->id.'-model-number-'.$key.' col-xxl-5 col-lg-5 col-md-5 col-sm-5 col-5">
                                         '.$AddonTypes->modelDescription->model_description.'

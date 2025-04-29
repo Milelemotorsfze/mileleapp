@@ -909,6 +909,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                         <option value="AUD" {{ $purchasingOrder->currency === 'AUD' ? 'selected' : '' }}>AUD</option>
                         <option value="CAD" {{ $purchasingOrder->currency === 'CAD' ? 'selected' : '' }}>CAD</option>
                         <option value="PHP" {{ $purchasingOrder->currency === 'PHP' ? 'selected' : '' }}>PHP</option>
+                        <option value="SAR" {{ $purchasingOrder->currency === 'SAR' ? 'selected' : '' }}>SAR</option>
                     </select>
                 </div>
             @endif
@@ -1362,7 +1363,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                 <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <iframe src="{{ asset($oldPlFile->file_path) }}" frameborder="0" style="height: 500px;"></iframe>
+                <iframe src="{{ url($oldPlFile->file_path) }}" frameborder="0" style="height: 500px;"></iframe>
             </div>
         </div>
     </div>
@@ -3485,7 +3486,7 @@ function postUpdateStatus(status, orderId, remarks = '') {
 $(document).ready(function() {
     var cancelUrl;
 
-    $('.cancelButtonveh').click(function(event) {
+    $(document).on('click', '.cancelButtonveh', function(event) {
         event.preventDefault(); // Prevent the default action (navigation)
         cancelUrl = $(this).data('url'); // Store the URL to redirect to after confirmation
         $('#confirmationvehModal').modal('show'); // Show the modal

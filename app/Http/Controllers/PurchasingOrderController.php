@@ -67,6 +67,7 @@ use App\Models\VehicleDn;
 use Illuminate\Support\Facades\Crypt;
 use setasign\Fpdi\PdfReader\Page;
 use setasign\Fpdi\Tcpdf\Fpdi;
+use Illuminate\Support\Str;
 use File;
 use Exception;
 
@@ -86,6 +87,7 @@ class PurchasingOrderController extends Controller
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -196,6 +198,7 @@ class PurchasingOrderController extends Controller
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -226,6 +229,7 @@ class PurchasingOrderController extends Controller
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -256,6 +260,7 @@ class PurchasingOrderController extends Controller
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
             
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
@@ -322,6 +327,7 @@ class PurchasingOrderController extends Controller
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -401,6 +407,7 @@ class PurchasingOrderController extends Controller
         'CAD' => 2.89,
         'AED' => 1,
         'PHP' => 0.063,
+        'SAR' => 0.98,
     ];
     $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
         return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -469,6 +476,7 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -519,6 +527,7 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -569,6 +578,7 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -623,6 +633,7 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -677,6 +688,7 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -731,6 +743,7 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -782,6 +795,7 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -845,6 +859,7 @@ public function filterconfirmation($status)
         'CAD' => 2.89,
         'AED' => 1,
         'PHP' => 0.063,
+        'SAR' => 0.98,
     ];
     $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
         return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -906,6 +921,7 @@ public function paymentinitiation($status)
         'CAD' => 2.89,
         'AED' => 1,
         'PHP' => 0.063,
+        'SAR' => 0.98,
     ];
     $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
         return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -3213,6 +3229,9 @@ if ($paymentOrderStatus->isNotEmpty()) {
             case "PHP":
                 $totalcostconverted = $totalcost * 0.063;
                 break;
+            case "SAR":
+                $totalcostconverted = $totalcost * 0.98;
+                break;
             default:
                 $totalcostconverted = $totalcost;
                 }
@@ -3466,8 +3485,10 @@ if ($paymentOrderStatus->isNotEmpty()) {
             $vehicle->delete();
             return redirect()->back()->with('success', 'Vehicle cancellation request submitted successfully.');
         }
-        public function updatebasicdetails(Request $request)
+public function updatebasicdetails(Request $request)
 {
+
+  info("update basci details");
     $purchasingOrder = PurchasingOrder::find($request->input('purchasing_order_id'));
     if (!$purchasingOrder) {
         return response()->json(['error' => 'Purchasing order not found'], 404);
@@ -3516,6 +3537,8 @@ if ($paymentOrderStatus->isNotEmpty()) {
         $fileNameWithExt = $request->file('uploadPL')->getClientOriginalName();
         // Get just the filename
         $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+        $filename = Str::slug($filename);
+     
         // Get just the extension
         $extension = $request->file('uploadPL')->getClientOriginalExtension();
         // Create a unique filename to store
@@ -3524,6 +3547,7 @@ if ($paymentOrderStatus->isNotEmpty()) {
         $path = $request->file('uploadPL')->move(public_path('storage/PL_Documents'), $fileNameToStore);
         // Update the file path in the purchasing order
         $purchasingOrder->pl_file_path = 'storage/PL_Documents/' . $fileNameToStore;
+       
     }
     // Save the purchasing order
     $purchasingOrder->save();
@@ -3637,6 +3661,7 @@ if($purchasingOrder->is_demand_planning_po == 1)
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
+            'SAR' => 0.98
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -3954,7 +3979,8 @@ public function updatePrices(Request $request)
         'GBP' => 4.66,
         'JPY' => 0.023,
         'CAD' => 2.69,
-        "PHP" => 0.063
+        "PHP" => 0.063,
+        'SAR' => 0.98,
     ];
 
     $totalDifference = 0;
@@ -5030,6 +5056,7 @@ public function submitPaymentDetails(Request $request)
                             "AED" => 1,
                             "CAD" => 2.68,
                             "PHP" => 0.063,
+                            'SAR' => 0.98,
                         ];
                         // Check if the currencies are different
                         if ($purchasingOrder->currency != $supplierAccount->currency) {
@@ -5073,8 +5100,8 @@ public function submitPaymentDetails(Request $request)
             $currency = $supplierAccountTransaction->account_currency;
             if($purchasingOrder->is_demand_planning_po == 1)
             {
-            $recipients = config('mail.custom_recipients.dp');
-            Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+            // $recipients = config('mail.custom_recipients.dp');
+            // Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
             }
             else
             {
@@ -5332,6 +5359,7 @@ public function submitPaymentDetails(Request $request)
                     "AED" => 1,
                     "CAD" => 2.68,
                     "PHP" => 0.063,
+                    'SAR' => 0.98,
                 ];
                 // Check if the currencies are different
         if ($purchasingOrder->currency != $supplierAccount->currency) {
@@ -5402,6 +5430,7 @@ public function submitPaymentDetails(Request $request)
                             "AED" => 1,
                             "CAD" => 2.68,
                             "PHP" => 0.063,
+                            'SAR' => 0.98,
                         ];
                         if($supplierAccountTransaction->transaction_type == 'Released') {
 
@@ -5554,6 +5583,7 @@ public function submitPaymentDetails(Request $request)
                         "AUD" => 2.29,
                         "CAD" => 2.68,
                         "PHP" => 0.063,
+                        "SAR" => 0.98,
                     ];
                     // Check if the currencies are different
                     if ($purchasingOrder->currency != $supplierAccount->currency) {

@@ -17,6 +17,8 @@
 <link href="{{ asset('css/customcss.css') }}" rel="stylesheet" type="text/css" />
 <!-- select 2 -->
 <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('css/custom/daterangepicker.css') }}" rel="stylesheet" type="text/css" />
+
 <!-- CHANGE CDN TO LOCAL PATH --><!-- add new css/custom/alertify.min.css -->
 <!-- <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.12.0/build/css/alertify.min.css"/>  -->
 <link rel="stylesheet" href="{{ asset('css/custom/alertify.min.css') }}"/>

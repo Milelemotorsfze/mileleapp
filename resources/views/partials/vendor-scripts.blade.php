@@ -21,6 +21,8 @@
 <!-- CHANGE CDN TO LOCAL PATH --><!-- add new js/custom/moment.min.js -->
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script> -->
 <script src="{{ asset('js/custom/moment.min.js') }}"></script>
+<script src="{{ asset('js/custom/daterangepicker.min.js') }}"></script>
+
 <script>
     jQuery.validator.setDefaults({
         errorClass: "is-invalid",
