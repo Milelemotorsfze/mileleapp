@@ -384,7 +384,7 @@ var currentOnChange = '';
 
     function onScroll(){
 
-        if($(window).scrollTop() + $(window).height() >= $(document).height()) {
+      if (Math.ceil($(window).scrollTop() + $(window).height()) >= $(document).height()) {
             var start = Number($('#start').val());
             var totalrecords = Number($('#totalrecords').val());
             var rowperpage = Number($('#rowperpage').val());
