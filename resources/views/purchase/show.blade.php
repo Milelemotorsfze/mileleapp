@@ -688,7 +688,8 @@
       @csrf
       <div class="modal-body">
        
-          <input type="hidden" name="transition_id" id="transition_id" value="">
+          <input type="hidden" name="po_transition_id" id="po_transition_id" value="">
+          <input type="hidden" name="payment_from_po" value="{{$purchasingOrder->po_number}}">
           <div class="col-12">
             <label for="payment_adjustment_amount">Adjustment Amount</label>
             <input type="number" name="payment_adjustment_amount" id="payment_adjustment_amount" required min="1" max=""
@@ -738,7 +739,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="uploadSwiftButton">Upload</button>
+        <button type="button" class="btn btn-primary" id="uploadSwiftButton" >Upload</button>
       </div>
     </div>
   </div>
@@ -2529,8 +2530,9 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                                 $hasdetailsPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                                 $haspaymentinitiatedPermission = Auth::user()->hasPermissionForSelectedRole('payment-initiated');
                                 $haspaymentreleasePermission = Auth::user()->hasPermissionForSelectedRole('payment-release-approval');
+                                $haspaymentAdjustmentPermission = Auth::user()->hasPermissionForSelectedRole('po-payment-adjustment');
                                 @endphp
-                                @if ($hasTransitionPermission || $hasPaymentPermission || $hasdetailsPermission || $haspaymentinitiatedPermission || $haspaymentreleasePermission)
+                                @if ($hasTransitionPermission || $hasPaymentPermission || $hasdetailsPermission || $haspaymentinitiatedPermission || $haspaymentreleasePermission || $haspaymentAdjustmentPermission)
                                 <th>Action</th>
                                 @endif
                             </tr>
@@ -2549,6 +2551,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                                 <td>{{ $transition->vehicle_count }}</td>
                                 <td>{{ $transition->remarks }}</td>
                                 <td>
+                                    <!-- //View Details -->
                                 @php
                                 $haspostdebit = $transition->transaction_type == "Pre-Debit";
                                 $hasreleased = $transition->transaction_type == "Released";
@@ -2587,71 +2590,66 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                                     @endif
                                 </td>
                             @endif -->
-                            @php
-                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-request-approval');
-                            @endphp
-                            @if ($hasPermission)
-                                <td>
+                            <!-- action -->
+                            <td>
+                                @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-request-approval');
+                                @endphp
+                                @if ($hasPermission)
                                     @if($transition->transaction_type == "Initiate Payment Request")
                                         <button class="btn btn-success btn-sm" onclick="handleActioninitiate('approve', {{ $transition->id }})">Approve</button>
                                         <button class="btn btn-danger btn-sm" onclick="showRejectModalinitiate({{ $transition->id }})">Reject</button>
                                     @endif
-                                </td>
-                            @endif
-                            @php
-                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
-                            @endphp
-                            @if ($hasPermission)
-                                <td>
+                                @endif
+                                @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                                @endphp
+                                @if ($hasPermission)
+                             
                                     @if($transition->created_by == auth()->user()->id && $transition->transaction_type == "Draft")
                                         <button class="btn btn-primary btn-sm" onclick="submitpayment('approve', {{ $transition->id }})">Submit</button>
                                     @endif
                                     @if($transition->transaction_type == "Debit" && $transition->vendor_payment_status == Null)
                                         <button class="btn btn-primary btn-sm" onclick="paymentconfirm('approve', {{ $transition->id }})">Vendor Payment Confirm</button>
                                     @endif
-                                </td>
-                            @endif
-                            @php
-                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-release-approval');
-                            @endphp
-                            @if ($hasPermission)
-                                <td>
+                             
+                                @endif
+                                @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-release-approval');
+                                @endphp
+                                @if ($hasPermission)
+                              
                                     @if($transition->transaction_type == "Pre-Debit")
                                         <button id="approveButton" class="btn btn-success btn-sm" data-transition-id="{{ $transition->id }}">Released</button>
                                         <button class="btn btn-danger btn-sm" data-reject-id="{{ $transition->id }}" onclick="showRejectModalreleased({{ $transition->id }})">Reject</button>
                                         <!-- <button class="btn btn-danger btn-sm" onclick="showRejectModalreleased({{ $transition->id }})">Reject</button> -->
                                     @endif
-                                </td>
-                            @endif
-                            @php
-                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-initiated');
-                            @endphp
-                            @if ($hasPermission)
-                                <td>
-                                @if($transition->transaction_type == "Debit")
-                                    @can('send-swift-copy-to-supplier')
-                                        @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('send-swift-copy-to-supplier');
-                                        @endphp
-                                        @if ($hasPermission)
-                                            @if($purchasingOrder->supplier->is_AMS == 0 && $purchasingOrder->supplier->is_MMC == 0 )
-                                            @if($transition->is_swift_copy_email_send == 0)
-                                                <button class="btn btn-primary btn-sm mt-2"  title="send Swift copy to vendor through email" 
-                                                onclick="sendSwiftCopyToSupplier({{ $transition->id }})"> <i class="fa fa-envelope" ></i> Send </button>
-                                            @else
-                                                <badge class="btn btn-success btn-sm mt-2">  Email sent</badge>
-                                            @endif
-                                            @endif 
-                                        @endif
-                                    @endcan
-
-                                    <!-- Button trigger modal -->
-                                    <button type="button" class="btn btn-primary mt-2" onclick="openPaymentAdjustmentModal({{ $transition->id }}, {{ $transition->transaction_amount }})">
-                                    Payment Adjustment
-                                    </button>
-
-                    
+                               
                                 @endif
+                          
+                              
+                                @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-initiated');
+                                @endphp
+                                @if ($hasPermission)
+                                    @if($transition->transaction_type == "Debit")
+                                        @can('send-swift-copy-to-supplier')
+                                            @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('send-swift-copy-to-supplier');
+                                            @endphp
+                                            @if ($hasPermission)
+                                                @if($purchasingOrder->supplier->is_AMS == 0 && $purchasingOrder->supplier->is_MMC == 0 )
+                                                @if($transition->is_swift_copy_email_send == 0)
+                                                    <button class="btn btn-primary btn-sm mt-2"  title="send Swift copy to vendor through email" 
+                                                    onclick="sendSwiftCopyToSupplier({{ $transition->id }})"> <i class="fa fa-envelope" ></i> Send </button>
+                                                @else
+                                                    <badge class="btn btn-success btn-sm mt-2">  Email sent</badge>
+                                                @endif
+                                                @endif 
+                                            @endif
+                                        @endcan
+                                    @endif
+                        
                                     @if($transition->transaction_type == "Released")
                                         <button class="btn btn-success btn-sm" onclick="openSwiftUploadModal({{ $transition->id }})" data-transition-id="{{ $transition->id }}">Uploading Swift</button>
                                         <button class="btn btn-danger btn-sm" onclick="showRejectModalinitiate({{ $transition->id }})">Reject</button>
@@ -2661,9 +2659,24 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                                         <button class="btn btn-success btn-sm" onclick="modalforinitiated({{ $transition->id }})" data-transition-id="{{ $transition->id }}">Initiated</button>
                                         <button class="btn btn-danger btn-sm" onclick="showRejectModalinitiate({{ $transition->id }})">Reject</button>
                                     @endif
-                                </td>
                                 @endif
-                                </tr>
+
+                                @if($purchaseOrders->count() > 0)  
+                                    @can('po-payment-adjustment')
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('po-payment-adjustment');
+                                        @endphp
+                                        @if ($hasPermission)
+                                            @if($transition->transaction_type == "Debit")    
+                                            <button type="button" class="btn btn-sm btn-primary mt-2" onclick="openPaymentAdjustmentModal({{ $transition->id }}, {{ $transition->transaction_amount }})">
+                                                Payment Adjustment
+                                            </button>
+                                        @endif   
+                                        @endif  
+                                    @endcan
+                                @endif
+                            </td>
+                            </tr>
                             @endforeach
                             </tbody>
                         </table>
@@ -5323,7 +5336,7 @@ function openSwiftUploadModal(transitionId) {
     $('#swiftUploadModal').modal('show');
 }
 function openPaymentAdjustmentModal(transitionId,transitionAmount) {
-    $('#transition_id').val(transitionId);
+    $('#po_transition_id').val(transitionId);
     $('#payment_adjustment_amount').attr('max',transitionAmount);
     $('#paymentAdjustmentModal').modal('show');
 }
