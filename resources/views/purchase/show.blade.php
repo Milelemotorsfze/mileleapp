@@ -22,6 +22,7 @@
     border-bottom: 1px solid #dee2e6;
 }
 
+
 .fixed-height {
     height: 280px; /* Adjust the height as needed */
     overflow-y: auto;
@@ -675,6 +676,48 @@
         </div>
     </div>
 </div>
+<!-- payment Adjustment Modal -->
+<div class="modal fade" id="paymentAdjustmentModal" tabindex="-1" aria-labelledby="paymentAdjustmentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="paymentAdjustmentModalLabel">Payment Adjustment</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="paymentAdjustmentForm" action="{{ route('po-payment-adjustment')}}" method="POST">
+      @csrf
+      <div class="modal-body">
+       
+          <input type="hidden" name="transition_id" id="transition_id" value="">
+          <div class="col-12">
+            <label for="payment_adjustment_amount">Adjustment Amount</label>
+            <input type="number" name="payment_adjustment_amount" id="payment_adjustment_amount" required min="1" max=""
+             placeholder="Payment Adjustment Amount"  class="form-control widthinput"> 
+          </div>
+          
+          <div class="col-12">
+            <label for="payment_adjustment_po_number">PO Number</label>
+            <select class="form-control widthinput" name="payment_adjustment_po_id" required id="payment_adjustment_po_number" multiple >
+                @foreach($purchaseOrders as $purchaseOrder)
+                    <option value="{{$purchaseOrder->id}}" > {{ $purchaseOrder->po_number }} </option>
+                @endforeach
+            </select>
+          </div>
+          <div class="col-12">
+            <label for="Remarks">Remarks</label>
+           <input type="text" name="remarks" placeholder="Remarks"  class="form-control widthinput"> 
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" >Save</button>
+      </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
 <!-- Modal -->
 <div class="modal fade" id="swiftUploadModal" tabindex="-1" aria-labelledby="swiftUploadModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -2601,6 +2644,13 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                                             @endif 
                                         @endif
                                     @endcan
+
+                                    <!-- Button trigger modal -->
+                                    <button type="button" class="btn btn-primary mt-2" onclick="openPaymentAdjustmentModal({{ $transition->id }}, {{ $transition->transaction_amount }})">
+                                    Payment Adjustment
+                                    </button>
+
+                    
                                 @endif
                                     @if($transition->transaction_type == "Released")
                                         <button class="btn btn-success btn-sm" onclick="openSwiftUploadModal({{ $transition->id }})" data-transition-id="{{ $transition->id }}">Uploading Swift</button>
@@ -2610,11 +2660,11 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                                     @elseif($transition->transaction_type == "Request For Payment")
                                         <button class="btn btn-success btn-sm" onclick="modalforinitiated({{ $transition->id }})" data-transition-id="{{ $transition->id }}">Initiated</button>
                                         <button class="btn btn-danger btn-sm" onclick="showRejectModalinitiate({{ $transition->id }})">Reject</button>
-                                                    @endif
-                                                </td>
-                                            @endif
-                                        </tr>
-                                    @endforeach
+                                    @endif
+                                </td>
+                                @endif
+                                </tr>
+                            @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -2931,7 +2981,8 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
         });
         $('#total-PO-Price').text(totalPrice.toFixed(2)); 
     };
-
+   
+            
     $('#submitRemarksrej').click(function() {
         var vehicleId = $('#vehicleId').val();
         var remarks = $('#remarksrej').val();
@@ -3236,6 +3287,13 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
         @endif
         <script>
             $(document).ready(function() {
+
+                $('#payment_adjustment_po_number').select2({
+                    placeholder: 'PO Number',
+                    maximumSelectionLength: 1,
+                    dropdownParent: $('#paymentAdjustmentModal')
+                });
+
                 $('#variants_id').on('input', function() {
                     var selectedVariant = $(this).val();
                     var variantOption = $('#variantslist').find('option[value="' + selectedVariant + '"]');
@@ -5264,6 +5322,11 @@ function openSwiftUploadModal(transitionId) {
     $('#transition_id').val(transitionId);
     $('#swiftUploadModal').modal('show');
 }
+function openPaymentAdjustmentModal(transitionId,transitionAmount) {
+    $('#transition_id').val(transitionId);
+    $('#payment_adjustment_amount').attr('max',transitionAmount);
+    $('#paymentAdjustmentModal').modal('show');
+}
 
 $('#uploadSwiftButton').on('click', function() {
     var formData = new FormData($('#swiftUploadForm')[0]);
@@ -5557,6 +5620,7 @@ $.ajax({
 </script>
 <script>
     $(document).ready(function() {
+       
         $('body').on('focus', '.ex-colour-select', function () {
         if (!$(this).hasClass("select2-hidden-accessible")) {
             $(this).select2({
@@ -5597,6 +5661,8 @@ $.ajax({
             poInput.setCustomValidity("");
         }
     });
+    
+
 </script>
 @endsection
 

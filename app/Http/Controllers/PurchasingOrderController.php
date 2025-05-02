@@ -1447,6 +1447,8 @@ public function getBrandsAndModelLines(Request $request)
         ->where('status', 'Approved')
         ->whereNotNull('dn_id')
         ->get();
+        $purchaseOrders = PurchasingOrder::whereNot('status','Cancelled')->whereNot('id',$purchasingOrder->id)
+        ->where('vendors_id', $purchasingOrder->vendors_id)->select('id','po_number')->get();
 
         return view('purchase.show', [
                'currentId' => $id,
@@ -1455,7 +1457,8 @@ public function getBrandsAndModelLines(Request $request)
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname','showCancelButton', 'vehicleslog','exColours','intColours','showAddMorePOSection',
             'purchasinglog','paymentterms','pfiVehicleVariants','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies',
             'purchasedorderevents', 'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 'totalSurcharges', 'totalDiscounts',
-            'oldPlFiles','transitions', 'accounts','additionalpaymentpend','additionalpaymentint','additionalpaymentpapproved','additionalpaymentintreq','vehiclesdn'));
+            'oldPlFiles','transitions', 'accounts','additionalpaymentpend','additionalpaymentint','additionalpaymentpapproved','additionalpaymentintreq','vehiclesdn',
+            'purchaseOrders'));
 
     }
     public function edit($id)
@@ -5894,5 +5897,39 @@ public function sendTransferCopy(Request $request) {
                 return response()->json(['success' => false, 'message' => 'Email sending failed',
                  'error' => $e->getMessage()], 500);
             }
+    }
+    public function paymentAdjustment(Request $request) {
+        info($request->all());
+        // add entry in supplier account transaction with type debit with payment adjustment amount
+        $supplierAccount = SupplierAccountTransaction::findOrFail($request->transition_id);
+        // $paymentFromPurchaseOrder = PurchasingOrder::find($supplierAccount->purchasing_order_id);
+        // already paid amount need to be reveresd based on new payment adjustment
+        $alreadypaidAmount = PurchasedOrderPaidAmounts::where('purchasing_order_id',$supplierAccount->purchasing_order_id )
+                            ->where('sat_id', $supplierAccount->id)->first();
+        if($alreadypaidAmount) {
+            $alreadypaidAmount->amount = $alreadypaidAmount->amount - $request->payment_adjustment_amount ?? 0;
+            $alreadypaidAmount->save();
+        }
+        // for adjusted po already apid amount
+        $purchasedorderpaidamounts = new PurchasedOrderPaidAmounts();
+        $purchasedorderpaidamounts->amount = $request->payment_adjustment_amount ?? 0;
+        $purchasedorderpaidamounts->created_by = Auth::id();
+        $purchasedorderpaidamounts->purchasing_order_id = $supplierAccount->purchasing_order_id;
+        $purchasedorderpaidamounts->status = 'Paid';
+        $purchasedorderpaidamounts->sat_id = $supplierAccount->id;
+        $purchasedorderpaidamounts->save();
+
+        $supplierAccountTransaction = new SupplierAccountTransaction();
+        $supplierAccountTransaction->transaction_type = "Debit";
+        $supplierAccountTransaction->purchasing_order_id = $request->payment_adjustment_po_id;
+        $supplierAccountTransaction->supplier_account_id = $supplierAccount->supplier_account_id;
+        $supplierAccountTransaction->currency = $supplierAccount->supplier_account_id;
+        $supplierAccountTransaction->created_by = Auth::id();
+        $supplierAccountTransaction->account_currency = $supplierAccount->currency;
+        $supplierAccountTransaction->transaction_amount = $request->payment_adjustment_amount ?? 0;
+        $supplierAccountTransaction->save();
+
+        return redirect()->back()->with('success', 'Payment Adjustment successfully done.');
+
     }
 }
