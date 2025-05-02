@@ -5903,51 +5903,66 @@ public function sendTransferCopy(Request $request) {
     public function paymentAdjustment(Request $request) {
         // info($request->all());
         // add entry in supplier account transaction with type debit with payment adjustment amount
-        $supplierAccount = SupplierAccountTransaction::findOrFail($request->po_transition_id);
-        // $paymentFromPurchaseOrder = PurchasingOrder::find($supplierAccount->purchasing_order_id);
-        // already paid amount need to be reveresd based on new payment adjustment
-       
-        $purchaseOrder = PurchasingOrder::findOrFail($request->payment_adjustment_po_id);
-        $alreadypaidAmount = PurchasedOrderPaidAmounts::where('purchasing_order_id',$supplierAccount->purchasing_order_id )
-                            ->where('sat_id', $supplierAccount->id)->first();
-            info($alreadypaidAmount);
-        if($alreadypaidAmount) {
-            $alreadypaidAmount->amount = $alreadypaidAmount->amount - $request->payment_adjustment_amount ?? 0;
-            $alreadypaidAmount->save();
+        DB::beginTransaction();
+
+        try{
+            $supplierAccount = SupplierAccountTransaction::findOrFail($request->po_transition_id);
+            // already paid amount need to be reveresd based on new payment adjustment
+        
+            $purchaseOrder = PurchasingOrder::findOrFail($request->payment_adjustment_po_id);
+            $alreadypaidAmount = PurchasedOrderPaidAmounts::where('purchasing_order_id',$supplierAccount->purchasing_order_id )
+                                ->where('sat_id', $supplierAccount->id)->first();
+                info($alreadypaidAmount);
+            if($alreadypaidAmount) {
+                $alreadypaidAmount->amount = $alreadypaidAmount->amount - $request->payment_adjustment_amount ?? 0;
+                $alreadypaidAmount->save();
+            }
+            // for adjusted po already apid amount
+            $purchasedorderpaidamounts = new PurchasedOrderPaidAmounts();
+            $purchasedorderpaidamounts->amount = $request->payment_adjustment_amount ?? 0;
+            $purchasedorderpaidamounts->created_by = Auth::id();
+            $purchasedorderpaidamounts->purchasing_order_id = $request->payment_adjustment_po_id;
+            $purchasedorderpaidamounts->status = 'Paid';
+            $purchasedorderpaidamounts->sat_id = $supplierAccount->id;
+            $purchasedorderpaidamounts->save();
+
+            $supplierAccountTransaction = new SupplierAccountTransaction();
+            $supplierAccountTransaction->transaction_type = "Debit";
+            $supplierAccountTransaction->purchasing_order_id = $request->payment_adjustment_po_id;
+            $supplierAccountTransaction->supplier_account_id = $supplierAccount->supplier_account_id;
+            $supplierAccountTransaction->created_by = Auth::id();
+            $supplierAccountTransaction->remarks = $request->remarks;
+            $supplierAccountTransaction->account_currency = $supplierAccount->account_currency;
+            $supplierAccountTransaction->transaction_amount = $request->payment_adjustment_amount ?? 0;
+            $supplierAccountTransaction->save();
+
+            $purchasingordereventsLog = new PurchasingOrderEventsLog();
+            $purchasingordereventsLog->event_type = "Payment Adjustment";
+            $purchasingordereventsLog->created_by = auth()->user()->id;
+            $purchasingordereventsLog->purchasing_order_id = $request->payment_adjustment_po_id;
+            $purchasingordereventsLog->description = $request->payment_adjustment_amount.' '.$supplierAccount->account_currency.' payment adjustment from '.$request->payment_from_po ?? '';
+            $purchasingordereventsLog->save();
+
+            $purchasingordereventsLog = new PurchasingOrderEventsLog();
+            $purchasingordereventsLog->event_type = "Payment Adjustment";
+            $purchasingordereventsLog->created_by = auth()->user()->id;
+            $purchasingordereventsLog->purchasing_order_id = $supplierAccount->purchasing_order_id;
+            $purchasingordereventsLog->description = $request->payment_adjustment_amount.' '.$supplierAccount->account_currency.' payment adjustment towards '.$purchaseOrder->po_number ?? '';
+            $purchasingordereventsLog->save();
+
+            $supplierAccount->transaction_amount =   $supplierAccount->transaction_amount - $request->payment_adjustment_amount;
+            $supplierAccount->save();
+
+            (new UserActivityController)->createActivity('Payment Adjustment successfully Done.');
+          
+            DB::commit();
+            return redirect()->back()->with('success', 'Payment Adjustment successfully done towards '.$purchaseOrder->po_number.'.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Payment Adjustment failed', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('roor', 'Payment Adjustment failed due to '. $e->getMessage().'.');
+        
         }
-        // for adjusted po already apid amount
-        $purchasedorderpaidamounts = new PurchasedOrderPaidAmounts();
-        $purchasedorderpaidamounts->amount = $request->payment_adjustment_amount ?? 0;
-        $purchasedorderpaidamounts->created_by = Auth::id();
-        $purchasedorderpaidamounts->purchasing_order_id = $request->payment_adjustment_po_id;
-        $purchasedorderpaidamounts->status = 'Paid';
-        $purchasedorderpaidamounts->sat_id = $supplierAccount->id;
-        $purchasedorderpaidamounts->save();
-
-        $supplierAccountTransaction = new SupplierAccountTransaction();
-        $supplierAccountTransaction->transaction_type = "Debit";
-        $supplierAccountTransaction->purchasing_order_id = $request->payment_adjustment_po_id;
-        $supplierAccountTransaction->supplier_account_id = $supplierAccount->supplier_account_id;
-        $supplierAccountTransaction->created_by = Auth::id();
-        $supplierAccountTransaction->account_currency = $supplierAccount->account_currency;
-        $supplierAccountTransaction->transaction_amount = $request->payment_adjustment_amount ?? 0;
-        $supplierAccountTransaction->save();
-
-        $purchasingordereventsLog = new PurchasingOrderEventsLog();
-        $purchasingordereventsLog->event_type = "Payment Adjustment";
-        $purchasingordereventsLog->created_by = auth()->user()->id;
-        $purchasingordereventsLog->purchasing_order_id = $request->payment_adjustment_po_id;
-        $purchasingordereventsLog->description = $request->payment_adjustment_amount.' '.$supplierAccount->account_currency.' payment adjustment from PO '.$request->payment_from_po ?? '';
-        $purchasingordereventsLog->save();
-
-        $purchasingordereventsLog = new PurchasingOrderEventsLog();
-        $purchasingordereventsLog->event_type = "Payment Adjustment";
-        $purchasingordereventsLog->created_by = auth()->user()->id;
-        $purchasingordereventsLog->purchasing_order_id = $supplierAccount->purchasing_order_id;
-        $purchasingordereventsLog->description = $request->payment_adjustment_amount.' '.$supplierAccount->account_currency.' payment adjustment towards PO '.$purchaseOrder->payment_from_po ?? '';
-        $purchasingordereventsLog->save();
-
-        return redirect()->back()->with('success', 'Payment Adjustment successfully done towards '.$purchaseOrder->po_number.'.');
 
     }
 }
