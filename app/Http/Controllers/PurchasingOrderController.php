@@ -5944,7 +5944,7 @@ public function sendTransferCopy(Request $request) {
         $purchasingordereventsLog->event_type = "Payment Adjustment";
         $purchasingordereventsLog->created_by = auth()->user()->id;
         $purchasingordereventsLog->purchasing_order_id = $supplierAccount->purchasing_order_id;
-        $purchasingordereventsLog->description = $request->payment_adjustment_amount.' '.$supplierAccount->account_currency.' payment adjustment towards PO '.$request->payment_from_po ?? '';
+        $purchasingordereventsLog->description = $request->payment_adjustment_amount.' '.$supplierAccount->account_currency.' payment adjustment towards PO '.$purchaseOrder->payment_from_po ?? '';
         $purchasingordereventsLog->save();
 
         return redirect()->back()->with('success', 'Payment Adjustment successfully done towards '.$purchaseOrder->po_number.'.');
