@@ -25,6 +25,10 @@
         color: red;
         font-size: 0.9em;
     }
+
+    .widthinput {
+	    height:32px!important;
+	}
 </style>
 <div class="card">
     <div class="card-header">
@@ -331,46 +335,62 @@
                 </div>
             </div>
 
-            <hr>
-            <div class="row">
-                @php
-                // Calculate the total number of vehicles
-                $totalVehicles = $quotationItems->sum('quantity');
-                @endphp
-                <h6>Vehicles - Total Vehicles ({{ $totalVehicles }})</h6>
-                <div class="col-md-12">
-                    @foreach($quotationItems as $quotationItem)
-                    <div class="mb-1">
-                        <h6>{{ $loop->iteration }} - {{ $quotationItem->description }} - ({{ $quotationItem->quantity }})</h6>
+            <div class="card" id="branModaDiv">
+                <div class="card-header">
+                    <h4 class="card-title">Sales Order Vehicles</h4>
+                </div>
+                <div class="card-body">
+                    <div class="card" style="background-color:#fafaff; border-color:#e6e6ff;">
                         <div class="row">
-                            @for ($i = 0; $i < $quotationItem->quantity; $i++)
-                                <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-                                    @php
-                                    // Get the corresponding so_item for this specific loop iteration
-                                    $soItem = $soitems->where('quotation_items_id', $quotationItem->id)->skip($i)->first();
-                                    $soItemId = $soItem ? $soItem->id : null;
-                                    $selectedVehicleId = $soItem ? $soItem->vehicles_id : null;
-                                    @endphp
-                                    <select name="vehicle_vin[{{ $quotationItem->id }}][]" class="form-control select2">
-                                        <option value="" selected>Select VIN</option>
-                                        @foreach($vehicles[$quotationItem->id] as $vehicle)
-                                        @php
-                                        // Determine if this vehicle should be selected
-                                        $selected = ($vehicle->id == $selectedVehicleId) ? 'selected' : '';
-                                        @endphp
-                                        <option value="{{ $vehicle->id }}" {{ $selected }}>{{ $vehicle->vin }}</option>
+                            <div class="card-body">
+                                <div class="row">
+                                    <h5>Total Vehicles - {{ $totalVehicles }}</h5>
+                                    <div class="col-md-12 mt-3">
+                                        @foreach($quotationItems as $quotationItem)
+                                            <h6> {{ $quotationItem->description }} -  ({{ $quotationItem->quantity }})</h6>
+                                            <div class="row">
+                                                <label class="form-label font-size-13">Choose Variant</label>
+                                                <div class="mb-2 col-sm-12 col-md-6 col-lg-6 col-xxl-6">
+                                                    <select name="vehicle_variants[{{ $quotationItem->reference_id }}][]" class="variants form-control" multiple >
+                                                        @foreach($variants as $variant)
+                                                        <option value="{{ $variant->id }}" 
+                                                        {{ $variant->id == $quotationItem->reference_id ? 'selected' : '' }}>{{ $variant->name ?? '' }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div> 
+                                                <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
+                                                   <input type="number" class="form-control variant-prices widthinput" name="prices[]" placeholder="Price" value="{{ $quotation->unit_price }}" >
+                                                </div>
+                                                <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
+                                                   <input type="number" class="form-control variant-quantities widthinput" min="1" name="quantities[]" placeholder="Quantity"  value="{{ $quotation->quantity }}" >
+                                                </div>
+                                                <div class="col-sm-12 col-md-1 col-lg-1 col-xxl-1">
+                                                    <a class="btn btn-sm btn-danger removeVariantButton" >
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-12 col-md-10 col-lg-10 col-xxl-10 mb-4 ms-5">
+                                                    <label class="form-label font-size-13">Choose VIN</label>
+                                                    <select name="vehicle_vin[{{ $quotationItem->id }}][]" class="vins form-control" multiple >
+                                                        @foreach($vehicles[$quotationItem->id] as $vehicle)
+                                                        <option value="{{ $vehicle->id }}" 
+                                                        {{ in_array($vehicle->id, $quotationItem->selectedVehicleIds) ? 'selected' : '' }}
+                                                        {{ $vehicle->gdn_id ? 'data-lock=true' : '' }} >{{ $vehicle->vin ?? '' }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div> 
+                                            </div>
+                                            <!-- <input type="hidden" name="quotation_item_id[]" value="{{ $quotationItem->id }}"> -->
                                         @endforeach
-                                    </select>
+                                    </div>
                                 </div>
-                                @endfor
-                        </div>
-                        <input type="hidden" name="quotation_item_id[]" value="{{ $quotationItem->id }}">
-                    </div>
-                    @endforeach
-
+                            </div> 
+                        </div> 
+                    </div> 
                 </div>
             </div>
-            <hr>
             <div class="mt-4">
                 <div class="card">
                     <div class="card-header">
@@ -425,7 +445,20 @@
     @push('scripts')
     <script>
         $(document).ready(function() {
-            $('.select2').select2();
+            $('.vins').select2({
+                placeholder : 'Select VIN',
+            });
+            $('.variants').select2({
+                placeholder : 'Select Variant',
+                maximumSelectionLength: 1
+            });
+            $('.vins').on('select2:unselecting', function (e) {
+                var $option = $(e.params.args.data.element);
+                if ($option.data('lock')) {
+                    e.preventDefault(); // Prevent removal
+                    alertify.confirm('This vehicle cannot be removed because it has a GDN assigned.').set({title: "Can't Remove this VIN"});
+                }
+            });
         });
     </script>
     <script>

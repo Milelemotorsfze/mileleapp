@@ -443,15 +443,22 @@ class SalesOrderController extends Controller
                     default:
                         break;
                     }
-                        }
-                        } 
-                        $saleperson = User::find($quotation->created_by);
-                        $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first(); 
-                      
-                        return view('salesorder.update', compact('vehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails','sodetails', 'soitems', 'empProfile', 'saleperson'));  
+            }
+            } 
+            $saleperson = User::find($quotation->created_by);
+            $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first(); 
+            foreach($quotationItems as $quotationItem) {
+                $quotationItem->selectedVehicleIds = $quotationItem->soItems->pluck('vehicles_id')->toArray();
+               
+            }
+            $totalVehicles = $quotationItems->sum('quantity');
+            $variants = Varaint::select('id','name')->get();
+            // return $quotationItems;
+            return view('salesorder.update', compact('vehicles','variants','totalVehicles','quotationItems', 'quotation', 'calls', 'customerdetails','sodetails', 'soitems', 'empProfile', 'saleperson'));  
         }
 public function storesalesorderupdate(Request $request, $quotationId)
 {
+    // return $request->all();
     DB::beginTransaction();
     try {
     // Validate and retrieve the Sales Order ID
@@ -561,7 +568,7 @@ public function storesalesorderupdate(Request $request, $quotationId)
     $solog->save();
 
     DB::commit();
-    return redirect()->route('dailyleads.index')->with('success', 'Sales Order updated successfully.');
+    return redirect()->back()->with('success', 'Sales Order updated successfully.');
 } catch (\Exception $e) {
     DB::rollBack(); // Rollback transaction in case of error
      Log::error('Sales order updte faisls', ['error' => $e->getMessage()]);
