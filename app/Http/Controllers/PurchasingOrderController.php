@@ -67,6 +67,7 @@ use App\Models\VehicleDn;
 use Illuminate\Support\Facades\Crypt;
 use setasign\Fpdi\PdfReader\Page;
 use setasign\Fpdi\Tcpdf\Fpdi;
+use Illuminate\Support\Str;
 use File;
 use Exception;
 
@@ -1446,6 +1447,10 @@ public function getBrandsAndModelLines(Request $request)
         ->where('status', 'Approved')
         ->whereNotNull('dn_id')
         ->get();
+        $purchaseOrders = PurchasingOrder::whereNot('status','Cancelled')->whereNot('id',$purchasingOrder->id)
+                            ->where('currency', $purchasingOrder->currency)
+                            ->where('vendors_id', $purchasingOrder->vendors_id)->select('id','po_number')
+                            ->orderBy('id','DESC')->get();
 
         return view('purchase.show', [
                'currentId' => $id,
@@ -1454,7 +1459,8 @@ public function getBrandsAndModelLines(Request $request)
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname','showCancelButton', 'vehicleslog','exColours','intColours','showAddMorePOSection',
             'purchasinglog','paymentterms','pfiVehicleVariants','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies',
             'purchasedorderevents', 'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 'totalSurcharges', 'totalDiscounts',
-            'oldPlFiles','transitions', 'accounts','additionalpaymentpend','additionalpaymentint','additionalpaymentpapproved','additionalpaymentintreq','vehiclesdn'));
+            'oldPlFiles','transitions', 'accounts','additionalpaymentpend','additionalpaymentint','additionalpaymentpapproved','additionalpaymentintreq','vehiclesdn',
+            'purchaseOrders'));
 
     }
     public function edit($id)
@@ -3484,8 +3490,10 @@ if ($paymentOrderStatus->isNotEmpty()) {
             $vehicle->delete();
             return redirect()->back()->with('success', 'Vehicle cancellation request submitted successfully.');
         }
-        public function updatebasicdetails(Request $request)
+public function updatebasicdetails(Request $request)
 {
+
+  info("update basci details");
     $purchasingOrder = PurchasingOrder::find($request->input('purchasing_order_id'));
     if (!$purchasingOrder) {
         return response()->json(['error' => 'Purchasing order not found'], 404);
@@ -3534,6 +3542,8 @@ if ($paymentOrderStatus->isNotEmpty()) {
         $fileNameWithExt = $request->file('uploadPL')->getClientOriginalName();
         // Get just the filename
         $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+        $filename = Str::slug($filename);
+     
         // Get just the extension
         $extension = $request->file('uploadPL')->getClientOriginalExtension();
         // Create a unique filename to store
@@ -3542,6 +3552,7 @@ if ($paymentOrderStatus->isNotEmpty()) {
         $path = $request->file('uploadPL')->move(public_path('storage/PL_Documents'), $fileNameToStore);
         // Update the file path in the purchasing order
         $purchasingOrder->pl_file_path = 'storage/PL_Documents/' . $fileNameToStore;
+       
     }
     // Save the purchasing order
     $purchasingOrder->save();
@@ -5888,5 +5899,70 @@ public function sendTransferCopy(Request $request) {
                 return response()->json(['success' => false, 'message' => 'Email sending failed',
                  'error' => $e->getMessage()], 500);
             }
+    }
+    public function paymentAdjustment(Request $request) {
+        // info($request->all());
+        // add entry in supplier account transaction with type debit with payment adjustment amount
+        DB::beginTransaction();
+
+        try{
+            $supplierAccount = SupplierAccountTransaction::findOrFail($request->po_transition_id);
+            // already paid amount need to be reveresd based on new payment adjustment
+        
+            $purchaseOrder = PurchasingOrder::findOrFail($request->payment_adjustment_po_id);
+            $alreadypaidAmount = PurchasedOrderPaidAmounts::where('purchasing_order_id',$supplierAccount->purchasing_order_id )
+                                ->where('sat_id', $supplierAccount->id)->first();
+                info($alreadypaidAmount);
+            if($alreadypaidAmount) {
+                $alreadypaidAmount->amount = $alreadypaidAmount->amount - $request->payment_adjustment_amount ?? 0;
+                $alreadypaidAmount->save();
+            }
+            // for adjusted po already apid amount
+            $purchasedorderpaidamounts = new PurchasedOrderPaidAmounts();
+            $purchasedorderpaidamounts->amount = $request->payment_adjustment_amount ?? 0;
+            $purchasedorderpaidamounts->created_by = Auth::id();
+            $purchasedorderpaidamounts->purchasing_order_id = $request->payment_adjustment_po_id;
+            $purchasedorderpaidamounts->status = 'Paid';
+            $purchasedorderpaidamounts->sat_id = $supplierAccount->id;
+            $purchasedorderpaidamounts->save();
+
+            $supplierAccountTransaction = new SupplierAccountTransaction();
+            $supplierAccountTransaction->transaction_type = "Debit";
+            $supplierAccountTransaction->purchasing_order_id = $request->payment_adjustment_po_id;
+            $supplierAccountTransaction->supplier_account_id = $supplierAccount->supplier_account_id;
+            $supplierAccountTransaction->created_by = Auth::id();
+            $supplierAccountTransaction->remarks = $request->remarks;
+            $supplierAccountTransaction->account_currency = $supplierAccount->account_currency;
+            $supplierAccountTransaction->transaction_amount = $request->payment_adjustment_amount ?? 0;
+            $supplierAccountTransaction->save();
+
+            $purchasingordereventsLog = new PurchasingOrderEventsLog();
+            $purchasingordereventsLog->event_type = "Payment Adjustment";
+            $purchasingordereventsLog->created_by = auth()->user()->id;
+            $purchasingordereventsLog->purchasing_order_id = $request->payment_adjustment_po_id;
+            $purchasingordereventsLog->description = $request->payment_adjustment_amount.' '.$supplierAccount->account_currency.' payment adjustment from '.$request->payment_from_po ?? '';
+            $purchasingordereventsLog->save();
+
+            $purchasingordereventsLog = new PurchasingOrderEventsLog();
+            $purchasingordereventsLog->event_type = "Payment Adjustment";
+            $purchasingordereventsLog->created_by = auth()->user()->id;
+            $purchasingordereventsLog->purchasing_order_id = $supplierAccount->purchasing_order_id;
+            $purchasingordereventsLog->description = $request->payment_adjustment_amount.' '.$supplierAccount->account_currency.' payment adjustment towards '.$purchaseOrder->po_number ?? '';
+            $purchasingordereventsLog->save();
+
+            $supplierAccount->transaction_amount =   $supplierAccount->transaction_amount - $request->payment_adjustment_amount;
+            $supplierAccount->save();
+
+            (new UserActivityController)->createActivity('Payment Adjustment successfully Done.');
+          
+            DB::commit();
+            return redirect()->back()->with('success', 'Payment Adjustment successfully done towards '.$purchaseOrder->po_number.'.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Payment Adjustment failed', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('roor', 'Payment Adjustment failed due to '. $e->getMessage().'.');
+        
+        }
+
     }
 }

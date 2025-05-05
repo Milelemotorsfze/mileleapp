@@ -44,6 +44,8 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\WOBOE;
 use App\Mail\WOBOEStatusMail; 
 use Illuminate\Pagination\LengthAwarePaginator;
+use Rap2hpoutre\FastExcel\FastExcel;
+
 class WorkOrderController extends Controller
 {
     public function workOrderCreate($type) {
@@ -308,6 +310,9 @@ class WorkOrderController extends Controller
                     });
                 }
             })
+            ->when(!empty($request->start_date) && !empty($request->end_date), function ($query) use ($request) {
+                $query->whereBetween('date', [$request->start_date, $request->end_date]);
+            })
             ->latest()
             ->get();
 
@@ -353,6 +358,76 @@ class WorkOrderController extends Controller
                 return $matchesFilter || $matchesBlank;
             });
         }
+        if($request->export == 'EXCEL') {
+            (new UserActivityController)->createActivity('Export Work Order List');
+
+            return (new FastExcel($filteredDatas))->download('work-orders.csv', function ($data) {
+               
+                    return [
+                        'Type' => $data->type,
+                        'status' => $data->latestStatus->status ?? '',
+                        'Sales Support Confirmation' => $data->sales_support_data_confirmation ?? '',
+                        'Finance Approval Status' => $data->finance_approval_status ?? '',
+                        'COO Office Approval Status' => $data->coo_approval_status ?? '',
+                        'Documentation Status' => $data->docs_status ?? '',
+                        'Vehicle Modification status' => $data->vehicles_modification_summary ?? '',
+                        'PDI Status' => $data->pdi_summary ?? '',
+                        'Delivery Status' => $data->delivery_summary ?? '',
+                        'Sales Person Name' => $data->salesPerson->name ?? '',
+                        'SO Number' => $data->so_number,
+                        'WO Number' => $data->wo_number,
+                        'Date' => $data->date,
+                        'Batch' => $data->is_batch == 0 ? 'Single' : $data->batch ?? '',
+                        'Customer Name' => $data->customer_name ?? '',
+                        'Customer Email' => $data->customer_email ?? '', 
+                        'Customer Contact Number' => "\t".$data->customer_company_number ?? '',
+                        'Customer Representative Name' => $data->customer_representative_name ?? '',
+                        'Customer Representative Email' => $data->customer_representative_email ?? '',
+                        'Customer Representative Number' =>  "\t".$data->customer_representative_contact ?? '',
+                        'Freight Agent Name' => $data->freight_agent_name ?? '',
+                        'Freight Agent Email' => $data->freight_agent_email ?? '',
+                        'Freight Agent Contact Number' => "\t".$data->freight_agent_contact_number ?? '',
+                        'Delivery Advise' => $data->delivery_advise ?? '',
+                        'Transfer Of Ownership' => $data->showroom_transfer ?? '',
+                        'Cross Trade' => $data->cross_trade ?? '',
+                        'LTO' => $data->lto ?? '',
+                        'Temporary Exit' => $data->temporary_exit ?? '',
+                        'Port Of Loading' => $data->port_of_loading ?? '',
+                        'Port Of Discharge' => $data->port_of_discharge ?? '',
+                        'Final Destination' => $data->final_destination ?? '',
+                        'Transport Type' => $data->transport_type ?? '',
+                        'Airline/Shipping Line/Trailer No.' => $data->transport_type ? $data->getTransportField('name') ?? '' : '',
+                        'AWB/Container No./Transportation Company' => $data->transport_type ? $data->getTransportField('id') ?? '': '',
+                        'Airway Info/Fwd Import Code/Driver Contact No.' => $data->transport_type ? $data->getTransportField('details') ?? '' : '',
+                        'BRN/Transportation Com. Info' => $data->transport_type === 'sea' || $data->transport_type === 'road' ? $data->getTransportField('additional') ?? '': '',
+                        'SO Vehicle Quantity' => $data->so_vehicle_quantity ?? '',
+                        'SO Currency' => $data->currency ?? '',
+                        'SO Amount' => $data->so_total_amount != 0.00 ? $data->so_total_amount : '',
+                        'Deposit' => $data->amount_received != 0.00 ? $data->amount_received : '',
+                        'Balance' => $data->balance_amount != 0.00 ? $data->balance_amount : '',
+                        'Delivery Location' => $data->delivery_location ?? '',
+                        'Delivery Contact Person' => $data->delivery_contact_person ?? '',
+                        'Delivery Contact Number' => "\t".$data->delivery_contact_person_number ?? '',
+                        'Delivery Date' => $data->delivery_date ? Carbon::parse($data->delivery_date)->format('d M Y') : '',
+                        'Preferred Shipping Line' => $data->preferred_shipping_line_of_customer ?? '',
+                        'Bill of Lading' => $data->bill_of_loading_details ?? '',
+                        'Shipper' => $data->shipper ?? '',
+                        'Consignee' => $data->consignee ?? '',
+                        'Notify Party' => $data->notify_party ?? '',
+                        'Special Requests' => $data->special_or_transit_clause_or_request ?? '',
+                        'Created By' => $data->CreatedBy->name ?? '',
+                        'Created At' => $data->created_at ?? '',
+                        'Last Updated By' => $data->UpdatedBy->name ?? '',
+                        'Last Updated At' => $data->updated_at ?? '',
+                        'Sales Support Confirmation By' => $data->salesSupportDataConfirmationBy->name ?? '',
+                        'Sales Support Confirmation At' => $data->sales_support_data_confirmation_at ?? '',
+                        'Total BOE' => $data->total_number_of_boe ?? '',
+                        'Has Claim' => $data->has_claim ?? '',
+                        'Vehicle Count' => $data->vehicles->count() ?? 0,
+                    ];
+                });
+        }
+
         // Pagination parameters
         $page = request()->get('page', 1);
         $perPage = 100;
@@ -3184,4 +3259,8 @@ class WorkOrderController extends Controller
         $exists = So::where('so_number', $soNumber)->exists();
         return response()->json(['valid' => $exists]);
     }  
+    function formatPhoneForExcel($number)
+    {
+        return $number ? " " . $number : '';
+    }
 }

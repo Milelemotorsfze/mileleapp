@@ -585,6 +585,7 @@ Route::get('/d', function () {
                                                                 ->name('dp-purchase-order.inventory-check');
     Route::get('dp-purchasing-order/check-po-number', [DemandPlanningPurchaseOrderController::class, 'uniqueCheckPONumber'])->name('dp-purchasing-order.checkPONumber');
   
+    
 
     // Supplier Inventories
     Route::resource('supplier-inventories', SupplierInventoryController::class)->except('show');
@@ -1173,5 +1174,6 @@ Route::get('/d', function () {
     Route::post('/check-vehicle-quantity', [VehiclesController::class, 'checkVehicleQuantity'])->name('check.vehicle.quantity');
     Route::get('/salespersons/list', [SalesOrderController::class, 'getSalespersons'])->name('salespersons.list');
     Route::post('/salesorder/updateSalesperson', [SalesOrderController::class, 'updateSalesperson'])->name('salesorder.updateSalesperson');
-
+    Route::post('po-payment-adjustment', [PurchasingOrderController::class, 'paymentAdjustment'])->name('po-payment-adjustment');
+  
 });
