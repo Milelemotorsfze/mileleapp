@@ -52,8 +52,9 @@ class ProformaInvoiceController extends Controller {
                 ->orwhereHas('user', function($query) {
                     $query->whereIn('id', [17,20,40,190,168]);
                 })
-                ->distinct()
-                ->get();
+                ->get()
+                ->unique('model_id')  // Ensures one entry per user
+                ->values();
         $countries = Country::all();
         $shippingPorts = MasterShippingPorts::all();
         $shippings = ShippingMedium::all();
