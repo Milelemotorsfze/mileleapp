@@ -53,6 +53,7 @@ class ProformaInvoiceController extends Controller {
                     $query->whereIn('id', [17,20,40,190,168]);
                 })
                 ->get();
+                info($sales_persons);
         $countries = Country::all();
         $shippingPorts = MasterShippingPorts::all();
         $shippings = ShippingMedium::all();
