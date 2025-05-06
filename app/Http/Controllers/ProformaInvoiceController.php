@@ -53,7 +53,7 @@ class ProformaInvoiceController extends Controller {
                     $query->whereIn('id', [17,20,40,190,168]);
                 })
                 ->get()
-                ->unique('model_id')  // Ensures one entry per user
+                ->unique('model_id') 
                 ->values();
         $countries = Country::all();
         $shippingPorts = MasterShippingPorts::all();
@@ -525,9 +525,10 @@ class ProformaInvoiceController extends Controller {
                             ->orwhereHas('user', function($query) {
                                 $query->whereIn('id', [17,20,40,190,168]);
                             })
-                            ->get();
+                            ->get()
+                            ->unique('model_id') 
+                            ->values();
 
-                            // return $sales_persons;
         $existingItemsJson = json_encode($quotationitems);
         return view('proforma.invoice_edit', compact('callDetails', 'brands','assessoriesDesc',
             'sparePartsDesc','kitsDesc','shippings','certifications','countries','shippingPorts',
