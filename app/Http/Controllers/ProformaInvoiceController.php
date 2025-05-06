@@ -50,7 +50,7 @@ class ProformaInvoiceController extends Controller {
         })->get();
         $sales_persons = ModelHasRoles::with('user')->where('role_id', 7)
                 ->orwhereHas('user', function($query) {
-                    $query->whereIn('id', [17,20,40,190]);
+                    $query->whereIn('id', [17,20,40,190,168]);
                 })
                 ->get();
         $countries = Country::all();
@@ -521,7 +521,7 @@ class ProformaInvoiceController extends Controller {
         $usd_to_eru_rate = Setting::where('key', 'usd_to_euro_convertion_rate')->first();
         $sales_persons = ModelHasRoles::with('user')->where('role_id', 7)
                             ->orwhereHas('user', function($query) {
-                                $query->whereIn('id', [17,20,40,190]);
+                                $query->whereIn('id', [17,20,40,190,168]);
                             })
                             ->get();
 
