@@ -105,6 +105,8 @@ class DailyleadsController extends Controller
             }
             if($status === "Preorder")
             {
+                $search = $request->input('search.value');
+
                 $preorders = PreOrder::select([
                     'pre_orders.status as status',
                     'quotations.id as quotationsid',
@@ -124,7 +126,14 @@ class DailyleadsController extends Controller
                 ->leftJoin('users', 'pre_orders.requested_by', '=', 'users.id')
                 ->where('pre_orders.requested_by', $id)
                 ->groupby('pre_orders.id')
-                ->get();
+                ->when($search, function ($query, $search) {
+                    $query->where(function ($q) use ($search) {
+                        $q->where('quotations.sales_notes', 'like', "%$search%")
+                          ->orWhere('varaints.name', 'like', "%$search%")
+                          ->orWhere('countries.name', 'like', "%$search%")
+                          ->orWhere('users.name', 'like', "%$search%");
+                    });
+                });
                 return DataTables::of($preorders)->toJson();  
             }
             else if($status === "followup")
@@ -161,9 +170,10 @@ class DailyleadsController extends Controller
                 ->get();
                 return DataTables::of($fellowup)->toJson();  
             }
-            else if($status === "activelead")
-            {
-                $activelead = calls::select([
+            else if($status === "activelead") {
+                $searchValue = $request->input('search.value');
+            
+                $activelead = Calls::select([
                     'calls.priority',
                     'calls.id',
                     'calls.name',
@@ -178,9 +188,9 @@ class DailyleadsController extends Controller
                     'calls.language',
                     'master_model_lines.model_line',
                     'brands.brand_name',
-                    \DB::raw("DATE_FORMAT(calls.created_at, '%Y %m %d') as leaddate"),
-                    \DB::raw("sales_person_user.name as sales_person_name"),
-                    \DB::raw("created_by_user.name as created_by_name")
+                    DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d') as leaddate"),
+                    DB::raw("sales_person_user.name as sales_person_name"),
+                    DB::raw("created_by_user.name as created_by_name")
                 ])
                 ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
                 ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
@@ -188,16 +198,38 @@ class DailyleadsController extends Controller
                 ->leftJoin('users as sales_person_user', 'calls.sales_person', '=', 'sales_person_user.id')
                 ->leftJoin('users as created_by_user', 'calls.created_by', '=', 'created_by_user.id')
                 ->whereIn('calls.status', ['contacted', 'working', 'qualify', 'converted', 'Follow Up', 'Prospecting']);
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access')|| Auth::user()->hasPermissionForSelectedRole('leads-view-only');
+            
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
                 if(!$hasPermission) {
                     $activelead->where('calls.sales_person', $id);
                 }
-                $activelead = $activelead->groupBy('calls.id')->get();
+            
+                if (!empty($searchValue)) {
+                    $activelead->where(function ($query) use ($searchValue) {
+                        $query->where('calls.name', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.phone', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.email', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.language', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.location', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.remarks', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.type', 'LIKE', "%$searchValue%")
+                            ->orWhere('brands.brand_name', 'LIKE', "%$searchValue%")
+                            ->orWhere('master_model_lines.model_line', 'LIKE', "%$searchValue%");
+                    });
+                }
+                \Log::info('Search Term 11111 : ' . $searchValue);
+
+            
+                $activelead = $activelead->groupBy('calls.id');
+            
                 return DataTables::of($activelead)->toJson(); 
             }
+            
             else if($status === "bulkleads")
             {
-                $bulkleads = calls::select([
+                $searchValue = $request->input('search.value');
+            
+                $bulkleads = Calls::select([
                     'calls.id',
                     'calls.name',
                     'calls.phone',
@@ -218,13 +250,33 @@ class DailyleadsController extends Controller
                 ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
                 ->whereNotNull('calls.leadtype');
+            
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
                 if(!$hasPermission) {
                     $bulkleads->where('calls.sales_person', $id);
                 }
+            
+                if (!empty($searchValue)) {
+                    $bulkleads->where(function ($query) use ($searchValue) {
+                        $query->where('calls.name', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.phone', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.email', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.language', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.location', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.remarks', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.type', 'LIKE', "%$searchValue%")
+                            ->orWhere('brands.brand_name', 'LIKE', "%$searchValue%")
+                            ->orWhere('master_model_lines.model_line', 'LIKE', "%$searchValue%");
+                    });
+                }
+            
+                \Log::info('Search Term bulkleads : ' . $searchValue);
+            
                 $bulkleads = $bulkleads->groupBy('calls.id')->get();
+            
                 return DataTables::of($bulkleads)->toJson();   
             }
+            
             else
             {
             $searchValue = $request->input('search.value');
