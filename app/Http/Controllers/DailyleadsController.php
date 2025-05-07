@@ -242,7 +242,6 @@ class DailyleadsController extends Controller
                     'calls.language',
                     'master_model_lines.model_line',
                     'brands.brand_name',
-                    'calls.remarks',
                     \DB::raw("DATE_FORMAT(calls.created_at, '%Y %m %d') as leaddate"),
                 ])
                 ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
@@ -272,7 +271,7 @@ class DailyleadsController extends Controller
             
                 \Log::info('Search Term bulkleads : ' . $searchValue);
             
-                $bulkleads = $bulkleads->groupBy('calls.id')->get();
+                $bulkleads = $bulkleads->groupBy('calls.id');
             
                 return DataTables::of($bulkleads)->toJson();   
             }

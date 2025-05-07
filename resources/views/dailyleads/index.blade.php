@@ -3041,7 +3041,7 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         { data: 'quotationsid', name: 'quotationsid' },
         {
             data: 'date_formatted',
-            name: 'date_formatted',
+            name: 'quotations.date',
              render: function (data, type, row) {
         if (type === 'display' || type === 'filter') {
             if (!data || !moment(data).isValid()) {
@@ -3290,7 +3290,7 @@ $('#my-table_filter').hide();
     columns: [
       {
             data: 'leaddate',
-            name: 'leaddate',
+            name: 'calls.created_at',
              render: function (data, type, row) {
         if (type === 'display' || type === 'filter') {
             if (!data || !moment(data).isValid()) {
