@@ -27,8 +27,18 @@
     }
 
     .widthinput {
-	    height:32px!important;
+	    height:34px!important;
 	}
+    .overlay
+        {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(128,128,128,0.5); 
+            display: none; 
+        }
 </style>
 <div class="card">
     <div class="card-header">
@@ -345,45 +355,54 @@
                             <div class="card-body">
                                 <div class="row">
                                     <h5>Total Vehicles - {{ $totalVehicles }}</h5>
-                                    <div class="col-md-12 mt-3">
-                                        @foreach($quotationItems as $quotationItem)
+                                    <div class="col-md-12 mt-3" id="so-vehicles">
+                                        @foreach($quotationItems as $key => $quotationItem)
                                             <h6> {{ $quotationItem->description }} -  ({{ $quotationItem->quantity }})</h6>
-                                            <div class="row">
-                                                <label class="form-label font-size-13">Choose Variant</label>
-                                                <div class="mb-2 col-sm-12 col-md-6 col-lg-6 col-xxl-6">
-                                                    <select name="vehicle_variants[{{ $quotationItem->reference_id }}][]" class="variants form-control" multiple >
-                                                        @foreach($variants as $variant)
-                                                        <option value="{{ $variant->id }}" 
-                                                        {{ $variant->id == $quotationItem->reference_id ? 'selected' : '' }}>{{ $variant->name ?? '' }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div> 
-                                                <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
-                                                   <input type="number" class="form-control variant-prices widthinput" name="prices[]" placeholder="Price" value="{{ $quotation->unit_price }}" >
+                                            <div class="so-variant-add-section" id="variant-section-{{ $key + 1 }}">
+                                                <div class="row">
+                                                    <label class="form-label font-size-13">Choose Variant</label>
+                                                    <div class="mb-2 col-sm-12 col-md-6 col-lg-6 col-xxl-6">
+                                                        <select name="vehicle_variants[{{ $quotationItem->reference_id }}][]" index="{{$key+1}}" id="variant-{{ $key+1 }}"
+                                                        class="variants form-control" multiple >
+                                                            @foreach($variants as $variant)
+                                                                <option value="{{ $variant->id }}" {{ $variant->id == $quotationItem->reference_id ? 'selected' : '' }}>{{ $variant->name ?? '' }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div> 
+                                                    <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
+                                                    <input type="number" class="form-control variant-prices widthinput" name="prices[]" placeholder="Price" value="{{ $quotationItem->unit_price }}" >
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
+                                                    <input type="number" class="form-control variant-quantities widthinput"  index="{{$key+1}}" min="1" name="quantities[]" placeholder="Quantity"  value="{{ $quotationItem->quantity }}" >
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-1 col-lg-1 col-xxl-1">
+                                                        <a class="btn btn-sm btn-danger removeVariantButton" index="{{ $key+1}}" >
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </a>
+                                                    </div>
                                                 </div>
-                                                <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
-                                                   <input type="number" class="form-control variant-quantities widthinput" min="1" name="quantities[]" placeholder="Quantity"  value="{{ $quotation->quantity }}" >
+                                                <div class="row">
+                                                    <div class="col-sm-12 col-md-10 col-lg-10 col-xxl-10 mb-4 ms-5">
+                                                        <label class="form-label font-size-13">Choose VIN</label>
+                                                        <select name="vehicle_vin[{{ $quotationItem->id }}][]" id="vin-{{ $key+1 }}" index="{{$key+1}}" class="vins form-control" multiple >
+                                                            @foreach($vehicles[$quotationItem->id] as $vehicle)
+                                                            <option value="{{ $vehicle->id }}" 
+                                                            {{ in_array($vehicle->id, $quotationItem->selectedVehicleIds) ? 'selected' : '' }}
+                                                            {{ $vehicle->gdn_id ? 'data-lock=true' : '' }} >{{ $vehicle->vin ?? '' }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div> 
                                                 </div>
-                                                <div class="col-sm-12 col-md-1 col-lg-1 col-xxl-1">
-                                                    <a class="btn btn-sm btn-danger removeVariantButton" >
-                                                        <i class="fas fa-trash-alt"></i>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-sm-12 col-md-10 col-lg-10 col-xxl-10 mb-4 ms-5">
-                                                    <label class="form-label font-size-13">Choose VIN</label>
-                                                    <select name="vehicle_vin[{{ $quotationItem->id }}][]" class="vins form-control" multiple >
-                                                        @foreach($vehicles[$quotationItem->id] as $vehicle)
-                                                        <option value="{{ $vehicle->id }}" 
-                                                        {{ in_array($vehicle->id, $quotationItem->selectedVehicleIds) ? 'selected' : '' }}
-                                                        {{ $vehicle->gdn_id ? 'data-lock=true' : '' }} >{{ $vehicle->vin ?? '' }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div> 
                                             </div>
                                             <!-- <input type="hidden" name="quotation_item_id[]" value="{{ $quotationItem->id }}"> -->
                                         @endforeach
+                                    </div>
+                                    <div class="row ">
+                                        <div class="col-11">
+                                            <div class="btn btn-info btn-sm add-variant-btn float-end mt-2" >
+                                                <i class="fas fa-plus"></i> Add Variant
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div> 
@@ -441,6 +460,7 @@
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
+    <div class="overlay"></div>
     @endsection
     @push('scripts')
     <script>
@@ -460,6 +480,117 @@
                 }
             });
         });
+
+        $('.add-variant-btn').click(function() {
+            var index = $("#so-vehicles").find(".so-variant-add-section").length + 1;
+
+            var newRow = `
+                 <div class="so-variant-add-section" id="variant-section-${index}">
+                    <div class="row">
+                        <label class="form-label font-size-13">Choose Variant</label>
+                        <div class="mb-2 col-sm-12 col-md-6 col-lg-6 col-xxl-6">
+                            <select name="vehicle_variants[{{ $quotationItem->reference_id }}][]" index="${index}" id="variant-${index}"
+                             class="variants form-control" multiple >
+                            </select>
+                        </div> 
+                        <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
+                        <input type="number" class="form-control variant-prices widthinput" required name="prices[]" placeholder="Price">
+                        </div>
+                        <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
+                        <input type="number" class="form-control variant-quantities widthinput" index="${index}" min="1" value="1" name="quantities[]" placeholder="Quantity" >
+                        </div>
+                        <div class="col-sm-12 col-md-1 col-lg-1 col-xxl-1">
+                            <a class="btn btn-sm btn-danger removeVariantButton" index="${index}" >
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-10 col-lg-10 col-xxl-10 mb-4 ms-5">
+                            <label class="form-label font-size-13">Choose VIN</label>
+                            <select name="vehicle_vin[{{ $quotationItem->id }}][]" id="vin-${index}" index="${index}" class="vins form-control" multiple >
+                                
+                            </select>
+                        </div> 
+                    </div>
+                </div>`;
+                    
+            $('#so-vehicles').append(newRow);
+
+            $('#vin-' + index).select2({
+                placeholder: 'Select Vin',
+            });
+            getSOVariants(index);
+            $('#variant-' + index).select2({
+                placeholder: 'Select Variant',
+                maximumSelectionLength: 1
+            });
+        });
+
+        $(document.body).on('select2:select', ".variants", function (e) {
+            $('.overlay').show();
+            var index = $(this).attr('index');
+            let url = '{{ route('so.getVins') }}';
+            let variant = $('#variant-'+index).val();
+           
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                data: {
+                    variant_id: variant[0],
+                },
+                success:function (data) {    
+                    $('#vin-'+index).empty();
+                    $('#vin-'+index).html('<option value=""> Select Vin </option>');   
+                    jQuery.each(data, function(key,value){
+                        $('#vin-'+index).append('<option value="'+ value.id +'">'+ value.vin +'</option>');
+                    });
+                    $('.overlay').hide();  
+                }
+            });                      
+        });
+
+        function getSOVariants(index){
+            $('.overlay').show();  
+            let totalIndex =  $("#so-vehicles").find(".so-variant-add-section").length;
+            let url = '{{ route('so.getVariants') }}';
+            var selectedVariantIds = [];
+            for(let i=1; i< totalIndex; i++)
+            {
+                var eachselectedVariantId = $('#variant-'+i).val();
+                if(eachselectedVariantId) {
+                    selectedVariantIds.push(eachselectedVariantId);
+                }
+            }
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                data: {
+                    selectedVariantIds:selectedVariantIds,
+                },
+                success:function (data) {  
+                   
+                    let variantDropdownData = [];
+                    $.each(data,function(key,value){
+                        variantDropdownData.push
+                        ({
+                            id: value.id,
+                            text: value.name
+                        });
+                    });
+                        $('#variant-' + index).html("");
+                        $('#variant-' + index).select2({
+                            placeholder: 'Select Variant',
+                            data: variantDropdownData,
+                            maximumSelectionLength: 1,
+                        });
+                        $('.overlay').hide();  
+                }
+            }); 
+        }
+            
     </script>
     <script>
         function updateTotalReceivingPayment() {

@@ -1175,5 +1175,6 @@ Route::get('/d', function () {
     Route::get('/salespersons/list', [SalesOrderController::class, 'getSalespersons'])->name('salespersons.list');
     Route::post('/salesorder/updateSalesperson', [SalesOrderController::class, 'updateSalesperson'])->name('salesorder.updateSalesperson');
     Route::post('po-payment-adjustment', [PurchasingOrderController::class, 'paymentAdjustment'])->name('po-payment-adjustment');
-  
+    Route::get('so-vins', [SalesOrderController::class, 'getVins'])->name('so.getVins');
+    Route::get('so-variants', [SalesOrderController::class, 'getVariants'])->name('so.getVariants');
 });

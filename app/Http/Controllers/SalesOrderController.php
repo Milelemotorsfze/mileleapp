@@ -992,21 +992,33 @@ public function showSalespersonCommissions($sales_person_id, Request $request)
     }
 
     public function updateSalesperson(Request $request)
-{
-    $request->validate([
-        'sales_order_id' => 'required|exists:so,id', // Correct table name
-        'salesperson_id' => 'required|exists:users,id'
-    ]);
+    {
+        $request->validate([
+            'sales_order_id' => 'required|exists:so,id', // Correct table name
+            'salesperson_id' => 'required|exists:users,id'
+        ]);
 
-    $salesOrder = So::find($request->sales_order_id);
-    info($salesOrder);
-    if ($salesOrder) {
-        $salesOrder->sales_person_id = $request->salesperson_id;
-        $salesOrder->save();
-        info($salesOrder);
-        return response()->json(['success' => true]);
-    }
-
-    return response()->json(['success' => false], 400);
-}
+        $salesOrder = So::find($request->sales_order_id);
+        if ($salesOrder) {
+            $salesOrder->sales_person_id = $request->salesperson_id;
+            $salesOrder->save();
+            return response()->json(['success' => true]);
         }
+
+        return response()->json(['success' => false], 400);
+    }
+    public function getVins(Request $request) {
+
+      $vehicles = Vehicles::where('varaints_id', $request->variant_id)
+                    ->whereNull('gdn_id')->wherenotNull('vin')
+                    ->select('id','vin')->get();
+
+      return response()->json($vehicles);
+    }
+    public function getVariants(Request $request) {
+
+        $variants = Varaint::whereNotIn('id', $request->selectedVariantIds)->select('id','name')->get();
+
+        return response()->json($variants);
+    }
+}
