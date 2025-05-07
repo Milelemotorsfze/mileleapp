@@ -2231,6 +2231,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
         });
+        $('#my-table_filter').hide();
         dataTable3 = $('#dtBasicExample3').DataTable({
             processing: true,
             serverSide: true,
@@ -2364,6 +2365,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 // },
             ]
         });
+        $('#my-table_filter').hide();
+
        dataTable4 = $('#dtBasicExample4').DataTable({
             processing: true,
             serverSide: true,
@@ -2590,6 +2593,8 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         }
     }
         });
+        $('#my-table_filter').hide();
+
        dataTable5 =  $('#dtBasicExample5').DataTable({
             processing: true,
             serverSide: true,
@@ -2818,6 +2823,8 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                 },
             ]
         });
+        $('#my-table_filter').hide();
+
         dataTable7 =   $('#dtBasicExample7').DataTable({
             processing: true,
             serverSide: true,
@@ -3024,6 +3031,8 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         }
     }
         });
+        $('#my-table_filter').hide();
+
     dataTable8 = $('#dtBasicExample8').DataTable({
     processing: true,
     serverSide: true,
@@ -3067,6 +3076,8 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         }
     }
     });
+    $('#my-table_filter').hide();
+
     dataTable9 = $('#dtBasicExample9').DataTable({
     processing: true,
     serverSide: true,
@@ -3136,6 +3147,8 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                 { data: 'sales_person_name', name: 'sales_person_name' },   
     ]
     });
+    $('#my-table_filter').hide();
+
     dataTable11 = $('#dtBasicExample11').DataTable({
     processing: true,
     serverSide: true,
@@ -3148,7 +3161,7 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         },
         {
             data: 'leaddate',
-            name: 'leaddate',
+            name: 'calls.created_at',
             title: 'Lead Date',
             render: function (data, type, row) {
                 if (type === 'display' || type === 'filter') {
@@ -3249,12 +3262,12 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
           },
         {
             data: 'created_by_name',
-            name: 'created_by_name',
+            name: 'created_by_user.name',
             title: 'Created By'
         },
         {
             data: 'sales_person_name',
-            name: 'sales_person_name',
+            name: 'sales_person_user.name',
             title: 'Assigned To'
         }
     ],
@@ -3268,6 +3281,8 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         }
     }
 });
+$('#my-table_filter').hide();
+
     dataTable9 = $('#dtBasicExample10').DataTable({
     processing: true,
     serverSide: true,
@@ -3318,6 +3333,8 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         }
     }
     });
+    $('#my-table_filter').hide();
+
     });
     function toggleRemarks(uniqueId) {
     const $truncatedText = $('#' + uniqueId + '_truncated');
