@@ -498,8 +498,9 @@
     <script>
         let soId = '{{ $sodetails->id }}';
         let QuotaionItemCount = '{{ $quotationItems->count() }}';
+        let isFormValid = 0;
+
         $(document).ready(function() {
-            // 
             $('.vins').select2({
                 placeholder : 'Select VIN',
             });
@@ -642,12 +643,28 @@
 
         $(document.body).on('select2:unselect', ".variants", function (e) {
             var index = $(this).attr('index');
-            $('#variant-description-'+index).val('');
             let variant = e.params.data.id;
             let variantText = e.params.data.text;
-            appendVariant(index, variant, variantText);
+            // allow variant desc=lection if vin is not selected
+            selectedVinCount = $('#vin-' + index).val()?.length;
+            if(selectedVinCount > 0) {
+                var confirm = alertify.confirm('unselecting of varaint will leads to removal of related vins!',function (e) {
+                    if (e) {
+                        resetVin(index,variant, variantText);
+                    }
+                    }).set({title:"Are You Sure?"}).set('oncancel', function(closeEvent){
+                        $('#variant-' + index).val(variant).trigger('change');
+                        }); 
+            }else{
+                resetVin(index,variant, variantText); 
+            }
               
         });
+        function resetVin(index,variant, variantText) {
+            $('#variant-description-'+index).val('');
+            $('#vin-'+index).empty();
+            appendVariant(index, variant, variantText);
+        }
 
         function getSOVariants(index){
             let totalIndex =  $("#so-vehicles").find(".so-variant-add-section").length;
@@ -746,12 +763,10 @@
            
             var totalIndex = $("#so-vehicles").find(".so-variant-add-section").length;
             var variant = $('#variant-'+index).val();
-            console.log(variant[0]);
             for(let i=1; i<=totalIndex; i++)
             {
                 if(i != index ) {
                     var currentId = 'variant-' + i;
-                    console.log(currentId);
                     $('#' + currentId + ' option[value=' + variant[0] + ']').detach();       
                 }
             }
@@ -781,11 +796,9 @@
         }
         function initializeSelect2(index) {
             const quantity = parseInt($('#quantity-' + index).val()) || 1;
-            console.log(quantity);
             $('#vin-' + index).select2('destroy').select2({
                 placeholder: 'Select Vin',
                 maximumSelectionLength: quantity,  
-                allowClear: true
             });
 
         }
@@ -793,30 +806,39 @@
         $(document).on('input', '.variant-quantities', function() { 
             const index = $(this).attr('index');
             initializeSelect2(index);
+            ValidateVinwithQty();
         });
         $('.btn-submit').click(function (e) {
             e.preventDefault();
             var rowCount = $("#so-vehicles").find(".so-variant-add-section").length;
-            let $isValid = 0;
-            $('.so-variant-add-section').each(function(i){
-                console.log(i);
-                let qty = $('#quantity-'+i).val();
-                let selectedVinCount = $('#vin-' + i).val()?.length || 0;
-                console.log(selectedVinCount);
-                if (selectedVinCount > qty) {
-                    console.log(i);
-                     isValid = 1;
-                    alert(`The selected vin count exceeding the variant quantity`);
-                    return false;
-                } 
-
-            });
-
-            if($("#form-update").valid()) {
-                $('#form-update').unbind('submit').submit();
+            ValidateVinwithQty();
+            if(isValid = 0) {
+                if($("#form-update").valid()) {
+                    $('#form-update').unbind('submit').submit();
+                }
             }
 
         });
+        function ValidateVinwithQty(){
+            var totalIndex = $("#so-vehicles").find(".so-variant-add-section").length;
+            for(let i=1; i<=totalIndex; i++)
+            {
+                let qty = $('#quantity-'+i).val();
+                let selectedVinCount = $('#vin-' + i).val()?.length || 0;
+                if (selectedVinCount > qty) {
+                    let select2Container = $('#vin-' + i).next('.select2');
+                    select2Container.find('.vin-error-message').remove();
+                    isFormValid = 1;
+                     select2Container.append(`
+                            <span class="vin-error-message" style="color: red; font-size: 14px; margin-top: 4px; display: block;">
+                                The chosen vin count exceeding the variant quantity (${qty}).
+                            </span>
+                        `);
+                    return false;
+                } 
+
+            };
+        }
     </script>
     <script>
         function updateTotalReceivingPayment() {
