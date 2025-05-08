@@ -88,6 +88,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      <th>Status</th>
                      <th>Is Sales Rep.</th>
                      <th>Can Send WO Email</th>
+                     <th>Manual Lead Assign</th>
+                     <th>PFI/Quotation</th>
                      <th>Action</th>
                   </tr>
                </thead>
@@ -115,6 +117,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      </td>
                      <td>
                         {{ $user->can_send_wo_email ?? '' }}
+                     </td>
+                     <td>
+                        {{ $user->manual_lead_assign == 1 ? 'Yes' : 'No' }}
+                     </td>
+                     <td>
+                        {{ $user->pfi_access == 1 ? 'Yes' : 'No'  }}
                      </td>
                      <td>
                         @can('user-view')
@@ -206,6 +214,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      <th>Status</th>
                      <th>Is Sales Rep.</th>
                      <th>Can Send WO Email</th>
+                     <th>Manual Lead Assign</th>
+                     <th>PFI/Quotation</th>
                      <th>Action</th>
                   </tr>
                </thead>
@@ -233,6 +243,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      </td>
                      <td>
                         {{ $user->can_send_wo_email ?? '' }}
+                     </td>
+                     <td>
+                        {{ $user->manual_lead_assign == 1 ? 'Yes' : 'No' }}
+                     </td>
+                     <td>
+                        {{ $user->pfi_access == 1 ? 'Yes' : 'No'  }}
                      </td>
                      <td>
                      @php
@@ -339,6 +355,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      <th>Status</th>
                      <th>Is Sales Rep.</th>
                      <th>Can Send WO Email</th>
+                     <th>Manual Lead Assign</th>
+                     <th>PFI/Quotation</th>
                      <th>Action</th>
                   </tr>
                </thead>
@@ -362,6 +380,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      </td>
                      <td>
                         {{ $user->can_send_wo_email ?? '' }}
+                     </td>
+                     <td>
+                        {{ $user->manual_lead_assign == 1 ? 'Yes' : 'No' }}
+                     </td>
+                     <td>
+                        {{ $user->pfi_access == 1 ? 'Yes' : 'No'  }}
                      </td>
                      <td>
                         @can('user-view')
@@ -458,6 +482,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                         <th>Status</th>
                         <th>Is Sales Rep.</th>
                         <th>Can Send WO Email</th>
+                        <th>Manual Lead Assign</th>
+                        <th>PFI/Quotation</th>
                         <th>Action</th>
                      </tr>
                   </thead>
@@ -479,6 +505,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                         <td>{{ $user->is_sales_rep ?? '' }}</td>
                         <td>
                         {{ $user->can_send_wo_email ?? '' }}
+                     </td>
+                     <td>
+                        {{ $user->manual_lead_assign == 1 ? 'Yes' : 'No' }}
+                     </td>
+                     <td>
+                        {{ $user->pfi_access == 1 ? 'Yes' : 'No'  }}
                      </td>
                         <td>
                            @can('user-view')
