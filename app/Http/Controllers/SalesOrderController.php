@@ -458,7 +458,7 @@ class SalesOrderController extends Controller
         }
 public function storesalesorderupdate(Request $request, $quotationId)
 {
-    // return $request->all();
+   
     DB::beginTransaction();
     try {
     // Validate and retrieve the Sales Order ID
@@ -1008,17 +1008,31 @@ public function showSalespersonCommissions($sales_person_id, Request $request)
         return response()->json(['success' => false], 400);
     }
     public function getVins(Request $request) {
-
-      $vehicles = Vehicles::where('varaints_id', $request->variant_id)
+    
+      $data = [];
+      $data['vehicles'] = Vehicles::where('varaints_id', $request->variant_id)
                     ->whereNull('gdn_id')->wherenotNull('vin')
+                    ->where(function ($query) use ($request) {
+                        $query->whereNull('so_id')
+                              ->orWhere('so_id', $request->so_id);
+                    })
                     ->select('id','vin')->get();
 
-      return response()->json($vehicles);
+        $variant = Varaint::find($request->variant_id);
+        $data['variant_description'] = ($variant->brand->brand_name ?? '') . ',' . ($variant->model_detail ?? '');
+
+      return response()->json($data);
     }
     public function getVariants(Request $request) {
+           
+        $selectedVariantIds = $request->selectedVariantIds;
+        $variants = Varaint::when(!empty($selectedVariantIds), function ($query) use ($selectedVariantIds) {
+                $query->whereNotIn('id', $selectedVariantIds);
+            })
+            ->select('id', 'name')
+            ->get();
 
-        $variants = Varaint::whereNotIn('id', $request->selectedVariantIds)->select('id','name')->get();
-
-        return response()->json($variants);
+        return response()->json($variants); 
+    
     }
 }

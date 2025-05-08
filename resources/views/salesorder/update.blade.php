@@ -39,6 +39,7 @@
             background-color: rgba(128,128,128,0.5); 
             display: none; 
         }
+       
 </style>
 <div class="card">
     <div class="card-header">
@@ -48,7 +49,29 @@
         </h4>
     </div>
     <div class="card-body">
-        <form onsubmit="return checkForDuplicateVINs();" action="{{ route('salesorder.storesalesorderupdate', ['QuotationId' => $quotation->id]) }}" id="form-create" method="POST">
+        @if (count($errors) > 0)
+            <div class="alert alert-danger">
+                <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        @if (Session::has('error'))
+            <div class="alert alert-danger" >
+                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                {{ Session::get('error') }}
+            </div>
+        @endif
+        @if (Session::has('success'))
+            <div class="alert alert-success" id="success-alert">
+                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                {{ Session::get('success') }}
+            </div>
+        @endif
+        <form action="{{ route('salesorder.storesalesorderupdate', ['QuotationId' => $quotation->id]) }}" id="form-update" method="POST">
             @csrf
             <div class="row gy-3">
                 <div class="col-lg-4 col-md-6 col-sm-12">
@@ -357,34 +380,43 @@
                                     <h5>Total Vehicles - {{ $totalVehicles }}</h5>
                                     <div class="col-md-12 mt-3" id="so-vehicles">
                                         @foreach($quotationItems as $key => $quotationItem)
-                                            <h6> {{ $quotationItem->description }} -  ({{ $quotationItem->quantity }})</h6>
-                                            <div class="so-variant-add-section" id="variant-section-{{ $key + 1 }}">
+                                          
+                                            <div class="so-variant-add-section " id="variant-section-{{ $key + 1 }}">
                                                 <div class="row">
-                                                    <label class="form-label font-size-13">Choose Variant</label>
-                                                    <div class="mb-2 col-sm-12 col-md-6 col-lg-6 col-xxl-6">
-                                                        <select name="vehicle_variants[{{ $quotationItem->reference_id }}][]" index="{{$key+1}}" id="variant-{{ $key+1 }}"
+                                                    <div class="mb-2 col-sm-12 col-md-3 col-lg-3 col-xxl-3">
+                                                        <label class="form-label font-size-13">Choose Variant</label>
+                                                        <select name="variants[{{$key+1}}][variant_id]" required index="{{$key+1}}" id="variant-{{ $key+1 }}"
                                                         class="variants form-control" multiple >
                                                             @foreach($variants as $variant)
                                                                 <option value="{{ $variant->id }}" {{ $variant->id == $quotationItem->reference_id ? 'selected' : '' }}>{{ $variant->name ?? '' }}</option>
                                                             @endforeach
                                                         </select>
                                                     </div> 
+                                                    <div class="mb-2 col-sm-12 col-md-4 col-lg-4 col-xxl-4">
+                                                    <label class="form-label font-size-13">Description</label>
+                                                        <input type="text" class="variant-descriptions form-control widthinput"  name="variants[{{ $key + 1 }}][description]" index="{{$key+1}}" 
+                                                        id="variant-description-{{ $key+1 }}" required value="{{ $quotationItem->description ?? '' }}"  placeholder="Decsription" />
+                                                    </div> 
                                                     <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
-                                                    <input type="number" class="form-control variant-prices widthinput" name="prices[]" placeholder="Price" value="{{ $quotationItem->unit_price }}" >
+                                                    <label class="form-label font-size-13">Price</label>
+                                                        <input type="number" class="form-control variant-prices widthinput" required name="variants[{{$key+1}}][price]" placeholder="Price" 
+                                                        value="{{ $quotationItem->unit_price }}" id="price-{{ $key+1 }}" >
                                                     </div>
                                                     <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
-                                                    <input type="number" class="form-control variant-quantities widthinput"  index="{{$key+1}}" min="1" name="quantities[]" placeholder="Quantity"  value="{{ $quotationItem->quantity }}" >
+                                                    <label class="form-label font-size-13">Quantity</label>
+                                                        <input type="number" class="form-control variant-quantities widthinput" required index="{{$key+1}}" min="1"
+                                                        name="variants[{{$key+1}}][quantity]" placeholder="Quantity"  value="{{ $quotationItem->quantity }}" id="quantity-{{ $key+1 }}" >
                                                     </div>
                                                     <div class="col-sm-12 col-md-1 col-lg-1 col-xxl-1">
-                                                        <a class="btn btn-sm btn-danger removeVariantButton" index="{{ $key+1}}" >
+                                                        <a class="btn btn-sm btn-danger removeVariantButton" index="{{ $key+1}}" style="margin-top: 31px;" >
                                                             <i class="fas fa-trash-alt"></i>
                                                         </a>
                                                     </div>
                                                 </div>
                                                 <div class="row">
-                                                    <div class="col-sm-12 col-md-10 col-lg-10 col-xxl-10 mb-4 ms-5">
+                                                    <div class="col-sm-12 col-md-11 col-lg-11 col-xxl-11 mb-4 ms-5">
                                                         <label class="form-label font-size-13">Choose VIN</label>
-                                                        <select name="vehicle_vin[{{ $quotationItem->id }}][]" id="vin-{{ $key+1 }}" index="{{$key+1}}" class="vins form-control" multiple >
+                                                        <select name="variants[{{$key+1}}][vins][]" id="vin-{{ $key+1 }}" index="{{$key+1}}" class="vins form-control" multiple >
                                                             @foreach($vehicles[$quotationItem->id] as $vehicle)
                                                             <option value="{{ $vehicle->id }}" 
                                                             {{ in_array($vehicle->id, $quotationItem->selectedVehicleIds) ? 'selected' : '' }}
@@ -398,7 +430,7 @@
                                         @endforeach
                                     </div>
                                     <div class="row ">
-                                        <div class="col-11">
+                                        <div class="col-12">
                                             <div class="btn btn-info btn-sm add-variant-btn float-end mt-2" >
                                                 <i class="fas fa-plus"></i> Add Variant
                                             </div>
@@ -457,58 +489,112 @@
             </br>
             </br>
             <input type="hidden" name="so_id" value="{{ $sodetails->id }}">
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary btn-submit">Submit</button>
         </form>
     </div>
     <div class="overlay"></div>
     @endsection
     @push('scripts')
     <script>
+        let soId = '{{ $sodetails->id }}';
+        let QuotaionItemCount = '{{ $quotationItems->count() }}';
         $(document).ready(function() {
+            // 
             $('.vins').select2({
                 placeholder : 'Select VIN',
             });
+            for(let i=1;i<= QuotaionItemCount;i++) {
+                let index = $('#vin-'+i).attr('index');
+                initializeSelect2(index)
+
+            }
+           
             $('.variants').select2({
                 placeholder : 'Select Variant',
                 maximumSelectionLength: 1
             });
             $('.vins').on('select2:unselecting', function (e) {
+
                 var $option = $(e.params.args.data.element);
                 if ($option.data('lock')) {
-                    e.preventDefault(); // Prevent removal
+                    e.preventDefault(); 
                     alertify.confirm('This vehicle cannot be removed because it has a GDN assigned.').set({title: "Can't Remove this VIN"});
                 }
             });
         });
 
+        $("#form-update").validate({
+            ignore: [],
+            rules: {
+                "variants[*][variant_id]": {
+                    required: true
+                },
+                "variants[*][description]": {
+                    required: true
+                },
+                "variants[*][price]": {
+                    required: true
+                },
+                "variants[*][quantity]": {
+                    required: true
+                },
+            },
+
+        });
+
+        $.validator.prototype.checkForm = function (){
+            this.prepareForm();
+            for ( var i = 0, elements = (this.currentElements = this.elements()); elements[i]; i++ ) {
+                if (this.findByName( elements[i].name ).length != undefined && this.findByName( elements[i].name ).length > 1) {
+                    for (var cnt = 0; cnt < this.findByName( elements[i].name ).length; cnt++) {
+                        this.check( this.findByName( elements[i].name )[cnt] );
+                    }
+                }
+                else {
+                    this.check( elements[i] );
+                }
+            }
+            return this.valid();
+        };
+        
         $('.add-variant-btn').click(function() {
             var index = $("#so-vehicles").find(".so-variant-add-section").length + 1;
 
             var newRow = `
                  <div class="so-variant-add-section" id="variant-section-${index}">
+                 
                     <div class="row">
-                        <label class="form-label font-size-13">Choose Variant</label>
-                        <div class="mb-2 col-sm-12 col-md-6 col-lg-6 col-xxl-6">
-                            <select name="vehicle_variants[{{ $quotationItem->reference_id }}][]" index="${index}" id="variant-${index}"
-                             class="variants form-control" multiple >
+                        <div class="mb-2 col-sm-12 col-md-3 col-lg-3 col-xxl-3">
+                         <label class="form-label font-size-13">Choose Variant</label>
+                            <select name="variants[${index}][variant_id]" index="${index}" id="variant-${index}"
+                             class="variants form-control" multiple required >
                             </select>
                         </div> 
-                        <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
-                        <input type="number" class="form-control variant-prices widthinput" required name="prices[]" placeholder="Price">
+                        <div class="mb-2 col-sm-12 col-md-4 col-lg-4 col-xxl-4">
+                            <label class="form-label font-size-13">Description</label>
+                            <input type="text" class="variant-descriptions form-control widthinput" name="variants[${index}][description]" index="${index}"
+                              required id="variant-description-${index}" placeholder="Decsription" />
                         </div>
                         <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
-                        <input type="number" class="form-control variant-quantities widthinput" index="${index}" min="1" value="1" name="quantities[]" placeholder="Quantity" >
+                          <label class="form-label font-size-13">Price</label>
+                        <input type="number" class="form-control variant-prices widthinput" required name="variants[${index}][price]" placeholder="Price"
+                         id="price-${index}">
+                        </div>
+                        <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
+                          <label class="form-label font-size-13">Quantity</label>
+                        <input type="number" class="form-control variant-quantities widthinput" required index="${index}" min="1" value="1" placeholder="Quantity"
+                            name="variants[${index}][quantity]" id="quantity-${index}"  >
                         </div>
                         <div class="col-sm-12 col-md-1 col-lg-1 col-xxl-1">
-                            <a class="btn btn-sm btn-danger removeVariantButton" index="${index}" >
+                            <a class="btn btn-sm btn-danger removeVariantButton" index="${index}" style="margin-top: 31px;" >
                                 <i class="fas fa-trash-alt"></i>
                             </a>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-12 col-md-10 col-lg-10 col-xxl-10 mb-4 ms-5">
+                        <div class="col-sm-12 col-md-11 col-lg-11 col-xxl-11 mb-4 ms-5">
                             <label class="form-label font-size-13">Choose VIN</label>
-                            <select name="vehicle_vin[{{ $quotationItem->id }}][]" id="vin-${index}" index="${index}" class="vins form-control" multiple >
+                            <select name="variants[${index}][vins][]" id="vin-${index}" index="${index}" class="vins form-control" multiple >
                                 
                             </select>
                         </div> 
@@ -519,6 +605,7 @@
 
             $('#vin-' + index).select2({
                 placeholder: 'Select Vin',
+                maximumSelectionLength: 1,
             });
             getSOVariants(index);
             $('#variant-' + index).select2({
@@ -532,27 +619,37 @@
             var index = $(this).attr('index');
             let url = '{{ route('so.getVins') }}';
             let variant = $('#variant-'+index).val();
-           
             $.ajax({
                 type: "GET",
                 url: url,
                 dataType: "json",
                 data: {
                     variant_id: variant[0],
+                    so_id: soId
                 },
                 success:function (data) {    
                     $('#vin-'+index).empty();
                     $('#vin-'+index).html('<option value=""> Select Vin </option>');   
-                    jQuery.each(data, function(key,value){
+                    jQuery.each(data.vehicles, function(key,value){
                         $('#vin-'+index).append('<option value="'+ value.id +'">'+ value.vin +'</option>');
                     });
+                    $('#variant-description-'+index).val(data.variant_description);
                     $('.overlay').hide();  
+                    hideVariant(index); 
                 }
             });                      
         });
 
+        $(document.body).on('select2:unselect', ".variants", function (e) {
+            var index = $(this).attr('index');
+            $('#variant-description-'+index).val('');
+            let variant = e.params.data.id;
+            let variantText = e.params.data.text;
+            appendVariant(index, variant, variantText);
+              
+        });
+
         function getSOVariants(index){
-            $('.overlay').show();  
             let totalIndex =  $("#so-vehicles").find(".so-variant-add-section").length;
             let url = '{{ route('so.getVariants') }}';
             var selectedVariantIds = [];
@@ -586,11 +683,140 @@
                             data: variantDropdownData,
                             maximumSelectionLength: 1,
                         });
-                        $('.overlay').hide();  
                 }
             }); 
         }
-            
+
+        $(document.body).on('click', ".removeVariantButton", function (e) {
+            var rowCount = $("#so-vehicles").find(".so-variant-add-section").length;
+            if(rowCount > 1) {
+
+                var indexNumber = $(this).attr('index');
+                var variantText  = $('#variant-'+indexNumber).text();
+                var variant = $('#variant-'+indexNumber).val();
+               
+                if(variantText) {
+                    appendVariant(indexNumber, variant[0], variantText);
+                }
+               
+                $(this).closest('#variant-section-'+indexNumber).remove();
+
+                $('.so-variant-add-section').each(function(i){
+                    var index = +i + +1;
+                    $(this).find('.variant-descriptions').attr('index', index); 
+                    $(this).find('.variant-descriptions').attr('id', 'variant-description-'+index); 
+                    $(this).find('.variant-descriptions').attr('name', 'variants[+index+][description]'); 
+                    $(this).attr('id', 'variant-section-'+index);
+                    $(this).find('.variants').attr('index', index);
+                    $(this).find('.variants').attr('id', 'variant-'+index);
+                    $(this).find('.variants').attr('name', 'variants['+index+'][variant_id]');
+                    $(this).find('.variant-prices').attr('index', index);
+                    $(this).find('.variant-prices').attr('id', 'price-'+index);
+                    $(this).find('.variant-prices').attr('name', 'variants['+index+'][price]');
+                    $(this).find('.variant-quantities').attr('index', index);
+                    $(this).find('.variant-quantities').attr('id', 'quantity-'+index);
+                    $(this).find('.variant-quantities').attr('name', 'variants['+index+'][quantity]');
+                    $(this).find('.vins').attr('index', index);
+                    $(this).find('.vins').attr('id', 'vin-'+index);
+                    $(this).find('.vins').attr('name', 'variants['+index+'][vin][]');
+                
+                    $(this).find('.removeVariantButton').attr('index', index);
+
+                    $('#variant-'+index).select2
+                    ({
+                        placeholder: 'Select Variant',
+                        maximumSelectionLength:1,
+                        allowClear: true
+                    });
+                    $('#vin-'+index).select2
+                    ({
+                        placeholder: 'Select Vin',
+                    });
+                  
+                });
+              
+            }else{
+                var confirm = alertify.confirm('You are not able to remove this row, Atleast one Variant is Required',function (e) {
+                }).set({title:"Can't Remove Variant"})
+
+            }
+        });
+       
+        function hideVariant(index) {
+           
+            var totalIndex = $("#so-vehicles").find(".so-variant-add-section").length;
+            var variant = $('#variant-'+index).val();
+            console.log(variant[0]);
+            for(let i=1; i<=totalIndex; i++)
+            {
+                if(i != index ) {
+                    var currentId = 'variant-' + i;
+                    console.log(currentId);
+                    $('#' + currentId + ' option[value=' + variant[0] + ']').detach();       
+                }
+            }
+        }
+
+        function appendVariant(index,unSelectedvariant,variantText) {
+            var totalIndex = $("#so-vehicles").find(".so-variant-add-section").length;
+            for(let i=1; i<=totalIndex; i++)
+            {
+                if(i != index) {
+                    let Currentvariant = $('#variant-'+i).val();
+                    if(unSelectedvariant !== Currentvariant[0] ) {
+                        var currentId = 'variant-'+i;    
+                        var isOptionExist = 'no';
+                        $('#' + currentId +' option').each(function () {
+                            if (this.id == Currentvariant[0]) {
+                                isOptionExist = 'yes';
+                                return false;
+                            }
+                        });
+                        if(isOptionExist == 'no'){
+                            $('#variant-'+i).append($('<option>', {value: unSelectedvariant, text : variantText}))
+                        }
+                    }
+                }
+            }
+        }
+        function initializeSelect2(index) {
+            const quantity = parseInt($('#quantity-' + index).val()) || 1;
+            console.log(quantity);
+            $('#vin-' + index).select2('destroy').select2({
+                placeholder: 'Select Vin',
+                maximumSelectionLength: quantity,  
+                allowClear: true
+            });
+
+        }
+
+        $(document).on('input', '.variant-quantities', function() { 
+            const index = $(this).attr('index');
+            initializeSelect2(index);
+        });
+        $('.btn-submit').click(function (e) {
+            e.preventDefault();
+            var rowCount = $("#so-vehicles").find(".so-variant-add-section").length;
+            let $isValid = 0;
+            $('.so-variant-add-section').each(function(i){
+                console.log(i);
+                let qty = $('#quantity-'+i).val();
+                let selectedVinCount = $('#vin-' + i).val()?.length || 0;
+                console.log(selectedVinCount);
+                if (selectedVinCount > qty) {
+                    console.log(i);
+                     isValid = 1;
+                    alert(`The selected vin count exceeding the variant quantity`);
+                    return false;
+                } 
+
+            });
+
+            if($("#form-update").valid()) {
+                $('#form-update').unbind('submit').submit();
+            }
+
+        });
     </script>
     <script>
         function updateTotalReceivingPayment() {
@@ -612,29 +838,29 @@
                 updateBalancePayment();
             });
         });
-    </script>
-    <script>
+
         // JavaScript code to check for duplicate VINs
-        function checkForDuplicateVINs() {
-            var selectedVINs = {};
-            var dropdowns = document.querySelectorAll('select[name^="vehicle_vin"]');
+        // function checkForDuplicateVINs() {
+        //     var selectedVINs = {};
+        //     var dropdowns = document.querySelectorAll('select[name^="vehicle_vin"]');
 
-            for (var i = 0; i < dropdowns.length; i++) {
-                var selectedOption = dropdowns[i].value;
+        //     for (var i = 0; i < dropdowns.length; i++) {
+        //         var selectedOption = dropdowns[i].value;
 
-                if (selectedOption && selectedOption !== '') {
-                    if (selectedVINs[selectedOption]) {
-                        // Duplicate VIN found, display an error message and prevent form submission
-                        alert('Duplicate VIN ' + selectedOption + ' selected. Please select a unique VIN for each vehicle.');
-                        return false; // Prevent form submission
-                    }
-                    selectedVINs[selectedOption] = true;
-                }
-            }
-            return true; // No duplicate VINs found, allow form submission
-        }
-    </script>
-    <script>
+        //         if (selectedOption && selectedOption !== '') {
+        //             if (selectedVINs[selectedOption]) {
+        //                 // Duplicate VIN found, display an error message and prevent form submission
+        //                 alert('Duplicate VIN ' + selectedOption + ' selected. Please select a unique VIN for each vehicle.');
+        //                 return false; // Prevent form submission
+        //             }
+        //             selectedVINs[selectedOption] = true;
+        //         }
+        //     }
+        //     return true; // No duplicate VINs found, allow form submission
+        // }
+
+      
+  
         const soInput = document.getElementById('so_number');
         const errorMessage = document.getElementById('error_message');
 
@@ -650,5 +876,7 @@
                 soInput.setCustomValidity("");
             }
         });
+
+       
     </script>
     @endpush
