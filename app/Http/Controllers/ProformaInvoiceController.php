@@ -49,7 +49,7 @@ class ProformaInvoiceController extends Controller {
         $kitsDesc = AddonDescription::whereHas('Addon', function($q) {
             $q->where('addon_type','K');
         })->get();
-        $sales_persons = User::where('pfi_access', 1)
+        $sales_persons = User::where('pfi_access', 1)->where('status','active')
         ->orderBy('name', 'asc')
         ->get();
         $countries = Country::all();
@@ -519,9 +519,20 @@ class ProformaInvoiceController extends Controller {
         $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
         $usd_to_eru_rate = Setting::where('key', 'usd_to_euro_convertion_rate')->first();
-        $sales_persons = User::where('pfi_access', 1)
+        $sales_persons = User::where(function ($query) use ($quotation) {
+            $query->where(function ($q) {
+                $q->where('pfi_access', 1)
+                  ->where('status', 'active');
+            });
+    
+            if ($quotation && $quotation->created_by) {
+                $query->orWhere('id', $quotation->created_by);
+            }
+        })
         ->orderBy('name', 'asc')
-        ->get();
+        ->get()
+        ->unique('id')
+        ->values();
 
         $existingItemsJson = json_encode($quotationitems);
         return view('proforma.invoice_edit', compact('callDetails', 'brands','assessoriesDesc',
