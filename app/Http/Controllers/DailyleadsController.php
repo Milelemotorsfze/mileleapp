@@ -279,7 +279,20 @@ class DailyleadsController extends Controller
             else
             {
             $searchValue = $request->input('search.value');
-            $data = Calls::select(['calls.id',DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d') as created_at"), 'calls.type', 'calls.name', 'calls.phone', 'calls.email', 'calls.custom_brand_model', 'calls.created_by', 'calls.location', 'calls.language', DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as remarks")]);
+            $data = Calls::select([
+                'calls.id',
+                DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d') as created_at"),
+                'calls.type',
+                'calls.name',
+                'calls.phone',
+                'calls.email',
+                'calls.custom_brand_model',
+                'calls.created_by',
+                'calls.location',
+                'calls.language',
+                DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as plain_remarks"),
+                'calls.remarks'
+            ]);            
             if($status === "Prospecting")
             {
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
@@ -372,14 +385,35 @@ class DailyleadsController extends Controller
                 );
                 $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
                 $data->addSelect([
+                    'calls.remarks',
+                    DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as plain_remarks"),
                     DB::raw("DATE_FORMAT(quotations.date, '%Y %m %d') as qdate"),
                     'quotations.sales_notes as qsalesnotes',
                     DB::raw("IFNULL(quotations.file_path, '') as file_path"),
-                    DB::raw("CONCAT(IFNULL(FORMAT(quotations.deal_value, 0), ''), ' ', IFNULL(quotations.currency, '')) as ddealvalues"), ('quotations.signature_status as signature_status'),
+                    DB::raw("CONCAT(IFNULL(FORMAT(quotations.deal_value, 0), ''), ' ', IFNULL(quotations.currency, '')) as ddealvalues"),
+                    DB::raw("IFNULL(quotations.signature_status, '') as signature_status"),
                     'users.name as salespersonname',
                 ]);
                 $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
                 $data->leftJoin('users', 'quotations.created_by', '=', 'users.id');
+                $data->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id');
+                $data->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id');
+                $data->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id');
+
+                if (!empty($searchValue)) {
+                    $data->where(function ($query) use ($searchValue) {
+                        $query->where('calls.name', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.phone', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.email', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.language', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.location', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.type', 'LIKE', "%$searchValue%")
+                            ->orWhere('brands.brand_name', 'LIKE', "%$searchValue%")
+                            ->orWhere('master_model_lines.model_line', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.remarks', 'LIKE', "%$searchValue%"); 
+                    });
+                }
+                
             } elseif ($status === 'Negotiation') {
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%Y %m %d'), '') as date"),
@@ -478,11 +512,21 @@ class DailyleadsController extends Controller
             }
             $data->groupBy('calls.id');
             $results = $data->get();
+
+            $results->transform(function ($item) {
+                $item->plain_remarks = strip_tags($item->remarks);
+                return $item;
+            });
+
             return DataTables::of($results)
-                ->addColumn('models_brands', function ($row) {
-                    return $row->models_brands;
-                })
-                ->toJson();
+    ->addColumn('models_brands', function ($row) {
+        return $row->models_brands;
+    })
+    ->editColumn('plain_remarks', function ($row) {
+        return $row->plain_remarks ?? '';
+    })
+    ->toJson();
+
         }
     }
         return view('dailyleads.index', compact('pendingdata', 'clients'));
