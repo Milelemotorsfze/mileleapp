@@ -388,7 +388,8 @@
                                                         <select name="variants[{{$key+1}}][variant_id]" required index="{{$key+1}}" id="variant-{{ $key+1 }}"
                                                         class="variants form-control" multiple >
                                                             @foreach($variants as $variant)
-                                                                <option value="{{ $variant->id }}" {{ $variant->id == $quotationItem->reference_id ? 'selected' : '' }}>{{ $variant->name ?? '' }}</option>
+                                                                <option value="{{ $variant->id }}" {{ $variant->id == $quotationItem->reference_id ? 'selected' : '' }}
+                                                                    {{  $quotationItem->isgdnExist == 1 ? 'data-lock=true' : ''}}>{{ $variant->name ?? '' }}</option>
                                                             @endforeach
                                                         </select>
                                                     </div> 
@@ -646,19 +647,24 @@
             let variant = e.params.data.id;
             let variantText = e.params.data.text;
             // allow variant desc=lection if vin is not selected
-            selectedVinCount = $('#vin-' + index).val()?.length;
-            if(selectedVinCount > 0) {
-                var confirm = alertify.confirm('unselecting of varaint will leads to removal of related vins!',function (e) {
-                    if (e) {
-                        resetVin(index,variant, variantText);
+            var $option = $(e.params.args.data.element);
+                if ($option.data('lock')) {
+                    e.preventDefault(); 
+                    alertify.confirm('This Variant cannot be removed because it has a GDN assigned vehicles.').set({title: "Can't Remove this Variant"});
+                }else{
+                    selectedVinCount = $('#vin-' + index).val()?.length;
+                    if(selectedVinCount > 0) {
+                        var confirm = alertify.confirm('unselecting of varaint will leads to removal of related vins!',function (e) {
+                            if (e) {
+                                resetVin(index,variant, variantText);
+                            }
+                            }).set({title:"Are You Sure?"}).set('oncancel', function(closeEvent){
+                                $('#variant-' + index).val(variant).trigger('change');
+                                }); 
+                    }else{
+                        resetVin(index,variant, variantText); 
                     }
-                    }).set({title:"Are You Sure?"}).set('oncancel', function(closeEvent){
-                        $('#variant-' + index).val(variant).trigger('change');
-                        }); 
-            }else{
-                resetVin(index,variant, variantText); 
-            }
-              
+                }
         });
         function resetVin(index,variant, variantText) {
             $('#variant-description-'+index).val('');
@@ -707,50 +713,56 @@
         $(document.body).on('click', ".removeVariantButton", function (e) {
             var rowCount = $("#so-vehicles").find(".so-variant-add-section").length;
             if(rowCount > 1) {
+                var $option = $(e.params.args.data.element);
+                if ($option.data('lock')) {
+                    e.preventDefault(); 
+                    alertify.confirm('This Variant cannot be removed because it has a GDN assigned vehicles.').set({title: "Can't Remove this Variant"});
+                }else{
+                    var indexNumber = $(this).attr('index');
+                    var variantText  = $('#variant-'+indexNumber).text();
+                    var variant = $('#variant-'+indexNumber).val();
+                
+                    if(variantText) {
+                        appendVariant(indexNumber, variant[0], variantText);
+                    }
+                
+                    $(this).closest('#variant-section-'+indexNumber).remove();
 
-                var indexNumber = $(this).attr('index');
-                var variantText  = $('#variant-'+indexNumber).text();
-                var variant = $('#variant-'+indexNumber).val();
-               
-                if(variantText) {
-                    appendVariant(indexNumber, variant[0], variantText);
+                    $('.so-variant-add-section').each(function(i){
+                        var index = +i + +1;
+                        $(this).find('.variant-descriptions').attr('index', index); 
+                        $(this).find('.variant-descriptions').attr('id', 'variant-description-'+index); 
+                        $(this).find('.variant-descriptions').attr('name', 'variants[+index+][description]'); 
+                        $(this).attr('id', 'variant-section-'+index);
+                        $(this).find('.variants').attr('index', index);
+                        $(this).find('.variants').attr('id', 'variant-'+index);
+                        $(this).find('.variants').attr('name', 'variants['+index+'][variant_id]');
+                        $(this).find('.variant-prices').attr('index', index);
+                        $(this).find('.variant-prices').attr('id', 'price-'+index);
+                        $(this).find('.variant-prices').attr('name', 'variants['+index+'][price]');
+                        $(this).find('.variant-quantities').attr('index', index);
+                        $(this).find('.variant-quantities').attr('id', 'quantity-'+index);
+                        $(this).find('.variant-quantities').attr('name', 'variants['+index+'][quantity]');
+                        $(this).find('.vins').attr('index', index);
+                        $(this).find('.vins').attr('id', 'vin-'+index);
+                        $(this).find('.vins').attr('name', 'variants['+index+'][vin][]');
+                    
+                        $(this).find('.removeVariantButton').attr('index', index);
+
+                        $('#variant-'+index).select2
+                        ({
+                            placeholder: 'Select Variant',
+                            maximumSelectionLength:1,
+                            allowClear: true
+                        });
+                        $('#vin-'+index).select2
+                        ({
+                            placeholder: 'Select Vin',
+                        });
+                    
+                    });
                 }
                
-                $(this).closest('#variant-section-'+indexNumber).remove();
-
-                $('.so-variant-add-section').each(function(i){
-                    var index = +i + +1;
-                    $(this).find('.variant-descriptions').attr('index', index); 
-                    $(this).find('.variant-descriptions').attr('id', 'variant-description-'+index); 
-                    $(this).find('.variant-descriptions').attr('name', 'variants[+index+][description]'); 
-                    $(this).attr('id', 'variant-section-'+index);
-                    $(this).find('.variants').attr('index', index);
-                    $(this).find('.variants').attr('id', 'variant-'+index);
-                    $(this).find('.variants').attr('name', 'variants['+index+'][variant_id]');
-                    $(this).find('.variant-prices').attr('index', index);
-                    $(this).find('.variant-prices').attr('id', 'price-'+index);
-                    $(this).find('.variant-prices').attr('name', 'variants['+index+'][price]');
-                    $(this).find('.variant-quantities').attr('index', index);
-                    $(this).find('.variant-quantities').attr('id', 'quantity-'+index);
-                    $(this).find('.variant-quantities').attr('name', 'variants['+index+'][quantity]');
-                    $(this).find('.vins').attr('index', index);
-                    $(this).find('.vins').attr('id', 'vin-'+index);
-                    $(this).find('.vins').attr('name', 'variants['+index+'][vin][]');
-                
-                    $(this).find('.removeVariantButton').attr('index', index);
-
-                    $('#variant-'+index).select2
-                    ({
-                        placeholder: 'Select Variant',
-                        maximumSelectionLength:1,
-                        allowClear: true
-                    });
-                    $('#vin-'+index).select2
-                    ({
-                        placeholder: 'Select Vin',
-                    });
-                  
-                });
               
             }else{
                 var confirm = alertify.confirm('You are not able to remove this row, Atleast one Variant is Required',function (e) {
@@ -839,6 +851,8 @@
 
             };
         }
+
+        
     </script>
     <script>
         function updateTotalReceivingPayment() {

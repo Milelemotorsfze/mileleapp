@@ -451,10 +451,18 @@ class SalesOrderController extends Controller
                 $selectedVehicleIds = $quotationItem->soItems->pluck('vehicles_id')->toArray();
                 $quotationItem->selectedVehicleIds = $selectedVehicleIds;
                // check the quotation referenceid
+               $quotationItem->isgdnExist = 0;
+               foreach($selectedVehicleIds as $eachVehicle) {
+                    $eachVehicle = Vehicles::find($eachVehicle);
+                    if($eachVehicle->gdn_id) {
+                        $quotationItem->isgdnExist = 1;
+                        break; 
+                    }
+               }
             }
             $totalVehicles = $quotationItems->sum('quantity');
             $variants = Varaint::select('id','name')->get();
-            return $quotationItems;
+            // return $quotationItems;
             return view('salesorder.update', compact('vehicles','variants','totalVehicles','quotationItems', 'quotation', 'calls', 'customerdetails','sodetails', 'soitems', 'empProfile', 'saleperson'));  
         }
 public function storesalesorderupdate(Request $request, $quotationId)
