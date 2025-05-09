@@ -397,7 +397,7 @@ function openModal(id) {
                 var variantItemsHeader = $('<thead><tr><th>Attributes</th><th>Options</th></tr></thead>');
               }
               var variantItemsBody = $('<tbody></tbody>');
-              console.log(response.variantItems);
+              // console.log(response.variantItems);
               response.variantItems.forEach(function(variantItem) {
                   var specificationName = variantItem.model_specification ? variantItem.model_specification.name : 'N/A';
                   var optionName = variantItem.model_specification_option ? variantItem.model_specification_option.name : 'N/A';
@@ -423,7 +423,7 @@ function openModal(id) {
                 var modifiedVariantHeader = $('<thead><tr><th>Modified Attributes</th><th>Modified Option</th></tr></thead>');
                 var modifiedVariantBody = $('<tbody></tbody>');
                 response.modifiedVariants.forEach(function(modifiedVariant) {
-                  console.log(modifiedVariant);
+                  // console.log(modifiedVariant);
                     var modifiedVariantName = modifiedVariant.modified_variant_items ? modifiedVariant.modified_variant_items.name : 'N/A';
                     var addonName = modifiedVariant.addon ? modifiedVariant.addon.name : 'N/A';
                     modifiedVariantBody.append('<tr><td>' + modifiedVariantName + '</td><td>' + addonName + '</td></tr>');

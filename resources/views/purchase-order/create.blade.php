@@ -324,7 +324,7 @@
         });
 
         if (duplicates.length > 0) {
-            alertify.alert('Duplicate VIN values found. Please ensure all VIN values are unique.').set({title:"Alert !"});
+            alertify.alert("VIN already exists under a different PO. Please choose another VIN.").set({title:"Alert !"});
             formValid = false;
         }
 

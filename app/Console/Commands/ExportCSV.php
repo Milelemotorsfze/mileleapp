@@ -18,8 +18,8 @@ class ExportCSV extends Command
                 'purchasing_order.po_number', 'purchasing_order.po_date',
                 DB::raw('COALESCE(so.so_number, "") as so_number'),
                 DB::raw('COALESCE(so.so_date, "") as so_date'),
-                DB::raw('COALESCE(grn.grn_number, "") as grn_number'),
-                DB::raw('COALESCE(grn.date, "") as grn_date'),
+                DB::raw('COALESCE(movement_grns.grn_number, "") as grn_number'),
+                DB::raw('COALESCE(movements_reference.date, "") as grn_date'),
                 DB::raw('COALESCE(gdn.date, "") as gdn_date'),
                 DB::raw('COALESCE(gdn.gdn_number, "") as gdn_number'),
                 DB::raw('COALESCE(warehouse.name, "") as warehouse'),
@@ -32,7 +32,8 @@ class ExportCSV extends Command
             )
             ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
             ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
-            ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+            ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
+            ->leftJoin('movements_reference', 'movement_grns.movement_reference_id', '=', 'movements_reference.id')
             ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
             ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')

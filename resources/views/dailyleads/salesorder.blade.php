@@ -1,8 +1,22 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<script type="text/javascript" src="https://cdn.rawgit.com/asvd/dragscroll/master/dragscroll.js"></script>
 
 <style>
+    /* Allow Select2 dropdown to adjust dynamically based on content */
+    .select2-container {
+    width: 100% !important; /* Forces the width to match its parent */
+}
+
+.select2-dropdown {
+    min-width: auto !important; /* Allows dynamic resizing */
+    width: auto !important; /* Adjusts to content */
+}
+
+/* Make sure the dropdown appears above the modal */
+.select2-container--open {
+    z-index: 9999 !important;
+}
+
 /* Ensure table rows do not wrap text */
 table.dataTable {
     font-size: 12px; /* Decrease font size */
@@ -307,7 +321,33 @@ table.dataTable thead th select {
     <h4 class="card-title">
      Sales Order
     </h4>
-</div>     
+</div>
+<!-- Modal for Updating Sales Person -->
+<div class="modal fade" id="updateSalespersonModal" tabindex="-1" aria-labelledby="updateSalespersonLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateSalespersonLabel">Update Sales Person</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updateSalespersonForm">
+                    <!-- Hidden Field for Sales Order ID -->
+                    <input type="hidden" id="salesOrderId" name="sales_order_id">
+
+                    <label for="salespersonSelect">Select Sales Person:</label>
+                    <select class="form-control" id="salespersonSelect" name="salesperson_id">
+                        <option value="">Select Sales Person</option>
+                    </select>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveSalesperson">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -384,7 +424,21 @@ table.dataTable thead th select {
                     return ''; // If no date, return empty
                 }
             },
-            { data: 'name', name: 'users.name' },
+            {
+    data: 'name',
+    name: 'users.name',
+    render: function(data, type, row) {
+        if (row.calls_id === null) { // Check if calls_id is not null
+            return `<a href="#" class="update-salesperson" 
+                        data-so-id="${row.soid}" 
+                        data-current-salesperson="${row.name}">
+                        ${data}
+                    </a>`;
+        } else {
+            return data; // If calls_id is null, return plain text
+        }
+    }
+},
             { data: 'customername', name: 'calls.name' },
             { data: 'phone', name: 'calls.phone' },
             { data: 'email', name: 'calls.email' },
@@ -429,8 +483,8 @@ table.dataTable thead th select {
     }
             },
             {
-                data: 'calls_id',
-                name: 'quotations.calls_id',
+                data: 'soid',
+                name: 'so.id',
                 searchable: false,
                 orderable: false,
                 render: function (data, type, row) {
@@ -521,6 +575,71 @@ table.dataTable thead th select {
 }
 $('#fileModal').on('hidden.bs.modal', function () {
     $('#fileViewer').attr('src', '');
+});
+$(document).ready(function () {
+    $(document).on('click', '.update-salesperson', function (e) {
+    e.preventDefault();
+
+    let soId = $(this).data('so-id'); // Get Sales Order ID
+    let currentSalesperson = $(this).data('current-salesperson'); // Get current Salesperson
+
+    // Set Sales Order ID inside the modal's hidden input field
+    $('#salesOrderId').val(soId);
+
+    // Fetch Salespersons via AJAX
+    $.ajax({
+        url: "{{ route('salespersons.list') }}",
+        type: "GET",
+        success: function (response) {
+            let dropdown = $('#salespersonSelect');
+            dropdown.empty();
+            dropdown.append('<option value="">Select Sales Person</option>');
+
+            $.each(response.salespersons, function (key, salesperson) {
+                let selected = (salesperson.name === currentSalesperson) ? 'selected' : '';
+                dropdown.append(`<option value="${salesperson.id}" ${selected}>${salesperson.name}</option>`);
+            });
+
+            // Show the modal
+            $('#updateSalespersonModal').modal('show');
+        }
+    });
+});
+
+
+$('#saveSalesperson').click(function () {
+    let soId = $('#salesOrderId').val(); // Get Sales Order ID
+    let selectedSalespersonId = $('#salespersonSelect').val(); // Get Selected Sales Person ID
+
+    if (!selectedSalespersonId) {
+        alert("Please select a sales person.");
+        return;
+    }
+
+    $.ajax({
+        url: "{{ route('salesorder.updateSalesperson') }}",
+        type: "POST",
+        data: {
+            _token: "{{ csrf_token() }}",
+            sales_order_id: soId, // Send Sales Order ID
+            salesperson_id: selectedSalespersonId
+        },
+        success: function (response) {
+            if (response.success) {
+                alert('Sales Person Updated Successfully!');
+                $('#updateSalespersonModal').modal('hide');
+
+                // Reload DataTable to reflect changes
+                $('#dtBasicExample3').DataTable().ajax.reload();
+            } else {
+                alert('Failed to update Sales Person. Please try again.');
+            }
+        },
+        error: function () {
+            alert('Error updating Sales Person.');
+        }
+    });
+});
 });
 </script>
 @endsection

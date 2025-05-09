@@ -317,51 +317,52 @@ public function approvals(Request $request)
     $incidentsapprove->save();
     return response()->json(['message' => 'Approved Repaired Inspection']);
 }
+
     public function updatevehicledetails(Request $request)
-        {
-            try {
-                $selectedVIN = $request->input('vin');
-
-                $vehicle = Vehicles::where('vin', $selectedVIN)->first();
-
-                if (!$vehicle) {
-                    return response()->json(['error' => 'Vehicle not found'], 404);
-                }
-
-                $variant = Varaint::find($vehicle->varaints_id); 
-
-                $interiorColor = $vehicle->int_colour ? ColorCode::find($vehicle->int_colour) : null;
-                $exteriorColor = $vehicle->ex_colour ? ColorCode::find($vehicle->ex_colour) : null;
-
-                $brand = $variant ? Brand::find($variant->brands_id) : null;
-                $modelLine = $variant ? MasterModelLines::find($variant->master_model_lines_id) : null;
-
-                $vehicleDetails = [
-                    'brand' => $brand ? $brand->brand_name : 'N/A',
-                    'modelLine' => $modelLine ? $modelLine->model_line : 'N/A',
-                    'interiorColor' => $interiorColor ? $interiorColor->name : 'N/A',
-                    'exteriorColor' => $exteriorColor ? $exteriorColor->name : 'N/A',
-                    'variant' => $variant ? $variant->name : 'N/A',
-                    'detail' => $variant ? $variant->detail : 'N/A',
-                    'name' => $variant ? $variant->name : 'N/A',
-                    'my' => $variant ? $variant->my : 'N/A',
-                    'modeldetail' => $variant ? $variant->model_detail : 'N/A',
-                    'steering' => $variant ? $variant->steering : 'N/A',
-                    'seat' => $variant ? $variant->seat : 'N/A',
-                    'fuel_type' => $variant ? $variant->fuel_type : 'N/A',
-                    'gearbox' => $variant ? $variant->gearbox : 'N/A',
-                    'py' => $vehicle ? $vehicle->ppmmyyy : 'N/A',
-                    'interiorColorName' => $interiorColor ? $interiorColor->name : 'N/A',
-                    'exteriorColorName' => $exteriorColor ? $exteriorColor->name : 'N/A',
-                ];
-
-                return response()->json($vehicleDetails);
-            } catch (\Exception $e) {
-                \Log::error('Error fetching vehicle details: ' . $e->getMessage());
-                return response()->json(['error' => 'Internal Server Error'], 500);
-            }
-        }
-
+         {
+             try {
+                 $selectedVIN = $request->input('vin');
+ 
+                 $vehicle = Vehicles::where('vin', $selectedVIN)->first();
+ 
+                 if (!$vehicle) {
+                     return response()->json(['error' => 'Vehicle not found'], 404);
+                 }
+ 
+                 $variant = Varaint::find($vehicle->varaints_id); 
+ 
+                 $interiorColor = $vehicle->int_colour ? ColorCode::find($vehicle->int_colour) : null;
+                 $exteriorColor = $vehicle->ex_colour ? ColorCode::find($vehicle->ex_colour) : null;
+ 
+                 $brand = $variant ? Brand::find($variant->brands_id) : null;
+                 $modelLine = $variant ? MasterModelLines::find($variant->master_model_lines_id) : null;
+ 
+                 $vehicleDetails = [
+                     'brand' => $brand ? $brand->brand_name : 'N/A',
+                     'modelLine' => $modelLine ? $modelLine->model_line : 'N/A',
+                     'interiorColor' => $interiorColor ? $interiorColor->name : 'N/A',
+                     'exteriorColor' => $exteriorColor ? $exteriorColor->name : 'N/A',
+                     'variant' => $variant ? $variant->name : 'N/A',
+                     'detail' => $variant ? $variant->detail : 'N/A',
+                     'name' => $variant ? $variant->name : 'N/A',
+                     'my' => $variant ? $variant->my : 'N/A',
+                     'modeldetail' => $variant ? $variant->model_detail : 'N/A',
+                     'steering' => $variant ? $variant->steering : 'N/A',
+                     'seat' => $variant ? $variant->seat : 'N/A',
+                     'fuel_type' => $variant ? $variant->fuel_type : 'N/A',
+                     'gearbox' => $variant ? $variant->gearbox : 'N/A',
+                     'py' => $vehicle ? $vehicle->ppmmyyy : 'N/A',
+                     'interiorColorName' => $interiorColor ? $interiorColor->name : 'N/A',
+                     'exteriorColorName' => $exteriorColor ? $exteriorColor->name : 'N/A',
+                 ];
+ 
+                 return response()->json($vehicleDetails);
+             } catch (\Exception $e) {
+                 \Log::error('Error fetching vehicle details: ' . $e->getMessage());
+                 return response()->json(['error' => 'Internal Server Error'], 500);
+             }
+         }
+ 
     public function createincidents(Request $request)
     {
         $useractivities =  New UserActivities();

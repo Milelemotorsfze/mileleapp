@@ -44,6 +44,8 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\WOBOE;
 use App\Mail\WOBOEStatusMail; 
 use Illuminate\Pagination\LengthAwarePaginator;
+use Rap2hpoutre\FastExcel\FastExcel;
+
 class WorkOrderController extends Controller
 {
     public function workOrderCreate($type) {
@@ -308,6 +310,9 @@ class WorkOrderController extends Controller
                     });
                 }
             })
+            ->when(!empty($request->start_date) && !empty($request->end_date), function ($query) use ($request) {
+                $query->whereBetween('date', [$request->start_date, $request->end_date]);
+            })
             ->latest()
             ->get();
 
@@ -353,6 +358,76 @@ class WorkOrderController extends Controller
                 return $matchesFilter || $matchesBlank;
             });
         }
+        if($request->export == 'EXCEL') {
+            (new UserActivityController)->createActivity('Export Work Order List');
+
+            return (new FastExcel($filteredDatas))->download('work-orders.csv', function ($data) {
+               
+                    return [
+                        'Type' => $data->type,
+                        'status' => $data->latestStatus->status ?? '',
+                        'Sales Support Confirmation' => $data->sales_support_data_confirmation ?? '',
+                        'Finance Approval Status' => $data->finance_approval_status ?? '',
+                        'COO Office Approval Status' => $data->coo_approval_status ?? '',
+                        'Documentation Status' => $data->docs_status ?? '',
+                        'Vehicle Modification status' => $data->vehicles_modification_summary ?? '',
+                        'PDI Status' => $data->pdi_summary ?? '',
+                        'Delivery Status' => $data->delivery_summary ?? '',
+                        'Sales Person Name' => $data->salesPerson->name ?? '',
+                        'SO Number' => $data->so_number,
+                        'WO Number' => $data->wo_number,
+                        'Date' => $data->date,
+                        'Batch' => $data->is_batch == 0 ? 'Single' : $data->batch ?? '',
+                        'Customer Name' => $data->customer_name ?? '',
+                        'Customer Email' => $data->customer_email ?? '', 
+                        'Customer Contact Number' => "\t".$data->customer_company_number ?? '',
+                        'Customer Representative Name' => $data->customer_representative_name ?? '',
+                        'Customer Representative Email' => $data->customer_representative_email ?? '',
+                        'Customer Representative Number' =>  "\t".$data->customer_representative_contact ?? '',
+                        'Freight Agent Name' => $data->freight_agent_name ?? '',
+                        'Freight Agent Email' => $data->freight_agent_email ?? '',
+                        'Freight Agent Contact Number' => "\t".$data->freight_agent_contact_number ?? '',
+                        'Delivery Advise' => $data->delivery_advise ?? '',
+                        'Transfer Of Ownership' => $data->showroom_transfer ?? '',
+                        'Cross Trade' => $data->cross_trade ?? '',
+                        'LTO' => $data->lto ?? '',
+                        'Temporary Exit' => $data->temporary_exit ?? '',
+                        'Port Of Loading' => $data->port_of_loading ?? '',
+                        'Port Of Discharge' => $data->port_of_discharge ?? '',
+                        'Final Destination' => $data->final_destination ?? '',
+                        'Transport Type' => $data->transport_type ?? '',
+                        'Airline/Shipping Line/Trailer No.' => $data->transport_type ? $data->getTransportField('name') ?? '' : '',
+                        'AWB/Container No./Transportation Company' => $data->transport_type ? $data->getTransportField('id') ?? '': '',
+                        'Airway Info/Fwd Import Code/Driver Contact No.' => $data->transport_type ? $data->getTransportField('details') ?? '' : '',
+                        'BRN/Transportation Com. Info' => $data->transport_type === 'sea' || $data->transport_type === 'road' ? $data->getTransportField('additional') ?? '': '',
+                        'SO Vehicle Quantity' => $data->so_vehicle_quantity ?? '',
+                        'SO Currency' => $data->currency ?? '',
+                        'SO Amount' => $data->so_total_amount != 0.00 ? $data->so_total_amount : '',
+                        'Deposit' => $data->amount_received != 0.00 ? $data->amount_received : '',
+                        'Balance' => $data->balance_amount != 0.00 ? $data->balance_amount : '',
+                        'Delivery Location' => $data->delivery_location ?? '',
+                        'Delivery Contact Person' => $data->delivery_contact_person ?? '',
+                        'Delivery Contact Number' => "\t".$data->delivery_contact_person_number ?? '',
+                        'Delivery Date' => $data->delivery_date ? Carbon::parse($data->delivery_date)->format('d M Y') : '',
+                        'Preferred Shipping Line' => $data->preferred_shipping_line_of_customer ?? '',
+                        'Bill of Lading' => $data->bill_of_loading_details ?? '',
+                        'Shipper' => $data->shipper ?? '',
+                        'Consignee' => $data->consignee ?? '',
+                        'Notify Party' => $data->notify_party ?? '',
+                        'Special Requests' => $data->special_or_transit_clause_or_request ?? '',
+                        'Created By' => $data->CreatedBy->name ?? '',
+                        'Created At' => $data->created_at ?? '',
+                        'Last Updated By' => $data->UpdatedBy->name ?? '',
+                        'Last Updated At' => $data->updated_at ?? '',
+                        'Sales Support Confirmation By' => $data->salesSupportDataConfirmationBy->name ?? '',
+                        'Sales Support Confirmation At' => $data->sales_support_data_confirmation_at ?? '',
+                        'Total BOE' => $data->total_number_of_boe ?? '',
+                        'Has Claim' => $data->has_claim ?? '',
+                        'Vehicle Count' => $data->vehicles->count() ?? 0,
+                    ];
+                });
+        }
+
         // Pagination parameters
         $page = request()->get('page', 1);
         $perPage = 100;
@@ -1367,9 +1442,26 @@ class WorkOrderController extends Controller
             'create-wo-for-all-sales-person'
         ]);
         if ($hasAllSalesAccess) {
-            $salesPersons = User::orderBy('name','ASC')->where('status','active')->where('is_sales_rep','Yes')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
-                $q = $q->where('type','employee');
-            })->get();
+            $salesPersons = User::where(function ($query) use ($workOrder) {
+                // Main condition for active sales reps
+                $query->where(function ($q) {
+                    $q->where('status', 'active')
+                      ->where('is_sales_rep', 'Yes')
+                      ->whereNotIn('id', [1, 16])
+                      ->whereHas('empProfile', function($sub) {
+                          $sub->where('type', 'employee');
+                      });
+                });
+        
+                // Additional condition to include the specific sales_person_id
+                if ($workOrder && $workOrder->sales_person_id) {
+                    $query->orWhere('id', $workOrder->sales_person_id);
+                }
+            })
+            ->orderBy('name', 'ASC')
+            ->get()
+            ->unique('id')
+            ->values();
         }
         $canDisableBatch = false;
         $otherWo = WorkOrder::whereNot('id',$workOrder->id)->where('so_number',$workOrder->so_number)->get();
@@ -2723,7 +2815,6 @@ class WorkOrderController extends Controller
 
                             // Prepare email data
                             $subject = "Finance approved the work order " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
-
                             // Define a quick access link (adjust the route as needed)
                             $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
                             $approvalHistoryLink = env('BASE_URL') . '/coo-approval-history/' . $workOrder->id;
@@ -2731,16 +2822,26 @@ class WorkOrderController extends Controller
                             $rolesWithPermission = Role::whereHas('permissions', function ($query) {
                                 $query->where('name', 'do-coo-office-approval');
                             })->pluck('id')->toArray();                   
-                            $recipients = \App\Models\User::role($rolesWithPermission)->whereIn('status',['new','active'])->where('password','!=','')->whereHas('roles')
-                            ->pluck('email')->filter(function($email) {
-                                return filter_var($email, FILTER_VALIDATE_EMAIL);
-                            })->toArray(); 
+                            // Get users with the required roles and valid email addresses
+                            $recipients = \App\Models\User::role($rolesWithPermission)
+                                ->whereIn('status', ['new', 'active'])
+                                ->where('password', '!=', '')
+                                ->whereHas('roles')
+                                ->pluck('email')
+                                ->filter(function($email) {
+                                    return filter_var($email, FILTER_VALIDATE_EMAIL);
+                                })->toArray(); 
+                            // Get the emails to exclude from the environment variable
+                            $excludedEmails = explode(',', env('DONT_SEND_EMAIL', ''));
+                        
+                            // Filter out the excluded emails
+                            $filteredRecipients = array_diff($recipients, $excludedEmails);                      
                             // Log email addresses to help with debugging
                             \Log::info('Email Recipients:', [
-                                'recipients' => implode(', ', $recipients) ?: 'none found',
+                                'recipients' => implode(', ', $filteredRecipients) ?: 'none found',
                             ]);
                             // Log and handle invalid email addresses (but do not throw an exception, just log)
-                            if (empty($recipients)) {
+                            if (empty($filteredRecipients)) {
                                 \Log::info('No valid recipients found. Skipping email sending for Work Order: ' . $workOrder->wo_number);
                                 return;
                             }
@@ -2749,9 +2850,9 @@ class WorkOrderController extends Controller
                                 'workOrder' => $workOrder,
                                 'accessLink' => $accessLink,
                                 'approvalHistoryLink' => $approvalHistoryLink,
-                            ], function ($message) use ($subject, $recipients, $template) {
+                            ], function ($message) use ($subject, $filteredRecipients, $template) {
                                 $message->from($template['from'], $template['from_name'])
-                                        ->to($recipients)
+                                        ->to($filteredRecipients)
                                         ->subject($subject);
                             });                            
                         } 
@@ -3121,46 +3222,49 @@ class WorkOrderController extends Controller
         $soNumber = $request->input('so_number');  
         $workOrderId = $request->input('work_order_id'); // In case of edit 
     
-        // Proceed with the rest of the logic
+        // Helper closure to extract the numeric batch
+        $extractNumericBatch = function ($batch) {
+            return (int) filter_var($batch, FILTER_SANITIZE_NUMBER_INT);
+        };    
         if ($workOrderId) {
             $workOrders = WorkOrder::where('id',$workOrderId)->first(); 
             if($workOrders->so_number == $soNumber) {
-                $largestBatch = $workOrders->batch; // Get the max batch number
-                $isBatch = $workOrders->is_batch; // Get the is_batch status from the first result
+                $largestBatch = $extractNumericBatch($workOrders->batch);
+                $isBatch = $workOrders->is_batch;
                 return response()->json([
                     'exists' => true,
-                    'largest_batch' => $largestBatch ? (int) str_replace('Batch ', '', $largestBatch) : 0,
+                    'largest_batch' => $largestBatch,
                     'is_batch' => $isBatch,
                 ]);
             } else {
-                // Find work orders with the same SO number, excluding the current one in edit mode
-                $query = WorkOrder::where('so_number', $soNumber);                
-                $workOrders = $query->get();
+                $workOrders = WorkOrder::where('so_number', $soNumber)->get();
                 if ($workOrders->isEmpty()) {
                     return response()->json(['exists' => false]); // SO number doesn't exist
                 }
-                // Get the largest batch number and check is_batch status
-                $largestBatch = $workOrders->where('is_batch', 1)->max('batch'); // Get the max batch number
-                $isBatch = $workOrders->first()->is_batch; // Get the is_batch status from the first result
+                $numericBatches = $workOrders->where('is_batch', 1)
+                    ->pluck('batch')
+                    ->map($extractNumericBatch);               
+                $largestBatch = $numericBatches->max() ?? 0;
+                $isBatch = $workOrders->first()->is_batch;
                 return response()->json([
                     'exists' => true,
-                    'largest_batch' => $largestBatch ? (int) str_replace('Batch ', '', $largestBatch) : 0,
+                    'largest_batch' => $largestBatch,
                     'is_batch' => $isBatch,
                 ]);
             }
         } else {
-            // Find work orders with the same SO number, excluding the current one in edit mode
-            $query = WorkOrder::where('so_number', $soNumber);           
-            $workOrders = $query->get();
+            $workOrders = WorkOrder::where('so_number', $soNumber)->get();
             if ($workOrders->isEmpty()) {
                 return response()->json(['exists' => false]); // SO number doesn't exist
             }
-            // Get the largest batch number and check is_batch status
-            $largestBatch = $workOrders->where('is_batch', 1)->max('batch'); // Get the max batch number
+            $numericBatches = $workOrders->where('is_batch', 1)
+                ->pluck('batch')
+                ->map($extractNumericBatch);
+            $largestBatch = $numericBatches->max() ?? 0;
             $isBatch = $workOrders->first()->is_batch; // Get the is_batch status from the first result
             return response()->json([
                 'exists' => true,
-                'largest_batch' => $largestBatch ? (int) str_replace('Batch ', '', $largestBatch) : 0,
+                'largest_batch' => $largestBatch,
                 'is_batch' => $isBatch,
             ]);
         }
@@ -3172,4 +3276,8 @@ class WorkOrderController extends Controller
         $exists = So::where('so_number', $soNumber)->exists();
         return response()->json(['valid' => $exists]);
     }  
+    function formatPhoneForExcel($number)
+    {
+        return $number ? " " . $number : '';
+    }
 }

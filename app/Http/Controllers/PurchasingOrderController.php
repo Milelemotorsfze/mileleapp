@@ -67,6 +67,7 @@ use App\Models\VehicleDn;
 use Illuminate\Support\Facades\Crypt;
 use setasign\Fpdi\PdfReader\Page;
 use setasign\Fpdi\Tcpdf\Fpdi;
+use Illuminate\Support\Str;
 use File;
 use Exception;
 
@@ -84,7 +85,9 @@ class PurchasingOrderController extends Controller
             'EUR' => 4.03,
             'JPY' => 0.023,
             'CAD' => 2.89,
-            'AED' => 1
+            'AED' => 1,
+            'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -193,7 +196,9 @@ class PurchasingOrderController extends Controller
             'EUR' => 4.03,
             'JPY' => 0.023,
             'CAD' => 2.89,
-            'AED' => 1
+            'AED' => 1,
+            'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -222,7 +227,9 @@ class PurchasingOrderController extends Controller
             'EUR' => 4.03,
             'JPY' => 0.023,
             'CAD' => 2.89,
-            'AED' => 1
+            'AED' => 1,
+            'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -251,7 +258,10 @@ class PurchasingOrderController extends Controller
             'EUR' => 4.03,
             'JPY' => 0.023,
             'CAD' => 2.89,
-            'AED' => 1
+            'AED' => 1,
+            'PHP' => 0.063,
+            'SAR' => 0.98,
+            
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -315,7 +325,9 @@ class PurchasingOrderController extends Controller
             'EUR' => 4.03,
             'JPY' => 0.023,
             'CAD' => 2.89,
-            'AED' => 1
+            'AED' => 1,
+            'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -393,7 +405,9 @@ class PurchasingOrderController extends Controller
         'EUR' => 4.03,
         'JPY' => 0.023,
         'CAD' => 2.89,
-        'AED' => 1
+        'AED' => 1,
+        'PHP' => 0.063,
+        'SAR' => 0.98,
     ];
     $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
         return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -460,7 +474,9 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'EUR' => 4.03,
             'JPY' => 0.023,
             'CAD' => 2.89,
-            'AED' => 1
+            'AED' => 1,
+            'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -509,7 +525,9 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'EUR' => 4.03,
             'JPY' => 0.023,
             'CAD' => 2.89,
-            'AED' => 1
+            'AED' => 1,
+            'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -558,7 +576,9 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'EUR' => 4.03,
             'JPY' => 0.023,
             'CAD' => 2.89,
-            'AED' => 1
+            'AED' => 1,
+            'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -611,7 +631,9 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'EUR' => 4.03,
             'JPY' => 0.023,
             'CAD' => 2.89,
-            'AED' => 1
+            'AED' => 1,
+            'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -664,7 +686,9 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'EUR' => 4.03,
             'JPY' => 0.023,
             'CAD' => 2.89,
-            'AED' => 1
+            'AED' => 1,
+            'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -717,7 +741,9 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'EUR' => 4.03,
             'JPY' => 0.023,
             'CAD' => 2.89,
-            'AED' => 1
+            'AED' => 1,
+            'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -767,7 +793,9 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
             'EUR' => 4.03,
             'JPY' => 0.023,
             'CAD' => 2.89,
-            'AED' => 1
+            'AED' => 1,
+            'PHP' => 0.063,
+            'SAR' => 0.98,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -829,7 +857,9 @@ public function filterconfirmation($status)
         'EUR' => 4.03,
         'JPY' => 0.023,
         'CAD' => 2.89,
-        'AED' => 1
+        'AED' => 1,
+        'PHP' => 0.063,
+        'SAR' => 0.98,
     ];
     $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
         return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -889,7 +919,9 @@ public function paymentinitiation($status)
         'EUR' => 4.03,
         'JPY' => 0.023,
         'CAD' => 2.89,
-        'AED' => 1
+        'AED' => 1,
+        'PHP' => 0.063,
+        'SAR' => 0.98,
     ];
     $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
         return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -989,6 +1021,7 @@ public function getBrandsAndModelLines(Request $request)
      */
     public function store(Request $request)
     {
+        // return $request->all();
         $this->validate($request, [
             'payment_term_id' => 'required',
             'po_type' => 'required',
@@ -1228,7 +1261,7 @@ public function getBrandsAndModelLines(Request $request)
         $supplier_created = New SupplierAccount();
         $supplier_created->opening_balance = 0;
         $supplier_created->current_balance = 0;
-        $supplier_created->currency = "AED";
+        $supplier_created->currency = $request->currency;
         $supplier_created->suppliers_id = $vendors_id;
         $supplier_created->save();
         }
@@ -1414,6 +1447,10 @@ public function getBrandsAndModelLines(Request $request)
         ->where('status', 'Approved')
         ->whereNotNull('dn_id')
         ->get();
+        $purchaseOrders = PurchasingOrder::whereNot('status','Cancelled')->whereNot('id',$purchasingOrder->id)
+                            ->where('currency', $purchasingOrder->currency)
+                            ->where('vendors_id', $purchasingOrder->vendors_id)->select('id','po_number')
+                            ->orderBy('id','DESC')->get();
 
         return view('purchase.show', [
                'currentId' => $id,
@@ -1422,7 +1459,8 @@ public function getBrandsAndModelLines(Request $request)
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname','showCancelButton', 'vehicleslog','exColours','intColours','showAddMorePOSection',
             'purchasinglog','paymentterms','pfiVehicleVariants','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies',
             'purchasedorderevents', 'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 'totalSurcharges', 'totalDiscounts',
-            'oldPlFiles','transitions', 'accounts','additionalpaymentpend','additionalpaymentint','additionalpaymentpapproved','additionalpaymentintreq','vehiclesdn'));
+            'oldPlFiles','transitions', 'accounts','additionalpaymentpend','additionalpaymentint','additionalpaymentpapproved','additionalpaymentintreq','vehiclesdn',
+            'purchaseOrders'));
 
     }
     public function edit($id)
@@ -2562,6 +2600,7 @@ public function paymentreleasesrejected(Request $request, $id)
 }
 public function paymentrelconfirmdebited(Request $request, $id)
 {
+    // need to test
     $vehicle = Vehicles::find($id);
     $vehicleCount = $vehicle->count();
            if ($request->hasFile('paymentFile')) {
@@ -2580,7 +2619,7 @@ public function paymentrelconfirmdebited(Request $request, $id)
             $swiftcopy->batch_no = $batchNo;
             $swiftcopy->file_path = 'storage/swift_copies/' . $fileNameToStore;
             $swiftcopy->save();
-            $purchasedorder = PurchasingOrder::where('id', $vehicle->purchasing_order_id);
+            $purchasedorder = PurchasingOrder::where('id', $vehicle->purchasing_order_id)->first();
             $supplieraccountchange = SupplierAccount::where('suppliers_id', $purchasedorder->vendors_id)->first();
             $paymentad = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)
                 ->where('status', 'Approved')
@@ -2589,7 +2628,7 @@ public function paymentrelconfirmdebited(Request $request, $id)
             $supplieraccountchange = new SupplierAccount();
             $supplieraccountchange->suppliers_id = $purchasedorder->vendors_id;
             $supplieraccountchange->current_balance += $paymentad;
-            $supplieraccountchange->currency = $purchasedorder;
+            $supplieraccountchange->currency = $purchasedorder->currency;
             $supplieraccountchange->opening_balance = 0;
             $supplieraccountchange->save();
             }
@@ -3166,7 +3205,7 @@ if ($paymentOrderStatus->isNotEmpty()) {
             $supplieraccountchange = new SupplierAccount();
             $supplieraccountchange->suppliers_id = $purchasedorder->vendors_id;
             $supplieraccountchange->current_balance -= $totalcost;
-            $supplieraccountchange->currency = "AED";
+            $supplieraccountchange->currency = $purchasedorder->currency;
             $supplieraccountchange->opening_balance = 0;
             $supplieraccountchange->save();
             }
@@ -3177,7 +3216,7 @@ if ($paymentOrderStatus->isNotEmpty()) {
             case "USD":
                 $totalcostconverted = $totalcost * 3.67;
                 break;
-                case "AUD":
+            case "AUD":
                     $totalcostconverted = $totalcost * 2.29;
                     break;
             case "EUR":
@@ -3191,6 +3230,12 @@ if ($paymentOrderStatus->isNotEmpty()) {
                 break;
             case "CAD":
                 $totalcostconverted = $totalcost * 2.68;
+                break;
+            case "PHP":
+                $totalcostconverted = $totalcost * 0.063;
+                break;
+            case "SAR":
+                $totalcostconverted = $totalcost * 0.98;
                 break;
             default:
                 $totalcostconverted = $totalcost;
@@ -3445,8 +3490,10 @@ if ($paymentOrderStatus->isNotEmpty()) {
             $vehicle->delete();
             return redirect()->back()->with('success', 'Vehicle cancellation request submitted successfully.');
         }
-        public function updatebasicdetails(Request $request)
+public function updatebasicdetails(Request $request)
 {
+
+  info("update basci details");
     $purchasingOrder = PurchasingOrder::find($request->input('purchasing_order_id'));
     if (!$purchasingOrder) {
         return response()->json(['error' => 'Purchasing order not found'], 404);
@@ -3495,6 +3542,8 @@ if ($paymentOrderStatus->isNotEmpty()) {
         $fileNameWithExt = $request->file('uploadPL')->getClientOriginalName();
         // Get just the filename
         $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+        $filename = Str::slug($filename);
+     
         // Get just the extension
         $extension = $request->file('uploadPL')->getClientOriginalExtension();
         // Create a unique filename to store
@@ -3503,6 +3552,7 @@ if ($paymentOrderStatus->isNotEmpty()) {
         $path = $request->file('uploadPL')->move(public_path('storage/PL_Documents'), $fileNameToStore);
         // Update the file path in the purchasing order
         $purchasingOrder->pl_file_path = 'storage/PL_Documents/' . $fileNameToStore;
+       
     }
     // Save the purchasing order
     $purchasingOrder->save();
@@ -3614,7 +3664,9 @@ if($purchasingOrder->is_demand_planning_po == 1)
             'EUR' => 4.03,
             'JPY' => 0.023,
             'CAD' => 2.89,
-            'AED' => 1
+            'AED' => 1,
+            'PHP' => 0.063,
+            'SAR' => 0.98
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -3931,7 +3983,9 @@ public function updatePrices(Request $request)
         'EUR' => 4.03,
         'GBP' => 4.66,
         'JPY' => 0.023,
-        'CAD' => 2.69
+        'CAD' => 2.69,
+        "PHP" => 0.063,
+        'SAR' => 0.98,
     ];
 
     $totalDifference = 0;
@@ -4019,8 +4073,9 @@ public function updatePrices(Request $request)
             $vehicleCost->update(['unit_price' => $newPrice]);
 
             if(!empty($vehiclesalreadypaid) && !empty($vehicleAlreadyPaidOrRemainingInStatuses)) {
-                $supplierAccount->current_balance += $totalDifference;
-                $supplierAccount->save();
+                // $supplierAccount->current_balance += $totalDifference;
+                // $supplierAccount->save();
+
                 SupplierAccountTransaction::create([
                     'transaction_type' => $totalDifference > 0 ? 'Debit' : 'Credit',
                     'purchasing_order_id' => $purchasingOrderId,
@@ -4029,7 +4084,7 @@ public function updatePrices(Request $request)
                     'account_currency' => $accountCurrency,
                     'transaction_amount' => abs($totalDifference),
                 ]);
-}
+            }
 if($purchasingOrder->is_demand_planning_po == 1)
 {
     $recipients = [
@@ -4138,7 +4193,8 @@ public function storeMessages(Request $request)
     }
     public function vehiclesdatagettingvariants($id)
 {
-    $vehicles = Vehicles::with('variant')->where('purchasing_order_id', $id)->whereNull('deleted_at')->whereNull('grn_id')->get();
+  
+    $vehicles = Vehicles::with('variant')->where('purchasing_order_id', $id)->whereNull('deleted_at')->whereNull('movement_grn_id')->get();
     $vehicleData = [];
     foreach ($vehicles as $vehicle) {
         $vehicleData[] = [
@@ -5003,7 +5059,9 @@ public function submitPaymentDetails(Request $request)
                             "JPY" => 0.025,
                             "AUD" => 2.29,
                             "AED" => 1,
-                            "CAD" => 2.68
+                            "CAD" => 2.68,
+                            "PHP" => 0.063,
+                            'SAR' => 0.98,
                         ];
                         // Check if the currencies are different
                         if ($purchasingOrder->currency != $supplierAccount->currency) {
@@ -5016,8 +5074,12 @@ public function submitPaymentDetails(Request $request)
                             $totalCostConverted = $transactionAmountInAED / $supplierAccountConversionRate; // Convert from AED to supplier account currency
                         } else {
                             $totalCostConverted = $supplierAccountTransaction->transaction_amount;
+                           
                         }
-                        $supplierAccount->current_balance -= $totalCostConverted;
+                     
+                        $account_balance = $supplierAccount->current_balance + $totalCostConverted;
+                        $supplierAccount->current_balance = $account_balance <= 0 ? 0 : $account_balance;
+                        
                         $supplierAccount->save();
                 }
             }
@@ -5043,8 +5105,8 @@ public function submitPaymentDetails(Request $request)
             $currency = $supplierAccountTransaction->account_currency;
             if($purchasingOrder->is_demand_planning_po == 1)
             {
-            $recipients = config('mail.custom_recipients.dp');
-            Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+            // $recipients = config('mail.custom_recipients.dp');
+            // Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
             }
             else
             {
@@ -5300,7 +5362,9 @@ public function submitPaymentDetails(Request $request)
                     "JPY" => 0.023,
                     "AUD" => 2.29,
                     "AED" => 1,
-                    "CAD" => 2.68
+                    "CAD" => 2.68,
+                    "PHP" => 0.063,
+                    'SAR' => 0.98,
                 ];
                 // Check if the currencies are different
         if ($purchasingOrder->currency != $supplierAccount->currency) {
@@ -5317,7 +5381,8 @@ public function submitPaymentDetails(Request $request)
         }
 
         // Update the supplier account balance
-        $supplierAccount->current_balance += $totalCostConverted;
+        $account_balance = $supplierAccount->current_balance - $totalCostConverted;
+        $supplierAccount->current_balance = $account_balance <= 0 ? 0 : $account_balance;
         $supplierAccount->save();
         }
     }
@@ -5347,17 +5412,18 @@ public function submitPaymentDetails(Request $request)
     }
     public function rejectTransitionlinitiate(Request $request)
     {
+       info("rejected transition");
+        // payment initiate reject
         try{
 
             DB::beginTransaction();
             $transitionId = $request->input('transition_id');
             $remarks = $request->input('remarks');
             $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
+            $purchasingOrder = PurchasingOrder::find($supplierAccountTransaction->purchasing_order_id);    
+
                 if ($supplierAccountTransaction) {
-                    $supplierAccountTransaction->transaction_type = 'Rejected';
-                    $supplierAccountTransaction->status = 'Rejected';
-                    $supplierAccountTransaction->remarks = $remarks;
-                    $supplierAccountTransaction->save();
+                   
                     $supplierAccount = SupplierAccount::where('id', $supplierAccountTransaction->supplier_account_id)->first();
                     if ($supplierAccount) {
                         $conversionRates = [
@@ -5367,32 +5433,37 @@ public function submitPaymentDetails(Request $request)
                             "JPY" => 0.023,
                             "AUD" => 2.29,
                             "AED" => 1,
-                            "CAD" => 2.68
+                            "CAD" => 2.68,
+                            "PHP" => 0.063,
+                            'SAR' => 0.98,
                         ];
-                
-                        $transactionCurrency = $supplierAccountTransaction->account_currency; // Assuming there's a 'currency' column
-                        $accountCurrency = $supplierAccount->currency; // Assuming there's a 'currency' column in SupplierAccount
-                        $transactionAmount = $supplierAccountTransaction->transaction_amount;
-                
-                        // Convert transaction amount if currencies differ
-                        if ($transactionCurrency !== $accountCurrency) {
-                            if (isset($conversionRates[$transactionCurrency]) && isset($conversionRates[$accountCurrency])) {
-                                $convertedAmount = $transactionAmount * ($conversionRates[$transactionCurrency] / $conversionRates[$accountCurrency]);
-                            } else {
-                                // Handle missing conversion rate
-                                throw new Exception("Conversion rate not found for one of the currencies.");
-                            }
-                        } else {
-                            $convertedAmount = $transactionAmount; // No conversion needed
-                        }
-                
-                        // Update the current balance of the supplier account
-                        $supplierAccount->current_balance += $convertedAmount;
-                        $supplierAccount->save();
-                    }
-                }
-            $purchasingOrder = PurchasingOrder::find($supplierAccountTransaction->purchasing_order_id);    
+                        if($supplierAccountTransaction->transaction_type == 'Released') {
 
+                            if ($purchasingOrder->currency != $supplierAccount->currency) {
+                                // Convert the transactionAmount to the SupplierAccount currency
+                                $purchasingOrderConversionRate = $conversionRates[$purchasingOrder->currency] ?? 1;
+                                $supplierAccountConversionRate = $conversionRates[$supplierAccount->currency] ?? 1;
+        
+                                // Convert the transaction amount from the purchasing order currency to the supplier account currency
+                                $transactionAmountInAED = $supplierAccountTransaction->transaction_amount * $purchasingOrderConversionRate; // Convert to base currency (e.g. AED)
+                                $totalCostConverted = $transactionAmountInAED / $supplierAccountConversionRate; // Convert from AED to supplier account currency
+                            } else {
+                                // If the currencies are the same, no conversion is needed
+                                $totalCostConverted = $supplierAccountTransaction->transaction_amount;
+                            }
+        
+                                // Update the supplier account balance
+                              $account_balance = $supplierAccount->current_balance - $totalCostConverted;
+                              $supplierAccount->current_balance = $account_balance <= 0 ? 0 : $account_balance;
+                              $supplierAccount->save();
+                        }
+                    }
+                    $supplierAccountTransaction->transaction_type = 'Rejected';
+                    $supplierAccountTransaction->status = 'Rejected';
+                    $supplierAccountTransaction->remarks = $remarks;
+                    $supplierAccountTransaction->save();
+                }
+          
             $purchasedOrderPaidAmounts = PurchasedOrderPaidAmounts::where('sat_id', $transitionId)->first();
                 if ($purchasedOrderPaidAmounts) {
                     $purchasedOrderPaidAmounts->status = 'Rejected';
@@ -5515,7 +5586,9 @@ public function submitPaymentDetails(Request $request)
                         "JPY" => 0.023,
                         "AED" => 1,
                         "AUD" => 2.29,
-                        "CAD" => 2.68
+                        "CAD" => 2.68,
+                        "PHP" => 0.063,
+                        "SAR" => 0.98,
                     ];
                     // Check if the currencies are different
                     if ($purchasingOrder->currency != $supplierAccount->currency) {
@@ -5532,8 +5605,9 @@ public function submitPaymentDetails(Request $request)
                     }
 
                         // Update the supplier account balance
-                        $supplierAccount->current_balance += $totalCostConverted;
-                        $supplierAccount->save();
+                      $account_balance = $supplierAccount->current_balance - $totalCostConverted;
+                      $supplierAccount->current_balance = $account_balance <= 0 ? 0 : $account_balance;
+                      $supplierAccount->save();
                                                     
                 }
             }
@@ -5825,5 +5899,70 @@ public function sendTransferCopy(Request $request) {
                 return response()->json(['success' => false, 'message' => 'Email sending failed',
                  'error' => $e->getMessage()], 500);
             }
+    }
+    public function paymentAdjustment(Request $request) {
+        // info($request->all());
+        // add entry in supplier account transaction with type debit with payment adjustment amount
+        DB::beginTransaction();
+
+        try{
+            $supplierAccount = SupplierAccountTransaction::findOrFail($request->po_transition_id);
+            // already paid amount need to be reveresd based on new payment adjustment
+        
+            $purchaseOrder = PurchasingOrder::findOrFail($request->payment_adjustment_po_id);
+            $alreadypaidAmount = PurchasedOrderPaidAmounts::where('purchasing_order_id',$supplierAccount->purchasing_order_id )
+                                ->where('sat_id', $supplierAccount->id)->first();
+                info($alreadypaidAmount);
+            if($alreadypaidAmount) {
+                $alreadypaidAmount->amount = $alreadypaidAmount->amount - $request->payment_adjustment_amount ?? 0;
+                $alreadypaidAmount->save();
+            }
+            // for adjusted po already apid amount
+            $purchasedorderpaidamounts = new PurchasedOrderPaidAmounts();
+            $purchasedorderpaidamounts->amount = $request->payment_adjustment_amount ?? 0;
+            $purchasedorderpaidamounts->created_by = Auth::id();
+            $purchasedorderpaidamounts->purchasing_order_id = $request->payment_adjustment_po_id;
+            $purchasedorderpaidamounts->status = 'Paid';
+            $purchasedorderpaidamounts->sat_id = $supplierAccount->id;
+            $purchasedorderpaidamounts->save();
+
+            $supplierAccountTransaction = new SupplierAccountTransaction();
+            $supplierAccountTransaction->transaction_type = "Debit";
+            $supplierAccountTransaction->purchasing_order_id = $request->payment_adjustment_po_id;
+            $supplierAccountTransaction->supplier_account_id = $supplierAccount->supplier_account_id;
+            $supplierAccountTransaction->created_by = Auth::id();
+            $supplierAccountTransaction->remarks = $request->remarks;
+            $supplierAccountTransaction->account_currency = $supplierAccount->account_currency;
+            $supplierAccountTransaction->transaction_amount = $request->payment_adjustment_amount ?? 0;
+            $supplierAccountTransaction->save();
+
+            $purchasingordereventsLog = new PurchasingOrderEventsLog();
+            $purchasingordereventsLog->event_type = "Payment Adjustment";
+            $purchasingordereventsLog->created_by = auth()->user()->id;
+            $purchasingordereventsLog->purchasing_order_id = $request->payment_adjustment_po_id;
+            $purchasingordereventsLog->description = $request->payment_adjustment_amount.' '.$supplierAccount->account_currency.' payment adjustment from '.$request->payment_from_po ?? '';
+            $purchasingordereventsLog->save();
+
+            $purchasingordereventsLog = new PurchasingOrderEventsLog();
+            $purchasingordereventsLog->event_type = "Payment Adjustment";
+            $purchasingordereventsLog->created_by = auth()->user()->id;
+            $purchasingordereventsLog->purchasing_order_id = $supplierAccount->purchasing_order_id;
+            $purchasingordereventsLog->description = $request->payment_adjustment_amount.' '.$supplierAccount->account_currency.' payment adjustment towards '.$purchaseOrder->po_number ?? '';
+            $purchasingordereventsLog->save();
+
+            $supplierAccount->transaction_amount =   $supplierAccount->transaction_amount - $request->payment_adjustment_amount;
+            $supplierAccount->save();
+
+            (new UserActivityController)->createActivity('Payment Adjustment successfully Done.');
+          
+            DB::commit();
+            return redirect()->back()->with('success', 'Payment Adjustment successfully done towards '.$purchaseOrder->po_number.'.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Payment Adjustment failed', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('roor', 'Payment Adjustment failed due to '. $e->getMessage().'.');
+        
+        }
+
     }
 }

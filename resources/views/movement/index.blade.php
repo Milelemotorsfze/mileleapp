@@ -35,14 +35,14 @@
                 </a>
 <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
       <a class="btn btn-sm btn-success float-end" href="{{ route('movement.create') }}" text-align: right>
-        <i class="fa fa-plus" aria-hidden="true"></i> Add New Movement Transection
+        <i class="fa fa-plus" aria-hidden="true"></i> Add New Movement Transaction
       </a>
       <div class="clearfix"></div>
       @endif
       <br>
       <ul class="nav nav-pills nav-fill">
       <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Movement Transection</a>
+        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Movement Transaction</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab2">All Vehicle Movements</a>
@@ -103,7 +103,7 @@
                         <td>{{$vehicles}}</td>
                         @php
                         $created_bys = DB::table('users')->where('id', $movementreference->created_by)->first();
-                        $created_by = $created_bys->name;
+                        $created_by = $created_bys->name ?? '';
                         @endphp
                         <td>{{ $created_by }}</td>
                         <td class="createdDated">{{ date('d-M-Y', strtotime($movementreference->created_at)) }}</td>

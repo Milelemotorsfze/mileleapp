@@ -50,7 +50,7 @@
                     @endphp
                     @if ($hasPermission)
     <h4 class="card-title">
-     GRN Info
+     GDN Info
      <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </h4>
     <br>
