@@ -357,14 +357,16 @@
                     </div>
                     <div class="col-sm-6">
                     <select id="salespersons" name="salespersons" class="form-select" required>
-                    @foreach ($sales_persons as $sales_person)
-                    @php
-                            $sales_person_details = DB::table('users')->where('id', $sales_person->model_id)->first();
-                            $sales_person_name = $sales_person_details->name;
-                        @endphp
-                        <option value="{{ $sales_person->model_id }}">{{ $sales_person_name }}</option>      
-                    @endforeach
-                        </select>
+                        <option disabled selected>Select a Salesperson</option>
+                        @if(!empty($sales_persons) && $sales_persons->count())
+                            @foreach ($sales_persons as $sales_person)
+                                <option value="{{ $sales_person->id }}">{{ $sales_person->name }}</option>      
+                            @endforeach
+                        @else
+                            <option disabled>No salespersons available</option>
+                        @endif
+                    </select>
+
                     </div>
                 </div>
                     @else
