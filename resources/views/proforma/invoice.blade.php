@@ -281,10 +281,10 @@
             </div>
             <div class="col-sm-4">
                 <div class="row">
-                    <div class="col-sm-2">
+                    <div class="col-sm-4">
                         Category :
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-8">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input shipping_method @error('shipping_method') is-invalid @enderror" type="checkbox"
                                    name="shipping_method" id="CNF" value="CNF" >
@@ -305,10 +305,27 @@
             </div>
             <div class="col-sm-4">
                 <div class="row">
-                    <div class="col-sm-2">
+                    <div class="col-sm-4">
+                        Nature of Deal :
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="nature_of_deal" id="regular_deal" value="regular_deal" required {{ old('nature_of_deal') == 'regular_deal' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="regular_deal">Regular deal</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="nature_of_deal" id="letter_of_credit" value="letter_of_credit" required {{ old('nature_of_deal') == 'letter_of_credit' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="letter_of_credit">Letter of credit</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4 pt-2">
+                <div class="row">
+                    <div class="col-sm-4">
                         Currency :
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-6">
                         <select class="form-select" name="currency" id="currency">
                             <option>AED</option>
                             <option>USD</option>
@@ -321,13 +338,13 @@
         <hr>
         <div class="row">
             <div class="col-sm-4">
-                Document Details
+               <strong> Document Details </strong>
             </div>
             <div class="col-sm-4">
-                Client's Details
+                <strong> Client's Details </strong>
             </div>
             <div class="col-sm-4">
-                Delivery Details
+               <strong> Delivery Details </strong>
             </div>
         </div>
         <hr>
@@ -549,10 +566,10 @@
         <hr>
         <div class="row mt-2">
             <div class="col-sm-4">
-                Payment Details
+                <strong> Payment Details </strong>
             </div>
             <div class="col-sm-8">
-                Client's Representative
+                <strong> Client's Representative </strong>
             </div>
         </div>
         <hr>

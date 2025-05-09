@@ -1967,7 +1967,7 @@ function saveRejection() {
           var escaped = selectedValues.map(function (val) {
             return '^' + val.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '$';
           }).join('|');
-          column.search(selectedValues.join('|'), false, true).draw();
+          column.search(escaped, true, false).draw();
         } else {
           column.search('', true, false).draw();
         }
