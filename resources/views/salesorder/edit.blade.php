@@ -71,8 +71,9 @@
                 {{ Session::get('success') }}
             </div>
         @endif
-        <form action="{{ route('salesorder.storesalesorderupdate', ['QuotationId' => $quotation->id]) }}" id="form-update" method="POST">
+        <form action="{{ route('salesorder.update', $so->id) }}" id="form-update" method="POST">
             @csrf
+            @method('PUT')
             <div class="row gy-3">
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="row align-items-center">
@@ -123,7 +124,7 @@
                                 <div class="row mb-2">
                                     <div class="col-sm-6"><strong>Client Category:</strong></div>
                                     <div class="col-sm-6">
-                                        @if(!$calls->company_name)
+                                        @if(!$call->company_name)
                                         <label class="form-check-label">Individual</label>
                                         @else
                                         <label class="form-check-label">Company</label>
@@ -133,37 +134,37 @@
                                 <div class="row mb-2" id="contact-person-div">
                                     <div class="col-sm-6"><strong>Contact Person:</strong></div>
                                     <div class="col-sm-6">
-                                        <label class="form-check-label">{{$calls->name}}</label>
+                                        <label class="form-check-label">{{$call->name}}</label>
                                     </div>
                                 </div>
                                 <div class="row mb-2" id="company-div">
                                     <div class="col-sm-6"><strong>Company:</strong></div>
                                     <div class="col-sm-6">
-                                        <label class="form-check-label">{{$calls->company_name}}</label>
+                                        <label class="form-check-label">{{$call->company_name}}</label>
                                     </div>
                                 </div>
                                 <div class="row mb-2">
                                     <div class="col-sm-6"><strong>Customer:</strong></div>
                                     <div class="col-sm-6">
-                                        <label class="form-check-label">{{$calls->name}}</label>
+                                        <label class="form-check-label">{{$call->name}}</label>
                                     </div>
                                 </div>
                                 <div class="row mb-2">
                                     <div class="col-sm-6"><strong>Contact Number:</strong></div>
                                     <div class="col-sm-6">
-                                        <label class="form-check-label">{{$calls->phone}}</label>
+                                        <label class="form-check-label">{{$call->phone}}</label>
                                     </div>
                                 </div>
                                 <div class="row mb-2">
                                     <div class="col-sm-6"><strong>Email:</strong></div>
                                     <div class="col-sm-6">
-                                        <label class="form-check-label">{{$calls->email}}</label>
+                                        <label class="form-check-label">{{$call->email}}</label>
                                     </div>
                                 </div>
                                 <div class="row mb-2">
                                     <div class="col-sm-6"><strong>Address:</strong></div>
                                     <div class="col-sm-6">
-                                        <label class="form-check-label">{{$calls->address}}</label>
+                                        <label class="form-check-label">{{$call->address}}</label>
                                     </div>
                                 </div>
                             </div>
@@ -338,7 +339,7 @@
                             <div class="row gy-3">
                                 <div class="col-lg-3 col-md-6 col-sm-6">
                                     <label for="today_date"><strong>SO Date</strong></label>
-                                    <input type="date" class="form-control" id="so_date" name="so_date" value="{{$sodetails->so_date}}">
+                                    <input type="date" class="form-control" id="so_date" name="so_date" value="{{$so->so_date}}">
                                 </div>
 
                                 <div class="col-lg-3 col-md-6 col-sm-6">
@@ -347,21 +348,16 @@
                                         <span class="prefix">SO-</span>
                                         <input type="text" class="form-control input-field" id="so_number" name="so_number"
                                             placeholder="Enter SO Number"
-                                            value="{{ preg_replace('/^SO-/', '', $sodetails->so_number) }}">
+                                            value="{{ preg_replace('/^SO-/', '', $so->so_number) }}">
                                     </div>
                                     <span id="error_message" class="text-danger"></span>
                                 </div>
 
                                 <div class="col-lg-6 col-md-6 col-sm-6">
                                     <label for="text_area"><strong>Sales Notes</strong></label>
-                                    <textarea class="form-control" id="notes" name="notes">{{$sodetails->notes}}</textarea>
+                                    <textarea class="form-control" id="notes" name="notes">{{$so->notes}}</textarea>
                                 </div>
-                                <!-- <div class="col-12 mt-3">
-                                <a href="{{ route('qoutation.proforma_invoice_edit', ['callId' => $calls->id]) }}" 
-                                    class="btn btn-warning">
-                                        Reopen Quotation
-                                    </a>
-                                </div> -->
+                               
                             </div>
                         </div>
                     </div>
@@ -458,28 +454,28 @@
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
                                 <label for="total_payment"><strong>Total Payment</strong></label>
-                                <input type="number" class="form-control" id="total_payment" name="total_payment" value="{{$quotation->deal_value}}" readonly>
+                                <input type="number" class="form-control" id="total_payment" name="total_payment" value="{{$quotation->deal_value}}" >
                             </div>
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
                                 <label for="receiving_payment"><strong>Total Receiving Payment</strong></label>
-                                <input type="number" class="form-control" id="receiving_payment" name="receiving_payment" value="{{$sodetails->receiving}}" readonly>
+                                <input type="number" class="form-control" id="receiving_payment" name="receiving_payment" value="{{$so->receiving}}" >
                             </div>
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
                                 <label for="advance_payment_performa"><strong>Payment In Performa</strong></label>
-                                <input type="number" class="form-control payment" id="advance_payment_performa" name="advance_payment_performa" value="{{$quotation->quotationdetails->advance_amount}}" readonly>
+                                <input type="number" class="form-control payment" id="advance_payment_performa" name="advance_payment_performa" value="{{$quotation->quotationdetails->advance_amount}}" >
                             </div>
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
                                 <label for="payment_so"><strong>Payment In SO</strong></label>
-                                <input type="number" class="form-control payment" id="payment_so" name="payment_so" value="{{$sodetails->paidinso}}" required>
+                                <input type="number" class="form-control payment" id="payment_so" name="payment_so" value="{{$so->paidinso}}" required>
                             </div>
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
                                 <label for="balance_payment"><strong>Balance Payment</strong></label>
                                 @php
-                                $balance = $sodetails->total - $sodetails->receiving;
+                                $balance = $so->total - $so->receiving;
                                 @endphp
                                 <input type="number" class="form-control" id="balance_payment" value="{{$balance}}" readonly>
                             </div>
@@ -489,7 +485,7 @@
             </div>
             </br>
             </br>
-            <input type="hidden" name="so_id" value="{{ $sodetails->id }}">
+            <input type="hidden" name="so_id" value="{{ $so->id }}">
             <button type="submit" class="btn btn-primary btn-submit">Submit</button>
         </form>
     </div>
@@ -497,7 +493,7 @@
     @endsection
     @push('scripts')
     <script>
-        let soId = '{{ $sodetails->id }}';
+        let soId = '{{ $so->id }}';
         let QuotaionItemCount = '{{ $quotationItems->count() }}';
         let isFormValid = 0;
 
@@ -646,12 +642,12 @@
             var index = $(this).attr('index');
             let variant = e.params.data.id;
             let variantText = e.params.data.text;
-            // allow variant desc=lection if vin is not selected
+
             var isGdn = $(this).attr('data-is-gdn');
                 if (isGdn == 1) {
                     e.preventDefault(); 
                     alertify.confirm('This Variant cannot be removed because it has a GDN assigned vehicles.').set({title: "Can't Remove this Variant"});
-                     $('#variant-' + index).val(variant).trigger('change');
+                    $('#variant-' + index).val(variant).trigger('change');
                 }else{
                     selectedVinCount = $('#vin-' + index).val()?.length;
                     if(selectedVinCount > 0) {
@@ -823,11 +819,13 @@
             ValidateVinwithQty();
         });
         $('.btn-submit').click(function (e) {
+            alert("ok");
             e.preventDefault();
             var rowCount = $("#so-vehicles").find(".so-variant-add-section").length;
             ValidateVinwithQty();
             if(isFormValid == 0) {
                 if($("#form-update").valid()) {
+                    alert("ok3");
                     $('#form-update').unbind('submit').submit();
                 }
             }

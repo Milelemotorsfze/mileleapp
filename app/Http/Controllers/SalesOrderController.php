@@ -128,17 +128,173 @@ class SalesOrderController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(SalesOrder $salesOrder)
+    public function edit($id)
     {
-        //
+        // return 1;
+            $so = SO::findorFail($id);
+            $quotation = Quotation::findOrFail($so->quotation_id);
+            $call = Calls::findOrFail($quotation->calls_id);
+
+            // $sodetails = So::where('quotation_id', $so->quotation_id)->first();
+           
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') 
+                 || Auth::user()->hasPermissionForSelectedRole('sales-view');
+            $soitems = Soitems::with('vehicle') // Ensure that vehicle is eager loaded
+                      ->where('so_id', $so->id)
+                      ->get();
+            $customerdetails = QuotationDetail::with('country', 'shippingPort', 'shippingPortOfLoad', 'paymentterms')->where('quotation_id', $quotation->id)->first();
+            $vehicles = [];
+            if ($so->quotation_id) {
+                $quotationItems = QuotationItem::where('quotation_id', $so->quotation_id)
+                    ->whereIn('reference_type', [
+                        'App\Models\Varaint',
+                        'App\Models\MasterModelLines',
+                        'App\Models\Brand'
+                    ])->get();
+                foreach ($quotationItems as $item) {
+                    switch ($item->reference_type) {
+                        case 'App\Models\Varaint':
+                        $variantId = $item->reference_id;
+                        $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                        ->where(function ($query) use ($so) {
+                            $query->whereNull('so_id')
+                                  ->orWhere('so_id', $so->id);
+                        })
+                        ->when(function ($query) use ($so) {
+                            // Check if so_id exists with the same $sodetails->id
+                            return DB::table('vehicles')->where('so_id', $so->id)->exists() === false;
+                        }, function ($query) {
+                            // Apply gdn_id condition only if so_id is not the same
+                            $query->whereNull('gdn_id');
+                        })
+                        ->when(!$hasPermission, function ($query) use($so){
+                            $query->where(function ($subQuery) use($so) {
+                                $subQuery->whereNull('booking_person_id')
+                                         ->orWhere('booking_person_id', $so->sales_person_id);
+                            });
+                        })->get()->toArray();
+                      
+                        $vehicles[$item->id] = $variantVehicles;
+                        break;
+                    case 'App\Models\MasterModelLines':
+                        $variants = Varaint::where('master_model_lines_id', $item->reference_id)->get();
+                        foreach ($variants as $variant) {
+                            $variantId = $variant->id;
+                            $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                            ->where(function ($query) use ($so) {
+                                $query->whereNull('so_id')
+                                      ->orWhere('so_id', $so->id);
+                            })
+                            ->when(function ($query) use ($so) {
+                                // Check if so_id exists with the same $sodetails->id
+                                return DB::table('vehicles')->where('so_id', $so->id)->exists() === false;
+                            }, function ($query) {
+                                // Apply gdn_id condition only if so_id is not the same
+                                $query->whereNull('gdn_id');
+                            })
+                            ->when(!$hasPermission, function ($query) use($so) {
+                                $query->where(function ($subQuery) use($so){
+                                    $subQuery->whereNull('booking_person_id')
+                                             ->orWhere('booking_person_id', $so->sales_person_id);
+                                });
+                            })->get()->toArray();
+                            $vehicles[$item->id] = $variantVehicles;
+                        }
+                        break;
+                    case 'App\Models\Brand':
+                        $variants = Varaint::where('brand_id', $item->reference_id)->get();
+                        foreach ($variants as $variant) {
+                            $variantId = $variant->id;
+                            $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                            ->where(function ($query) use ($so) {
+                                $query->whereNull('so_id')
+                                      ->orWhere('so_id', $so->id);
+                            })
+                            ->when(function ($query) use ($so) {
+                                // Check if so_id exists with the same $sodetails->id
+                                return DB::table('vehicles')->where('so_id', $so->id)->exists() === false;
+                            }, function ($query) {
+                                // Apply gdn_id condition only if so_id is not the same
+                                $query->whereNull('gdn_id');
+                            })
+                            ->when(!$hasPermission, function ($query) use($so){
+                                $query->where(function ($subQuery)use($so) {
+                                    $subQuery->whereNull('booking_person_id')
+                                             ->orWhere('booking_person_id', $so->sales_person_id);
+                                });
+                            })->get()->toArray();
+                            $vehicles[$item->id] = $variantVehicles;
+                        }
+                        break;
+                    default:
+                        break;
+                    }
+            }
+            } 
+            $saleperson = User::find($quotation->created_by);
+            $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first(); 
+            foreach($quotationItems as $quotationItem) {
+                $selectedVehicleIds = $quotationItem->soItems->pluck('vehicles_id')->toArray();
+                $quotationItem->selectedVehicleIds = $selectedVehicleIds;
+               // check the quotation referenceid
+               $quotationItem->isgdnExist = 0;
+               foreach($selectedVehicleIds as $eachVehicle) {
+                    $eachVehicle = Vehicles::find($eachVehicle);
+                    if($eachVehicle->gdn_id) {
+                        $quotationItem->isgdnExist = 1;
+                        break; 
+                    }
+               }
+            }
+            $totalVehicles = $quotationItems->sum('quantity');
+            $variants = Varaint::select('id','name')->get();
+            // return $quotationItems;
+            return view('salesorder.edit', compact('vehicles','variants','totalVehicles','quotationItems', 
+            'quotation', 'call', 'customerdetails','so', 'soitems', 'empProfile', 'saleperson'));  
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, SalesOrder $salesOrder)
+    public function update(Request $request, $id)
     {
-        //
+        return $request->all();
+
+        DB::beginTransaction();
+        try {
+                $so = SO::findorFail($id);
+           
+                // Update the Sales Order fields
+                $so_number = $request->input('so_number'); 
+                $so->so_number = 'SO-' . $so_number; 
+                $so->so_date = $request->input('so_date');
+                $so->notes = $request->input('notes');
+                $so->total = $request->input('total_payment');
+                $so->receiving = $request->input('receiving_payment');
+                $so->paidinso = $request->input('payment_so');
+                $so->paidinperforma = $request->input('advance_payment_performa');
+                $so->updated_by = Auth::id();
+                $so->updated_at = Carbon::now();
+                $so->save();
+
+                // Soitems::where('so_id', $so->id)->update(['deleted_by' => Auth::id()]);
+                // Soitems::where('so_id', $so->id)->delete();
+                // Vehicles::where('so_id', $so->id)->update(['so_id' => null]);
+
+                $quotationVehicles = $request->variants;
+                foreach($quotationVehicles as $quotationVehicle) {
+                    
+                } 
+
+                
+                DB::commit();
+                return redirect()->back()->with('success', 'Sales Order updated successfully.');
+            } catch (\Exception $e) {
+                DB::rollBack(); // Rollback transaction in case of error
+                Log::error('Sales order updte faisls', ['error' => $e->getMessage()]);
+
+                return redirect()->back()->withErrors('An error occurred while updating sales order.');
+            }
     }
 
     /**
@@ -381,8 +537,8 @@ class SalesOrderController extends Controller
                             // Apply gdn_id condition only if so_id is not the same
                             $query->whereNull('gdn_id');
                         })
-                        ->when(!$hasPermission, function ($query) use($sodetails){
-                            $query->where(function ($subQuery) use($sodetails) {
+                        ->when(!$hasPermission, function ($query) use($so){
+                            $query->where(function ($subQuery) use($so) {
                                 $subQuery->whereNull('booking_person_id')
                                          ->orWhere('booking_person_id', $sodetails->sales_person_id);
                             });
@@ -463,7 +619,7 @@ class SalesOrderController extends Controller
             $totalVehicles = $quotationItems->sum('quantity');
             $variants = Varaint::select('id','name')->get();
             // return $quotationItems;
-            return view('salesorder.update', compact('vehicles','variants','totalVehicles','quotationItems', 'quotation', 'calls', 'customerdetails','sodetails', 'soitems', 'empProfile', 'saleperson'));  
+            return view('salesorder.update', compact('vehicles','variants','totalVehicles','quotationItems', 'quotation', 'calls', 'customerdetails','so', 'soitems', 'empProfile', 'saleperson'));  
         }
 public function storesalesorderupdate(Request $request, $quotationId)
 {

@@ -477,11 +477,13 @@ table.dataTable thead th select {
                 searchable: false,
                 render: function (data, type, row) {
                     if (row.calls_id !== null) { // Check if quotation_id is not null
-            const updatesaleorder = `{{ url('salesorder/update') }}/${data}`;
-            return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
-        }
-        return ''; // Return empty string to hide the button
-    }
+                    // const updatesaleorder = `{{ url('salesorder/update') }}/${data}`;
+                    let so_id = row.soid; // Check if quotation_id is not null
+                    const updatesaleorder = `{{ route('salesorder.edit', ':id') }}`.replace(':id', so_id);
+                    return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
+                }
+                return ''; // Return empty string to hide the button
+            }
             },
             {
                 data: 'soid',
