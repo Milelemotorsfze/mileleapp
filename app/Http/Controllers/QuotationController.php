@@ -532,9 +532,7 @@ class QuotationController extends Controller
      */
     public function update(Request $request, quotation $quotation)
     {
-        info("quotation update");
-        info($request->all());
-        // return $request->all();
+   
     $qoutationid = request()->input('quotationid');
     $agentsmuiltples = 0;
     $systemcode = $request->system_code_amount;
@@ -1025,7 +1023,6 @@ class QuotationController extends Controller
         $newsignatures->signature_link = $signatureLink;
         $newsignatures->signature_status = null;
         $newsignatures->save();
-        // return redirect()->back()->with('success', 'Quotation Updated successfully.');
         return redirect()->route('dailyleads.index',['quotationFilePath' => $file])->with('success', 'Quotation Updated successfully.');
     }
     }
