@@ -505,7 +505,7 @@
                 let url = '{{ route('pfi.get-pfi-brand') }}';
                  // check each parent model for toyota PFI or other brand
                  // check if any existing item qty or price changed
-                 if($("#form-create").valid()) {
+                 if($("#form-update").valid()) {
                     $.ajax({
                         type:"GET",
                         url: url, 
@@ -552,6 +552,8 @@
                             }
                         }
                     });
+                }else{
+                    $('.overlay').hide();
                 }
 
         });
