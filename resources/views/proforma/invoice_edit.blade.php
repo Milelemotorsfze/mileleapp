@@ -497,7 +497,7 @@
                             Port of Loading :
                         </div>
                         <div class="col-sm-6">
-                        <select class="form-control col" id="to_shipping_port" multiple name="to_shipping_port_id[]" style="width: 100%">
+                        <select class="form-control col" id="to_shipping_port" multiple name="to_shipping_port_id" style="width: 100%">
                             <option></option>
                             @foreach($shippingPorts as $shippingPort)
                                 <option value="{{ $shippingPort->id }}"
