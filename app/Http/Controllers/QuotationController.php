@@ -86,7 +86,10 @@ class QuotationController extends Controller
      */
     public function store(Request $request)
     {
-        
+        if (!in_array($request->nature_of_deal, ['regular_deal', 'letter_of_credit'])) {
+            return redirect()->back()->with('error', 'Invalid Nature of Deal selected.')->withInput();
+        }  
+
         $agentsmuiltples = 0;
         $systemcode = $request->system_code_amount;
         $separatedValues = [];
@@ -144,6 +147,7 @@ class QuotationController extends Controller
         $quotation->calls_id = $request->calls_id;
         $quotation->currency = $request->currency;
         $quotation->document_type = $request->document_type;
+        $quotation->nature_of_deal = $request->nature_of_deal;
         $quotation->third_party_payment = $request->thirdpartypayment;
         $quotation->date = Carbon::now();
         if($request->document_type == 'Proforma') {
@@ -582,6 +586,7 @@ class QuotationController extends Controller
     $quotation->calls_id = $request->calls_id;
     $quotation->currency = $request->currency;
     $quotation->document_type = $request->document_type;
+    $quotation->nature_of_deal = $request->nature_of_deal;
     $quotation->third_party_payment = $request->thirdpartypayment;
     $quotation->date = Carbon::now();
     if($request->document_type == 'Proforma') {

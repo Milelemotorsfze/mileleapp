@@ -685,29 +685,32 @@
                     </table>
                 @endif
                 @endif
-    <br/>
-
-    <p><strong>Terms & Conditions:</strong></p>
-        <ol>
-            <li><strong>Port Of Shipment:</strong> Jebel Ali Free Zone.</li>
-            <li> <strong>Transshipment:</strong> Allowed.</li>
-            <li><strong>LC Reimbursement Clause - Authorization to Debit or Claim:</strong> Issuing bank (Buyer Bank) authorizes the Negotiating Bank (Seller
-            Bank) to debit their account with Negotiating Bank or claim reimbursement upon presentation of complying document.</li>
-            <li> <strong>Pricing:</strong> Prices quoted are exclusive of insurance, taxes, or customs duties at destination.</li>
-            <li><strong>Payment:</strong> All payments must be made in full before delivery unless otherwise agreed.</li>
-            <li> <strong>Documentation:</strong> Original documents including Commercial Invoice, Packing List, Bill of Lading, and Certificate of Origin will be 
-                provided upon shipment and payment confirmation.</li>
-            <li> <strong>Warranty:</strong> Exported vehicles are sold on an 'as-is, where-is' basis with no warranties expressed or implied, unless explicitly stated
-            in the sales agreement.</li>
-            <li><strong>Force Majeure:</strong> The seller is not liable for delays caused by events beyond control including port delays, shipping congestion, or
-            natural disasters.</li>
-            <li> <strong>Governing Law:</strong> This transaction shall be governed by the laws of the UAE.</li>
-            <li> <strong>LC charges:</strong> Any charges related to LC are borne by the buyer.</li>
-            <li><strong>Other charges:</strong> Demurrages and any other charges when vehicles reached at port are the responsibility of the buyer.</li>
-            <li><strong>Shipment Charges:</strong> Shipment charges will be paid by buyer at the time of booking.</li>
-            <li><strong>Banking Channel:</strong> The Letter of Credit will only be accepted if it fully complies with our bank's terms and conditions.</li>
-        </ol>
     
+                @if($quotation->nature_of_deal == 'letter_of_credit')
+                <br/>
+                <p><strong>Terms & Conditions:</strong></p>
+                <ol>
+                    <li><strong>Port Of Shipment:</strong> Jebel Ali Free Zone.</li>
+                    <li> <strong>Transshipment:</strong> Allowed.</li>
+                    <li><strong>LC Reimbursement Clause - Authorization to Debit or Claim:</strong> Issuing bank (Buyer Bank) authorizes the Negotiating Bank (Seller
+                    Bank) to debit their account with Negotiating Bank or claim reimbursement upon presentation of complying document.</li>
+                    <li> <strong>Pricing:</strong> Prices quoted are exclusive of insurance, taxes, or customs duties at destination.</li>
+                    <li><strong>Payment:</strong> All payments must be made in full before delivery unless otherwise agreed.</li>
+                    <li> <strong>Documentation:</strong> Original documents including Commercial Invoice, Packing List, Bill of Lading, and Certificate of Origin will be 
+                        provided upon shipment and payment confirmation.</li>
+                    <li> <strong>Warranty:</strong> Exported vehicles are sold on an 'as-is, where-is' basis with no warranties expressed or implied, unless explicitly stated
+                    in the sales agreement.</li>
+                    <li><strong>Force Majeure:</strong> The seller is not liable for delays caused by events beyond control including port delays, shipping congestion, or
+                    natural disasters.</li>
+                    <li> <strong>Governing Law:</strong> This transaction shall be governed by the laws of the UAE.</li>
+                    <li> <strong>LC charges:</strong> Any charges related to LC are borne by the buyer.</li>
+                    <li><strong>Other charges:</strong> Demurrages and any other charges when vehicles reached at port are the responsibility of the buyer.</li>
+                    <li><strong>Shipment Charges:</strong> Shipment charges will be paid by buyer at the time of booking.</li>
+                    <li><strong>Banking Channel:</strong> The Letter of Credit will only be accepted if it fully complies with our bank's terms and conditions.</li>
+                </ol>
+                @endif
+
+
         @if($quotation->document_type == 'Proforma Invoice')
         @php
         $due_date = $quotationDetail->due_date;
@@ -757,4 +760,3 @@ Cash Payments AED at actuals, USD New Bills EUR 100 at {{ $aed_to_eru_rate->valu
     </div>
 </body>
 </html>
-
