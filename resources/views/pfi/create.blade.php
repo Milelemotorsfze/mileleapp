@@ -439,34 +439,38 @@
                 let url = '{{ route('pfi.get-pfi-brand') }}';
                  // check each parent model for toyota PFI or other brand
                  // check if any existing item qty or price changed
-                 $.ajax({
-                    type:"GET",
-                    url: url, 
-                    data: {
-                        master_model_ids: selectedModelIds
-                    },
-                    success: function(data) {
-                        if(data['is_pfi_valid_brand'] == true) {
-                            if(data['is_toyota_pfi'] == true) {
-                                var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
-                                for(let i=1; i<= parentIndex; i++)
-                                {
-                                    let totalChildIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
-                                    if(totalChildIndex <= 0) {
-                                        let msg = "You have to add atleast one LOI Item for each parent item!";
-                                        showError(msg);
-                                        return false;
+                 if($("#form-create").valid()) {
+                    $.ajax({
+                        type:"GET",
+                        url: url, 
+                        data: {
+                            master_model_ids: selectedModelIds
+                        },
+                        success: function(data) {
+                            if(data['is_pfi_valid_brand'] == true) {
+                                if(data['is_toyota_pfi'] == true) {
+                                    var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+                                    for(let i=1; i<= parentIndex; i++)
+                                    {
+                                        let totalChildIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
+                                        if(totalChildIndex <= 0) {
+                                            let msg = "You have to add atleast one LOI Item for each parent item!";
+                                            showError(msg);
+                                            return false;
+                                        }
                                     }
                                 }
+                                // if brand is toyota make sure have child
+                                submitForm(formValid); 
+                            }else{
+                                let msg = "You are selected non-toyota and toyota Brands together which is not allowed!";
+                                showError(msg);
                             }
-                            // if brand is toyota make sure have child
-                            submitForm(formValid); 
-                        }else{
-                            let msg = "You are selected non-toyota and toyota Brands together which is not allowed!";
-                            showError(msg);
                         }
-                    }
-                });
+                    });
+                }else{
+                    $('.overlay').hide();
+                }
         });
 
         function showError(msg) {

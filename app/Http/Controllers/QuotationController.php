@@ -414,16 +414,16 @@ class QuotationController extends Controller
         $salesPersonDetail = EmployeeProfile::where('user_id', $quotation->created_by)->first();
         $salespersonqu = User::find($quotation->created_by);
         $data = [];
-        $data['sales_person'] = $salespersonqu->name;
+        $data['sales_person'] = $salespersonqu->name ?? '';
         $data['sales_office'] = 'Central 191';
         $data['sales_phone'] = '';
-        $data['sales_email'] = $salespersonqu->email;
+        $data['sales_email'] = $salespersonqu->email ?? '';
         $data['client_id'] = $call->id;
         $data['client_email'] = $call->email;
         $data['client_name'] = $call->name;
-        $data['client_contact_person'] = $call->client_contact_person;
+        $data['client_contact_person'] = $call->client_contact_person ?? '';
         $data['client_phone'] = $call->phone;
-        $data['client_address'] = $call->address;
+        $data['client_address'] = $call->address ?? '';
         $data['document_number'] = $quotation->id;
         $data['company'] = $call->company_name;
         $data['document_date'] = Carbon::parse($quotation->date)->format('M d,Y');
@@ -532,6 +532,7 @@ class QuotationController extends Controller
      */
     public function update(Request $request, quotation $quotation)
     {
+   
     $qoutationid = request()->input('quotationid');
     $agentsmuiltples = 0;
     $systemcode = $request->system_code_amount;
@@ -971,22 +972,22 @@ class QuotationController extends Controller
         $salesPersonDetail = EmployeeProfile::where('user_id', $quotation->created_by)->first();
         $salespersonqu = User::find($quotation->created_by);
         $data = [];
-        $data['sales_person'] = $salespersonqu->name;
+        $data['sales_person'] = $salespersonqu->name ?? '';
         $data['sales_office'] = 'Central 191';
         $data['sales_phone'] = '';
-        $data['sales_email'] = $salespersonqu->email;
+        $data['sales_email'] = $salespersonqu->email ?? '';
         $data['client_id'] = $call->id;
         $data['client_email'] = $call->email;
         $data['client_name'] = $call->name;
-        $data['client_contact_person'] = $call->client_contact_person;
+        $data['client_contact_person'] = $call->client_contact_person ?? '';
         $data['client_phone'] = $call->phone;
         $data['client_address'] = $call->address;
         $data['document_number'] = $quotation->id;
         $data['company'] = $call->company_name;
         $data['document_date'] = Carbon::parse($quotation->date)->format('M d,Y');
         if($salesPersonDetail) {
-            $data['sales_office'] = $salesPersonDetail->location->name;
-            $data['sales_phone'] = $salesPersonDetail->contact_number;
+            $data['sales_office'] = $salesPersonDetail->location->name ?? '';
+            $data['sales_phone'] = $salesPersonDetail->contact_number ?? '';
         }
         $shippingHidedItemAmount = QuotationItem::where('is_enable', false)
             ->where('quotation_id', $quotation->id)
@@ -1022,7 +1023,7 @@ class QuotationController extends Controller
         $newsignatures->signature_link = $signatureLink;
         $newsignatures->signature_status = null;
         $newsignatures->save();
-        return redirect()->route('dailyleads.index',['quotationFilePath' => $file])->with('success', 'Quotation Update successfully.');
+        return redirect()->route('dailyleads.index',['quotationFilePath' => $file])->with('success', 'Quotation Updated successfully.');
     }
     }
     /**

@@ -1121,6 +1121,7 @@ class PFIController extends Controller
             $data['remaining_quantity'] = $remianingQty;
         }
 
+
         $isLOIItemPfiExist = PfiItem::with('pfi','letterOfIndentItem')
                                     ->whereHas('pfi', function($query) use($request){
                                         $query->where('client_id', $request->client_id)
@@ -1161,7 +1162,7 @@ class PFIController extends Controller
 
     public function getPfiBrand(Request $request)
     {
-      
+      info($request->all());
         $masterModels = $request->master_model_ids;
         $brands = [];
         foreach($masterModels as $masterModel) {

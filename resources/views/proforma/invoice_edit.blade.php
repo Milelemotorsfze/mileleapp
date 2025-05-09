@@ -343,14 +343,16 @@
                         <label for="timeRange">Document Validity:</label>
                     </div>
                     <div class="col-sm-6">
-                    <select id="timeRange" name="document_validity" class="form-select">
-                        <option value="1" <?php echo ($quotation_details->document_validity == '1') ? 'selected' : ''; ?>>1 day</option>
-                        <option value="7" <?php echo ($quotation_details->document_validity == '7') ? 'selected' : ''; ?>>7 days</option>
-                        <option value="14" <?php echo ($quotation_details->document_validity == '14') ? 'selected' : ''; ?>>14 days</option>
-                        <option value="30" <?php echo ($quotation_details->document_validity == '30') ? 'selected' : ''; ?>>30 days</option>
-                        <option value="60" <?php echo ($quotation_details->document_validity == '60') ? 'selected' : ''; ?>>60 days</option>
-                    </select>
-                </div>
+                        <?php if(isset($quotation_details)): ?>
+                            <select id="timeRange" name="document_validity" class="form-select">
+                                <option value="1" <?= ($quotation_details->document_validity == '1') ? 'selected' : ''; ?>>1 day</option>
+                                <option value="7" <?= ($quotation_details->document_validity == '7') ? 'selected' : ''; ?>>7 days</option>
+                                <option value="14" <?= ($quotation_details->document_validity == '14') ? 'selected' : ''; ?>>14 days</option>
+                                <option value="30" <?= ($quotation_details->document_validity == '30') ? 'selected' : ''; ?>>30 days</option>
+                                <option value="60" <?= ($quotation_details->document_validity == '60') ? 'selected' : ''; ?>>60 days</option>
+                            </select>
+                        <?php endif; ?>
+                    </div>
                 </div>
                 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
@@ -361,16 +363,15 @@
                         Sales Person :
                     </div>
                     <div class="col-sm-6">
-                  
                         <select id="salespersons" name="salespersons" class="form-select" required>
+                        <option disabled selected>Select a Salesperson</option>
+                        @if(!empty($sales_persons) && $sales_persons->count())
                             @foreach ($sales_persons as $sales_person)
-                                @php
-                                    $sales_person_details = DB::table('users')->where('id', $sales_person->model_id)->first();
-                                    $sales_person_name = $sales_person_details->name;
-                                    $selected = ($sales_person->model_id == $quotation->created_by) ? 'selected' : '';
-                                @endphp
-                                <option value="{{ $sales_person->model_id }}" {{ $selected }}>{{ $sales_person_name }}</option>      
+                            <option value="{{ $sales_person->id }}" {{ ($quotation?->created_by == $sales_person->id) ? 'selected' : '' }}>{{ $sales_person->name }}</option>
                             @endforeach
+                        @else
+                            <option disabled>No salespersons available</option>
+                        @endif
                         </select>
                     </div>
                 </div>
@@ -483,11 +484,11 @@
                         <div class="col-sm-6">
                         <select name="incoterm" id="incoterm" class="form-control form-control-xs">
                             <option></option>
-                            <option value="EXW" {{ ($quotation_details->incoterm == 'EXW') ? 'selected' : '' }}>EXW</option>
-                            <option value="CNF" {{ ($quotation_details->incoterm == 'CNF') ? 'selected' : '' }}>CNF</option>
-                            <option value="CIF" {{ ($quotation_details->incoterm == 'CIF') ? 'selected' : '' }}>CIF</option>
-                            <option value="FOB" {{ ($quotation_details->incoterm == 'FOB') ? 'selected' : '' }}>FOB</option>
-                            <option value="Local Registration" {{ ($quotation_details->incoterm == 'Local Registration') ? 'selected' : '' }}>Local Registration</option>
+                            <option value="EXW" {{ ($quotation_details?->incoterm == 'EXW') ? 'selected' : '' }}>EXW</option>
+                            <option value="CNF" {{ ($quotation_details?->incoterm == 'CNF') ? 'selected' : '' }}>CNF</option>
+                            <option value="CIF" {{ ($quotation_details?->incoterm == 'CIF') ? 'selected' : '' }}>CIF</option>
+                            <option value="FOB" {{ ($quotation_details?->incoterm == 'FOB') ? 'selected' : '' }}>FOB</option>
+                            <option value="Local Registration" {{ ($quotation_details?->incoterm == 'Local Registration') ? 'selected' : '' }}>Local Registration</option>
                         </select>
                     </div>
                     </div>
@@ -496,12 +497,15 @@
                             Port of Loading :
                         </div>
                         <div class="col-sm-6">
-                            <select class="form-control col" id="to_shipping_port" multiple name="to_shipping_port_id" style="width: 100%">
-                                <option></option>
-                                @foreach($shippingPorts as $shippingPort)
-                                    <option value="{{ $shippingPort->id }}" {{ ($quotation_details->to_shipping_port_id == $shippingPort->id) ? 'selected' : '' }}>{{ $shippingPort->name }}</option>
-                                @endforeach
-                            </select>
+                        <select class="form-control col" id="to_shipping_port" multiple name="to_shipping_port_id" style="width: 100%">
+                            <option></option>
+                            @foreach($shippingPorts as $shippingPort)
+                                <option value="{{ $shippingPort->id }}"
+                                    {{ ($quotation_details?->to_shipping_port_id == $shippingPort->id) ? 'selected' : '' }}>
+                                    {{ $shippingPort->name }}
+                                </option>
+                            @endforeach
+                        </select>
                         </div>
                     </div>
                 </div>
@@ -510,12 +514,15 @@
                             Final Destination :
                         </div>
                         <div class="col-sm-6">
-                            <select class="form-control col" id="country" name="country_id" style="width: 100%">
-                                <option></option>
-                                @foreach($countries as $country)
-                                    <option value="{{ $country->id }}" {{ ($quotation_details->country_id == $country->id) ? 'selected' : '' }}>{{ $country->name }}</option>
-                                @endforeach
-                            </select>
+                        <select class="form-control col" id="country" name="country_id" style="width: 100%">
+                            <option></option>
+                            @foreach($countries as $country)
+                                <option value="{{ $country->id }}"
+                                    {{ ($quotation_details?->country_id == $country->id) ? 'selected' : '' }}>
+                                    {{ $country->name }}
+                                </option>
+                            @endforeach
+                        </select>
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -523,10 +530,13 @@
                             Country Of Discharge :
                         </div>
                         <div class="col-sm-6">
-                        <select name="countryofdischarge" id="countryofdischarge" class="form-control form-control-xs">
-                        <option disabled selected>Select Country Of Discharge</option>
+                            <select name="countryofdischarge" id="countryofdischarge" class="form-control form-control-xs">
+                                <option disabled selected>Select Country Of Discharge</option>
                                 @foreach($countries as $country)
-                                <option value="{{ $country->id }}" {{ ($quotation_details->delivery_country == $country->id) ? 'selected' : '' }}>{{ $country->name }}</option>
+                                    <option value="{{ $country->id }}"
+                                        {{ ($quotation_details?->delivery_country == $country->id) ? 'selected' : '' }}>
+                                        {{ $country->name }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -536,13 +546,16 @@
                             Port of Discharge :
                         </div>
                         <div class="col-sm-6">
-                        <select class="form-control col" id="shipping_port" name="from_shipping_port_id" style="width: 100%">
-                            <option></option>
-                            @foreach($shippingPorts as $port)
-                                <option value="{{ $port->id }}" {{ ($quotation_details->shipping_port_id == $port->id) ? 'selected' : '' }}>{{ $port->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                            <select class="form-control col" id="shipping_port" name="from_shipping_port_id" style="width: 100%">
+                                <option></option>
+                                @foreach($shippingPorts as $port)
+                                    <option value="{{ $port->id }}"
+                                        {{ ($quotation_details?->shipping_port_id == $port->id) ? 'selected' : '' }}>
+                                        {{ $port->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     
                 <div class="row mt-2" hidden id="local-shipment">
@@ -550,7 +563,8 @@
                         Place of Supply :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="place_of_supply" readonly id="place_of_supply" class="form-control form-control-xs" placeholder="Place Of Supply" value="{{$quotation_details->place_of_supply}}">
+                    <input type="text" name="place_of_supply" readonly id="place_of_supply" class="form-control form-control-xs" placeholder="Place Of Supply"
+                        value="{{ $quotation_details?->place_of_supply }}">
                     </div>
                 </div>
             </div>
@@ -580,7 +594,8 @@
                         Payment Terms :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="payment_terms" id="payment_terms" class="form-control form-control-xs" placeholder="Payment Terms" value="{{$quotation_details->payment_terms}}">
+                    <input type="text" name="payment_terms" id="payment_terms" class="form-control form-control-xs" placeholder="Payment Terms"
+                        value="{{ $quotation_details?->payment_terms ?? '' }}">
                     </div>
                 </div>
             </div>
@@ -590,7 +605,8 @@
                         Rep Name :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="representative_name" id="representative_name" class="form-control form-control-xs" placeholder="Rep. Name" value="{{$quotation_details->representative_name}}">
+                    <input type="text" name="representative_name" id="representative_name" class="form-control form-control-xs" placeholder="Rep. Name"
+                        value="{{ $quotation_details?->representative_name ?? '' }}">
                     </div>
                 </div>
                 <div class="row mt-2">
@@ -598,7 +614,8 @@
                         Rep No :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="representative_number" id="representative_number" class="form-control form-control-xs" placeholder="Rep. Number" value="{{$quotation_details->representative_number}}">
+                    <input type="text" name="representative_number" id="representative_number" class="form-control form-control-xs" placeholder="Rep. Number"
+                        value="{{ $quotation_details?->representative_number ?? '' }}">
                     </div>
                 </div>
             </div>
@@ -643,8 +660,9 @@
                         Advance Amount :
                     </div>
                     <div class="col-sm-6">
-                        <input type="number" min="0" class="form-control form-control-xs advance-amount"
-                               name="advance_amount" id="advance-amount" placeholder="Advance Amount" value="{{$quotation_details->advance_amount}}">
+                    <input type="number" min="0" class="form-control form-control-xs advance-amount"
+                        name="advance_amount" id="advance-amount" placeholder="Advance Amount"
+                        value="{{ $quotation_details?->advance_amount ?? '' }}">
                     </div>
                 </div>
             </div>
@@ -654,9 +672,10 @@
                         Payment Due Date :
                     </div>
                     <div class="col-sm-6">
-                        <input type="date" min="0" class="form-control form-control-xs due-date"
-                               name="due_date" id="due-date" placeholder="Due Date" value="{{$quotation_details->due_date}}">
-                        <span class="required-message" style="display: none; color: red;">This field is required</span>
+                    <input type="date" min="0" class="form-control form-control-xs due-date"
+                        name="due_date" id="due-date" placeholder="Due Date"
+                        value="{{ $quotation_details?->due_date ?? '' }}">
+                    <span class="required-message" style="display: none; color: red;">This field is required</span>
                     </div>
                 </div>
             </div>

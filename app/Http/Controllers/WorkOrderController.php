@@ -1442,9 +1442,26 @@ class WorkOrderController extends Controller
             'create-wo-for-all-sales-person'
         ]);
         if ($hasAllSalesAccess) {
-            $salesPersons = User::orderBy('name','ASC')->where('status','active')->where('is_sales_rep','Yes')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
-                $q = $q->where('type','employee');
-            })->get();
+            $salesPersons = User::where(function ($query) use ($workOrder) {
+                // Main condition for active sales reps
+                $query->where(function ($q) {
+                    $q->where('status', 'active')
+                      ->where('is_sales_rep', 'Yes')
+                      ->whereNotIn('id', [1, 16])
+                      ->whereHas('empProfile', function($sub) {
+                          $sub->where('type', 'employee');
+                      });
+                });
+        
+                // Additional condition to include the specific sales_person_id
+                if ($workOrder && $workOrder->sales_person_id) {
+                    $query->orWhere('id', $workOrder->sales_person_id);
+                }
+            })
+            ->orderBy('name', 'ASC')
+            ->get()
+            ->unique('id')
+            ->values();
         }
         $canDisableBatch = false;
         $otherWo = WorkOrder::whereNot('id',$workOrder->id)->where('so_number',$workOrder->so_number)->get();

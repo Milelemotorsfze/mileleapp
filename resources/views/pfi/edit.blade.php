@@ -505,52 +505,56 @@
                 let url = '{{ route('pfi.get-pfi-brand') }}';
                  // check each parent model for toyota PFI or other brand
                  // check if any existing item qty or price changed
-                $.ajax({
-                    type:"GET",
-                    url: url, 
-                    data: {
-                        master_model_ids: selectedModelIds
-                    },
-                    success: function(data) {
-                        var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
-                        if(data['is_pfi_valid_brand'] == true) {
-                         
-                            if(data['is_toyota_pfi'] == true) {
-                                // if brand is toyota make sure have child
-                                
-                                for(let i=1; i<= parentIndex; i++)
-                                {
-                                    let totalChildIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
-                                    if(totalChildIndex <= 0) {
-                                        let msg = "You have to add atleast one LOI Item for each parent item!";
-                                        showError(msg);
-                                        return false;
+                 if($("#form-update").valid()) {
+                    $.ajax({
+                        type:"GET",
+                        url: url, 
+                        data: {
+                            master_model_ids: selectedModelIds
+                        },
+                        success: function(data) {
+                            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+                            if(data['is_pfi_valid_brand'] == true) {
+                            
+                                if(data['is_toyota_pfi'] == true) {
+                                    // if brand is toyota make sure have child
+                                    
+                                    for(let i=1; i<= parentIndex; i++)
+                                    {
+                                        let totalChildIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
+                                        if(totalChildIndex <= 0) {
+                                            let msg = "You have to add atleast one LOI Item for each parent item!";
+                                            showError(msg);
+                                            return false;
+                                        }
                                     }
                                 }
-                            }
-                            if(formValid == true) {
-                                let newPfiPrice = $('#amount').val();
-                                if(isPoCreated == 1) {
-                                    // if(ParentPfiCount != parentIndex || parseInt(oldPfiPrice) != parseInt(newPfiPrice)) {
-                                        let msg = "If you have changes in Pfi Qty or Unit Price or model and sfx which will directly update in PO and PO Need approval again to process Changes";
-                                        var confirm = alertify.confirm(msg,function (e) {
-                                            if (e) {
-                                                submitForm(formValid); 
-                                            }
-                                        }).set({title:"Are You Sure ?"}).set('oncancel', function(e){
-                                            $('.overlay').hide();
-                                            formValid = false;
-                                        });
-                                    // }
+                                if(formValid == true) {
+                                    let newPfiPrice = $('#amount').val();
+                                    if(isPoCreated == 1) {
+                                        // if(ParentPfiCount != parentIndex || parseInt(oldPfiPrice) != parseInt(newPfiPrice)) {
+                                            let msg = "If you have changes in Pfi Qty or Unit Price or model and sfx which will directly update in PO and PO Need approval again to process Changes";
+                                            var confirm = alertify.confirm(msg,function (e) {
+                                                if (e) {
+                                                    submitForm(formValid); 
+                                                }
+                                            }).set({title:"Are You Sure ?"}).set('oncancel', function(e){
+                                                $('.overlay').hide();
+                                                formValid = false;
+                                            });
+                                        // }
+                                    }
+                                    submitForm(formValid); 
                                 }
-                                submitForm(formValid); 
+                            }else{
+                                let msg = "You are selected non-toyota and toyota Brands together which is not allowed!";
+                                showError(msg);
                             }
-                        }else{
-                            let msg = "You are selected non-toyota and toyota Brands together which is not allowed!";
-                            showError(msg);
                         }
-                    }
-                });
+                    });
+                }else{
+                    $('.overlay').hide();
+                }
 
         });
 
@@ -563,6 +567,8 @@
             if(formValid == true) {
                 if($("#form-update").valid()) {
                     $('#form-update').unbind('submit').submit();
+                }else{
+                    $('.overlay').hide();
                 }
             }else{
                 $('.overlay').hide();
