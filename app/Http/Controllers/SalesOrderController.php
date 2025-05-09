@@ -448,12 +448,13 @@ class SalesOrderController extends Controller
             $saleperson = User::find($quotation->created_by);
             $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first(); 
             foreach($quotationItems as $quotationItem) {
-                $quotationItem->selectedVehicleIds = $quotationItem->soItems->pluck('vehicles_id')->toArray();
-               
+                $selectedVehicleIds = $quotationItem->soItems->pluck('vehicles_id')->toArray();
+                $quotationItem->selectedVehicleIds = $selectedVehicleIds;
+               // check the quotation referenceid
             }
             $totalVehicles = $quotationItems->sum('quantity');
             $variants = Varaint::select('id','name')->get();
-            // return $quotationItems;
+            return $quotationItems;
             return view('salesorder.update', compact('vehicles','variants','totalVehicles','quotationItems', 'quotation', 'calls', 'customerdetails','sodetails', 'soitems', 'empProfile', 'saleperson'));  
         }
 public function storesalesorderupdate(Request $request, $quotationId)
