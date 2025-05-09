@@ -532,6 +532,8 @@ class QuotationController extends Controller
      */
     public function update(Request $request, quotation $quotation)
     {
+        info($request->all());
+        // return $request->all();
     $qoutationid = request()->input('quotationid');
     $agentsmuiltples = 0;
     $systemcode = $request->system_code_amount;
