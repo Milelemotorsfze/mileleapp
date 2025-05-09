@@ -86,23 +86,26 @@ class QuotationController extends Controller
      */
     public function store(Request $request)
     {
+        if (!in_array($request->nature_of_deal, ['regular_deal', 'letter_of_credit'])) {
+            return redirect()->back()->with('error', 'Invalid Nature of Deal selected.')->withInput();
+        }        
         
         $agentsmuiltples = 0;
         $systemcode = $request->system_code_amount;
         $separatedValues = [];
         if($request->agents_id)
         {
-        foreach ($systemcode as $code) {
-            if (strpos($code, '/') !== false) {
-                $agentsmuiltples = 1;
-                $values = explode('/', $code);
-                $sum = array_sum($values);
-                $separatedValues[] = $sum;
-            } else {
-                $separatedValues[] = (int)$code;
+            foreach ($systemcode as $code) {
+                if (strpos($code, '/') !== false) {
+                    $agentsmuiltples = 1;
+                    $values = explode('/', $code);
+                    $sum = array_sum($values);
+                    $separatedValues[] = $sum;
+                } else {
+                    $separatedValues[] = (int)$code;
+                }
             }
         }
-    }
         $agentsin = 0;
         $isVehicle = 0;
         $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
@@ -144,6 +147,7 @@ class QuotationController extends Controller
         $quotation->calls_id = $request->calls_id;
         $quotation->currency = $request->currency;
         $quotation->document_type = $request->document_type;
+        $quotation->nature_of_deal = $request->nature_of_deal; // now required
         $quotation->third_party_payment = $request->thirdpartypayment;
         $quotation->date = Carbon::now();
         if($request->document_type == 'Proforma') {
@@ -587,6 +591,7 @@ class QuotationController extends Controller
         $quotation->document_type = 'Proforma Invoice';
     }
     $quotation->shipping_method = $request->shipping_method;
+    $quotation->nature_of_deal = $request->nature_of_deal;
     $quotation->save();
     $agentsId = $request->agents_id;
     $lastAgentId = null;
