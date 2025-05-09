@@ -742,6 +742,46 @@ $(document).ready(function() {
     });
   });
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"></script>
+
+<script>
+    $(document).ready(function () {
+        var input = document.querySelector("#phone");
+        var iti = window.intlTelInput(input, {
+            separateDialCode: true,
+            preferredCountries: ["ae"],
+            hiddenInput: "full",
+            utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+        });
+
+        input.addEventListener('input', function () {
+            let value = input.value;
+
+            value = value.replace(/[^\d+]/g, '');
+
+            if (value.indexOf('+') > 0) {
+                value = value.replace(/\+/g, ''); 
+            }
+            if (value.indexOf('+') !== 0) {
+                value = value.replace(/\+/g, '');
+            }
+
+            input.value = value;
+        });
+
+        $("#calls").on("submit", function () {
+            var fullNumber = iti.getNumber();
+            $("<input>").attr({
+                type: "hidden",
+                name: "phone",
+                value: fullNumber
+            }).appendTo("#calls");
+        });
+
+        $('.remove-row-btn').click(function(e) {
+            e.preventDefault();
+            $(this).closest('.row').remove();
+        });
+    });
+</script>
+
 @endpush
