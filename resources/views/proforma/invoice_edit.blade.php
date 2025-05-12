@@ -1583,16 +1583,22 @@ $(document).ready(function () {
                 method: 'GET',
                 success: function (data) {
                     $('#selectedAgentsList').empty();
-                    data.forEach(function (item) {
-        var agent = item.agent;
-        if (agent) { 
-            var listItem = '<li class="list-group-item d-flex justify-content-between align-items-center">' +
-                agent.name + 
-                '<button type="button" class="btn btn-danger btn-sm removeAgentButton" data-agent-id="' + agent.id + '">Remove</button></li>';
+                    data.forEach(function (item, index) {
+        // Defensive check to prevent the error
+        if (item && item.agent && item.agent.name) {
+            var listItem = `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    ${item.agent.name}
+                    <button type="button" class="btn btn-danger btn-sm removeAgentButton" data-agent-id="${item.agent.id}">
+                        Remove
+                    </button>
+                </li>`;
             $('#selectedAgentsList').append(listItem);
+        } else {
+            console.warn(`Skipping item at index ${index} due to missing agent`, item);
         }
     });
-                },
+                                },
                 error: function () {
                     console.error('Failed to fetch agents');
                 }
@@ -4297,20 +4303,20 @@ function updateSecondTable(RowId, savedVins) {
         if (existings.reference_type.length === 18) {
             row['model_type'] = 'Vehicle';
             row['table_type'] = 'vehicle-table';
-            code = existings.varaint.name; 
+            code = existings.varaint?.name ?? ''; 
         }
         else if(existings.reference_type.length === 16)
         {
             row['model_type'] = 'Brand';
             row['table_type'] = 'vehicle-table';
-            code = existings.varaint.name;  
-            addon = existings.varaint.name; 
+            code = existings.varaint?.name ?? '';  
+            addon = existings.varaint?.name ?? ''; 
         }
         else if(existings.reference_type.length === 27){
             row['model_type'] = 'ModelLine';
             row['table_type'] = 'vehicle-table';
-            code = existings.varaint.name; 
-            addon = existings.varaint.name; 
+            code = existings.varaint?.name ?? ''; 
+            addon = existings.varaint?.name ?? ''; 
         }
         else 
         {
