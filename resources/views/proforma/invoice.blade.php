@@ -5,8 +5,11 @@
      div.dataTables_wrapper div.dataTables_info {
   padding-top: 0px;
 }
+    .quotation-items-addons {
+        padding-left: 10px;
+    }
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
-  padding: 4px 8px 4px 8px;
+  /* padding: 4px 8px 4px 8px; */
   text-align: center;
   vertical-align: middle;
 }
@@ -318,6 +321,7 @@
                             <label class="form-check-label" for="letter_of_credit">Letter of credit</label>
                         </div>
                     </div>
+                    <div id="nature-of-deal-error" class="text-danger" style="display: none;"></div>
                 </div>
             </div>
             <div class="col-sm-4 pt-2">
@@ -638,7 +642,7 @@
                     </div>
                 </div>
                 <br>
-                <button class="float-end" type="button" onclick="addMoreAgents()">+ Add More Agent</button>
+                <button class="float-end btn btn-primary" type="button" onclick="addMoreAgents()">+ Add More Agent</button>
             </div>
             <div class="col-sm-4"  id="advance-amount-div" hidden>
                 <div class="row mt-2">
@@ -760,37 +764,37 @@
         </div>
         <br>
         <div class="row">
-            <div class="col-lg-1 col-md-2 col-sm-12">
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
                 <input type="radio" id="showVehicles" name="contentType" data-target="#vehiclesContent">
-                <label for="showVehicles">Add Vehicles</label>
+                <label for="showVehicles" class="quotation-items-addons">Add Vehicles</label>
             </div>
-            <div class="col-lg-1 col-md-3 col-sm-12">
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
                 <input type="radio" id="showAccessories" name="contentType" data-target="#accessoriesContent">
-                <label for="showAccessories">Add Accessories</label>
+                <label for="showAccessories" class="quotation-items-addons">Add Accessories</label>
             </div>
-            <div class="col-lg-1 col-md-3 col-sm-12">
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
                 <input type="radio" id="showSpareParts" name="contentType" data-target="#sparePartsContent">
-                <label for="showSpareParts">Add Spare Parts</label>
+                <label for="showSpareParts" class="quotation-items-addons">Add Spare Parts</label>
             </div>
-            <div class="col-lg-1 col-md-2 col-sm-12">
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
                 <input type="radio" id="showKits" name="contentType" data-target="#kitsContent">
-                <label for="showKits">Add Kits</label>
+                <label for="showKits" class="quotation-items-addons">Add Kits</label>
             </div>
-            <div class="col-lg-1 col-md-2 col-sm-12">
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
                 <input type="radio" id="showShipping" name="contentType" data-target="#shippingContent">
-                <label for="showShipping">Add Shipping</label>
+                <label for="showShipping" class="quotation-items-addons">Add Shipping</label>
             </div>
-            <div class="col-lg-2 col-md-3 col-sm-12">
+            <div class="col-lg-2 align-items-baseline col-md-3 col-sm-12">
                 <input type="radio" id="showShippingDocuments" name="contentType" data-target="#shippingDocumentContent">
-                <label for="showShippingDocuments">Add Shipping Documents</label>
+                <label for="showShippingDocuments" class="quotation-items-addons">Add Shipping Documents</label>
             </div>
-            <div class="col-lg-1 col-md-2 col-sm-12">
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
                 <input type="radio" id="showCertificates" name="contentType" data-target="#certificateContent">
-                <label for="showCertificates">Certificate</label>
+                <label for="showCertificates" class="quotation-items-addons">Certificate</label>
             </div>
-            <div class="col-lg-1 col-md-2 col-sm-12">
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
                 <input type="radio" id="showOthers" name="contentType" data-target="#otherContent">
-                <label for="showOthers">Add Other</label>
+                <label for="showOthers" class="quotation-items-addons">Add Other</label>
             </div>
         </div>
         <div id="vehiclesContent" class="contentveh">
@@ -2590,6 +2594,14 @@ $('#shipping_port').select2();
             resetIndex();
     });
     $('#submit-button').on('click', function(e) {
+        
+        $('.text-danger').hide();
+        let hasError = false;
+        if (!$('input[name="nature_of_deal"]:checked').val()) {
+            $('#nature-of-deal-error').text('Please select the Nature of Deal.').show();
+            hasError = true;
+        }
+
         var selectedData = [];
         secondTable.rows().every(function() {
         var data = this.data();
