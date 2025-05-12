@@ -761,35 +761,35 @@
         <br>
         <div class="row">
             <div class="col-lg-1 col-md-2 col-sm-12">
-                <input type="radio" id="showVehicles" name="contentType">
+                <input type="radio" id="showVehicles" name="contentType" data-target="#vehiclesContent">
                 <label for="showVehicles">Add Vehicles</label>
             </div>
             <div class="col-lg-1 col-md-3 col-sm-12">
-            <input type="radio" id="showAccessories" name="contentType">
+                <input type="radio" id="showAccessories" name="contentType" data-target="#accessoriesContent">
                 <label for="showAccessories">Add Accessories</label>
             </div>
             <div class="col-lg-1 col-md-3 col-sm-12">
-            <input type="radio" id="showSpareParts" name="contentType">
+                <input type="radio" id="showSpareParts" name="contentType" data-target="#sparePartsContent">
                 <label for="showSpareParts">Add Spare Parts</label>
             </div>
             <div class="col-lg-1 col-md-2 col-sm-12">
-            <input type="radio" id="showKits" name="contentType">
+                <input type="radio" id="showKits" name="contentType" data-target="#kitsContent">
                 <label for="showKits">Add Kits</label>
             </div>
             <div class="col-lg-1 col-md-2 col-sm-12">
-            <input type="radio" id="showShipping" name="contentType">
+                <input type="radio" id="showShipping" name="contentType" data-target="#shippingContent">
                 <label for="showShipping">Add Shipping</label>
             </div>
             <div class="col-lg-2 col-md-3 col-sm-12">
-                <input type="radio" id="showShippingDocuments" name="contentType">
+                <input type="radio" id="showShippingDocuments" name="contentType" data-target="#shippingDocumentContent">
                 <label for="showShippingDocuments">Add Shipping Documents</label>
             </div>
             <div class="col-lg-1 col-md-2 col-sm-12">
-            <input type="radio" id="showCertificates" name="contentType">
-                <label for="showCertificates"> Certificate</label>
+                <input type="radio" id="showCertificates" name="contentType" data-target="#certificateContent">
+                <label for="showCertificates">Certificate</label>
             </div>
             <div class="col-lg-1 col-md-2 col-sm-12">
-            <input type="radio" id="showOthers" name="contentType">
+                <input type="radio" id="showOthers" name="contentType" data-target="#otherContent">
                 <label for="showOthers">Add Other</label>
             </div>
         </div>
@@ -1566,20 +1566,15 @@ $(document).ready(function () {
   });
 </script>
 <script>
-        var radioButtons = document.querySelectorAll('input[type="radio"]');
-        var contentDivs = document.querySelectorAll('.contentveh');
-        radioButtons.forEach(function (radioButton, index) {
-            radioButton.addEventListener("change", function () {
-                contentDivs.forEach(function (contentDiv) {
-                    contentDiv.style.display = "none";
-                });
-                if (radioButton.checked) {
-                    contentDivs[index].style.display = "block";
-                }
-            });
-        });
+        $(document).ready(function () {
+    $('[name="contentType"]').on('change', function () {
+        $('.contentveh').hide();
+        const target = $(this).data('target');
+        $(target).show();
+    });
+});
 
-    </script>
+</script>
 <script>
     // get the shipping medium charges based on port selected
 
