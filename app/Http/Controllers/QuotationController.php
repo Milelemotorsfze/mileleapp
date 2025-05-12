@@ -90,6 +90,13 @@ class QuotationController extends Controller
             return redirect()->back()->with('error', 'Invalid Nature of Deal selected.')->withInput();
         }  
 
+        $request->validate([
+            'nature_of_deal' => 'required|in:regular_deal,letter_of_credit',
+        ], [
+            'nature_of_deal.required' => 'Please select the Nature of Deal.',
+            'nature_of_deal.in' => 'Invalid selection for Nature of Deal.',
+        ]);      
+
         $agentsmuiltples = 0;
         $systemcode = $request->system_code_amount;
         $separatedValues = [];
