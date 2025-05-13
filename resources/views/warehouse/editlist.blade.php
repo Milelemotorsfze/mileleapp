@@ -48,6 +48,19 @@
                         <input type="text" value="{{ old('name', $warehouse->name) }}" name="name" class="form-control " placeholder="Warehouse Name" required>
                     </div>
                 </div>
+                <div class="col-lg-3 col-md-6 col-sm-12 d-flex align-items-center justify-content-center">
+                    <div class="mb-3">
+                        <label class="form-label d-block"><span class="error">* </span>Status</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="status" id="statusYes" value="1" {{ $warehouse->status == 1 ? 'checked' : '' }}>
+                            <label class="form-check-label" for="statusYes">Yes</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="status" id="statusNo" value="0" {{ $warehouse->status == 0 ? 'checked' : '' }}>
+                            <label class="form-check-label" for="statusNo">No</label>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-12 text-center">
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </div>

@@ -66,6 +66,7 @@ class WarehouseController extends Controller
     {
         $this->validate($request, [
             'name' => 'string|required|max:255',
+            'status' => 'required|boolean',
         ]);
         $name = $request->input('name');
         $existingColour = Warehouse::where('name', $name)->where('id', '!=', $id)->first();
@@ -75,6 +76,7 @@ class WarehouseController extends Controller
         $warehouse = Warehouse::findOrFail($id);   
         $oldValues = $warehouse->toArray();
         $warehouse->name  = $name;
+        $warehouse->status = $request->input('status');
         $changes = [];
         foreach ($oldValues as $field => $oldValue) {
             if ($field !== 'created_at' && $field !== 'updated_at') {
