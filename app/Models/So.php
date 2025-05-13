@@ -43,4 +43,8 @@ class So extends Model
     {
         return $this->hasOneThrough(Calls::class, Quotation::class, 'id', 'id', 'quotation_id', 'calls_id');
     }
+    public function so_items()
+    {
+        return $this->hasMany(Soitems::class,'so_id');
+    }
 }

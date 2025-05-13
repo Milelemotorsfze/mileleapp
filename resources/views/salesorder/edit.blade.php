@@ -819,13 +819,10 @@
             ValidateVinwithQty();
         });
         $('.btn-submit').click(function (e) {
-            alert("ok");
             e.preventDefault();
-            var rowCount = $("#so-vehicles").find(".so-variant-add-section").length;
             ValidateVinwithQty();
             if(isFormValid == 0) {
                 if($("#form-update").valid()) {
-                    alert("ok3");
                     $('#form-update').unbind('submit').submit();
                 }
             }
@@ -833,6 +830,7 @@
         });
         function ValidateVinwithQty(){
             var totalIndex = $("#so-vehicles").find(".so-variant-add-section").length;
+             isFormValid = 0;
             for(let i=1; i<=totalIndex; i++)
             {
                 let qty = $('#quantity-'+i).val();

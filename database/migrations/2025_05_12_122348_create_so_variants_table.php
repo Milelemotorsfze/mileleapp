@@ -11,12 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sales_order_histories', function (Blueprint $table) {
+        Schema::create('so_variants', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('so_id')->unsigned()->index()->nullable();
             $table->foreign('so_id')->references('id')->on('so');
-            $table->bigInteger('user_id')->unsigned()->index()->nullable();
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->bigInteger('variant_id')->unsigned()->index()->nullable();
+            $table->foreign('variant_id')->references('id')->on('varaints');
+            $table->decimal('price', 10,2)->default('0.00')->nullable();
+            $table->string('description')->nullable();
+            $table->integer('quantity')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sales_order_histories');
+        Schema::dropIfExists('so_variants');
     }
 };

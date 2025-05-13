@@ -355,37 +355,26 @@
     </div>
         <hr>
         <div class="row">
-        @php
-    // Calculate the total number of vehicles
-    $totalVehicles = $quotationItems->sum('quantity');
-@endphp
+ 
     <h6>Vehicles - Total Vehicles ({{ $totalVehicles }})</h6>
     <div class="col-md-12">
-        @foreach($quotationItems as $quotationItem)
-        <div class="mb-1">
-            <h6>{{ $loop->iteration }} - {{ $quotationItem->description }} - ({{ $quotationItem->quantity }})</h6>
+        @foreach($quotationItems as $key => $quotationItem)
+            <h6>{{ $loop->iteration }} -{{ $quotationItem->description }} - ({{ $quotationItem->quantity }})</h6>
             <div class="row">
-                @for ($i = 0; $i < $quotationItem->quantity; $i++)
-                <div class="col-md-2 mb-3">
-                    <select name="vehicle_vin[{{ $quotationItem->id }}][]" class="form-control select2">
-                        <option value="" selected>Select VIN</option>
+                <input type="hidden" name="variants[{{$key+1}}][variant_id]" value="{{ $quotationItem->reference_id }}">
+                   <input type="hidden" name="variants[{{$key+1}}][quotation_item_id]" value="{{ $quotationItem->id }}">
+                <div class="col-sm-12 col-md-11 col-lg-11 col-xxl-11 mb-4 ms-5">
+                    <label class="form-label font-size-13">Choose VIN</label>
+                    <select name="variants[{{$key+1}}][vehicles][]" id="vin-{{ $key+1 }}" index="{{$key+1}}" class="vins form-control" multiple >
                         @foreach($vehicles[$quotationItem->id] as $vehicle)
-                        @php
-                            $selected = '';
-                            if ($quotationVin = $quotationItem->quotationVins->where('quotation_items_id', $vehicle->vin)->first()) {
-                                $selected = 'selected';
-                            }
-                        @endphp
-                        <option value="{{ $vehicle->vin }}" {{ $selected }}>{{ $vehicle->vin }}</option>
+                        <option value="{{ $vehicle->id }}"  >{{ $vehicle->vin ?? '' }}</option>
                         @endforeach
                     </select>
-                </div>
-                @endfor
+                </div> 
             </div>
-            <input type="hidden" name="quotation_item_id[]" value="{{ $quotationItem->id }}">
-        </div>
         @endforeach
     </div>
+
 </div>
         <hr>
         <h6>Payments</h6>
@@ -441,6 +430,9 @@
 <script>
     $(document).ready(function() {
         $('.select2').select2();
+          $('.vins').select2({
+            placeholder : 'Select VIN',
+        });
     });
 </script>
 <script>
@@ -500,5 +492,6 @@ function checkForDuplicateVINs() {
             soInput.setCustomValidity("");
         }
     });
+   
 </script>
 @endpush

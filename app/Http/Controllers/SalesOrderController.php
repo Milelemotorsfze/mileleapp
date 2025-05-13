@@ -27,6 +27,9 @@ use App\Models\QuotationDetail;
 use App\Models\Soitems;
 use App\Models\Solog;
 use App\Models\MasterModelLines;
+use App\Models\SalesOrderHistory;
+use App\Models\SalesOrderHistoryDetails;
+use App\Models\SoVariant;
 
 use Illuminate\Http\Request;
 
@@ -258,10 +261,10 @@ class SalesOrderController extends Controller
      */
     public function update(Request $request, $id)
     {
-        return $request->all();
+        // return $request->all();
 
-        DB::beginTransaction();
-        try {
+        // DB::beginTransaction();
+        // try {
                 $so = SO::findorFail($id);
            
                 // Update the Sales Order fields
@@ -280,21 +283,54 @@ class SalesOrderController extends Controller
                 // Soitems::where('so_id', $so->id)->update(['deleted_by' => Auth::id()]);
                 // Soitems::where('so_id', $so->id)->delete();
                 // Vehicles::where('so_id', $so->id)->update(['so_id' => null]);
+                // get the variants count of existing so
+                $oldVariants = $so->vehicles()->groupBy('varaints_id')->pluck('varaints_id')->toArray();
 
-                $quotationVehicles = $request->variants;
-                foreach($quotationVehicles as $quotationVehicle) {
-                    
-                } 
 
-                
-                DB::commit();
-                return redirect()->back()->with('success', 'Sales Order updated successfully.');
-            } catch (\Exception $e) {
-                DB::rollBack(); // Rollback transaction in case of error
-                Log::error('Sales order updte faisls', ['error' => $e->getMessage()]);
+                $newVariants = $request->variants;
+                return $newVariants;
+                $latestSoHistory = SalesOrderHistory::where('so_id',$so->id)->latest()->first();
+                if(!$latestSoHistory) {
+                    $versionNumber = 1;
+                }else{
+                    $versionNumber = $latestSoHistory->version_number ?? 1 ;
+                }
+                    SalesOrderHistory::create([
+                            'so_id' => $so->id,
+                            'version_number' => $versionNumber,
+                            'user_id ' => Auth::id(),
+                            'created_at' => Carbon::now(),
+                        ]);
+                foreach ($newVariants as $key => $newVariant) {
+                    $newVariant = $oldVariants[$key]['variant_id'] ?? null;
+                    info($newVariant);
+                   
 
-                return redirect()->back()->withErrors('An error occurred while updating sales order.');
-            }
+                    if (!in_array($newVariant, $oldVariant)) {
+                        // New Entry
+                         SalesOrderHistory::create([
+                            'so_id' => $soId,
+                            'change_type' => 'set',
+                            'variant_id' => $newVariant['variant_id'],
+                            'old_value' => null,
+                            'new_value' => json_encode($newVariant),
+                            'created_at' => now(),
+                        ]);
+
+                    }
+
+                }
+
+
+                return 1;
+            //     DB::commit();
+            //     return redirect()->back()->with('success', 'Sales Order updated successfully.');
+            // } catch (\Exception $e) {
+            //     DB::rollBack(); // Rollback transaction in case of error
+            //     Log::error('Sales order updte faisls', ['error' => $e->getMessage()]);
+
+            //     return redirect()->back()->withErrors('An error occurred while updating sales order.');
+            // }
     }
 
     /**
@@ -364,18 +400,25 @@ class SalesOrderController extends Controller
                         })->get()->toArray();
                         $vehicles[$item->id] = $variantVehicles;
                     }
-                    break;
-                default:
-                    break;
-                }
+                        break;
+                    default:
+                        break;
                     }
                     }
+                    }
+                     $totalVehicles = $quotationItems->sum('quantity');
                     $saleperson = User::find($quotation->created_by);
                     $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first();
-                    return view('salesorder.create', compact('vehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails', 'empProfile', 'saleperson')); 
+                    return view('salesorder.create', compact('vehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails', 'empProfile', 'saleperson',
+                'totalVehicles')); 
             }  
             public function storesalesorder(Request $request, $quotationId)
             {
+
+                // return $request->all();
+        DB::beginTransaction();
+        //     try {
+        // unique check needed
                 $qoutation = Quotation::find($quotationId);
                 $so = New So();
                 $so->quotation_id = $quotationId;
@@ -404,102 +447,165 @@ class SalesOrderController extends Controller
                 $closed->currency = $qoutation->currency;
                 $closed->so_id = $so->id;
                 $closed->save();
-                $vins = $request->input('vehicle_vin');
-                $selectedVinsWithNull = [];
-                $selectedVinsWithoutNull = [];
-                foreach ($vins as $quotationItemId => $selectedVins) {
-                    foreach ($selectedVins as $selectedVin) {
-                        if ($selectedVin === null) {
-                            $selectedVinsWithNull[$quotationItemId][] = $selectedVin;
-                        } else {
-                            $selectedVinsWithoutNull[$quotationItemId][] = $selectedVin;
-                        }
-                    }
-                }
-                $allVinsWithoutNull = [];
-                foreach ($selectedVinsWithoutNull as $selectedVins) {
-                    $allVinsWithoutNull = array_merge($allVinsWithoutNull, $selectedVins);
-                }
-                Vehicles::whereIn('vin', $allVinsWithoutNull)->update(['so_id' => $so->id]);
-                foreach ($selectedVinsWithoutNull as $quotationItemId => $selectedVins) {
-                    foreach ($selectedVins as $selectedVin) {
-                        $vehicle = Vehicles::where('vin', $selectedVin)->first();
-                        $soVinRelationship = new Soitems();
-                        $soVinRelationship->so_id = $so->id;
-                        $soVinRelationship->quotation_items_id = $quotationItemId;
-                        $soVinRelationship->vehicles_id = $vehicle->id;
-                        $soVinRelationship->save();
-                        $existingbookingpending = BookingRequest::where('quotation_items_id', $quotationItemId)->where('status', "New")->first();
-                        $existingbookingapproved = BookingRequest::where('quotation_items_id', $quotationItemId)->where('status', "Approved")->first();
-                        if($existingbookingpending)
-                        {
-                            $existingbookingpending->days = "10";
-                            $existingbookingpending->save();
-                        }
-                        else if ($existingbookingapproved)
-                        {
-                            $existingbookingapproved->days = "10";
-                            $existingbookingapproved->save();
-                            $updatebooking = Booking::where('booking_requests_id',$existingbookingapproved->id)->whereDate('booking_end_date', '>', now())->first();
-                            if($updatebooking)
-                            {
-                            $updatebooking->booking_end_date  = Carbon::now()->addDays(10);
-                            $updatebooking->save();
-                            $vehicle->reservation_end_date = Carbon::now()->addDays(10);
-                            $vehicle->save();
-                            }
-                            else
-                            {
-                                $booking = New BookingRequest();
-                                $booking->vehicle_id = $vehicle->id;
-                                $booking->calls_id = $calls->id;
-                                $booking->created_by = Auth::id();
-                                $booking->status = "New";
-                                $booking->days = "10";
-                                $booking->save();   
-                            }
-                        }
-                        else
-                        {
-                        $booking = New BookingRequest();
-                        $booking->vehicle_id = $vehicle->id;
-                        $booking->calls_id = $calls->id;
-                        $booking->created_by = Auth::id();
-                        $booking->status = "New";
-                        $booking->days = "10";
-                        $booking->save();
-                        }
-                    }
-                }
-                // if($selectedVinsWithNull)
-                // {
-                //     $pre_order = new PreOrder();
-                //     $pre_order->quotations_id = $quotationId;
-                //     $pre_order->requested_by  = Auth::id();
-                //     $pre_order->save();
-                //     foreach ($selectedVinsWithNull as $quotationItemId => $selectedVins) {
-                //         $totalNullVins = count($selectedVins);
-                //         $quotationitems = QuotationItem::find($quotationItemId);
-                //         $quotationdetails = QuotationDetail::with('country')->where('quotation_id', $quotationId)->first();
-                //         $preOrderItem = new PreOrdersItems();
-                //         $preOrderItem->countries_id = $quotationdetails->country->id;
-                //         $preOrderItem->description = $quotationitems->description; 
-                //         $preOrderItem->master_model_lines_id = $quotationitems->model_line_id;
-                //         $preOrderItem->preorder_id = $pre_order->id;
-                //         $preOrderItem->qty = $totalNullVins;
-                //         $preOrderItem->save();
-                //     }  
+                // $vins = $request->input('vehicle_vin');
+                // $selectedVinsWithNull = [];
+                // $selectedVinsWithoutNull = [];
+                // foreach ($vins as $quotationItemId => $selectedVins) {
+                //     foreach ($selectedVins as $selectedVin) {
+                //         if ($selectedVin === null) {
+                //             $selectedVinsWithNull[$quotationItemId][] = $selectedVin;
+                //         } else {
+                //             $selectedVinsWithoutNull[$quotationItemId][] = $selectedVin;
+                //         }
+                //     }
                 // }
-                $solog = New Solog();
-                $solog->time = now()->format('H:i:s');
-                $solog->date = now()->format('Y-m-d');
-                $solog->status = 'SO Created';
-                $solog->created_by = Auth::id();
-                $solog->so_id = $so->id;
-                $solog->role = Auth::user()->selectedRole;
-                $solog->save();
+                // $allVinsWithoutNull = [];
+                // foreach ($selectedVinsWithoutNull as $selectedVins) {
+                //     $allVinsWithoutNull = array_merge($allVinsWithoutNull, $selectedVins);
+                // }
+                // Vehicles::whereIn('vin', $allVinsWithoutNull)->update(['so_id' => $so->id]);
+                // foreach ($selectedVinsWithoutNull as $quotationItemId => $selectedVins) {
+                //     foreach ($selectedVins as $selectedVin) {
+                //         $vehicle = Vehicles::where('vin', $selectedVin)->first();
+                //         $soVinRelationship = new Soitems();
+                //         $soVinRelationship->so_id = $so->id;
+                //         $soVinRelationship->quotation_items_id = $quotationItemId;
+                //         $soVinRelationship->vehicles_id = $vehicle->id;
+                //         $soVinRelationship->save();
+                //         $existingbookingpending = BookingRequest::where('quotation_items_id', $quotationItemId)->where('status', "New")->first();
+                //         $existingbookingapproved = BookingRequest::where('quotation_items_id', $quotationItemId)->where('status', "Approved")->first();
+                //         if($existingbookingpending)
+                //         {
+                //             $existingbookingpending->days = "10";
+                //             $existingbookingpending->save();
+                //         }
+                //         else if ($existingbookingapproved)
+                //         {
+                //             $existingbookingapproved->days = "10";
+                //             $existingbookingapproved->save();
+                //             $updatebooking = Booking::where('booking_requests_id',$existingbookingapproved->id)->whereDate('booking_end_date', '>', now())->first();
+                //             if($updatebooking)
+                //             {
+                //             $updatebooking->booking_end_date  = Carbon::now()->addDays(10);
+                //             $updatebooking->save();
+                //             $vehicle->reservation_end_date = Carbon::now()->addDays(10);
+                //             $vehicle->save();
+                //             }
+                //             else
+                //             {
+                //                 $booking = New BookingRequest();
+                //                 $booking->vehicle_id = $vehicle->id;
+                //                 $booking->calls_id = $calls->id;
+                //                 $booking->created_by = Auth::id();
+                //                 $booking->status = "New";
+                //                 $booking->days = "10";
+                //                 $booking->save();   
+                //             }
+                //         }
+                //         else
+                //         {
+                //         $booking = New BookingRequest();
+                //         $booking->vehicle_id = $vehicle->id;
+                //         $booking->calls_id = $calls->id;
+                //         $booking->created_by = Auth::id();
+                //         $booking->status = "New";
+                //         $booking->days = "10";
+                //         $booking->save();
+                //         }
+                //     }
+                // }
+          
+                // new section 
+
+                $soVariants = $request->variants;
+                if($soVariants) {
+                    foreach($soVariants as $key => $soVariant) {
+                        $quotationItem = QuotationItem::findOrFail($soVariant['quotation_item_id']);
+                        $soVariantdata  = New SoVariant();
+                        $soVariantdata->so_id = $so->id;
+                        $soVariantdata->variant_id = $soVariant['variant_id'];
+                        $soVariantdata->price = $quotationItem ? $quotationItem->unit_price : 0;
+                        $soVariantdata->description = $quotationItem ? $quotationItem->description : '';
+                        $soVariantdata->quantity = $quotationItem ? $quotationItem->quantity : 0;
+                        $soVariantdata->save();
+                        if(isset($soVariant['vehicles'])) {
+                            $vehicleIds = $soVariant['vehicles'];
+                            foreach($vehicleIds as $vehicleId) {
+                                $soItem  = New Soitems();
+                                $soItem->vehicles_id = $vehicleId;
+                                $soItem->so_variant_id  = $soVariantdata->id;
+                                $soItem->save();
+                                $vehicle = Vehicles::find($vehicleId);
+                                Vehicles::where('id', $vehicleId)->update(['so_id' => $so->id]);
+
+                                $existingbookingpending = BookingRequest::where('quotation_items_id', $quotationItem->id )->where('status', "New")->first();
+                                $existingbookingapproved = BookingRequest::where('quotation_items_id', $quotationItem->id)->where('status', "Approved")->first();
+                                if($existingbookingpending)
+                                {
+                                    $existingbookingpending->days = "10";
+                                    $existingbookingpending->save();
+                                }
+                                else if ($existingbookingapproved)
+                                {
+                                    $existingbookingapproved->days = "10";
+                                    $existingbookingapproved->save();
+                                    $updatebooking = Booking::where('booking_requests_id',$existingbookingapproved->id)->whereDate('booking_end_date', '>', now())->first();
+                                    if($updatebooking)
+                                    {
+                                        $updatebooking->booking_end_date  = Carbon::now()->addDays(10);
+                                        $updatebooking->save();
+                                        $vehicle->reservation_end_date = Carbon::now()->addDays(10);
+                                        $vehicle->save();
+                                    }
+                                    else
+                                    {
+                                        $booking = New BookingRequest();
+                                        $booking->vehicle_id = $vehicleId;
+                                        $booking->calls_id = $calls->id;
+                                        $booking->created_by = Auth::id();
+                                        $booking->status = "New";
+                                        $booking->days = "10";
+                                        $booking->save();   
+                                    }
+                                }
+                                else
+                                {
+                                    $booking = New BookingRequest();
+                                    $booking->vehicle_id = $vehicleId;
+                                    $booking->calls_id = $calls->id;
+                                    $booking->created_by = Auth::id();
+                                    $booking->status = "New";
+                                    $booking->days = "10";
+                                    $booking->save();
+                                }
+                            }
+
+                        }
+                    }
+
+                    $solog = New Solog();
+                    $solog->time = now()->format('H:i:s');
+                    $solog->date = now()->format('Y-m-d');
+                    $solog->status = 'SO Created';
+                    $solog->created_by = Auth::id();
+                    $solog->so_id = $so->id;
+                    $solog->role = Auth::user()->selectedRole;
+                    $solog->save();
+
+                }else{
+                      return redirect()->back()->with('error', 'Failed to create So, vehicle variant required to create so!'); 
+                }
+               
+            DB::commit();
                 return redirect()->route('dailyleads.index')->with('success', 'Sales Order created successfully.'); 
-            } 
+            // } catch (\Exception $e) {
+            //     DB::rollBack(); // Rollback transaction in case of error
+            //     Log::error('Sales order create Fails', ['error' => $e->getMessage()]);
+
+            //     return redirect()->back()->withErrors('An error occurred while creating sales order.');
+            // }
+               
+    } 
         public function updatesalesorder ($id) 
         {
             $quotation = Quotation::where('calls_id', $id)->first();
