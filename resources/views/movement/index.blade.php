@@ -236,6 +236,7 @@
 
     // Initialize DataTables with custom sorting applied to specific columns
     var table = $('#dtBasicExample1').DataTable({
+        order: [[0, 'desc']], // 0 = first column, 'desc' = descending
         columnDefs: [
             { type: 'mov-numeric', targets: 0 }, // Apply MOV - XXX sorting to the first column
             { type: 'custom-date', targets: [3, 4] } // Apply custom date sorting to the 4th and 5th columns (index 3 and 4)

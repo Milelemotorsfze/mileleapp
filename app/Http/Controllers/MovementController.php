@@ -39,7 +39,7 @@ class MovementController extends Controller
     public function index(Request $request, Builder $builder)
 {
   
-    $movementreference = MovementsReference::get();
+    $movementreference = MovementsReference::orderBy('id', 'desc')->get();
     $vehicles = Vehicles::whereNotNull('vin')
         ->where('status', '!=', 'cancel')
         ->pluck('vin', 'varaints_id');
