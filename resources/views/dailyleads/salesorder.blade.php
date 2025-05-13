@@ -1,6 +1,5 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<script type="text/javascript" src="https://cdn.rawgit.com/asvd/dragscroll/master/dragscroll.js"></script>
 
 <style>
     /* Allow Select2 dropdown to adjust dynamically based on content */

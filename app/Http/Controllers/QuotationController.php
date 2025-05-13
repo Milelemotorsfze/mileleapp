@@ -86,7 +86,17 @@ class QuotationController extends Controller
      */
     public function store(Request $request)
     {
-        
+        if (!in_array($request->nature_of_deal, ['regular_deal', 'letter_of_credit'])) {
+            return redirect()->back()->with('error', 'Invalid Nature of Deal selected.')->withInput();
+        }  
+
+        $request->validate([
+            'nature_of_deal' => 'required|in:regular_deal,letter_of_credit',
+        ], [
+            'nature_of_deal.required' => 'Please select the Nature of Deal.',
+            'nature_of_deal.in' => 'Invalid selection for Nature of Deal.',
+        ]);      
+
         $agentsmuiltples = 0;
         $systemcode = $request->system_code_amount;
         $separatedValues = [];
@@ -144,6 +154,7 @@ class QuotationController extends Controller
         $quotation->calls_id = $request->calls_id;
         $quotation->currency = $request->currency;
         $quotation->document_type = $request->document_type;
+        $quotation->nature_of_deal = $request->nature_of_deal;
         $quotation->third_party_payment = $request->thirdpartypayment;
         $quotation->date = Carbon::now();
         if($request->document_type == 'Proforma') {
@@ -414,16 +425,16 @@ class QuotationController extends Controller
         $salesPersonDetail = EmployeeProfile::where('user_id', $quotation->created_by)->first();
         $salespersonqu = User::find($quotation->created_by);
         $data = [];
-        $data['sales_person'] = $salespersonqu->name;
+        $data['sales_person'] = $salespersonqu->name ?? '';
         $data['sales_office'] = 'Central 191';
         $data['sales_phone'] = '';
-        $data['sales_email'] = $salespersonqu->email;
+        $data['sales_email'] = $salespersonqu->email ?? '';
         $data['client_id'] = $call->id;
         $data['client_email'] = $call->email;
         $data['client_name'] = $call->name;
-        $data['client_contact_person'] = $call->client_contact_person;
+        $data['client_contact_person'] = $call->client_contact_person ?? '';
         $data['client_phone'] = $call->phone;
-        $data['client_address'] = $call->address;
+        $data['client_address'] = $call->address ?? '';
         $data['document_number'] = $quotation->id;
         $data['company'] = $call->company_name;
         $data['document_date'] = Carbon::parse($quotation->date)->format('M d,Y');
@@ -532,6 +543,7 @@ class QuotationController extends Controller
      */
     public function update(Request $request, quotation $quotation)
     {
+   
     $qoutationid = request()->input('quotationid');
     $agentsmuiltples = 0;
     $systemcode = $request->system_code_amount;
@@ -581,6 +593,7 @@ class QuotationController extends Controller
     $quotation->calls_id = $request->calls_id;
     $quotation->currency = $request->currency;
     $quotation->document_type = $request->document_type;
+    $quotation->nature_of_deal = $request->nature_of_deal;
     $quotation->third_party_payment = $request->thirdpartypayment;
     $quotation->date = Carbon::now();
     if($request->document_type == 'Proforma') {
@@ -971,22 +984,22 @@ class QuotationController extends Controller
         $salesPersonDetail = EmployeeProfile::where('user_id', $quotation->created_by)->first();
         $salespersonqu = User::find($quotation->created_by);
         $data = [];
-        $data['sales_person'] = $salespersonqu->name;
+        $data['sales_person'] = $salespersonqu->name ?? '';
         $data['sales_office'] = 'Central 191';
         $data['sales_phone'] = '';
-        $data['sales_email'] = $salespersonqu->email;
+        $data['sales_email'] = $salespersonqu->email ?? '';
         $data['client_id'] = $call->id;
         $data['client_email'] = $call->email;
         $data['client_name'] = $call->name;
-        $data['client_contact_person'] = $call->client_contact_person;
+        $data['client_contact_person'] = $call->client_contact_person ?? '';
         $data['client_phone'] = $call->phone;
         $data['client_address'] = $call->address;
         $data['document_number'] = $quotation->id;
         $data['company'] = $call->company_name;
         $data['document_date'] = Carbon::parse($quotation->date)->format('M d,Y');
         if($salesPersonDetail) {
-            $data['sales_office'] = $salesPersonDetail->location->name;
-            $data['sales_phone'] = $salesPersonDetail->contact_number;
+            $data['sales_office'] = $salesPersonDetail->location->name ?? '';
+            $data['sales_phone'] = $salesPersonDetail->contact_number ?? '';
         }
         $shippingHidedItemAmount = QuotationItem::where('is_enable', false)
             ->where('quotation_id', $quotation->id)
@@ -1022,7 +1035,7 @@ class QuotationController extends Controller
         $newsignatures->signature_link = $signatureLink;
         $newsignatures->signature_status = null;
         $newsignatures->save();
-        return redirect()->route('dailyleads.index',['quotationFilePath' => $file])->with('success', 'Quotation Update successfully.');
+        return redirect()->route('dailyleads.index',['quotationFilePath' => $file])->with('success', 'Quotation Updated successfully.');
     }
     }
     /**

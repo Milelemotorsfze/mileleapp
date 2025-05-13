@@ -435,13 +435,11 @@
                     if(eachSelectedModelId) {
                         selectedModelIds.push(eachSelectedModelId);
                     }
-                }  
-                if($("#form-create").valid()) {         
-                    if(selectedModelIds.length > 0 ) {
-
-                        let url = '{{ route('pfi.get-pfi-brand') }}';
-                    // check each parent model for toyota PFI or other brand
-                    // check if any existing item qty or price changed
+                }                 
+                let url = '{{ route('pfi.get-pfi-brand') }}';
+                 // check each parent model for toyota PFI or other brand
+                 // check if any existing item qty or price changed
+                 if($("#form-create").valid()) {
                     $.ajax({
                         type:"GET",
                         url: url, 
@@ -470,11 +468,9 @@
                             }
                         }
                     });
-                    }else{
-                        
-                    }  
-            }   
-            
+                }else{
+                    $('.overlay').hide();
+                }
         });
 
         function showError(msg) {

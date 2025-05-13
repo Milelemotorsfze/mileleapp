@@ -67,13 +67,25 @@
         <div class="col-md-2">
             <div class="form-check mt-4">
                 <input class="form-check-input" type="checkbox" id="is_sales_rep" name="is_sales_rep" value="yes" {{ old('is_sales_rep', $user->is_sales_rep) == 'Yes' ? 'checked' : '' }}>
-                <label class="form-check-label" for="is_sales_rep">Is Sales Rep.</label>
+                <label class="form-check-label" for="is_sales_rep">Is Sales Rep. ?</label>
             </div>
         </div>
         <div class="col-md-2">
             <div class="form-check mt-4">
                 <input class="form-check-input" type="checkbox" id="can_send_wo_email" name="can_send_wo_email" value="yes" {{ old('can_send_wo_email', $user->can_send_wo_email) == 'yes' ? 'checked' : '' }}>
-                <label class="form-check-label" for="can_send_wo_email">Can Send Work Order Email</label>
+                <label class="form-check-label" for="can_send_wo_email">Can Send Work Order Email ?</label>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-check mt-4">
+                <input class="form-check-input" type="checkbox" id="manual_lead_assign" name="manual_lead_assign" value="1" {{ old('manual_lead_assign', $user->manual_lead_assign) == '1' ? 'checked' : '' }}>
+                <label class="form-check-label" for="manual_lead_assign">Can Use In Manual Lead Assign ?</label>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-check mt-4">
+                <input class="form-check-input" type="checkbox" id="pfi_access" name="pfi_access" value="1" {{ old('pfi_access', $user->pfi_access) == '1' ? 'checked' : '' }}>
+                <label class="form-check-label" for="pfi_access">Can Use As Sales Person In PFI/Quotation ?</label>
             </div>
         </div>
         <div class="col-md-4">

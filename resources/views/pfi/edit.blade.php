@@ -505,10 +505,8 @@
               
                  // check each parent model for toyota PFI or other brand
                  // check if any existing item qty or price changed
-                 if($("#form-create").valid()) {   
-                    if(selectedModelIds.length > 0 ) {
-                        let url = '{{ route('pfi.get-pfi-brand') }}';
-                        $.ajax({
+                 if($("#form-update").valid()) {
+                    $.ajax({
                         type:"GET",
                         url: url, 
                         data: {
@@ -554,9 +552,9 @@
                             }
                         }
                     });
-                    }
+                }else{
+                    $('.overlay').hide();
                 }
-              
 
         });
 
@@ -569,6 +567,8 @@
             if(formValid == true) {
                 if($("#form-update").valid()) {
                     $('#form-update').unbind('submit').submit();
+                }else{
+                    $('.overlay').hide();
                 }
             }else{
                 $('.overlay').hide();

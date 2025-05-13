@@ -1954,7 +1954,7 @@ function saveRejection() {
 
       var column = this;
       var selectWrapper = $('<div class="select-wrapper"></div>');
-      var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
+      var select = $('<select class="form-control my-1" multiple></select>')
         .appendTo(selectWrapper)
         .select2({
           width: '100%',
@@ -1976,11 +1976,16 @@ function saveRejection() {
       selectWrapper.appendTo($(column.header()));
       $(column.header()).addClass('nowrap-td');
 
-      column.data().unique().sort().each(function (d, j) {
-        if (typeof d === 'string') {
-          let textVal = $('<div>').html(d).text().trim();
-          select.append('<option value="' + textVal + '">' + textVal + '</option>');
+      let uniqueValues = new Set();
+      column.data().each(function (d) {
+        let tempDiv = $('<div>').html(d);
+let textVal = tempDiv.text().trim();
+        if (textVal && !uniqueValues.has(textVal)) {
+          uniqueValues.add(textVal);
         }
+      });
+      Array.from(uniqueValues).sort().forEach(function (val) {
+        select.append('<option value="' + val + '">' + val + '</option>');
       });
     });
   }
@@ -2076,20 +2081,28 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
                 {
-                  data: 'remarks',
-                  name: 'calls.remarks',
-                  title: 'Remarks & Messages',
-                  render: function (data, type, row) {
-                    if (!data) return '';
-                      let stripped = $('<div>').html(data).text(); 
-                      let shortText = stripped.substring(0, 20);
-                      let fullText = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;'); 
-                      if (stripped.length > 20) {
-                          return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
-                      }
-                      return stripped;
-                  }
-                },
+  data: 'remarks',
+  name: 'calls.remarks',
+  title: 'Remarks & Messages',
+  render: function (data, type, row) {
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
+
+    if (type !== 'display') return plainText;
+
+    let shortText = plainText.substring(0, 20);
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    if (plainText.length > 20) {
+      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+    }
+
+    return plainText;
+  }
+},
+
+
 {
             data: 'date',
             name: 'date',
@@ -2231,6 +2244,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
         });
+        $('#my-table_filter').hide();
         dataTable3 = $('#dtBasicExample3').DataTable({
             processing: true,
             serverSide: true,
@@ -2259,20 +2273,27 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
                 {
-                  data: 'remarks',
-                  name: 'calls.remarks',
-                  title: 'Remarks & Messages',
-                  render: function (data, type, row) {
-                    if (!data) return '';
-                      let stripped = $('<div>').html(data).text(); 
-                      let shortText = stripped.substring(0, 20);
-                      let fullText = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;'); 
-                      if (stripped.length > 20) {
-                          return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
-                      }
-                      return stripped;
-                  }
-                },
+  data: 'remarks',
+  name: 'calls.remarks',
+  title: 'Remarks & Messages',
+  render: function (data, type, row) {
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
+
+    if (type !== 'display') return plainText;
+
+    let shortText = plainText.substring(0, 20);
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    if (plainText.length > 20) {
+      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+    }
+
+    return plainText;
+  }
+},
+
 {
             data: 'date',
             name: 'date',
@@ -2364,6 +2385,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 // },
             ]
         });
+        $('#my-table_filter').hide();
+
        dataTable4 = $('#dtBasicExample4').DataTable({
             processing: true,
             serverSide: true,
@@ -2391,21 +2414,29 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'custom_brand_model', name: 'custom_brand_model' },
                 { data: 'language', name: 'language' },
                 { data: 'location', name: 'location' },
-                {
-                  data: 'remarks',
-                  name: 'calls.remarks',
-                  title: 'Remarks & Messages',
-                  render: function (data, type, row) {
-                    if (!data) return '';
-                      let stripped = $('<div>').html(data).text(); 
-                      let shortText = stripped.substring(0, 20);
-                      let fullText = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;'); 
-                      if (stripped.length > 20) {
-                          return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
-                      }
-                      return stripped;
-                  }
-                },
+{
+  data: 'remarks',
+  name: 'calls.remarks',
+  title: 'Remarks & Messages',
+  render: function (data, type, row) {
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
+
+    if (type !== 'display') return plainText;
+
+    let shortText = plainText.substring(0, 20);
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    if (plainText.length > 20) {
+      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+    }
+
+    return plainText;
+  }
+},
+
+
                 {
                     data: 'date',
                     name: 'date',
@@ -2590,6 +2621,8 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         }
     }
         });
+        $('#my-table_filter').hide();
+
        dataTable5 =  $('#dtBasicExample5').DataTable({
             processing: true,
             serverSide: true,
@@ -2618,20 +2651,27 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                 { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
                 {
-                  data: 'remarks',
-                  name: 'calls.remarks',
-                  title: 'Remarks & Messages',
-                  render: function (data, type, row) {
-                    if (!data) return '';
-                      let stripped = $('<div>').html(data).text(); 
-                      let shortText = stripped.substring(0, 20);
-                      let fullText = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;'); 
-                      if (stripped.length > 20) {
-                          return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
-                      }
-                      return stripped;
-                  }
-                },
+  data: 'remarks',
+  name: 'calls.remarks',
+  title: 'Remarks & Messages',
+  render: function (data, type, row) {
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
+
+    if (type !== 'display') return plainText;
+
+    let shortText = plainText.substring(0, 20);
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    if (plainText.length > 20) {
+      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+    }
+
+    return plainText;
+  }
+},
+
 {
             data: 'date',
             name: 'date',
@@ -2818,6 +2858,8 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                 },
             ]
         });
+        $('#my-table_filter').hide();
+
         dataTable7 =   $('#dtBasicExample7').DataTable({
             processing: true,
             serverSide: true,
@@ -2846,20 +2888,27 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                 { data: 'location', name: 'location'},
                 { data: 'language', name: 'language'},
                 {
-                  data: 'remarks',
-                  name: 'calls.remarks',
-                  title: 'Remarks & Messages',
-                  render: function (data, type, row) {
-                    if (!data) return '';
-                      let stripped = $('<div>').html(data).text(); 
-                      let shortText = stripped.substring(0, 20);
-                      let fullText = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;'); 
-                      if (stripped.length > 20) {
-                          return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
-                      }
-                      return stripped;
-                  }
-                },
+  data: 'remarks',
+  name: 'calls.remarks',
+  title: 'Remarks & Messages',
+  render: function (data, type, row) {
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
+
+    if (type !== 'display') return plainText;
+
+    let shortText = plainText.substring(0, 20);
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    if (plainText.length > 20) {
+      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+    }
+
+    return plainText;
+  }
+},
+
 {
             data: 'date',
             name: 'date',
@@ -3024,6 +3073,8 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         }
     }
         });
+        $('#my-table_filter').hide();
+
     dataTable8 = $('#dtBasicExample8').DataTable({
     processing: true,
     serverSide: true,
@@ -3032,7 +3083,7 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         { data: 'quotationsid', name: 'quotationsid' },
         {
             data: 'date_formatted',
-            name: 'date_formatted',
+            name: 'quotations.date',
              render: function (data, type, row) {
         if (type === 'display' || type === 'filter') {
             if (!data || !moment(data).isValid()) {
@@ -3067,6 +3118,8 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         }
     }
     });
+    $('#my-table_filter').hide();
+
     dataTable9 = $('#dtBasicExample9').DataTable({
     processing: true,
     serverSide: true,
@@ -3093,8 +3146,28 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         { data: 'model_line', name: 'master_model_lines.model_line' },
         { data: 'language', name: 'calls.language' },
         { data: 'location', name: 'calls.location' },
-        { data: 'remarks', name: 'calls.remarks' },
         {
+  data: 'remarks',
+  name: 'calls.remarks',
+  title: 'Remarks & Messages',
+  render: function (data, type, row) {
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
+
+    if (type !== 'display') return plainText;
+
+    let shortText = plainText.substring(0, 20);
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    if (plainText.length > 20) {
+      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+    }
+
+    return plainText;
+  }
+},
+      {
             data: 'datefol',
             name: 'datefol',
              render: function (data, type, row) {
@@ -3136,6 +3209,8 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                 { data: 'sales_person_name', name: 'sales_person_name' },   
     ]
     });
+    $('#my-table_filter').hide();
+
     dataTable11 = $('#dtBasicExample11').DataTable({
     processing: true,
     serverSide: true,
@@ -3148,7 +3223,7 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         },
         {
             data: 'leaddate',
-            name: 'leaddate',
+            name: 'calls.created_at',
             title: 'Lead Date',
             render: function (data, type, row) {
                 if (type === 'display' || type === 'filter') {
@@ -3201,20 +3276,27 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
             title: 'Location'
         },
         {
-          data: 'remarks',
-          name: 'calls.remarks',
-          title: 'Remarks & Messages',
-          render: function (data, type, row) {
-            if (!data) return '';
-              let stripped = $('<div>').html(data).text(); 
-              let shortText = stripped.substring(0, 20);
-              let fullText = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;'); 
-              if (stripped.length > 20) {
-                  return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
-              }
-              return stripped;
-          }
-        },
+  data: 'remarks',
+  name: 'calls.remarks',
+  title: 'Remarks & Messages',
+  render: function (data, type, row) {
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
+
+    if (type !== 'display') return plainText;
+
+    let shortText = plainText.substring(0, 20);
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    if (plainText.length > 20) {
+      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+    }
+
+    return plainText;
+  }
+},
+
         {
             data: 'status',
             name: 'calls.status',
@@ -3249,12 +3331,12 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
           },
         {
             data: 'created_by_name',
-            name: 'created_by_name',
+            name: 'created_by_user.name',
             title: 'Created By'
         },
         {
             data: 'sales_person_name',
-            name: 'sales_person_name',
+            name: 'sales_person_user.name',
             title: 'Assigned To'
         }
     ],
@@ -3268,6 +3350,8 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         }
     }
 });
+$('#my-table_filter').hide();
+
     dataTable9 = $('#dtBasicExample10').DataTable({
     processing: true,
     serverSide: true,
@@ -3275,7 +3359,7 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
     columns: [
       {
             data: 'leaddate',
-            name: 'leaddate',
+            name: 'calls.created_at',
              render: function (data, type, row) {
         if (type === 'display' || type === 'filter') {
             if (!data || !moment(data).isValid()) {
@@ -3302,10 +3386,28 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         { data: 'model_line', name: 'master_model_lines.model_line' },
         { data: 'language', name: 'calls.language' },
         { data: 'location', name: 'calls.location' },
-        { data: 'remarks', name: 'calls.remarks', render: function(data, type, row) {
-                    return $('<div>').html(data).text();
-                }
-            },
+        {
+  data: 'remarks',
+  name: 'calls.remarks',
+  title: 'Remarks & Messages',
+  render: function (data, type, row) {
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
+
+    if (type !== 'display') return plainText;
+
+    let shortText = plainText.substring(0, 20);
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    if (plainText.length > 20) {
+      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+    }
+
+    return plainText;
+  }
+},
+
         { data: 'createdby', name: 'users.name' },
     ],
     initComplete: function () {
@@ -3318,6 +3420,8 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         }
     }
     });
+    $('#my-table_filter').hide();
+
     });
     function toggleRemarks(uniqueId) {
     const $truncatedText = $('#' + uniqueId + '_truncated');
