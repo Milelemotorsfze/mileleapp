@@ -2,8 +2,15 @@
 @section('content')
 <style>
     .is-invalid.invalid-feedback {
-    margin-top: 10px;
-}
+        margin-top: 10px;
+    }
+    .input-group .select-so .select2-container--default,
+    .input-group .select-po .select2-container--default {
+        width: 150px !important;
+    }
+    .select-po.select2-container, .select-so.select2-container {
+        margin: 0px 0px 10px 0px !important;
+    }
 </style>
 @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-daily-movemnets');
@@ -57,7 +64,7 @@
         <form id="formCreate" action="{{ route('movement.store') }}" method="POST"  enctype="multipart/form-data" >
         @csrf
         <div class="row">
-        <div class="col-lg-2 col-md-6">
+        <div class="col-lg-4 col-md-6">
         <span class="error">* </span>
         <label for="basicpill-firstname-input" class="form-label">Date : </label>
         <input type="Date" id="date" name="date" class="form-control" placeholder="PO Date" required value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
@@ -65,7 +72,7 @@
         </div>
         <br>
         <div class="row">
-        <div class="col-lg-2 col-md-6">
+        <div class="col-lg-4 col-md-6">
         <div class="form-group">
     <label for="vin_file">Upload VIN File:</label>
     <input type="file" id="vin_file" name="file" class="form-control" />
@@ -115,19 +122,21 @@
         </div>
         <br>
         <div class="row">
-            <div class="col-lg-1 col-md-6">
+            <div class="col-lg-1 col-md-2 col-sm-6 pb-2 d-flex align-items-center">
                 <div class="btn btn-primary add-row-btn" data-row="1">
                     <i class="fas fa-plus"></i> Add Vehicles
                 </div>
             </div>
-            <div class="col-lg-4 col-md-6">
+            <div class="col-lg-5 col-md-5 col-sm-12 pb-2 d-flex align-items-center">
                 <div class="input-group">
-                    <select name="po_number" class="form-control mb-1" id="po_number">
-                        <option value="" selected disabled>Select PO</option>
-                        @foreach ($purchasing_order as $purchasing_order)
-                        <option value="{{ $purchasing_order->id }}">{{ $purchasing_order->po_number }}</option>
-                        @endforeach
-                    </select>
+                    <div class="select-po">
+                        <select name="po_number" class="form-control mx-4 mb-1" id="po_number">
+                            <option value="" selected disabled>Select PO</option>
+                            @foreach ($purchasing_order as $purchasing_order)
+                            <option value="{{ $purchasing_order->id }}">{{ $purchasing_order->po_number }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary" type="button" id="generate-button">
                         <i class="fas fa-cogs"></i> Add PO Vehicles
@@ -135,17 +144,21 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 col-md-6">
+            <div class="col-lg-5 col-md-5 col-sm-12 pb-2 d-flex align-items-center">
                 <div class="input-group">
-                    <select name="so_number" class="form-control mb-1" id="so_number">
-                        <option value="" selected disabled>Select SO</option>
-                        @foreach ($so as $so)
-                        <option value="{{ $so->id }}">{{ $so->so_number }}</option>
-                        @endforeach
-                    </select>
-                    <button class="btn btn-outline-secondary" type="button" id="generate-sobutton">
-                        <i class="fas fa-cogs"></i> Add SO Vehicles
-                    </button>
+                    <div class="select-so">
+                        <select name="so_number" class="form-control mb-1" id="so_number">
+                            <option value="" selected disabled>Select SO</option>
+                            @foreach ($so as $so)
+                            <option value="{{ $so->id }}">{{ $so->so_number }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="generate-sobutton">
+                            <i class="fas fa-cogs"></i> Add SO Vehicles
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

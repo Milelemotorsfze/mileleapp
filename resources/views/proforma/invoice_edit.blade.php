@@ -5,6 +5,9 @@
      div.dataTables_wrapper div.dataTables_info {
   padding-top: 0px;
 }
+    .quotation-items-addons {
+        padding-left: 10px;
+    }
 .my-select2-dropdown {
     z-index: 99999;
 }
@@ -13,7 +16,7 @@
     z-index: 99999;
 }
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
-  padding: 4px 8px 4px 8px;
+  /* padding: 4px 8px 4px 8px; */
   text-align: center;
   vertical-align: middle;
 }
@@ -286,10 +289,10 @@
             </div>
             <div class="col-sm-4">
                 <div class="row">
-                    <div class="col-sm-2">
+                    <div class="col-sm-4">
                         Category :
                     </div>
-                                        <div class="col-sm-4">
+                    <div class="col-sm-8">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input shipping_method @error('shipping_method') is-invalid @enderror" type="checkbox"
                                 name="shipping_method" id="CNF" value="CNF" <?php echo ($quotation->shipping_method == 'CNF') ? 'checked' : ''; ?>>
@@ -310,10 +313,32 @@
             </div>
             <div class="col-sm-4">
                 <div class="row">
-                    <div class="col-sm-2">
+                    <div class="col-sm-4">
+                        Nature of Deal :
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="nature_of_deal" id="regular_deal"
+                                value="regular_deal" required
+                                {{ (old('nature_of_deal', $quotation->nature_of_deal ?? '') == 'regular_deal') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="regular_deal">Regular deal</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="nature_of_deal" id="letter_of_credit"
+                                value="letter_of_credit" required
+                                {{ (old('nature_of_deal', $quotation->nature_of_deal ?? '') == 'letter_of_credit') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="letter_of_credit">Letter of credit</label>
+                        </div>
+                    </div>
+                    <div id="nature-of-deal-error" class="text-danger" style="display: none;"></div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="row">
+                    <div class="col-sm-4">
                         Currency :
                     </div>
-                     <div class="col-sm-4">
+                     <div class="col-sm-6">
                     <select class="form-select" name="currency" id="currency">
                         <option <?php echo ($quotation->currency == 'AED') ? 'selected' : ''; ?>>AED</option>
                         <option <?php echo ($quotation->currency == 'USD') ? 'selected' : ''; ?>>USD</option>
@@ -326,13 +351,13 @@
         <hr>
         <div class="row">
             <div class="col-sm-4">
-                Document Details
+                <strong>Document Details </strong>
             </div>
             <div class="col-sm-4">
-                Client's Details
+                <strong>Client's Details </strong>
             </div>
             <div class="col-sm-4">
-                Delivery Details
+                <strong>Delivery Details </strong>
             </div>
         </div>
         <hr>
@@ -497,7 +522,7 @@
                             Port of Loading :
                         </div>
                         <div class="col-sm-6">
-                        <select class="form-control col" id="to_shipping_port" multiple name="to_shipping_port_id[]" style="width: 100%">
+                        <select class="form-control col" id="to_shipping_port" multiple name="to_shipping_port_id" style="width: 100%">
                             <option></option>
                             @foreach($shippingPorts as $shippingPort)
                                 <option value="{{ $shippingPort->id }}"
@@ -572,10 +597,10 @@
         <hr>
         <div class="row mt-2">
             <div class="col-sm-4">
-                Payment Details
+               <strong> Payment Details </strong>
             </div>
             <div class="col-sm-8">
-                Client's Representative
+               <strong> Client's Representative </strong>
             </div>
         </div>
         <hr>
@@ -652,7 +677,7 @@
                     </div>
                 </div>
                 <br>
-                <button class="float-end" type="button" onclick="addMoreAgents()">+ Add More Agent</button>
+                <button class="float-end btn btn-primary" type="button" onclick="addMoreAgents()">+ Add More Agent</button>
             </div>
             <div class="col-sm-4"  id="advance-amount-div" hidden>
                 <div class="row mt-2">
@@ -777,37 +802,37 @@
         </div>
         <br>
         <div class="row">
-            <div class="col-lg-1 col-md-2 col-sm-12">
-                <input type="radio" id="showVehicles" name="contentType">
-                <label for="showVehicles">Add Vehicles</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showVehicles" name="contentType" data-target="#vehiclesContent">
+                <label for="showVehicles" class="quotation-items-addons">Add Vehicles</label>
             </div>
-            <div class="col-lg-1 col-md-3 col-sm-12">
-            <input type="radio" id="showAccessories" name="contentType">
-                <label for="showAccessories">Add Accessories</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showAccessories" name="contentType" data-target="#accessoriesContent">
+                <label for="showAccessories" class="quotation-items-addons">Add Accessories</label>
             </div>
-            <div class="col-lg-1 col-md-3 col-sm-12">
-            <input type="radio" id="showSpareParts" name="contentType">
-                <label for="showSpareParts">Add Spare Parts</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showSpareParts" name="contentType" data-target="#sparePartsContent">
+                <label for="showSpareParts" class="quotation-items-addons">Add Spare Parts</label>
             </div>
-            <div class="col-lg-1 col-md-2 col-sm-12">
-            <input type="radio" id="showKits" name="contentType">
-                <label for="showKits">Add Kits</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showKits" name="contentType" data-target="#kitsContent">
+                <label for="showKits" class="quotation-items-addons">Add Kits</label>
             </div>
-            <div class="col-lg-1 col-md-2 col-sm-12">
-            <input type="radio" id="showShipping" name="contentType">
-                <label for="showShipping">Add Shipping</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showShipping" name="contentType" data-target="#shippingContent">
+                <label for="showShipping" class="quotation-items-addons">Add Shipping</label>
             </div>
-            <div class="col-lg-2 col-md-3 col-sm-12">
-                <input type="radio" id="showShippingDocuments" name="contentType">
-                <label for="showShippingDocuments">Add Shipping Documents</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showShippingDocuments" name="contentType" data-target="#shippingDocumentContent">
+                <label for="showShippingDocuments" class="quotation-items-addons">Add Shipping Documents</label>
             </div>
-            <div class="col-lg-1 col-md-2 col-sm-12">
-            <input type="radio" id="showCertificates" name="contentType">
-                <label for="showCertificates"> Certificate</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showCertificates" name="contentType" data-target="#certificateContent">
+                <label for="showCertificates" class="quotation-items-addons">Certificate</label>
             </div>
-            <div class="col-lg-1 col-md-2 col-sm-12">
-            <input type="radio" id="showOthers" name="contentType">
-                <label for="showOthers">Add Other</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showOthers" name="contentType" data-target="#otherContent">
+                <label for="showOthers" class="quotation-items-addons">Add Other</label>
             </div>
         </div>
         <div id="vehiclesContent" class="contentveh">
@@ -1562,16 +1587,22 @@ $(document).ready(function () {
                 method: 'GET',
                 success: function (data) {
                     $('#selectedAgentsList').empty();
-                    data.forEach(function (item) {
-        var agent = item.agent;
-        if (agent) { 
-            var listItem = '<li class="list-group-item d-flex justify-content-between align-items-center">' +
-                agent.name + 
-                '<button type="button" class="btn btn-danger btn-sm removeAgentButton" data-agent-id="' + agent.id + '">Remove</button></li>';
+                    data.forEach(function (item, index) {
+        // Defensive check to prevent the error
+        if (item && item.agent && item.agent.name) {
+            var listItem = `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    ${item.agent.name}
+                    <button type="button" class="btn btn-danger btn-sm removeAgentButton" data-agent-id="${item.agent.id}">
+                        Remove
+                    </button>
+                </li>`;
             $('#selectedAgentsList').append(listItem);
+        } else {
+            console.warn(`Skipping item at index ${index} due to missing agent`, item);
         }
     });
-                },
+                                },
                 error: function () {
                     console.error('Failed to fetch agents');
                 }
@@ -1728,20 +1759,14 @@ $(document).ready(function () {
     });
 </script>
 <script>
-        var radioButtons = document.querySelectorAll('input[type="radio"]');
-        var contentDivs = document.querySelectorAll('.contentveh');
-        radioButtons.forEach(function (radioButton, index) {
-            radioButton.addEventListener("change", function () {
-                contentDivs.forEach(function (contentDiv) {
-                    contentDiv.style.display = "none";
-                });
-                if (radioButton.checked) {
-                    contentDivs[index].style.display = "block";
-                }
-            });
+    $(document).ready(function () {
+        $('[name="contentType"]').on('change', function () {
+            $('.contentveh').hide();
+            const target = $(this).data('target');
+            $(target).show(); 
         });
-
-    </script>
+    });
+</script>
 <script>
     // get the shipping medium charges based on port selected
 
@@ -2780,6 +2805,14 @@ $('#shipping_port').select2();
             resetIndex();
     });
     $('#submit-button').on('click', function(e) {
+
+        $('.text-danger').hide();
+        let hasError = false;
+        if (!$('input[name="nature_of_deal"]:checked').val()) {
+            $('#nature-of-deal-error').text('Please select the Nature of Deal.').show();
+            hasError = true;
+        }
+
         var selectedData = [];
         secondTable.rows().every(function() {
         var data = this.data();
@@ -4282,20 +4315,20 @@ function updateSecondTable(RowId, savedVins) {
         if (existings.reference_type.length === 18) {
             row['model_type'] = 'Vehicle';
             row['table_type'] = 'vehicle-table';
-            code = existings.varaint.name; 
+            code = existings.varaint?.name ?? ''; 
         }
         else if(existings.reference_type.length === 16)
         {
             row['model_type'] = 'Brand';
             row['table_type'] = 'vehicle-table';
-            code = existings.varaint.name;  
-            addon = existings.varaint.name; 
+            code = existings.varaint?.name ?? '';  
+            addon = existings.varaint?.name ?? ''; 
         }
         else if(existings.reference_type.length === 27){
             row['model_type'] = 'ModelLine';
             row['table_type'] = 'vehicle-table';
-            code = existings.varaint.name; 
-            addon = existings.varaint.name; 
+            code = existings.varaint?.name ?? ''; 
+            addon = existings.varaint?.name ?? ''; 
         }
         else 
         {

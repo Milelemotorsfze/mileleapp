@@ -1967,7 +1967,7 @@ function saveRejection() {
           var escaped = selectedValues.map(function (val) {
             return '^' + val.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '$';
           }).join('|');
-          column.search(selectedValues.join('|'), false, true).draw();
+          column.search(escaped, true, false).draw();
         } else {
           column.search('', true, false).draw();
         }
@@ -2085,11 +2085,14 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
   name: 'calls.remarks',
   title: 'Remarks & Messages',
   render: function (data, type, row) {
-    const plainText = $('<div>').html(data || '').text().trim();
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
+
     if (type !== 'display') return plainText;
 
     let shortText = plainText.substring(0, 20);
-    let fullText = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
     if (plainText.length > 20) {
       return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
@@ -2274,11 +2277,14 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
   name: 'calls.remarks',
   title: 'Remarks & Messages',
   render: function (data, type, row) {
-    const plainText = $('<div>').html(data || '').text().trim();
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
+
     if (type !== 'display') return plainText;
 
     let shortText = plainText.substring(0, 20);
-    let fullText = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
     if (plainText.length > 20) {
       return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
@@ -2649,11 +2655,14 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
   name: 'calls.remarks',
   title: 'Remarks & Messages',
   render: function (data, type, row) {
-    const plainText = $('<div>').html(data || '').text().trim();
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
+
     if (type !== 'display') return plainText;
 
     let shortText = plainText.substring(0, 20);
-    let fullText = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
     if (plainText.length > 20) {
       return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
@@ -2883,11 +2892,14 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
   name: 'calls.remarks',
   title: 'Remarks & Messages',
   render: function (data, type, row) {
-    const plainText = $('<div>').html(data || '').text().trim();
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
+
     if (type !== 'display') return plainText;
 
     let shortText = plainText.substring(0, 20);
-    let fullText = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
     if (plainText.length > 20) {
       return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
@@ -3139,11 +3151,14 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
   name: 'calls.remarks',
   title: 'Remarks & Messages',
   render: function (data, type, row) {
-    const plainText = $('<div>').html(data || '').text().trim();
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
+
     if (type !== 'display') return plainText;
 
     let shortText = plainText.substring(0, 20);
-    let fullText = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
     if (plainText.length > 20) {
       return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
@@ -3265,11 +3280,14 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
   name: 'calls.remarks',
   title: 'Remarks & Messages',
   render: function (data, type, row) {
-    const plainText = $('<div>').html(data || '').text().trim();
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
+
     if (type !== 'display') return plainText;
 
     let shortText = plainText.substring(0, 20);
-    let fullText = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
     if (plainText.length > 20) {
       return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
@@ -3373,11 +3391,14 @@ $('#my-table_filter').hide();
   name: 'calls.remarks',
   title: 'Remarks & Messages',
   render: function (data, type, row) {
-    const plainText = $('<div>').html(data || '').text().trim();
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
+
     if (type !== 'display') return plainText;
 
     let shortText = plainText.substring(0, 20);
-    let fullText = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
     if (plainText.length > 20) {
       return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;

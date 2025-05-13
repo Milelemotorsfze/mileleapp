@@ -14,6 +14,7 @@ class Quotation extends Model
         'deal_value',
         'sales_notes',
         'file_path',
+        'nature_of_deal',
     ];
     public $timestamps = false;
     public function quotationdetails()

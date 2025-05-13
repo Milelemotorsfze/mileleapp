@@ -204,19 +204,22 @@ class DailyleadsController extends Controller
                     $activelead->where('calls.sales_person', $id);
                 }
             
-                if (!empty($searchValue)) {
-                    $activelead->where(function ($query) use ($searchValue) {
-                        $query->where('calls.name', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.phone', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.email', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.language', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.location', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.remarks', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.type', 'LIKE', "%$searchValue%")
-                            ->orWhere('brands.brand_name', 'LIKE', "%$searchValue%")
-                            ->orWhere('master_model_lines.model_line', 'LIKE', "%$searchValue%");
-                    });
+                $columns = $request->input('columns', []);
+                foreach ($columns as $col) {
+                    $colName = $col['name'] ?? '';
+                    $search = trim($col['search']['value'] ?? '');
+                
+                    if ($search !== '') {
+                        $terms = explode('|', $search);
+                
+                        $activelead->where(function ($query) use ($colName, $terms) {
+                            foreach ($terms as $term) {
+                                $query->orWhereRaw("LOWER($colName) LIKE ?", ['%' . strtolower($term) . '%']);
+                            }
+                        });
+                    }
                 }
+                
                 \Log::info('Search Term 11111 : ' . $searchValue);
 
             
@@ -255,19 +258,22 @@ class DailyleadsController extends Controller
                     $bulkleads->where('calls.sales_person', $id);
                 }
             
-                if (!empty($searchValue)) {
-                    $bulkleads->where(function ($query) use ($searchValue) {
-                        $query->where('calls.name', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.phone', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.email', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.language', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.location', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.remarks', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.type', 'LIKE', "%$searchValue%")
-                            ->orWhere('brands.brand_name', 'LIKE', "%$searchValue%")
-                            ->orWhere('master_model_lines.model_line', 'LIKE', "%$searchValue%");
-                    });
+                $columns = $request->input('columns', []);
+                foreach ($columns as $col) {
+                    $colName = $col['name'] ?? '';
+                    $search = trim($col['search']['value'] ?? '');
+                
+                    if ($search !== '') {
+                        $terms = explode('|', $search); // select2 multi filter uses pipe-delimited values
+                
+                        $bulkleads->where(function ($query) use ($colName, $terms) {
+                            foreach ($terms as $term) {
+                                $query->orWhereRaw("LOWER($colName) LIKE ?", ['%' . strtolower($term) . '%']);
+                            }
+                        });
+                    }
                 }
+                
             
                 \Log::info('Search Term bulkleads : ' . $searchValue);
             
@@ -322,28 +328,28 @@ class DailyleadsController extends Controller
                 JOIN master_model_lines ON calls_requirement.model_line_id = master_model_lines.id
                 JOIN brands ON master_model_lines.brand_id = brands.id
                 WHERE calls_requirement.lead_id = calls.id) as models_brands'));
-                if (!empty($searchValue)) {
-                    $data->where(function ($query) use ($searchValue) {
-                        $query->where('calls.name', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.created_at', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.email', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.phone', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.custom_brand_model', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.location', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.language', 'LIKE', "%$searchValue%")
-                            ->orWhereExists(function ($subquery) use ($searchValue) {
-                                $subquery->select(DB::raw(1))
-                                    ->from('calls_requirement')
-                                    ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
-                                    ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
-                                    ->whereRaw('calls_requirement.lead_id = calls.id')
-                                    ->where(function ($subquery) use ($searchValue) {
-                                        $subquery->whereRaw('LOWER(brands.brand_name) LIKE ?', ["%" . strtolower($searchValue) . "%"])
-                                            ->orWhereRaw('LOWER(master_model_lines.model_line) LIKE ?', ["%" . strtolower($searchValue) . "%"]);
-                                    });
-                            });
-                    });
+                
+                $columns = $request->input('columns', []);
+                foreach ($columns as $col) {
+                    $colName = $col['name'] ?? '';
+                    $search = trim($col['search']['value'] ?? '');
+                
+                    if ($colName && $search !== '') {
+                        $terms = array_filter(explode('|', $search));
+                
+                        $data->where(function ($query) use ($colName, $terms) {
+                            foreach ($terms as $term) {
+                                if (Str::contains($colName, '.')) {
+                                    $query->orWhere(DB::raw("LOWER($colName)"), 'LIKE', '%' . strtolower($term) . '%');
+                                } else {
+                                    $query->orWhere(DB::raw("LOWER(`$colName`)"), 'LIKE', '%' . strtolower($term) . '%');
+                                }
+                            }
+                        });
+                    }
                 }
+                
+                
                 if ($status === 'Prospecting') {
                     $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%Y %m %d') as date"), 'prospectings.salesnotes');
                     $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
@@ -400,20 +406,28 @@ class DailyleadsController extends Controller
                 $data->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id');
                 $data->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id');
 
-                if (!empty($searchValue)) {
-                    $data->where(function ($query) use ($searchValue) {
-                        $query->where('calls.name', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.phone', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.email', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.language', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.location', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.type', 'LIKE', "%$searchValue%")
-                            ->orWhere('brands.brand_name', 'LIKE', "%$searchValue%")
-                            ->orWhere('master_model_lines.model_line', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.remarks', 'LIKE', "%$searchValue%"); 
-                    });
+                $columns = $request->input('columns', []);
+                foreach ($columns as $col) {
+                    $colName = $col['name'] ?? '';
+                    $search = trim($col['search']['value'] ?? '');
+                
+                    if ($colName && $search !== '') {
+                        $terms = array_filter(explode('|', $search));
+                
+                        $data->where(function ($query) use ($colName, $terms) {
+                            foreach ($terms as $term) {
+                                if (Str::contains($colName, '.')) {
+                                    $query->orWhere(DB::raw("LOWER($colName)"), 'LIKE', '%' . strtolower($term) . '%');
+                                } else {
+                                    $query->orWhere(DB::raw("LOWER(`$colName`)"), 'LIKE', '%' . strtolower($term) . '%');
+                                }
+                            }
+                        });
+                    }
                 }
                 
+                
+                           
             } elseif ($status === 'Negotiation') {
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%Y %m %d'), '') as date"),
@@ -517,6 +531,7 @@ class DailyleadsController extends Controller
                 $item->plain_remarks = strip_tags($item->remarks);
                 return $item;
             });
+            
 
             return DataTables::of($results)
     ->addColumn('models_brands', function ($row) {

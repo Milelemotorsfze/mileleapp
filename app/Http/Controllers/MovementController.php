@@ -438,6 +438,8 @@ class MovementController extends Controller
                 $movementgrn->save();
             }
 
+            $remarks = $request->input('remarks');
+
             foreach ($vin as $index => $value) {
                 if (array_key_exists($index, $from) && array_key_exists($index, $to)) {    
                 $movement = new Movement();
@@ -445,6 +447,11 @@ class MovementController extends Controller
                 $movement->from = $from[$index];
                 $movement->to = $to[$index];
                 $movement->reference_id = $movementsReferenceId;
+
+                if (!empty($remarks[$index])) {
+                    $movement->remarks = $remarks[$index];
+                }
+                
                 // if (isset($newvin[$index]) && $newvin[$index] !== null && $newvin[$index] !== '') {
                 //     $movement->vin = $newvin[$index];
                 // }
@@ -503,14 +510,14 @@ class MovementController extends Controller
           
         (new UserActivityController)->createActivity('Movement Created');
         DB::commit();
-        return redirect()->back()->with('success', 'Movement has been successfully Saved!');
-    } catch (\Exception $e) {
+            return redirect()->back()->with('success', 'Movement has been successfully Saved!');
+            } catch (\Exception $e) {
         DB::rollBack(); 
      
         Log::error('Movement Creation Failed', ['error' => $e->getMessage()]);
 
-        return response()->view('errors.generic', [], 500); // Return a 500 error page
-    }
+            return response()->view('errors.generic', [], 500); // Return a 500 error page
+        }
     }    
     /**
      * Display the specified resource.
