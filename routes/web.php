@@ -1177,4 +1177,5 @@ Route::get('/d', function () {
     Route::post('po-payment-adjustment', [PurchasingOrderController::class, 'paymentAdjustment'])->name('po-payment-adjustment');
     Route::get('so-vins', [SalesOrderController::class, 'getVins'])->name('so.getVins');
     Route::get('so-variants', [SalesOrderController::class, 'getVariants'])->name('so.getVariants');
+    Route::get('so-unique-check', [SalesOrderController::class, 'checkUniqueSoNumber'])->name('so.uniqueSoNumber');
 });

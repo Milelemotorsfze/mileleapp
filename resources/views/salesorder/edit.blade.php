@@ -375,16 +375,16 @@
                                 <div class="row">
                                     <h5>Total Vehicles - {{ $totalVehicles }}</h5>
                                     <div class="col-md-12 mt-3" id="so-vehicles">
-                                        @foreach($quotationItems as $key => $quotationItem)
+                                        @foreach($soVariants as $key => $soVariant)
                                           
                                             <div class="so-variant-add-section " id="variant-section-{{ $key + 1 }}">
                                                 <div class="row">
                                                     <div class="mb-2 col-sm-12 col-md-3 col-lg-3 col-xxl-3">
                                                         <label class="form-label font-size-13">Choose Variant</label>
                                                         <select name="variants[{{$key+1}}][variant_id]"  required index="{{$key+1}}" id="variant-{{ $key+1 }}"
-                                                        multiple class="variants form-control" data-is-gdn="{{ $quotationItem->isgdnExist }}">
+                                                        multiple class="variants form-control" data-is-gdn="{{ $soVariant->isgdnExist }}">
                                                             @foreach($variants as $variant)
-                                                                <option value="{{ $variant->id }}" {{ $variant->id == $quotationItem->reference_id ? 'selected' : '' }}
+                                                                <option value="{{ $variant->id }}" {{ $variant->id == $soVariant->variant_id ? 'selected' : '' }}
                                                                    >{{ $variant->name ?? '' }}</option>
                                                             @endforeach
                                                         </select>
@@ -392,17 +392,17 @@
                                                     <div class="mb-2 col-sm-12 col-md-4 col-lg-4 col-xxl-4">
                                                     <label class="form-label font-size-13">Description</label>
                                                         <input type="text" class="variant-descriptions form-control widthinput"  name="variants[{{ $key + 1 }}][description]" index="{{$key+1}}" 
-                                                        id="variant-description-{{ $key+1 }}" required value="{{ $quotationItem->description ?? '' }}"  placeholder="Decsription" />
+                                                        id="variant-description-{{ $key+1 }}" required value="{{ $soVariant->description ?? '' }}"  placeholder="Decsription" />
                                                     </div> 
                                                     <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
                                                     <label class="form-label font-size-13">Price</label>
                                                         <input type="number" class="form-control variant-prices widthinput" required name="variants[{{$key+1}}][price]" placeholder="Price" 
-                                                        value="{{ $quotationItem->unit_price }}" id="price-{{ $key+1 }}" >
+                                                        value="{{ $soVariant->price }}" id="price-{{ $key+1 }}" >
                                                     </div>
                                                     <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
                                                     <label class="form-label font-size-13">Quantity</label>
                                                         <input type="number" class="form-control variant-quantities widthinput" required index="{{$key+1}}" min="1"
-                                                        name="variants[{{$key+1}}][quantity]" placeholder="Quantity"  value="{{ $quotationItem->quantity }}" id="quantity-{{ $key+1 }}" >
+                                                        name="variants[{{$key+1}}][quantity]" placeholder="Quantity"  value="{{ $soVariant->quantity }}" id="quantity-{{ $key+1 }}" >
                                                     </div>
                                                     <div class="col-sm-12 col-md-1 col-lg-1 col-xxl-1">
                                                         <a class="btn btn-sm btn-danger removeVariantButton" index="{{ $key+1}}" style="margin-top: 31px;" >
@@ -413,17 +413,16 @@
                                                 <div class="row">
                                                     <div class="col-sm-12 col-md-11 col-lg-11 col-xxl-11 mb-4 ms-5">
                                                         <label class="form-label font-size-13">Choose VIN</label>
-                                                        <select name="variants[{{$key+1}}][vins][]" id="vin-{{ $key+1 }}" index="{{$key+1}}" class="vins form-control" multiple >
-                                                            @foreach($vehicles[$quotationItem->id] as $vehicle)
+                                                        <select name="variants[{{$key+1}}][vehicles][]" id="vin-{{ $key+1 }}" index="{{$key+1}}" class="vins form-control" multiple >
+                                                            @foreach($soVariant->soVehicles as $vehicle)
                                                             <option value="{{ $vehicle->id }}" 
-                                                            {{ in_array($vehicle->id, $quotationItem->selectedVehicleIds) ? 'selected' : '' }}
+                                                            {{ in_array($vehicle->id, $soVariant->selectedVehicleIds) ? 'selected' : '' }}
                                                             {{ $vehicle->gdn_id ? 'data-lock=true' : '' }} >{{ $vehicle->vin ?? '' }}</option>
                                                             @endforeach
                                                         </select>
                                                     </div> 
                                                 </div>
                                             </div>
-                                            <!-- <input type="hidden" name="quotation_item_id[]" value="{{ $quotationItem->id }}"> -->
                                         @endforeach
                                     </div>
                                     <div class="row ">
@@ -454,17 +453,17 @@
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
                                 <label for="total_payment"><strong>Total Payment</strong></label>
-                                <input type="number" class="form-control" id="total_payment" name="total_payment" value="{{$quotation->deal_value}}" >
+                                <input type="number" class="form-control" id="total_payment" name="total_payment" value="{{$so->total}}" >
                             </div>
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
                                 <label for="receiving_payment"><strong>Total Receiving Payment</strong></label>
-                                <input type="number" class="form-control" id="receiving_payment" name="receiving_payment" value="{{$so->receiving}}" >
+                                <input type="number" class="form-control" id="receiving_payment" name="receiving_payment" readonly value="{{$so->receiving}}" >
                             </div>
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
                                 <label for="advance_payment_performa"><strong>Payment In Performa</strong></label>
-                                <input type="number" class="form-control payment" id="advance_payment_performa" name="advance_payment_performa" value="{{$quotation->quotationdetails->advance_amount}}" >
+                                <input type="number" class="form-control payment" id="advance_payment_performa" name="advance_payment_performa" value="{{$so->paidinperforma}}" >
                             </div>
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
@@ -494,7 +493,7 @@
     @push('scripts')
     <script>
         let soId = '{{ $so->id }}';
-        let QuotaionItemCount = '{{ $quotationItems->count() }}';
+        let QuotaionItemCount = '{{ $soVariants->count() }}';
         let isFormValid = 0;
 
         $(document).ready(function() {
@@ -504,7 +503,6 @@
             for(let i=1;i<= QuotaionItemCount;i++) {
                 let index = $('#vin-'+i).attr('index');
                 initializeSelect2(index)
-
             }
            
             $('.variants').select2({
@@ -521,9 +519,39 @@
             });
         });
 
+         $.validator.addMethod("uniqueSO", function(value, element) {
+            let isUnique = false;
+            $.ajax({
+                url: '/so-unique-check',    
+                type: 'GET',
+                data: {
+                    so_number: value,
+                    so_id:soId,      
+                    _token: $('meta[name="csrf-token"]').attr('content') 
+                },
+                async: false,           
+                success: function(response) {
+                    isUnique = !response.exists;
+                }
+            });
+
+            return isUnique;
+        }, "SO Number already exists. Please enter a different one.");
+
+         $.validator.addMethod("sixDigit", function(value, element) {
+            return this.optional(element) || /^\d{6}$/.test(value);
+        }, "SO Number must be exactly 6 digits.");
+
+
         $("#form-update").validate({
             ignore: [],
             rules: {
+                 so_number: {
+                    required: true,
+                    uniqueSO: true,
+                    sixDigit:true
+
+                },
                 "variants[*][variant_id]": {
                     required: true
                 },
@@ -592,7 +620,7 @@
                     <div class="row">
                         <div class="col-sm-12 col-md-11 col-lg-11 col-xxl-11 mb-4 ms-5">
                             <label class="form-label font-size-13">Choose VIN</label>
-                            <select name="variants[${index}][vins][]" id="vin-${index}" index="${index}" class="vins form-control" multiple >
+                            <select name="variants[${index}][vehicles][]" id="vin-${index}" index="${index}" class="vins form-control" multiple >
                                 
                             </select>
                         </div> 
@@ -743,7 +771,7 @@
                         $(this).find('.variant-quantities').attr('name', 'variants['+index+'][quantity]');
                         $(this).find('.vins').attr('index', index);
                         $(this).find('.vins').attr('id', 'vin-'+index);
-                        $(this).find('.vins').attr('name', 'variants['+index+'][vin][]');
+                        $(this).find('.vins').attr('name', 'variants['+index+'][vehicles][]');
                     
                         $(this).find('.removeVariantButton').attr('index', index);
 

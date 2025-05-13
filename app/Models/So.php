@@ -47,4 +47,9 @@ class So extends Model
     {
         return $this->hasMany(Soitems::class,'so_id');
     }
+    public function so_logs()
+    {
+        return $this->hasMany(Solog::class,'so_id');
+    }
+    
 }
