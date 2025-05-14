@@ -97,8 +97,24 @@
                             {{$change_bys}}
                         </td>
                         <td>{{$warehouselog->field}}</td>
-                        <td>{{ $warehouselog->old_value }}</td>
-                        <td>{{ $warehouselog->new_value }}</td>
+                        <td>
+                            @if ($warehouselog->field === 'status')
+                                {!! $warehouselog->old_value == 1 
+                                    ? '<span class="badge bg-success fs-6">Active</span>' 
+                                    : '<span class="badge bg-danger fs-6">In-Active</span>' !!}
+                            @else
+                                {{ $warehouselog->old_value }}
+                            @endif
+                        </td>
+                        <td>
+                            @if ($warehouselog->field === 'status')
+                                {!! $warehouselog->new_value == 1 
+                                    ? '<span class="badge bg-success fs-6">Active</span>' 
+                                    : '<span class="badge bg-danger fs-6">In-Active</span>' !!}
+                            @else
+                                {{ $warehouselog->new_value }}
+                            @endif
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>
