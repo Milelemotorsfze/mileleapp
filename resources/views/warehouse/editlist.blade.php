@@ -53,11 +53,11 @@
                         <label class="form-label d-block"><span class="error">* </span>Status</label>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="status" id="statusYes" value="1" {{ $warehouse->status == 1 ? 'checked' : '' }}>
-                            <label class="form-check-label" for="statusYes">Yes</label>
+                            <label class="form-check-label" for="statusYes">Active</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="status" id="statusNo" value="0" {{ $warehouse->status == 0 ? 'checked' : '' }}>
-                            <label class="form-check-label" for="statusNo">No</label>
+                            <label class="form-check-label" for="statusNo">In-Active</label>
                         </div>
                     </div>
                 </div>
