@@ -44,7 +44,7 @@ class MovementController extends Controller
         ->where('status', '!=', 'cancel')
         ->pluck('vin', 'varaints_id');
 
-    $warehouses = Warehouse::select('id', 'name')->get();
+    $warehouses = Warehouse::select('id', 'name')->where('status', 1)->get();
     if ($request->ajax()) {
         $movementsQuery = Movement::select('movements.*')
                         ->join('movements_reference as mr', function ($join) {
@@ -138,7 +138,7 @@ class MovementController extends Controller
      */
     public function create()
     {
-        $warehouses = Warehouse::select('id', 'name')->orderBy('name', 'asc')->get();
+        $warehouses = Warehouse::select('id', 'name')->where('status', 1)->orderBy('name', 'asc')->get();
         $movementsReferenceId = MovementsReference::max('id') + 1;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
         if($hasPermission)
@@ -279,8 +279,8 @@ class MovementController extends Controller
             foreach ($counts as $key => $count) {
                 if ($count > 1) {
                     [$vin, $from, $to] = explode('|', $key);
-                    $fromLocation = Warehouse::find($from);
-                    $toLocation = Warehouse::find($to);
+                    $fromLocation = Warehouse::where('id', $from)->where('status', 1)->first();
+                    $toLocation = Warehouse::where('id', $to)->where('status', 1)->first();
                     $fromPlace = $fromLocation->name ?? '';
                     $toPlace = $toLocation->name ?? '';
                     $duplicateCombinations[] = "Duplicate entry found for VIN: $vin, From: $fromPlace, To: $toPlace";
@@ -589,11 +589,11 @@ class MovementController extends Controller
     $brand = Brand::find($vehicle->variant->brands_id)->first();
     $ownership_type = $vehicle->ownership_type;
     $movement = Movement::where('vin', $vin)->pluck('to')->last();
-    $warehouseName = Warehouse::where('id', $movement)->pluck('id')->first();
+    $warehouseName = Warehouse::where('id', $movement)->where('status', 1)->pluck('id')->first();
 
     if (empty($warehouseName)) {
         if($vehicle->latest_location){
-        $warehouseName = Warehouse::where('id', $vehicle->latest_location)->pluck('id')->first();
+        $warehouseName = Warehouse::where('id', $vehicle->latest_location)->where('status', 1)->pluck('id')->first();
         }
         else{
            $warehouseName = 1;
@@ -735,11 +735,11 @@ class MovementController extends Controller
                 $brand = Brand::find($vehicle->variant->brands_id)->brand_name;
                 $ownership_type = $vehicle->ownership_type;
                 $movement = Movement::where('vin', $data->vin)->pluck('to')->last();
-                $warehouseName = Warehouse::where('id', $movement)->pluck('id')->first();
-                $warehouseNames = Warehouse::where('id', $movement)->pluck('name')->first();
+                $warehouseName = Warehouse::where('id', $movement)->where('status', 1)->value('id');;
+                $warehouseNames = Warehouse::where('id', $movement)->where('status', 1)->value('name');;
                 if (empty($warehouseName)) {
                  if($vehicle->latest_location){
-                 $warehouseName = Warehouse::where('id', $vehicle->latest_location)->pluck('id')->first();
+                 $warehouseName = Warehouse::where('id', $vehicle->latest_location)->where('status', 1)->value('id');;
                  }
                  else{
                     $warehouseName = 1;
@@ -748,7 +748,7 @@ class MovementController extends Controller
                  if (empty($warehouseNames)) {
                  if($vehicle->latest_location)
                  {
-                    $warehouseNames = Warehouse::where('id', $vehicle->latest_location)->pluck('name')->first();
+                    $warehouseNames = Warehouse::where('id', $vehicle->latest_location)->where('status', 1)->value('name');;
                  }
                 else
                 {
@@ -791,11 +791,11 @@ class MovementController extends Controller
                 $ownership_type = $vehicle->ownership_type;
                 $brand = Brand::find($vehicle->variant->brands_id)->brand_name;
                 $movement = Movement::where('vin', $data->vin)->pluck('to')->last();
-                $warehouseName = Warehouse::where('id', $movement)->pluck('id')->first();
-                $warehouseNames = Warehouse::where('id', $movement)->pluck('name')->first();
+                $warehouseName = Warehouse::where('id', $movement)->where('status', 1)->value('id');;
+                $warehouseNames = Warehouse::where('id', $movement)->where('status', 1)->value('name');;
                 if (empty($warehouseName)) {
                     if($vehicle->latest_location){
-                    $warehouseName = Warehouse::where('id', $vehicle->latest_location)->pluck('id')->first();
+                    $warehouseName = Warehouse::where('id', $vehicle->latest_location)->where('status', 1)->value('id');;
                     }
                     else{
                        $warehouseName = 1;
@@ -804,7 +804,7 @@ class MovementController extends Controller
                     if (empty($warehouseNames)) {
                     if($vehicle->latest_location)
                     {
-                       $warehouseNames = Warehouse::where('id', $vehicle->latest_location)->pluck('name')->first();
+                       $warehouseNames = Warehouse::where('id', $vehicle->latest_location)->where('status', 1)->value('name');;
                     }
                    else
                    {
@@ -921,13 +921,13 @@ public function uploadVinFile(Request $request)
                 $modelLine = MasterModelLines::find($vehicle->variant->master_model_lines_id)->model_line;
                 $brand = Brand::find($vehicle->variant->brands_id)->brand_name;
                 $movement = Movement::where('vin', $vin)->pluck('to')->last();
-                $warehouseName = Warehouse::where('id', $movement)->pluck('id')->first();
-                $warehouseNames = Warehouse::where('id', $movement)->pluck('name')->first();
+                $warehouseName = Warehouse::where('id', $movement)->where('status', 1)->value('id');;
+                $warehouseNames = Warehouse::where('id', $movement)->where('status', 1)->value('name');;
                 // Default to Supplier if no warehouse name found
-                $warehouseName = $warehouseName ?: ($vehicle->latest_location ? Warehouse::where('id', $vehicle->latest_location)->pluck('id')->first() : 1);
-                $warehouseNames = $warehouseNames ?: ($vehicle->latest_location ? Warehouse::where('id', $vehicle->latest_location)->pluck('name')->first() : "Supplier");
+                $warehouseName = $warehouseName ?: ($vehicle->latest_location ? Warehouse::where('id', $vehicle->latest_location)->where('status', 1)->value('id') : 1);
+                $warehouseNames = $warehouseNames ?: ($vehicle->latest_location ? Warehouse::where('id', $vehicle->latest_location)->where('status', 1)->value('name') : "Supplier");
                 // Match the 'to' warehouse from the CSV and set as default
-                $matchedWarehouse = Warehouse::where('name', $toWarehouse)->first();
+                $matchedWarehouse = Warehouse::where('name', $toWarehouse)->where('status', 1)->first();
                 $vehicleDetails[] = [
                     'vin' => $vin,
                     'ownership_type' => $ownership_type,
@@ -966,8 +966,8 @@ public function uploadVinFile(Request $request)
         foreach ($counts as $key => $count) {
             if ($count > 1) {
                 [$vin, $from, $to] = explode('|', $key);
-                $fromLocation = Warehouse::find($from);
-                $toLocation = Warehouse::find($to);
+                $fromLocation = Warehouse::where('id', $from)->where('status', 1)->first();
+                $toLocation = Warehouse::where('id', $to)->where('status', 1)->first();
                 $from = $fromLocation->name ?? '';
                 $to = $toLocation->name ?? '';
                 $duplicateCombinations[] = "VIN: $vin, From: $from, To: $to.";

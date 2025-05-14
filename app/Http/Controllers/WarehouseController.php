@@ -30,6 +30,7 @@ class WarehouseController extends Controller
     {
         $this->validate($request, [
             'name' => 'string|required|max:255',
+            'status' => 'required|boolean',
         ]);
         $name = $request->input('name');
         $existingWarehouse = Warehouse::where('name', $name)->first();
@@ -38,6 +39,7 @@ class WarehouseController extends Controller
         }
         $warehouse = new Warehouse();
         $warehouse->name  = $name;
+        $warehouse->status = $request->input('status', 1); 
         $warehouse->created_by = auth()->user()->id;
         $warehouse->save();
         $warehouseId = $warehouse->id;
