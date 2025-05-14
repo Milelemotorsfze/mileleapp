@@ -53,7 +53,8 @@ class WarehouseController extends Controller
         $warehouselog->created_by = auth()->user()->id;
         $warehouselog->save();
         $warehouselist = Warehouse::orderBy('id','DESC')->get();
-        return view('warehouse.list')->with(compact('warehouselist'))->with('success', 'Warehouse added successfully.');
+        // return view('warehouse.list')->with(compact('warehouselist'))->with('success', 'Warehouse added successfully.');
+        return redirect()->route('warehouse.index')->with('success', 'Warehouse created successfully.');
     }
     public function show(string $id)
     {
@@ -109,7 +110,8 @@ class WarehouseController extends Controller
         }
     }
     $warehouselist = Warehouse::orderBy('id','DESC')->get();
-    return view('warehouse.list', compact('warehouselist'))->with('success', 'Variant added successfully.');
+    // return view('warehouse.list', compact('warehouselist'))->with('success', 'Variant added successfully.');
+    return redirect()->route('warehouse.index')->with('success', 'Warehouse updated successfully.');
     }
     public function destroy(string $id)
     {
