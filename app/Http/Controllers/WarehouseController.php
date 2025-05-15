@@ -63,7 +63,11 @@ class WarehouseController extends Controller
     {
         $warehouse = Warehouse::findOrFail($id);
         $warehouselog = Warehouselog::where('warehouse_id', $id)->orderBy('created_at', 'desc')->get();
-        return view('warehouse.editlist',compact('warehouse','warehouselog'));
+        $usedByVehicles = Vehicles::where('latest_location', $id)
+        ->whereNotNull('vin')
+        ->exists();
+
+        return view('warehouse.editlist',compact('warehouse','warehouselog', 'usedByVehicles'));
     }
     public function update(Request $request, string $id)
     {

@@ -48,19 +48,39 @@
                         <input type="text" value="{{ old('name', $warehouse->name) }}" name="name" class="form-control " placeholder="Warehouse Name" required>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6 col-sm-12 d-flex align-items-center justify-content-center">
+                <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label class="form-label d-block"><span class="error">* </span>Status</label>
+                        <label class="form-label d-block">
+                            <span class="error">*</span> Status
+                        </label>
+
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="status" id="statusYes" value="1" {{ $warehouse->status == 1 ? 'checked' : '' }}>
+                            <input class="form-check-input" type="radio" name="status" id="statusYes"
+                                value="1" {{ $warehouse->status == 1 ? 'checked' : '' }}>
                             <label class="form-check-label" for="statusYes">Active</label>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="status" id="statusNo" value="0" {{ $warehouse->status == 0 ? 'checked' : '' }}>
-                            <label class="form-check-label" for="statusNo">In-Active</label>
-                        </div>
+
+                        @if ($usedByVehicles)
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="statusNo" disabled>
+                                <label class="form-check-label text-muted" for="statusNo">In-Active (Blocked)</label>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-danger">
+                                    This warehouse location is being used by vehicles. Cannot mark it as In-Active.
+                                </small>
+                            </div>
+                            <input type="hidden" name="status" value="{{ $warehouse->status }}">
+                        @else
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="status" id="statusNo"
+                                    value="0" {{ $warehouse->status == 0 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="statusNo">In-Active</label>
+                            </div>
+                        @endif
                     </div>
                 </div>
+
                 <div class="col-12 text-center">
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </div>

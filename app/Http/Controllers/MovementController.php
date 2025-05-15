@@ -571,44 +571,71 @@ class MovementController extends Controller
     }
     public function vehiclesdetails(Request $request)
     {
-
-    // info($request->all());
-    $vin = $request->input('vin');
-    $vehicle = Vehicles::where('vin', $vin)->first();
-    // info($vehicle);
-    $variant = Varaint::find($vehicle->varaints_id)->first();
-    $modelLine = MasterModelLines::find($vehicle->variant->master_model_lines_id)->first();
-    $po_number = PurchasingOrder::find($vehicle->purchasing_order_id)->first();
+        $vin = $request->input('vin');
     
-    $so_number = '';
-    if($vehicle->so_id) {
-        $so_number = So::find($vehicle->so_id)->first();
-        $so_number = $so_number->so_number ?? '';
+        $vehicle = Vehicles::with(['variant'])->where('vin', $vin)->first();
+    
+        if (!$vehicle) {
+            return response()->json([
+                'success' => false,
+                'message' => 'VIN not found',
+            ]);
+        }
+    
+        $variant = Varaint::find($vehicle->varaints_id); 
+        
+        $modelLine = null;
+        if ($variant && $variant->master_model_lines_id) {
+            $modelLine = MasterModelLines::find($variant->master_model_lines_id);
+        }
+    
+        $po_number = '';
+        if ($vehicle->purchasing_order_id) {
+            $po = PurchasingOrder::find($vehicle->purchasing_order_id);
+            $po_number = $po?->po_number ?? '';
+        }
+    
+        $so_number = '';
+        if ($vehicle->so_id) {
+            $so = So::find($vehicle->so_id);
+            $so_number = $so?->so_number ?? '';
+        }
+    
+        $brand = null;
+        if ($variant && $variant->brands_id) {
+            $brandModel = Brand::find($variant->brands_id);
+            $brand = $brandModel?->brand_name ?? '';
+        }
+    
+        $ownership_type = $vehicle->ownership_type;
+    
+        $movement = Movement::where('vin', $vin)->pluck('to')->last();
+    
+        $warehouseName = Warehouse::where('id', $movement)
+            ->where('status', 1)
+            ->value('id');
+    
+        if (empty($warehouseName)) {
+            if ($vehicle->latest_location) {
+                $warehouseName = Warehouse::where('id', $vehicle->latest_location)
+                    ->where('status', 1)
+                    ->value('id');
+            } else {
+                $warehouseName = 1; 
+            }
+        }
+    
+        return response()->json([
+            'variant' => $variant?->name ?? '',
+            'brand' => $brand,
+            'ownership_type' => $ownership_type,
+            'movement' => $warehouseName,
+            'po_number' => $po_number,
+            'so_number' => $so_number,
+            'modelLine' => $modelLine?->model_line ?? '',
+        ]);
     }
-
-    $brand = Brand::find($vehicle->variant->brands_id)->first();
-    $ownership_type = $vehicle->ownership_type;
-    $movement = Movement::where('vin', $vin)->pluck('to')->last();
-    $warehouseName = Warehouse::where('id', $movement)->where('status', 1)->pluck('id')->first();
-
-    if (empty($warehouseName)) {
-        if($vehicle->latest_location){
-        $warehouseName = Warehouse::where('id', $vehicle->latest_location)->where('status', 1)->pluck('id')->first();
-        }
-        else{
-           $warehouseName = 1;
-        }
-        }
-    return response()->json([
-        'variant' => $variant->name ?? '',
-        'brand' => $brand->brand_name ?? '',
-        'ownership_type' => $ownership_type,
-        'movement' => $warehouseName,
-        'po_number' => $po_number->po_number ?? '',
-        'so_number' => $so_number,
-        'modelLine' => $modelLine->model_line ?? ''
-    ]);
-    }
+    
     public function vehiclesdetailsaspo(Request $request)
     {
     $selectedPo = $request->input('po');
