@@ -43,9 +43,10 @@ class So extends Model
     {
         return $this->hasOneThrough(Calls::class, Quotation::class, 'id', 'id', 'quotation_id', 'calls_id');
     }
-    public function so_items()
+    // need to remove
+    public function so_variants()
     {
-        return $this->hasMany(Soitems::class,'so_id');
+        return $this->hasMany(SoVariant::class,'so_id');
     }
     public function so_logs()
     {

@@ -30,6 +30,8 @@ use App\Models\MasterModelLines;
 use App\Models\SalesOrderHistory;
 use App\Models\SalesOrderHistoryDetail;
 use App\Models\SoVariant;
+use App\Models\QuotationVins;
+use App\Models\QuotationSubItem;
 
 use Illuminate\Http\Request;
 
@@ -133,7 +135,6 @@ class SalesOrderController extends Controller
      */
     public function edit($id)
     {
-        // return 1;
             $so = SO::findorFail($id);
             $quotation = Quotation::findOrFail($so->quotation_id);
             $call = Calls::findOrFail($quotation->calls_id);
@@ -252,11 +253,11 @@ class SalesOrderController extends Controller
                                             ->select('id','gdn_id','vin')->get();
                                             
                 $soVariant->selectedVehicleIds = $selectedVehicleIds;
-               // check the quotation referenceid
                $soVariant->isgdnExist = 0;
+            //    return $selectedVehicleIds;
                foreach($selectedVehicleIds as $eachVehicle) {
                     $eachVehicle = Vehicles::find($eachVehicle);
-                    if($eachVehicle->gdn_id) {
+                    if($eachVehicle && $eachVehicle->gdn_id) {
                         $soVariant->isgdnExist = 1;
                         break; 
                     }
@@ -264,7 +265,6 @@ class SalesOrderController extends Controller
             }
             $totalVehicles = $soVariants->sum('quantity');
             $variants = Varaint::select('id','name')->get();
-            // return $soVariants;
             return view('salesorder.edit', compact('variants','totalVehicles','quotation', 'call', 'customerdetails','so', 
             'empProfile', 'saleperson','soVariants'));  
     }
@@ -274,9 +274,10 @@ class SalesOrderController extends Controller
      */
     public function update(Request $request, $id)
     {
-        return $request->all();
+   
+        // return $request->all();
 
-        // DB::beginTransaction();
+        DB::beginTransaction();
         // try {
                 $so = SO::findorFail($id);
                 $logEntries = [];
@@ -284,35 +285,183 @@ class SalesOrderController extends Controller
 
                 // basic details Fields to check for changes
                 $fields = [
-                'so_number' => 'SO-' . $request->input('so_number'),
-                'so_date' => $request->input('so_date'),
-                'notes' => $request->input('notes') ?: null,
-                'total' => $request->input('total_payment') ?: null,
-                'receiving' => $request->input('receiving_payment') ?: null,
-                'paidinso' => $request->input('payment_so') ?: null,
-                'paidinperforma' => $request->input('advance_payment_performa') ?: null,
-                'updated_by' => Auth::id(),
-            ];
+                    'so_number' => 'SO-' . $request->input('so_number'),
+                    'so_date' => $request->input('so_date'),
+                    'notes' => $request->input('notes') ?: null,
+                    'total' => $request->input('total_payment') ?: null,
+                    'receiving' => $request->input('receiving_payment') ?: null,
+                    'paidinso' => $request->input('payment_so') ?: null,
+                    'paidinperforma' => $request->input('advance_payment_performa') ?: null,
+                    'updated_by' => Auth::id(),
+                ];
 
             foreach ($fields as $field => $newValue) {
                 $oldValue = $so->$field;
-
                 if ($newValue != $oldValue) {
-
                     $so->$field = $newValue;
                     $logEntries[] = [
                         'type' => is_null($oldValue) ? 'Set' : 'Change',
-                        'model_type' => 'App\Models\SO',
+                        'so_item_id' => null,
+                        'so_variant_id' => null,
                         'field_name' => $field,
                         'old_value' => $oldValue,
-                        'new_value' => $newValue,
-                        'created_at' => $currentTimestamp,
-                        'updated_at' => $currentTimestamp
+                        'new_value' => $newValue
                     ];
                 }
             }
             $so->save();
-                  
+           
+            $soVariants = $request->variants;
+            if ($soVariants) {
+                // Find removed quotaion items
+                $existingVariantIds = SoVariant::where('so_id', $so->id)->pluck('quotation_item_id')->toArray();
+                $newVariantIds = array_column($soVariants, 'quotation_item_id');
+            
+                $removedVariants = array_diff($existingVariantIds, $newVariantIds);
+                info("removed variants");
+                info($removedVariants);
+              
+                foreach ($removedVariants as $variantId) {
+                    $removedVariant = SoVariant::where('quotation_item_id', $variantId)
+                                        ->where('so_id', $so->id)->first();
+                    info($removedVariant);
+                    $logEntries[] = [
+                        'type' => 'Unset',
+                        'so_item_id' => null,
+                        'so_variant_id' => $removedVariant->id,
+                        'field_name' => 'so_variant_id',
+                        'old_value' => $variantId,
+                        'new_value' => null
+                    ];
+
+                    // get all so item corresponding so varaint and log => delete
+                    $removeVehicleIds = Soitems::where('so_variant_id', $removedVariant->id)->pluck('vehicles_id')->toArray();
+                    info("removed soitems");
+                 if (!empty($removeVehicleIds)) {
+                          $logEntries = array_merge($logEntries, $this->removeSoItems($removedVariant->id, $removeVehicleIds));
+                         info($removeVehicleIds);
+                    }
+                   
+                    // Delete the variant itself
+                    $removedVariant->delete();
+                }
+                    
+                foreach ($soVariants as $key => $soVariant) {
+                    info("each varaint looping");
+                    // chek variant existing or not
+                    if(isset($soVariant['quotation_item_id'])) {
+                        $existingVariant = SoVariant::where('quotation_item_id', $soVariant['quotation_item_id'])
+                                                ->where('so_id', $id)->first();
+                    }else{
+                        $existingVariant = null;
+                    }
+
+                    if (!$existingVariant) {
+                        // if(isset($soVariant['quotation_item_id'])) and existing varaint only 
+                        info("notexisting add new varaint");
+                        // add to so variants 
+                        // need to log for descrfiption price and qty
+
+                        $soVariantdata  = New SoVariant();
+                        $soVariantdata->so_id = $so->id;
+                        $soVariantdata->variant_id = $soVariant['variant_id'];
+                        $soVariantdata->price = $soVariant['price'];
+                        $soVariantdata->description = $soVariant['description'];
+                        $soVariantdata->quantity = $soVariant['quantity'];
+                        $soVariantdata->save();
+                        foreach (['so_variant_id','description', 'price', 'quantity'] as $field) {
+                                $logEntries[] = [
+                                'type' => 'Set',
+                                'so_item_id' => null,
+                                'so_variant_id' => $soVariantdata->id,
+                                'field_name' => $field,
+                                'old_value' => null,
+                                'new_value' => $field == 'so_variant_id' ? $soVariantdata->id : $soVariantdata->$field
+                            ];
+                        }
+                        // add all vins here for new variant
+                        info($soVariant);
+                        if (isset($soVariant['vehicles'])) {
+                                info("vehicles found under new varaint");
+                            foreach($soVariant['vehicles'] as $eachVehicleId) {
+                                info("new vehicle id added". $eachVehicleId);
+                                $soItem = Soitems::create(['vehicles_id' => $eachVehicleId, 'so_variant_id' => $soVariantdata->id]);
+                                $logEntries[] = [
+                                    'type' => 'Set',
+                                    'so_item_id' => $soItem->id,
+                                    'so_variant_id' => $soVariantdata->id,
+                                    'field_name' => 'vehicle_id',
+                                    'old_value' => null,
+                                    'new_value' => $eachVehicleId
+                                ];
+
+                                // Update vehicle's SO ID
+                                Vehicles::where('id', $eachVehicleId)->update(['so_id' => $so->id]);
+                            }
+                        }
+                            
+                    } else {
+                            info("variant found in the system".$existingVariant->variant->name ?? '');
+                        // Check for changes in variant fields (description, price, quantity)
+                        foreach (['description', 'price', 'quantity'] as $field) {
+                            $oldValue = $existingVariant->$field;
+                            $newValue = $soVariant[$field];
+
+                            if ($oldValue != $newValue) {
+                                        info("change found in the variants");
+                                        info($field);
+                                // Log the change
+                                $logEntries[] = [
+                                    'type' => 'Change',
+                                    'so_item_id' => null,
+                                    'so_variant_id' => $existingVariant->id,
+                                    'field_name' => $field,
+                                    'old_value' => $oldValue,
+                                    'new_value' => $newValue
+                                ];
+                                $existingVariant->$field = $newValue;
+                             
+                            }
+                        }
+                        $existingVariant->save();
+
+                        // Check for changes in associated vehicles
+                        $existingVehicleIds = $existingVariant ? $existingVariant->so_items->pluck('vehicles_id')->toArray() : [];
+                        $newVehicleIds = $soVariant['vehicles'] ?? [];
+
+                        // Find added and removed vehicles for each existing variant
+                        $addedVehicles = array_diff($newVehicleIds, $existingVehicleIds);
+                            info("newly added vehicles under variant".$existingVariant->variant->name ?? '');
+                            info($addedVehicles);
+                        $removedVehicles = array_diff($existingVehicleIds, $newVehicleIds);
+                            info("removed vehicles under variant".$existingVariant->variant->name ?? '');
+                            info($removedVehicles);
+
+                        // Log added vehicles
+                        foreach ($addedVehicles as $vehicleId) {
+                            // Add the vehicle to the SO items
+                            $soItem = Soitems::create(['vehicles_id' => $vehicleId, 'so_variant_id' => $existingVariant->id]);
+
+                                $logEntries[] = [
+                                'type' => 'Set',
+                                'so_item_id' => $soItem->id,
+                                'so_variant_id' => $existingVariant->id,
+                                'field_name' => 'vehicles_id',
+                                'old_value' => null,
+                                'new_value' => $vehicleId
+                            ];
+
+                            // Update vehicle's SO ID
+                            Vehicles::where('id', $vehicleId)->update(['so_id' => $so->id]);
+                        }
+
+                        // $removeSoItems = Soitems::where('so_variant_id', $removedVariant->id)->pluck('vehicles_id')->toArray();
+                        $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $removedVehicles));
+
+                    }
+                }
+            }
+
             if (!empty($logEntries)) {
                 $history = SalesOrderHistory::create([
                     'so_id' => $so->id,
@@ -322,80 +471,75 @@ class SalesOrderController extends Controller
 
                 foreach ($logEntries as &$entry) {
                     $entry['sales_order_history_id'] = $history->id;
+                    $entry['created_at'] = $currentTimestamp;
+                    $entry['updated_at'] = $currentTimestamp;
                 }
                 SalesOrderHistoryDetail::insert($logEntries);
             }
 
-            
+            $totalAmount = SoVariant::where('so_id', $id)
+                            ->selectRaw('SUM(quantity * price) as total_amount')
+                            ->value('total_amount');
 
-                // Soitems::where('so_id', $so->id)->update(['deleted_by' => Auth::id()]);
-                // Soitems::where('so_id', $so->id)->delete();
-                // Vehicles::where('so_id', $so->id)->update(['so_id' => null]);
-                // get the variants count of existing so
-                // $oldVariants = $so->vehicles()->groupBy('varaints_id')->pluck('varaints_id')->toArray();
+            // if($totalAmount != $so->quotation->deal_value) {
+            //     $so->status = 'Pending';
+            //     $so->save();
+            // }else{
+                info("no price cahnging");
+                // no price cahnge keep version history of quotation
+                // update the quotation items 
+                $existingQuotationItemIds = QuotationItem::where('reference_type', 'App\Models\Varaint')->where('quotation_id', $so->quotation_id)->pluck('id')->toArray();
+                $latestQuotationItemsExistingIds = SoVariant::where('so_id', $id)->pluck('quotation_item_id')->toArray();
 
+                $removedQuotationItemIds = array_diff($existingQuotationItemIds, $latestQuotationItemsExistingIds);
+                if (!empty($removedQuotationItemIds)) {
+                    // Delete related data from related tables
+                    // MultipleAgentSystemCode::whereIn('quotation_items_id', $removedQuotationItemIds)->delete();
+                    QuotationVins::whereIn('quotation_items_id', $removedQuotationItemIds)->delete();
+                    BookingRequest::whereIn('quotation_items_id', $removedQuotationItemIds)->delete();
+                    $quotationSubItems = QuotationSubItem::whereIn('quotation_item_parent_id', $removedQuotationItemIds)->pluck('quotation_item_id')->toArray(); 
+                    // delete quotation item sub items from quotation items table (addon,spareparts..)
+                    QuotationItem::where('quotation_id', $so->quotation_id)->whereIn('id', $quotationSubItems)->delete();
+                    // delete from subitems table
+                    QuotationSubItem::whereIn('quotation_item_parent_id', $removedQuotationItemIds)->delete();
+                    // Delete the quotation items
+                    QuotationItem::whereIn('id', $removedQuotationItemIds)->delete();
+                }
+                // get all so varianta and create new entry in quottaion items if quotation id is null => new entry
+               $soVariants = SoVariant::where('so_id', $id)->get();
+                foreach($soVariants as $soVariant) {
+                    if (is_null($soVariant->quotation_item_id)) {
+                        // Create a new entry in quotation_items
+                        $quotationItem = new QuotationItem();
+                        $quotationItem->quotation_id = $so->quotation_id;
+                        $quotationItem->reference_type = 'App\Models\Varaint';
+                        $quotationItem->reference_id  = $soVariant->variant_id;
+                        $quotationItem->description =  $soVariant->description;
+                        $quotationItem->unit_price =  $soVariant->price;
+                        $quotationItem->quantity =    $soVariant->quantity;
+                        $quotationItem->total_amount =  $soVariant->quantity *  $soVariant->price;
+                        $quotationItem->save();
+                        
+                        // Update the quotation_item_id in the so variant
+                        $soVariant->quotation_item_id = $quotationItem->id;
+                        $soVariant->save();
+                    } else {
+                        // Update the existing quotation item
+                        QuotationItem::where('id', $soVariant->quotation_item_id)->update([
+                            'reference_id' => $soVariant->variant_id,      
+                            'description' => $soVariant->description,
+                            'unit_price' => $soVariant->price, 
+                            'quantity' => $soVariant->quantity,   
+                            'total_amount' => $soVariant->quantity * $soVariant->price,
+                        ]);
+                    }
+                }
 
-                // $newVariants = $request->variants;
-                // return $newVariants;
-                // $latestSoHistory = SalesOrderHistory::where('so_id',$so->id)->latest()->first();
-                // if(!$latestSoHistory) {
-                //     $versionNumber = 1;
-                // }else{
-                //     $versionNumber = $latestSoHistory->version_number ?? 1 ;
-                // }
-                //     SalesOrderHistory::create([
-                //             'so_id' => $so->id,
-                //             'version_number' => $versionNumber,
-                //             'user_id ' => Auth::id(),
-                //             'created_at' => Carbon::now(),
-                //         ]);
-                // foreach ($newVariants as $key => $newVariant) {
-                //     $newVariant = $oldVariants[$key]['variant_id'] ?? null;
-                //     info($newVariant);
-                   
+                // need to keep quotation 
+                // $quotation = $this->generateLatestQuotation($so->quotation_id);
+            // }
 
-                //     if (!in_array($newVariant, $oldVariant)) {
-                //         // New Entry
-                //          SalesOrderHistory::create([
-                //             'so_id' => $soId,
-                //             'change_type' => 'set',
-                //             'variant_id' => $newVariant['variant_id'],
-                //             'old_value' => null,
-                //             'new_value' => json_encode($newVariant),
-                //             'created_at' => now(),
-                //         ]);
-
-                //     }
-
-                // }
-
-                //  $soVariants = $request->variants;
-                // if($soVariants) {
-                //     foreach($soVariants as $key => $soVariant) {
-                //         $quotationItem = QuotationItem::findOrFail($soVariant['quotation_item_id']);
-                //         $soVariantdata  = New SoVariant();
-                //         $soVariantdata->so_id = $so->id;
-                //         $soVariantdata->variant_id = $soVariant['variant_id'];
-                //         $soVariantdata->price = $quotationItem ? $quotationItem->unit_price : 0;
-                //         $soVariantdata->description = $quotationItem ? $quotationItem->description : '';
-                //         $soVariantdata->quantity = $quotationItem ? $quotationItem->quantity : 0;
-                //         $soVariantdata->save();
-                //         if(isset($soVariant['vehicles'])) {
-                //             $vehicleIds = $soVariant['vehicles'];
-                //             foreach($vehicleIds as $vehicleId) {
-                //                 $soItem  = New Soitems();
-                //                 $soItem->vehicles_id = $vehicleId;
-                //                 $soItem->so_variant_id  = $soVariantdata->id;
-                //                 $soItem->save();
-                //                 $vehicle = Vehicles::find($vehicleId);
-                //                 Vehicles::where('id', $vehicleId)->update(['so_id' => $so->id]);
-                //             }
-                //         }
-                //     }
-                // }
-
-
-            //     DB::commit();
+                DB::commit();
                 return redirect()->back()->with('success', 'Sales Order updated successfully.');
             // } catch (\Exception $e) {
             //     DB::rollBack(); // Rollback transaction in case of error
@@ -403,6 +547,131 @@ class SalesOrderController extends Controller
 
             //     return redirect()->back()->withErrors('An error occurred while updating sales order.');
             // }
+    }
+
+    public function removeSoItems($soVariantId, $vehicleIds) {
+        $logEntries = [];
+
+        // Fetch SO items to be deleted
+        $soItems = Soitems::whereIn('vehicles_id', $vehicleIds)
+            ->where('so_variant_id', $soVariantId)
+            ->get();
+
+        if ($soItems->isEmpty()) {
+            return $logEntries;
+        }
+
+        foreach ($soItems as $soItem) {
+            // Log the removal of each SO item
+            $logEntries[] = [
+                'type' => 'Unset',
+                'so_item_id' => $soItem->id,
+                'so_variant_id' => $soVariantId,
+                'field_name' => 'vehicles_id',
+                'old_value' => $soItem->vehicles_id,
+                'new_value' => null
+            ];
+
+            // Remove the SO item and update the vehicle's SO ID
+            $soItem->delete();
+            Vehicles::where('id', $soItem->vehicles_id)->update(['so_id' => null]);
+        }
+
+        return $logEntries;
+    }
+
+    public function generateLatestQuotation($id) {
+        $quotation = Quotation::find($id);
+        $quotationDetail = QuotationDetail::with('country')->where('quotation_id',$id)->first();
+        $vehicles =  QuotationItem::where("reference_type", 'App\Models\Varaint')
+            ->where('quotation_id', $quotation->id)->get();
+        $otherVehicles = QuotationItem::whereNull('reference_type')
+            ->whereNull('reference_id')
+            ->where('quotation_id', $quotation->id)
+            ->where('is_enable', true)
+            ->where('is_addon', false)
+            ->get();
+        $vehicleWithBrands = QuotationItem::where('quotation_id', $quotation->id)
+                ->whereIn("reference_type", ['App\Models\Brand','App\Models\MasterModelLines'])
+                ->where('is_addon', false)
+                ->get();
+        $alreadyAddedQuotationIds = QuotationSubItem::where('quotation_id', $quotation->id)
+                         ->pluck('quotation_item_id')->toArray();
+        $directlyAddedAddons =  QuotationItem::where("reference_type", 'App\Models\MasterModelLines')
+            ->where('quotation_id', $quotation->id)
+            ->whereNotIn('id', $alreadyAddedQuotationIds)
+            ->where('is_enable', true)
+            ->where('is_addon', true)->get();
+        $hidedDirectlyAddedAddonSum =  QuotationItem::where("reference_type", 'App\Models\MasterModelLines')
+            ->where('quotation_id', $quotation->id)
+            ->whereNotIn('id', $alreadyAddedQuotationIds)
+            ->where('is_enable', false)
+            ->where('is_addon', true)
+            ->sum('total_amount');
+        $addons = QuotationItem::whereIn('reference_type',['App\Models\AddonDetails','App\Models\Addon'])
+            ->whereNotIn('id', $alreadyAddedQuotationIds)
+            ->where('is_enable', true)
+            ->where('quotation_id', $quotation->id)->get();
+        $OtherAddons = QuotationItem::whereNull('reference_type')
+            ->whereNull('reference_id')
+            ->where('quotation_id', $quotation->id)
+            ->where('is_enable', true)
+            ->where('is_addon', true)->get();
+        $hidedAddonSum = QuotationItem::where('reference_type','App\Models\AddonDetails')
+            ->whereNotIn('id', $alreadyAddedQuotationIds)
+            ->where('quotation_id', $quotation->id)
+            ->where('is_enable', false)->sum('total_amount');
+        $addonsTotalAmount = $hidedDirectlyAddedAddonSum + $hidedAddonSum;
+        $shippingCharges = QuotationItem::where('reference_type','App\Models\Shipping')
+            ->where('is_enable', true)
+            ->where('quotation_id', $quotation->id)->get();
+        $shippingDocuments = QuotationItem::where('reference_type','App\Models\ShippingDocuments')
+            ->where('is_enable', true)
+            ->where('quotation_id', $quotation->id)->get();
+        $otherDocuments = QuotationItem::where('reference_type','App\Models\OtherLogisticsCharges')
+            ->where('is_enable', true)
+            ->where('quotation_id', $quotation->id)->get();
+        $shippingCertifications = QuotationItem::where('reference_type','App\Models\ShippingCertification')
+            ->where('is_enable', true)
+            ->where('quotation_id', $quotation->id)->get();
+        $salesPersonDetail = EmployeeProfile::where('user_id', $quotation->created_by)->first();
+        $salespersonqu = User::find($quotation->created_by);
+        $data = [];
+        $data['sales_person'] = $salespersonqu->name ?? '';
+        $data['sales_office'] = 'Central 191';
+        $data['sales_phone'] = '';
+        $data['sales_email'] = $salespersonqu->email ?? '';
+        $data['client_id'] = $call->id;
+        $data['client_email'] = $call->email;
+        $data['client_name'] = $call->name;
+        $data['client_contact_person'] = $call->client_contact_person ?? '';
+        $data['client_phone'] = $call->phone;
+        $data['client_address'] = $call->address ?? '';
+        $data['document_number'] = $quotation->id;
+        $data['company'] = $call->company_name;
+        $data['document_date'] = Carbon::parse($quotation->date)->format('M d,Y');
+        if($salesPersonDetail) {
+            $data['sales_office'] = $salesPersonDetail->location->name ?? '';
+            $data['sales_phone'] = $salesPersonDetail->contact_number ?? '';
+        }
+        $shippingHidedItemAmount = QuotationItem::where('is_enable', false)
+            ->where('quotation_id', $quotation->id)
+            ->whereIn('reference_type',['App\Models\ShippingDocuments','App\Models\Shipping',
+                'App\Models\ShippingCertification','App\Models\OtherLogisticsCharges'])
+            ->sum('total_amount');
+        $vehicleCount = $vehicles->count() + $otherVehicles->count() + $vehicleWithBrands->count();
+
+        if($vehicleCount > 0) {
+            $shippingChargeDistriAmount = $shippingHidedItemAmount / $vehicleCount;
+        }else{
+            $shippingChargeDistriAmount = 0;
+        }
+        $quotationid = $quotation->id;
+        $multiplecp = MuitlpleAgents::where('quotations_id', $quotationid)->where('agents_id', '!=', $quotationDetail->agents_id)->get();
+        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('multiplecp','quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
+            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','directlyAddedAddons','addonsTotalAmount',
+        'otherVehicles','vehicleWithBrands','OtherAddons','shippingChargeDistriAmount'));
+
     }
 
     /**
@@ -480,6 +749,7 @@ class SalesOrderController extends Controller
                     }
                      $totalVehicles = $quotationItems->sum('quantity');
                     $saleperson = User::find($quotation->created_by);
+                    // return $saleperson;
                     $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first();
                     return view('salesorder.create', compact('vehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails', 'empProfile', 'saleperson',
                 'totalVehicles')); 
@@ -506,6 +776,7 @@ class SalesOrderController extends Controller
                 $so->receiving = $request->input('receiving_payment');
                 $so->paidinso = $request->input('payment_so');
                 $so->paidinperforma = $request->input('advance_payment_performa');
+                $so->status = 'Approved';
                 $so->created_by = auth()->id();
                 $so->created_at = Carbon::now();
                 $so->updated_at = Carbon::now();
@@ -599,6 +870,7 @@ class SalesOrderController extends Controller
                         $soVariantdata  = New SoVariant();
                         $soVariantdata->so_id = $so->id;
                         $soVariantdata->variant_id = $soVariant['variant_id'];
+                        $soVariantdata->quotation_item_id = $soVariant['quotation_item_id'];
                         $soVariantdata->price = $quotationItem ? $quotationItem->unit_price : 0;
                         $soVariantdata->description = $quotationItem ? $quotationItem->description : '';
                         $soVariantdata->quantity = $quotationItem ? $quotationItem->quantity : 0;
@@ -864,6 +1136,7 @@ public function storesalesorderupdate(Request $request, $quotationId)
             $soVinRelationship->save();
 
             // Handle BookingRequest updates
+            // chcek for booking request existing for vin => if yes update days 10 
             $existingBookingPending = BookingRequest::where('quotation_items_id', $quotationItemId)
                 ->where('status', "New")->first();
             $existingBookingApproved = BookingRequest::where('quotation_items_id', $quotationItemId)

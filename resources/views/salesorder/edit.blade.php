@@ -341,8 +341,15 @@
                                     <label for="today_date"><strong>SO Date</strong></label>
                                     <input type="date" class="form-control" id="so_date" name="so_date" value="{{$so->so_date}}">
                                 </div>
-
-                                <div class="col-lg-3 col-md-6 col-sm-6">
+                                <div class="col-md-2 mb-3">
+                                    <label for="so_number">Netsuit SO Number</label>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text">SO-</span>
+                                        <input type="text" class="form-control" placeholder="Enter SO Number" id="so_number" name="so_number"
+                                         value="{{ preg_replace('/^SO-/', '', $so->so_number) }}" aria-label="Enter SO Number">
+                                    </div>
+                                </div>
+                                <!-- <div class="col-lg-3 col-md-6 col-sm-6">
                                     <label for="text_input"><strong>Netsuit SO Number</strong></label>
                                     <div class="input-wrapper d-flex align-items-center">
                                         <span class="prefix">SO-</span>
@@ -351,7 +358,7 @@
                                             value="{{ preg_replace('/^SO-/', '', $so->so_number) }}">
                                     </div>
                                     <span id="error_message" class="text-danger"></span>
-                                </div>
+                                </div> -->
 
                                 <div class="col-lg-6 col-md-6 col-sm-6">
                                     <label for="text_area"><strong>Sales Notes</strong></label>
@@ -388,6 +395,8 @@
                                                                    >{{ $variant->name ?? '' }}</option>
                                                             @endforeach
                                                         </select>
+                                                        <input type="hidden" name="variants[{{ $key + 1 }}][quotation_item_id]" value="{{ $soVariant->quotation_item_id}}" >
+
                                                     </div> 
                                                     <div class="mb-2 col-sm-12 col-md-4 col-lg-4 col-xxl-4">
                                                     <label class="form-label font-size-13">Description</label>
@@ -550,7 +559,6 @@
                     required: true,
                     uniqueSO: true,
                     sixDigit:true
-
                 },
                 "variants[*][variant_id]": {
                     required: true
@@ -758,7 +766,7 @@
                         var index = +i + +1;
                         $(this).find('.variant-descriptions').attr('index', index); 
                         $(this).find('.variant-descriptions').attr('id', 'variant-description-'+index); 
-                        $(this).find('.variant-descriptions').attr('name', 'variants[+index+][description]'); 
+                        $(this).find('.variant-descriptions').attr('name', 'variants['+index+'][description]'); 
                         $(this).attr('id', 'variant-section-'+index);
                         $(this).find('.variants').attr('index', index);
                         $(this).find('.variants').attr('id', 'variant-'+index);
@@ -779,7 +787,6 @@
                         ({
                             placeholder: 'Select Variant',
                             maximumSelectionLength:1,
-                            allowClear: true
                         });
                         $('#vin-'+index).select2
                         ({
