@@ -1,6 +1,13 @@
 @extends('layouts.main')
 @section('content')
 <style>
+    .error {
+        color: red;
+    }
+    .select2-dropdown.select2-dropdown--below {
+        position: relative !important;
+        z-index: 3 !important;
+    }
     .is-invalid.invalid-feedback {
         margin-top: 10px;
     }
@@ -85,7 +92,7 @@
         <div id ="rows-containertitle">
             <div class="row">
                 <div class="col-lg-2 col-md-6">
-                    <label for="basicpill-firstname-input" class="form-label">Vin</label>
+                    <label for="basicpill-firstname-input" class="form-label"><span class="error">* </span>Vin</label>
                 </div>
                 <div class="col-lg-1 col-md-6">
                     <label for="basicpill-firstname-input" class="form-label">PO</label>
@@ -97,10 +104,10 @@
                     <label for="basicpill-firstname-input" class="form-label">Ownership</label>
                 </div>
                 <div class="col-lg-1 col-md-6">
-                    <label for="basicpill-firstname-input" class="form-label">From</label>
+                    <label for="basicpill-firstname-input" class="form-label"><span class="error">* </span>From</label>
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <label for="basicpill-firstname-input" class="form-label">To </label>
+                    <label for="basicpill-firstname-input" class="form-label"><span class="error">* </span>To </label>
                 </div>
                 <div class="col-lg-1 col-md-6">
                     <label for="QTY" class="form-label">Brand</label>
@@ -214,6 +221,7 @@
                 </div>
                 <div class="col-lg-1 col-md-6">
                     <select class="form-control mb-1" id="from${row}" readonly disabled>
+                        <option value="" selected disabled>Select From</option>
                         @foreach ($warehouses as $warehouse)
                         <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                         @endforeach
@@ -222,6 +230,7 @@
                 </div>
                 <div class="col-lg-2 col-md-6">
                     <select name="to[]" class="form-control mb-1" id="to${row}" required>
+                        <option value="" selected disabled>Select To</option>
                         @foreach ($warehouses as $warehouse)
                         @if ($warehouse->name !== 'Supplier')
                         <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
@@ -280,7 +289,7 @@
                     SoFeildinput.val(response.so_number);
                     ownershipFeildinput.val(response.ownership_type);
                     PoFeildinput.val(response.po_number);
-                }
+                },
             });
         });
         $('#rows-container').on('click', '.remove-row-btn', function() {
@@ -330,6 +339,7 @@
                                 </div>
                                 <div class="col-lg-2 col-md-6">
                                     <select name="to[]" class="form-control mb-1" id="to" required>
+                                        <option value="" selected disabled>Select To</option>
                                         @foreach ($warehouses as $warehouse)
                                             @if ($warehouse->name !== 'Supplier')
                                                 <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
@@ -446,6 +456,7 @@
                                 </div>
                                 <div class="col-lg-2 col-md-6">
                                     <select name="to[]" class="form-control mb-1" id="to" required>
+                                        <option value="" selected disabled>Select To</option>
                                         @foreach ($warehouses as $warehouse)
                                             @if ($warehouse->name !== 'Supplier')
                                                 <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
@@ -573,7 +584,7 @@
                                 </div>
                                 <div class="col-lg-2 col-md-6">
                                     <select name="to[]" class="form-control mb-1" id="to" required>
-                                        <option value="">Select</option>
+                                        <option value="" selected disabled>Select To</option>
                                         @foreach ($warehouses as $warehouse)
                                             <option value="{{ $warehouse->id }}" ${vehicle.matchedWarehouseId == {{ $warehouse->id }} ? 'selected' : ''}>
                                                 {{ $warehouse->name }}
