@@ -573,8 +573,8 @@
                 // console.log(response);
                 if (response.success) {
 
-                    // Clear any existing rows before inserting new ones
-                    $("#rows-containerpo").html("");
+                    // Clear any existing excel rows before inserting new ones
+                    $("#rows-containerpo .excel-uploaded-row").remove();
                     
                     response.vehicleDetails.forEach(function (vehicle) {
                         var rowHtml = `
@@ -720,14 +720,31 @@
             e.preventDefault();
 
             let vinArray = [];
+            let duplicateVinMap = {};
+            let duplicateMessages = [];
+
             let fromArray = [];
             let toArray = [];
             let errorMessages = [];
 
-            $("input[name='vin[]']").each(function () {
-                vinArray.push($(this).val());
+            $("input[name='vin[]'], select[name='vin[]']").each(function () {
+                let vinVal = $(this).val();
+                if (vinVal) {
+                    vinArray.push(vinVal);
+                    duplicateVinMap[vinVal] = (duplicateVinMap[vinVal] || 0) + 1;
+                }
             });
 
+            for (const vin in duplicateVinMap) {
+                if (duplicateVinMap[vin] > 1) {
+                    duplicateMessages.push(`❌ VIN ${vin} appears ${duplicateVinMap[vin]} times.`);
+                }
+            }
+
+            if (duplicateMessages.length > 0) {
+                alertify.alert("Duplicate VINs Found", duplicateMessages.join("<br>"));
+                return false;
+            }
             if (vinArray.length <= 0) {
                 $("select[name='vin[]']").each(function () {
                     vinArray.push($(this).val());
@@ -772,16 +789,14 @@
                 },
                 data: {
                     vin: vinArray,
-                    from: fromArray,
-                    to: toArray,
                 },
                 success: function (data) {
                     if (data.length > 0) {
-                        let message = "The following duplicate entries were found:<br>";
+                        let message = "The following duplicate VINs were found:<br>";
                         data.forEach(function (duplicate) {
                             message += duplicate + "<br>";
                         });
-                        alertify.confirm(message, function (e) {}).set({ title: "Invalid Data" });
+                        alertify.alert("Invalid VINs", message);
                         return false;
                     } else {
                         document.getElementById("formCreate").submit();
