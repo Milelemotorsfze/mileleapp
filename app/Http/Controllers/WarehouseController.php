@@ -65,6 +65,7 @@ class WarehouseController extends Controller
         $warehouselog = Warehouselog::where('warehouse_id', $id)->orderBy('created_at', 'desc')->get();
         $usedByVehicles = Vehicles::where('latest_location', $id)
         ->whereNotNull('vin')
+        ->whereNull('gdn_id')
         ->exists();
 
         return view('warehouse.editlist',compact('warehouse','warehouselog', 'usedByVehicles'));

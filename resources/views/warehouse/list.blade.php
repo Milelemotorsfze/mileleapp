@@ -56,8 +56,9 @@
                         </td>
                         <td>
                             @can('warehouse-edit')
-                                <a data-placement="top" href="{{ route('warehouse.edit', $warehouselist->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i>
-                                </a>
+                                @if (!in_array(strtolower($warehouselist->name), ['supplier', 'customer']))
+                                    <a data-placement="top" href="{{ route('warehouse.edit', $warehouselist->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i></a>
+                                @endif
                             @endcan
                         </td>
                     </tr>
