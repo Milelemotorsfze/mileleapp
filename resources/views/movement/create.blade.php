@@ -403,6 +403,11 @@
                         $("#rows-containerpo").append(rowHtml);
                     });
 
+                    $("#rows-containerpo select.to-select").each(function () {
+                        if (!$(this).hasClass("select2-hidden-accessible")) {
+                            $(this).select2();
+                        }
+                    });
                     // Attach the remove-row event handler after adding the rows
                     attachRemoveRowHandler();
                 },
@@ -418,12 +423,6 @@
                 $(this).closest(".row").remove();
             });
         }
-
-        $("#rows-containerpo .to-select").each(function () {
-            if (!$(this).hasClass("select2-hidden-accessible")) {
-                $(this).select2();
-            }
-        });
 
         // Attach the remove-row event handler on document load
         attachRemoveRowHandler();
