@@ -268,28 +268,17 @@ class MovementController extends Controller
                 }
             }
 
-            $combined = [];
-            $duplicateCombinations = [];
+            $vinCounts = array_count_values($vin);
+            $duplicateVins = [];
             
-            for ($i = 0; $i < count($vin); $i++) {
-                $key = $vin[$i] . '|' . $from[$i] . '|' . $to[$i]; // Create unique key
-                $combined[] = $key;
-            }
-            $counts = array_count_values($combined);
-            foreach ($counts as $key => $count) {
+            foreach ($vinCounts as $vinCode => $count) {
                 if ($count > 1) {
-                    [$vin, $from, $to] = explode('|', $key);
-                    $fromLocation = Warehouse::where('id', $from)->where('status', 1)->first();
-                    $toLocation = Warehouse::where('id', $to)->where('status', 1)->first();
-                    $fromPlace = $fromLocation->name ?? '';
-                    $toPlace = $toLocation->name ?? '';
-                    $duplicateCombinations[] = "Duplicate entry found for VIN: $vin, From: $fromPlace, To: $toPlace";
+                    $duplicateVins[] = "VIN: $vinCode appears $count times.";
                 }
             }
             
-            if (count($duplicateCombinations) > 0) {
-             
-                return redirect()->back()->withErrors($duplicateCombinations);
+            if (!empty($duplicateVins)) {
+                return redirect()->back()->withErrors($duplicateVins);
             }
           
             if(count($vinNotExist) > 0) {
@@ -978,30 +967,22 @@ public function uploadVinFile(Request $request)
     }
 
     public function checkDuplicateMovement(Request $request) {
-      
-        $combined = [];
-        $duplicateCombinations = [];
         $vin = $request->vin;
-        $to = $request->to;
-        $from = $request->from;
-        
-        for ($i = 0; $i < count($vin); $i++) {
-            $key = $vin[$i] . '|' . $from[$i] . '|' . $to[$i]; // Create unique key
-            $combined[] = $key;
+    
+        if (!$vin || !is_array($vin)) {
+            return response()->json(['Invalid VIN data'], 400);
         }
-        $counts = array_count_values($combined);
-        foreach ($counts as $key => $count) {
+    
+        $vinCounts = array_count_values($vin);
+        $duplicateMessages = [];
+    
+        foreach ($vinCounts as $code => $count) {
             if ($count > 1) {
-                [$vin, $from, $to] = explode('|', $key);
-                $fromLocation = Warehouse::where('id', $from)->where('status', 1)->first();
-                $toLocation = Warehouse::where('id', $to)->where('status', 1)->first();
-                $from = $fromLocation->name ?? '';
-                $to = $toLocation->name ?? '';
-                $duplicateCombinations[] = "VIN: $vin, From: $from, To: $to.";
+                $duplicateMessages[] = "VIN: $code appears $count times.";
             }
         }
-        
-        return response()->json($duplicateCombinations);
-
-        }
+    
+        return response()->json($duplicateMessages);
+    }
+    
     }
