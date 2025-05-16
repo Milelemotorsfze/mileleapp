@@ -1,8 +1,12 @@
 @extends('layouts.main')
 @section('content')
 <style>
-    .error {
+    .error, p.is-invalid {
         color: red;
+    }
+
+    p.is-invalid {
+        margin-top: 12px;
     }
     .select2-dropdown.select2-dropdown--below {
         position: relative !important;
@@ -531,7 +535,23 @@
                         // `;
                         // }
                         $("#rows-containerpo").append(rowHtml);
-                        $("#rows-containerpo").find("select[name='to[]']").select2();
+// 1. Initialize select2
+$("#rows-containerpo").find("select[name='to[]']").select2();
+
+// 2. Add validation rules dynamically
+$("#rows-containerpo").find("select[name='to[]']").each(function () {
+    $(this).rules("add", {
+        required: true,
+        messages: {
+            required: "To location is required."
+        }
+    });
+});
+
+// 3. Validate on change
+$("#rows-containerpo").find("select[name='to[]']").on("change.select2", function () {
+    $(this).valid();
+});
                     });
                     $(".remove-row-btn").on("click", function () {
                         $(this).closest(".row").remove();
@@ -682,24 +702,40 @@
             $(this).closest(".row").remove();
         });
     }
+
     $("#formCreate").validate({
-            ignore: [],
-            rules: {
-                "vin[]": {
-                    required: true
-                },
-                file: {
-                    extension: "csv",
-                },
-            },
-            messages: {
-                file: {
-                    extension: "Please upload file in .csv format "
-                },
-                
-            },
-            
-        });
+    ignore: [],
+    rules: {
+        "vin[]": {
+            required: true
+        },
+        "to[]": {
+            required: true
+        },
+        file: {
+            extension: "csv"
+        }
+    },
+    messages: {
+        "vin[]": {
+            required: "VIN is required."
+        },
+        "to[]": {
+            required: "To location is required."
+        },
+        file: {
+            extension: "Please upload file in .csv format."
+        }
+    },
+    errorPlacement: function (error, element) {
+        if (element.hasClass('select2-hidden-accessible')) {
+            error.insertAfter(element.next('.select2')); // places error after select2 span
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
 
         $.validator.prototype.checkForm = function (){
             this.prepareForm();
