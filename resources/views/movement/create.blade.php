@@ -221,7 +221,7 @@
                 </div>
                 <div class="col-lg-1 col-md-6">
                     <select class="form-control mb-1" id="from${row}" readonly disabled>
-                        <option value="" selected disabled>Select From</option>
+                        <option value="" selected disabled>From</option>
                         @foreach ($warehouses as $warehouse)
                         <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                         @endforeach
@@ -692,69 +692,84 @@
             return this.valid();
         };
 
-    $('#btn-submit').click(function (e) {
-        e.preventDefault();
-      
-        let vinArray = [];
-        let fromArray = [];
-        let toArray = [];
+        $('#btn-submit').click(function (e) {
+            e.preventDefault();
+
+            let vinArray = [];
+            let fromArray = [];
+            let toArray = [];
+            let errorMessages = [];
+
             $("input[name='vin[]']").each(function () {
                 vinArray.push($(this).val());
             });
-            if(vinArray.length <= 0) {
+
+            if (vinArray.length <= 0) {
                 $("select[name='vin[]']").each(function () {
-                    let vinValue = $(this).val();
-                    vinArray.push(vinValue);
+                    vinArray.push($(this).val());
                 });
             }
-            $("input[name='from[]']").each(function () {
-                fromArray.push($(this).val());
+
+            $("input[name='from[]']").each(function (index, element) {
+                let fromVal = $(this).val();
+                fromArray.push(fromVal);
+
+                if (!fromVal || fromVal.trim() === "" || fromVal === "From" || fromVal === 'undefined' || fromVal === 'null') {
+                    let vinVal = vinArray[index] ?? 'Unknown';
+                    errorMessages.push(`❌ VIN ${vinVal} has no valid "From" location. Please contact IT Development team.`);
+                    $(this).closest('.row').addClass('border border-danger');
+                } else {
+                    $(this).closest('.row').removeClass('border border-danger');
+                }
             });
+
+            if (errorMessages.length > 0) {
+                alertify.alert("Invalid Data", errorMessages.join("<br>"));
+                console.warn("🚨 Validation blocked form submit");
+                return false; 
+            }
+
+            if (!$("#formCreate").valid()) {
+                console.log("Form validation failed");
+                return false;
+            }
+
             $("select[name='to[]']").each(function () {
                 toArray.push($(this).val());
             });
-        if($("#formCreate").valid()) {
 
+            // Ajax check after both validations
             let url = '{{ route('movement.unique-check') }}';
             $.ajax({
-                type:"POST",
-                url: url, 
+                type: "POST",
+                url: url,
                 headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // CSRF token for security
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 data: {
                     vin: vinArray,
                     from: fromArray,
                     to: toArray,
-
                 },
-                success: function(data) {
-                 if(data.length > 0) {
-                    
-                    let message = "The following duplicate entries were found:<br>";
-                    data.forEach(function(duplicate) {
-                        message += duplicate + "<br>";
-                    });
-                    alertify.confirm(message,function (e) {
-                    }).set({title:"Invalid Data"});
-                    
-                    return false;
-                 }else{
+                success: function (data) {
+                    if (data.length > 0) {
+                        let message = "The following duplicate entries were found:<br>";
+                        data.forEach(function (duplicate) {
+                            message += duplicate + "<br>";
+                        });
+                        alertify.confirm(message, function (e) {}).set({ title: "Invalid Data" });
+                        return false;
+                    } else {
                         document.getElementById("formCreate").submit();
                     }
                 },
                 error: function (xhr, status, error) {
-                console.log("Error:", error);
-                alert("An error occurred. Please try again.");
+                    console.log("Error:", error);
+                    const isErrorMsg = "An error occurred. Please try again with all valid fields."
+                    alertify.alert(isErrorMsg);
                 }
             });
-       }else{
-        console.log("Form validation failed");
-       }
-       
-    });
-
-   
+        });
 });
 
 
