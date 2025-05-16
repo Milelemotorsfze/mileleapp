@@ -12,6 +12,8 @@ use App\Models\Closed;
 use App\Models\ModelHasRoles;
 use App\Models\Calls;
 use App\Models\Vehicles;
+use App\Models\Setting;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +34,8 @@ use App\Models\SalesOrderHistoryDetail;
 use App\Models\SoVariant;
 use App\Models\QuotationVins;
 use App\Models\QuotationSubItem;
+use App\Models\MuitlpleAgents;
+use App\Models\QuotationFile;
 
 use Illuminate\Http\Request;
 
@@ -481,63 +485,17 @@ class SalesOrderController extends Controller
                             ->selectRaw('SUM(quantity * price) as total_amount')
                             ->value('total_amount');
 
-            // if($totalAmount != $so->quotation->deal_value) {
-            //     $so->status = 'Pending';
-            //     $so->save();
-            // }else{
+            if($totalAmount != $so->quotation->deal_value) {
+                $so->status = 'Pending';
+                $so->save();
+            }else{
                 info("no price cahnging");
                 // no price cahnge keep version history of quotation
                 // update the quotation items 
-                $existingQuotationItemIds = QuotationItem::where('reference_type', 'App\Models\Varaint')->where('quotation_id', $so->quotation_id)->pluck('id')->toArray();
-                $latestQuotationItemsExistingIds = SoVariant::where('so_id', $id)->pluck('quotation_item_id')->toArray();
-
-                $removedQuotationItemIds = array_diff($existingQuotationItemIds, $latestQuotationItemsExistingIds);
-                if (!empty($removedQuotationItemIds)) {
-                    // Delete related data from related tables
-                    // MultipleAgentSystemCode::whereIn('quotation_items_id', $removedQuotationItemIds)->delete();
-                    QuotationVins::whereIn('quotation_items_id', $removedQuotationItemIds)->delete();
-                    BookingRequest::whereIn('quotation_items_id', $removedQuotationItemIds)->delete();
-                    $quotationSubItems = QuotationSubItem::whereIn('quotation_item_parent_id', $removedQuotationItemIds)->pluck('quotation_item_id')->toArray(); 
-                    // delete quotation item sub items from quotation items table (addon,spareparts..)
-                    QuotationItem::where('quotation_id', $so->quotation_id)->whereIn('id', $quotationSubItems)->delete();
-                    // delete from subitems table
-                    QuotationSubItem::whereIn('quotation_item_parent_id', $removedQuotationItemIds)->delete();
-                    // Delete the quotation items
-                    QuotationItem::whereIn('id', $removedQuotationItemIds)->delete();
-                }
-                // get all so varianta and create new entry in quottaion items if quotation id is null => new entry
-               $soVariants = SoVariant::where('so_id', $id)->get();
-                foreach($soVariants as $soVariant) {
-                    if (is_null($soVariant->quotation_item_id)) {
-                        // Create a new entry in quotation_items
-                        $quotationItem = new QuotationItem();
-                        $quotationItem->quotation_id = $so->quotation_id;
-                        $quotationItem->reference_type = 'App\Models\Varaint';
-                        $quotationItem->reference_id  = $soVariant->variant_id;
-                        $quotationItem->description =  $soVariant->description;
-                        $quotationItem->unit_price =  $soVariant->price;
-                        $quotationItem->quantity =    $soVariant->quantity;
-                        $quotationItem->total_amount =  $soVariant->quantity *  $soVariant->price;
-                        $quotationItem->save();
-                        
-                        // Update the quotation_item_id in the so variant
-                        $soVariant->quotation_item_id = $quotationItem->id;
-                        $soVariant->save();
-                    } else {
-                        // Update the existing quotation item
-                        QuotationItem::where('id', $soVariant->quotation_item_id)->update([
-                            'reference_id' => $soVariant->variant_id,      
-                            'description' => $soVariant->description,
-                            'unit_price' => $soVariant->price, 
-                            'quantity' => $soVariant->quantity,   
-                            'total_amount' => $soVariant->quantity * $soVariant->price,
-                        ]);
-                    }
-                }
-
+               
                 // need to keep quotation 
-                // $quotation = $this->generateLatestQuotation($so->quotation_id);
-            // }
+                $file = $this->generateLatestQuotation($so->id);
+            }
 
                 DB::commit();
                 return redirect()->back()->with('success', 'Sales Order updated successfully.');
@@ -581,8 +539,60 @@ class SalesOrderController extends Controller
     }
 
     public function generateLatestQuotation($id) {
-        $quotation = Quotation::find($id);
-        $quotationDetail = QuotationDetail::with('country')->where('quotation_id',$id)->first();
+     
+        $so = SO::findOrFail($id);
+        $quotation = Quotation::findOrFail($so->quotation_id);
+        $call = Calls::findOrFail($quotation->calls_id);
+
+        $existingQuotationItemIds = QuotationItem::where('reference_type', 'App\Models\Varaint')->where('quotation_id', $so->quotation_id)->pluck('id')->toArray();
+        $latestQuotationItemsExistingIds = SoVariant::where('so_id', $id)->pluck('quotation_item_id')->toArray();
+
+        $removedQuotationItemIds = array_diff($existingQuotationItemIds, $latestQuotationItemsExistingIds);
+
+        if (!empty($removedQuotationItemIds)) {
+            // Delete related data from related tables
+            // MultipleAgentSystemCode::whereIn('quotation_items_id', $removedQuotationItemIds)->delete();
+            QuotationVins::whereIn('quotation_items_id', $removedQuotationItemIds)->delete();
+            BookingRequest::whereIn('quotation_items_id', $removedQuotationItemIds)->delete();
+            $quotationSubItems = QuotationSubItem::whereIn('quotation_item_parent_id', $removedQuotationItemIds)->pluck('quotation_item_id')->toArray(); 
+            // delete quotation item sub items from quotation items table (addon,spareparts..)
+            QuotationItem::where('quotation_id', $so->quotation_id)->whereIn('id', $quotationSubItems)->delete();
+            // delete from subitems table
+            QuotationSubItem::whereIn('quotation_item_parent_id', $removedQuotationItemIds)->delete();
+            // Delete the quotation items
+            QuotationItem::whereIn('id', $removedQuotationItemIds)->delete();
+        }
+        // get all so varianta and create new entry in quottaion items if quotation id is null => new entry
+        $soVariants = SoVariant::where('so_id', $id)->get();
+        foreach($soVariants as $soVariant) {
+            if (is_null($soVariant->quotation_item_id)) {
+                // Create a new entry in quotation_items
+                $quotationItem = new QuotationItem();
+                $quotationItem->quotation_id = $so->quotation_id;
+                $quotationItem->reference_type = 'App\Models\Varaint';
+                $quotationItem->reference_id  = $soVariant->variant_id;
+                $quotationItem->description =  $soVariant->description;
+                $quotationItem->unit_price =  $soVariant->price;
+                $quotationItem->quantity =    $soVariant->quantity;
+                $quotationItem->total_amount =  $soVariant->quantity *  $soVariant->price;
+                $quotationItem->save();
+                
+                // Update the quotation_item_id in the so variant
+                $soVariant->quotation_item_id = $quotationItem->id;
+                $soVariant->save();
+            } else {
+                // Update the existing quotation item
+                QuotationItem::where('id', $soVariant->quotation_item_id)->update([
+                    'reference_id' => $soVariant->variant_id,      
+                    'description' => $soVariant->description,
+                    'unit_price' => $soVariant->price, 
+                    'quantity' => $soVariant->quantity,   
+                    'total_amount' => $soVariant->quantity * $soVariant->price,
+                ]);
+            }
+        }
+                
+        $quotationDetail = QuotationDetail::with('country')->where('quotation_id', $quotation->id)->first();
         $vehicles =  QuotationItem::where("reference_type", 'App\Models\Varaint')
             ->where('quotation_id', $quotation->id)->get();
         $otherVehicles = QuotationItem::whereNull('reference_type')
@@ -635,20 +645,20 @@ class SalesOrderController extends Controller
             ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();
         $salesPersonDetail = EmployeeProfile::where('user_id', $quotation->created_by)->first();
-        $salespersonqu = User::find($quotation->created_by);
+        $salesperson = User::find($quotation->created_by);
         $data = [];
-        $data['sales_person'] = $salespersonqu->name ?? '';
+        $data['sales_person'] = $salesperson->name ?? '';
         $data['sales_office'] = 'Central 191';
         $data['sales_phone'] = '';
-        $data['sales_email'] = $salespersonqu->email ?? '';
+        $data['sales_email'] = $salesperson->email ?? '';
         $data['client_id'] = $call->id;
-        $data['client_email'] = $call->email;
-        $data['client_name'] = $call->name;
+        $data['client_email'] = $call->email ?? '';
+        $data['client_name'] = $call->name ?? '';
         $data['client_contact_person'] = $call->client_contact_person ?? '';
-        $data['client_phone'] = $call->phone;
+        $data['client_phone'] = $call->phone ?? '';
         $data['client_address'] = $call->address ?? '';
         $data['document_number'] = $quotation->id;
-        $data['company'] = $call->company_name;
+        $data['company'] = $call->company_name ?? '';
         $data['document_date'] = Carbon::parse($quotation->date)->format('M d,Y');
         if($salesPersonDetail) {
             $data['sales_office'] = $salesPersonDetail->location->name ?? '';
@@ -666,11 +676,28 @@ class SalesOrderController extends Controller
         }else{
             $shippingChargeDistriAmount = 0;
         }
-        $quotationid = $quotation->id;
-        $multiplecp = MuitlpleAgents::where('quotations_id', $quotationid)->where('agents_id', '!=', $quotationDetail->agents_id)->get();
+        $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
+        $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
+        $multiplecp = MuitlpleAgents::where('quotations_id', $quotation->id)->where('agents_id', '!=', $quotationDetail->agents_id)->get();
         $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('multiplecp','quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
             'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','directlyAddedAddons','addonsTotalAmount',
         'otherVehicles','vehicleWithBrands','OtherAddons','shippingChargeDistriAmount'));
+
+        $filename = 'quotation_'.$quotation->id.'.pdf';
+        $generatedPdfDirectory = public_path('Quotations');
+        $directory = public_path('storage/quotation_files');
+        \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
+        $pdfFile->save($generatedPdfDirectory . '/' . $filename);
+        $quotationController = new QuotationController();
+        $pdf = $quotationController->pdfMerge($quotation->id);
+        $file = 'Quotation_'.$quotation->id.'_'.date('Y_m_d_H_i_s').'.pdf';
+        $pdf->Output($directory.'/'.$file,'F');
+        $quotationFile = new QuotationFile();
+        $quotationFile->quotation_id = $quotation->id;
+        $quotationFile->file_name = $file;
+        $quotationFile->save();
+
+        return $file;
 
     }
 
@@ -1666,5 +1693,28 @@ public function showSalespersonCommissions($sales_person_id, Request $request)
         ->exists();
         // passing $request->so_id available  and except the id as well in edit page
     return response()->json(['exists' => $exists]);
+    }
+    public function approveOrRejectSO(Request $request) {
+        $so = SO::findOrFail($request->so_id);
+        $quotation = Quotation::findOrFail($so->quotation_id);
+        $status = $request->status;
+        if($status == 'Approved') {
+            $file = $this->generateLatestQuotation($so->id);
+            $quotation->file_path = 'quotation_files/'.$file; 
+            $quotation->save();
+            $so->status = 'Approved';
+            $so->save();
+
+        }else {
+            $so->status = 'Rejected';
+            $so->rejection_reason = $request->reason ?? '';
+            $so->save();
+        }
+
+         return response()->json([
+            'success' => true,
+            'message' => 'Sales Order '.$status.' successfully.',
+            'redirect' => route('salesorder.index')  
+        ]);
     }
 }
