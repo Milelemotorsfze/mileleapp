@@ -18,6 +18,9 @@
     .select-po.select2-container, .select-so.select2-container {
         margin: 0px 0px 10px 0px !important;
     }
+    .warehouse-from-location {
+        color: #AEB5BD !important;
+    }
 </style>
 @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-daily-movemnets');
@@ -220,10 +223,10 @@
                     </select>
                 </div>
                 <div class="col-lg-1 col-md-6">
-                    <select class="form-control mb-1" id="from${row}" readonly disabled>
+                    <select class="form-control mb-1 warehouse-from-location" id="from${row}" readonly disabled>
                         <option value="" selected disabled>From</option>
                         @foreach ($warehouses as $warehouse)
-                        <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                         @endforeach
                     </select>
                     <input type="hidden" name="from[]" class="form-control mb-1" id="from-input${row}">
@@ -232,9 +235,9 @@
                     <select name="to[]" class="form-control mb-1" id="to${row}" required>
                         <option value="" selected disabled>Select To</option>
                         @foreach ($warehouses as $warehouse)
-                        @if ($warehouse->name !== 'Supplier')
-                        <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                        @endif
+                            @if ($warehouse->name !== 'Supplier')
+                                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                            @endif
                         @endforeach
                     </select>
                 </div>
@@ -259,6 +262,12 @@
             $('#rows-container').append(newRow);
             $('#vin' + row).select2();
             $('#to' + row).select2();
+            let $fromSelect = $('#from' + row);
+            if ($fromSelect.find('option:selected').text().trim() === 'From') {
+                $fromSelect.addClass('warehouse-from-location');
+            } else {
+                $fromSelect.removeClass('warehouse-from-location');
+            }
         });
         $('#rows-container').on('change', '.vin', function() {
             let id = $(this).attr('id');
@@ -289,6 +298,11 @@
                     SoFeildinput.val(response.so_number);
                     ownershipFeildinput.val(response.ownership_type);
                     PoFeildinput.val(response.po_number);
+                    if (fromField.find("option:selected").text().trim() === "From") {
+                        fromField.addClass("warehouse-from-location");
+                    } else {
+                        fromField.removeClass("warehouse-from-location");
+                    }
                 },
             });
         });
@@ -334,17 +348,12 @@
                                     </select>
                                 </div>
                                 <div class="col-lg-1 col-md-6">
-                                    <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
-                                    <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
+                                    <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames ?? ''}">
+                                    <input type="hidden" name="from[]" class="form-control mb-1" value="${vehicle.warehouseName ?? ''}">
                                 </div>
                                 <div class="col-lg-2 col-md-6">
-                                    <select name="to[]" class="form-control mb-1" id="to" required>
-                                        <option value="" selected disabled>Select To</option>
-                                        @foreach ($warehouses as $warehouse)
-                                            @if ($warehouse->name !== 'Supplier')
-                                                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                                            @endif
-                                        @endforeach
+                                    <select name="to[]" class="form-control to-select" required>
+                                        ${warehouseOptionsHtml}
                                     </select>
                                 </div>
                                 <div class="col-lg-1 col-md-6">
@@ -410,10 +419,28 @@
             });
         }
 
+        $("#rows-containerpo .to-select").each(function () {
+            if (!$(this).hasClass("select2-hidden-accessible")) {
+                $(this).select2();
+            }
+        });
+
         // Attach the remove-row event handler on document load
         attachRemoveRowHandler();
     });
 </script>
+
+<script>
+    var warehouseOptionsHtml = `
+        <option value="" selected disabled>Select To</option>
+        @foreach ($warehouses as $warehouse)
+            @if ($warehouse->name !== 'Supplier')
+                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+            @endif
+        @endforeach
+    `;
+</script>
+
 <script>
  $(document).ready(function () {
         $("#generate-sobutton").click(function () {  // Bind to the Generate button's click event
@@ -451,18 +478,14 @@
                                     </select>
                                 </div>
                                 <div class="col-lg-1 col-md-6">
-                                    <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
-                                    <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
+                                    <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames ?? ''}">
+                                    <input type="hidden" name="from[]" class="form-control mb-1" value="${vehicle.warehouseName ?? ''}">
                                 </div>
                                 <div class="col-lg-2 col-md-6">
-                                    <select name="to[]" class="form-control mb-1" id="to" required>
-                                        <option value="" selected disabled>Select To</option>
-                                        @foreach ($warehouses as $warehouse)
-                                            @if ($warehouse->name !== 'Supplier')
-                                                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                                            @endif
-                                        @endforeach
-                                    </select>
+                                   <select name="to[]" class="form-control mb-1 to-select" required>
+    ${warehouseOptionsHtml}
+</select>
+
                                 </div>
                                 <div class="col-lg-1 col-md-6">
                                     <input type="text" name="brand" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.brand}">
@@ -509,6 +532,7 @@
                         // `;
                         // }
                         $("#rows-containerpo").append(rowHtml);
+                        $("#rows-containerpo").find("select[name='to[]']").select2();
                     });
                     $(".remove-row-btn").on("click", function () {
                         $(this).closest(".row").remove();
@@ -579,17 +603,12 @@
                                     </select>
                                 </div>
                                 <div class="col-lg-1 col-md-6">
-                                <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
-                                    <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
+                                <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames ?? ''}">
+                                    <input type="hidden" name="from[]" class="form-control mb-1" value="${vehicle.warehouseName ?? ''}">
                                 </div>
                                 <div class="col-lg-2 col-md-6">
-                                    <select name="to[]" class="form-control mb-1" id="to" required>
-                                        <option value="" selected disabled>Select To</option>
-                                        @foreach ($warehouses as $warehouse)
-                                            <option value="{{ $warehouse->id }}" ${vehicle.matchedWarehouseId == {{ $warehouse->id }} ? 'selected' : ''}>
-                                                {{ $warehouse->name }}
-                                            </option>
-                                        @endforeach
+                                    <select name="to[]" class="form-control to-select" required>
+                                        ${warehouseOptionsHtml}
                                     </select>
                                 </div>
                                 <div class="col-lg-1 col-md-6">
@@ -638,6 +657,12 @@
                                 //                 }
                         // rowHtml += `</div>`;
                         $("#rows-containerpo").append(rowHtml);
+
+                        $("#rows-containerpo .to-select").each(function () {
+                            if (!$(this).hasClass("select2-hidden-accessible")) {
+                                $(this).select2();
+                            }
+                        });
                     });
 
                     // Attach the remove-row event handler
