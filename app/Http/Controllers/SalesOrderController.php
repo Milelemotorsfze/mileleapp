@@ -36,8 +36,8 @@ use App\Models\QuotationVins;
 use App\Models\QuotationSubItem;
 use App\Models\MuitlpleAgents;
 use App\Models\QuotationFile;
-
 use Illuminate\Http\Request;
+use Yajra\DataTables\Html\Builder;
 
 class SalesOrderController extends Controller
 {
@@ -137,7 +137,7 @@ class SalesOrderController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit(Builder $builder, Request $request,$id)
     {
             $so = SO::findorFail($id);
             $quotation = Quotation::findOrFail($so->quotation_id);
@@ -269,6 +269,88 @@ class SalesOrderController extends Controller
             }
             $totalVehicles = $soVariants->sum('quantity');
             $variants = Varaint::select('id','name')->get();
+            $salesOrderHistories = SalesOrderHistoryDetail::whereHas('salesOrderHistory', function($query) use($id) {
+                                $query->where('so_id', $id);
+                            })
+                            ->orderBy('id', 'DESC')
+                            ->with([
+                                'salesOrderHistory' => function ($query)use($id) {
+                                    $query->select('*');
+                                },
+                                'SoVariant'  => function ($query) {
+                                    $query->select('id','variant_id','so_id');
+                                },
+                                'SoVariant.variant'  => function ($query) {
+                                    $query->select('id','name');
+                                },
+                                'salesOrderHistory.user'  => function ($query) {
+                                    $query->select('id','name');
+                                },]);
+
+                            if (request()->ajax()) {
+                                    return DataTables::of($salesOrderHistories)
+                                        ->addIndexColumn()
+                                        ->editColumn('created_at', function($query) {
+                                            return Carbon::parse($query->created_at)->format('d M Y');
+                                        })
+                                        ->addColumn('created_by', function($query) {
+                                            return $query->salesOrderHistory->user->name ?? '';
+                                        })
+                                        ->addColumn('version', function($query) use ($id) {
+                                            $historyIds = SalesOrderHistory::where('so_id', $id)
+                                                        ->orderBy('id', 'ASC')  
+                                                        ->pluck('id')
+                                                        ->toArray();
+
+                                                    $versionNumber = array_search($query->sales_order_history_id, $historyIds) + 1;
+                                                    return 'Version ' . $versionNumber;
+                                            })
+                                            ->editColumn('field_name', function($query) {
+                                            switch ($query->field_name) {
+                                                    case 'so_variant_id':
+                                                        return 'Variant';
+                                                    case 'vehicles_id':
+                                                        return 'Vin';
+                                                    default:
+                                                        return $query->field_name ?? '';
+                                                }
+                                            })
+                                            ->addColumn('so_variant_id', function($query) {
+                                                if($query->field_name == 'price' || $query->field_name == 'description' || $query->field_name == 'quantity'
+                                                || $query->field_name == 'vehicles_id' )  {
+                                                    return  optional($query->SoVariant()->withTrashed()->first()->variant)->name ?? '';
+                                                }
+                                            })
+                                        ->editColumn('old_value', function($query) {
+                                        if (!is_null($query->old_value)) {
+                                                if($query->field_name == 'so_variant_id') {
+                                                    return optional($query->SoVariant()->withTrashed()->first()->variant)->name ?? '';
+                                                }else if($query->field_name == 'vehicles_id'){
+                                                    return optional($query->so_item->vehicle()->withTrashed()->first())->vin ?? '';
+                                                }else{
+                                                    return $query->old_value ?? '';
+                                                }
+                                            }
+                                        
+                                            return "";
+                                        })
+                                        ->editColumn('new_value', function($query) {
+                                            if (!is_null($query->new_value)) {
+                                                if($query->field_name == 'so_variant_id') {
+                                                    return optional($query->SoVariant()->withTrashed()->first()->variant)->name ?? '';
+                                                }else if($query->field_name == 'vehicles_id'){
+                                                    return optional($query->so_item->vehicle()->withTrashed()->first())->vin ?? '';
+                                                }else{
+                                                    return $query->new_value ?? '';
+                                                }
+                                            }
+                                        
+                                            return "";
+                                        })
+                                        ->rawColumns(['version','so_variant_id','created_by'])
+                                        ->toJson();
+                                }
+
             return view('salesorder.edit', compact('variants','totalVehicles','quotation', 'call', 'customerdetails','so', 
             'empProfile', 'saleperson','soVariants'));  
     }
@@ -279,10 +361,8 @@ class SalesOrderController extends Controller
     public function update(Request $request, $id)
     {
    
-        // return $request->all();
-
         DB::beginTransaction();
-        // try {
+        try {
                 $so = SO::findorFail($id);
                 $logEntries = [];
                 $currentTimestamp = Carbon::now();
@@ -296,7 +376,6 @@ class SalesOrderController extends Controller
                     'receiving' => $request->input('receiving_payment') ?: null,
                     'paidinso' => $request->input('payment_so') ?: null,
                     'paidinperforma' => $request->input('advance_payment_performa') ?: null,
-                    'updated_by' => Auth::id(),
                 ];
 
             foreach ($fields as $field => $newValue) {
@@ -308,7 +387,7 @@ class SalesOrderController extends Controller
                         'so_item_id' => null,
                         'so_variant_id' => null,
                         'field_name' => $field,
-                        'old_value' => $oldValue,
+                        'old_value' =>  is_null($oldValue) ? null : $oldValue,
                         'new_value' => $newValue
                     ];
                 }
@@ -499,12 +578,12 @@ class SalesOrderController extends Controller
 
                 DB::commit();
                 return redirect()->back()->with('success', 'Sales Order updated successfully.');
-            // } catch (\Exception $e) {
-            //     DB::rollBack(); // Rollback transaction in case of error
-            //     Log::error('Sales order updte faisls', ['error' => $e->getMessage()]);
+            } catch (\Exception $e) {
+                DB::rollBack(); // Rollback transaction in case of error
+                Log::error('Sales order updte faisls', ['error' => $e->getMessage()]);
 
-            //     return redirect()->back()->withErrors('An error occurred while updating sales order.');
-            // }
+                return redirect()->back()->withErrors('An error occurred while updating sales order.');
+            }
     }
 
     public function removeSoItems($soVariantId, $vehicleIds) {

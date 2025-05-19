@@ -39,6 +39,20 @@
             background-color: rgba(128,128,128,0.5); 
             display: none; 
         }
+        /* Improved table responsiveness */
+.table-responsive {
+    overflow-x: auto;
+    padding: 0;
+    margin: 0;
+}
+
+/* Table style adjustments */
+.table th, .table td {
+    white-space: nowrap;
+    vertical-align: middle;
+    padding: 0.75rem;
+}
+
        
 </style>
  @can('edit-so')
@@ -412,7 +426,7 @@
                                                             <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
                                                             <label class="form-label font-size-13">Price</label>
                                                                 <input type="number" class="form-control variant-prices widthinput" required name="variants[{{$key+1}}][price]" placeholder="Price" 
-                                                                value="{{ $soVariant->price }}" id="price-{{ $key+1 }}" >
+                                                                value="{{ $soVariant->price }}" id="price-{{ $key+1 }}" index="{{$key+1}}" >
                                                             </div>
                                                             <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
                                                             <label class="form-label font-size-13">Quantity</label>
@@ -468,7 +482,7 @@
 
                                     <div class="col-lg-4 col-md-6 col-sm-12">
                                         <label for="total_payment"><strong>Total Payment</strong></label>
-                                        <input type="number" class="form-control" id="total_payment" name="total_payment" value="{{$so->total}}" >
+                                        <input type="number" class="form-control" readonly id="total_payment" name="total_payment" value="{{$so->total}}" >
                                     </div>
 
                                     <div class="col-lg-4 col-md-6 col-sm-12">
@@ -502,6 +516,33 @@
                     <input type="hidden" name="so_id" value="{{ $so->id }}">
                     <button type="submit" class="btn btn-primary btn-submit">Submit</button>
                 </form>
+                    <div class="card mt-3 shadow-sm">
+                        <div class="card-header text-white">
+                            <h6 >Sales Order Log Histories</h6>
+                        </div>
+                        <div class="card-body p-2">
+                             <div class="table-responsive" >
+                                <table id="so-logs" class="table table-striped table-editable table-edits table table-condensed" 
+                                    style="width:100%;" >
+                                    <thead class="bg-soft-secondary">
+                                    <tr>
+                                        <th>S.NO</th>
+                                        <th>Version</th>
+                                        <th>Variant</th>
+                                        <th>Field Name</th>
+                                        <th>Type</th>
+                                        <th>Old Value</th>
+                                        <th>New Value</th>
+                                        <th>Created Date</th>
+                                        <th>Created By</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 @can('approve-so')
                 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('approve-so');
@@ -542,10 +583,10 @@
                     @endif
                     @endif
                 @endcan
-
             </div>
         </div>
         <div class="overlay"></div>
+
     @endif
     @endcan
 
@@ -555,15 +596,37 @@
         let soId = '{{ $so->id }}';
         let QuotaionItemCount = '{{ $soVariants->count() }}';
         let isFormValid = 0;
-
+        let variantsData = @json($variants);
         $(document).ready(function() {
-        
+
+            var table1 = $('#so-logs').DataTable({      
+            processing: true,
+            serverSide: true,
+            searching: true,
+            ajax:{
+                 url: "{{ route('salesorder.edit', $so->id) }}",
+               
+            },
+        columns: [
+            {'data': 'DT_RowIndex', 'name': 'DT_RowIndex', orderable: false, searchable: false},
+            {'data' : 'version', 'name' : 'version', orderable: false},
+            {'data' : 'so_variant_id', 'name' : 'SoVariant.variant.name', orderable: false },
+            {'data' : 'field_name', 'name' : 'field_name', orderable: false },
+            {'data' : 'type', 'name' : 'type' , orderable: false},
+            {'data' : 'old_value', 'name' : 'old_value', orderable: false},
+            {'data' : 'new_value', 'name' : 'new_value', orderable: false},
+            {'data' : 'created_at', 'name': 'created_at', orderable: true},
+            {'data' : 'created_by', 'name': 'salesOrderHistory.user.name', orderable: true } ,  
+          
+            ]
+        });
+
             $('.vins').select2({
                 placeholder : 'Select VIN',
             });
             for(let i=1;i<= QuotaionItemCount;i++) {
                 let index = $('#vin-'+i).attr('index');
-                initializeSelect2(index)
+                initializeVinSelect2(index)
             }
            
             $('.variants').select2({
@@ -579,6 +642,22 @@
                 }
             });
         });
+
+          function formatVariantData(data) {
+            return data.map(variant => ({ id: variant.id, text: variant.name }));
+        }
+
+        function ReinitializeSelect2(selector) {
+
+            if ($(selector).data('select2')) {
+                $(selector).select2('destroy');
+            }
+            $(selector).select2({
+                placeholder: 'Select Variant',
+                maximumSelectionLength: 1,
+                data: formatVariantData(variantsData),
+            });
+        }
 
           $('.btn-approve').on('click',function(){
             let soid = $(this).attr('data-id');
@@ -638,7 +717,7 @@
             }).set({title:"So Approval"})
         });
 
-
+        // validation start //
          $.validator.addMethod("uniqueSO", function(value, element) {
             let isUnique = false;
             $.ajax({
@@ -701,6 +780,8 @@
             }
             return this.valid();
         };
+
+        /// validation end ///
         
         $('.add-variant-btn').click(function() {
             var index = $("#so-vehicles").find(".so-variant-add-section").length + 1;
@@ -711,6 +792,7 @@
                     <div class="row">
                         <div class="mb-2 col-sm-12 col-md-3 col-lg-3 col-xxl-3">
                          <label class="form-label font-size-13">Choose Variant</label>
+                         
                             <select name="variants[${index}][variant_id]" index="${index}" id="variant-${index}"
                              class="variants form-control" multiple required  data-is-gdn="0">
                             </select>
@@ -723,7 +805,7 @@
                         <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
                           <label class="form-label font-size-13">Price</label>
                         <input type="number" class="form-control variant-prices widthinput" required name="variants[${index}][price]" placeholder="Price"
-                         id="price-${index}">
+                         id="price-${index}" index="${index}">
                         </div>
                         <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
                           <label class="form-label font-size-13">Quantity</label>
@@ -752,11 +834,8 @@
                 placeholder: 'Select Vin',
                 maximumSelectionLength: 1,
             });
-            getSOVariants(index);
-            $('#variant-' + index).select2({
-                placeholder: 'Select Variant',
-                maximumSelectionLength: 1
-            });
+            // getSOVariants(index);
+           ReinitializeSelect2('#variant-' + index);
         });
 
         $(document.body).on('select2:select', ".variants", function (e) {
@@ -780,7 +859,7 @@
                     });
                     $('#variant-description-'+index).val(data.variant_description);
                     $('.overlay').hide();  
-                    hideVariant(index); 
+                    // hideVariant(index); 
                 }
             });                      
         });
@@ -813,50 +892,51 @@
         function resetVin(index,variant, variantText) {
             $('#variant-description-'+index).val('');
             $('#vin-'+index).empty();
-            appendVariant(index, variant, variantText);
+            // appendVariant(index, variant, variantText);
         }
 
-        function getSOVariants(index){
-            let totalIndex =  $("#so-vehicles").find(".so-variant-add-section").length;
-            let url = '{{ route('so.getVariants') }}';
-            var selectedVariantIds = [];
-            for(let i=1; i< totalIndex; i++)
-            {
-                var eachselectedVariantId = $('#variant-'+i).val();
-                if(eachselectedVariantId) {
-                    selectedVariantIds.push(eachselectedVariantId);
-                }
-            }
-            $.ajax({
-                type: "GET",
-                url: url,
-                dataType: "json",
-                data: {
-                    selectedVariantIds:selectedVariantIds,
-                },
-                success:function (data) {  
+        // function getSOVariants(index){
+        //     let totalIndex =  $("#so-vehicles").find(".so-variant-add-section").length;
+        //     let url = '{{ route('so.getVariants') }}';
+        //     var selectedVariantIds = [];
+        //     for(let i=1; i< totalIndex; i++)
+        //     {
+        //         var eachselectedVariantId = $('#variant-'+i).val();
+        //         if(eachselectedVariantId) {
+        //             selectedVariantIds.push(eachselectedVariantId);
+        //         }
+        //     }
+        //     $.ajax({
+        //         type: "GET",
+        //         url: url,
+        //         dataType: "json",
+        //         data: {
+        //             selectedVariantIds:selectedVariantIds,
+        //         },
+        //         success:function (data) {  
                    
-                    let variantDropdownData = [];
-                    $.each(data,function(key,value){
-                        variantDropdownData.push
-                        ({
-                            id: value.id,
-                            text: value.name
-                        });
-                    });
-                        $('#variant-' + index).html("");
-                        $('#variant-' + index).select2({
-                            placeholder: 'Select Variant',
-                            data: variantDropdownData,
-                            maximumSelectionLength: 1,
-                        });
-                }
-            }); 
-        }
+        //             let variantDropdownData = [];
+        //             $.each(data,function(key,value){
+        //                 variantDropdownData.push
+        //                 ({
+        //                     id: value.id,
+        //                     text: value.name
+        //                 });
+        //             });
+        //                 $('#variant-' + index).html("");
+        //                 $('#variant-' + index).select2({
+        //                     placeholder: 'Select Variant',
+        //                     data: variantDropdownData,
+        //                     maximumSelectionLength: 1,
+        //                 });
+        //         }
+        //     }); 
+        // }
 
         $(document.body).on('click', ".removeVariantButton", function (e) {
             var rowCount = $("#so-vehicles").find(".so-variant-add-section").length;
             var indexNumber = $(this).attr('index');
+        
             if(rowCount > 1) {
                 var isGdn = $('#variant-'+indexNumber).attr('data-is-gdn');
                 if (isGdn == 1) {
@@ -864,53 +944,94 @@
                     alertify.confirm('This Variant cannot be removed because it has a GDN assigned vehicles.').set({title: "Can't Remove this Variant"});
                 }else{
                    
-                    var variantText  = $('#variant-'+indexNumber).text();
-                    var variant = $('#variant-'+indexNumber).val();
+                    // var variantText  = $('#variant-'+indexNumber).text();
+                    // var variant = $('#variant-'+indexNumber).val();
                 
-                    if(variantText) {
-                        appendVariant(indexNumber, variant[0], variantText);
-                    }
+                    // if(variantText) {
+                    //     appendVariant(indexNumber, variant[0], variantText);
+                    // }
                 
                     $(this).closest('#variant-section-'+indexNumber).remove();
 
                     $('.so-variant-add-section').each(function(i){
-                        var index = +i + +1;
-                        $(this).find('.variant-descriptions').attr('index', index); 
-                        $(this).find('.variant-descriptions').attr('id', 'variant-description-'+index); 
-                        $(this).find('.variant-descriptions').attr('name', 'variants['+index+'][description]'); 
-                        $(this).attr('id', 'variant-section-'+index);
-                        $(this).find('.variants').attr('index', index);
-                        $(this).find('.variants').attr('id', 'variant-'+index);
-                        $(this).find('.variants').attr('name', 'variants['+index+'][variant_id]');
+                        var index = i + 1;
+                        // $(this).find('.variant-descriptions').attr('index', index); 
+                        // $(this).find('.variant-descriptions').attr('id', 'variant-description-'+index); 
+                        // $(this).find('.variant-descriptions').attr('name', 'variants['+index+'][description]'); 
+                        // $(this).attr('id', 'variant-section-'+index);
+                        // $(this).find('.variants').attr('index', index);
+                        // $(this).find('.variants').attr('id', 'variant-'+index);
+                        // $(this).find('.variants').attr('name', 'variants['+index+'][variant_id]');
                         
-                        $(this).find('.quotation-items').attr('index', index);
-                        $(this).find('.quotation-items').attr('id', 'quotation-item-'+index);
-                        $(this).find('.quotation-items').attr('name', 'variants['+index+'][quotation_item_id]');
-                        $(this).find('.variant-prices').attr('index', index);
-                        $(this).find('.variant-prices').attr('id', 'price-'+index);
-                        $(this).find('.variant-prices').attr('name', 'variants['+index+'][price]');
-                        $(this).find('.variant-quantities').attr('index', index);
-                        $(this).find('.variant-quantities').attr('id', 'quantity-'+index);
-                        $(this).find('.variant-quantities').attr('name', 'variants['+index+'][quantity]');
-                        $(this).find('.vins').attr('index', index);
-                        $(this).find('.vins').attr('id', 'vin-'+index);
-                        $(this).find('.vins').attr('name', 'variants['+index+'][vehicles][]');
+                        // $(this).find('.quotation-items').attr('index', index);
+                        // $(this).find('.quotation-items').attr('id', 'quotation-item-'+index);
+                        // $(this).find('.quotation-items').attr('name', 'variants['+index+'][quotation_item_id]');
+                        // $(this).find('.variant-prices').attr('index', index);
+                        // $(this).find('.variant-prices').attr('id', 'price-'+index);
+                        // $(this).find('.variant-prices').attr('name', 'variants['+index+'][price]');
+                        // $(this).find('.variant-quantities').attr('index', index);
+                        // $(this).find('.variant-quantities').attr('id', 'quantity-'+index);
+                        // $(this).find('.variant-quantities').attr('name', 'variants['+index+'][quantity]');
+                        // $(this).find('.vins').attr('index', index);
+                        // $(this).find('.vins').attr('id', 'vin-'+index);
+                        // $(this).find('.vins').attr('name', 'variants['+index+'][vehicles][]');
                     
-                        $(this).find('.removeVariantButton').attr('index', index);
+                        // $(this).find('.removeVariantButton').attr('index', index);
+                    $(this).find('.variant-descriptions').attr({
+                    'index': index,
+                    'id': 'variant-description-' + index,
+                    'name': 'variants[' + index + '][description]'
+                    });
 
-                        $('#variant-'+index).select2
-                        ({
-                            placeholder: 'Select Variant',
-                            maximumSelectionLength:1,
-                        });
+                    // Update variant section ID
+                    $(this).attr('id', 'variant-section-' + index);
+
+                    // Update attributes for variant dropdown
+                    $(this).find('.variants').attr({
+                        'index': index,
+                        'id': 'variant-' + index,
+                        'name': 'variants[' + index + '][variant_id]'
+                    });
+
+                    // Update attributes for quotation items
+                    $(this).find('.quotation-items').attr({
+                        'index': index,
+                        'id': 'quotation-item-' + index,
+                        'name': 'variants[' + index + '][quotation_item_id]'
+                    });
+
+                    // Update attributes for price and quantity
+                    $(this).find('.variant-prices').attr({
+                        'index': index,
+                        'id': 'price-' + index,
+                        'name': 'variants[' + index + '][price]'
+                    });
+                    $(this).find('.variant-quantities').attr({
+                        'index': index,
+                        'id': 'quantity-' + index,
+                        'name': 'variants[' + index + '][quantity]'
+                    });
+
+                    // Update attributes for VIN dropdown
+                    $(this).find('.vins').attr({
+                        'index': index,
+                        'id': 'vin-' + index,
+                        'name': 'variants[' + index + '][vehicles][]'
+                    });
+
+                    $(this).find('.removeVariantButton').attr('index', index);
+                  
+                        $('#vin-' + index).select2('destroy');
+
+                         ReinitializeSelect2('#variant-' + index);
                         $('#vin-'+index).select2
                         ({
                             placeholder: 'Select Vin',
                         });
                     
                     });
+                    calculateTotalSOAmount();
                 }
-               
               
             }else{
                 var confirm = alertify.confirm('You are not able to remove this row, Atleast one Variant is Required',function (e) {
@@ -919,54 +1040,54 @@
             }
         });
        
-        function hideVariant(index) {
+        // function hideVariant(index) {
            
-            var totalIndex = $("#so-vehicles").find(".so-variant-add-section").length;
-            var variant = $('#variant-'+index).val();
-            for(let i=1; i<=totalIndex; i++)
-            {
-                if(i != index ) {
-                    var currentId = 'variant-' + i;
-                    $('#' + currentId + ' option[value=' + variant[0] + ']').detach();       
-                }
-            }
-        }
+        //     var totalIndex = $("#so-vehicles").find(".so-variant-add-section").length;
+        //     var variant = $('#variant-'+index).val();
+        //     for(let i=1; i<=totalIndex; i++)
+        //     {
+        //         if(i != index ) {
+        //             var currentId = 'variant-' + i;
+        //             $('#' + currentId + ' option[value=' + variant[0] + ']').detach();       
+        //         }
+        //     }
+        // }
 
-        function appendVariant(index,unSelectedvariant,variantText) {
-            var totalIndex = $("#so-vehicles").find(".so-variant-add-section").length;
-            for(let i=1; i<=totalIndex; i++)
-            {
-                if(i != index) {
-                    let Currentvariant = $('#variant-'+i).val();
-                    if(unSelectedvariant !== Currentvariant[0] ) {
-                        var currentId = 'variant-'+i;    
-                        var isOptionExist = 'no';
-                        $('#' + currentId +' option').each(function () {
-                            if (this.id == Currentvariant[0]) {
-                                isOptionExist = 'yes';
-                                return false;
-                            }
-                        });
-                        if(isOptionExist == 'no'){
-                            $('#variant-'+i).append($('<option>', {value: unSelectedvariant, text : variantText}))
-                        }
-                    }
-                }
-            }
-        }
-        function initializeSelect2(index) {
+        // function appendVariant(index,unSelectedvariant,variantText) {
+        //     var totalIndex = $("#so-vehicles").find(".so-variant-add-section").length;
+        //     for(let i=1; i<=totalIndex; i++)
+        //     {
+        //         if(i != index) {
+        //             let Currentvariant = $('#variant-'+i).val();
+        //             if(unSelectedvariant !== Currentvariant[0] ) {
+        //                 var currentId = 'variant-'+i;    
+        //                 var isOptionExist = 'no';
+        //                 $('#' + currentId +' option').each(function () {
+        //                     if (this.id == Currentvariant[0]) {
+        //                         isOptionExist = 'yes';
+        //                         return false;
+        //                     }
+        //                 });
+        //                 if(isOptionExist == 'no'){
+        //                     $('#variant-'+i).append($('<option>', {value: unSelectedvariant, text : variantText}))
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+        function initializeVinSelect2(index) {
             const quantity = parseInt($('#quantity-' + index).val()) || 1;
             $('#vin-' + index).select2('destroy').select2({
                 placeholder: 'Select Vin',
                 maximumSelectionLength: quantity,  
             });
-
         }
 
         $(document).on('input', '.variant-quantities', function() { 
             const index = $(this).attr('index');
-            initializeSelect2(index);
+            initializeVinSelect2(index);
             ValidateVinwithQty();
+            calculateTotalSOAmount();
         });
         $('.btn-submit').click(function (e) {
             e.preventDefault();
@@ -999,8 +1120,25 @@
 
             };
         }
-
         
+
+        $(document).on('input', '.variant-prices', function() { 
+            calculateTotalSOAmount();
+        });
+
+      
+        function calculateTotalSOAmount() {
+              var sum = 0;
+            $('.variant-prices').each(function() {
+                var index = $(this).attr('index');
+                var quantity = $('#quantity-'+index).val();
+                var unitPrice = $('#price-'+index).val();
+                var eachItemTotal = parseFloat(quantity) * parseFloat(unitPrice);
+                
+                sum = sum + eachItemTotal;
+            });
+            $('#total_payment').val(sum);
+        }
     </script>
     <script>
         function updateTotalReceivingPayment() {
