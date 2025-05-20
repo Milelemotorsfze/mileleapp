@@ -3,11 +3,24 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
                     @section('content')
                     @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
                     @endphp
                     @if ($hasPermission)
   <div class="card-header">
   <style>
+
+    #remarksModalBody img {
+        width: 100% !important;
+    }
+    .nav-fill .nav-item .nav-link, .nav-justified .nav-item .nav-link {
+      width: 100% !important;     
+      padding: 8px 30px !important; 
+    }
+    
+    .nav-fill .nav-item, .nav-fill>.nav-link {
+      flex: none !important;
+      margin: 3px !important;
+    }
     #dtBasicExample2 {
         width: 100%;
     }
@@ -130,6 +143,14 @@ tr.highlight-orange {
   {
     border-left: 17px solid #3498DB;
   }
+  @media screen and (max-width: 1399px) {
+    .daily-leads-menus-button-container {
+      flex-direction: column-reverse;
+    }
+    .daily-leads-button-container-only {
+      padding: 10px 0px;
+    }
+  }
   @media (max-width: 765px)
   {
     .arrow-steps .step {
@@ -158,61 +179,51 @@ input[type=number]::-webkit-outer-spin-button
               {{ Session::get('success') }}
           </div>
       @endif
-      <a class="btn btn-sm btn-info float-end" href="{{ route('salescustomers.index') }}" text-align: right>
-        <i class="fa fa-users" aria-hidden="true"></i> Customers
-      </a>
-      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
-      <a class="btn btn-sm btn-primary float-end" href="{{ route('booking.index') }}" text-align: right>
-        <i class="fa fa-info" aria-hidden="true"></i> Bookings
-      </a>
-      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
-      <a class="btn btn-sm btn-success float-end" href="{{ route('dailyleads.create') }}" text-align: right>
-        <i class="fa fa-plus" aria-hidden="true"></i> Add New Lead
-      </a>
-      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
-      <!-- <a class="btn btn-sm btn-primary float-end" href="" text-align: right>
-        <i class="fa fa-info" aria-hidden="true"></i> Bookings (Coming Soon)
-      </a> -->
-      <div class="clearfix"></div>
-<br>
-    <ul class="nav nav-pills nav-fill">
-    <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab10">Bulk & Special Deals</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab1">New / Pending Inquiry</a>
-      </li>
-      <!-- <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab9">FollowUp</a>
-      </li> -->
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab11">Active Leads</a>
-      </li>
-      <!-- <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Prospecting</a>
-      </li> -->
-      <!-- <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab3">Demands</a>
-      </li> -->
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab4">Quotation</a>
-      </li>
-      <!-- <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab5">Negotiation</a>
-      </li> -->
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab8">Pre-Orders</a>
-      </li>
-      <!-- <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab6">Sales Order</a>
-      </li> -->
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab7">Rejected</a>
-      </li>
-    </ul>
-  </div>
+
+    <div class="row align-items-center daily-leads-menus-button-container">
+        <div class=" col-xxl-9 col-lg-12 col-md-12 mb-3 mb-lg-0">
+            <ul class="nav nav-pills nav-fill d-flex flex-wrap">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="pill" href="#tab1">New / Pending Inquiry</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#tab11">Active Leads</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#tab4">Quotation</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#tab8">Pre-Orders</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#tab10">Bulk & Special Deals</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#tab7">Rejected</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="col-xxl-3 col-lg-12 col-md-12 text-end daily-leads-button-container-only">
+            @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+            @endphp
+            @if ($hasPermission)
+                <a class="btn btn-sm btn-success me-lg-1" href="{{ route('dailyleads.create') }}">
+                    <i class="fa fa-plus" aria-hidden="true"></i> Add New Lead
+                </a>
+                <a class="btn btn-sm btn-primary me-lg-1" href="{{ route('booking.index') }}">
+                    <i class="fa fa-info" aria-hidden="true"></i> Bookings
+                </a>
+                <a class="btn btn-sm btn-info" href="{{ route('salescustomers.index') }}">
+                    <i class="fa fa-users" aria-hidden="true"></i> Customers
+                </a>
+            @endif
+        </div>
+    </div>
+
   <div class="tab-content">
-      <div class="tab-pane fade show" id="tab1">
+      <div class="tab-pane fade show active" id="tab1">
       <br>
       <!-- <div class="row">
   <div class="col-lg-1">
@@ -220,7 +231,7 @@ input[type=number]::-webkit-outer-spin-button
   </div>
 </div> -->
         <div class="card-body">
-          <div class="table-responsive">
+          <div class="table-responsive dragscroll">
             <table id="dtBasicExample1" class="table table-editable table-edits table">
             <thead class="bg-soft-secondary">
                 <tr>
@@ -236,6 +247,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Preferred Language</th>
                   <th>Location</th>
                   <th>Remarks & Messages</th>
+                  <th>Stage</th>
                   <th>Created By</th>
                   <th>Assigned To</th>
                 </tr>
@@ -305,11 +317,45 @@ input[type=number]::-webkit-outer-spin-button
                     <td>{{ $calls->custom_brand_model }}</td>
                     <td>{{ $calls->language }}</td>
                     <td>{{ $calls->location }}</td>
-                    @php
-                    $text = $calls->remarks;
-                    $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
-                    @endphp
-                    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>
+                    <td class="nowrap-td">
+                      @php
+                          $stripped = strip_tags($calls->remarks);
+                          $shortText = Str::limit($stripped, 20);
+                      @endphp
+                      {!! $shortText !!}
+                      @if(strlen($stripped) > 20)
+                          <a href="#" class="text-primary read-more-link" data-remarks="{!! htmlspecialchars($calls->remarks, ENT_QUOTES) !!}">Read More</a>
+                      @endif
+                    </td>
+                    <td>
+    @php
+        $colorClass = '';
+        switch ($calls->status) {
+            case 'contacted':
+                $colorClass = 'badge-primary';
+                break;
+            case 'working':
+                $colorClass = 'badge-info';
+                break;
+            case 'qualify':
+                $colorClass = 'badge-warning';
+                break;
+            case 'converted':
+                $colorClass = 'badge-success';
+                break;
+            case 'Follow Up':
+                $colorClass = 'badge-secondary';
+                break;
+            case 'New':
+                $colorClass = 'badge-danger';
+                break;
+            default:
+                $colorClass = 'badge-light';
+        }
+    @endphp
+
+    <span class="badge {{ $colorClass }}">{{ ucfirst($calls->status) }}</span>
+</td>
                     <td>
                     @php
                     $created_by = DB::table('users')->where('users.id', $calls->created_by)->first();
@@ -904,6 +950,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Inquiry Date</th>
                   <th>Inquiry Notes</th>
                   <th>Purchaser Remarks</th>
+                  <th>Stage</th>
                   <th>Created By</th>
                   <th>Assigned To</th>
                 </tr>
@@ -980,7 +1027,12 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Signature Status</th>
                   <th>Created By</th>
                   <th>Assigned To</th>
+                  @php
+$hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+@endphp
+@if ($hasFullAccess)
                   <th>Action</th>
+                  @endif
                 </tr>
               </thead>
             </table>
@@ -1164,7 +1216,7 @@ input[type=number]::-webkit-outer-spin-button
           </div>
         </div>
       </div>
-      <div class="tab-pane fade show active" id="tab10">
+      <div class="tab-pane fade show" id="tab10">
       <br>
         <div class="card-body">
           <div class="table-responsive">
@@ -1187,9 +1239,31 @@ input[type=number]::-webkit-outer-spin-button
           </div>
         </div>
       </div>
+      <div class="modal fade" id="remarksModal" tabindex="-1" aria-labelledby="remarksModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="remarksModalLabel">Full Remarks</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body" id="remarksModalBody">
+              </div>
+            </div>
+          </div>
+        </div>
       </div><!-- end tab-content-->
     </div>
   </div>
+
+  <script>
+    $(document).on('click', '.read-more-link', function(e) {
+        e.preventDefault();
+        var remarks = $(this).data('remarks');
+        $('#remarksModalBody').html(remarks);
+        $('#remarksModal').modal('show');
+    });
+</script>
+
   <script>
     function uploadingQuotations() {
   var formData = new FormData();
@@ -1870,6 +1944,52 @@ function saveRejection() {
     window.open(whatsappURL, '_blank');
 }
 </script>
+
+<script>
+  function applyColumnFilters(dataTableId, excludeColumns = []) {
+    console.log("1- Data is: ", dataTableId);
+    var table = $(dataTableId).DataTable();
+    table.columns().every(function (index) {
+      if (excludeColumns.includes(index)) return;
+
+      var column = this;
+      var selectWrapper = $('<div class="select-wrapper"></div>');
+      var select = $('<select class="form-control my-1" multiple></select>')
+        .appendTo(selectWrapper)
+        .select2({
+          width: '100%',
+          dropdownCssClass: 'select2-blue'
+        });
+
+      select.on('change', function () {
+        var selectedValues = $(this).val();
+        if (selectedValues && selectedValues.length) {
+          var escaped = selectedValues.map(function (val) {
+            return '^' + val.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '$';
+          }).join('|');
+          column.search(escaped, true, false).draw();
+        } else {
+          column.search('', true, false).draw();
+        }
+      });
+
+      selectWrapper.appendTo($(column.header()));
+      $(column.header()).addClass('nowrap-td');
+
+      let uniqueValues = new Set();
+      column.data().each(function (d) {
+        let tempDiv = $('<div>').html(d);
+let textVal = tempDiv.text().trim();
+        if (textVal && !uniqueValues.has(textVal)) {
+          uniqueValues.add(textVal);
+        }
+      });
+      Array.from(uniqueValues).sort().forEach(function (val) {
+        select.append('<option value="' + val + '">' + val + '</option>');
+      });
+    });
+  }
+</script>
 <script type="text/javascript">
 $(document).ready(function () {
   $('.select2').select2();
@@ -1879,44 +1999,9 @@ $(document).ready(function () {
     { type: 'date', targets: [1] },
   ],
   order: [[0, 'desc']],
-  initComplete: function() {
-    this.api().columns().every(function(d) {
-      var column = this;
-      var columnId = column.index();
-      var columnName = $(column.header()).attr('id');
-      if (d === 10 || d === 11 || d === 0 ) {
-        return;
-      }
-
-      var selectWrapper = $('<div class="select-wrapper"></div>');
-      var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
-        .appendTo(selectWrapper)
-        .select2({
-          width: '100%',
-          dropdownCssClass: 'select2-blue'
-        });
-      select.on('change', function() {
-        var selectedValues = $(this).val();
-        column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw();
-      });
-
-      selectWrapper.appendTo($(column.header()));
-      $(column.header()).addClass('nowrap-td');
-
-      column.data().unique().sort().each(function(d, j) {
-        if (columnId === 3) {  // Assuming the phone column is at index 2
-          var phoneNumber = $(d).text().trim();  // Extract phone number
-        select.append('<option value="' + phoneNumber + '">' + phoneNumber + '</option>');
-    }
-    else if (columnId === 4) {  // Assuming the phone column is at index 2
-          var Email = $(d).text().trim();  // Extract phone number
-        select.append('<option value="' + Email + '">' + Email + '</option>');
-    }
-    else {
-        select.append('<option value="' + d + '">' + d + '</option>');
-    }
-      });
-    });
+  orderCellsTop: true,
+  initComplete: function () {
+    applyColumnFilters('#dtBasicExample1', []); 
   }
 });
 $('#my-table_filter').hide();
@@ -1996,26 +2081,28 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
                 {
-                data: 'remarks',
-                name: 'remarks',
-    searchable: false,
-    render: function (data, type, row) {
-        // Set the maximum length for remarks before adding "Read More" link
-        const maxLength = 20;
-        const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
+  data: 'remarks',
+  name: 'calls.remarks',
+  title: 'Remarks & Messages',
+  render: function (data, type, row) {
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
 
-        if (data && data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
-            return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-            `;
-        } else {
-            return `<span class="remarks-text">${data}</span>`;
-        }
+    if (type !== 'display') return plainText;
+
+    let shortText = plainText.substring(0, 20);
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    if (plainText.length > 20) {
+      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
     }
+
+    return plainText;
+  }
 },
+
+
 {
             data: 'date',
             name: 'date',
@@ -2157,6 +2244,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
         });
+        $('#my-table_filter').hide();
         dataTable3 = $('#dtBasicExample3').DataTable({
             processing: true,
             serverSide: true,
@@ -2185,26 +2273,27 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
                 {
-    data: 'remarks',
-    name: 'remarks',
-    searchable: false,
-    render: function (data, type, row) {
-        // Set the maximum length for remarks before adding "Read More" link
-        const maxLength = 20;
-        const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
+  data: 'remarks',
+  name: 'calls.remarks',
+  title: 'Remarks & Messages',
+  render: function (data, type, row) {
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
 
-        if (data && data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
-            return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-            `;
-        } else {
-            return `<span class="remarks-text">${data}</span>`;
-        }
+    if (type !== 'display') return plainText;
+
+    let shortText = plainText.substring(0, 20);
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    if (plainText.length > 20) {
+      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
     }
+
+    return plainText;
+  }
 },
+
 {
             data: 'date',
             name: 'date',
@@ -2296,6 +2385,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 // },
             ]
         });
+        $('#my-table_filter').hide();
+
        dataTable4 = $('#dtBasicExample4').DataTable({
             processing: true,
             serverSide: true,
@@ -2323,41 +2414,43 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'custom_brand_model', name: 'custom_brand_model' },
                 { data: 'language', name: 'language' },
                 { data: 'location', name: 'location' },
-                {
-    data: 'remarks',
-    name: 'remarks',
-    searchable: false,
-    render: function (data, type, row) {
-        // Set the maximum length for remarks before adding "Read More" link
-        const maxLength = 20;
-        const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
-
-        if (data && data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
-            return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-            `;
-        } else {
-            return `<span class="remarks-text">${data}</span>`;
-        }
-    }
-},
 {
-            data: 'date',
-            name: 'date',
-             render: function (data, type, row) {
-        if (type === 'display' || type === 'filter') {
-            if (!data || !moment(data).isValid()) {
-                return '';
-            }
-            // Convert the date to your desired format
-            return moment(data).format('DD-MMM-YYYY');
-        }
-        return data;
+  data: 'remarks',
+  name: 'calls.remarks',
+  title: 'Remarks & Messages',
+  render: function (data, type, row) {
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
+
+    if (type !== 'display') return plainText;
+
+    let shortText = plainText.substring(0, 20);
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    if (plainText.length > 20) {
+      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
     }
-        },
+
+    return plainText;
+  }
+},
+
+
+                {
+                    data: 'date',
+                    name: 'date',
+                    render: function (data, type, row) {
+                      if (type === 'display' || type === 'filter') {
+                        if (!data || !moment(data).isValid()) {
+                            return '';
+                        }
+                          // Convert the date to your desired format
+                          return moment(data).format('DD-MMM-YYYY');
+                      }
+                        return data;
+                    }
+                },
                 {
     data: 'salesnotes',
     name: 'salesnotes',
@@ -2475,6 +2568,10 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             },
             { data: 'created_by_name', name: 'created_by_name' },
 { data: 'sales_person_name', name: 'sales_person_name' },
+@php
+$hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+@endphp
+@if ($hasFullAccess)
             {
     data: 'id',
     name: 'id',
@@ -2512,7 +2609,11 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             </div>`;
     }
 },
+@endif
             ],
+            initComplete: function () {
+              applyColumnFilters('#dtBasicExample4', []);
+            },
             createdRow: function (row, data, dataIndex) {
         console.log(data.created_by);
         if (data.created_by === {{ Auth::id() }}) {
@@ -2520,6 +2621,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
         });
+        $('#my-table_filter').hide();
+
        dataTable5 =  $('#dtBasicExample5').DataTable({
             processing: true,
             serverSide: true,
@@ -2548,26 +2651,27 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
                 {
-    data: 'remarks',
-    name: 'remarks',
-    searchable: false,
-    render: function (data, type, row) {
-        // Set the maximum length for remarks before adding "Read More" link
-        const maxLength = 20;
-        const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
+  data: 'remarks',
+  name: 'calls.remarks',
+  title: 'Remarks & Messages',
+  render: function (data, type, row) {
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
 
-        if (data && data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
-            return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-            `;
-        } else {
-            return `<span class="remarks-text">${data}</span>`;
-        }
+    if (type !== 'display') return plainText;
+
+    let shortText = plainText.substring(0, 20);
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    if (plainText.length > 20) {
+      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
     }
+
+    return plainText;
+  }
 },
+
 {
             data: 'date',
             name: 'date',
@@ -2754,6 +2858,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 },
             ]
         });
+        $('#my-table_filter').hide();
+
         dataTable7 =   $('#dtBasicExample7').DataTable({
             processing: true,
             serverSide: true,
@@ -2782,26 +2888,27 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'location', name: 'location'},
                 { data: 'language', name: 'language'},
                 {
-    data: 'remarks',
-    name: 'remarks',
-    searchable: false,
-    render: function (data, type, row) {
-        // Set the maximum length for remarks before adding "Read More" link
-        const maxLength = 20;
-        const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
+  data: 'remarks',
+  name: 'calls.remarks',
+  title: 'Remarks & Messages',
+  render: function (data, type, row) {
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
 
-        if (data && data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
-            return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-            `;
-        } else {
-            return `<span class="remarks-text">${data}</span>`;
-        }
+    if (type !== 'display') return plainText;
+
+    let shortText = plainText.substring(0, 20);
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    if (plainText.length > 20) {
+      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
     }
+
+    return plainText;
+  }
 },
+
 {
             data: 'date',
             name: 'date',
@@ -2956,6 +3063,9 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
     }
 },
             ],
+            initComplete: function () {
+              applyColumnFilters('#dtBasicExample7', []);
+            },
             createdRow: function (row, data, dataIndex) {
         console.log(data.created_by);
         if (data.created_by === {{ Auth::id() }}) {
@@ -2963,6 +3073,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
         });
+        $('#my-table_filter').hide();
+
     dataTable8 = $('#dtBasicExample8').DataTable({
     processing: true,
     serverSide: true,
@@ -2971,7 +3083,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         { data: 'quotationsid', name: 'quotationsid' },
         {
             data: 'date_formatted',
-            name: 'date_formatted',
+            name: 'quotations.date',
              render: function (data, type, row) {
         if (type === 'display' || type === 'filter') {
             if (!data || !moment(data).isValid()) {
@@ -2996,6 +3108,9 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         { data: 'salesperson', name: 'salesperson' },
         { data: 'status', name: 'status' },
     ],
+    initComplete: function () {
+      applyColumnFilters('#dtBasicExample8', []);
+    },
     createdRow: function (row, data, dataIndex) {
         console.log(data.created_by);
         if (data.created_by === {{ Auth::id() }}) {
@@ -3003,6 +3118,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
     });
+    $('#my-table_filter').hide();
+
     dataTable9 = $('#dtBasicExample9').DataTable({
     processing: true,
     serverSide: true,
@@ -3029,8 +3146,28 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         { data: 'model_line', name: 'master_model_lines.model_line' },
         { data: 'language', name: 'calls.language' },
         { data: 'location', name: 'calls.location' },
-        { data: 'remarks', name: 'calls.remarks' },
         {
+  data: 'remarks',
+  name: 'calls.remarks',
+  title: 'Remarks & Messages',
+  render: function (data, type, row) {
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
+
+    if (type !== 'display') return plainText;
+
+    let shortText = plainText.substring(0, 20);
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    if (plainText.length > 20) {
+      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+    }
+
+    return plainText;
+  }
+},
+      {
             data: 'datefol',
             name: 'datefol',
              render: function (data, type, row) {
@@ -3072,6 +3209,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'sales_person_name', name: 'sales_person_name' },   
     ]
     });
+    $('#my-table_filter').hide();
+
     dataTable11 = $('#dtBasicExample11').DataTable({
     processing: true,
     serverSide: true,
@@ -3084,7 +3223,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         },
         {
             data: 'leaddate',
-            name: 'leaddate',
+            name: 'calls.created_at',
             title: 'Lead Date',
             render: function (data, type, row) {
                 if (type === 'display' || type === 'filter') {
@@ -3137,10 +3276,27 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             title: 'Location'
         },
         {
-            data: 'remarks',
-            name: 'calls.remarks',
-            title: 'Remarks & Messages'
-        },
+  data: 'remarks',
+  name: 'calls.remarks',
+  title: 'Remarks & Messages',
+  render: function (data, type, row) {
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
+
+    if (type !== 'display') return plainText;
+
+    let shortText = plainText.substring(0, 20);
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    if (plainText.length > 20) {
+      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+    }
+
+    return plainText;
+  }
+},
+
         {
             data: 'status',
             name: 'calls.status',
@@ -3175,15 +3331,18 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
           },
         {
             data: 'created_by_name',
-            name: 'created_by_name',
+            name: 'created_by_user.name',
             title: 'Created By'
         },
         {
             data: 'sales_person_name',
-            name: 'sales_person_name',
+            name: 'sales_person_user.name',
             title: 'Assigned To'
         }
     ],
+    initComplete: function () {
+      applyColumnFilters('#dtBasicExample11', []); 
+    },
     createdRow: function (row, data, dataIndex) {
         console.log(data.created_by);
         if (data.created_by === {{ Auth::id() }}) {
@@ -3191,6 +3350,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 });
+$('#my-table_filter').hide();
+
     dataTable9 = $('#dtBasicExample10').DataTable({
     processing: true,
     serverSide: true,
@@ -3198,7 +3359,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
     columns: [
       {
             data: 'leaddate',
-            name: 'leaddate',
+            name: 'calls.created_at',
              render: function (data, type, row) {
         if (type === 'display' || type === 'filter') {
             if (!data || !moment(data).isValid()) {
@@ -3225,12 +3386,33 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         { data: 'model_line', name: 'master_model_lines.model_line' },
         { data: 'language', name: 'calls.language' },
         { data: 'location', name: 'calls.location' },
-        { data: 'remarks', name: 'calls.remarks', render: function(data, type, row) {
-                    return $('<div>').html(data).text();
-                }
-            },
+        {
+  data: 'remarks',
+  name: 'calls.remarks',
+  title: 'Remarks & Messages',
+  render: function (data, type, row) {
+    const div = document.createElement('div');
+    div.innerHTML = data || '';
+    const plainText = div.textContent.trim();
+
+    if (type !== 'display') return plainText;
+
+    let shortText = plainText.substring(0, 20);
+    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    if (plainText.length > 20) {
+      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+    }
+
+    return plainText;
+  }
+},
+
         { data: 'createdby', name: 'users.name' },
     ],
+    initComplete: function () {
+      applyColumnFilters('#dtBasicExample10', []);
+    },
     createdRow: function (row, data, dataIndex) {
         console.log(data.created_by);
         if (data.created_by === {{ Auth::id() }}) {
@@ -3238,6 +3420,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
     });
+    $('#my-table_filter').hide();
+
     });
     function toggleRemarks(uniqueId) {
     const $truncatedText = $('#' + uniqueId + '_truncated');

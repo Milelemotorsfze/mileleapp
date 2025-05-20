@@ -29,6 +29,16 @@
             font-size: 17px;
             border-radius: 10px;
         }
+        .form-control {
+            height:32px !important;
+        }
+        .select2-container {
+            width: 100% !important;
+        }
+      .select2-selection__rendered {
+            font-size: 12px !important;
+            font-weight: 400 !important; /* Adjust this value as needed */
+        }
     </style>
     @can('create-demand-planning-po')
         @php
@@ -63,9 +73,12 @@
                     {{ Session::get('success') }}
                 </div>
             @endif
-                <form action="{{ route('purchasing-order.store') }}" method="POST" id="po-create-form">
+                <form action="{{ route('purchasing-order.store') }}" method="POST" id="po-create-form"  enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="po_from" value="DEMAND_PLANNING">
+                    <input type="hidden" name="is_demand_planning_po" value="1">
+                    <input type="hidden" name="pfi_id" value="{{ \Crypt::encrypt($pfi->id) }}">
+                    
                     <div class="row">
                         <input type="hidden" value="{{ $pfi->supplier_id }}" name="vendors_id">
                         <div class="col-lg-2 col-md-6 col-sm-12">
@@ -106,7 +119,7 @@
                         <div class="col-lg-1 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label font-size-13 "> Territory </label>
-                                <input type="text" class="form-control" readonly value="Africa">
+                                <input type="text" class="form-control" readonly name="territory" value="Africa">
                             </div>
                         </div>
                         <div class="col-lg-1 col-md-6 col-sm-12">
@@ -117,14 +130,21 @@
                         </div>
                         <div class="col-lg-1 col-md-6 col-sm-12">
                             <div class="mb-3">
-
                                 <label for="choices-single-default" class="form-label font-size-13 "> Currency </label>
                                 <input type="text" class="form-control" name="currency" readonly value="{{ $pfi->currency ?? '' }}">
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-6">
-                            <label class="form-label">Total Unit Price:</label>
+                            <label class="form-label">Total Unit Price</label>
                             <input type="text" name="totalcost" class="form-control" readonly id="total-price" value="0" placeholder="Total Unit Price">
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <label class="form-label">Customer Name</label>
+                            <input type="text" class="form-control" readonly value="{{ strtoupper($pfi->customer->name ?? '') }}">
+                        </div>
+                        <div class="col-lg-2 col-md-6">
+                            <label class="form-label">PFI Number</label>
+                            <input type="text" class="form-control" readonly value="{{ $pfi->pfi_reference_number ?? '' }}">
                         </div>
                     </div>
                     <div id="variantRowsContainer" style="display: none;">
@@ -137,12 +157,10 @@
                                 <label for="brandInput" class="form-label">Variant:</label>
                             </div>
                             <div class="col-lg-1 col-md-6">
-                                <label for="QTY" class="form-label">Brand:</label>
+                                <label for="QTY" class="form-label">Brand & Model Line:</label>
                             </div>
-                            <div class="col-lg-1 col-md-6">
-                                <label for="QTY" class="form-label">Model Line:</label>
-                            </div>
-                            <div class="col-lg-1 col-md-6">
+                          
+                            <div class="col-lg-2 col-md-6">
                                 <label for="QTY" class="form-label">Variants Detail:</label>
                             </div>
                             <div class="col-lg-1 col-md-6">
@@ -189,59 +207,62 @@
                             <div class="col-lg-1 col-md-6">
                                 <label  class="form-label">QTY</label>
                             </div>
-                            <div class="col-lg-1 col-md-6">
-                                <label  class="form-label">Inventory QTY</label>
-                            </div>
+                            <!-- @if($isToyotaPO)
+                                <div class="col-lg-1 col-md-6">
+                                    <label  class="form-label">Inventory QTY</label>
+                                </div>
+                            @endif -->
                         </div>
-                        @foreach($pfiVehicleVariants as $key => $pfiVehicleVariant)
-                            <div class="row">
-                                <input type="hidden" id="loi-item-id-{{$key}}" value="{{$pfiVehicleVariant->letterOfIndentItem->id ?? ''}}">
-                                <input type="hidden" name="approved_loi_ids[]" value="{{$pfiVehicleVariant->id}}">
-                                <input type="hidden" name="item_quantity_selected[]" id="item-quantity-selected-{{$pfiVehicleVariant->id}}" value="0">
-                                <input type="hidden" id="master-model-id-{{$key}}" name="selected_model_ids[]"  value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->id ?? ''}}">
-                                <div class="col-lg-2 col-md-6 mt-md-2">
-                                    <input type="text"  class="form-control" placeholder="Model" id="model-{{$key}}"
-                                           value="{{ $pfiVehicleVariant->letterOfIndentItem->masterModel->model ."-". $pfiVehicleVariant->letterOfIndentItem->masterModel->sfx}}" readonly>
+                        @foreach($pfiItems as $key => $pfiItem)
+                                <div class="row">
+                                    <input type="hidden" id="pfi-item-id-{{$key}}" name="pfi_items[]" value="{{$pfiItem->id ?? ''}}"> 
+                                    <input type="hidden" name="item_quantity_selected[]" id="item-quantity-selected-{{$pfiItem->id}}" value="0">
+                                    <input type="hidden" id="master-model-id-{{$key}}" name="selected_model_ids[]"  value="{{$pfiItem->masterModel->id ?? ''}}">
+                                    <div class="col-lg-2 col-md-6 mt-md-2">
+                                        <input type="text"  class="form-control" placeholder="Model" id="model-{{$key}}"
+                                            value="{{ $pfiItem->masterModel->model ."-". $pfiItem->masterModel->sfx}}" readonly>
+                                    </div>
+                                    <div class="col-lg-2 col-md-6 mt-md-2">
+                                        <select class="form-control mb-2 variants" id="variant-id-{{$key}}" data-key="{{$key}}" >
+                                            @foreach($pfiItem->masterModels as $masterModel)
+                                                <option value="{{ $masterModel->variant_id }}" data-model-id="{{$masterModel->id}}"
+                                                        data-brand="{{ $masterModel->variant->brand->brand_name ?? '' }}"  data-model-line="{{ $masterModel->variant->master_model_lines->model_line ?? '' }}"
+                                                        data-variant-detail="{{ $masterModel->variant->detail ?? '' }}"
+                                                    {{ $masterModel->variant_id == $pfiItem->masterModel->variant_id ? 'selected' : ''  }} >{{ $masterModel->variant->name ?? '' }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <input type="text"   class="form-control" placeholder="Brand" id="brand-{{$key}}"
+                                            value="{{$pfiItem->masterModel->variant->brand->brand_name ?? ''}}" readonly>
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <input type="text"  class="form-control" id="master-model-line-{{$key}}"
+                                            value="{{$pfiItem->masterModel->variant->master_model_lines->model_line ?? ''}}"
+                                            placeholder="Model Line" readonly>
+                                    </div>
+                                    <div class="col-lg-2 col-md-6 mt-md-2">
+                                        <input type="text" id="variant-detail-{{$key}}" class="form-control"  placeholder="Variants Detail" readonly
+                                            value="{{$pfiItem->masterModel->variant->detail ?? ''}}">
+                                    </div>
+                                    <div class="col-lg-2 col-md-6 mt-md-2">
+                                        <input type="text"  class="form-control" id="unit-price-{{$key}}"
+                                            value="{{ $pfiItem->unit_price }}"
+                                            placeholder="Unit Price" readonly>
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <input type="number" id="quantity-{{$key}}" min="0" max="{{ $pfiItem->quantity }}" data-quantity="{{$pfiItem->quantity}}"
+                                        data-id="{{ $pfiItem->id }}"  class="form-control qty-{{$pfiItem->id}}" value="{{ $pfiItem->quantity }}" placeholder="QTY" >
+                                        <span class="QuantityError-{{$key}} text-danger"></span>
+                                    </div>
+                                    <!-- @if($isToyotaPO)
+                                        <div class="col-lg-1 col-md-6 mt-md-2">
+                                            <input type="number" id="inventory-qty-{{$key}}" min="0" readonly data-inventory-qty="{{$pfiItem->inventoryQuantity}}"
+                                            data-id="{{ $pfiItem->id }}"  class="form-control inventory-qty-{{$pfiItem->id}}" value="{{ $pfiItem->inventoryQuantity }}" placeholder="QTY">
+                                            <span class="InventoryQuantityError-{{$key}} text-danger"></span>
+                                        </div>
+                                    @endif -->
                                 </div>
-                                <div class="col-lg-2 col-md-6 mt-md-2">
-                                    <select class="form-control mb-2 variants" id="variant-id-{{$key}}" data-key="{{$key}}" >
-                                        @foreach($pfiVehicleVariant->masterModels as $masterModel)
-                                            <option value="{{ $masterModel->variant_id }}" data-model-id="{{$masterModel->id}}"
-                                                    data-brand="{{ $masterModel->variant->brand->brand_name ?? '' }}"  data-model-line="{{ $masterModel->variant->master_model_lines->model_line ?? '' }}"
-                                                    data-variant-detail="{{ $masterModel->variant->detail ?? '' }}"
-                                                {{ $masterModel->variant_id == $pfiVehicleVariant->letterOfIndentItem->masterModel->variant_id ? 'selected' : ''  }} >{{ $masterModel->variant->name ?? '' }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-lg-1 col-md-6 mt-md-2">
-                                    <input type="text"   class="form-control" placeholder="Brand" id="brand-{{$key}}"
-                                           value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->brand->brand_name ?? ''}}" readonly>
-                                </div>
-                                <div class="col-lg-1 col-md-6 mt-md-2">
-                                    <input type="text"  class="form-control" id="master-model-line-{{$key}}"
-                                           value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->master_model_lines->model_line ?? ''}}"
-                                           placeholder="Model Line" readonly>
-                                </div>
-                                <div class="col-lg-2 col-md-6 mt-md-2">
-                                    <input type="text" id="variant-detail-{{$key}}" class="form-control"  placeholder="Variants Detail" readonly
-                                           value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->detail ?? ''}}">
-                                </div>
-                                <div class="col-lg-2 col-md-6 mt-md-2">
-                                    <input type="text"  class="form-control" id="unit-price-{{$key}}"
-                                           value="{{ $pfiVehicleVariant->unit_price }}"
-                                           placeholder="Unit Price" readonly>
-                                </div>
-                                <div class="col-lg-1 col-md-6 mt-md-2">
-                                    <input type="number" id="quantity-{{$key}}" min="0"  oninput="checkQuantity({{$key}})" data-quantity="{{$pfiVehicleVariant->quantity}}"
-                                      data-id="{{ $pfiVehicleVariant->id }}"  class="form-control qty-{{$pfiVehicleVariant->id}}" value="{{ $pfiVehicleVariant->quantity }}" placeholder="QTY">
-                                    <span class="QuantityError-{{$key}} text-danger"></span>
-                                </div>
-                                <div class="col-lg-1 col-md-6 mt-md-2">
-                                    <input type="number" id="inventory-qty-{{$key}}" min="0" readonly data-inventory-qty="{{$pfiVehicleVariant->inventoryQuantity}}"
-                                      data-id="{{ $pfiVehicleVariant->id }}"  class="form-control inventory-qty-{{$pfiVehicleVariant->id}}" value="{{ $pfiVehicleVariant->inventoryQuantity }}" placeholder="QTY">
-                                    <span class="InventoryQuantityError-{{$key}} text-danger"></span>
-                                </div>
-                            </div>
                         @endforeach
                         <div class="col-12 justify-content-end">
                             <button type="button" class="btn btn-primary float-end add-row-btn">
@@ -261,15 +282,19 @@
                                 <option value="Local">Local</option>
                             </select>
                         </div>
-
                         <div class="col-lg-3 col-md-6">
                             <label class="form-label">Prefered Destination:</label>
-                            <input type="text" id="fd" name="fd" class="form-control" value="{{old('fd')}}" placeholder="Prefered Destination" >
+                            <select name="prefered_destination" class="form-control" id="prefered_destination" multiple>
+                                <option value="">Select the Prefered Destination</option>
+                                @foreach ($countries as $country)
+                                    <option value="{{ $country->id }}"{{ $country->id == $pfi->country_id ? 'selected' : ''}} >{{ $country->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
-
                     </div>
                     <br><br>
                       <div class="row">
+                        <input type="hidden" id="can-inventory-allocate" value="0" name="can_inventory_allocate">
                           <button type="submit" class="btn btncenter btn-success" id="submit-button">Submit</button>
                       </div>
                 </form>
@@ -281,29 +306,15 @@
 @push('scripts')
 <script>
     let formValid = true;
-    function checkQuantity(key) {
-        var selectedQuantity = $('#quantity-'+key).val();
-        var variantQuantity = $('#quantity-'+key).attr('data-quantity');
-        var inventoryQuantity = $('#inventory-qty-'+key).attr('data-inventory-qty');
-        if(parseInt(selectedQuantity) > parseInt(inventoryQuantity)) {
-            formValid = false;
-            $('.QuantityError-'+key).text("Please Enter Quantity less than inventory Quantity "+inventoryQuantity);
-            $('.add-row-btn').attr('disabled', true);
-        }
-        else if(parseInt(selectedQuantity) > parseInt(variantQuantity)){
-            formValid = false;
-            $('.QuantityError-'+key).text("Please Enter Quantity less than Maximum allocated Quantity "+variantQuantity);
-            $('.add-row-btn').attr('disabled', true);
-        }
-        else{
-            formValid = true;
-            $('.QuantityError-'+key).text("");
-            $('.add-row-btn').attr('disabled', false);
-        }
-    }
-
+    let isToyotaPO = "{{ $isToyotaPO }}"
+    let totalPOqty = "{{ $totalPOqty }}"
+    let isEnableVehicleAdd = true;
+    
+    $('#prefered_destination').select2({
+        placeholder: "Select Prefered Destination",
+        maximumSelectionLength: 1
+    })
     function checkDuplicateVIN() {
-
         var vinValues = $('input[name="vin[]"]').map(function() {
             return $(this).val();
         }).get();
@@ -313,7 +324,7 @@
         });
 
         if (duplicates.length > 0) {
-            alertify.alert('Duplicate VIN values found. Please ensure all VIN values are unique.').set({title:"Alert !"});
+            alertify.alert("VIN already exists under a different PO. Please choose another VIN.").set({title:"Alert !"});
             formValid = false;
         }
 
@@ -323,11 +334,8 @@
 
         if (allBlank) {
             formValid = true;
-            // $('#po-create-form').unbind('submit').submit();
         } else {
-            // if( formValid == true) {
                 var formData = $('#po-create-form').serialize();
-                console.log(formData);
                 $.ajax({
                     url: '{{ route('vehicles.check-create-vins') }}',
                     method: 'POST',
@@ -347,81 +355,137 @@
                         formValid = false;
                     }
                 });
-            // alert(formValid);
             }
-        // }
 
     }
     $('.add-row-btn').click(function(e) {
         $('.bar').show();
-        var variantQuantity = '{{ $pfiVehicleVariants->count() }}';
+        var variantQuantity = '{{ $pfiItems->count() }}';
         var price = 0;
-
-        // Move the declaration and assignment inside the click event function
-        var exColours = <?= json_encode($exColours) ?>;
-        var intColours = <?= json_encode($intColours) ?>;
         var sum = $('#total-price').val();
         for (var i = 0; i < variantQuantity; i++) {
-            checkQuantity(i);
-            if(formValid == true) {
+            var selectedQty = $('#quantity-'+i).val();
+            var pfiQuantity = $('#quantity-'+i).attr('data-quantity');
+            var inventoryQuantity = $('#inventory-qty-'+i).attr('data-inventory-qty');
+            // if(isToyotaPO == 1) {
+            //     // toyota - only one po
+            //     // check  pfiQuantity is less than inventory quantity  
+            //     if(parseInt(inventoryQuantity) < parseInt(pfiQuantity)) {
+            //         isEnableVehicleAdd = false;
+            //         alertify.confirm('Required vehicle quanity is not available in the inventory',function (e) {
+            //         }).set({title:"Invalid Data"});
+            //         return false;
+            //     }
+            // }else{
+                 // not toyota - multiple po 
+                // maximum quantity should the the pfi item quantity 
+                if(parseInt(pfiQuantity) < parseInt(selectedQty)) {
+                    var model = $('#model-'+i).val();
+                    alertify.confirm('The Maximum PFI quantity you can enter for the model '+ model +' is ' + pfiQuantity +'.',function (e) {
+                    }).set({title:"Invalid Data"});
+                    isEnableVehicleAdd = false;
+                    return false;
+                }else{
+                    isEnableVehicleAdd = true;
+                }
+            // }
+        }
+       
+        if(isEnableVehicleAdd == true) {
+            for (var i = 0; i < variantQuantity; i++) {
+                // check remaining quantity is available or not
                 var qty = $('#quantity-'+i).val();
                 var actualQuantity = $('#quantity-'+i).attr('data-quantity');
                 var remaingQuantity = parseInt(actualQuantity) - parseInt(qty);
-                $('#quantity-'+i).attr('data-quantity',remaingQuantity);
-                $('#quantity-'+i).val(remaingQuantity);
-                var selectedVariant = $('#variant-id-'+i).find(":selected").text();
 
-                var brand = $('#brand-'+i).val();
-                var model = $('#model-'+i).val();
-                var masterModelLine = $('#master-model-line-'+i).val();
-                var detail = $('#variant-detail-'+i).val();
-                var masterModelId = $('#master-model-id-'+i).val();
-                var loiItemId = $('#loi-item-id-'+i).val();
-                var dataid = $('#quantity-'+i).attr('data-id');
-                var price = $('#unit-price-'+i).val();
-                var existingQuantity =  $('#item-quantity-selected-'+dataid).val();
-                var latestQty = parseInt(existingQuantity) + parseInt(qty);
-                $('#item-quantity-selected-'+dataid).val(latestQty);
-                var unitPrices = price * qty;
-                var sum = parseInt(sum) + parseInt(unitPrices);
-                $('#total-price').val(sum);
+                    $('#quantity-'+i).attr('data-quantity',remaingQuantity);
+                    $('#quantity-'+i).val(remaingQuantity);
+                    var selectedVariant = $('#variant-id-'+i).find(":selected").text();
 
-                for (var j = 0; j < qty; j++) {
-                    var newRow = $('<div class="row row-space"></div>');
-                    var LoiItemCol  = $('<input type="hidden" name="loi_item_Ids[]" value="' + loiItemId + '" >');
-                    var masterModelCol  = $('<input type="hidden" id="model-id" name="master_model_id[]" value="' + masterModelId + '" >');
-                    var ModelCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" title="'+ model +'"  value="' + model + '" class="form-control" readonly></div>');
-                    var variantCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" id="variant-id" title="'+ selectedVariant +'"   title="'+ model +'"  name="variant_id[]" value="' + selectedVariant + '" class="form-control" readonly></div>');
-                    var brandCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" name="brand[]" title="'+ brand +'"  value="' + brand + '" class="form-control" readonly></div>');
-                    var masterModelLineCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" title="'+ masterModelLine +'" name="master_model_line[]" value="' + masterModelLine + '" class="form-control" readonly></div>');
-                    var detailCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" name="detail[]" value="' + detail + '"  title="'+ detail +'"  class="form-control" readonly></div>');
-                    var exColourCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><select name="ex_colour[]" class="form-control"><option value="">Exterior Color</option></select></div>');
-                    var intColourCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><select name="int_colour[]" class="form-control"><option value="">Interior Color</option></select></div>');
-                    var vinCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
-                    var estimatedCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="date" name="estimated_arrival[]" class="form-control"></div>');
-                    var engineNumber = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" name="engine_number[]" class="form-control"></div>');
-                    var unitPrice = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" value="' + price + '"  title="'+ price +'" name="unit_prices[]" readonly class="form-control"></div>');
-                    var removeBtn = $('<div class="col-lg-1 col-md-6 mt-md-2"><button type="button" data-unit-price="'+ price +'" data-approved-id="' + dataid + '" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></div>');
-                    // Populate Exterior Colors dropdown
-                    var exColourDropdown = exColourCol.find('select');
-                    for (var id in exColours) {
-                        if (exColours.hasOwnProperty(id)) {
-                            exColourDropdown.append($('<option></option>').attr('value', id).text(exColours[id]));
-                        }
+                    var brand = $('#brand-'+i).val();
+                    var model = $('#model-'+i).val();
+                    var masterModelLine = $('#master-model-line-'+i).val();
+                    var detail = $('#variant-detail-'+i).val();
+                    var masterModelId = $('#master-model-id-'+i).val();
+                    var pfiItemId = $('#pfi-item-id-'+i).val();
+                    var dataid = $('#quantity-'+i).attr('data-id');
+                    var price = $('#unit-price-'+i).val();
+                    var existingQuantity =  $('#item-quantity-selected-'+dataid).val();
+                    var latestQty = parseInt(existingQuantity) + parseInt(qty);
+                    $('#item-quantity-selected-'+dataid).val(latestQty);
+                    var unitPrices = price * qty;
+                    var sum = parseInt(sum) + parseInt(unitPrices);
+                    $('#total-price').val(sum);
+                    var brandModelLine = masterModelLine+'-'+brand;
+
+                    for (var j = 0; j < qty; j++) {
+                        var newRow = $(`<div class="row row-space">
+                                    <input type="hidden" name="pfi_item_Ids[]" value="${ pfiItemId }" >
+                                    <input type="hidden" id="model-id" name="master_model_id[]" value="${ masterModelId }" >
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <input type="text" title="${ model }"  value="${ model }" class="form-control" readonly>
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <input type="text" id="variant-id" title="${ selectedVariant }"   title="${ model }" 
+                                         name="variant_id[]" value="${selectedVariant}" class="form-control" readonly>
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <input type="text" title="${ brandModelLine }"  value="${ brandModelLine }" class="form-control" readonly>
+                                    </div>
+                                    <div class="col-lg-2 col-md-6 mt-md-2">
+                                        <textarea name="detail[]" class="form-control" readonly style="width: 100%;">${detail}</textarea>
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mb-5 mt-md-2">
+                                        <select name="ex_colour[]" class="form-control exterior-colours">
+                                            <option value="">Exterior Color</option>
+                                                @foreach ($exColours as $colour)
+                                                    <option value="{{ $colour->id }}">
+                                                        {{ $colour->name }} @if($colour->code) ( {{ $colour->code}}) @endif
+                                                    </option>
+                                                @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <select name="int_colour[]" class="form-control interior-colours">
+                                            <option value="">Interior Color</option>
+                                            @foreach ($intColours as $colour)
+                                                <option value="{{ $colour->id }}">
+                                                    {{ $colour->name }} @if($colour->code) ( {{ $colour->code}}) @endif
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <input type="date" name="estimated_arrival[]" class="form-control">
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <input type="text" name="engine_number[]" class="form-control" >
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <input type="text" value="${price}"  title="${price}" name="unit_prices[]" readonly class="form-control">
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <input type="text" name="vin[]" class="form-control"  title="VIN Number" placeholder="VIN">
+                                    </div>
+                                </div>`);
+                        var removeBtn = $(`<div class="col-lg-1 col-md-6 mt-md-2">
+                                            <button type="button" data-unit-price="${price}" data-approved-id="${dataid}" class="btn btn-danger btn-sm remove-row-btn">
+                                                <i class="fas fa-times"></i></button>
+                                            </div>`);
+                       
+                            newRow.append(removeBtn);
+                        $('#variantRowsContainer').append(newRow);
+                        $('.exterior-colours').select2({
+                            placeholder: 'Exterior',
+                            width: '100%',
+                        });
+                        $('.interior-colours').select2({
+                            placeholder: 'Interior',
+                            width: '100%',
+                        });
                     }
-                    // // Populate Interior Colors dropdown
-                    var intColourDropdown = intColourCol.find('select');
-                    for (var id in intColours) {
-                        if (intColours.hasOwnProperty(id)) {
-                            intColourDropdown.append($('<option></option>').attr('value', id).text(intColours[id]));
-                        }
-                    }
-                    newRow.append(LoiItemCol,masterModelCol, ModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, engineNumber, unitPrice, vinCol, removeBtn);
-                    $('#variantRowsContainer').append(newRow);
-                }
-                $('#variantRowsContainer').show();
+                    $('#variantRowsContainer').show();
             }
-
         }
     });
 
@@ -453,31 +517,35 @@
         $('#total-price').val(remainingPrice);
 
     });
-    $('#po_number').on('change', function() {
+    $('#po_number').on('keyup', function() {
+        checkPOUnique();
+    });
+
+    function checkPOUnique() {
         var poNumber = $('#po_number').val();
         $.ajax({
-            url: '{{ route('purchasing-order.checkPONumber') }}',
-            type: 'POST',
+            url: "{{ route('dp-purchasing-order.checkPONumber') }}",
+            async: false,
+            type: 'GET',
             data: {
-                '_token': '{{ csrf_token() }}',
                 'poNumber': poNumber
             },
             success: function(response) {
-                $('#poNumberError').hide().text('');
-                formValid = true;
-            },
-            error: function(xhr) {
-                if (xhr.status === 422) {
-                    $('#poNumberError').text("PO Number Already Existing");
+                if(response == true) {
                     formValid = false;
+                    $('#po_number').addClass('is-invalid');
+                    $('#poNumberError').text("PO Number Already Existing");
+                }else{
+                    formValid = true;
+                    $('#po_number').removeClass('is-invalid');
+                    $('#poNumberError').text(" ");
                 }
-            }
+            }   
         });
-    });
+    }
 
     $('.variants').on('change', function() {
         var key = $(this).attr('data-key');
-        console.log(key);
         var model = $(this).find('option:selected').attr("data-model-id");
         var brand = $(this).find('option:selected').attr("data-brand");
         var modelLine = $(this).find('option:selected').attr("data-model-line");
@@ -489,37 +557,92 @@
         $('#variant-detail-'+key).val(variantDetail);
     });
 
+
     $('#submit-button').click(function(e) {
         e.preventDefault();
 
         var variantIds = $('input[name="variant_id[]"]').map(function() {
             return $(this).val();
         }).get();
+       
+            var poNumber = $('#po_number').val();
+            if(poNumber == '') {
+                formValid = false;
+                $('#po_number').addClass('is-invalid');
+                $('#poNumberError').text("This field is required")
+            }else{
+                formValid = true;
+                $('#po_number').removeClass('is-invalid');
+                $('#poNumberError').text(" ");
+            }
+            if(formValid == true) {
+                checkPOUnique();
+            }
 
-        if (variantIds.length === 0) {
-            alertify.alert('Please select variant quantity and and add vehicles.').set({title:"Alert !"});
-            formValid = false;
-        }else{
-            // alert("variant is there");
-            formValid = true;
-            checkDuplicateVIN();
-        }
-        // alert("inside submit");
-        // alert(formValid);
-            if( formValid == true) {
-                var poNumber = $('#po_number').val();
-                if(poNumber == '') {
+            if(formValid == true) {
+                
+                if (variantIds.length === 0) {
+                    alertify.alert('Please select variant quantity and and add vehicles.').set({title:"Alert !"});
                     formValid = false;
-                    $('#poNumberError').text("This field is required")
                 }else{
-                    formValid = true;
-                    $('#poNumberError').text(" ");
+                    if(isToyotaPO == 1 && totalPOqty != variantIds.length) {
+                        alertify.alert('This is PO For Toyota, So Please utilize all quantity ('+totalPOqty+')').set({title:"Alert !"});
+                        formValid = false;
+                    }else{
+                        formValid = true;
+                        checkDuplicateVIN();
+                    }
+                    
                 }
             }
-        // alert("after po validation submit");
-        // alert(formValid);
+
         if(formValid == true) {
             $('#po-create-form').unbind('submit').submit();
+             //  mapping confirmation nand colour check if po is for toyota
+            // if(isToyotaPO == 1) {
+                // let exteriorColours = $('select[name="ex_colour[]"]').map(function() {
+                //     return $(this).val();
+                // }).get();
+
+                // let interiorColours = $('select[name="int_colour[]"]').map(function() {
+                //     return $(this).val();
+                // }).get();
+
+                // let masterModelsIds = $('input[name="master_model_id[]"]').map(function() {
+                //     return $(this).val();
+                // }).get();
+
+                // let msg = '';
+                // if(exteriorColours.length > 0 && interiorColours.length > 0) {
+
+                //     $.ajax({
+                //     url: "{{ route('dp-purchase-order.inventory-check') }}",
+                //     type: 'GET',
+                //     data: {
+                //         'int_colours': interiorColours,
+                //         'ex_colours': exteriorColours,
+                //         'master_model_id': masterModelsIds,
+                //         'pfi_id': "{{ $pfi->id }}"
+                //     },
+                //     success: function(response) {
+                //         if(response.length > 0) {
+                //                msg = "Inventory doest not exist exact colour matches with po vehicles";
+                //         }else{
+                //             msg = "The exact colour matches  in inventory "
+                //         }
+                       
+                //         }
+                //     });
+                // }
+                // var confirm = alertify.confirm(msg+'Do you want to allocate the PO vehicles with supplier inventory?',function (e) {
+                //                         if (e) {
+                //                             $('#can-inventory-allocate').val(1);
+                //                         }
+                //                     }).set({title:"Are You Sure ?"}).set('oncancel', function(closeEvent){
+                //                             $('#can-inventory-allocate').val(0);
+                //                         });
+            // }
+          
         }
     });
 </script>

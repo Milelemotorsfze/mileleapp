@@ -357,6 +357,24 @@
       </div> 
       @endcan
       </div>
+
+      <!-- Full Text Modal -->
+        <div class="modal fade" id="fullTextModal" tabindex="-1" role="dialog" aria-labelledby="fullTextModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="fullTextModalLabel">Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="fullTextContent"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
   </div>
   @php
@@ -410,7 +428,7 @@
                     <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         ${firstFiveWords}
                     </div>
-                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                    <button class="read-more-btn btn btn-primary" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
                 `;
             }
         },
@@ -476,7 +494,7 @@
                     <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         ${firstFiveWords}
                     </div>
-                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                    <button class="read-more-btn btn btn-primary" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
                 `;
             }
         },
@@ -547,7 +565,7 @@
                     <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         ${firstFiveWords}
                     </div>
-                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                    <button class="read-more-btn btn btn-primary" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
                 `;
             }
         },
@@ -614,7 +632,7 @@
                     <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         ${firstFiveWords}
                     </div>
-                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                    <button class="read-more-btn btn btn-primary" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
                 `;
             }
         },
@@ -670,7 +688,7 @@
                     <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         ${firstFiveWords}
                     </div>
-                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                    <button class="read-more-btn btn btn-primary" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
                 `;
             }
         },
@@ -813,9 +831,10 @@ $(document).ready(function () {
         return `${day} - ${month} - ${year}`;
     }
 });
-function showFullText(button) {
+    function showFullText(button) {
         var fullText = button.getAttribute('data-fulltext');
-        alert(fullText);
+        document.getElementById('fullTextContent').textContent = fullText;
+        $('#fullTextModal').modal('show');
     }
     function openModalfile(filePath) {
     const baseUrl = "{{ asset('storage/') }}"; // The base URL to the public storage directory

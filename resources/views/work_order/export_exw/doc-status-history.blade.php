@@ -87,8 +87,11 @@
     </div>
     <div class="card-body">
         <div class="row">
-            <div class="col-lg-12 col-md-12 col-sm-12 col-12">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-6">
                 <label for="choices-single-default" class="form-label"><strong>WO Number</strong></label> : {{$workOrder->wo_number ?? ''}}             
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-6">
+                <label for="choices-single-default" class="form-label"><strong>Has Claim</strong></label> : {{$workOrder->has_claim ?? ''}}             
             </div>
             @if(isset($workOrder->boe) && count($workOrder->boe) > 0)
                 <div class="col-lg-12 col-md-12 col-sm-12 col-12">

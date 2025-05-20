@@ -1,5 +1,8 @@
 @extends('layouts.main')
 <style>
+.error {
+    color: red;
+}
     .heading-background {
   display: inline-block;
   background-color: #f2f2f2;
@@ -45,8 +48,43 @@
                         <input type="text" value="{{ old('name', $warehouse->name) }}" name="name" class="form-control " placeholder="Warehouse Name" required>
                     </div>
                 </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label d-block">
+                            <span class="error">*</span> Status
+                        </label>
+                        @if ($usedByVehicles)
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="statusYes" disabled {{ $warehouse->status == 1 ? 'checked' : '' }}>
+                                <label class="form-check-label text-muted" for="statusYes">Active</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="statusNo" disabled {{ $warehouse->status == 0 ? 'checked' : '' }}>
+                                <label class="form-check-label text-muted" for="statusNo">In-Active</label>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-danger">
+                                    This warehouse location is being used by vehicles. You cannot change its status.
+                                </small>
+                            </div>
+                            <input type="hidden" name="status" value="{{ $warehouse->status }}">
+                        @else
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="status" id="statusYes"
+                                    value="1" {{ $warehouse->status == 1 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="statusYes">Active</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="status" id="statusNo"
+                                    value="0" {{ $warehouse->status == 0 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="statusNo">In-Active</label>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
                 <div class="col-12 text-center">
-                    <button type="submit" class="btn btn-dark">Submit</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
             </div>
         </form>
@@ -81,8 +119,24 @@
                             {{$change_bys}}
                         </td>
                         <td>{{$warehouselog->field}}</td>
-                        <td>{{ $warehouselog->old_value }}</td>
-                        <td>{{ $warehouselog->new_value }}</td>
+                        <td>
+                            @if ($warehouselog->field === 'status')
+                                {!! $warehouselog->old_value == 1 
+                                    ? '<span class="badge bg-success fs-6">Active</span>' 
+                                    : '<span class="badge bg-danger fs-6">In-Active</span>' !!}
+                            @else
+                                {{ $warehouselog->old_value }}
+                            @endif
+                        </td>
+                        <td>
+                            @if ($warehouselog->field === 'status')
+                                {!! $warehouselog->new_value == 1 
+                                    ? '<span class="badge bg-success fs-6">Active</span>' 
+                                    : '<span class="badge bg-danger fs-6">In-Active</span>' !!}
+                            @else
+                                {{ $warehouselog->new_value }}
+                            @endif
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>

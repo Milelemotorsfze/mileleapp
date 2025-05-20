@@ -46,7 +46,9 @@ class LOIExpiryConditionController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $loiExpiryCondition = LOIExpiryCondition::find($id);
+
+        return view('loi-expiry-conditions.edit', compact('loiExpiryCondition'));
     }
 
     /**
@@ -54,12 +56,18 @@ class LOIExpiryConditionController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $request->validate([
+            'expiry_duration' => 'required',
+            'expiry_duration_type' => 'required'
+        ]);
+       
         $loiExpiryCondition = LOIExpiryCondition::find($id);
-        $loiExpiryCondition->expiry_duration_year = $request->expiry_duration_year;
+        $loiExpiryCondition->expiry_duration = $request->expiry_duration;
+        $loiExpiryCondition->expiry_duration_type = $request->expiry_duration_type;
         $loiExpiryCondition->updated_by = Auth::id();
         $loiExpiryCondition->save();
         
-        return redirect()->back()->with('success', "LOI expiry Condition updated Successfully.");
+        return redirect()->route('loi-expiry-conditions.index')->with('success', "LOI expiry Condition updated Successfully.");
     
     }
 

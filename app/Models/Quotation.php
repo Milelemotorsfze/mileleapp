@@ -14,10 +14,24 @@ class Quotation extends Model
         'deal_value',
         'sales_notes',
         'file_path',
+        'nature_of_deal',
     ];
     public $timestamps = false;
     public function quotationdetails()
     {
         return $this->hasOne(QuotationDetail::class);
+    }
+    public function so()
+    {
+        return $this->hasOne(So::class, 'quotation_id');
+    }
+
+    public function call()
+    {
+        return $this->belongsTo(Calls::class, 'calls_id');
+    }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class,'created_by','id');
     }
 }

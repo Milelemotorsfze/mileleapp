@@ -300,7 +300,6 @@
             let url =  $(this).attr('data-url');
             let status =  $(this).attr('data-status');
             let msg =  $(this).attr('data-message');
-            console.log(msg);
             let successMsg = 'Approved';
             if(msg !== 'Approve') {
                 successMsg = 'Rejected';
@@ -394,7 +393,6 @@
                                     alertify.success('Supplier Approved successfully.'+response);
                                     },
                                     error: function (error) {
-                                    console.error(error);
                                     }
                                 });
                         }
@@ -442,7 +440,6 @@
 
                                     },
                                     error: function (error) {
-                                    console.error(error);
                                     }
                                 });
                         }

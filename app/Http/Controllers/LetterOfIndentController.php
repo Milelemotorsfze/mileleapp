@@ -303,7 +303,6 @@ class LetterOfIndentController extends Controller
             }
             
             $quantities = $request->quantity;
-            // $isTTCApprovalRequired = 0;
 
             foreach ($quantities as $key => $quantity) {
                 $masterModel = MasterModel::where('sfx', $request->sfx[$key])
@@ -329,7 +328,6 @@ class LetterOfIndentController extends Controller
                     $LOIItem = new LetterOfIndentItem();
                     $LOIItem->letter_of_indent_id  = $LOI->id;
                     $LOIItem->master_model_id = $masterModel->id ?? '';
-                    // $LOIItem->uuid = $code;
                     $LOIItem->code = $code;
                     $LOIItem->quantity = $quantity;
                     $LOIItem->save();
@@ -400,7 +398,6 @@ class LetterOfIndentController extends Controller
     
         $isCustomerTradeLicense = LetterOfIndentDocument::where('letter_of_indent_id',$letterOfIndent->id)
                         ->where('is_trade_license',true)->first();
-                        // return $isCustomerTradeLicense;
         $customerOtherDocAdded = LetterOfIndentDocument::where('letter_of_indent_id',$letterOfIndent->id)
                                         ->where('is_passport', false)
                                         ->where('is_trade_license',false)
@@ -564,8 +561,8 @@ class LetterOfIndentController extends Controller
                 }
                 $documents = $letterOfIndent->LOIDocuments()->orderBy('order','ASC')->get();
                 try{
-                $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.general_download_view',
-                    compact('letterOfIndent','documents'));
+                    $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.general_download_view',
+                        compact('letterOfIndent','documents'));
                 }catch (\Exception $e){
                     return $e->getMessage();
                 }
@@ -580,10 +577,6 @@ class LetterOfIndentController extends Controller
 
     }
 
-
-  
-  
-  
     // public function pdfMerge($letterOfIndentId)
     // {
     //     $letterOfIndent = LetterOfIndent::find($letterOfIndentId);
@@ -616,7 +609,6 @@ class LetterOfIndentController extends Controller
     // }
 
     public function getCustomerDocuments(Request $request) {
-        // info($request->all());
 
         $client = Clients::find($request->client_id);
         $data = [];
@@ -740,19 +732,12 @@ class LetterOfIndentController extends Controller
                     $customerNameCode .= strtoupper(mb_substr($name, 0, 1));
                 }
                 $customerCode = str_pad($customerNameCode, 3, '0', STR_PAD_RIGHT);
-                $yearCode = Carbon::now()->format('y');
-                $year = Carbon::now()->format('Y');
-                $customerTotalLoiCount = LetterOfIndent::where('client_id', $request->client_id)
-                                            ->whereNot('id', $id)
-                                            ->whereYear('date', $year)->count();
-
-                $nextLoiCount = str_pad($customerTotalLoiCount + 1, 2, '0', STR_PAD_LEFT);
-
-                $uuid = $countryName . $customerCode ."-".$yearCode . $nextLoiCount;
-                $customerYearCode = $yearCode . $nextLoiCount;
                 
+                $customerYearCode = $LOI->year_code;
+                
+                $uuid = $countryName . $customerCode ."-".$customerYearCode;
+               
                 $LOI->uuid = $uuid;
-                $LOI->year_code = $customerYearCode;
                 $LOI->client_id = $request->client_id;
                 $LOI->country_id = $request->country;
                 $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
@@ -780,20 +765,6 @@ class LetterOfIndentController extends Controller
                 }
 
                 $LOI->save();
-
-                // if ($request->has('files')) {
-                //     foreach ($request->file('files') as $key => $file) {
-                //         $extension = $file->getClientOriginalExtension();
-                //         $fileName = $key . time() . '.' . $extension;
-                //         $destinationPath = 'LOI-Documents';
-                //         $file->move($destinationPath, $fileName);
-                //         $LoiDocument = new LetterOfIndentDocument();
-
-                //         $LoiDocument->loi_document_file = $fileName;
-                //         $LoiDocument->letter_of_indent_id = $LOI->id;
-                //         $LoiDocument->save();
-                //     }
-                // }
             
                 $LOI->LOITemplates()->delete();
                 if($request->deletedIds) {
@@ -830,14 +801,12 @@ class LetterOfIndentController extends Controller
                         $isCustomerPassport->save();
                     }                       
                  }else{
-                    // value 0
+
                     LetterOfIndentDocument::where('is_passport', true)
                                         ->where('letter_of_indent_id', $LOI->id)->delete();
                 }
                 if($request->is_trade_license_added == 1 ) {
-                    // 
                     if(!$isCustomerTradeLicense) {
-                        // trade license added
                         $LoiDocument = new LetterOfIndentDocument();
                         $LoiDocument->loi_document_file = $customer->tradelicense;
                         $LoiDocument->letter_of_indent_id = $LOI->id;
@@ -846,7 +815,6 @@ class LetterOfIndentController extends Controller
                     }
                   
                 }else if($request->is_trade_license_added == 2){
-                    // value 2
                     // update new passport
                     if($isCustomerTradeLicense) {
                         $isCustomerTradeLicense->loi_document_file = $customer->tradelicense;
@@ -886,7 +854,6 @@ class LetterOfIndentController extends Controller
                                 $latestUUIDNumber = substr($latestUUID, $offset, $length);
                                 $newCode =  str_pad($latestUUIDNumber + 1, 3, 0, STR_PAD_LEFT);
                                 $code =  $prefix.$newCode;
-                                info("New Code");
                             }else{
                                 $code = $prefix.'001';
                             }
@@ -898,7 +865,6 @@ class LetterOfIndentController extends Controller
                             $LOIItem->letter_of_indent_id = $LOI->id;
                             $LOIItem->master_model_id = $model->id ?? '';
                             $LOIItem->quantity = $quantity;
-                            // $LOIItem->uuid = $code;
                             $LOIItem->code = $code;
                             $LOIItem->save();
                         }

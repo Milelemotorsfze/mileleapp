@@ -14,10 +14,12 @@ use App\Models\ModelSpecificationOption;
 use App\Models\VariantItems;
 use App\Models\AddonTypes;
 use App\Models\AddonDetails;
+use Illuminate\Support\Facades\DB;
 use App\Models\ModifiedVariants;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Carbon\CarbonTimeZone;
+use Illuminate\Support\Facades\Validator;
 
 class VariantController extends Controller
 {
@@ -43,9 +45,10 @@ class VariantController extends Controller
         'sunroof' => 'sunroof'
     ];
         foreach ($variants as $variant) {
+            if($variant->category != 'Modified')
+            {
             $details = [];
             $otherDetails = [];
-            
             foreach ($variant->variantItems as $item) {
                 $modelSpecification = $item->model_specification;
                 $modelSpecificationOption = $item->model_specification_option;
@@ -86,6 +89,7 @@ class VariantController extends Controller
             ksort($details);
             $variant->detail = implode(', ', array_merge($details, $otherDetails));
         }
+    }
         return view('variants.list', compact('variants'));
     }
     /**
@@ -107,6 +111,9 @@ class VariantController extends Controller
      */
 public function store(Request $request)
 {
+    DB::beginTransaction(); // Start transaction
+
+    try {
     $selectedSpecifications = json_decode(request('selected_specifications'), true);
     ksort($selectedSpecifications);
     $totalSpecifications = count($selectedSpecifications);
@@ -476,6 +483,7 @@ $existingspecifications = Varaint::with('VariantItems')
     $variant->model_detail = $model_details;
     $variant->detail = $variant_details;
     $variant->my = $request->input('my');
+    $variant->created_by = auth()->user()->id;
     $variant->save();
     $variantId = $variant->id;
     foreach ($selectedSpecifications as $specificationData) {
@@ -494,7 +502,14 @@ $existingspecifications = Varaint::with('VariantItems')
     $variantlog->variant_id = $variantId;
     $variantlog->created_by = auth()->user()->id;
     $variantlog->save();
+    DB::commit(); // Commit transaction if everything is successful
+
     return redirect()->route('variants.index')->with('success', 'Variant added successfully.');
+
+} catch (\Exception $e) {
+    DB::rollBack(); // Rollback in case of error
+    return redirect()->route('variants.index')->with('error', 'Error adding variant: ' . $e->getMessage());
+}
 }
     /**
      * Display the specified resource.
@@ -622,25 +637,34 @@ $existingspecifications = Varaint::with('VariantItems')
     {
         (new UserActivityController)->createActivity('Open Model Speification Page');
         $specifications = ModelSpecification::where('master_model_lines_id', $id)->get();
+        $modelLine = MasterModelLines::find($id);
         $model_line_id = $id;
-        return view('model-lines.specificationslist', compact('specifications', 'model_line_id'));
+        return view('model-lines.specificationslist', compact('specifications', 'model_line_id','modelLine'));
     }
     public function viewSpecification($id)
-{
+    {
     $options = ModelSpecificationOption::where('model_specification_id', $id)->get();
     return response()->json(['options' => $options]);
-}
+    }
 public function saveOption(Request $request)
 {
-    $request->validate([
+    $validator = Validator::make($request->all(), [
         'specificationId' => 'required|numeric',
-        'newOption' => 'required|string|max:255',
+        'newOption' => ['required','string','regex:/^[^\s]+(\s[^\s]+)*$/'] 
+    ],
+    [
+        'newOption.regex' => 'The specification name must not have leading or trailing spaces, and only one space is allowed between words.',
     ]);
+
+    if ($validator->fails()) {
+        return response()->json(['error' => $validator->errors()], 422);
+    }
     $existingOption = ModelSpecificationOption::where('name', $request->input('newOption'))
         ->where('model_specification_id', $request->input('specificationId'))
         ->first();
     if ($existingOption) {
-        return response()->json(['error' => 'Option already exists for the given specification.'], 422);
+        return response()->json([ 'error' => [ 'newOption' => ['Option already exists for the given specification']
+        ]], 422);
     }
     $specificationoptions = new ModelSpecificationOption();
     $specificationoptions->name = $request->input('newOption');
@@ -650,6 +674,19 @@ public function saveOption(Request $request)
 }
 public function savespecification(Request $request)
 {
+    $validator = Validator::make($request->all(), [
+        'newSpecificationName' => ['required','string', 'regex:/^[^\s]+(\s[^\s]+)*$/'] 
+    ],
+    [
+        'newSpecificationName.regex' => 'The specification name must not have leading or trailing spaces, and only one space is allowed between words.',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'error' => $validator->errors()->first('newSpecificationName'), 
+        ], 422);
+    }
+
     $existingOption = ModelSpecification::where('name', $request->input('newSpecificationName'))
         ->where('master_model_lines_id', $request->input('model_line_id'))
         ->first();
@@ -660,18 +697,18 @@ public function savespecification(Request $request)
     $specificationoptions->name = $request->input('newSpecificationName');
     $specificationoptions->master_model_lines_id = $request->input('model_line_id');
     $specificationoptions->save();
-    $masterModelLineId = $request->input('model_line_id');
-    $variants = Varaint::where('master_model_lines_id', $masterModelLineId)->get();
-    foreach ($variants as $variant) {
-        $vehicles = Vehicles::where('varaints_id', $variant->id)
-        ->whereNull('gdn_id')
-        ->whereNotNull('grn_id')
-        ->get();
-        foreach ($vehicles as $vehicle) {
-            $vehicle->inspection_status = "Pending";
-            $vehicle->save();
-        }
-    }
+    // $masterModelLineId = $request->input('model_line_id');
+    // $variants = Varaint::where('master_model_lines_id', $masterModelLineId)->get();
+    // foreach ($variants as $variant) {
+    //     $vehicles = Vehicles::where('varaints_id', $variant->id)
+    //     ->whereNull('gdn_id')
+    //     ->whereNotNull('movement_grn_id')
+    //     ->get();
+    //     foreach ($vehicles as $vehicle) {
+    //         $vehicle->inspection_status = "Pending";
+    //         $vehicle->save();
+    //     }
+    // }
     return response()->json(['message' => 'Option added successfully'], 200);
 }
     public function variantsaddons(string $id)
@@ -696,134 +733,142 @@ public function savespecification(Request $request)
     }
     public function variantmodifications(Request $request)
     {
-    $matchingerror = "";
-    $masterModelLineId = $request->input('master_model_lines_id');
-    $variant = $request->input('varaint');
-    $attributes = $request->input('attributes');
-    $accessories = $request->input('accessories');
-    $spareparts = $request->input('spareparts');
-    if($spareparts)
-    {
-    $sparepartsCount = count($spareparts);
-    }
-    else
-    {
-        $sparepartsCount = 0;
-    }
-    if($attributes)
-    {
-    $attributesCount = count($attributes);
-    }
-    else
-    {
-        $attributesCount = 0;  
-    }
-    $modified_variant_ids = ModifiedVariants::where('base_varaint_id', $variant)->groupBy('modified_varaint_id')->pluck('modified_varaint_id');
-    $existingVariant = [];
-    $maxExistingVariantCount = 0;
-    if($modified_variant_ids)
-    {
-    foreach ($modified_variant_ids as $id) {
-    $existingVariant = ModifiedVariants::where('base_varaint_id', $variant)
-        ->where('modified_varaint_id', $id)
-        ->where(function ($query) use ($attributes, $accessories, $attributesCount) { 
-            for ($i = 0; $i < $attributesCount; $i++) {
-                $currentAttributes = $attributes[$i];
-                $currentAccessories = $accessories[$i];
-                $query->orWhere(function ($subQuery) use ($currentAttributes, $currentAccessories) {
-                    $subQuery->where('modified_variant_items', $currentAttributes)
-                        ->where('addons_id', $currentAccessories);
-                });
-            }
-        })
-        ->get();
-        $modified_variant_counts = ModifiedVariants::where('base_varaint_id', $variant)->where('modified_varaint_id', $id)->count();
-        $existingVariantCount = count($existingVariant);
-        if($modified_variant_counts === $existingVariantCount)
+
+        DB::beginTransaction();
+        $matchingerror = "";
+        $masterModelLineId = $request->input('master_model_lines_id');
+        $variant = $request->input('varaint');
+        $attributes = $request->input('attributes');
+        $accessories = $request->input('accessories');
+        $spareparts = $request->input('spareparts');
+        if($spareparts)
         {
-        if ($existingVariantCount > $maxExistingVariantCount) {
-            $maxExistingVariantCount = $existingVariantCount;
+            $sparepartsCount = count($spareparts);
         }
+        else
+        {
+            $sparepartsCount = 0;
         }
-    }
-    }
-    if($attributesCount === $maxExistingVariantCount)
-    {
-        return redirect()->route('variants.index')->with('message', 'Variant already exists.');
-    }
-    else
-    {
-    $existingVariantsname = ModifiedVariants::where('base_varaint_id', $variant)->latest()->first();
-    if($existingVariantsname)
-    {
-        $existingvariantname = $existingVariantsname->name;
-        $nextVariantName = ++$existingvariantname;
-    }
-    else 
-    {
-        $nextVariantName = "A";
-    }
-    $variantfull = Varaint::findOrFail($variant);
-    $newvariant = New Varaint();
-    $oldname = $variantfull->name;
-    $newvariant->name = $oldname . $nextVariantName;
-    $newvariant->engine = $request->input('engine');
-    $newvariant->fuel_type = $request->input('fuel_type');
-    $newvariant->netsuite_name = $request->input('netsuite_name');
-    $newvariant->gearbox = $request->input('gearbox');
-    $newvariant->master_model_lines_id = $variantfull->master_model_lines_id;
-    $newvariant->brands_id = $variantfull->brands_id;
-    $newvariant->master_models_id = $variantfull->master_models_id;
-    $newvariant->my = $request->input('my');
-    $newvariant->drive_train = $request->input('drive_train');
-    $newvariant->coo = $variantfull->coo;
-    $newvariant->steering = $request->input('steering');
-    $newvariant->upholestry = $request->input('upholstery');
-    $newvariant->detail = $variantfull->detail;
-    $newvariant->model_detail = $variantfull->model_detail;
-    $newvariant->category = "Modified";
-    $newvariant->save();
-    if($attributes)
-    {
-    $count = count($attributes);
-    if($count >= 1)
-    {
-    for ($i = 0; $i < $count; $i++) {
-    $newModifiedVariant = new ModifiedVariants();
-    $newModifiedVariant->name = $nextVariantName;
-    $newModifiedVariant->modified_variant_items = $attributes[$i];
-    $newModifiedVariant->addons_id = $accessories[$i];
-    $newModifiedVariant->base_varaint_id = $variantfull->id;
-    $newModifiedVariant->modified_varaint_id = $newvariant->id;
-    $newModifiedVariant->save();
-    }
-    }
-    }
-    if($spareparts)
-    {
-    $countsp = count($spareparts);
-    if($countsp >= 1)
-    {
-    for ($i = 0; $i < $countsp; $i++) {
-    $newModifiedVariantsp = new ModifiedVariants();
-    $newModifiedVariantsp->name = $nextVariantName;
-    $newModifiedVariantsp->addons_id = $spareparts[$i];
-    $newModifiedVariantsp->base_varaint_id = $variantfull->id;
-    $newModifiedVariantsp->modified_varaint_id = $newvariant->id;
-    $newModifiedVariantsp->save();
-    }
-    }
-    }
-    if(!$spareparts && !$attributes)
-    {
-    $newModifiedVariantvps = new ModifiedVariants();
-    $newModifiedVariantvps->name = $nextVariantName;
-    $newModifiedVariantvps->base_varaint_id = $variantfull->id;
-    $newModifiedVariantvps->modified_varaint_id = $newvariant->id;
-    $newModifiedVariantvps->save();
-    }
-    return redirect()->route('variants.index')->with('message', 'Variant created successfully.');
-    }
+        if($attributes)
+        {
+            $attributesCount = count($attributes);
+        }
+        else
+        {
+            $attributesCount = 0;  
+        }
+        $modified_variant_ids = ModifiedVariants::where('base_varaint_id', $variant)->groupBy('modified_varaint_id')->pluck('modified_varaint_id');
+
+        $existingVariant = [];
+        $maxExistingVariantCount = 0;
+        if($modified_variant_ids)
+        {
+            foreach ($modified_variant_ids as $id) {
+                $existingVariant = ModifiedVariants::where('base_varaint_id', $variant)
+                ->where('modified_varaint_id', $id)
+                ->where(function ($query) use ($attributes, $accessories, $attributesCount) { 
+                    for ($i = 0; $i < $attributesCount; $i++) {
+                        $currentAttributes = $attributes[$i];
+                        $currentAccessories = $accessories[$i];
+                        $query->orWhere(function ($subQuery) use ($currentAttributes, $currentAccessories) {
+                            $subQuery->where('modified_variant_items', $currentAttributes)
+                                ->where('addons_id', $currentAccessories);
+                        });
+                    }
+                })
+                ->get();
+                $modified_variant_counts = ModifiedVariants::where('base_varaint_id', $variant)->where('modified_varaint_id', $id)->count();
+                $existingVariantCount = count($existingVariant);
+                if($modified_variant_counts === $existingVariantCount)
+                {
+                    if ($existingVariantCount > $maxExistingVariantCount) {
+                        $maxExistingVariantCount = $existingVariantCount;
+                    }
+                }
+            }
+        }
+        if($attributesCount === $maxExistingVariantCount)
+        {
+            return redirect()->route('variants.index')->with('message', 'Variant already exists.');
+        }
+        else
+        {
+            $existingVariantsname = ModifiedVariants::where('base_varaint_id', $variant)->latest()->first();
+            if($existingVariantsname)
+            {
+                $existingvariantname = $existingVariantsname->name;
+                $nextVariantName = ++$existingvariantname;
+            }
+            else 
+            {
+                $nextVariantName = "A";
+            }
+            $variantfull = Varaint::findOrFail($variant);
+            $newvariant = New Varaint();
+            $oldname = $variantfull->name;
+            $newvariant->name = $oldname . $nextVariantName;
+            $newvariant->engine = $request->input('engine');
+            $newvariant->fuel_type = $request->input('fuel_type');
+            $newvariant->netsuite_name = $request->input('netsuite_name');
+            $newvariant->gearbox = $request->input('gearbox');
+            $newvariant->master_model_lines_id = $variantfull->master_model_lines_id;
+            $newvariant->brands_id = $variantfull->brands_id;
+            $newvariant->master_models_id = $variantfull->master_models_id;
+            $newvariant->my = $request->input('my');
+            $newvariant->drive_train = $request->input('drive_train');
+            $newvariant->coo = $variantfull->coo;
+            $newvariant->steering = $request->input('steering');
+            $newvariant->upholestry = $request->input('upholstery');
+            $newvariant->detail = $variantfull->detail;
+            $newvariant->model_detail = $variantfull->model_detail;
+            $newvariant->created_by = auth()->user()->id;
+            $newvariant->category = "Modified";
+            $newvariant->save();
+            if($attributes)
+            {
+                $count = count($attributes);
+                if($count >= 1)
+                {
+                    for ($i = 0; $i < $count; $i++) {
+                        info($accessories[$i]);
+                    $newModifiedVariant = new ModifiedVariants();
+                    $newModifiedVariant->name = $nextVariantName;
+                    $newModifiedVariant->modified_variant_items = $attributes[$i];
+                    $newModifiedVariant->addons_id = $accessories[$i];
+                    $newModifiedVariant->base_varaint_id = $variantfull->id;
+                    $newModifiedVariant->modified_varaint_id = $newvariant->id;
+                    $newModifiedVariant->save();
+                    }
+                }
+            }
+            if($spareparts)
+            {
+                $countsp = count($spareparts);
+                if($countsp >= 1)
+                {
+                    for ($i = 0; $i < $countsp; $i++) {
+                    $newModifiedVariantsp = new ModifiedVariants();
+                    $newModifiedVariantsp->name = $nextVariantName;
+                    $newModifiedVariantsp->addons_id = $spareparts[$i];
+                    $newModifiedVariantsp->base_varaint_id = $variantfull->id;
+                    $newModifiedVariantsp->modified_varaint_id = $newvariant->id;
+                    $newModifiedVariantsp->save();
+                    }
+                }
+            }
+            if(!$spareparts && !$attributes)
+            {
+            $newModifiedVariantvps = new ModifiedVariants();
+            $newModifiedVariantvps->name = $nextVariantName;
+            $newModifiedVariantvps->base_varaint_id = $variantfull->id;
+            $newModifiedVariantvps->modified_varaint_id = $newvariant->id;
+            $newModifiedVariantvps->save();
+            }
+           
+        }
+        DB::commit();
+        return redirect()->route('variants.index')->with('message', 'Variant created successfully.');
+       
     }
     public function getvariantsdetails($id)
     {
@@ -847,5 +892,218 @@ public function savespecification(Request $request)
             'modifiedVariants' => $modifiedVariants ?? null,
             'basevaraint' => $basevaraint ?? null,
         ]);
-    }    
+    }  
+    
+    function fetchModelSpecifications(Request $request) {
+
+        $modelSpecifications = ModelSpecification::where('master_model_lines_id', $request->master_model_line_id)
+                    ->where('name','like', "%{$request->search}%")
+                    ->pluck('name')->toArray();
+
+         return response()->json($modelSpecifications);
     }
+    public function editvar(string $id)
+    {
+        (new UserActivityController)->createActivity('Duplicate the Variants');
+        $variant = Varaint::findOrFail($id);
+        $brand = Brand::findOrFail($variant->brands_id);
+        $brands = Brand::all();
+        $countries = CountryListFacade::getList('en');
+        $masterModelLines = MasterModelLines::all();
+        $masterModelLine = MasterModelLines::findOrFail($variant->master_model_lines_id);
+        $variantItems = VariantItems::where('varaint_id', '=', $id)->get();
+        $modelLineId = $masterModelLine->id;
+        $specifications = ModelSpecification::where('master_model_lines_id', $modelLineId)->get();
+        $data = [];
+        foreach ($specifications as $specification) {
+            $selectedOptions = VariantItems::where('varaint_id', $id)
+                ->where('model_specification_id', $specification->id)
+                ->pluck('model_specification_options_id')
+                ->toArray();
+            $options = ModelSpecificationOption::where('model_specification_id', $specification->id)->get();
+    
+            $data[] = [
+                'specification' => $specification,
+                'selectedOptions' => $selectedOptions,
+                'options' => $options,
+            ];
+        }
+        return view('variants.editvar',compact('countries','variant','brand','brands','masterModelLines', 'variantItems', 'data', 'masterModelLine'));
+    }
+    public function storevar(Request $request, $variant)
+    {
+        DB::beginTransaction();
+
+    try {
+        (new UserActivityController)->createActivity('Editing Variant');
+        $selectedSpecifications = json_decode(request('selected_specifications'), true);
+        ksort($selectedSpecifications);
+        $totalSpecifications = count($selectedSpecifications);
+        $existingVariantop = Varaint::where('brands_id', $request->input('brands_id'))
+            ->where('master_model_lines_id', $request->input('master_model_lines_id'))
+            ->where('fuel_type', $request->input('fuel_type'))
+            ->where('engine', $request->input('engine'))
+            ->where('coo', $request->input('coo'))
+            ->where('my', $request->input('my'))
+            ->where('drive_train', $request->input('drive_train'))
+            ->where('gearbox', $request->input('gearbox'))
+            ->where('steering', $request->input('steering'))
+            ->where('upholestry', $request->input('upholestry'))
+            ->where('id', '!=', $variant)
+            ->whereHas('variantItems', function ($q) use ($selectedSpecifications) {
+                $q->whereIn('model_specification_id', array_column($selectedSpecifications, 'specification_id'))
+                ->whereIn('model_specification_options_id', array_column($selectedSpecifications, 'value'));
+            })
+            ->orderBy('created_at', 'desc')
+            ->first();
+            info($request->input('fuel_type'));
+        if ($existingVariantop) {
+            // Check if all specifications and values match
+            $matchedSpecifications = 0;
+            foreach ($selectedSpecifications as $specificationData) {
+                $matchFound = $existingVariantop->variantItems->contains(function ($variantItem) use ($specificationData) {
+                    return $variantItem->model_specification_id == $specificationData['specification_id'] &&
+                        $variantItem->model_specification_options_id == $specificationData['value'];
+                });
+        
+                if ($matchFound) {
+                    $matchedSpecifications++;
+                }
+            }
+            if ($matchedSpecifications == $totalSpecifications) {
+                return redirect()->back()->with('error', 'Variant with the same specifications and options already exists');
+            }
+        }
+        $variant = Varaint::findOrFail($variant);
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        VariantItems::where('varaint_id', $variant->id)->delete();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        $model_details= $request->input('model_detail');
+        if($model_details == null){
+        $steering = $request->input('steering');
+        $master_model_lines_id = $request->input('master_model_lines_id');
+        $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
+        $engine = $request->input('engine');
+        $gearbox = $request->input('gearbox');
+        $fuel_type = $request->input('fuel_type');
+        if($fuel_type == "Petrol")
+            {
+                $f = "P";
+            }
+            else if($fuel_type == "Diesel") 
+            {
+                $f = "D";
+            }
+            else if($fuel_type == "PHEV") 
+            {
+                $f = "PHEV";
+            }
+            else if($fuel_type == "MHEV") 
+            {
+                $f = "MHEV";
+            }
+            else if($fuel_type == "PH") 
+            {
+                $f = "PH";
+            }
+            else
+            {
+                $f = "EV";
+            }
+            if($gearbox == "Auto")
+            {
+                $gearbox = "AT";
+            }
+            if($gearbox == "Manual")
+            {
+                $gearbox = "MT";
+            }
+            $model_details = $steering . ' ' . $model_line . ' ' . $engine . ' ' . $f . ' ' . $gearbox;
+            }
+        $variant_details= $request->input('variant');
+        if($variant_details == null)
+        {
+            $steering = $request->input('steering');
+            $master_model_lines_id = $request->input('master_model_lines_id');
+            $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
+            $engine = $request->input('engine');
+            $gearbox = $request->input('gearbox');
+            $coo = $request->input('coo');
+            $my = $request->input('my');
+            $drive_train = $request->input('drive_train');
+            $upholestry = $request->input('upholestry');
+            $fuel_type = $request->input('fuel_type');
+            if($fuel_type == "Petrol")
+            {
+                $f = "P";
+            }
+            else if($fuel_type == "Diesel") 
+            {
+                $f = "D";
+            }
+            else if($fuel_type == "PHEV") 
+            {
+                $f = "PHEV";
+            }
+            else if($fuel_type == "MHEV") 
+            {
+                $f = "MHEV";
+            }
+            else if($fuel_type == "PH") 
+            {
+                $f = "PH";
+            }
+            else
+            {
+                $f = "EV";
+            }
+            $variant_details = $my . ',' . $steering . ',' . $model_line . ',' . $engine . ',' . $gearbox . ',' . $fuel_type . ',' . $gearbox . ',' . $coo . ',' . $drive_train . ',' . $upholestry;
+        }
+        $variant->netsuite_name = $request->input('netsuite_name');
+        $variant->upholestry = $request->input('upholestry');
+        $variant->coo = $request->input('coo');
+        $variant->drive_train = $request->input('drive_train');
+        $variant->gearbox = $request->input('gearbox');
+        $variant->model_detail = $model_details;
+        $variant->detail = $variant_details;
+        $variant->my = $request->input('my');
+        $variant->created_by = auth()->user()->id;
+        $variant->save();
+        $variantId = $variant->id;
+        foreach ($selectedSpecifications as $specificationData) {
+            $specification = new VariantItems();
+            $specification->varaint_id = $variantId;
+            $specification->model_specification_id = $specificationData['specification_id'];
+            $specification->model_specification_options_id = $specificationData['value'];
+            $specification->save();
+        }
+        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+        $currentDateTime = Carbon::now($dubaiTimeZone);
+        $variantlog = new Variantlog();
+        $variantlog->time = $currentDateTime->toTimeString();
+        $variantlog->date = $currentDateTime->toDateString();
+        $variantlog->status = 'Update Variant Details';
+        $variantlog->variant_id = $variant->id;
+        $variantlog->created_by = auth()->user()->id;
+        $variantlog->save();
+        DB::commit();
+
+            return redirect()->route('variants.index')->with('success', 'Variant updated successfully.');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()->with('error', 'Failed to update variant: ' . $e->getMessage());
+    }
+
+    }
+    function fetchModelSpecificationOptions(Request $request) {
+
+        $modelSpecificationOptions = ModelSpecificationOption::where('model_specification_id', $request->model_specification_id)
+                    ->where('name','like', "%{$request->search}%")
+                    ->pluck('name')->toArray();
+
+         return response()->json($modelSpecificationOptions);
+
+    }
+
+}
+    

@@ -15,6 +15,7 @@ class Calls extends Model
         'sales_person',
         'remarks',
         'phone',
+        // 'secondary_phone_number',
         'source',
         'status',
         'language',
@@ -80,5 +81,9 @@ class Calls extends Model
     public function closed()
     {
         return $this->hasOne(Closed::class, 'call_id', 'id');
+    }
+    public function quotation()
+    {
+        return $this->hasOne(Quotation::class, 'calls_id');
     }
     }

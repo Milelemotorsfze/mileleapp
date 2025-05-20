@@ -27,6 +27,7 @@ use App\Models\RoutineInspection;
 use App\Models\Incident;
 use App\Models\MasterModelLines;
 use App\Models\IncidentWork;
+use App\Models\MovementsReference;
 use App\Models\VariantRequest;
 use App\Models\VariantRequestItems;
 use App\Models\ModelSpecification;
@@ -36,15 +37,11 @@ use App\Models\Variantlog;
 use App\Models\VehicleVariantHistories;
 use App\Models\Grn;
 use App\Models\Gdn;
+use App\Models\MovementGrn;
 use App\Models\PurchasingOrder;
 use App\Mail\QCUpdateNotification;
 use App\Models\DepartmentNotifications;
 use App\Models\Dnaccess;
-
-
-
-
-
 
 class ApprovalsController extends Controller
 {  
@@ -114,6 +111,7 @@ class ApprovalsController extends Controller
                     DB::raw('REPLACE(REPLACE(inspection.remark, "<p>", ""), "</p>", "") as remark'),
                     'vehicle_detail_approval_requests.action_at',    
                     'warehouse.name as location',
+                    'vehicles.inspection_status',
                     'vehicles.vin',
                     DB::raw("DATE_FORMAT(inspection.created_at, '%d-%b-%Y') as created_at_formte"),  
                     'vehicles.qc_remarks',
@@ -125,7 +123,7 @@ class ApprovalsController extends Controller
                     'int_color.name as interior_color',
                     'ex_color.name as exterior_color',
                     'purchasing_order.po_number',
-                    'grn.grn_number',
+                    'movement_grns.grn_number',
                     'so.so_number',
                     DB::raw('(SELECT GROUP_CONCAT(field) FROM vehicle_detail_approval_requests WHERE inspection_id = inspection.id) as changing_fields')
                 ])
@@ -133,7 +131,7 @@ class ApprovalsController extends Controller
                 ->leftJoin('vehicle_detail_approval_requests', 'inspection.id', '=', 'vehicle_detail_approval_requests.inspection_id')
                 ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
                 ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
                 ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
                 ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
@@ -170,6 +168,7 @@ class ApprovalsController extends Controller
      */
     public function show($id)
     {
+      
     $useractivities =  New UserActivities();
     $useractivities->activity = "Open the Approval Page For Approval";
     $useractivities->users_id = Auth::id();
@@ -195,6 +194,7 @@ class ApprovalsController extends Controller
     $extvehicle = ColorCode::find($vehicle->ex_colour);
     $extmaster = ColorCode::where('belong_to', 'ex')->get();
     $variant_request = VariantRequest::where('inspection_id', $id)->first();
+  
     $variantRequestItems = VariantRequestItems::where('variant_request_id', $variant_request->id)->get();
     $data = [];
     foreach ($variantRequestItems as $item) {
@@ -209,14 +209,20 @@ class ApprovalsController extends Controller
             ];
         }
     }
+   
     $brands = Brand::find($variant_request->brands_id);
+
     $modal = MasterModelLines::find($variant_request->master_model_lines_id);
     $intrequest = ColorCode::find($variant_request->int_colour);
     $extrequest = ColorCode::find($variant_request->ex_colour);
     $extraItems = DB::table('vehicles_extra_items')
         ->where('vehicle_id', $inspection->vehicle_id)
         ->get(['item_name', 'qty']);
-    return view('inspection.approvalview', compact('extmaster','intmaster','intrequest','extrequest','modal','model_lines','data','allBrands','brands','variant_request','Incidentpicturelink','modificationpicturelink','PDIpicturelink', 'secgdnpicturelink', 'gdnpicturelink', 'secgrnpicturelink', 'grnpicturelink', 'extraItems','inspection', 'vehicle', 'variant', 'brand', 'model_line', 'vehiclecolour', 'extvehicle','Incident', 'extra_featuresvalue'));
+      
+    return view('inspection.approvalview', compact('extmaster','intmaster','intrequest','extrequest','modal','model_lines','data',
+    'allBrands','brands','variant_request','Incidentpicturelink','modificationpicturelink','PDIpicturelink',
+     'secgdnpicturelink', 'gdnpicturelink', 'secgrnpicturelink', 'grnpicturelink', 'extraItems','inspection', 
+     'vehicle', 'variant', 'brand', 'model_line', 'vehiclecolour', 'extvehicle','Incident', 'extra_featuresvalue'));
     }
 
     /**
@@ -514,6 +520,8 @@ class ApprovalsController extends Controller
         return response()->json(['message' => 'Data saved successfully']);
     }
     public function approveInspection(Request $request) {
+
+        
         $currentDate = Carbon::now();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -562,6 +570,8 @@ class ApprovalsController extends Controller
             $vehicles = Vehicles::find($inspection->vehicle_id);
             if($inspection->stage == "GRN")
             {
+            // need to update inspection status
+            $vehicles->inspection_status = 'Approved';
             $vehicles->grn_remark = $comments;
             $vehicles->inspection_date = $currentDate;
             }
@@ -574,6 +584,8 @@ class ApprovalsController extends Controller
             {
                 $vehicles->qc_remarks = $comments;
             }
+            $vehicles->ex_colour = $request->input('ex_colour');
+            $vehicles->int_colour = $request->input('int_colour');
             $vehicles->save();
             $selectedSpecifications = [];
             foreach ($request->all() as $key => $value) {
@@ -1015,7 +1027,7 @@ class ApprovalsController extends Controller
                 $vehicleslog->new_value = $newVariantName;
                 $vehicleslog->created_by = auth()->user()->id;
                 $vehicleslog->save();
-                $vehicles = Vehicles::where('id', $inspection->vehicle_id);
+                $vehicles = Vehicles::where('id', $inspection->vehicle_id)->first();
                 $purchasingOrder = PurchasingOrder::where('id', $vehicles->purchasing_order_id)->first();
                 $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
                 $vehiclesVIN = $vehicles->vin;
@@ -1092,7 +1104,7 @@ class ApprovalsController extends Controller
             ->where('inspection_id', $vehicleId)
             ->get();
             $inspection = Inspection::find($vehicleId);
-            $additionalInfo = Vehicles::select('master_model_lines.model_line', 'vehicles.vin', 'color_codes.name as int_colour', 'color_codes.name as ext_colour', 'warehouse.name as location')
+            $additionalInfo = Vehicles::select('master_model_lines.model_line', 'vehicles.vin', 'color_codes.name as int_colour', 'ext_color.name as ext_colour', 'warehouse.name as location')
         ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
         ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
         ->leftJoin('color_codes', 'vehicles.int_colour', '=', 'color_codes.id')
@@ -1143,7 +1155,7 @@ class ApprovalsController extends Controller
                             ->where('inspection_id', $vehicleId)
                             ->get();
         $inspection = Inspection::find($vehicleId);
-        $additionalInfo = Vehicles::select('master_model_lines.model_line', 'vehicles.vin', 'color_codes.name as int_colour', 'color_codes.name as ext_colour', 'warehouse.name as location')
+        $additionalInfo = Vehicles::select('master_model_lines.model_line', 'vehicles.vin', 'color_codes.name as int_colour', 'ext_color.name as ext_colour', 'warehouse.name as location')
         ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
         ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
         ->leftJoin('color_codes', 'vehicles.int_colour', '=', 'color_codes.id')
@@ -1354,7 +1366,7 @@ class ApprovalsController extends Controller
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $inspection = Inspection::find($vehicleId);
-        $additionalInfo = Vehicles::select('master_model_lines.model_line', 'vehicles.vin', 'color_codes.name as int_colour', 'color_codes.name as ext_colour', 'warehouse.name as location')
+        $additionalInfo = Vehicles::select('master_model_lines.model_line', 'vehicles.vin', 'color_codes.name as int_colour', 'ext_color.name as ext_colour', 'warehouse.name as location')
         ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
         ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
         ->leftJoin('color_codes', 'vehicles.int_colour', '=', 'color_codes.id')
@@ -1404,9 +1416,11 @@ class ApprovalsController extends Controller
                     'purchasing_order.po_number',
                     'vehicle_variant_histories.varaints_old',
                     'vehicle_variant_histories.varaints_new',
+                    DB::raw("DATE_FORMAT(movements_reference.date, '%d-%b-%Y') as grn_date"),
                 ])
                 ->leftJoin('vehicle_variant_histories', 'vehicle_variant_histories.vehicles_id', '=', 'vehicles.id')
-                ->leftJoin('grn', 'grn.id', '=', 'vehicles.grn_id')
+                ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
+                ->leftJoin('movements_reference', 'movement_grns.movement_reference_id', '=', 'movements_reference.id')
                 ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                 ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
                 ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
@@ -1415,8 +1429,8 @@ class ApprovalsController extends Controller
                 ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
                 ->whereNotNull('vehicles.inspection_date')
                 ->whereNotNull('vehicles.vin')
-                ->whereNotNull('vehicles.grn_id')
-                ->whereNull('grn.grn_number')
+                ->whereNotNull('vehicles.movement_grn_id')
+                ->whereNull('movement_grns.grn_number')
                 ->groupBy('vehicles.id');
         } else {
             $data = Vehicles::select([
@@ -1433,10 +1447,12 @@ class ApprovalsController extends Controller
                 'purchasing_order.po_number',
                 'vehicle_variant_histories.varaints_old',
                 'vehicle_variant_histories.varaints_new',
-                'grn.grn_number'
+                'movement_grns.grn_number',
+                DB::raw("DATE_FORMAT(movements_reference.date, '%d-%b-%Y') as grn_date"),
             ])
             ->leftJoin('vehicle_variant_histories', 'vehicle_variant_histories.vehicles_id', '=', 'vehicles.id')
-            ->leftJoin('grn', 'grn.id', '=', 'vehicles.grn_id')
+            ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
+            ->leftJoin('movements_reference', 'movement_grns.movement_reference_id', '=', 'movements_reference.id')
             ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
             ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
             ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
@@ -1445,7 +1461,7 @@ class ApprovalsController extends Controller
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
             ->whereNotNull('vehicles.inspection_date')
             ->whereNotNull('vehicles.vin')
-            ->whereNotNull('grn.grn_number')
+            ->whereNotNull('movement_grns.grn_number')
             ->groupBy('vehicles.id');
         }
 
@@ -1456,12 +1472,13 @@ class ApprovalsController extends Controller
 }
 public function submitGrn(Request $request)
     {
+        // info($request->all());
         // Validate the request data
         $validator = Validator::make($request->all(), [
             'vehicle_id' => 'required|exists:vehicles,id',
             'grn' => 'required|string|max:255',
         ]);
-
+        
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -1476,62 +1493,68 @@ public function submitGrn(Request $request)
                 'message' => 'Vehicle not found',
             ], 404);
         }
+        // get po corresponding to the vin and update GRN number to the particular 
         // Retrieve the GRN record by grn_id in the vehicle record
-        $grnRecord = Grn::find($vehicle->grn_id);
+        // take data from Movement GRN table to update the GRN Numebr
+        // $grnRecord = Grn::find($vehicle->grn_id);
+        $grnRecord = MovementGrn::find($vehicle->movement_grn_id);
         if (!$grnRecord) {
             return response()->json([
                 'success' => false,
                 'message' => 'GRN record not found',
             ], 404);
         }
+
         // Update the GRN record with the new GRN number
         $grnRecord->grn_number = $request->grn;
         $grnRecord->save();
+
         return response()->json([
             'success' => true,
             'message' => 'Netsuite GRN updated successfully',
         ]);
-    }
-    public function addGrn(Request $request)
-{
-    // Validate the request data
-    $validator = Validator::make($request->all(), [
-        'vehicle_id' => 'required|exists:vehicles,id',
-        'grn' => 'required|string|max:255',
-    ]);
 
-    if ($validator->fails()) {
-        return response()->json([
-            'success' => false,
-            'errors' => $validator->errors(),
-        ], 422);
     }
+// public function addGrn(Request $request)
+// {
+//     // Validate the request data
+//     $validator = Validator::make($request->all(), [
+//         'vehicle_id' => 'required|exists:vehicles,id',
+//         'grn' => 'required|string|max:255',
+//     ]);
 
-    // Retrieve the vehicle by ID
-    $vehicle = Vehicles::find($request->vehicle_id);
+//     if ($validator->fails()) {
+//         return response()->json([
+//             'success' => false,
+//             'errors' => $validator->errors(),
+//         ], 422);
+//     }
+
+//     // Retrieve the vehicle by ID
+//     $vehicle = Vehicles::find($request->vehicle_id);
     
-    if (!$vehicle) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Vehicle not found',
-        ], 404);
-    }
+//     if (!$vehicle) {
+//         return response()->json([
+//             'success' => false,
+//             'message' => 'Vehicle not found',
+//         ], 404);
+//     }
+//     $oldgrn = MovementGrn::where('id', $vehicle->movement_grn_id)->first();
+//     // Create new GRN record
+//     $grnRecord = new Grn();
+//     $grnRecord->grn_number = $request->grn;
+//     $grnRecord->date = $oldgrn->date;
+//     $grnRecord->save();
 
-    // Create new GRN record
-    $grnRecord = new Grn();
-    $grnRecord->grn_number = $request->grn;
-    $grnRecord->date = now(); // Assuming you want to use the current date
-    $grnRecord->save();
+//     // Associate the GRN with the vehicle
+//     $vehicle->grn_id = $grnRecord->id;
+//     $vehicle->save();
 
-    // Associate the GRN with the vehicle
-    $vehicle->grn_id = $grnRecord->id;
-    $vehicle->save();
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Netsuite GRN added successfully',
-    ]);
-}
+//     return response()->json([
+//         'success' => true,
+//         'message' => 'Netsuite GRN added successfully',
+//     ]);
+// }
 public function addingnetsuitegdn(Request $request)
 {
     $useractivities = new UserActivities();

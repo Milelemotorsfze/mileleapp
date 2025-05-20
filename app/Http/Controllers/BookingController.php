@@ -121,7 +121,7 @@ public function getbookingvehicles($variantId, $interiorColorId = null, $exterio
         'model_detail as model_detail',
         'interior_color_code.name as interior_color',
         'exterior_color_code.name as exterior_color',
-        \DB::raw('CASE WHEN vehicles.grn_id IS NULL THEN "Incoming" ELSE "Arrived" END as grn_status')
+        \DB::raw('CASE WHEN vehicles.movement_grn_id IS NULL THEN "Incoming" ELSE "Arrived" END as grn_status')
     ])
     ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
     ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
@@ -596,7 +596,7 @@ public function approval(Request $request)
         'model_detail as model_detail',
         'interior_color_code.name as interior_color',
         'exterior_color_code.name as exterior_color',
-        \DB::raw('CASE WHEN vehicles.grn_id IS NULL THEN "Incoming" ELSE "Arrived" END as grn_status')
+        \DB::raw('CASE WHEN vehicles.movement_grn_id IS NULL THEN "Incoming" ELSE "Arrived" END as grn_status')
     ])
     ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
     ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')

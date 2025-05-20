@@ -1,4 +1,12 @@
 @extends('layouts.main')
+
+<style>
+    .custom-error {
+        color: red;
+        margin-top: 10px !important;
+    }
+</style>
+
 @section('content')
     @can('edit-master-models')
     @php
@@ -41,20 +49,26 @@
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">Model</label>
-                        <input type="text" class="form-control" value="{{ $masterModel->model }}" name="model">
+                        <input type="text" class="form-control"  @if($disableEdit == 1) readonly title="Not allowed to edit! model already used in LOI/PFI/PO" @endif 
+                        value="{{ $masterModel->model }}" name="model">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">SFX</label>
-                        <input type="text" class="form-control" value="{{ $masterModel->sfx }}" name="sfx">
+                        <input type="text" class="form-control" @if($disableEdit == 1) readonly title="Not allowed to edit! model already used in LOI/PFI/PO" @endif 
+                        value="{{ $masterModel->sfx }}" name="sfx">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label  class="form-label">Model Year</label>
-                        <input type="text" class="form-control" id="model-year"  name="model_year" placeholder="Enter Model Year">
+                        <input type="text" class="form-control" id="model-year" @if($disableEdit == 1) disabled title="Not allowed to edit! model already used in LOI/PFI/PO" @endif 
+                        name="model_year" placeholder="Enter Model Year">
                     </div>
+                    @if($disableEdit == 1)
+                            <input type="hidden" name="model_year" value="{{ $masterModel->model_year }}">
+                        @endif
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
@@ -73,21 +87,28 @@
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 ">Steering</label>
-                        <select class="form-control" data-trigger name="steering" >
+                        <select class="form-control" name="steering" @if($disableVariantEdit == 1) disabled title="Not allowed to edit! already used in LOI/PFI/PO" @endif >
                             <option value="LHD" {{ $masterModel->steering == "LHD" ? 'selected' : " "}} >LHD</option>
                             <option value="RHD"  {{ $masterModel->steering == "RHD" ? 'selected' : " "}} >RHD</option>
                         </select>
                     </div>
+                    @if($disableEdit == 1)
+                        <input type="hidden" name="steering" value="{{ $masterModel->steering }}">
+                    @endif
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">Variant</label>
-                        <select class="form-control" name="variant_id" id="variant_id">
+                        <select class="form-control" name="variant_id" @if($disableVariantEdit == 1) disabled title="Not allowed to edit! already used in LOI/PFI/PO" @else 
+                        title="Variant is missing" @endif id="variant_id">
                             <option></option>
                             @foreach($variants as $variant)
                                 <option value="{{ $variant->id }}" {{$masterModel->variant_id == $variant->id ? 'selected' : " "}}>{{$variant->name}}</option>
                             @endforeach
                         </select>
+                        @if($disableEdit == 1)
+                            <input type="hidden" name="variant_id" value="{{ $masterModel->variant_id }}">
+                        @endif
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
@@ -286,6 +307,7 @@
 @endsection
 @push('scripts')
     <script>
+        
         $("#model-year").yearpicker({
             year: '{{ $masterModel->model_year }}',
             startYear: 2000,
@@ -313,6 +335,14 @@
                     required: true,
                 },
             },
+            errorPlacement: function(error, element) {
+                error.addClass('custom-error');
+                if (element.attr("name") === "variant_id") {
+                    error.insertAfter(element.next('.select2'));
+                } else {
+                    error.insertAfter(element);
+                }
+            }
         });
         function showOrHideLoiDescription() {
             let variantId = $("#variant_id").val();
@@ -387,26 +417,13 @@
                     $('#detail').html(data.variant.detail);
                     $('#model-detail').html(data.variant.model_detail);
                     $('#netsuite-name').html(data.variant.netsuite_name);
-                    // if(data.variant_items) {
-                    //     jQuery.each(data.variant_items, function(key,value){
-                    //         $("#variant-items").append('<div class="col-sm-4"> ' +
-                    //             '<div class="row mt-2"> ' +
-                    //             '<div class="col-sm-3">' +
-                    //             ' <dl id="variant-specification"> '+ value.model_specification.name ?? '' +' : </dl> ' +
-                    //             '</div> ' +
-                    //             '<div class="col-sm-9"> ' +
-                    //             '<dl id="variant-specification-option"> '+ value.model_specification_option.name ?? '' +' </dl> ' +
-                    //             '</div> ' +
-                    //             '</div> ' +
-                    //             '</div>');
-                    //     });
-                    // }
+                   
                 }
             });
         }
-
-        $("#variant_id").attr("data-placeholder","Choose Variant....  Or  Type Here To Search....");
-        $("#variant_id").select2();
+        $("#variant_id").select2({
+            placeholder:'Choose Variant',
+        });
         $('#variant_id').on('change',function() {
             $('#variant_id-error').hide();
             getLOIDescription();

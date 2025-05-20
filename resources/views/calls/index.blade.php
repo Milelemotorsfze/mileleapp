@@ -68,6 +68,19 @@
       background-color: #e9ecef;
       border-color: #bbb;
     }
+
+    .select2-container--default .select2-selection--single {
+        width: 150px !important; 
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap; 
+    }
+
+    .select2-container--default .select2-selection--multiple {
+        width: 150px !important; 
+        white-space: nowrap;
+    }
+
     .badge-notification {
     position: absolute;
     top: -7;
@@ -77,7 +90,11 @@
     border-radius: 50%;
     padding: 0.3rem 0.6rem;
     transform: translate(50%, -50%);
-}
+    }
+    #remarksModalBody img {
+        width: 100% !important;
+    }
+
   </style>
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
@@ -140,6 +157,7 @@
                   <th>Selling Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
+                  <!-- <th>Secondary Phone</th> -->
                   <th>Customer Email</th>
                   <th>Sales Person</th>
                   <th>Brands & Models</th>
@@ -159,7 +177,8 @@
                   <td class="nowrap-td">{{ \Carbon\Carbon::parse($calls->created_at)->format('d-M-Y') }}</td>
                     <td class="nowrap-td">{{ $calls->type }}</td>
                     <td class="nowrap-td">{{ $calls->name }}</td>     
-                    <td class="nowrap-td">{{ $calls->phone }}</td> 
+                    <td class="nowrap-td">{{ $calls->phone }}</td>
+                    <!-- <td class="nowrap-td">{{ $calls->secondary_phone_number }}</td> -->
                     <td class="nowrap-td">{{ $calls->email }}</td>
                      @php
                      $sales_persons_name = "";
@@ -196,11 +215,23 @@
                     <td class="nowrap-td">{{ $leadsources }}</td>
                     <td class="nowrap-td">{{ ucwords(strtolower($calls->language))}}</td>
                     <td class="nowrap-td">{{ ucwords(strtolower($calls->location))}}</td>
-                    @php
+                    <td class="nowrap-td">
+                      @php
+                          $stripped = strip_tags($calls->remarks);
+                          $shortText = Str::limit($stripped, 20);
+                      @endphp
+                      {!! $shortText !!}
+                      @if(strlen($stripped) > 20)
+                          <a href="#" class="text-primary read-more-link" data-remarks="{!! htmlspecialchars($calls->remarks, ENT_QUOTES) !!}">Read More</a>
+                      @endif
+                    </td>
+
+
+                    <!-- @php
     $text = $calls->remarks;
     $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
     @endphp
-    <td class="nowrap-td">{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>   
+    <td class="nowrap-td">{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>    -->
     <td class="nowrap-td">
     <div class="dropdown">
     <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
@@ -296,24 +327,30 @@
                     <td class="nowrap-td">{{ $leadsources }}</td>
                     <td class="nowrap-td">{{ ucwords(strtolower($calls->language))}}</td>
                     <td class="nowrap-td">{{ ucwords(strtolower($calls->location))}}</td>
-                    @php
-    $text = $calls->remarks;
-    $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
-    @endphp
-    <td class="nowrap-td">{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>   
-    <td class="nowrap-td">
-    <div class="dropdown">
-    <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
-      <i class="fa fa-bars" aria-hidden="true"></i>
-    </button>
-    <ul class="dropdown-menu dropdown-menu-end">
-      <li><a class="dropdown-item" href="{{ route('calls.edit',$calls->id) }}">Edit</a></li>
-      <li>
-  <a class="dropdown-item delete-link" href="#" data-url="{{ route('calls.destroy', $calls->id) }}">Delete</a>
-</li>
-    </ul>
-  </div>
-    </td>
+                    <td class="nowrap-td">
+                      @php
+                          $stripped = strip_tags($calls->remarks);
+                          $shortText = Str::limit($stripped, 20); // show 20 characters
+                      @endphp
+                      {!! $shortText !!}
+                      @if(strlen($stripped) > 20)
+                          <a href="#" class="text-primary read-more-link" data-remarks="{!! htmlspecialchars($calls->remarks, ENT_QUOTES) !!}">Read More</a>
+                      @endif
+                  </td>
+
+                    <td class="nowrap-td">
+                    <div class="dropdown">
+                    <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+                      <i class="fa fa-bars" aria-hidden="true"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                      <li><a class="dropdown-item" href="{{ route('calls.edit',$calls->id) }}">Edit</a></li>
+                      <li>
+                  <a class="dropdown-item delete-link" href="#" data-url="{{ route('calls.destroy', $calls->id) }}">Delete</a>
+                </li>
+                    </ul>
+                  </div>
+                    </td>
                   </tr>
                 @endforeach
               </tbody>
@@ -396,11 +433,21 @@
                     <td class="nowrap-td">{{ $leadsources }}</td>
                     <td class="nowrap-td">{{ ucwords(strtolower($calls->language))}}</td>
                     <td class="nowrap-td">{{ ucwords(strtolower($calls->location))}}</td>
-                    @php
+                    <td class="nowrap-td">
+                      @php
+                          $stripped = strip_tags($calls->remarks);
+                          $shortText = Str::limit($stripped, 20);
+                      @endphp
+                      {!! $shortText !!}
+                      @if(strlen($stripped) > 20)
+                          <a href="#" class="text-primary read-more-link" data-remarks="{!! htmlspecialchars($calls->remarks, ENT_QUOTES) !!}">Read More</a>
+                      @endif
+                    </td>
+                    <!-- @php
     $text = $calls->remarks;
     $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
     @endphp
-    <td class="nowrap-td">{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>   
+    <td class="nowrap-td">{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>    -->
     <td class="nowrap-td">
     <div class="dropdown">
     <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
@@ -420,12 +467,36 @@
             </table>
           </div> 
         </div>  
+
+        
       </div> 
       @endcan
+        <div class="modal fade" id="remarksModal" tabindex="-1" aria-labelledby="remarksModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="remarksModalLabel">Full Remarks</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body" id="remarksModalBody">
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
   <script src="{{ asset('libs/jquery/jquery.min.js') }}"></script>
+  <script>
+    $(document).on('click', '.read-more-link', function(e) {
+        e.preventDefault();
+        var remarks = $(this).data('remarks');
+        $('#remarksModalBody').html(remarks);
+        $('#remarksModal').modal('show');
+    });
+</script>
+
   <script type="text/javascript">
 $(document).ready(function () {
   $('.select2').select2();
@@ -447,7 +518,7 @@ $(document).ready(function () {
       var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
         .appendTo(selectWrapper)
         .select2({
-          width: '100%',
+          width: '150px',
           dropdownCssClass: 'select2-blue'
         });
       select.on('change', function() {
@@ -575,7 +646,7 @@ function s2ab(s) {
       var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
         .appendTo(selectWrapper)
         .select2({
-          width: '100%',
+          width: '150px',
           dropdownCssClass: 'select2-blue'
         });
       select.on('change', function() {
@@ -613,7 +684,7 @@ function s2ab(s) {
       var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
         .appendTo(selectWrapper)
         .select2({
-          width: '100%',
+          width: '150px',
           dropdownCssClass: 'select2-blue'
         });
       select.on('change', function() {
@@ -651,7 +722,7 @@ function s2ab(s) {
       var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
         .appendTo(selectWrapper)
         .select2({
-          width: '100%',
+          width: '150px',
           dropdownCssClass: 'select2-blue'
         });
       select.on('change', function() {

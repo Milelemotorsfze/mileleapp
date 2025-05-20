@@ -7,6 +7,13 @@
         td {
             font-size:12px!important;
         }
+        .widthinput {
+            height:32px!important;
+        }
+        .error
+        {
+        color: #FF0000;
+        }
     </style>
 </head>
 @section('content')
@@ -18,12 +25,24 @@
 @if ($canViewPenaltyInfo)
 <body>
     <div class="card-header">
-        <h4 class="card-title">Penalized Vehicles Info</h4>
+        <h4 class="card-title">Penalized BOE Info</h4>
     </div>
 
     <div class="card-body">
+        @if (Session::has('error'))
+            <div class="alert alert-danger" >
+                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                {{ Session::get('error') }}
+            </div>
+        @endif
+        @if (Session::has('success'))
+            <div class="alert alert-success" id="success-alert">
+                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                {{ Session::get('success') }}
+            </div>
+        @endif
         <div class="row">
-            <div class="table-responsive">
+            <div class="table-responsive dragscroll">
                 <table class="table table-striped table-editable table-condensed my-datatableclass">
                     <thead style="background-color: #e6f1ff">
                         <tr>
@@ -31,11 +50,10 @@
                             <th>SO Number</th>
                             <th>WO Number</th>
                             <th>BOE Number</th>
-                            <th>VIN Number</th>
+                            <th>Declaration Number</th>
                             <th>Declaration Date</th>
                             <th>Penalty Start</th>
                             <th>Excess Days</th>
-                            <th>Total Penalty(AED)</th>
                         </tr>
                         @if(isset($datas) && count($datas) > 0)
                         <tr>
@@ -56,7 +74,7 @@
                                 </select>
                             </th>
                             <th>
-                                <select class="column-filter form-control" id="vin-filter" multiple="multiple">
+                                <select class="column-filter form-control" id="declaration-number-filter" multiple="multiple">
                                     <!-- Options will be dynamically added via JS -->
                                 </select>
                             </th>
@@ -71,24 +89,18 @@
                                     <!-- Options will be dynamically added via JS -->
                                 </select>
                             </th>
-                            <th><input type="text" placeholder="Search Total Penalty" class="column-filter form-control" id="penalty-amount-filter"/></th>
                         </tr>
                         @endif
                     </thead>
                     <tbody>
                         @if(isset($datas) && count($datas) > 0)
                             @foreach($datas as $data)
-                                @if($data->woBoe->declaration_date != '')
+                                @if($data->declaration_date != '')
                                     @php
                                         $daysDifference = '';
-                                        $thirtiethDay = \Carbon\Carbon::parse($data->woBoe->declaration_date)->addDays(29);
+                                        $thirtiethDay = \Carbon\Carbon::parse($data->declaration_date)->addDays(29);
                                         $today = \Carbon\Carbon::today();
                                         $daysDifference = $thirtiethDay->diffInDays($today, false) + 1;
-                                    @endphp
-                                @endif
-                                @if(isset($daysDifference))
-                                    @php
-                                        $penalty = $daysDifference * 200;
                                     @endphp
                                 @endif
                                 <tr>
@@ -114,75 +126,69 @@
                                             </ul>
                                         </div> 
                                         <div class="modal fade" id="updatePenaltyModal_{{$data->id}}" tabindex="-1" aria-labelledby="updatePenaltyModalLabel_{{$data->id}}" aria-hidden="true">
-                                            <div class="modal-dialog modal-xl"> <!-- Add modal-dialog here -->
+                                            <div class="modal-dialog modal-xl">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="updatePenaltyModalLabel_{{$data->id}}">Update Vehicle Penalty Info For {{$data->vin ?? ''}}</h5>
+                                                        <h5 class="modal-title">Update BOE Penalty Info for {{$data->boe ?? ''}}</h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <form id="docStatusForm_{{$data->id}}" method="POST" enctype="multipart/form-data" action="{{ route('penalty.storeOrUpdate') }}" onsubmit="return validateForm({{ $data->id }})">
-                                                        @csrf
                                                         <div class="modal-body">
-                                                            <input type="hidden" value="{{$data->id}}" name="wo_vehicle_id_{{$data->id}}">
+                                                            @csrf
                                                             <div class="row">
-                                                                <!-- Payment Date -->
-                                                                <div class="col-2">
-                                                                    <label for="payment_date{{$data->id}}" class="form-label" style="font-size: 14px;">Payment Date:</label>
+                                                                <!-- Invoice Date -->
+                                                                <div class="col-4">
+                                                                    <input hidden name="wo_boe_id_{{$data->id}}" value="{{ $data->id ?? '' }}">
+                                                                    <input hidden name="wo_boe_{{$data->id}}" value="{{ $data->boe ?? '' }}">
+                                                                    <span class="error">* </span>
+                                                                    <label for="invoice_date{{$data->id}}" class="form-label" style="font-size: 14px;">Invoice Date:</label>
                                                                     <input type="date" 
-                                                                        class="form-control" 
-                                                                        id="payment_date{{ $data->id }}" 
-                                                                        name="payment_date_{{$data->id}}" 
-                                                                        value="{{ now()->format('Y-m-d') }}" 
-                                                                        min="{{ \Carbon\Carbon::parse($data->woBoe->declaration_date)->addDays(29)->format('Y-m-d') }}" 
+                                                                        class="form-control widthinput" 
+                                                                        id="invoice_date_{{ $data->id }}" 
+                                                                        name="invoice_date_{{$data->id}}" 
+                                                                        min="{{ \Carbon\Carbon::parse($data->declaration_date)->addDays(29)->format('Y-m-d') }}" 
                                                                         max="{{ now()->format('Y-m-d') }}"
-                                                                        data-declaration-date="{{ $data->woBoe->declaration_date }}">
-                                                                    <span id="payment_dateError_{{$data->id}}" class="text-danger"></span>
+                                                                        data-declaration-date="{{ $data->declaration_date }}">
+                                                                    <span id="invoice_dateError_{{$data->id}}" class="text-danger"></span>
                                                                 </div>
 
-                                                                <!-- Excess Days -->
-                                                                <div class="col-3">
-                                                                    <input hidden value="{{ $data->id ?? '' }}">
-                                                                    <label for="excess_days_{{$data->id}}" class="form-label" style="font-size: 14px;">Excess Export Days Post Expiry:</label>
-                                                                    <div class="input-group">
-                                                                        <input type="number" class="form-control" id="excess_days_{{ $data->id }}" name="excess_days_{{$data->id}}" 
-                                                                            placeholder="Enter Excess Export Days Post Expiry" value="{{ $daysDifference ?? '' }}" min="1" oninput="validity.valid||(value='');" step="1" readonly>
-                                                                        <div class="input-group-append">
-                                                                            <span class="input-group-text widthinput" id="basic-addon2">Days</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <span id="excess_daysError_{{$data->id}}" class="text-danger"></span>
+                                                                <!-- Invoice Number -->
+                                                                <div class="col-4">
+                                                                    <span class="error">* </span>
+                                                                    <label for="invoice_number_{{$data->id}}" class="form-label" style="font-size: 14px;">Invoice Number:</label>
+                                                                    <input type="numbers" class="form-control widthinput" id="invoice_number_{{ $data->id }}" name="invoice_number_{{$data->id}}" placeholder="Enter Invoice Number">                                                                    
+                                                                    <span id="invoice_numberError_{{$data->id}}" class="text-danger"></span>
                                                                 </div>
-
-                                                                <!-- Total Penalty Amount -->
-                                                                <div class="col-2">
-                                                                    <label for="total_penalty_amount_{{$data->id}}" class="form-label" style="font-size: 14px;">Total Penalty Amount:</label>
+                                                             
+                                                                <!-- Penalty Amount -->
+                                                                <div class="col-4">
+                                                                    <span class="error">* </span>
+                                                                    <label for="penalty_amount_{{$data->id}}" class="form-label" style="font-size: 14px;">Penalty Amount:</label>
                                                                     <div class="input-group">
-                                                                        <input type="number" class="form-control" id="total_penalty_amount_{{ $data->id }}" name="total_penalty_amount_{{$data->id}}" 
-                                                                        placeholder="Enter Total Penalty Amount" value="{{ $penalty ?? '' }}" step="0.01" min="0" readonly>
-                                                                        <div class="input-group-append">
-                                                                            <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <span id="total_penalty_amountError_{{$data->id}}" class="text-danger"></span>
-                                                                </div>
-
-                                                                <!-- Amount Paid -->
-                                                                <div class="col-2">
-                                                                    <label for="amount_paid_{{$data->id}}" class="form-label" style="font-size: 14px;">Amount Paid:</label>
-                                                                    <div class="input-group">
-                                                                        <input type="number" class="form-control" id="amount_paid_{{ $data->id }}" name="amount_paid_{{$data->id}}" placeholder="Enter Amount Paid" 
+                                                                        <input type="number" class="form-control widthinput" id="penalty_amount_{{ $data->id }}" name="penalty_amount_{{$data->id}}" placeholder="Enter Penalty Amount" 
                                                                         value="{{ $penalty ?? '' }}" step="0.01" min="0">
                                                                         <div class="input-group-append">
                                                                             <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                                         </div>
                                                                     </div>
-                                                                    <span id="amount_paidError_{{$data->id}}" class="text-danger"></span>
+                                                                    <span id="penalty_amountError_{{$data->id}}" class="text-danger"></span>
                                                                 </div>
-
+                                                                <!-- Penalty Type -->
+                                                                <div class="col-8">
+                                                                    <span class="error">* </span>
+                                                                    <label for="penalty_type_{{$data->id}}" class="form-label mt-2" style="font-size: 14px;">Penalty Type:</label>
+                                                                    <select class="form-control select2" id="penalty_type_{{$data->id}}" name="penalty_type_{{$data->id}}[]" style="width: 100%;" multiple>
+                                                                        <option value="">Select Penalty Type</option>
+                                                                        @foreach ($penaltyTypes as $penaltyType)
+                                                                            <option value="{{ $penaltyType->id }}">{{ $penaltyType->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                    <span id="penalty_typeError_{{$data->id}}" class="text-danger"></span>
+                                                                </div>
                                                                 <!-- Payment Receipt -->
-                                                                <div class="col-3">
-                                                                    <label for="payment_receipt_{{$data->id}}" class="form-label" style="font-size: 14px;">Payment Receipt/Penalty Confirmation :</label>
-                                                                    <input type="file" class="form-control" id="payment_receipt_{{ $data->id }}" name="payment_receipt_{{$data->id}}" placeholder="Enter Payment Receipt">
+                                                                <div class="col-4">
+                                                                    <label for="payment_receipt_{{$data->id}}" class="form-label mt-2" style="font-size: 14px;">Payment Receipt/Penalty Confirmation :</label>
+                                                                    <input type="file" class="form-control widthinput" id="payment_receipt_{{ $data->id }}" name="payment_receipt_{{$data->id}}" placeholder="Enter Payment Receipt">
                                                                     <span id="payment_receiptError_{{$data->id}}" class="text-danger"></span>
                                                                 </div>
                                                                 <!-- Remarks -->
@@ -204,17 +210,16 @@
                                     </td>
                                     <td>{{ $data->workOrder->so_number ?? '' }}</td>
                                     <td>{{ $data->workOrder->wo_number ?? '' }}</td>
-                                    <td>{{ $data->woBoe->boe ?? '' }}</td>
-                                    <td>{{ $data->vin ?? '' }}</td>
-                                    <td>@if($data->woBoe->declaration_date != ''){{ \Carbon\Carbon::parse($data->woBoe->declaration_date)->format('d M Y') }}@endif</td>
-                                    <td>@if($data->woBoe->declaration_date != ''){{ \Carbon\Carbon::parse($data->woBoe->declaration_date)->addDays(29)->format('d M Y') }}@endif</td>
+                                    <td>{{ $data->boe ?? '' }}</td>
+                                    <td>{{ $data->declaration_number ?? '' }}</td>
+                                    <td>@if($data->declaration_date != ''){{ \Carbon\Carbon::parse($data->declaration_date)->format('d M Y') }}@endif</td>
+                                    <td>@if($data->declaration_date != ''){{ \Carbon\Carbon::parse($data->declaration_date)->addDays(29)->format('d M Y') }}@endif</td>
                                     <td>{{ $daysDifference }}</td>
-                                    <td>{{ $penalty }}</td>
                                 </tr>
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="9" class="text-center">No data history available.</td>
+                                <td colspan="8" class="text-center">No data history available.</td>
                             </tr>
                         @endif
                     </tbody>
@@ -222,8 +227,14 @@
             </div>
         </div>
     </div>
+    @if(isset($data) && isset($data->id))
     <script type="text/javascript">
     $(document).ready(function() {
+        $('.select2').select2({
+            placeholder: "Select Penalty Type",
+            allowClear: true,
+            dropdownParent: $('#updatePenaltyModal_{{$data->id}}') // Replace with your actual modal ID
+        });
         @if(isset($datas) && count($datas) > 0)
             // Initialize DataTable since $datas has rows
             var table = $('.my-datatableclass').DataTable({  // Use DataTable() here
@@ -233,7 +244,7 @@
             });
 
             // Initialize Select2 for multi-select filters
-            $('#so-filter, #wo-filter, #boe-filter, #vin-filter, #days-late-filter').select2({
+            $('#so-filter, #wo-filter, #boe-filter, #declaration-number-filter, #days-late-filter').select2({
                 placeholder: "Select filter",
                 allowClear: true
             });
@@ -258,70 +269,83 @@
             populateDropdown(1, '#so-filter');
             populateDropdown(2, '#wo-filter');
             populateDropdown(3, '#boe-filter');
-            populateDropdown(4, '#vin-filter');
+            populateDropdown(4, '#declaration-number-filter');
             populateDropdown(7, '#days-late-filter');
 
             // Apply multi-select filter for each dropdown
-            $('#so-filter, #wo-filter, #boe-filter, #vin-filter, #days-late-filter').on('change', function() {
+            $('#so-filter, #wo-filter, #boe-filter, #declaration-number-filter, #days-late-filter').on('change', function() {
                 var columnIndex = $(this).parent().index();
                 var selectedOptions = $(this).val();
                 var searchValue = selectedOptions ? selectedOptions.join('|') : '';
                 table.column(columnIndex).search(searchValue, true, false).draw();  // Use table.column() directly
             });
 
-            $('#penalty-amount-filter').on('keyup change', function() {
-                table.column($(this).parent().index()).search(this.value).draw();  // Use table.column() directly
-            });
 
             // Clear all filters on button click
             $('#clear-filters').click(function() {
-                $('#penalty-amount-filter').val('').trigger('change');
-                $('#so-filter, #wo-filter, #boe-filter, #vin-filter, #days-late-filter').val(null).trigger('change');
+                $('#so-filter, #wo-filter, #boe-filter, #declaration-number-filter, #days-late-filter').val(null).trigger('change');
                 table.search('').columns().search('').draw();
             });
         @else
             console.log("No data available to initialize DataTable.");
-        @endif        
+        @endif 
     });
-    function validateForm(id) {
-        const totalPenalty = parseFloat(document.getElementById(`total_penalty_amount_${id}`).value);
-        const amountPaid = parseFloat(document.getElementById(`amount_paid_${id}`).value);
-        const errorElement = document.getElementById(`amount_paidError_${id}`);
-        
-        // Clear previous error message
-        errorElement.textContent = '';
-
-        if (amountPaid > totalPenalty) {
-            errorElement.textContent = "Amount Paid cannot exceed Total Penalty Amount.";
-            return false; // Prevent form submission
-        }
-
-        return true; // Allow form submission
-    }
-    document.addEventListener('DOMContentLoaded', function () {
-        // Define the daily penalty rate
-        const penaltyRate = 200;
-
-        // Attach an event listener to each payment_date field
-        document.querySelectorAll('[id^=payment_date]').forEach(function (dateInput) {
-            dateInput.addEventListener('change', function () {
-                const id = dateInput.id.match(/\d+/)[0]; // Extract the dynamic ID
-                const declarationDate = dateInput.getAttribute('data-declaration-date'); // Get the declaration date from data attribute
-                const paymentDate = new Date(dateInput.value);
-                const expiryDate = new Date(new Date(declarationDate).setDate(new Date(declarationDate).getDate() + 29));
-
-                // Calculate excess days
-                const excessDays = Math.max(0, Math.ceil((paymentDate - expiryDate) / (1000 * 60 * 60 * 24))) + 1;
-                
-                // Update the excess days and penalty amount fields
-                document.getElementById(`excess_days_${id}`).value = excessDays;
-                document.getElementById(`total_penalty_amount_${id}`).value = excessDays * penaltyRate;
-                document.getElementById(`amount_paid_${id}`).value = excessDays * penaltyRate;
-            });
+    $(document).on('shown.bs.modal', function (e) {
+        const modalId = $(e.target).attr('id');
+        $(`#${modalId} .select2`).select2({
+            placeholder: "Select Penalty Type",
+            allowClear: true,
+            dropdownParent: $(`#${modalId}`) // Dynamically reference the modal ID
         });
     });
+    function validateForm(id) {
+        var invoiceDate = document.getElementById('invoice_date_' + id).value;
+        var invoiceNumber = document.getElementById('invoice_number_' + id).value;
+        var penaltyAmount =  document.getElementById('penalty_amount_' + id).value;
+        var penaltyType =  document.getElementById('penalty_type_' + id).value;
+
+        // Check for empty fields
+        if (!invoiceDate) {
+            document.getElementById('invoice_dateError_' + id).textContent = 'Invoice Date is required.';
+            return false;
+        } else {
+            document.getElementById('invoice_dateError_' + id).textContent = '';
+        }
+        if (!invoiceNumber || !/^[1-9][0-9]*$/.test(invoiceNumber)) {
+            document.getElementById('invoice_numberError_' + id).textContent = 'Please enter a valid positive integer.';
+            return false;
+        }else {
+            document.getElementById('invoice_numberError_' + id).textContent = '';      
+        }
+        if (!penaltyAmount) {
+            document.getElementById('penalty_amountError_' + id).textContent = 'Penalty Amount is required.';
+            return false;
+        } else {
+            document.getElementById('penalty_amountError_' + id).textContent = '';          
+        }
+        if (!penaltyType) {
+            document.getElementById('penalty_typeError_' + id).textContent = 'Penalty Type is required.';
+            return false;
+        } else {
+            document.getElementById('penalty_typeError_' + id).textContent = '';          
+        }
+        return true; // Submit if all validations pass
+    }
 </script>
+@endif
 </body>
+@else
+    <div class="card-header">
+        <p class="card-title">Sorry! You don't have permission to access this page.</p>
+        <div class="d-flex justify-content-between">
+            <a class="btn btn-sm btn-info" href="/">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i> Go To Dashboard
+            </a>
+            <a class="btn btn-sm btn-info" href="{{ url()->previous() }}">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page
+            </a>
+        </div>
+    </div>
 @endif
 @endsection
 

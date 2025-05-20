@@ -28,6 +28,10 @@ class Varaint extends Model
     {
         return $this->hasOne(MasterModel::class,'variant_id');
     }
+    public function users()
+    {
+        return $this->belongsTo(User::class,'created_by');
+    }
     public function master_model_lines()
     {
         return $this->belongsTo(MasterModelLines::class,'master_model_lines_id');

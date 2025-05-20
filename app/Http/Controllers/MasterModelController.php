@@ -6,7 +6,10 @@ use App\Models\Brand;
 use App\Models\MasterModel;
 use App\Models\Varaint;
 use App\Models\VariantItems;
+use App\Models\PfiItemPurchaseOrder;
+use App\Models\PfiItem;
 use Carbon\Carbon;
+use App\Models\LetterOfIndentItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
@@ -22,7 +25,9 @@ class MasterModelController extends Controller
     {
         (new UserActivityController)->createActivity('Open the listing page of Master Models.');
 
-        $masterModel = MasterModel::orderBy('id','DESC');
+        $masterModel = MasterModel::orderBy('id','DESC')->with(['variant'  => function ($query) {
+                $query->select('id','name','master_model_lines_id');
+            }]);
 
         if($request->export == 'EXCEL') {
             $data = $masterModel->get();
@@ -74,7 +79,7 @@ class MasterModelController extends Controller
                 ->editColumn('amount_belgium', function($query) {
                     return  number_format($query->amount_belgium);
                 })
-                ->rawColumns(['action'])
+                ->rawColumns(['action','variant_id'])
                  
                 ->toJson();
         }
@@ -89,7 +94,7 @@ class MasterModelController extends Controller
             ['data' => 'pfi_sfx', 'name' => 'pfi_sfx','title' => 'New SFX'],
             ['data' => 'model_year', 'name' => 'model_year','title' => 'Model Year'],
             ['data' => 'model_description', 'name' => 'model_description','title' => 'Model Description'],
-            ['data' => 'variant_id', 'name' => 'variant_id','title' => 'Variant'],
+            ['data' => 'variant_id', 'name' => 'variant.name','title' => 'Variant'],
             ['data' => 'master_model_line_id', 'name' => 'master_model_line_id','title' => 'Model Line'],
             ['data' => 'transcar_loi_description', 'name' => 'transcar_loi_description','title' => 'Trans Car LOI Description'],
             ['data' => 'milele_loi_description', 'name' => 'milele_loi_description','title' => 'PFI Milele LOI Description'],
@@ -120,7 +125,6 @@ class MasterModelController extends Controller
      */
     public function store(Request $request)
     {
-//        return dd($request->all());
         $this->validate($request, [
             'model' => 'required',
             'sfx' => 'required',
@@ -181,8 +185,20 @@ class MasterModelController extends Controller
 
         $masterModel = MasterModel::find($id);
         $variants = Varaint::all();
-
-        return view('master-models.edit', compact('masterModel','variants'));
+        $ismasterModelExistLOI = LetterOfIndentItem::select('master_model_id')->where('master_model_id',$masterModel->id)->first();
+        $ismasterModelExistPFI = PfiItem::select('master_model_id')->where('master_model_id',$masterModel->id)->first();
+        $ismasterModelExistPO = PfiItemPurchaseOrder::select('master_model_id')->where('master_model_id',$masterModel->id)->first();
+        $disableEdit = 0;
+        $disableVariantEdit = 0;
+        if($ismasterModelExistLOI || $ismasterModelExistPFI || $ismasterModelExistPO) {
+            $disableEdit = 1;
+            if($ismasterModelExistPO || $ismasterModelExistPFI) {
+                $disableVariantEdit = 1;
+            }
+            
+        }
+        // return $disableEdit;
+        return view('master-models.edit', compact('masterModel','variants','disableEdit','disableVariantEdit'));
     }
 
     /**
@@ -190,8 +206,6 @@ class MasterModelController extends Controller
      */
     public function update(Request $request, string $id)
     {
-//        return dd($request->all());
-
         $this->validate($request, [
             'model' => 'required',
             'sfx' => 'required',

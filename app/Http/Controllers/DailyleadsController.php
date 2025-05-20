@@ -58,7 +58,7 @@ class DailyleadsController extends Controller
         $clients = SalespersonOfClients::with('client')
         ->where('sales_person_id', $id)
         ->get();
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access')|| Auth::user()->hasPermissionForSelectedRole('leads-view-only');
         if($hasPermission)
         {
         $pendingdata = Calls::join('lead_source', 'calls.source', '=', 'lead_source.id')
@@ -105,6 +105,8 @@ class DailyleadsController extends Controller
             }
             if($status === "Preorder")
             {
+                $search = $request->input('search.value');
+
                 $preorders = PreOrder::select([
                     'pre_orders.status as status',
                     'quotations.id as quotationsid',
@@ -124,7 +126,14 @@ class DailyleadsController extends Controller
                 ->leftJoin('users', 'pre_orders.requested_by', '=', 'users.id')
                 ->where('pre_orders.requested_by', $id)
                 ->groupby('pre_orders.id')
-                ->get();
+                ->when($search, function ($query, $search) {
+                    $query->where(function ($q) use ($search) {
+                        $q->where('quotations.sales_notes', 'like', "%$search%")
+                          ->orWhere('varaints.name', 'like', "%$search%")
+                          ->orWhere('countries.name', 'like', "%$search%")
+                          ->orWhere('users.name', 'like', "%$search%");
+                    });
+                });
                 return DataTables::of($preorders)->toJson();  
             }
             else if($status === "followup")
@@ -161,9 +170,10 @@ class DailyleadsController extends Controller
                 ->get();
                 return DataTables::of($fellowup)->toJson();  
             }
-            else if($status === "activelead")
-            {
-                $activelead = calls::select([
+            else if($status === "activelead") {
+                $searchValue = $request->input('search.value');
+            
+                $activelead = Calls::select([
                     'calls.priority',
                     'calls.id',
                     'calls.name',
@@ -178,9 +188,9 @@ class DailyleadsController extends Controller
                     'calls.language',
                     'master_model_lines.model_line',
                     'brands.brand_name',
-                    \DB::raw("DATE_FORMAT(calls.created_at, '%Y %m %d') as leaddate"),
-                    \DB::raw("sales_person_user.name as sales_person_name"),
-                    \DB::raw("created_by_user.name as created_by_name")
+                    DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d') as leaddate"),
+                    DB::raw("sales_person_user.name as sales_person_name"),
+                    DB::raw("created_by_user.name as created_by_name")
                 ])
                 ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
                 ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
@@ -188,16 +198,41 @@ class DailyleadsController extends Controller
                 ->leftJoin('users as sales_person_user', 'calls.sales_person', '=', 'sales_person_user.id')
                 ->leftJoin('users as created_by_user', 'calls.created_by', '=', 'created_by_user.id')
                 ->whereIn('calls.status', ['contacted', 'working', 'qualify', 'converted', 'Follow Up', 'Prospecting']);
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+            
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
                 if(!$hasPermission) {
                     $activelead->where('calls.sales_person', $id);
                 }
-                $activelead = $activelead->groupBy('calls.id')->get();
+            
+                $columns = $request->input('columns', []);
+                foreach ($columns as $col) {
+                    $colName = $col['name'] ?? '';
+                    $search = trim($col['search']['value'] ?? '');
+                
+                    if ($search !== '') {
+                        $terms = explode('|', $search);
+                
+                        $activelead->where(function ($query) use ($colName, $terms) {
+                            foreach ($terms as $term) {
+                                $query->orWhereRaw("LOWER($colName) LIKE ?", ['%' . strtolower($term) . '%']);
+                            }
+                        });
+                    }
+                }
+                
+                \Log::info('Search Term 11111 : ' . $searchValue);
+
+            
+                $activelead = $activelead->groupBy('calls.id');
+            
                 return DataTables::of($activelead)->toJson(); 
             }
+            
             else if($status === "bulkleads")
             {
-                $bulkleads = calls::select([
+                $searchValue = $request->input('search.value');
+            
+                $bulkleads = Calls::select([
                     'calls.id',
                     'calls.name',
                     'calls.phone',
@@ -210,7 +245,6 @@ class DailyleadsController extends Controller
                     'calls.language',
                     'master_model_lines.model_line',
                     'brands.brand_name',
-                    'calls.remarks',
                     \DB::raw("DATE_FORMAT(calls.created_at, '%Y %m %d') as leaddate"),
                 ])
                 ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
@@ -218,20 +252,56 @@ class DailyleadsController extends Controller
                 ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
                 ->whereNotNull('calls.leadtype');
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+            
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
                 if(!$hasPermission) {
                     $bulkleads->where('calls.sales_person', $id);
                 }
-                $bulkleads = $bulkleads->groupBy('calls.id')->get();
+            
+                $columns = $request->input('columns', []);
+                foreach ($columns as $col) {
+                    $colName = $col['name'] ?? '';
+                    $search = trim($col['search']['value'] ?? '');
+                
+                    if ($search !== '') {
+                        $terms = explode('|', $search); // select2 multi filter uses pipe-delimited values
+                
+                        $bulkleads->where(function ($query) use ($colName, $terms) {
+                            foreach ($terms as $term) {
+                                $query->orWhereRaw("LOWER($colName) LIKE ?", ['%' . strtolower($term) . '%']);
+                            }
+                        });
+                    }
+                }
+                
+            
+                \Log::info('Search Term bulkleads : ' . $searchValue);
+            
+                $bulkleads = $bulkleads->groupBy('calls.id');
+            
                 return DataTables::of($bulkleads)->toJson();   
             }
+            
             else
             {
             $searchValue = $request->input('search.value');
-            $data = Calls::select(['calls.id',DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d') as created_at"), 'calls.type', 'calls.name', 'calls.phone', 'calls.email', 'calls.custom_brand_model', 'calls.created_by', 'calls.location', 'calls.language', DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as remarks")]);
+            $data = Calls::select([
+                'calls.id',
+                DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d') as created_at"),
+                'calls.type',
+                'calls.name',
+                'calls.phone',
+                'calls.email',
+                'calls.custom_brand_model',
+                'calls.created_by',
+                'calls.location',
+                'calls.language',
+                DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as plain_remarks"),
+                'calls.remarks'
+            ]);            
             if($status === "Prospecting")
             {
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
                 if($hasPermission)
                 {
                     $data->whereIn('calls.status', ['Prospecting', 'New Demand'])->orderBy('created_at', 'desc');
@@ -243,7 +313,7 @@ class DailyleadsController extends Controller
             }
             else
             {
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
                 if($hasPermission)
                 {
                     $data->where('calls.status', $status)->orderBy('created_at', 'desc');
@@ -258,28 +328,28 @@ class DailyleadsController extends Controller
                 JOIN master_model_lines ON calls_requirement.model_line_id = master_model_lines.id
                 JOIN brands ON master_model_lines.brand_id = brands.id
                 WHERE calls_requirement.lead_id = calls.id) as models_brands'));
-                if (!empty($searchValue)) {
-                    $data->where(function ($query) use ($searchValue) {
-                        $query->where('calls.name', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.created_at', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.email', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.phone', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.custom_brand_model', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.location', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.language', 'LIKE', "%$searchValue%")
-                            ->orWhereExists(function ($subquery) use ($searchValue) {
-                                $subquery->select(DB::raw(1))
-                                    ->from('calls_requirement')
-                                    ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
-                                    ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
-                                    ->whereRaw('calls_requirement.lead_id = calls.id')
-                                    ->where(function ($subquery) use ($searchValue) {
-                                        $subquery->whereRaw('LOWER(brands.brand_name) LIKE ?', ["%" . strtolower($searchValue) . "%"])
-                                            ->orWhereRaw('LOWER(master_model_lines.model_line) LIKE ?', ["%" . strtolower($searchValue) . "%"]);
-                                    });
-                            });
-                    });
+                
+                $columns = $request->input('columns', []);
+                foreach ($columns as $col) {
+                    $colName = $col['name'] ?? '';
+                    $search = trim($col['search']['value'] ?? '');
+                
+                    if ($colName && $search !== '') {
+                        $terms = array_filter(explode('|', $search));
+                
+                        $data->where(function ($query) use ($colName, $terms) {
+                            foreach ($terms as $term) {
+                                if (Str::contains($colName, '.')) {
+                                    $query->orWhere(DB::raw("LOWER($colName)"), 'LIKE', '%' . strtolower($term) . '%');
+                                } else {
+                                    $query->orWhere(DB::raw("LOWER(`$colName`)"), 'LIKE', '%' . strtolower($term) . '%');
+                                }
+                            }
+                        });
+                    }
                 }
+                
+                
                 if ($status === 'Prospecting') {
                     $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%Y %m %d') as date"), 'prospectings.salesnotes');
                     $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
@@ -321,14 +391,43 @@ class DailyleadsController extends Controller
                 );
                 $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
                 $data->addSelect([
+                    'calls.remarks',
+                    DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as plain_remarks"),
                     DB::raw("DATE_FORMAT(quotations.date, '%Y %m %d') as qdate"),
                     'quotations.sales_notes as qsalesnotes',
                     DB::raw("IFNULL(quotations.file_path, '') as file_path"),
-                    DB::raw("CONCAT(IFNULL(FORMAT(quotations.deal_value, 0), ''), ' ', IFNULL(quotations.currency, '')) as ddealvalues"), ('quotations.signature_status as signature_status'),
+                    DB::raw("CONCAT(IFNULL(FORMAT(quotations.deal_value, 0), ''), ' ', IFNULL(quotations.currency, '')) as ddealvalues"),
+                    DB::raw("IFNULL(quotations.signature_status, '') as signature_status"),
                     'users.name as salespersonname',
                 ]);
                 $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
                 $data->leftJoin('users', 'quotations.created_by', '=', 'users.id');
+                $data->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id');
+                $data->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id');
+                $data->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id');
+
+                $columns = $request->input('columns', []);
+                foreach ($columns as $col) {
+                    $colName = $col['name'] ?? '';
+                    $search = trim($col['search']['value'] ?? '');
+                
+                    if ($colName && $search !== '') {
+                        $terms = array_filter(explode('|', $search));
+                
+                        $data->where(function ($query) use ($colName, $terms) {
+                            foreach ($terms as $term) {
+                                if (Str::contains($colName, '.')) {
+                                    $query->orWhere(DB::raw("LOWER($colName)"), 'LIKE', '%' . strtolower($term) . '%');
+                                } else {
+                                    $query->orWhere(DB::raw("LOWER(`$colName`)"), 'LIKE', '%' . strtolower($term) . '%');
+                                }
+                            }
+                        });
+                    }
+                }
+                
+                
+                           
             } elseif ($status === 'Negotiation') {
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%Y %m %d'), '') as date"),
@@ -427,11 +526,22 @@ class DailyleadsController extends Controller
             }
             $data->groupBy('calls.id');
             $results = $data->get();
+
+            $results->transform(function ($item) {
+                $item->plain_remarks = strip_tags($item->remarks);
+                return $item;
+            });
+            
+
             return DataTables::of($results)
-                ->addColumn('models_brands', function ($row) {
-                    return $row->models_brands;
-                })
-                ->toJson();
+    ->addColumn('models_brands', function ($row) {
+        return $row->models_brands;
+    })
+    ->editColumn('plain_remarks', function ($row) {
+        return $row->plain_remarks ?? '';
+    })
+    ->toJson();
+
         }
     }
         return view('dailyleads.index', compact('pendingdata', 'clients'));
@@ -447,7 +557,12 @@ class DailyleadsController extends Controller
         $clients = SalespersonOfClients::with('client')
         ->where('sales_person_id', $salespersonId)
         ->get();
-        $sales_persons = ModelHasRoles::where('role_id', 7)->get();
+        $sales_persons = User::select('id', 'name') 
+            ->where('manual_lead_assign', 1)
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
+    
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
         return view('dailyleads.create', compact('modelLineMasters', 'clients', 'countries','sales_persons'));
     }
@@ -921,7 +1036,45 @@ public function leaddetailpage($id)
         ->where('leads_log.lead_id', $id)
         ->orderBy('leads_log.created_at', 'desc')
         ->get();
-    return view('dailyleads.leads', compact('lead', 'languages', 'countries', 'requirements', 'brands', 'mastermodellines', 'countries', 'documents','users','tasks','logs'));
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+        
+        if($hasPermission)
+        {
+        $nextLead = Calls::where('status', '!=', 'Quoted')
+        ->where('status', '!=', 'Closed')
+        ->where('id', '>', $id)
+        ->orderBy('id', 'asc')
+        ->first();
+        }
+        else
+        {
+        $nextLead = Calls::where('sales_person', auth()->id())
+        ->where('status', '!=', 'Quoted')
+        ->where('status', '!=', 'Closed')
+        ->where('id', '>', $id)
+        ->orderBy('id', 'asc')
+        ->first();
+    }
+    // Fetch Previous Lead
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+        if($hasPermission)
+        {
+        $previousLead = Calls::where('status', '!=', 'Quoted')
+        ->where('status', '!=', 'Closed')
+        ->where('id', '<', $id)
+        ->orderBy('id', 'desc')
+        ->first();
+        }
+        else
+        {
+    $previousLead = Calls::where('sales_person', auth()->id())
+        ->where('status', '!=', 'Quoted')
+        ->where('status', '!=', 'Closed')
+        ->where('id', '<', $id)
+        ->orderBy('id', 'desc')
+        ->first();
+        }
+    return view('dailyleads.leads', compact('lead', 'languages', 'countries', 'requirements', 'brands', 'mastermodellines', 'countries', 'documents','users','tasks','logs', 'nextLead', 'previousLead'));
 }
 public function leaddeupdate(Request $request)
 {

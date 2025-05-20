@@ -122,6 +122,32 @@
             </tr>
         </table>
         <hr>
+        <h4>GRN Details</h4>
+        <table class="checklist">
+            <thead>
+                <tr>
+                    <th>Attributes</th>
+                    <th>Option</th>
+                    <th>Attributes</th>
+                    <th>Option</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach ($variantitems as $index => $variantitem)
+                @if ($index % 2 == 0)
+                <tr>
+                    <td>{{$variantitem->model_specification->name}}</td>
+                    <td>{{$variantitem->model_specification_option->name}}</td>
+                @else
+                    <td>{{$variantitem->model_specification->name}}</td>
+                    <td>{{$variantitem->model_specification_option->name}}</td>
+                </tr>
+                @endif
+            @endforeach
+            </tbody>
+        </table>
+        <hr>
+        <h4>PDI Details</h4>
         <table class="checklist">
             <thead>
                 <tr>

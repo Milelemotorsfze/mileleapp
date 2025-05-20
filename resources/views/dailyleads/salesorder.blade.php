@@ -1,6 +1,22 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
+
 <style>
+    /* Allow Select2 dropdown to adjust dynamically based on content */
+    .select2-container {
+    width: 100% !important; /* Forces the width to match its parent */
+}
+
+.select2-dropdown {
+    min-width: auto !important; /* Allows dynamic resizing */
+    width: auto !important; /* Adjusts to content */
+}
+
+/* Make sure the dropdown appears above the modal */
+.select2-container--open {
+    z-index: 9999 !important;
+}
+
 /* Ensure table rows do not wrap text */
 table.dataTable {
     font-size: 12px; /* Decrease font size */
@@ -42,11 +58,17 @@ table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td
 .table-responsive {
     height: 80vh;
     overflow-y: auto;
+    white-space: nowrap;
+    cursor: grab;
 }
    .btn-outline-primary {
     margin-bottom: 5px;
     width: 100%;
 }
+.select2-dropdown.select2-dropdown--below {
+    position: inherit !important;
+}
+
 .select2-container--default .select2-search--inline .select2-search__field {
     font-size: 12px !important; /* Adjust the font-size as per your needs */
     width: 100% !important;
@@ -55,11 +77,6 @@ table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td
 table.dataTable thead th select {
     width: 100% !important; /* Ensures the select element fits the header width */
     min-width: 100%; /* Ensures it takes at least 100% width */
-}
-
-/* Ensure the Select2 dropdown fits the full header width when opened */
-.select2-container {
-    width: 100% !important; /* Ensures the container takes full width */
 }
 
 /* Ensure the dropdown itself is properly styled */
@@ -94,7 +111,7 @@ table.dataTable thead th select {
     margin-top: -30px;
     background: url('https://logosbynick.com/wp-content/uploads/2021/01/animated-gif.gif') no-repeat center center;
     background-size: contain;
-    z-index: 1100; /* Higher than the z-index of the <thead> */
+    z-index: 1100;
     display: none;
 }
 #dtBasicExample3_processing {
@@ -304,7 +321,33 @@ table.dataTable thead th select {
     <h4 class="card-title">
      Sales Order
     </h4>
-</div>     
+</div>
+<!-- Modal for Updating Sales Person -->
+<div class="modal fade" id="updateSalespersonModal" tabindex="-1" aria-labelledby="updateSalespersonLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateSalespersonLabel">Update Sales Person</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updateSalespersonForm">
+                    <!-- Hidden Field for Sales Order ID -->
+                    <input type="hidden" id="salesOrderId" name="sales_order_id">
+
+                    <label for="salespersonSelect">Select Sales Person:</label>
+                    <select class="form-control" id="salespersonSelect" name="salesperson_id">
+                        <option value="">Select Sales Person</option>
+                    </select>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveSalesperson">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -322,15 +365,15 @@ table.dataTable thead th select {
     </div>
 </div>
         <div class="card-body">
-        <div class="table-responsive" style="height: 80vh;">
+        <div class="table-responsive dragscroll" style="height: 80vh;">
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
             <tr>
-                <th>Customer Name</th>
-                <th>Sales Person</th>
-                  <th>Sales Date</th>
                   <th>SO Number</th>
-                <th>Customer Phone</th>
+                  <th>Sales Date</th>
+                  <th>Sales Person</th>
+                  <th>Customer Name</th>
+                  <th>Customer Phone</th>
                   <th>Customer Email</th>
                   <th>Quotation Date</th>
                   <th>Quotation Value</th>
@@ -366,8 +409,7 @@ table.dataTable thead th select {
         serverSide: true,
         ajax: "{{ route('salesorder.index', ['status' => 'SalesOrder']) }}",
         columns: [
-            { data: 'customername', name: 'calls.name' },
-            { data: 'name', name: 'users.name' },
+            { data: 'so_number', name: 'so.so_number' },
             {
                 data: 'so_date',
                 name: 'so.so_date',
@@ -382,7 +424,22 @@ table.dataTable thead th select {
                     return ''; // If no date, return empty
                 }
             },
-            { data: 'so_number', name: 'so.so_number' },
+            {
+    data: 'name',
+    name: 'users.name',
+    render: function(data, type, row) {
+        if (row.calls_id === null) { // Check if calls_id is not null
+            return `<a href="#" class="update-salesperson" 
+                        data-so-id="${row.soid}" 
+                        data-current-salesperson="${row.name}">
+                        ${data}
+                    </a>`;
+        } else {
+            return data; // If calls_id is null, return plain text
+        }
+    }
+},
+            { data: 'customername', name: 'calls.name' },
             { data: 'phone', name: 'calls.phone' },
             { data: 'email', name: 'calls.email' },
             {
@@ -399,7 +456,7 @@ table.dataTable thead th select {
                     return ''; // If no date, return empty
                 }
             },
-            { data: 'deal_value', name: 'quotations.deal_value' },
+            { data: 'deal_value', name: 'quotations.deal_value', type: 'num' },
             { data: 'sales_notes', name: 'quotations.sales_notes' },
             {
                 data: 'file_path',
@@ -418,20 +475,38 @@ table.dataTable thead th select {
                 name: 'quotations.calls_id',
                 searchable: false,
                 render: function (data, type, row) {
-                    const updatesaleorder = `{{ url('salesorder/update') }}/${data}`;
-                    return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
-                }
+                    if (row.calls_id !== null) { // Check if quotation_id is not null
+            const updatesaleorder = `{{ url('salesorder/update') }}/${data}`;
+            return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
+        }
+        return ''; // Return empty string to hide the button
+    }
             },
             {
-                data: 'calls_id',
-                name: 'quotations.calls_id',
+                data: 'soid',
+                name: 'so.id',
                 searchable: false,
                 orderable: false,
                 render: function (data, type, row) {
+                    if (row.calls_id !== null) { // Check if quotation_id is not null
                     return `<button class="btn btn-sm btn-danger" onclick="cancelSO(${data})" title="Cancel Sales Order">Cancel SO</button>`;
+                    }
+                    return '';
                 }
             }
         ],
+        columnDefs: [
+        {
+            targets: 7, // Target the deal_value column
+            render: function (data, type, row) {
+                // Ensure proper numeric formatting
+                return type === 'display' || type === 'filter'
+                    ? parseFloat(data).toFixed(2) // Format for display
+                    : parseFloat(data); // Use numeric for sorting
+            },
+            type: 'num' // Explicitly set type to numeric
+        }
+    ],
         pageLength: -1,
         initComplete: function () {
             // Apply dropdown filters to each column
@@ -458,7 +533,7 @@ table.dataTable thead th select {
                     if (index === 10 || index === 11) {
     return; // Skip adding a filter for these columns
 }
-                    if (index === 2 || index === 6) { // Assuming date columns are 3 and 8
+                    if (index === 1 || index === 6) { // Assuming date columns are 3 and 8
                         if (d) {
                             var dateObj = new Date(d);
                             var formattedDate = dateObj.toLocaleDateString('en-GB', {
@@ -473,7 +548,6 @@ table.dataTable thead th select {
 
                 // Initialize Select2 on the select element with a custom width to fit the column
                 select.select2({
-                    width: 'resolve', // Resolve the width to fit within the column
                     dropdownAutoWidth: true, // Adjust dropdown width to fit the content
                     placeholder: 'Filter'
                 });
@@ -496,12 +570,76 @@ table.dataTable thead th select {
      function openModalfile(filePath) {
     const baseUrl = "{{ asset('storage/') }}"; // The base URL to the public storage directory
     const fileUrl = baseUrl + '/' + filePath; // Add a slash between baseUrl and filePath
-    console.log('File URL:', fileUrl); // Log the URL to the console
     $('#fileViewer').attr('src', fileUrl);
     $('#fileModal').modal('show');
 }
 $('#fileModal').on('hidden.bs.modal', function () {
     $('#fileViewer').attr('src', '');
+});
+$(document).ready(function () {
+    $(document).on('click', '.update-salesperson', function (e) {
+    e.preventDefault();
+
+    let soId = $(this).data('so-id'); // Get Sales Order ID
+    let currentSalesperson = $(this).data('current-salesperson'); // Get current Salesperson
+
+    // Set Sales Order ID inside the modal's hidden input field
+    $('#salesOrderId').val(soId);
+
+    // Fetch Salespersons via AJAX
+    $.ajax({
+        url: "{{ route('salespersons.list') }}",
+        type: "GET",
+        success: function (response) {
+            let dropdown = $('#salespersonSelect');
+            dropdown.empty();
+            dropdown.append('<option value="">Select Sales Person</option>');
+
+            $.each(response.salespersons, function (key, salesperson) {
+                let selected = (salesperson.name === currentSalesperson) ? 'selected' : '';
+                dropdown.append(`<option value="${salesperson.id}" ${selected}>${salesperson.name}</option>`);
+            });
+
+            // Show the modal
+            $('#updateSalespersonModal').modal('show');
+        }
+    });
+});
+
+
+$('#saveSalesperson').click(function () {
+    let soId = $('#salesOrderId').val(); // Get Sales Order ID
+    let selectedSalespersonId = $('#salespersonSelect').val(); // Get Selected Sales Person ID
+
+    if (!selectedSalespersonId) {
+        alert("Please select a sales person.");
+        return;
+    }
+
+    $.ajax({
+        url: "{{ route('salesorder.updateSalesperson') }}",
+        type: "POST",
+        data: {
+            _token: "{{ csrf_token() }}",
+            sales_order_id: soId, // Send Sales Order ID
+            salesperson_id: selectedSalespersonId
+        },
+        success: function (response) {
+            if (response.success) {
+                alert('Sales Person Updated Successfully!');
+                $('#updateSalespersonModal').modal('hide');
+
+                // Reload DataTable to reflect changes
+                $('#dtBasicExample3').DataTable().ajax.reload();
+            } else {
+                alert('Failed to update Sales Person. Please try again.');
+            }
+        },
+        error: function () {
+            alert('Error updating Sales Person.');
+        }
+    });
+});
 });
 </script>
 @endsection

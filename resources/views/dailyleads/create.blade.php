@@ -164,11 +164,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                     <select id="assignto" name="assignto" class="form-control">
                     <option value="" disabled selected>Select a Sales Person</option>
                         @foreach ($sales_persons as $sales_person)
-                        @php
-                            $sales_person_details = DB::table('users')->where('id', $sales_person->model_id)->first();
-                            $sales_person_name = $sales_person_details->name;
-                        @endphp
-                            <option value="{{ $sales_person->model_id }}">{{ $sales_person_name }}</option>
+                            <option value="{{ $sales_person->id }}">{{ $sales_person->name }}</option>
                         @endforeach
                     </select>
                     </div>

@@ -1,5 +1,9 @@
 @extends('layouts.main')
 <style>
+
+.error {
+  color: red;
+}
 .select2-container {
   width: 100% !important;
 }
@@ -18,9 +22,9 @@
 }
 
 .btn.btn-success.btncenter:hover {
-  background-color: #0000ff;
-  font-size: 17px;
-  border-radius: 5px;
+  background-color: #22973c;
+  /* font-size: 17px; */
+  /* border-radius: 5px; */
 }
 
 /* Responsive Styles */
@@ -73,16 +77,16 @@
     <form action="{{ route('lead_source.store') }}" method="post" enctype="multipart/form-data"> 
     @csrf
                 <div class="row"> 
-					<div class="col-lg-6 col-md-6">
+					<div class="col-lg-3 col-md-4 col-sm-8 col-12">
           <span class="error">*</span>
                         <label for="basicpill-firstname-input" class="form-label">Source Name : </label>
-                        <input type="text" class="form-control" id="basicpill-firstname-input" name="source_name">
+                        <input type="text" class="form-control" id="basicpill-firstname-input" name="source_name" required>
                     </div>
 			        </div>  
                     </br>
                     </br> 
-			        <div class="col-lg-12 col-md-12">
-				    <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
+			        <div class="col-lg-12 col-md-12 text-center">
+				    <input type="submit" name="submit" value="Submit" class="btn btn-success" />
 			        </div>  
                     </form>
                     <br>

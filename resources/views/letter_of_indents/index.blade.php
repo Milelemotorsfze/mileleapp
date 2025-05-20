@@ -1,17 +1,12 @@
 @extends('layouts.table')
 @section('content')
     <style>
-        /* .modal {
-            position: absolute;
-            min-height: 500px;
-        } */
+        
         .widthinput{
             height:32px!important;
 
         }
-        /* body.modal-open {
-            overflow: hidden;
-        } */
+       
     </style>
  
     @can('LOI-list')
@@ -87,7 +82,7 @@
                                     <th>S.No</th>
                                     <th>LOI Number</th>
                                     <th>LOI Date</th>
-                                    <th>Cutsomer Name</th>
+                                    <th>Customer Name</th>
                                     <th>Customer Type</th>
                                     <th>Country</th>
                                     <th>Category</th>
@@ -118,7 +113,7 @@
                                     <th>S.No</th>
                                     <th>LOI Number</th>
                                     <th>LOI Date</th>
-                                    <th>Cutsomer Name</th>
+                                    <th>Customer Name</th>
                                     <th>Customer Type</th>
                                     <th>Country</th>
                                     <th>Category</th>
@@ -150,7 +145,7 @@
                                     <th>S.No</th>
                                     <th>LOI Number</th>
                                     <th>LOI Date</th>
-                                    <th>Cutsomer Name</th>
+                                    <th>Customer Name</th>
                                     <th>Customer Type</th>
                                     <th>Country</th>
                                     <th>Category</th>
@@ -181,7 +176,7 @@
                                     <th>S.No</th>
                                     <th>LOI Number</th>
                                     <th>LOI Date</th>
-                                    <th>Cutsomer Name</th>
+                                    <th>Customer Name</th>
                                     <th>Customer Type</th>
                                     <th>Country</th>
                                     <th>Category</th>

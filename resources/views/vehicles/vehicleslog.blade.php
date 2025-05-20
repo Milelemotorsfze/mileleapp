@@ -90,7 +90,7 @@
     $so_number = $so->so_number ?? '';
     $sales_person_id = $so->sales_person_id ?? '';
     $salesPersonName = $so ? DB::table('users')->where('id', $sales_person_id)->value('name') : '';
-    $grn = $vehicle->grn_id ? DB::table('grn')->where('id', $vehicle->grn_id)->first() : null;
+    $grn = $vehicle->movement_grn_id ? DB::table('movement_grns')->where('id', $vehicle->movement_grn_id)->first() : null;
     $grn_date = $grn ? $grn->date : null;
     $grn_number = $grn ? $grn->grn_number : null;
     $gdn = $vehicle->gdn_id ? DB::table('gdn')->where('id', $vehicle->gdn_id)->first() : null;

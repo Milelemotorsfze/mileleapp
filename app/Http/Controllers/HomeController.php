@@ -26,10 +26,10 @@ class HomeController extends Controller
         $useractivities->activity = "Open the DashBoard";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-    $calls = DB::table('calls')
-    ->select('calls.source', 'calls.location', 'lead_source.source_name')
-    ->join('lead_source', 'calls.source', '=', 'lead_source.id')
-    ->get();
+        $calls = DB::table('calls')
+            ->select('calls.source', 'calls.location', 'lead_source.source_name')
+            ->join('lead_source', 'calls.source', '=', 'lead_source.id')
+            ->get();
         $chartData = [
             'datasets' => []
         ];
@@ -51,149 +51,149 @@ class HomeController extends Controller
                 }
             }
         }
-    $startOfWeek = Carbon::now()->subDays(7)->startOfDay();
-    $endOfWeek = Carbon::now()->endOfDay();
-    $rowsweek = DB::table('calls')
-    ->select('master_model_lines.brand_id', 'calls_requirement.model_line_id', 'calls.location','calls.id  as id', 'calls.custom_brand_model',  DB::raw('COUNT(*) as count'))
-    ->join('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
-    ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
-    ->whereBetween('calls.created_at', [$startOfWeek, $endOfWeek])
-    ->whereNotNull('location')
-    ->whereNotNull('language')
-    ->groupBy('master_model_lines.brand_id', 'calls_requirement.model_line_id', 'calls.location')
-    ->orderByDesc('count')
-    ->limit(8)
-    ->get();
-    $startOfyes = Carbon::now()->subDays(1)->startOfDay();
-    $endOfyes = Carbon::now()->endOfDay();
-    $rowsyesterday = DB::table('calls')
-    ->select('master_model_lines.brand_id', 'calls_requirement.model_line_id', 'calls.location', 'calls.id  as id', 'calls.custom_brand_model', DB::raw('COUNT(*) as count'))
-    ->join('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
-    ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
-    ->whereBetween('calls.created_at', [$startOfyes, $endOfyes])
-    ->whereNotNull('location')
-    ->whereNotNull('language')
-    ->groupBy('master_model_lines.brand_id', 'calls_requirement.model_line_id', 'calls.location')
-    ->orderByDesc('count')
-    ->limit(8)
-    ->get();
-    $startDatethr = Carbon::now()->subDays(30)->startOfDay();
-    $endDatethr = Carbon::now()->endOfDay();
-    $rowsmonth = DB::table('calls')
-    ->select('master_model_lines.brand_id', 'calls_requirement.model_line_id', 'calls.location','calls.id  as id', 'calls.custom_brand_model', DB::raw('COUNT(*) as count'))
-    ->join('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
-    ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
-    ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
-    ->whereBetween('calls.created_at', [$startDatethr, $endDatethr])
-    ->groupBy('master_model_lines.brand_id', 'calls_requirement.model_line_id', 'calls.location')
-    ->whereNotNull('location')
-    ->whereNotNull('language')
-    ->orderByDesc('count')
-    ->limit(8)
-    ->get();
-    $variants = DB::table('varaints as v')
-              ->join('available_colour as ac', 'v.id', '=', 'ac.varaint_id')
-              ->leftJoin('variants_pictures as vp', 'ac.id', '=', 'vp.available_colour_id')
-              ->whereNull('vp.id')
-              ->select('v.*', 'ac.*')
-              ->limit(20)
-              ->get();
-    $countpendingpictures = $variants->count();
-    $reels = DB::table('varaints as v')
-              ->join('available_colour as ac', 'v.id', '=', 'ac.varaint_id')
-              ->leftJoin('variants_reels as vs', 'ac.id', '=', 'vs.available_colour_id')
-              ->whereNull('vs.id')
-              ->select('v.*', 'ac.*')
-              ->limit(20)
-              ->get();
-    $countpendingreels = $reels->count();
-    // Fetch the data from the database
-$last30Days = Carbon::now()->subDays(30);
-$last7Days = Carbon::now()->subDays(7);
-$todayl = Carbon::now();
-$todayl = $todayl->startOfDay();
-$variantsdays = DB::table('varaints as v')
-              ->join('available_colour as ac', 'v.id', '=', 'ac.varaint_id')
-              ->leftJoin('variants_pictures as vp', 'ac.id', '=', 'vp.available_colour_id')
-              ->whereNull('vp.id')
-              ->where('v.created_at', '>=', $last7Days)
-              ->select('v.*', 'ac.*')
-              ->get();
-$countpendingpicturesdays = $variantsdays->count();
-$reelsdays = DB::table('varaints as v')
-              ->join('available_colour as ac', 'v.id', '=', 'ac.varaint_id')
-              ->leftJoin('variants_reels as vs', 'ac.id', '=', 'vs.available_colour_id')
-              ->whereNull('vs.id')
-              ->where('v.created_at', '>=', $last7Days)
-              ->select('v.*', 'ac.*')
-              ->get();
-$countpendingreelsdays = $reelsdays->count();
-$totalleadscounttoday = DB::table('calls')->where('created_at', '>=', $todayl)->count();
-$totalleadscount = DB::table('calls')->where('created_at', '>=', $last30Days)->count();
-$totalleadscount7days = DB::table('calls')->where('created_at', '>=', $last7Days)->count();
-$totalvariantcounttoday = AvailableColour::where('created_at', '>=', $todayl)->count();
-$totalvariantcount = AvailableColour::where('created_at', '>=', $last30Days)->count();
-$totalvariantcount7days = AvailableColour::where('created_at', '>=', $last7Days)->count();
-$totalcalls = DB::table('calls')
-->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as total'))
-->groupBy('date')
-->where('created_at', ">=", $last30Days)
-->get();
+        $startOfWeek = Carbon::now()->subDays(7)->startOfDay();
+        $endOfWeek = Carbon::now()->endOfDay();
+        $rowsweek = DB::table('calls')
+            ->select('master_model_lines.brand_id', 'calls_requirement.model_line_id', 'calls.location','calls.id  as id', 'calls.custom_brand_model',  DB::raw('COUNT(*) as count'))
+            ->join('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+            ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+            ->whereBetween('calls.created_at', [$startOfWeek, $endOfWeek])
+            ->whereNotNull('location')
+            ->whereNotNull('language')
+            ->groupBy('master_model_lines.brand_id', 'calls_requirement.model_line_id', 'calls.location')
+            ->orderByDesc('count')
+            ->limit(8)
+            ->get();
+        $startOfyes = Carbon::now()->subDays(1)->startOfDay();
+        $endOfyes = Carbon::now()->endOfDay();
+        $rowsyesterday = DB::table('calls')
+            ->select('master_model_lines.brand_id', 'calls_requirement.model_line_id', 'calls.location', 'calls.id  as id', 'calls.custom_brand_model', DB::raw('COUNT(*) as count'))
+            ->join('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+            ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+            ->whereBetween('calls.created_at', [$startOfyes, $endOfyes])
+            ->whereNotNull('location')
+            ->whereNotNull('language')
+            ->groupBy('master_model_lines.brand_id', 'calls_requirement.model_line_id', 'calls.location')
+            ->orderByDesc('count')
+            ->limit(8)
+            ->get();
+        $startDatethr = Carbon::now()->subDays(30)->startOfDay();
+        $endDatethr = Carbon::now()->endOfDay();
+        $rowsmonth = DB::table('calls')
+            ->select('master_model_lines.brand_id', 'calls_requirement.model_line_id', 'calls.location','calls.id  as id', 'calls.custom_brand_model', DB::raw('COUNT(*) as count'))
+            ->join('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+            ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+            ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+            ->whereBetween('calls.created_at', [$startDatethr, $endDatethr])
+            ->groupBy('master_model_lines.brand_id', 'calls_requirement.model_line_id', 'calls.location')
+            ->whereNotNull('location')
+            ->whereNotNull('language')
+            ->orderByDesc('count')
+            ->limit(8)
+            ->get();
+        $variants = DB::table('varaints as v')
+            ->join('available_colour as ac', 'v.id', '=', 'ac.varaint_id')
+            ->leftJoin('variants_pictures as vp', 'ac.id', '=', 'vp.available_colour_id')
+            ->whereNull('vp.id')
+            ->select('v.*', 'ac.*')
+            ->limit(20)
+            ->get();
+        $countpendingpictures = $variants->count();
+        $reels = DB::table('varaints as v')
+            ->join('available_colour as ac', 'v.id', '=', 'ac.varaint_id')
+            ->leftJoin('variants_reels as vs', 'ac.id', '=', 'vs.available_colour_id')
+            ->whereNull('vs.id')
+            ->select('v.*', 'ac.*')
+            ->limit(20)
+            ->get();
+        $countpendingreels = $reels->count();
+        // Fetch the data from the database
+        $last30Days = Carbon::now()->subDays(30);
+        $last7Days = Carbon::now()->subDays(7);
+        $todayl = Carbon::now();
+        $todayl = $todayl->startOfDay();
+        $variantsdays = DB::table('varaints as v')
+            ->join('available_colour as ac', 'v.id', '=', 'ac.varaint_id')
+            ->leftJoin('variants_pictures as vp', 'ac.id', '=', 'vp.available_colour_id')
+            ->whereNull('vp.id')
+            ->where('v.created_at', '>=', $last7Days)
+            ->select('v.*', 'ac.*')
+            ->get();
+        $countpendingpicturesdays = $variantsdays->count();
+        $reelsdays = DB::table('varaints as v')
+            ->join('available_colour as ac', 'v.id', '=', 'ac.varaint_id')
+            ->leftJoin('variants_reels as vs', 'ac.id', '=', 'vs.available_colour_id')
+            ->whereNull('vs.id')
+            ->where('v.created_at', '>=', $last7Days)
+            ->select('v.*', 'ac.*')
+            ->get();
+        $countpendingreelsdays = $reelsdays->count();
+        $totalleadscounttoday = DB::table('calls')->where('created_at', '>=', $todayl)->count();
+        $totalleadscount = DB::table('calls')->where('created_at', '>=', $last30Days)->count();
+        $totalleadscount7days = DB::table('calls')->where('created_at', '>=', $last7Days)->count();
+        $totalvariantcounttoday = AvailableColour::where('created_at', '>=', $todayl)->count();
+        $totalvariantcount = AvailableColour::where('created_at', '>=', $last30Days)->count();
+        $totalvariantcount7days = AvailableColour::where('created_at', '>=', $last7Days)->count();
+        $totalcalls = DB::table('calls')
+            ->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as total'))
+            ->groupBy('date')
+            ->where('created_at', ">=", $last30Days)
+            ->get();
 
-// Initialize the labels and data arrays
-$labelss = [];
-$data = [];
+        // Initialize the labels and data arrays
+        $labelss = [];
+        $data = [];
 
-// Loop through the results and populate the arrays
-foreach ($totalcalls as $totalcall) {
-    $date = \Carbon\Carbon::parse($totalcall->date)->format('d-M-Y');
-    $labelss[] = $date;
-    $data[] = $totalcall->total;
-}
+        // Loop through the results and populate the arrays
+        foreach ($totalcalls as $totalcall) {
+            $date = \Carbon\Carbon::parse($totalcall->date)->format('d-M-Y');
+            $labelss[] = $date;
+            $data[] = $totalcall->total;
+        }
 
-// Define the chart data object
-$totalleads = [
-    'labels' => $labelss,
-    'datasets' => [
-        [
-            'data' => $data,
-            'borderColor' => 'rgb(255, 99, 132)',
-            'backgroundColor' => 'transparent',
-            'tension' => 0.1
-        ]
-    ]
-];
-$totalvariants = DB::table('available_colour')
-->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as total'))
-->groupBy('date')
-->where('created_at', ">=", $last30Days)
-->get();
+        // Define the chart data object
+        $totalleads = [
+            'labels' => $labelss,
+            'datasets' => [
+                [
+                    'data' => $data,
+                    'borderColor' => 'rgb(255, 99, 132)',
+                    'backgroundColor' => 'transparent',
+                    'tension' => 0.1
+                ]
+            ]
+        ];
+        $totalvariants = DB::table('available_colour')
+            ->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as total'))
+            ->groupBy('date')
+            ->where('created_at', ">=", $last30Days)
+            ->get();
 
-// Initialize the labels and data arrays
-$labelsss = [];
-$data = [];
+        // Initialize the labels and data arrays
+        $labelsss = [];
+        $data = [];
 
-// Loop through the results and populate the arrays
-foreach ($totalvariants as $totalvariants) {
-    $dates = \Carbon\Carbon::parse($totalvariants->date)->format('d-M-Y');
-    $labelsss[] = $dates;
-    $data[] = $totalvariants->total;
-}
+        // Loop through the results and populate the arrays
+        foreach ($totalvariants as $totalvariants) {
+            $dates = \Carbon\Carbon::parse($totalvariants->date)->format('d-M-Y');
+            $labelsss[] = $dates;
+            $data[] = $totalvariants->total;
+        }
 
-// Define the chart data object
-$totalvariantss = [
-    'labels' => $labelsss,
-    'datasets' => [
-        [
-            'data' => $data,
-            'borderColor' => 'rgb(255, 99, 132)',
-            'backgroundColor' => 'transparent',
-            'tension' => 0.1
-        ]
-    ]
-];
+        // Define the chart data object
+        $totalvariantss = [
+            'labels' => $labelsss,
+            'datasets' => [
+                [
+                    'data' => $data,
+                    'borderColor' => 'rgb(255, 99, 132)',
+                    'backgroundColor' => 'transparent',
+                    'tension' => 0.1
+                ]
+            ]
+        ];
 
-      /////// parts procurment dashbaord ////////////
+        /////// parts procurment dashbaord ////////////
         $addonSellingPrices = AddonSellingPrice::with('addonDetails');
 
         $pendingSellingPrices = $addonSellingPrices->whereHas('addonDetails', function ($query){
@@ -223,23 +223,23 @@ $totalvariantss = [
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-log-activity');
         if ($hasPermission)
         {
-    $sales_persons_w = ModelHasRoles::where('role_id', 7)
-    ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-    ->where('users.status', 'active')
-    ->where('users.sales_rap', 'Yes')
-    ->get();
-    $leadsCount = DB::table('calls')
-    ->join('users', 'calls.sales_person', '=', 'users.id')
-    ->where('calls.status', '=', 'New')
-    ->whereIn('calls.sales_person', $sales_persons_w->pluck('id')->toArray())
-    ->groupBy('users.name')
-    ->select('users.name as salespersonname', DB::raw('count(*) as lead_count'), 'calls.*')
-    ->get();
-    $sales_personsname = ModelHasRoles::where('role_id', 7)
-    ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-    ->where('users.status', 'active')
-    ->where('users.sales_rap', 'Yes')
-    ->get();
+            $sales_persons_w = ModelHasRoles::where('role_id', 7)
+                ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+                ->where('users.status', 'active')
+                ->where('users.sales_rap', 'Yes')
+                ->get();
+            $leadsCount = DB::table('calls')
+                ->join('users', 'calls.sales_person', '=', 'users.id')
+                ->where('calls.status', '=', 'New')
+                ->whereIn('calls.sales_person', $sales_persons_w->pluck('id')->toArray())
+                ->groupBy('users.name')
+                ->select('users.name as salespersonname', DB::raw('count(*) as lead_count'), 'calls.*')
+                ->get();
+            $sales_personsname = ModelHasRoles::where('role_id', 7)
+                ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+                ->where('users.status', 'active')
+                ->where('users.sales_rap', 'Yes')
+                ->get();
         }
         else{
             $sales_personsname = [];
@@ -302,10 +302,10 @@ $totalvariantss = [
             $commissons = [];
         }
         $dataforpie = DB::table('lead_rejection')
-        ->select('Reason', DB::raw('count(*) as count'))
-        ->whereNotNull('Reason') // Exclude null values
-        ->groupBy('Reason')
-        ->get();
+            ->select('Reason', DB::raw('count(*) as count'))
+            ->whereNotNull('Reason') // Exclude null values
+            ->groupBy('Reason')
+            ->get();
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('dp-dashboard');
         if ($hasPermission) {
             $dpdashboarduae = DB::table('vehicles')
@@ -316,12 +316,12 @@ $totalvariantss = [
             ->join('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
             ->where('brands.brand_name', 'Toyota')
             ->where('varaints.is_dp_variant', 'Yes')
-            ->where('vehicles.latest_location', '!=', 38)
+            ->whereNotIn('vehicles.latest_location', ['102', '153', '147', '38'])
             ->where('purchasing_order.is_demand_planning_po', true)
             ->select('varaints.name as variant_name', 'varaints.id as varaints_id')
             ->distinct()
             ->get();
-            $dpdashboardnon = DB::table('vehicles')
+        $dpdashboardnon = DB::table('vehicles')
             ->join('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
             ->join('brands', 'varaints.brands_id', '=', 'brands.id')
             ->join('color_codes as int_colours', 'vehicles.int_colour', '=', 'int_colours.id')
@@ -330,23 +330,24 @@ $totalvariantss = [
             ->where('brands.brand_name', 'Toyota')
             ->where('varaints.is_dp_variant', 'Yes')
             ->where('vehicles.latest_location', '=', 38)
+            ->whereNotIn('vehicles.latest_location', ['102', '153', '147'])
             ->where('purchasing_order.is_demand_planning_po', true)
             ->select('varaints.name as variant_name', 'varaints.id as varaints_id')
             ->distinct()
             ->get();
             return view('home', compact('totalleadscounttoday','totalvariantcounttoday','chartData',
-            'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days',
-            'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays',
-            'countpendingreels', 'countpendingreelsdays','pendingSellingPrices','withOutSellingPrices','recentlyAddedAccessories',
-             'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname','dpdashboarduae','dpdashboardnon','undersalesleads','commissons','dataforpie'));
+                'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days',
+                'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays',
+                'countpendingreels', 'countpendingreelsdays','pendingSellingPrices','withOutSellingPrices','recentlyAddedAccessories',
+                'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname','dpdashboarduae','dpdashboardnon','undersalesleads','commissons','dataforpie'));
         }
         else
         {
             return view('home', compact('totalleadscounttoday','totalvariantcounttoday','chartData',
-            'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days',
-            'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays',
-            'countpendingreels', 'countpendingreelsdays','pendingSellingPrices','withOutSellingPrices','recentlyAddedAccessories',
-             'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname','undersalesleads','commissons','dataforpie'));
+                'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days',
+                'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays',
+                'countpendingreels', 'countpendingreelsdays','pendingSellingPrices','withOutSellingPrices','recentlyAddedAccessories',
+                'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname','undersalesleads','commissons','dataforpie'));
         }
     }
     public function marketingupdatechart(Request $request)

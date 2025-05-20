@@ -47,13 +47,16 @@ class WOVehicleDeliveryStatusController extends Controller
         $workOrder = $woVehicle->workOrder;
 
         // Retrieve email addresses from the users table where can_send_wo_email is true
-        $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function($email) {
+        $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function ($email) {
             return filter_var($email, FILTER_VALIDATE_EMAIL);
         })->toArray();
         // Retrieve and validate other recipients' emails
         $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL);
         $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
         $salesPersonEmail = filter_var(optional($workOrder->salesPerson)->email, FILTER_VALIDATE_EMAIL);
+        // Fetch `DONT_SEND_EMAIL` and `REDIRECT_SALES_EMAIL_TO` from .env
+        $dontSendEmail = env('DONT_SEND_EMAIL');
+        $redirectSalesEmailTo = filter_var(env('REDIRECT_SALES_EMAIL_TO'), FILTER_VALIDATE_EMAIL);
         // $customerEmail = filter_var($workOrder->customer_email ?? null, FILTER_VALIDATE_EMAIL);
         $customerEmail = '';
         // Log email recipients for debugging
@@ -70,9 +73,15 @@ class WOVehicleDeliveryStatusController extends Controller
         if ($createdByEmail) {
             $recipients[] = $createdByEmail;
         }
-        // Add salesPersonEmail if it meets the condition
+        // Handle salesPersonEmail conditions
         if ($workOrder->salesPerson && $salesPersonEmail && $createdByEmail !== $salesPersonEmail) {
-            $recipients[] = $salesPersonEmail;
+            if ($salesPersonEmail !== $dontSendEmail) {
+                // If salesperson's email is not blocked, add it
+                $recipients[] = $salesPersonEmail;
+            } elseif ($salesPersonEmail === $dontSendEmail && $redirectSalesEmailTo) {
+                // Redirect email if salesPersonEmail matches DONT_SEND_EMAIL
+                $recipients[] = $redirectSalesEmailTo;
+            }
         }
 
         // Add customer email for "Ready" status

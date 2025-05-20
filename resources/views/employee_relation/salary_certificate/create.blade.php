@@ -6,6 +6,11 @@
     .hidden {
         display: none;
     }
+
+    .custom-error {
+        color: red !important; 
+    }
+
 </style>
 @section('content')
 <div class="card-header">
@@ -150,6 +155,14 @@
                 }
             },
         },
+        errorPlacement: function(error, element) {
+            error.addClass('custom-error');
+            if (element.attr("name") === "requested_for") {
+                error.insertAfter(element.next('.select2'));
+            } else {
+                error.insertAfter(element);
+            }
+        }
     });
 </script>
 @endpush

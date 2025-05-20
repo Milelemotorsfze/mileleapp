@@ -369,6 +369,7 @@ class AddonController extends Controller {
                             if($AddonTypes->is_all_model_lines == 'yes') {
                                 $html .= ' All Model Lines';
                             }
+  
                             $html .= '</div>
                                     <div class="testtransform divcolor labellist databack1 addon-'.$addon->id.'-model-number-'.$key.' col-xxl-5 col-lg-5 col-md-5 col-sm-5 col-5">
                                         '.$AddonTypes->modelDescription->model_description.'
@@ -536,9 +537,6 @@ class AddonController extends Controller {
                       $html .=              '</td>
                                         </tr>';
                 }else{
-            //                      info("inside addon types");
-            //                      info($addon->id);
-            //                      info($addon->AddonTypes);
                       $AddonTypes = AddonTypes::where('addon_details_id', $addon->id)->get();
                       foreach($AddonTypes as $key => $AddonTypes) {
 

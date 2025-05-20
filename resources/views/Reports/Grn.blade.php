@@ -100,11 +100,23 @@
             <table class="basic-info-table">
                 <tr>
                     <th>Date:</th>
-                    <td>{{ date('d/M/Y', strtotime($grn->date)) }}</td>
+                    <td>{{ date('d/M/Y', strtotime($grn_date)) }}</td>
                 </tr>
                 <tr>
                     <th>VIN:</th>
                     <td>{{$vehicle->vin}}</td>
+                </tr>
+                <tr>
+                    <th>Engine Number:</th>
+                    <td>{{$vehicle->engine}}</td>
+                </tr>
+                <tr>
+                    <th>Variant Name:</th>
+                    <td>{{$variant->name}}</td>
+                </tr>
+                <tr>
+                    <th>Model Year:</th>
+                    <td>{{$variant->my}}</td>
                 </tr>
                 <tr>
                     <th>Make & Model:</th>

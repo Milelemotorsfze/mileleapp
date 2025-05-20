@@ -87,11 +87,17 @@ input[type=number]::-webkit-outer-spin-button {
             <label for="basicpill-firstname-input" class="form-label">PO Date : </label>
             <input type="Date" id="po_date" name="po_date" class="form-control" placeholder="PO Date" required value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
         </div>
-        <div class="col-lg-1 col-md-6">
-            <span class="error">* </span>
-            <label for="basicpill-firstname-input" class="form-label">Netsuit PO: </label>
-            <input type="text" id="po_number" name="po_number" class="form-control" placeholder="PO Number" required>
+        <div class="col-lg-2 col-md-6" style="margin-bottom: 15px;">
+        <span class="error">*</span>
+        <label for="po_number" class="form-label" style="display: block; margin-bottom: 5px;">Netsuit PO: </label>
+        <div style="display: flex; align-items: center;">
+            <span style="margin-right: 5px; font-weight: bold;">PO-</span>
+            <input type="text" id="po_number" name="po_number" class="form-control" 
+                   style="flex-grow: 1; padding: 5px; border: 1px solid #ced4da; border-radius: 4px;" 
+                   placeholder="Enter PO Number" required>
         </div>
+        <span id="po_error_message" style="color: red; font-size: 12px; margin-top: 5px; display: block;"></span>
+    </div>
         <div class="col-lg-2 col-md-6">
             <span class="error">* </span>
             <label for="basicpill-firstname-input" class="form-label">Payment Terms : </label>
@@ -114,7 +120,7 @@ input[type=number]::-webkit-outer-spin-button {
                                 @endforeach
             </select>
         </div>
-        <div class="col-lg-2 col-md-6">
+        <div class="col-lg-1 col-md-6">
             <span class="error">* </span>
             <label for="basicpill-firstname-input" class="form-label">PO Type: </label>
             <select class="form-control" autofocus name="po_type" required>
@@ -132,6 +138,9 @@ input[type=number]::-webkit-outer-spin-button {
                                     <option value="GBP">GBP</option>
                                     <option value="JPY">JPY</option>
                                     <option value="CAD">CAD</option>
+                                    <option value="AUD">AUD</option>
+                                    <option value="PHP">PHP</option>
+                                    <option value="SAR">SAR</option>
             </select>
         </div>
         <div class="col-lg-2 col-md-6">
@@ -542,6 +551,23 @@ intColourDropdown.select2({
         $('#fd').select2();
         $('#pol').select2();
         $('#pod').select2();
+    });
+</script>
+<script>
+    const poInput = document.getElementById('po_number');
+    const poErrorMessage = document.getElementById('po_error_message');
+
+    poInput.addEventListener('input', function () {
+        const regex = /^\d{6,}$/; // Pattern: At least 6 digits
+        const value = poInput.value;
+
+        if (!regex.test(value)) {
+            poErrorMessage.textContent = "Please enter at least 6 digits after 'PO-' (e.g., 123456 or more).";
+            poInput.setCustomValidity("Invalid");
+        } else {
+            poErrorMessage.textContent = "";
+            poInput.setCustomValidity("");
+        }
     });
 </script>
 @endpush

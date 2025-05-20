@@ -37,19 +37,35 @@ class SendWOBOEStatusEmail extends Command
         })->filter(function ($boe) {
             return $boe->vehicles->isNotEmpty();  // Keep only if there are valid vehicles
         });
-
+        // Fetch team emails from the .env file
+        $salesSupportEmail = env('SALESUPPORT_TEAM_EMAIL');
+        $logisticsTeamEmail = env('LOGISTICS_TEAM_EMAIL');
+        $wareHouseTeamEmail = env('WAREHOUSE_TEAM_EMAIL');
+        $dontSendEmail = env('DONT_SEND_EMAIL');
+    
         // Send email notifications to each salesperson
         foreach ($filteredBoes as $boe) {
-            // Access the related salesperson through the work order relationship
             $salesperson = $boe->workOrder->salesPerson;
-
-            // Fetch team emails from the .env file
-            $salesSupportEmail = env('SALESUPPORT_TEAM_EMAIL');
-            $logisticsTeamEmail = env('LOGISTICS_TEAM_EMAIL');
-            $developerEmail = env('DEVELOPER_EMAIL');
-            // Send email to the salesperson's email and team emails from .env file
-            Mail::to([$salesperson->email, $salesSupportEmail, $logisticsTeamEmail,$developerEmail])
-                ->send(new WOBOEStatusMail($boe, $salesperson));
+            $salespersonEmail = $salesperson->email ?? null; // Ensure email exists
+    
+            // Determine recipient list based on work order type
+            if ($boe->workOrder->type === 'export_cnf') {
+                // Send email only to the logistics team for export_cnf type
+                $recipients = [$logisticsTeamEmail];
+            } else {
+                // Send email to team emails, and only include the salesperson if not in DONT_SEND_EMAIL
+                $recipients = [
+                    $salesSupportEmail,
+                    $logisticsTeamEmail,
+                    $wareHouseTeamEmail
+                ];
+    
+                if ($salespersonEmail && $salespersonEmail !== $dontSendEmail) {
+                    $recipients[] = $salespersonEmail;
+                }
+            }
+            // Send email to the determined recipient list
+            Mail::to($recipients)->send(new WOBOEStatusMail($boe, $salesperson));
         }
 
         $this->info('WOBOE status emails have been sent successfully.');

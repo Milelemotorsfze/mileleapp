@@ -5,6 +5,9 @@
      div.dataTables_wrapper div.dataTables_info {
   padding-top: 0px;
 }
+    .quotation-items-addons {
+        padding-left: 10px;
+    }
 .my-select2-dropdown {
     z-index: 99999;
 }
@@ -13,7 +16,7 @@
     z-index: 99999;
 }
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
-  padding: 4px 8px 4px 8px;
+  /* padding: 4px 8px 4px 8px; */
   text-align: center;
   vertical-align: middle;
 }
@@ -286,10 +289,10 @@
             </div>
             <div class="col-sm-4">
                 <div class="row">
-                    <div class="col-sm-2">
+                    <div class="col-sm-4">
                         Category :
                     </div>
-                                        <div class="col-sm-4">
+                    <div class="col-sm-8">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input shipping_method @error('shipping_method') is-invalid @enderror" type="checkbox"
                                 name="shipping_method" id="CNF" value="CNF" <?php echo ($quotation->shipping_method == 'CNF') ? 'checked' : ''; ?>>
@@ -310,10 +313,32 @@
             </div>
             <div class="col-sm-4">
                 <div class="row">
-                    <div class="col-sm-2">
+                    <div class="col-sm-4">
+                        Nature of Deal :
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="nature_of_deal" id="regular_deal"
+                                value="regular_deal" required
+                                {{ (old('nature_of_deal', $quotation->nature_of_deal ?? '') == 'regular_deal') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="regular_deal">Regular deal</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="nature_of_deal" id="letter_of_credit"
+                                value="letter_of_credit" required
+                                {{ (old('nature_of_deal', $quotation->nature_of_deal ?? '') == 'letter_of_credit') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="letter_of_credit">Letter of credit</label>
+                        </div>
+                    </div>
+                    <div id="nature-of-deal-error" class="text-danger" style="display: none;"></div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="row">
+                    <div class="col-sm-4">
                         Currency :
                     </div>
-                     <div class="col-sm-4">
+                     <div class="col-sm-6">
                     <select class="form-select" name="currency" id="currency">
                         <option <?php echo ($quotation->currency == 'AED') ? 'selected' : ''; ?>>AED</option>
                         <option <?php echo ($quotation->currency == 'USD') ? 'selected' : ''; ?>>USD</option>
@@ -326,13 +351,13 @@
         <hr>
         <div class="row">
             <div class="col-sm-4">
-                Document Details
+                <strong>Document Details </strong>
             </div>
             <div class="col-sm-4">
-                Client's Details
+                <strong>Client's Details </strong>
             </div>
             <div class="col-sm-4">
-                Delivery Details
+                <strong>Delivery Details </strong>
             </div>
         </div>
         <hr>
@@ -343,14 +368,16 @@
                         <label for="timeRange">Document Validity:</label>
                     </div>
                     <div class="col-sm-6">
-                    <select id="timeRange" name="document_validity" class="form-select">
-                        <option value="1" <?php echo ($quotation_details->document_validity == '1') ? 'selected' : ''; ?>>1 day</option>
-                        <option value="7" <?php echo ($quotation_details->document_validity == '7') ? 'selected' : ''; ?>>7 days</option>
-                        <option value="14" <?php echo ($quotation_details->document_validity == '14') ? 'selected' : ''; ?>>14 days</option>
-                        <option value="30" <?php echo ($quotation_details->document_validity == '30') ? 'selected' : ''; ?>>30 days</option>
-                        <option value="60" <?php echo ($quotation_details->document_validity == '60') ? 'selected' : ''; ?>>60 days</option>
-                    </select>
-                </div>
+                        <?php if(isset($quotation_details)): ?>
+                            <select id="timeRange" name="document_validity" class="form-select">
+                                <option value="1" <?= ($quotation_details->document_validity == '1') ? 'selected' : ''; ?>>1 day</option>
+                                <option value="7" <?= ($quotation_details->document_validity == '7') ? 'selected' : ''; ?>>7 days</option>
+                                <option value="14" <?= ($quotation_details->document_validity == '14') ? 'selected' : ''; ?>>14 days</option>
+                                <option value="30" <?= ($quotation_details->document_validity == '30') ? 'selected' : ''; ?>>30 days</option>
+                                <option value="60" <?= ($quotation_details->document_validity == '60') ? 'selected' : ''; ?>>60 days</option>
+                            </select>
+                        <?php endif; ?>
+                    </div>
                 </div>
                 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
@@ -361,19 +388,19 @@
                         Sales Person :
                     </div>
                     <div class="col-sm-6">
-    <select id="salespersons" name="salespersons" class="form-select" required>
-        @foreach ($sales_persons as $sales_person)
-            @php
-                $sales_person_details = DB::table('users')->where('id', $sales_person->model_id)->first();
-                $sales_person_name = $sales_person_details->name;
-                $selected = ($sales_person->model_id == $quotation->created_by) ? 'selected' : '';
-            @endphp
-            <option value="{{ $sales_person->model_id }}" {{ $selected }}>{{ $sales_person_name }}</option>      
-        @endforeach
-    </select>
-</div>
+                        <select id="salespersons" name="salespersons" class="form-select" required>
+                        <option disabled selected>Select a Salesperson</option>
+                        @if(!empty($sales_persons) && $sales_persons->count())
+                            @foreach ($sales_persons as $sales_person)
+                            <option value="{{ $sales_person->id }}" {{ ($quotation?->created_by == $sales_person->id) ? 'selected' : '' }}>{{ $sales_person->name }}</option>
+                            @endforeach
+                        @else
+                            <option disabled>No salespersons available</option>
+                        @endif
+                        </select>
+                    </div>
                 </div>
-                    @else
+                @else
                 @php
                 $user = \Illuminate\Support\Facades\Auth::user();
                 $empProfile = $user->empProfile;
@@ -383,7 +410,7 @@
                         Sales Person :
                     </div>
                     <div class="col-sm-6">
-                        {{ Auth::user()->name }}
+                    {{ $quotation->createdBy->name ?? ''}}
                     </div>
                 </div>
                 <div class="row mt-2">
@@ -482,11 +509,11 @@
                         <div class="col-sm-6">
                         <select name="incoterm" id="incoterm" class="form-control form-control-xs">
                             <option></option>
-                            <option value="EXW" {{ ($quotation_details->incoterm == 'EXW') ? 'selected' : '' }}>EXW</option>
-                            <option value="CNF" {{ ($quotation_details->incoterm == 'CNF') ? 'selected' : '' }}>CNF</option>
-                            <option value="CIF" {{ ($quotation_details->incoterm == 'CIF') ? 'selected' : '' }}>CIF</option>
-                            <option value="FOB" {{ ($quotation_details->incoterm == 'FOB') ? 'selected' : '' }}>FOB</option>
-                            <option value="Local Registration" {{ ($quotation_details->incoterm == 'Local Registration') ? 'selected' : '' }}>Local Registration</option>
+                            <option value="EXW" {{ ($quotation_details?->incoterm == 'EXW') ? 'selected' : '' }}>EXW</option>
+                            <option value="CNF" {{ ($quotation_details?->incoterm == 'CNF') ? 'selected' : '' }}>CNF</option>
+                            <option value="CIF" {{ ($quotation_details?->incoterm == 'CIF') ? 'selected' : '' }}>CIF</option>
+                            <option value="FOB" {{ ($quotation_details?->incoterm == 'FOB') ? 'selected' : '' }}>FOB</option>
+                            <option value="Local Registration" {{ ($quotation_details?->incoterm == 'Local Registration') ? 'selected' : '' }}>Local Registration</option>
                         </select>
                     </div>
                     </div>
@@ -495,12 +522,15 @@
                             Port of Loading :
                         </div>
                         <div class="col-sm-6">
-                            <select class="form-control col" id="to_shipping_port" multiple name="to_shipping_port_id" style="width: 100%">
-                                <option></option>
-                                @foreach($shippingPorts as $shippingPort)
-                                    <option value="{{ $shippingPort->id }}" {{ ($quotation_details->to_shipping_port_id == $shippingPort->id) ? 'selected' : '' }}>{{ $shippingPort->name }}</option>
-                                @endforeach
-                            </select>
+                        <select class="form-control col" id="to_shipping_port" multiple name="to_shipping_port_id" style="width: 100%">
+                            <option></option>
+                            @foreach($shippingPorts as $shippingPort)
+                                <option value="{{ $shippingPort->id }}"
+                                    {{ ($quotation_details?->to_shipping_port_id == $shippingPort->id) ? 'selected' : '' }}>
+                                    {{ $shippingPort->name }}
+                                </option>
+                            @endforeach
+                        </select>
                         </div>
                     </div>
                 </div>
@@ -509,12 +539,15 @@
                             Final Destination :
                         </div>
                         <div class="col-sm-6">
-                            <select class="form-control col" id="country" name="country_id" style="width: 100%">
-                                <option></option>
-                                @foreach($countries as $country)
-                                    <option value="{{ $country->id }}" {{ ($quotation_details->country_id == $country->id) ? 'selected' : '' }}>{{ $country->name }}</option>
-                                @endforeach
-                            </select>
+                        <select class="form-control col" id="country" name="country_id" style="width: 100%">
+                            <option></option>
+                            @foreach($countries as $country)
+                                <option value="{{ $country->id }}"
+                                    {{ ($quotation_details?->country_id == $country->id) ? 'selected' : '' }}>
+                                    {{ $country->name }}
+                                </option>
+                            @endforeach
+                        </select>
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -522,10 +555,13 @@
                             Country Of Discharge :
                         </div>
                         <div class="col-sm-6">
-                        <select name="countryofdischarge" id="countryofdischarge" class="form-control form-control-xs">
-                        <option disabled selected>Select Country Of Discharge</option>
+                            <select name="countryofdischarge" id="countryofdischarge" class="form-control form-control-xs">
+                                <option disabled selected>Select Country Of Discharge</option>
                                 @foreach($countries as $country)
-                                <option value="{{ $country->id }}" {{ ($quotation_details->delivery_country == $country->id) ? 'selected' : '' }}>{{ $country->name }}</option>
+                                    <option value="{{ $country->id }}"
+                                        {{ ($quotation_details?->delivery_country == $country->id) ? 'selected' : '' }}>
+                                        {{ $country->name }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -535,13 +571,16 @@
                             Port of Discharge :
                         </div>
                         <div class="col-sm-6">
-                        <select class="form-control col" id="shipping_port" name="from_shipping_port_id" style="width: 100%">
-                            <option></option>
-                            @foreach($shippingPorts as $port)
-                                <option value="{{ $port->id }}" {{ ($quotation_details->shipping_port_id == $port->id) ? 'selected' : '' }}>{{ $port->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                            <select class="form-control col" id="shipping_port" name="from_shipping_port_id" style="width: 100%">
+                                <option></option>
+                                @foreach($shippingPorts as $port)
+                                    <option value="{{ $port->id }}"
+                                        {{ ($quotation_details?->shipping_port_id == $port->id) ? 'selected' : '' }}>
+                                        {{ $port->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     
                 <div class="row mt-2" hidden id="local-shipment">
@@ -549,7 +588,8 @@
                         Place of Supply :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="place_of_supply" readonly id="place_of_supply" class="form-control form-control-xs" placeholder="Place Of Supply" value="{{$quotation_details->place_of_supply}}">
+                    <input type="text" name="place_of_supply" readonly id="place_of_supply" class="form-control form-control-xs" placeholder="Place Of Supply"
+                        value="{{ $quotation_details?->place_of_supply }}">
                     </div>
                 </div>
             </div>
@@ -557,10 +597,10 @@
         <hr>
         <div class="row mt-2">
             <div class="col-sm-4">
-                Payment Details
+               <strong> Payment Details </strong>
             </div>
             <div class="col-sm-8">
-                Client's Representative
+               <strong> Client's Representative </strong>
             </div>
         </div>
         <hr>
@@ -579,7 +619,8 @@
                         Payment Terms :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="payment_terms" id="payment_terms" class="form-control form-control-xs" placeholder="Payment Terms" value="{{$quotation_details->payment_terms}}">
+                    <input type="text" name="payment_terms" id="payment_terms" class="form-control form-control-xs" placeholder="Payment Terms"
+                        value="{{ $quotation_details?->payment_terms ?? '' }}">
                     </div>
                 </div>
             </div>
@@ -589,7 +630,8 @@
                         Rep Name :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="representative_name" id="representative_name" class="form-control form-control-xs" placeholder="Rep. Name" value="{{$quotation_details->representative_name}}">
+                    <input type="text" name="representative_name" id="representative_name" class="form-control form-control-xs" placeholder="Rep. Name"
+                        value="{{ $quotation_details?->representative_name ?? '' }}">
                     </div>
                 </div>
                 <div class="row mt-2">
@@ -597,7 +639,8 @@
                         Rep No :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="representative_number" id="representative_number" class="form-control form-control-xs" placeholder="Rep. Number" value="{{$quotation_details->representative_number}}">
+                    <input type="text" name="representative_number" id="representative_number" class="form-control form-control-xs" placeholder="Rep. Number"
+                        value="{{ $quotation_details?->representative_number ?? '' }}">
                     </div>
                 </div>
             </div>
@@ -634,7 +677,7 @@
                     </div>
                 </div>
                 <br>
-                <button class="float-end" type="button" onclick="addMoreAgents()">+ Add More Agent</button>
+                <button class="float-end btn btn-primary" type="button" onclick="addMoreAgents()">+ Add More Agent</button>
             </div>
             <div class="col-sm-4"  id="advance-amount-div" hidden>
                 <div class="row mt-2">
@@ -642,8 +685,9 @@
                         Advance Amount :
                     </div>
                     <div class="col-sm-6">
-                        <input type="number" min="0" class="form-control form-control-xs advance-amount"
-                               name="advance_amount" id="advance-amount" placeholder="Advance Amount" value="{{$quotation_details->advance_amount}}">
+                    <input type="number" min="0" class="form-control form-control-xs advance-amount"
+                        name="advance_amount" id="advance-amount" placeholder="Advance Amount"
+                        value="{{ $quotation_details?->advance_amount ?? '' }}">
                     </div>
                 </div>
             </div>
@@ -653,9 +697,10 @@
                         Payment Due Date :
                     </div>
                     <div class="col-sm-6">
-                        <input type="date" min="0" class="form-control form-control-xs due-date"
-                               name="due_date" id="due-date" placeholder="Due Date" value="{{$quotation_details->due_date}}">
-                        <span class="required-message" style="display: none; color: red;">This field is required</span>
+                    <input type="date" min="0" class="form-control form-control-xs due-date"
+                        name="due_date" id="due-date" placeholder="Due Date"
+                        value="{{ $quotation_details?->due_date ?? '' }}">
+                    <span class="required-message" style="display: none; color: red;">This field is required</span>
                     </div>
                 </div>
             </div>
@@ -668,8 +713,13 @@
                     <select name="select_bank" class="form-control">
                         <option value="rak-aed">RAK BANK AED</option>
                         <option value="rak-usd">RAK BANK USD</option>
-                        <option value="city-aed">CITY BANK AED</option>
-                        <option value="city-usd">CITY BANK USD</option>
+                        <option value="rak-eur">RAK BANK EUR</option>
+                        <option value="rak-aud">RAK BANK AUD</option>
+                        <option value="rak-jpy">RAK BANK JPY</option>
+                        <option value="hbz-aed">HBZ BANK AED</option>
+                        <option value="hbz-usd">HBZ BANK USD</option>
+                        <option value="hbz-eur">HBZ BANK EUR</option>
+                        <option value="hbz-jpy">HBZ BANK JPY</option>
                     </select>
                     </div>
                 </div>
@@ -752,37 +802,37 @@
         </div>
         <br>
         <div class="row">
-            <div class="col-lg-1 col-md-2 col-sm-12">
-                <input type="radio" id="showVehicles" name="contentType">
-                <label for="showVehicles">Add Vehicles</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showVehicles" name="contentType" data-target="#vehiclesContent">
+                <label for="showVehicles" class="quotation-items-addons">Add Vehicles</label>
             </div>
-            <div class="col-lg-1 col-md-3 col-sm-12">
-            <input type="radio" id="showAccessories" name="contentType">
-                <label for="showAccessories">Add Accessories</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showAccessories" name="contentType" data-target="#accessoriesContent">
+                <label for="showAccessories" class="quotation-items-addons">Add Accessories</label>
             </div>
-            <div class="col-lg-1 col-md-3 col-sm-12">
-            <input type="radio" id="showSpareParts" name="contentType">
-                <label for="showSpareParts">Add Spare Parts</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showSpareParts" name="contentType" data-target="#sparePartsContent">
+                <label for="showSpareParts" class="quotation-items-addons">Add Spare Parts</label>
             </div>
-            <div class="col-lg-1 col-md-2 col-sm-12">
-            <input type="radio" id="showKits" name="contentType">
-                <label for="showKits">Add Kits</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showKits" name="contentType" data-target="#kitsContent">
+                <label for="showKits" class="quotation-items-addons">Add Kits</label>
             </div>
-            <div class="col-lg-1 col-md-2 col-sm-12">
-            <input type="radio" id="showShipping" name="contentType">
-                <label for="showShipping">Add Shipping</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showShipping" name="contentType" data-target="#shippingContent">
+                <label for="showShipping" class="quotation-items-addons">Add Shipping</label>
             </div>
-            <div class="col-lg-2 col-md-3 col-sm-12">
-                <input type="radio" id="showShippingDocuments" name="contentType">
-                <label for="showShippingDocuments">Add Shipping Documents</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showShippingDocuments" name="contentType" data-target="#shippingDocumentContent">
+                <label for="showShippingDocuments" class="quotation-items-addons">Add Shipping Documents</label>
             </div>
-            <div class="col-lg-1 col-md-2 col-sm-12">
-            <input type="radio" id="showCertificates" name="contentType">
-                <label for="showCertificates"> Certificate</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showCertificates" name="contentType" data-target="#certificateContent">
+                <label for="showCertificates" class="quotation-items-addons">Certificate</label>
             </div>
-            <div class="col-lg-1 col-md-2 col-sm-12">
-            <input type="radio" id="showOthers" name="contentType">
-                <label for="showOthers">Add Other</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showOthers" name="contentType" data-target="#otherContent">
+                <label for="showOthers" class="quotation-items-addons">Add Other</label>
             </div>
         </div>
         <div id="vehiclesContent" class="contentveh">
@@ -1414,6 +1464,40 @@
 @endsection
 @push('scripts')
 <script>
+function validateVehicleQuantity(input, model_type, quotation_id, additionalData) {
+    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+    var quotationId = "{{ $quotation_details->quotation_id ?? '' }}";
+    if (model_type !== 'Vehicle') {
+        console.log("Validation skipped as model_type is not 'Vehicle'.");
+        return;
+    }
+
+    var newQty = parseInt(input.value);
+
+    $.ajax({
+        url: '{{ route("check.vehicle.quantity") }}',
+        type: 'POST',
+        data: {
+            _token: csrfToken,
+            quotation_id: quotationId,
+            additional_data: additionalData,
+        },
+        success: function(response) {
+            console.log(response.gdn_count);
+            if (response.exists) {
+                var minQty = response.gdn_count;
+                if (newQty < minQty) {
+                    alert('Quantity cannot be less than ' + minQty + ' as per existing GDN records.');
+                    input.value = minQty;
+                }
+            }
+        },
+        error: function(xhr) {
+            console.log(xhr.responseText);
+            alert('Error checking quantity constraints.');
+        }
+    });
+}
      function addAgentModal() {
         $('#addAgentModal').modal('show');
     }
@@ -1502,18 +1586,23 @@ $(document).ready(function () {
                 url: '/get-agents/' + quotationId,
                 method: 'GET',
                 success: function (data) {
-                    console.log(data);
                     $('#selectedAgentsList').empty();
-                    data.forEach(function (item) {
-        var agent = item.agent;
-        if (agent) { 
-            var listItem = '<li class="list-group-item d-flex justify-content-between align-items-center">' +
-                agent.name + 
-                '<button type="button" class="btn btn-danger btn-sm removeAgentButton" data-agent-id="' + agent.id + '">Remove</button></li>';
+                    data.forEach(function (item, index) {
+        // Defensive check to prevent the error
+        if (item && item.agent && item.agent.name) {
+            var listItem = `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    ${item.agent.name}
+                    <button type="button" class="btn btn-danger btn-sm removeAgentButton" data-agent-id="${item.agent.id}">
+                        Remove
+                    </button>
+                </li>`;
             $('#selectedAgentsList').append(listItem);
+        } else {
+            console.warn(`Skipping item at index ${index} due to missing agent`, item);
         }
     });
-                },
+                                },
                 error: function () {
                     console.error('Failed to fetch agents');
                 }
@@ -1670,20 +1759,14 @@ $(document).ready(function () {
     });
 </script>
 <script>
-        var radioButtons = document.querySelectorAll('input[type="radio"]');
-        var contentDivs = document.querySelectorAll('.contentveh');
-        radioButtons.forEach(function (radioButton, index) {
-            radioButton.addEventListener("change", function () {
-                contentDivs.forEach(function (contentDiv) {
-                    contentDiv.style.display = "none";
-                });
-                if (radioButton.checked) {
-                    contentDivs[index].style.display = "block";
-                }
-            });
+    $(document).ready(function () {
+        $('[name="contentType"]').on('change', function () {
+            $('.contentveh').hide();
+            const target = $(this).data('target');
+            $(target).show(); 
         });
-
-    </script>
+    });
+</script>
 <script>
     // get the shipping medium charges based on port selected
 
@@ -1918,7 +2001,6 @@ $('#shipping_port').select2();
                         to_shipping_port_id: toShippingPortId,
                     },
                     success:function (response) {
-                        console.log(response);
                         var slNo = 0;
                         var data = response.map(function(response) {
                             
@@ -1978,7 +2060,6 @@ $('#shipping_port').select2();
 
         $('#dtBasicExample2 tbody').on('click', '.checkbox-hide', function(e) {
             var id = this.id;
-
             var tableType = $('#'+id).attr('data-table-type');
             if(tableType == "Vehicle") {
                 this.checked=!this.checked;
@@ -2521,12 +2602,17 @@ $('#shipping_port').select2();
                 }
             },
             {
-                targets: -3,
-                render: function (data, type, row) {
-                var quantityValue = row.qty ? row.qty : 1;
-                return '<input type="number" min="0" value="' + quantityValue + '" step="1" class="qty-editable form-control" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)" required name="quantities[]" id="quantity-' + row['index'] + '" />';
-            }
-            },
+    targets: -3,
+    render: function (data, type, row) {
+        var quantityValue = row.qty ? row.qty : 1;
+        return `<input type="number" min="0" value="${quantityValue}" step="1" 
+                    class="qty-editable form-control" 
+                    onchange="validateVehicleQuantity(this, '${row.model_type}', '${row.quotation_id}', '${row['6']}')"
+                    onkeypress="return /[0-9]/.test(event.key)" 
+                    required name="quantities[]" 
+                    id="quantity-${row.index}" />`;
+                    }
+                },
             {
                 targets: -7,
                 render: function (data, type, row) {
@@ -2719,6 +2805,14 @@ $('#shipping_port').select2();
             resetIndex();
     });
     $('#submit-button').on('click', function(e) {
+
+        $('.text-danger').hide();
+        let hasError = false;
+        if (!$('input[name="nature_of_deal"]:checked').val()) {
+            $('#nature-of-deal-error').text('Please select the Nature of Deal.').show();
+            hasError = true;
+        }
+
         var selectedData = [];
         secondTable.rows().every(function() {
         var data = this.data();
@@ -4201,7 +4295,6 @@ function updateSecondTable(RowId, savedVins) {
     var existingItemsJson = <?php echo $existingItemsJson; ?>;
     var secondTable = $('#dtBasicExample2').DataTable();
     existingItemsJson.forEach(function(existings) {
-        console.log(existings);
     var description =  existings.description; 
     var uniqueNumber = existings.uuid;
     var row = [];
@@ -4222,20 +4315,20 @@ function updateSecondTable(RowId, savedVins) {
         if (existings.reference_type.length === 18) {
             row['model_type'] = 'Vehicle';
             row['table_type'] = 'vehicle-table';
-            code = existings.varaint.name; 
+            code = existings.varaint?.name ?? ''; 
         }
         else if(existings.reference_type.length === 16)
         {
             row['model_type'] = 'Brand';
             row['table_type'] = 'vehicle-table';
-            code = existings.varaint.name;  
-            addon = existings.varaint.name; 
+            code = existings.varaint?.name ?? '';  
+            addon = existings.varaint?.name ?? ''; 
         }
         else if(existings.reference_type.length === 27){
             row['model_type'] = 'ModelLine';
             row['table_type'] = 'vehicle-table';
-            code = existings.varaint.name; 
-            addon = existings.varaint.name; 
+            code = existings.varaint?.name ?? ''; 
+            addon = existings.varaint?.name ?? ''; 
         }
         else 
         {
@@ -4296,7 +4389,6 @@ function updateSecondTable(RowId, savedVins) {
         row['model_description_id'] = existings.model_description_id;
         row['qty'] = existings.quantity;
         row['systemcode'] = existings.system_code_amount;
-        console.log(existings.system_code_amount);
         row['agents_id'] = existings.agents_id;
         row['edit_page'] = 'editpage';
         row['itemid'] = existings.id;

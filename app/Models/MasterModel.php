@@ -42,15 +42,22 @@ class MasterModel extends Model
     }
     public function getIsDeletableAttribute() {
 
-        $isExistinInventory = SupplierInventory::where('master_model_id', $this->id)->count();
-
+        $isExistinInventory = SupplierInventory::select('master_model_id')->where('master_model_id', $this->id)->count();
         if ($isExistinInventory <= 0) {
-            $isExistinLOI = LetterOfIndentItem::where('master_model_id', $this->id)->count();
-
+            $isExistinLOI = LetterOfIndentItem::select('master_model_id')->where('master_model_id', $this->id)->count();
             if($isExistinLOI <= 0) {
-                $isExistinDemandList = DemandList::where('master_model_id', $this->id)->count();
+                $isExistinDemandList = DemandList::select('master_model_id')->where('master_model_id', $this->id)->count();
                 if($isExistinDemandList <= 0) {
-                    return true;
+                    $isExistinPFIItem = PfiItem::select('master_model_id')->where('master_model_id', $this->id)->count();
+                        if($isExistinPFIItem <= 0) {
+                            $isExistinPO = PfiItemPurchaseOrder::select('master_model_id')->where('master_model_id', $this->id)->count();
+                            if($isExistinPO <= 0) {
+                                $isExistinVehicles = Vehicles::select('model_id')->where('model_id', $this->id)->count();
+                                if($isExistinVehicles <= 0) {
+                                    return true;
+                                }
+                            }
+                        }
                 }
             }
         }

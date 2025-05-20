@@ -30,6 +30,7 @@ use App\Models\AddonTypes;
 use App\Models\Varaint;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Addon;
+use App\Models\User;
 class ProformaInvoiceController extends Controller {
     public function proforma_invoice($callId) {
         $brands = Brand::all();
@@ -48,7 +49,9 @@ class ProformaInvoiceController extends Controller {
         $kitsDesc = AddonDescription::whereHas('Addon', function($q) {
             $q->where('addon_type','K');
         })->get();
-        $sales_persons = ModelHasRoles::where('role_id', 7)->get();
+        $sales_persons = User::where('pfi_access', 1)->where('status','active')
+        ->orderBy('name', 'asc')
+        ->get();
         $countries = Country::all();
         $shippingPorts = MasterShippingPorts::all();
         $shippings = ShippingMedium::all();
@@ -482,6 +485,7 @@ class ProformaInvoiceController extends Controller {
     }
     }
     public function proforma_invoice_edit($callId) {
+
         $quotation = Quotation::where('calls_id', $callId)->first();
         $salespersoncalls = Calls::where('id', $callId)->first();
         $currentUser = Auth::user();
@@ -491,6 +495,7 @@ class ProformaInvoiceController extends Controller {
          }
         $quotation_details = QuotationDetail::where('quotation_id', $quotation->id)->first();
         $quotationitems = QuotationItem::with('varaint')->with('addon')->with('quotationVins')->with('shippingdocuments')->with('shippingcertification')->with('otherlogisticscharges')->where('quotation_id', $quotation->id)->get();
+        $quotation_vins = [];
         foreach ($quotationitems as $quotationitem) {
             $quotation_vins = QuotationVins::where('quotation_items_id', $quotationitem->id)->get();
         }
@@ -514,7 +519,21 @@ class ProformaInvoiceController extends Controller {
         $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
         $usd_to_eru_rate = Setting::where('key', 'usd_to_euro_convertion_rate')->first();
-        $sales_persons = ModelHasRoles::where('role_id', 7)->get();
+        $sales_persons = User::where(function ($query) use ($quotation) {
+            $query->where(function ($q) {
+                $q->where('pfi_access', 1)
+                  ->where('status', 'active');
+            });
+    
+            if ($quotation && $quotation->created_by) {
+                $query->orWhere('id', $quotation->created_by);
+            }
+        })
+        ->orderBy('name', 'asc')
+        ->get()
+        ->unique('id')
+        ->values();
+
         $existingItemsJson = json_encode($quotationitems);
         return view('proforma.invoice_edit', compact('callDetails', 'brands','assessoriesDesc',
             'sparePartsDesc','kitsDesc','shippings','certifications','countries','shippingPorts',

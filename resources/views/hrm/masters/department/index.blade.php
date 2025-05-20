@@ -53,6 +53,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-department-li
 							<th>Approval HandOver To (Optional)</th>
 							<th>Department Division</th>
 							<th>Division Head</th>
+							<th>Is Demand Planning</th>
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -70,6 +71,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-department-li
 							</td>
 							<td>{{ $dataOne->division->name ?? '' }}</td>
 							<td>{{ $dataOne->division->divisionHead->name ?? '' }}</td>
+							<td> 
+								@if($dataOne->is_demand_planning == 1)
+									Yes
+								@else
+									No
+								@endif
+							</td>
 							<td>
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-department-details']);

@@ -5,8 +5,11 @@
      div.dataTables_wrapper div.dataTables_info {
   padding-top: 0px;
 }
+    .quotation-items-addons {
+        padding-left: 10px;
+    }
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
-  padding: 4px 8px 4px 8px;
+  /* padding: 4px 8px 4px 8px; */
   text-align: center;
   vertical-align: middle;
 }
@@ -281,10 +284,10 @@
             </div>
             <div class="col-sm-4">
                 <div class="row">
-                    <div class="col-sm-2">
+                    <div class="col-sm-4">
                         Category :
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-8">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input shipping_method @error('shipping_method') is-invalid @enderror" type="checkbox"
                                    name="shipping_method" id="CNF" value="CNF" >
@@ -305,10 +308,28 @@
             </div>
             <div class="col-sm-4">
                 <div class="row">
-                    <div class="col-sm-2">
+                    <div class="col-sm-4">
+                        Nature of Deal :
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="nature_of_deal" id="regular_deal" value="regular_deal" required {{ old('nature_of_deal') == 'regular_deal' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="regular_deal">Regular deal</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="nature_of_deal" id="letter_of_credit" value="letter_of_credit" required {{ old('nature_of_deal') == 'letter_of_credit' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="letter_of_credit">Letter of credit</label>
+                        </div>
+                    </div>
+                    <div id="nature-of-deal-error" class="text-danger" style="display: none;"></div>
+                </div>
+            </div>
+            <div class="col-sm-4 pt-2">
+                <div class="row">
+                    <div class="col-sm-4">
                         Currency :
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-6">
                         <select class="form-select" name="currency" id="currency">
                             <option>AED</option>
                             <option>USD</option>
@@ -321,13 +342,13 @@
         <hr>
         <div class="row">
             <div class="col-sm-4">
-                Document Details
+               <strong> Document Details </strong>
             </div>
             <div class="col-sm-4">
-                Client's Details
+                <strong> Client's Details </strong>
             </div>
             <div class="col-sm-4">
-                Delivery Details
+               <strong> Delivery Details </strong>
             </div>
         </div>
         <hr>
@@ -357,14 +378,16 @@
                     </div>
                     <div class="col-sm-6">
                     <select id="salespersons" name="salespersons" class="form-select" required>
-                    @foreach ($sales_persons as $sales_person)
-                    @php
-                            $sales_person_details = DB::table('users')->where('id', $sales_person->model_id)->first();
-                            $sales_person_name = $sales_person_details->name;
-                        @endphp
-                        <option value="{{ $sales_person->model_id }}">{{ $sales_person_name }}</option>      
-                    @endforeach
-                        </select>
+                        <option disabled selected>Select a Salesperson</option>
+                        @if(!empty($sales_persons) && $sales_persons->count())
+                            @foreach ($sales_persons as $sales_person)
+                                <option value="{{ $sales_person->id }}">{{ $sales_person->name }}</option>      
+                            @endforeach
+                        @else
+                            <option disabled>No salespersons available</option>
+                        @endif
+                    </select>
+
                     </div>
                 </div>
                     @else
@@ -547,10 +570,10 @@
         <hr>
         <div class="row mt-2">
             <div class="col-sm-4">
-                Payment Details
+                <strong> Payment Details </strong>
             </div>
             <div class="col-sm-8">
-                Client's Representative
+                <strong> Client's Representative </strong>
             </div>
         </div>
         <hr>
@@ -619,7 +642,7 @@
                     </div>
                 </div>
                 <br>
-                <button class="float-end" type="button" onclick="addMoreAgents()">+ Add More Agent</button>
+                <button class="float-end btn btn-primary" type="button" onclick="addMoreAgents()">+ Add More Agent</button>
             </div>
             <div class="col-sm-4"  id="advance-amount-div" hidden>
                 <div class="row mt-2">
@@ -653,8 +676,13 @@
                     <select name="select_bank" class="form-control">
                         <option value="rak-aed">RAK BANK AED</option>
                         <option value="rak-usd">RAK BANK USD</option>
-                        <option value="city-aed">CITY BANK AED</option>
-                        <option value="city-usd">CITY BANK USD</option>
+                        <option value="rak-eur">RAK BANK EUR</option>
+                        <option value="rak-aud">RAK BANK AUD</option>
+                        <option value="rak-jpy">RAK BANK JPY</option>
+                        <option value="hbz-aed">HBZ BANK AED</option>
+                        <option value="hbz-usd">HBZ BANK USD</option>
+                        <option value="hbz-eur">HBZ BANK EUR</option>
+                        <option value="hbz-jpy">HBZ BANK JPY</option>
                     </select>
                     </div>
                 </div>
@@ -682,7 +710,6 @@
                     <div class="col-sm-2">
                     <select name="thirdpartypayment" class="form-control">
                         <option value="No">No</option>
-                        <option value="Yes">Yes</option>
                     </select>
                     </div>
                 </div>
@@ -737,37 +764,37 @@
         </div>
         <br>
         <div class="row">
-            <div class="col-lg-1 col-md-2 col-sm-12">
-                <input type="radio" id="showVehicles" name="contentType">
-                <label for="showVehicles">Add Vehicles</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showVehicles" name="contentType" data-target="#vehiclesContent">
+                <label for="showVehicles" class="quotation-items-addons">Add Vehicles</label>
             </div>
-            <div class="col-lg-1 col-md-3 col-sm-12">
-            <input type="radio" id="showAccessories" name="contentType">
-                <label for="showAccessories">Add Accessories</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showAccessories" name="contentType" data-target="#accessoriesContent">
+                <label for="showAccessories" class="quotation-items-addons">Add Accessories</label>
             </div>
-            <div class="col-lg-1 col-md-3 col-sm-12">
-            <input type="radio" id="showSpareParts" name="contentType">
-                <label for="showSpareParts">Add Spare Parts</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showSpareParts" name="contentType" data-target="#sparePartsContent">
+                <label for="showSpareParts" class="quotation-items-addons">Add Spare Parts</label>
             </div>
-            <div class="col-lg-1 col-md-2 col-sm-12">
-            <input type="radio" id="showKits" name="contentType">
-                <label for="showKits">Add Kits</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showKits" name="contentType" data-target="#kitsContent">
+                <label for="showKits" class="quotation-items-addons">Add Kits</label>
             </div>
-            <div class="col-lg-1 col-md-2 col-sm-12">
-            <input type="radio" id="showShipping" name="contentType">
-                <label for="showShipping">Add Shipping</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showShipping" name="contentType" data-target="#shippingContent">
+                <label for="showShipping" class="quotation-items-addons">Add Shipping</label>
             </div>
-            <div class="col-lg-2 col-md-3 col-sm-12">
-                <input type="radio" id="showShippingDocuments" name="contentType">
-                <label for="showShippingDocuments">Add Shipping Documents</label>
+            <div class="col-lg-2 align-items-baseline col-md-3 col-sm-12">
+                <input type="radio" id="showShippingDocuments" name="contentType" data-target="#shippingDocumentContent">
+                <label for="showShippingDocuments" class="quotation-items-addons">Add Shipping Documents</label>
             </div>
-            <div class="col-lg-1 col-md-2 col-sm-12">
-            <input type="radio" id="showCertificates" name="contentType">
-                <label for="showCertificates"> Certificate</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showCertificates" name="contentType" data-target="#certificateContent">
+                <label for="showCertificates" class="quotation-items-addons">Certificate</label>
             </div>
-            <div class="col-lg-1 col-md-2 col-sm-12">
-            <input type="radio" id="showOthers" name="contentType">
-                <label for="showOthers">Add Other</label>
+            <div class="d-flex align-items-baseline col-lg-2 col-md-3 col-sm-12">
+                <input type="radio" id="showOthers" name="contentType" data-target="#otherContent">
+                <label for="showOthers" class="quotation-items-addons">Add Other</label>
             </div>
         </div>
         <div id="vehiclesContent" class="contentveh">
@@ -1543,20 +1570,15 @@ $(document).ready(function () {
   });
 </script>
 <script>
-        var radioButtons = document.querySelectorAll('input[type="radio"]');
-        var contentDivs = document.querySelectorAll('.contentveh');
-        radioButtons.forEach(function (radioButton, index) {
-            radioButton.addEventListener("change", function () {
-                contentDivs.forEach(function (contentDiv) {
-                    contentDiv.style.display = "none";
-                });
-                if (radioButton.checked) {
-                    contentDivs[index].style.display = "block";
-                }
-            });
-        });
+        $(document).ready(function () {
+    $('[name="contentType"]').on('change', function () {
+        $('.contentveh').hide();
+        const target = $(this).data('target');
+        $(target).show();
+    });
+});
 
-    </script>
+</script>
 <script>
     // get the shipping medium charges based on port selected
 
@@ -2572,6 +2594,14 @@ $('#shipping_port').select2();
             resetIndex();
     });
     $('#submit-button').on('click', function(e) {
+        
+        $('.text-danger').hide();
+        let hasError = false;
+        if (!$('input[name="nature_of_deal"]:checked').val()) {
+            $('#nature-of-deal-error').text('Please select the Nature of Deal.').show();
+            hasError = true;
+        }
+
         var selectedData = [];
         secondTable.rows().every(function() {
         var data = this.data();

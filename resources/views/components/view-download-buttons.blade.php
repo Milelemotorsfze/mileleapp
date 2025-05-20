@@ -1,6 +1,6 @@
 @props(['filePath', 'fileName'])
 <td class="no-click">
-@if($filePath)
+@if($fileName)
     <a href="{{ url($filePath . $fileName) }}" target="_blank">
         <button class="btn btn-primary mb-1 btn-style">View</button>
     </a>

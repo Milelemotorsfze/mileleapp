@@ -102,6 +102,10 @@ public function latestRemarkSales()
     {
         return $this->belongsTo(Grn::class, 'grn_id');
     }
+    public function movementGrn()
+    {
+        return $this->belongsTo(MovementGrn::class, 'movement_grn_id');
+    }
     public function gdn()
     {
         return $this->belongsTo(Gdn::class, 'gdn_id');
@@ -118,6 +122,11 @@ public function latestRemarkSales()
     {
         return $this->belongsTo(Warehouse::class, 'latest_location','id');
     }
+    public function woVehicle()
+    {
+        return $this->hasOne(WOVehicles::class, 'vehicle_id', 'id');
+    }
+
     // public function getSimilarVehiclesWithInactiveStockAttribute()
     // {
     //     // dd($this->varaints_id);

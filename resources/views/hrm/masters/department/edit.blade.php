@@ -84,6 +84,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-department'])
 							</select>
 						</div>
 					</div>
+					<div class="col-xxl-6 col-lg-6 col-md-6 select-button-main-div">
+						<div class="dropdown-option-div mt-1">
+							<input type="checkbox" name="is_demand_planning" id="AMS-checkbox" class="dp-checkbox"  {{ old('is_demand_planning') ? 'checked' : '' }}
+							{{ $data->is_demand_planning == 1 ? 'checked' : '' }} >
+                            <label for="dp-checkbox" class="col-form-label text-md-end">{{ __('Is Demand Planning?') }}</label>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

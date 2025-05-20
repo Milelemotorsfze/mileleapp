@@ -29,7 +29,6 @@ class LetterOfIndent extends Model
     public const LOI_STATUS_PARTIAL_PFI_CREATED = "Partialy PFI Created";
     public const LOI_STATUS_EXPIRED = "Expired";
 
-    // delete total loi qty when po section live.
     protected $appends = [  
         'total_loi_quantity',
     ];

@@ -114,13 +114,16 @@
                     <option value="2.8" @if($variant_request->engine == '2.8') selected @endif>2.8</option>
                     <option value="3" @if($variant_request->engine == '3') selected @endif>3</option>
                     <option value="3.3" @if($variant_request->engine == '3.3') selected @endif>3.3</option>
+                    <option value="3.4" @if($variant_request->engine == '3.4') selected @endif>3.4</option>
                     <option value="3.5" @if($variant_request->engine == '3.5') selected @endif>3.5</option>
                     <option value="4" @if($variant_request->engine == '4') selected @endif>4</option>
                     <option value="4.2" @if($variant_request->engine == '4.2') selected @endif>4.2</option>
                     <option value="4.4" @if($variant_request->engine == '4.4') selected @endif>4.4</option>
                     <option value="4.5" @if($variant_request->engine == '4.5') selected @endif>4.5</option>
                     <option value="4.8" @if($variant_request->engine == '4.8') selected @endif>4.8</option>
+                    <option value="5.0" @if($variant_request->engine == '5.0') selected @endif>5.0</option>
                     <option value="5.3" @if($variant_request->engine == '5.3') selected @endif>5.3</option>
+                    <option value="5.5" @if($variant_request->engine == '5.5') selected @endif>5.5</option>
                     <option value="5.6" @if($variant_request->engine == '5.6') selected @endif>5.6</option>
                     <option value="5.7" @if($variant_request->engine == '5.7') selected @endif>5.7</option>
                     <option value="6" @if($variant_request->engine == '6') selected @endif>6</option>
@@ -156,8 +159,8 @@
                 <td>Gear</td>
                 <td>
                     <select class="form-control" name="gearbox">
-                    <option value="Auto" @if($variant_request->upholestry == 'Auto') selected @endif>Auto</option>
-                    <option value="Manual" @if($variant_request->upholestry == 'Manual') selected @endif>Manual</option>
+                    <option value="Auto" @if($variant_request->gearbox == 'AT') selected @endif>Auto</option>
+                    <option value="Manual" @if($variant_request->gearbox == 'MT') selected @endif>Manual</option>
                  </select>
                 </td>
             </tr>
@@ -183,7 +186,7 @@
                 <td>
                     <select class="form-control" name="int_colour">
                     @foreach($intColorall as $intColorall)
-                    <option value="{{$intColorall->id}}" @if($intColorall->id == $intColorr->id) selected @endif>
+                    <option value="{{$intColorall->id}}" @if($intColorr && $intColorall->id == $intColorr->id) selected @endif>
                     {{$intColorall->name}}
                     </option>
                     @endforeach
@@ -195,7 +198,7 @@
                 <td>
                     <select class="form-control" name="ex_colour">
                     @foreach($extColorall as $exColorall)
-                    <option value="{{$exColorall->id}}" @if($exColorall->id == $extColorr->id) selected @endif>
+                    <option value="{{$exColorall->id}}" @if($extColorr && $exColorall->id == $extColorr->id) selected @endif>
                     {{$exColorall->name}}
                     </option>
                     @endforeach

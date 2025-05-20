@@ -10,6 +10,7 @@ class WOVehicles extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = "w_o_vehicles";
+    protected $dates = ['deleted_at'];
     protected $fillable = [
         'work_order_id',
         'vehicle_id',
@@ -170,8 +171,4 @@ class WOVehicles extends Model
                               });
                     });
     }    
-    public function penalty()
-    {
-        return $this->hasOne(VehiclePenalty::class,'wo_vehicle_id','id');
-    }  
 }

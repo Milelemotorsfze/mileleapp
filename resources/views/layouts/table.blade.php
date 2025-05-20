@@ -74,8 +74,8 @@
         @stack('scripts')
         <script src="{{ asset('libs/table-edits/build/table-edits.min.js')}}"></script>
         <script src="{{ asset('js/pages/table-editable.int.js')}}"></script>
-        <script src="{{ asset('js/app.js')}}"></script>
         <script src="{{ asset('libs/datatables.net/js/jquery.dataTables.min.js')}}"></script>
+        <script src="{{ asset('js/app.js')}}"></script>
         <script src="{{ asset('libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
         <script>
         $(document).ready(function ()
@@ -140,7 +140,7 @@
                 "pageLength": 5,
                 "dom": 'frtip',
             });
-
+            $('#variant-update-table').DataTable();
             // $('#suppliersList').DataTable();
             // $('#suppliersList').on( 'click', '.modal-button', function () {
             //     var modalId = $(this).data('modal-id');

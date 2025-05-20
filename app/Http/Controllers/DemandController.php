@@ -95,9 +95,7 @@ class DemandController extends Controller
         }
         $addedModelIds = [];
         foreach ($demandLists as $demandList) {
-//            $model = MasterModel::where('model', $demandList->model)
-//                ->where('sfx', $demandList->sfx)
-//                ->first();
+
             $addedModelIds[] = $demandList->master_model_id;
         }
         $models = MasterModel::whereNotIn('model',$addedModelIds)
@@ -140,11 +138,9 @@ class DemandController extends Controller
    
     public function getLOIDescription(Request $request)
     {
-//        $letterOfIndent = LetterOfIndent::find($request->letter_of_indent_id);
 
         $masterModel = MasterModel::where('model', $request->model)
                                     ->where('sfx', $request->sfx)
-                                    // ->where('model_year', $request->model_year)
                                     ->first();
         if($masterModel) {
             if($request->dealer == 'Milele Motors') {

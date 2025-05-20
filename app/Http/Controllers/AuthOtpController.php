@@ -35,54 +35,31 @@ class AuthOtpController extends Controller
                     'password' => 'required',
                 ]);
 
-                // calculate verification expiry date time
-                // get the latest login activeity of user
-//                $macAddr = exec('getmac');
-//                $userMacAdress = substr($macAddr, 0, 17);
-
                 $userCurrentBrowser = Agent::browser();
                 $userLastOtpVerified = VerificationCode::where('user_id', $user->id)
                     ->orderBy('id','DESC')->first();
-                // info($userLastOtpVerified);
-                // check opt table has entry
                 if($userLastOtpVerified) {
                     $latestLoginActivity = LogActivity::where('user_id', $user->id)->orderBy('id','DESC')->first();
-                    // check the mac address change to check whether the device is changed or not
-//                    if($latestLoginActivity->mac_address == $userMacAdress ) {
-                        // info("mac address same");
-                        // info($latestLoginActivity);
                     if($latestLoginActivity) {
-                        // info("last login activity is there");
-//                        if($latestLoginActivity->mac_address == $userMacAdress ) {
-                        // check the platform same or not
                         if (Agent::isPhone() == 'phone') {
-                            // info("logged in phone");
                             $userDevice = 'phone';
                         } elseif (Agent::isTablet() == 'tablet') {
-                            // info("logged in tablet");
                             $userDevice = 'tablet';
                         } elseif (Agent::isDesktop() == 'desktop') {
-                            // info("logged in tablet");
                             $userDevice = 'desktop';
                         }
-//                        info("mac address same");
                         if ($latestLoginActivity->device_name == $userDevice) {
-                            // info("device matching");
                             if ($latestLoginActivity->browser_name == $userCurrentBrowser) {
-                                // info("browser name same");
 
                                 $userLastOtpVerifiedDate = Carbon::parse($userLastOtpVerified->created_at)->addDays(30);
-                                // info($userLastOtpVerifiedDate);
                                 $currentDate = Carbon::now();
                                 if ($currentDate->isBefore($userLastOtpVerifiedDate)) {
-                                    // info("expiration  date NOT reached");
 
                                     $request['user_id'] = $user->id;
                                     return (app('App\Http\Controllers\Auth\LoginController')->login($request));
                                 }
                             }
                         }
-//                    }
                     }
 
                 }
@@ -122,7 +99,6 @@ class AuthOtpController extends Controller
             Session::flash('error','These credentials do not match our records.');
             return view('auth.login');
         }
-//        return view('auth.login');
     }
     // Generate OTP
     public function generate(Request $request)
@@ -151,7 +127,6 @@ class AuthOtpController extends Controller
                             $msg->to($data['email'], $data['name'])
                                 ->from($template['from'],$template['from_name'])
                                 ->subject($subject);
-                                // ->attachData($renderedData, 'name_of_attachment');
                         }
                     );
                 return redirect()->route('otp.verification', ['user_id' => $verificationCode->user_id])->with('success',  $message);

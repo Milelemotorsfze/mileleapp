@@ -24,6 +24,9 @@
             background-color: rgba(128,128,128,0.5); /* color */
             display: none; /* making it hidden by default */
         }
+        .custom-error{
+            color: red;
+        }
     </style>
     @can('create-customer')
         @php
@@ -286,6 +289,19 @@
                     extension: "Please upload file format (png,jpeg,jpg)"
                 },
             },
+            errorPlacement: function(error, element) {
+                    error.addClass('custom-error');
+                    var name = element.attr("name");
+                    if (name.match(/\country_id\[\]\b/)) {
+                        if (element.data('select2')) {
+                            error.insertAfter(element.next('.select2'));
+                        } else {
+                            error.insertAfter(element.next('.select2'));
+                        }
+                    } else {
+                        error.insertAfter(element.next('.select2'));
+                    }
+            }
         });
        
     </script>

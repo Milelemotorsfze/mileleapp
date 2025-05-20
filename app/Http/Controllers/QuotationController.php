@@ -52,6 +52,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Monarobase\CountryList\CountryListFacade;
+use Illuminate\Support\Facades\Log;
 
 class QuotationController extends Controller
 {
@@ -85,7 +86,17 @@ class QuotationController extends Controller
      */
     public function store(Request $request)
     {
-        
+        if (!in_array($request->nature_of_deal, ['regular_deal', 'letter_of_credit'])) {
+            return redirect()->back()->with('error', 'Invalid Nature of Deal selected.')->withInput();
+        }  
+
+        $request->validate([
+            'nature_of_deal' => 'required|in:regular_deal,letter_of_credit',
+        ], [
+            'nature_of_deal.required' => 'Please select the Nature of Deal.',
+            'nature_of_deal.in' => 'Invalid selection for Nature of Deal.',
+        ]);      
+
         $agentsmuiltples = 0;
         $systemcode = $request->system_code_amount;
         $separatedValues = [];
@@ -143,6 +154,7 @@ class QuotationController extends Controller
         $quotation->calls_id = $request->calls_id;
         $quotation->currency = $request->currency;
         $quotation->document_type = $request->document_type;
+        $quotation->nature_of_deal = $request->nature_of_deal;
         $quotation->third_party_payment = $request->thirdpartypayment;
         $quotation->date = Carbon::now();
         if($request->document_type == 'Proforma') {
@@ -278,21 +290,16 @@ class QuotationController extends Controller
                $quotationItem->model_line_id = $request->model_line_ids[$key];
                $quotationItem->model_description_id = $request->model_description_ids[$key];
            }else if($request->types[$key] == 'Addon') {
-                // info($request->reference_ids[$key]);
                if($request->reference_ids[$key] != 'Other') {
-                //    info("not other");
 
                    $item = Addon::find($request->reference_ids[$key]);
-                //    info($item);
                }
                $quotationItem->addon_type = $request->addon_types[$key];
                $quotationItem->brand_id = $request->brand_ids[$key];
                $quotationItem->model_line_id = $request->model_line_ids[$key];
                $quotationItem->model_description_id = $request->model_description_ids[$key];
-            //    info($request->model_description_ids[$key]);
            }
             if($item) {
-                info("item not found");
                 $quotationItem->reference()->associate($item);
 
             }
@@ -418,22 +425,22 @@ class QuotationController extends Controller
         $salesPersonDetail = EmployeeProfile::where('user_id', $quotation->created_by)->first();
         $salespersonqu = User::find($quotation->created_by);
         $data = [];
-        $data['sales_person'] = $salespersonqu->name;
+        $data['sales_person'] = $salespersonqu->name ?? '';
         $data['sales_office'] = 'Central 191';
         $data['sales_phone'] = '';
-        $data['sales_email'] = $salespersonqu->email;
+        $data['sales_email'] = $salespersonqu->email ?? '';
         $data['client_id'] = $call->id;
         $data['client_email'] = $call->email;
         $data['client_name'] = $call->name;
-        $data['client_contact_person'] = $call->client_contact_person;
+        $data['client_contact_person'] = $call->client_contact_person ?? '';
         $data['client_phone'] = $call->phone;
-        $data['client_address'] = $call->address;
+        $data['client_address'] = $call->address ?? '';
         $data['document_number'] = $quotation->id;
         $data['company'] = $call->company_name;
         $data['document_date'] = Carbon::parse($quotation->date)->format('M d,Y');
         if($salesPersonDetail) {
-            $data['sales_office'] = $salesPersonDetail->location->name;
-            $data['sales_phone'] = $salesPersonDetail->contact_number;
+            $data['sales_office'] = $salesPersonDetail->location->name ?? '';
+            $data['sales_phone'] = $salesPersonDetail->contact_number ?? '';
         }
         $shippingHidedItemAmount = QuotationItem::where('is_enable', false)
             ->where('quotation_id', $quotation->id)
@@ -473,6 +480,7 @@ class QuotationController extends Controller
     }
     public function pdfMerge($quotationId)
     {
+       
         $quotation = Quotation::find($quotationId);
         $filename = 'quotation_'.$quotationId.'.pdf';
 
@@ -482,7 +490,7 @@ class QuotationController extends Controller
         $files[] = 'Quotations/'.$filename;
         if($quotation->third_party_payment === "Yes")
         {
-            $files[] = 'Quotations/quotation_attachment_withparty_documents.pdf';
+            $files[] = public_path('Quotations/quotation_attachment_documents.pdf');
         }
         else
         {
@@ -535,6 +543,7 @@ class QuotationController extends Controller
      */
     public function update(Request $request, quotation $quotation)
     {
+   
     $qoutationid = request()->input('quotationid');
     $agentsmuiltples = 0;
     $systemcode = $request->system_code_amount;
@@ -584,6 +593,7 @@ class QuotationController extends Controller
     $quotation->calls_id = $request->calls_id;
     $quotation->currency = $request->currency;
     $quotation->document_type = $request->document_type;
+    $quotation->nature_of_deal = $request->nature_of_deal;
     $quotation->third_party_payment = $request->thirdpartypayment;
     $quotation->date = Carbon::now();
     if($request->document_type == 'Proforma') {
@@ -664,9 +674,14 @@ class QuotationController extends Controller
                         foreach ($soitems as $soitem) {
                             $vehicle = Vehicles::find($soitem->vehicles_id);
                             if ($vehicle) {
+                                $soId = $vehicle->so_id;
                                 $vehicle->so_id = null;
+                                \Log::info('Unassign SO id - Case 1-'.$soId);
                                 $vehicle->save();
+                                \Log::info('SO items deleted - Case 1-'.$soId);
+                                Soitems::where('vehicles_id', $vehicle->id)->update(['deleted_by' => Auth::id()]);
                                 Soitems::where('vehicles_id', $vehicle->id)->delete();
+
                             }
                         }
                     }
@@ -717,8 +732,12 @@ class QuotationController extends Controller
                         }
                         $vehiclesToDelete = array_slice($vehicles, 0, $quantityDifference);
                         foreach ($vehiclesToDelete as $vehicle) {
+                            $soId = $vehicle->so_id;
                             $vehicle->so_id = null;
+                            \Log::info('Unassign SO id - Case 2-'.$soId);
                             $vehicle->save();
+                            \Log::info('SO items deleted - Case 2-'.$soId);
+                            Soitems::where('vehicles_id', $vehicle->id)->update(['deleted_by' => Auth::id()]);
                             Soitems::where('vehicles_id', $vehicle->id)->delete();
                         }
                     }
@@ -965,22 +984,22 @@ class QuotationController extends Controller
         $salesPersonDetail = EmployeeProfile::where('user_id', $quotation->created_by)->first();
         $salespersonqu = User::find($quotation->created_by);
         $data = [];
-        $data['sales_person'] = $salespersonqu->name;
+        $data['sales_person'] = $salespersonqu->name ?? '';
         $data['sales_office'] = 'Central 191';
         $data['sales_phone'] = '';
-        $data['sales_email'] = $salespersonqu->email;
+        $data['sales_email'] = $salespersonqu->email ?? '';
         $data['client_id'] = $call->id;
         $data['client_email'] = $call->email;
         $data['client_name'] = $call->name;
-        $data['client_contact_person'] = $call->client_contact_person;
+        $data['client_contact_person'] = $call->client_contact_person ?? '';
         $data['client_phone'] = $call->phone;
         $data['client_address'] = $call->address;
         $data['document_number'] = $quotation->id;
         $data['company'] = $call->company_name;
         $data['document_date'] = Carbon::parse($quotation->date)->format('M d,Y');
         if($salesPersonDetail) {
-            $data['sales_office'] = $salesPersonDetail->location->name;
-            $data['sales_phone'] = $salesPersonDetail->contact_number;
+            $data['sales_office'] = $salesPersonDetail->location->name ?? '';
+            $data['sales_phone'] = $salesPersonDetail->contact_number ?? '';
         }
         $shippingHidedItemAmount = QuotationItem::where('is_enable', false)
             ->where('quotation_id', $quotation->id)
@@ -1016,7 +1035,7 @@ class QuotationController extends Controller
         $newsignatures->signature_link = $signatureLink;
         $newsignatures->signature_status = null;
         $newsignatures->save();
-        return redirect()->route('dailyleads.index',['quotationFilePath' => $file])->with('success', 'Quotation created successfully.');
+        return redirect()->route('dailyleads.index',['quotationFilePath' => $file])->with('success', 'Quotation Updated successfully.');
     }
     }
     /**
@@ -1114,13 +1133,11 @@ public function addqaddone(Request $request)
         return $shippingPorts;
     }
     public function getShippingCharges(Request $request) {
-        // info($request->from_shipping_port_id);
-        // info($request->to_shipping_port_id);
+      
         $shippingCharges =Shipping::with('shippingMedium')
                             ->where('from_port', $request->from_shipping_port_id)
                             ->where('to_port', $request->to_shipping_port_id)
                             ->get();
-                            // info($shippingCharges);               
         return $shippingCharges;
     }
     public function getvinsqoutation(Request $request)
@@ -1230,7 +1247,7 @@ public function getVehiclesvins(Request $request)
 {
     $RowId = $request->input('RowId');
     $quotationItem = QuotationItem::where('uuid', $RowId)->first();
-    // info($quotationItem);
+
     switch ($quotationItem->reference_type) {
         case 'App\Models\Varaint':
             $vehicles = Vehicles::where('varaints_id', $quotationItem->reference_id)

@@ -26,8 +26,9 @@
 	background-color: #c1e1fb !important;
 	}
 	.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
-	color: black!important;
-	background-image: linear-gradient(to right,#4ba6ef,#4ba6ef,#0065ac)!important;
+	/* color: black!important; */
+	/* background-image: linear-gradient(to right,#4ba6ef,#4ba6ef,#0065ac)!important; */
+	background: #072c47 !important;
 	}
 	.nav-link:focus{
 	color: black!important;

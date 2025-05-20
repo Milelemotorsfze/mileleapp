@@ -59,7 +59,7 @@ table.dataTable thead th select {
 
 /* Ensure the Select2 dropdown fits the full header width when opened */
 .select2-container {
-    width: 100% !important; /* Ensures the container takes full width */
+    /* width: 100% !important;  */
 }
 
 /* Ensure the dropdown itself is properly styled */
@@ -67,6 +67,10 @@ table.dataTable thead th select {
     width: auto !important; /* Let the dropdown size adjust dynamically */
     min-width: 100%; /* Ensure the dropdown is at least the width of the select element */
     box-sizing: border-box; /* Makes sure the padding is included in width */
+}
+
+.select2-container--open .select2-dropdown--below {
+    position: inherit !important;
 }
 
 /* Ensure proper spacing between dropdown options */
@@ -560,6 +564,7 @@ table.dataTable thead th select {
     </div>
   </div>
 </div>     
+</div>     
   @php
     $hasPricePermission = Auth::user()->hasPermissionForSelectedRole('selling-price-stock-report-view');
     $hasManagementPermission = Auth::user()->hasPermissionForSelectedRole('cost-price-link-stock-report');
@@ -574,7 +579,7 @@ table.dataTable thead th select {
       $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
       @endphp
       @if ($hasPermission)
-        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample3')">
+        <button type="button" class="btn btn-success mb-2" onclick="exportToExcel('dtBasicExample3')">
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
 @endif
@@ -632,6 +637,7 @@ table.dataTable thead th select {
                   <th>Document Owership</th>
                   <th>Custom Inspection Number</th>
                   <th>Custom Inspection Status</th>
+                  <th>Work Order Date</th>
                   <th>Comments</th>
                 </tr>
               </thead>
@@ -658,7 +664,7 @@ table.dataTable thead th select {
       </div>
     </div>
   </div>
-  <script>
+<script>
         $(document).ready(function () {
         var now = new Date();
     var columns3 = [
@@ -703,10 +709,20 @@ table.dataTable thead th select {
         return ''; // If no date, return empty
     }
 },
-        { data: 'grn_number', name: 'grn.grn_number' },
-        {
+{
+    data: 'grn_number',
+    name: 'movement_grns.grn_number',
+    render: function(data, type, row) {
+        if (row.inspection_status == 'Approved') {
+           
+            return data;
+        }
+        return ''; // If no data, return empty
+    }
+},
+    {
     data: 'date',
-    name: 'grn.date',
+    name: 'movements_reference.date',
     render: function(data, type, row) {
         if (data) {
             // Assuming data is in Y-m-d format (default SQL date format)
@@ -821,20 +837,21 @@ table.dataTable thead th select {
             }
         },
         {
-            data: 'variant_detail',
+            data: 'variant_detail', // Updated to use the computed `variant_detail`
             name: 'varaints.detail',
             render: function(data, type, row) {
                 if (!data) {
-                    return '';
+                    return ''; // Return an empty string if data is undefined or null
                 }
                 var words = data.split(' ');
-                var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                var firstFiveWords = words.slice(0, 15).join(' ') + '...';
                 var fullText = data;
                 return `
                     <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         ${firstFiveWords}
                     </div>
                     <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                    <span class="full-text" style="display: none;">${data}</span>
                 `;
             }
         },
@@ -964,6 +981,20 @@ table.dataTable thead th select {
             return data ? data : '';
         }
     },
+    {
+        data: 'work_order_date',
+        name: 'work_orders.date',
+        render: function(data, type, row) {
+            if (data) {
+                var dateObj = new Date(data);
+                var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                    day: '2-digit', month: 'short', year: 'numeric'
+                });
+                return formattedDate;
+            }
+            return '';
+        }
+    },
         {
     data: null,
     name: 'chat',
@@ -986,7 +1017,7 @@ table.dataTable thead th select {
         const buttonClass = messageCount > 0 ? 'btn-warning' : 'btn-primary';
 
         return `
-            <div style="position: relative; display: inline-block;">
+            <div style="display: inline-block;">
                 ${badgeHtml}
                 <button class="btn ${buttonClass} btn-sm" onclick="openChatModal(${row.id})">
                     Comments
@@ -1004,8 +1035,8 @@ table.dataTable thead th select {
         2: 'purchasing_order.po_number',
         3: 'purchasing_order.po_date',
         4: 'vehicles.estimation_date',
-        5: 'grn.grn_number',
-        6: 'grn.date',
+        5: 'movement_grns.grn_number',
+        6: 'movements_reference.date',
         7: 'vehicles.inspection_date',
         8: 'vehicles.grn_remark',
         9: 'grn_inspectionid',
@@ -1063,12 +1094,10 @@ if (hasManagementPermission) {
         type: "POST",
         data: function (d) {
                 d.filters = {};  // Initialize an empty filters object
-
                 $('#dtBasicExample3 thead select').each(function () {
                     var columnIndex = $(this).parent().index(); // Get the column index
                     var columnName = columnMap[columnIndex]; // Map index to column name
                     var value = $(this).val();
-                        console.log(columnIndex);
                     // Send filter values using column names, including special `__NULL__` and `__Not EMPTY__`
                     if (value && columnName) {
                         if (value.includes('__NULL__') || value.includes('__Not EMPTY__')) {
@@ -1090,17 +1119,17 @@ if (hasManagementPermission) {
         {
             targets: 1,
             render: function (data, type, row) {
-                if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id == null) {
+                if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.movement_grn_id == null) {
                     return 'Incoming';
-                } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id != null) {
+                } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.movement_grn_id != null) {
                     return 'Pending Inspection';
                 } else if (row.inspection_date != null && row.so_id == null && (row.reservation_end_date == null || new Date(row.reservation_end_date) < now)) {
                     return 'Available Stock';
                   } else if (row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) >= now ) {
                     return 'Booked';
-                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.grn_id != null) {
+                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.movement_grn_id != null) {
                     return 'Sold';
-                } else if (row.inspection_date != null && row.gdn_id != null && row.grn_id != null) {
+                } else if (row.inspection_date != null && row.gdn_id != null && row.movement_grn_id != null) {
                     return 'Delivered';
                 } else {
                     return '';
@@ -1262,7 +1291,6 @@ $('#dtBasicExample3 tbody').on('click', 'td', function () {
         $hasonwershipPermission = Auth::user()->hasPermissionForSelectedRole('ownership-type');
         @endphp
         @if ($hasonwershipPermission)
-        console.log("inside");
             var dataownership = table3.row(this).data();
             openownershipModal(dataownership.id);
         @endif
@@ -1329,18 +1357,55 @@ handleModalShow('#variantview'); // Already existing modal
 });
 function exportToExcel(tableId) {
     var table = document.getElementById(tableId);
-    var rows = table.rows;
+    var theadRows = table.querySelectorAll("thead tr"); // Get header rows
+    var tbodyRows = table.querySelectorAll("tbody tr"); // Get data rows
     var csvContent = "";
-    for (var i = 0; i < rows.length; i++) {
-        var row = rows[i];
-        for (var j = 0; j < row.cells.length; j++) {
-            var cellText = row.cells[j].innerText || row.cells[j].textContent;
-            csvContent += '"' + cellText.replace(/"/g, '""') + '",';
+
+    // Add table headers
+    for (var i = 0; i < theadRows.length; i++) {
+        var row = theadRows[i];
+        if (i === 1) continue; // Skip the second row (index 1)
+
+        var cells = row.querySelectorAll("th"); // Only include <th> elements
+        var rowData = [];
+
+        for (var j = 0; j < cells.length; j++) {
+            var cell = cells[j];
+            var filterSelect = cell.querySelector('select'); // Check for filter dropdown
+            if (!filterSelect) { // Skip the filter dropdowns
+                var cellText = cell.innerText || cell.textContent;
+                rowData.push('"' + cellText.replace(/"/g, '""') + '"'); // Escape double quotes
+            }
         }
-        csvContent += "\n";
+
+        if (rowData.length > 0) { // Add header row only if it has content
+            csvContent += rowData.join(",") + "\n";
+        }
     }
+
+    // Add table body rows (data)
+    for (var i = 0; i < tbodyRows.length; i++) {
+        var row = tbodyRows[i];
+        var cells = row.querySelectorAll("td"); // Only include <td> elements
+        var rowData = [];
+
+        for (var j = 0; j < cells.length; j++) {
+            var cell = cells[j];
+
+            // Check if the cell contains the hidden full-text span
+            var fullTextSpan = cell.querySelector('.full-text');
+            var cellText = fullTextSpan ? fullTextSpan.textContent : cell.innerText || cell.textContent;
+
+            rowData.push('"' + cellText.replace(/"/g, '""') + '"'); // Escape double quotes
+        }
+
+        csvContent += rowData.join(",") + "\n"; // Add data row to CSV
+    }
+
     var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    if (navigator.msSaveBlob) { // IE 10+
+
+    if (navigator.msSaveBlob) {
+        // For IE 10+
         navigator.msSaveBlob(blob, 'export.csv');
     } else {
         var link = document.createElement("a");

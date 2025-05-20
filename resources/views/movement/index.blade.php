@@ -35,14 +35,14 @@
                 </a>
 <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
       <a class="btn btn-sm btn-success float-end" href="{{ route('movement.create') }}" text-align: right>
-        <i class="fa fa-plus" aria-hidden="true"></i> Add New Movement Transection
+        <i class="fa fa-plus" aria-hidden="true"></i> Add New Movement Transaction
       </a>
       <div class="clearfix"></div>
       @endif
       <br>
       <ul class="nav nav-pills nav-fill">
       <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Movement Transection</a>
+        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Movement Transaction</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab2">All Vehicle Movements</a>
@@ -103,7 +103,7 @@
                         <td>{{$vehicles}}</td>
                         @php
                         $created_bys = DB::table('users')->where('id', $movementreference->created_by)->first();
-                        $created_by = $created_bys->name;
+                        $created_by = $created_bys->name ?? '';
                         @endphp
                         <td>{{ $created_by }}</td>
                         <td class="createdDated">{{ date('d-M-Y', strtotime($movementreference->created_at)) }}</td>
@@ -123,7 +123,7 @@
         <div class="card-body">
         <div class="table-responsive" style="height: 74vh;">
             <table id="dtBasicExample2" class="table table-striped table-editable table-edits table table-bordered">
-            <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
+            <thead style="position: sticky; top: 0; background-color: #dcdde3">
             <tr>
                 <th>Creation Date</th>
                 <th>Movement Date</th>
@@ -236,6 +236,7 @@
 
     // Initialize DataTables with custom sorting applied to specific columns
     var table = $('#dtBasicExample1').DataTable({
+        order: [[0, 'desc']], // 0 = first column, 'desc' = descending
         columnDefs: [
             { type: 'mov-numeric', targets: 0 }, // Apply MOV - XXX sorting to the first column
             { type: 'custom-date', targets: [3, 4] } // Apply custom date sorting to the 4th and 5th columns (index 3 and 4)

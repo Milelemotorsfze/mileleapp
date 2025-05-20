@@ -1,6 +1,40 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}" />
 <style>
+	#loading-overlay {
+		position: fixed;
+		top: 0; left: 0;
+		width: 100%; height: 100%;
+		background: rgba(0,0,0,0.5);
+		z-index: 9999;
+		display: none; /* start hidden */
+		align-items: center;
+		justify-content: center;
+		opacity: 0; /* for smooth fade */
+		transition: opacity 0.3s ease; /* smooth transition */
+	}
+
+	#loading-overlay.active {
+		display: flex; /* flex centering */
+		opacity: 1; /* fully visible */
+	}
+
+	.loader {
+		width: 50px;
+		height: 50px;
+		border: 5px solid #f3f3f3;
+		border-top: 5px solid #3498db;
+		border-radius: 50%;
+		animation: spin 1s linear infinite;
+	}
+
+	@keyframes spin {
+		0% { transform: rotate(0deg); }
+		100% { transform: rotate(360deg); }
+	}
+	.widthinput {
+        height: 32px !important;
+    }
 	.btn-full-width {
 		width: 100%;
 		margin-top: 2px;
@@ -68,6 +102,9 @@
 	}
 </style>
 @section('content')
+<div id="loading-overlay" style="display: none;">
+    <div class="loader"></div>
+</div>
 <div class="card-header">
 	@php
 		$canViewWOList = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','view-current-user-export-exw-wo-list',
@@ -87,6 +124,7 @@
 		$canViewDocLog = Auth::user()->hasPermissionForSelectedRole(['view-doc-status-log']);
 		$canChangeWOStatus = Auth::user()->hasPermissionForSelectedRole(['can-change-status']);
 		$canViewWOStatusLog = Auth::user()->hasPermissionForSelectedRole(['view-wo-status-log']);
+		$canDeleteWO = Auth::user()->hasPermissionForSelectedRole(['delete-work-order']);
 	@endphp
 	@if ($canViewWOList && isset($type))
 		<h4>
@@ -180,7 +218,7 @@
 					<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
 							<label for="{{ $id }}" class="col-form-label text-md-end">{{ __($filter['label']) }}</label>
-							<select name="{{ $id }}" id="{{ $id }}" multiple="true" class="form-control widthinput" autofocus>
+							<select name="{{ $id }}" id="{{ $id }}" multiple class="form-control widthinput">
 								@foreach($filter['options'] as $option)
 									<option value="{{ $option }}" 
 										{{ in_array($option, $filter['selected']) ? 'selected' : '' }}>
@@ -191,14 +229,44 @@
 						</div>
 					</div>
 				@endforeach
-				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div">
-					<button id="apply-filters" type="submit" class="btn btn-info btn-sm mb-3" style="margin-top:25px!important;">
+				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div d-flex align-items-end">
+					<button id="apply-filters" type="submit" class="btn btn-info btn-sm">
 						Save & Apply Filters
 					</button>
 				</div>
 			</div>
+			<div class="row">
+				<div class="col-12 d-flex justify-content-end align-items-end flex-wrap gap-2">
+					<div>
+						<label for="dateRange" class="col-form-label">Date</label>
+						<input type="text" id="dateRange" class="form-control form-control-sm" placeholder="Select Date Range" />
+					</div>
+					<div>
+						<label for="search" class="col-form-label">Search</label>
+						<input id="search" name="search" type="text" class="form-control form-control-sm" placeholder="Search" value="{{ $search ?? '' }}">
+					</div>
+					<div class="d-flex align-items-end gap-2">
+						<button id="apply_search" type="button" class="btn btn-info btn-sm">
+							Search
+						</button>
+						<button id="clear-search" type="button" class="btn btn-secondary btn-sm">
+							Clear
+						</button>
+						@can('work-order-export')
+						@php
+							$hasPermission = Auth::user()->hasPermissionForSelectedRole('work-order-export');
+						@endphp
+							@if ($hasPermission)
+							<button id="export" type="button" class="btn btn-primary btn-sm" onclick="exportData()">
+								Export
+							</button>
+							@endif
+						@endcan
+					</div>
+				</div>
+			</div>
 			<br/>
-			<div class="table-responsive">
+			<div class="table-responsive dragscroll">
 				<table class="my-datatable table table-striped table-editable" style="width:100%;">
 					<thead>
 						<tr>
@@ -272,7 +340,9 @@
 								<th rowspan="2" class="dark">Sales Support Data Confirmation By</th>
 								<th rowspan="2" class="dark">Sales Support Data Confirmation At</th>
 								<th rowspan="2" class="dark">Total Number Of BOE</th>
+								<th rowspan="2" class="dark">Has Claim</th>
 							@endif
+							<th rowspan="2" class="light">Vehilce Count</th>
 						</tr>
 						<tr>
 							<td class="dark">Finance</td>
@@ -374,6 +444,17 @@
 													</a>
 												</li>
 											@endif
+											@if ($canDeleteWO && $data->sales_support_data_confirmation_at == '')
+												<li>
+													<a 
+														title="Delete" 
+														class="btn btn-sm btn-info btn-full-width" 
+														href="javascript:void(0);" 
+														onclick="confirmDelete('{{ route('workorder.destroy', $data->id) }}', '{{ $data->wo_number }}')">
+														<i class="fas fa-trash"></i> Delete
+													</a>
+												</li>
+											@endif						
 										</ul>
 									</div>
 									@include('work_order.export_exw.doc_status_update')
@@ -415,20 +496,22 @@
 								</td>
 								<td>
 									@if($data->sales_support_data_confirmation_at && $data->finance_approval_status === 'Approved' && $data->coo_approval_status === 'Approved')
+										<div class="tooltip-container">
 										<label class="badge {{ $data->getBadgeClass($data->docs_status) }}">
 											<strong>{{ strtoupper($data->docs_status) }}</strong>
 										</label>
 										@if($data->latestDocsStatus && $data->latestDocsStatus->documentation_comment)
-											<div class="tooltip-container">
+											@if(isset($data->latestDocsStatus) && $data->latestDocsStatus->documentation_comment != null)
 												<div class="tooltip-text">
 													<div class="tooltip-header">Remarks</div>
 													<div class="tooltip-body">
 														{{ $data->latestDocsStatus->documentation_comment }}
 													</div>
 												</div>
-											</div>
+											@endif
 										@endif
 									@endif
+									</div>
 								</td>
 								<td>
 									@if($data->sales_support_data_confirmation_at && $data->finance_approval_status === 'Approved' && $data->coo_approval_status === 'Approved')
@@ -485,10 +568,7 @@
 									<td>{{ $data->port_of_discharge ?? '' }}</td>
 									<td>{{ $data->final_destination ?? '' }}</td>
 									<td>{{ $data->transport_type ?? '' }}</td>
-									<td>
-										@component('components.view-download-buttons', ['filePath' => 'wo/brn_file/', 'fileName' => $data->brn_file])
-										@endcomponent
-									</td>
+									@component('components.view-download-buttons', ['filePath' => 'wo/brn_file/', 'fileName' => $data->brn_file])@endcomponent
 									<td>{{ $data->getTransportField('name') }}</td>
 									<td>{{ $data->getTransportField('id') }}</td>
 									<td class="{{ $data->transport_type == 'road' ? 'no-click' : '' }}">{{ $data->getTransportField('details') }}</td>
@@ -528,7 +608,9 @@
 									<td>{{ $data->salesSupportDataConfirmationBy->name ?? '' }}</td>
 									<td>{{ $data->formatDate($data->sales_support_data_confirmation_at) }}</td>
 									<td>{{ $data->total_number_of_boe != 0 ? $data->total_number_of_boe : '' }}</td>
+									<td>{{ $data->has_claim ?? ''}}</td>
 								@endif
+								<td>{{ $data->vehicles->count() ?? 0 }}</td>
 							</tr>
 						@endforeach
 					</tbody>
@@ -539,23 +621,38 @@
 			</div>
 		</div>
     </div>
-@else
-    <div class="card-header">
-        <p class="card-title">Sorry! You don't have permission to access this page.</p>
-        <div class="d-flex justify-content-between">
-            <a class="btn btn-sm btn-info" href="/">
-                <i class="fa fa-arrow-left" aria-hidden="true"></i> Go To Dashboard
-            </a>
-            <a class="btn btn-sm btn-info" href="{{ url()->previous() }}">
-                <i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page
-            </a>
-        </div>
-    </div>
 @endif
 @endsection
 @push('scripts')
+
 <script type="text/javascript">
     $(document).ready(function() {
+
+		let startDate = "{{ request('start_date') }}";
+		let endDate = "{{ request('end_date') }}";
+
+    $('#dateRange').daterangepicker({
+        autoUpdateInput: false,
+        locale: {
+            cancelLabel: 'Clear',
+            format: 'YYYY-MM-DD'
+        }
+    });
+
+    if (startDate && endDate) {
+        $('#dateRange').data('daterangepicker').setStartDate(startDate);
+        $('#dateRange').data('daterangepicker').setEndDate(endDate);
+        $('#dateRange').val(`${startDate} - ${endDate}`);
+    }
+
+    $('#dateRange').on('apply.daterangepicker', function (ev, picker) {
+        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+    });
+
+    $('#dateRange').on('cancel.daterangepicker', function (ev, picker) {
+        $(this).val('');
+    });
+
         $('.tooltip-container').hover(
             function() {
                 $(this).find('.tooltip-text').css({ visibility: 'visible', opacity: '1' });
@@ -576,11 +673,15 @@
         ];
         selectFilters.forEach(filter => {
             $(filter.id).select2({ allowClear: true, placeholder: filter.placeholder });
+			// Manually remove aria-hidden on Select2 initialization
+			$(filter.id).removeAttr('aria-hidden');
         });
         $('#apply-filters').on('click', function(e) {
             e.preventDefault();
 
-            const filterData = {
+            // Show the overlay
+			$('#loading-overlay').css('display', 'flex').addClass('active');
+			const filterData = {
                 status_filter: $('#status-filter').val(),
                 sales_support_filter: $('#sales-support-filter').val(),
                 finance_approval_filter: $('#finance-approval-filter').val(),
@@ -592,29 +693,44 @@
 
             $.post("{{ route('save.filters') }}", filterData)
                 .done(function() {
+					// Show loader again before redirect
+					$('#loading-overlay').css('display', 'flex').addClass('active');
+
+					// Small timeout to allow the overlay to appear
+					setTimeout(function() {
                     window.location.href = "{{ route('work-order.index', '') }}/" + filterData.type;
+    				}, 300); // 300ms delay
                 })
                 .fail(function() {
                     alert("Failed to apply filters. Please try again.");
-                });
+			})
+			.always(function() {
+				// Hide the overlay whether success or fail
+				$('#loading-overlay').removeClass('active');
+				setTimeout(() => {
+					$('#loading-overlay').css('display', 'none');
+				}, 300); // Wait for the opacity transition to finish
+			});
         });
 
-        $('.my-datatable tbody').on('click', 'tr td:not(.no-click)', function() {
-            const workOrderId = $(this).closest('tr').data('id');
-            if (workOrderId) window.location.href = `/work-order/${workOrderId}`;
-        });
+		$('.my-datatable tbody').on('dblclick', 'tr td:not(.no-click)', function() {
+			const workOrderId = $(this).closest('tr').data('id');
+			if (workOrderId) window.location.href = `/work-order/${workOrderId}`;
+		});
         const table = $('.my-datatable').DataTable({
-            pageLength: 100,
-            lengthMenu: [10, 25, 50, 100, 200],
-            order: [],
-            columnDefs: [{ targets: 'no-sort', orderable: false }],
-            paging: false,
-            info: false,
-            lengthChange: false,
-            initComplete: function() {
-                hideEmptyColumns(this.api());
-            }
-        });
+			pageLength: 100,
+			lengthMenu: [10, 25, 50, 100, 200],
+			order: [],
+			columnDefs: [{ targets: 'no-sort', orderable: false }],
+			paging: false,
+			info: false,
+			lengthChange: false,
+			searching: false,  // Disables the search box
+			initComplete: function() {
+				hideEmptyColumns(this.api());
+			}
+		});
+
         function hideEmptyColumns(tableApi) {
 			tableApi.columns().every(function() {
 				const column = this;
@@ -623,10 +739,89 @@
 			});
 		}
     });
+	$(document).on('select2:open', function(e) {
+		const selectId = e.target.id;
+		const searchField = document.querySelector(`#select2-${selectId}-container`);
+		if (searchField) searchField.focus();
+	});
+	$('.form-control').on('select2:open', function() {
+		$(this).removeAttr('aria-hidden');
+	});
+	function confirmDelete(url, woNumber) {
+		var message = "delete this work order " + woNumber; // Add the work order number
+		alertify.confirm(
+			'Are you sure you want to ' + message + '?',
+			function (confirmed) { // 'confirmed' will be true if OK is clicked
+				if (confirmed) {
+					$.ajax({
+						type: "POST",
+						url: url,
+						data: {
+							_method: 'DELETE', // Emulates DELETE HTTP method
+							_token: '{{ csrf_token() }}'
+						},
+						success: function () {
+							window.location.reload();
+							alertify.success("Work order " + woNumber + " deleted successfully");
+						},
+						error: function () {
+							alertify.error("An error occurred while deleting work order " + woNumber);
+						}
+					});
+				} else {
+					alertify.error("Deletion canceled for work order " + woNumber);
+				}
+			}
+		).set({ title: "Confirm Deletion" });
+	}
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
+	document.getElementById('apply_search').addEventListener('click', function() {
+		const searchValue = document.getElementById('search').value;
+		const type = 'all';  // Modify this if 'type' should be dynamically set based on other input
+		const dateRange = $('#dateRange').val();
+
+		let startDate = '';
+		let endDate = '';
+
+		if (dateRange.includes(' - ')) {
+			const dates = dateRange.split(' - ');
+			startDate = dates[0];
+			endDate = dates[1];
+		}
+
+		const queryParams = new URLSearchParams({
+			search: searchValue,
+			start_date: startDate,
+			end_date: endDate
+		});
+
+		window.location.href = `/work-order-info/${type}?${queryParams.toString()}`;
+		// Redirect to the URL with both 'type' and 'search' parameters
+		// window.location.href = `/work-order-info/${type}?search=${encodeURIComponent(searchValue)}`;
+	});
+	document.getElementById('clear-search').addEventListener('click', function() {
+		const type = 'all';  // Modify this if 'type' should be dynamically set based on other input
+		window.location.href = `/work-order-info/${type}`;
+	});
+	function exportData() {
+            let search = $('#search').val(); 
+			let startDate = '';
+			let endDate = '';
+			const dateRange = $('#dateRange').val();
+			if (dateRange.includes(' - ')) {
+				const dates = dateRange.split(' - ');
+				startDate = dates[0];
+				endDate = dates[1];
+			}
+         
+            var exportUrl = "{{ url('work-order-info/all')}}"+"?search="+search+"&end_date="+endDate+"&start_date="+startDate+
+                   "&export=EXCEL";
+           
+            window.location.href = exportUrl;
+        }
 </script>
 @endpush

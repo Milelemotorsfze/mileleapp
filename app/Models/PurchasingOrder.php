@@ -9,6 +9,13 @@ class PurchasingOrder extends Model
 {
     use HasFactory;
     protected $table = 'purchasing_order';
+
+    public const PAYMENT_STATUS_PENDING = 'Pending';
+    public const PAYMENT_STATUS_INITIATED = 'Initiated';
+    public const PAYMENT_STATUS_PARTIALY_PAID = 'Partially Paid';
+    public const PAYMENT_STATUS_PAID = 'Paid';
+    public const PAYMENT_STATUS_UNPAID = 'Unpaid';
+
     protected $fillable = [
         'po_number',
         'po_date',
@@ -29,6 +36,7 @@ class PurchasingOrder extends Model
         'pl_number',
         'pl_file_path',
     ];
+
     protected $appends = [
         'is_demand_planning_purchase_order',
 
@@ -41,12 +49,20 @@ class PurchasingOrder extends Model
     {
         return $this->hasMany(Vehicles::class);
     }
+    // need to remove
     public function LOIPurchasingOrder()
     {
         return $this->hasOne(LOIItemPurchaseOrder::class, 'purchase_order_id');
     }
+    public function PfiItemPurchaseOrders() {
+        return $this->hasMany(PfiItemPurchaseOrder::class,'purchase_order_id');
+    }
+    public function PFIPurchasingOrder()
+    {
+        return $this->hasOne(PfiItemPurchaseOrder::class, 'purchase_order_id');
+    }
     public function getIsDemandPlanningPurchaseOrderAttribute() {
-        $isDemandPlanningPO = LOIItemPurchaseOrder::where('purchase_order_id', $this->id)->count();
+        $isDemandPlanningPO = PfiItemPurchaseOrder::where('purchase_order_id', $this->id)->count();
         if($isDemandPlanningPO > 0) {
             return true;
         }
@@ -70,4 +86,13 @@ class PurchasingOrder extends Model
     {
         return $this->hasMany(PurchasedOrderPaidAmounts::class, 'purchasing_order_id');
     }
+    public function SupplierAccountTransactions()
+    {
+        return $this->hasMany(SupplierAccountTransaction::class, 'purchasing_order_id');
+    }
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class, 'vendors_id','id');
+    }
+    
 }

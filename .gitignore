@@ -7,6 +7,7 @@
 /vendor
 .env
 .env.backup
+.htaccess
 .env.production
 .phpunit.result.cache
 Homestead.json
@@ -20,6 +21,9 @@ yarn-error.log
 
 # Ignore everything in the public directory
 /public/*
+.htaccess
+/php.ini
+/user.ini
 
 # Allow the css/custom and js/custom directories and their contents
 !/public/css/
@@ -32,3 +36,18 @@ yarn-error.log
 /latest
 /laravel-blog
 /testings
+/sbskillsage
+/skillsage
+/testskillsage
+# Configuration files
+php.ini
+user.ini
+.htaccess
+
+/node_modules/
+/vendor/
+/storage/logs/
+/storage/framework/sessions/
+/storage/framework/cache/
+/storage/
+/Backup folder/

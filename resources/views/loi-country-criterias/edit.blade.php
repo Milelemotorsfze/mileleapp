@@ -5,6 +5,9 @@
         {
             height:32px!important;
         }
+        .custom-error {
+            color: red;
+        }
     </style>
     @can('loi-restricted-country-edit')
         @php
@@ -172,12 +175,10 @@
         $('#restricted_model_line').select2({
             placeholder : 'Select Restricted Model Lines',
             allowClear: true,
-            // maximumSelectionLength: 1
         });
         $('#allowed_model_line').select2({
             placeholder : 'Select Allowed Model Lines',
             allowClear: true,
-            // maximumSelectionLength: 1
         });
         $('#is_only_company_allowed').select2({
             placeholder : 'Select Option',
@@ -205,6 +206,14 @@
                     required: true,
                 },
             },
+            errorPlacement: function(error, element) {
+                error.addClass('custom-error');
+                if (element.attr("name") === "country_id") {
+                    error.insertAfter(element.next('.select2'));
+                } else {
+                    error.insertAfter(element);
+                }
+            }
         });
     </script>
 @endpush

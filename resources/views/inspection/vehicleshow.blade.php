@@ -1,4 +1,12 @@
 @extends('layouts.main')
+<style>
+   #interior_colour-error {
+        margin-top:10px !important;
+    }
+    #exterior_colour-error {
+        margin-top:10px !important;
+    }
+    </style>
 <script src="https://unpkg.com/konva@9.2.1/konva.min.js"></script>
 <div id="csrf-token" data-token="{{ csrf_token() }}"></div>
 @section('content')
@@ -12,9 +20,16 @@
     </h4>
     <br>
 </div>
-<div class="card-body">
-<div class="modal fade optionsmodal-modal" id="optionsmodal" tabindex="-1" aria-labelledby="optionsmodalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
+
+                @if (Session::has('error'))
+                    <div class="alert alert-danger mt-3 mb-0" id="success-alert">
+                        <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                        {{ Session::get('error') }}
+                    </div>
+                @endif
+                    <div class="card-body">
+                    <div class="modal fade optionsmodal-modal" id="optionsmodal" tabindex="-1" aria-labelledby="optionsmodalLabel" aria-hidden="true">
+                                                <div class="modal-dialog">
                                 <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="optionsmodalLabel">Update Options</h5>
@@ -74,7 +89,7 @@
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Interior Colour</label>
-                                    <select class="form-control" autofocus name="interior_colour" id="interior_colour">
+                                    <select class="form-control" required autofocus name="int_colour" id="interior_colour">
                                     <option value="" disabled selected>Select a Colour</option>
                                     @foreach($int_colours as $int_colours)
                                     <option value="{{ $int_colours->id }}">
@@ -86,8 +101,8 @@
                             </div>
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Exterior Colour</label>
-                                    <select class="form-control" autofocus name="exterior_colour" id="exterior_colour">
+                                    <label for="choices-single-default" required class="form-label">Exterior Colour</label>
+                                    <select class="form-control" autofocus  name="ex_colour" id="exterior_colour">
                                     <option value="" disabled selected>Select a Colour</option>
                                     @foreach($ext_colours as $ext_colours)
                                     <option value="{{ $ext_colours->id }}">
@@ -112,24 +127,26 @@
                                     </select>
                                 </div>
                             </div>
-                            @php
-    // Convert the 'Mar-2021' format to '2021-03' if $vehicle->ppmmyyy exists
+    @php
+    // Initialize formattedDate as an empty string
     $formattedDate = '';
+
+    // Check if $vehicle->ppmmyyy exists and matches the expected format
     if (!empty($vehicle->ppmmyyy)) {
-        $date = \Carbon\Carbon::createFromFormat('M-Y', $vehicle->ppmmyyy);
-        $formattedDate = $date ? $date->format('Y-m') : '';
+        try {
+            // Attempt to parse 'Mar-2021' format
+            $date = \Carbon\Carbon::createFromFormat('M-Y', $vehicle->ppmmyyy);
+            $formattedDate = $date->format('Y-m');
+        } catch (\Exception $e) {
+            // Handle invalid date format gracefully
+            $formattedDate = '';
+        }
     }
 @endphp
 <div class="col-lg-2 col-md-6 col-sm-12">
     <div class="mb-3">
         <label for="production-date" class="form-label">Production Date</label>
-        <input 
-            type="month" 
-            id="production-date" 
-            name="ppmmyyy" 
-            class="form-control" 
-            value="{{ $formattedDate }}"
-        >
+        <input  type="month"  id="production-date" name="ppmmyyy"  class="form-control" value="{{ $formattedDate }}" >
     </div>
 </div>
                             <div class="col-lg-2 col-md-6 col-sm-12">
@@ -175,6 +192,7 @@
                                         <option value="2.8" {{ old('engine') == '2.8' ? 'selected' : '' }}>2.8</option>
                                         <option value="3.0" {{ old('engine') == '3.0' ? 'selected' : '' }}>3.0</option>
                                         <option value="3.3" {{ old('engine') == '3.3' ? 'selected' : '' }}>3.3</option>
+                                        <option value="3.4" {{ old('engine') == '3.4' ? 'selected' : '' }}>3.4</option>
                                         <option value="3.5" {{ old('engine') == '3.5' ? 'selected' : '' }}>3.5</option>
                                         <option value="4.0" {{ old('engine') == '4.0' ? 'selected' : '' }}>4.0</option>
                                         <option value="4.2" {{ old('engine') == '4.2' ? 'selected' : '' }}>4.2</option>
@@ -182,7 +200,9 @@
                                         <option value="4.5" {{ old('engine') == '4.5' ? 'selected' : '' }}>4.5</option>
                                         <option value="4.6" {{ old('engine') == '4.6' ? 'selected' : '' }}>4.6</option>
                                         <option value="4.8" {{ old('engine') == '4.8' ? 'selected' : '' }}>4.8</option>
+                                        <option value="5.0" {{ old('engine') == '5.0' ? 'selected' : '' }}>5.0</option>
                                         <option value="5.3" {{ old('engine') == '5.3' ? 'selected' : '' }}>5.3</option>
+                                        <option value="5.5" {{ old('engine') == '5.5' ? 'selected' : '' }}>5.5</option>
                                         <option value="5.6" {{ old('engine') == '5.6' ? 'selected' : '' }}>5.6</option>
                                         <option value="5.7" {{ old('engine') == '5.7' ? 'selected' : '' }}>5.7</option>
                                         <option value="5.9" {{ old('engine') == '5.9' ? 'selected' : '' }}>5.9</option>
@@ -421,7 +441,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <label>Remarks</label>
-                            <textarea name="remarks" id="editor"></textarea>
+                            <textarea name="remarks" class="form-control"></textarea>
                         </div>
                     </div>
                 </div>
@@ -436,8 +456,17 @@
 @push('scripts')
 <script>
     $(document).ready(function() {
-        $('#interior_colour').select2();
-        $('#exterior_colour').select2();
+        $('#interior_colour').select2({
+            placeholder: 'Select Interior Colour'
+        }).on('change',function() {
+            $('#interior_colour-error').remove();
+        })
+        $('#exterior_colour').select2({
+            placeholder: 'Select Exterior Colour'
+        }).on('change',function() {
+            $('#exterior_colour-error').remove();
+        });
+       
         $('#enableInputs').change(function() {
             $('#vin, #variant, #newVariantDropdown, #interior_color, #exterior_color').prop('disabled', !this.checked);
         });
@@ -561,12 +590,7 @@
             placeholder: 'Select Brand'
         })
         $('.coo').select2();
-        $('#int_colour').select2({
-            placeholder: 'Select Interior Colour'
-        })
-        $('#ex_colour').select2({
-            placeholder: 'Select Exterior Colour'
-        })
+        
         $('#model').select2({
             placeholder: 'Select Model'
         })
@@ -576,20 +600,19 @@
         $('#model').on('change',function() {
             $('#model-error').remove();
         })
-        $("#form-create").validate({
+        $("#inspection-form").validate({
             ignore: [],
             rules: {
-                name: {
-                    required: true,
-                    string:true,
-                    max:255
-                },
-                master_model_lines_id:{
+                ex_colour:{
                     required:true,
                 },
-                brands_id:{
+                int_colour:{
                     required:true,
                 },
+                ppmmyyy:{
+                    required:true,
+                }
+
             }
         });
     </script>

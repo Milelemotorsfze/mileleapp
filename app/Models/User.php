@@ -34,6 +34,8 @@ class User extends Authenticatable
         'is_management',
         'is_sales_rep',
         'can_send_wo_email',
+        'pfi_access',
+        'manual_lead_assign',
     ];
     protected $hidden = [
         'password',

@@ -1,330 +1,455 @@
 @extends('layouts.main')
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
 <style>
-.select2-container {
-  width: 100% !important;
-}
-.form-label[for="basicpill-firstname-input"] {
-  margin-top: 12px;
-}
-.btn.btn-success.btncenter {
-    background-color: #28a745;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-
-  .btn.btn-success.btncenter:hover {
-    background-color: #0000ff;
-    font-size: 17px;
-    border-radius: 10px;
-  }
-
-  /* Media Query for small screens */
-  @media (max-width: 767px) {
-    .col-lg-12.col-md-12 {
-      text-align: center;
+    .select2-container {
+        width: 100% !important;
     }
-  }
-.error 
-    {
+
+    .form-label[for="basicpill-firstname-input"] {
+        margin-top: 12px;
+    }
+
+    .btn.btn-success.btncenter {
+        background-color: #28a745;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn.btn-success.btncenter:hover {
+        background-color: #0000ff;
+        font-size: 17px;
+        border-radius: 10px;
+    }
+
+    /* Media Query for small screens */
+    @media (max-width: 767px) {
+        .col-lg-12.col-md-12 {
+            text-align: center;
+        }
+    }
+
+    .error {
         color: #FF0000;
     }
-    .iti 
-    { 
-        width: 100%; 
+
+    .iti {
+        width: 100%;
     }
+
     label {
-  display: inline-block;
-  margin-right: 10px;
-}
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button,
-input[type=number]::-webkit-outer-spin-button { 
-    -webkit-appearance: none; 
-    -moz-appearance: none;
-    appearance: none; 
-    margin: 0; 
-}
-.error-text{
-    color: #FF0000;
-}
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        display: inline-block;
+        margin-right: 10px;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        margin: 0;
+    }
+
+    .error-text {
+        color: #FF0000;
+    }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')
 @php
-  $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
-  @endphp
-  @if ($hasPermission)
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
+@endphp
+@if ($hasPermission)
 <div class="card-header">
-        <h4 class="card-title">New Calls & Messages</h4>
-        <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
-    </div>
-    <div class="card-body">
+    <h4 class="card-title">New Calls & Messages</h4>
+    <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+</div>
+<div class="card-body">
     <div class="col-lg-12">
-    <div id="flashMessage"></div>
-</div>
-        @if (count($errors) > 0)
-            <div class="alert alert-danger">
-                <strong>Whoops!</strong> There were some problems with your input.<br><br>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-        {!! Form::open(array('route' => 'calls.store','method'=>'POST', 'id' => 'calls')) !!}
-            <div class="row">
-            <p><span style="float:right;" class="error">* Required Field</span></p>
-			</div>  
-			<form action="" method="post" enctype="multipart/form-data">
-                <div class="row"> 
-					<div class="col-lg-4 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">Customer Name : </label>
-                        {!! Form::text('name', null, array('placeholder' => 'Name','class' => 'form-control')) !!}
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-    <span class="error">* </span>
-    <label for="basicpill-firstname-input" class="form-label">Customer Phone:</label>
-    <input type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number" autocomplete="off">
-</div>
-                    <div class="col-lg-4 col-md-6">
-    <span class="error">*</span>
-    <label for="basicpill-firstname-input" class="form-label">Customer Email:</label>
-    {!! Form::email('email', null, array('id' => 'email', 'placeholder' => 'Email','class' => 'form-control')) !!}
-    <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}" autocomplete="off">
-    <div id="emailError" class="error-text"></div>
-</div>
-                    <div class="col-lg-4 col-md-6">
-                    <span class="error">* </span>
-                    <label for="basicpill-firstname-input" class="form-label">Source:</label>
-                    <input type="text" placeholder="Source" name="milelemotors" list="milelemotorsList" class="form-control" id="milelemotorsInput" autocomplete="off">
-                    <datalist id="milelemotorsList">
-                    @foreach ($LeadSource as $source)
-                    <option value="{{ $source->source_name }}">{{ $source->source_name }}</option>
-                    @endforeach
-                    </datalist>
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                    <span class="error">*</span>
-                    <label for="basicpill-firstname-input" class="form-label">Preferred Language:</label>
-                    <input type="text" placeholder="Language" name="language" list="laList" class="form-control" id="languageInput" autocomplete="off">
-                    <datalist id="laList">
-                    @foreach ($Language as $language)
-                        <option value="{{ $language->name }}" data-value="{{ $language->name }}">{{ $language->name }}</option>
-                    @endforeach
-                    </datalist>
-                </div>
-                    <div class="col-xs-4 col-sm-12 col-md-4">
-                    <span class="error">* </span>
-                        <label for="basicpill-firstname-input" class="form-label">Destination : </label>
-                        <input type="text" placeholder="Location" name="location" list="loList" class="form-control" id="locationInput">
-                    <datalist id="loList">
-                    @foreach ($countries as $country)
-                    <option value="{{ $country }}" data-value="{{ $country }}">{{ $country }}</option>
-                    @endforeach
-                    <option value="Not Mentioned" data-value="Not Mentioned">Not Mentioned</option>
-                    </datalist>
-                        </div>
-                        <div class="col-lg-4 col-md-6">
-                        <span class="error">* </span>
-                        <label for="basicpill-firstname-input" class="form-label">Type : </label>
-                        <input type="text" placeholder="Type" name="type" list="typeList" class="form-control" id="typeInput">
-                    <datalist id="typeList">
-                    <option value="Export" data-value="Export">Export</option>
-                    <option value="Local" data-value="Export">Local</option>
-                    <option value="Other" data-value="Export">Other</option>
-                    </datalist>
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                        <span class="error">* </span>
-                        <label for="basicpill-firstname-input" class="form-label">Strategies:</label>
-                        <select name="strategy" class="form-control" id="typeInput">
-                            @foreach ($strategy as $strategies)
-                                <option value="{{ $strategies->name }}">{{ $strategies->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                        <span class="error">* </span>
-                        <label for="basicpill-firstname-input" class="form-label">Priority : </label>
-                        <input type="text" placeholder="Type" name="priority" list="priorityList" class="form-control" id="priorityInput">
-                    <datalist id="priorityList">
-                    <option value="Normal" data-value="Normal">Normal</option>
-                    <option value="Low" data-value="Low">Low</option>
-                    <option value="Hot" data-value="Hot">Hot</option>
-                    </datalist>
-                    </div>
-                    </div>
-                    </br>
-                    <div class="row">
-                    <div class="col-lg-4 col-md-6">
-    <label for="sales-options" class="form-label">Sales Persons Options:</label>
-    <div>
-        <label>
-            <input type="radio" name="sales-option" id="auto-assign-option" value="auto-assign" checked> System Auto Assign
-        </label>
-        <label>
-            <input type="radio" name="sales-option" id="manual-assign-option" value="manual-assign"> Manual Assign
-        </label>
+        <div id="flashMessage"></div>
     </div>
-</div>
-<div class="col-lg-4 col-md-6" id="manual-sales-person-list" style="display: none;">
-    <label for="manual-sales-person" class="form-label">Sales Person:</label>
-    <input type="text" placeholder="Sales Persons" name="sales_person" list="salesList" class="form-control" id="salesPersonInput" autocomplete="off">
-<datalist id="salesList">
-    @foreach ($sales_persons as $sales_person)
-        @php
-            $sales_person_details = DB::table('users')->where('id', $sales_person->model_id)->first();
-            $sales_person_name = $sales_person_details->name;
-        @endphp
-        <option value="{{ $sales_person_name }}" data-id="{{ $sales_person->model_id }}"></option>      
-    @endforeach
-</datalist>
-<input type="hidden" name="sales_person_id" id="selectedSalesPersonId">
-                    </div>
-                    </div>
-                    <div class="maindd">
-    <div id="row-container">
+    @if (count($errors) > 0)
+    <div class="alert alert-danger">
+        <strong>Whoops!</strong> There were some problems with your input.<br><br>
+        <ul>
+            @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+    {!! Form::open(array('route' => 'calls.store','method'=>'POST', 'id' => 'calls')) !!}
+    <div class="row">
+        <p><span style="float:right;" class="error">* Required Field</span></p>
+    </div>
         <div class="row">
             <div class="col-lg-4 col-md-6">
-            <label for="brandInput" class="form-label">Brand & Models:</label>
-<input type="text" placeholder="Select Brand & Model" name="model_line_id[]" list="brandList" class="form-control mb-1" id="brandInput">
-<datalist id="brandList">
-    @foreach ($modelLineMasters as $modelLineMaster)
-        @php
-            $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
-            $brand_name = $brand->brand_name;
-        @endphp 
-        <option value="{{ $brand_name }} / {{ $modelLineMaster->model_line }}" data-value="{{ $modelLineMaster->id }}">{{ $brand_name }} / {{ $modelLineMaster->model_line }}</option>
-    @endforeach
-</datalist>
-<input type="hidden" name="model_line_ids[]" id="selectedBrandId">
+                <label for="basicpill-firstname-input" class="form-label">Customer Name : </label>
+                {!! Form::text('name', old('name'), ['placeholder' => 'Name', 'class' => 'form-control']) !!}
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <span class="error">* </span>
+                <label for="basicpill-firstname-input" class="form-label">Customer Phone:</label>
+                <input type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number" autocomplete="off" value="{{ old('phone') }}">
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <span class="error">*</span>
+                <label for="basicpill-firstname-input" class="form-label">Customer Email:</label>
+                {!! Form::email('email', old('email'), ['id' => 'email', 'placeholder' => 'Email', 'class' => 'form-control']) !!}
+                <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}" autocomplete="off">
+                <div id="emailError" class="error-text"></div>
+            </div>
+            <div class="col-lg-4 col-md-6 pt-3">
+                <span class="error">* </span>
+                <label for="milelemotorsSelect" class="form-label">Source:</label>
+                <select name="milelemotors" class="form-control select2" id="milelemotorsSelect" multiple>
+                    <option value="">Select Source</option>
+                    @foreach ($LeadSource as $source)
+                    <option value="{{ $source->source_name }}" {{ old('milelemotors') == $source->source_name ? 'selected' : '' }}>
+                        {{ $source->source_name }}
+                    </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-lg-4 col-md-6 pt-3">
+                <span class="error">*</span>
+                <label for="languageSelect" class="form-label">Preferred Language:</label>
+                <select name="language" class="form-control select2" id="languageSelect" multiple>
+                    <option value="">Select Language</option>
+                    @foreach ($Language as $language)
+                    <option value="{{ $language->name }}" {{ old('language') == $language->name ? 'selected' : '' }}>
+                        {{ $language->name }}
+                    </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="col-lg-4 col-md-6 pt-3">
+                <span class="error">* </span>
+                <label for="locationSelect" class="form-label">Destination:</label>
+                <select name="location" class="form-control select2" id="locationSelect" multiple>
+                    <option value="">Select Destination</option>
+                    @foreach ($countries as $country)
+                    <option value="{{ $country }}" {{ old('location') == $country ? 'selected' : '' }}>
+                        {{ $country }}
+                    </option>
+                    @endforeach
+                    <option value="Not Mentioned" {{ old('location') == 'Not Mentioned' ? 'selected' : '' }}>Not Mentioned</option>
+                </select>
+            </div>
+
+            <div class="col-lg-4 col-md-6 pt-3">
+                <span class="error">* </span>
+                <label for="typeSelect" class="form-label">Type:</label>
+                <select name="type" class="form-control select2" id="typeSelect" multiple>
+                    <option value="">Select Type</option>
+                    <option value="Export" {{ old('type') == 'Export' ? 'selected' : '' }}>Export</option>
+                    <option value="Local" {{ old('type') == 'Local' ? 'selected' : '' }}>Local</option>
+                    <option value="Other" {{ old('type') == 'Other' ? 'selected' : '' }}>Other</option>
+                </select>
+            </div>
+
+            <div class="col-lg-4 col-md-6 pt-1">
+                <span class="error">* </span>
+                <label for="basicpill-firstname-input" class="form-label">Strategies:</label>
+                <select name="strategy" class="form-control select2" id="strategyInput" multiple>
+                    @foreach ($strategy as $strategies)
+                    <option value="{{ $strategies->name }}" {{ old('strategy') == $strategies->name ? 'selected' : '' }}>{{ $strategies->name }} </option>
+                    @endforeach
+                </select>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 pt-3">
+                <span class="error">* </span>
+                <label for="prioritySelect" class="form-label">Priority:</label>
+                <select name="priority" class="form-control select2" id="prioritySelect" multiple>
+                    <option value="">Select Priority</option>
+                    <option value="normal" {{ old('priority') == 'normal' ? 'selected' : '' }}>Normal</option>
+                    <option value="low" {{ old('priority') == 'low' ? 'selected' : '' }}>Low</option>
+                    <option value="hot" {{ old('priority') == 'hot' ? 'selected' : '' }}>Hot</option>
+                </select>
+            </div>
+
+        </div>
+        </br>
+        <div class="row">
+            <div class="col-lg-4 col-md-6">
+                <label for="sales-options" class="form-label">Sales Persons Options:</label>
+                <div>
+                    <label>
+                        <input type="radio" name="sales-option" id="auto-assign-option" value="auto-assign" {{ old('sales-option', 'auto-assign') == 'auto-assign' ? 'checked' : '' }}> System Auto Assign
+                    </label>
+                    <label>
+                        <input type="radio" name="sales-option" id="manual-assign-option" value="manual-assign" {{ old('sales-option') == 'manual-assign' ? 'checked' : '' }}> Manual Assign
+                    </label>
+                </div>
+            </div>
+
+            <input type="hidden" id="sales-option-value" name="sales-option" value="{{ old('sales-option', 'auto-assign') }}">
+            
+            <div class="col-lg-4 col-md-6" id="manual-sales-person-list" style="display: none;">
+                <span class="error">* </span>
+                <label for="sales_person" class="form-label">Sales Person:</label>
+                <select name="sales_person_id" id="salesPersonSelect" class="form-control select2" multiple>
+                    <option value="">Select Sales Person</option>
+                    @foreach ($sales_persons as $sales_person)
+                    <option value="{{ $sales_person->id }}" {{ old('sales_person_id') == $sales_person->id ? 'selected' : '' }}>
+                        {{ $sales_person->name }}
+                    </option>
+                    @endforeach
+                </select>
             </div>
         </div>
-    </div>
-    <div class="col-lg-12 col-md-12 mt-3 d-flex justify-content-start">
-        <div class="btn btn-primary add-row-btn">
-            <i class="fas fa-plus"></i> Add More
+        <div class="maindd">
+            <div id="row-container">
+
+                @if(old('model_line_ids'))
+                    @foreach(old('model_line_ids') as $id)
+                        <div class="row">
+                            <div class="col-lg-4 col-md-6">
+                                <label for="brandModelSelect" class="form-label">Brand & Model:</label>
+                                <select name="model_line_ids[]" class="form-control select2" multiple>
+                                    <option value="">Select Brand & Model</option>
+                                    @foreach ($modelLineMasters as $modelLineMaster)
+                                        @php
+                                            $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
+                                            $combinedValue = $brand->brand_name . ' / ' . $modelLineMaster->model_line;
+                                        @endphp
+                                        <option value="{{ $modelLineMaster->id }}" {{ $id == $modelLineMaster->id ? 'selected' : '' }}>
+                                            {{ $combinedValue }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    <div class="row">
+                        <div class="col-lg-4 col-md-6">
+                            <label for="brandModelSelect" class="form-label">Brand & Model:</label>
+                            <select name="model_line_ids[]" class="form-control select2" multiple>
+                                <option value="">Select Brand & Model</option>
+                                @foreach ($modelLineMasters as $modelLineMaster)
+                                    @php
+                                        $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
+                                        $combinedValue = $brand->brand_name . ' / ' . $modelLineMaster->model_line;
+                                    @endphp
+                                    <option value="{{ $modelLineMaster->id }}" {{ old('model_line_ids.0') == $modelLineMaster->id ? 'selected' : '' }}>
+                                        {{ $combinedValue }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+            <div class="col-lg-12 col-md-12 mt-3 d-flex justify-content-start">
+                <div class="btn btn-primary add-row-btn">
+                    <i class="fas fa-plus"></i> Add More
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+            <label for="basicpill-firstname-input" class="form-label">Custom Brand & Model : </label>
+            {!! Form::text('custom_brand_model', null, array('placeholder' => 'Custom Brand & Model','class' => 'form-control')) !!}
+        </div>
+        <div class="col-lg-12 col-md-12">
+            <label for="basicpill-firstname-input" class="form-label">Remarks : </label>
+            <textarea id="summernote" name="remarks">{{ old('remarks') }}</textarea>
         </div>
     </div>
+    </br>
+    </br>
+<div class="col-lg-12 col-md-12">
+    <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
 </div>
-                    <div class="col-lg-4 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">Custom Brand & Model : </label>
-                        {!! Form::text('custom_brand_model', null, array('placeholder' => 'Custom Brand & Model','class' => 'form-control')) !!}
-                    </div>
-                    <div class="col-lg-12 col-md-12">
-                        <label for="basicpill-firstname-input" class="form-label">Remarks : </label>
-                        <textarea name="remarks" id="editor"></textarea>
-                    </div>
-			        </div>  
-                    </br>
-                    </br> 
-			        <div class="col-lg-12 col-md-12">
-				    <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
-			        </div>  
-		{!! Form::close() !!}
-		</br>
-    </div>
-    @else
-    @php
-        redirect()->route('home')->send();
-    @endphp
+{!! Form::close() !!}
+</br>
+</div>
+@else
+@php
+redirect()->route('home')->send();
+@endphp
 @endif
 @endsection
 @push('scripts')
-    <script type="text/javascript">
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('#summernote').summernote({
+        height: 300,
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline', 'clear']],
+            ['font', ['strikethrough', 'superscript', 'subscript']],
+            ['fontsize', ['fontsize']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['insert', ['picture', 'link', 'video']],
+            ['view', ['fullscreen', 'codeview', 'help']]
+        ],
+        callbacks: {
+            onImageUpload: function(files) {
+                uploadImage(files[0]);
+            }
+        }
+    });
+
+    function uploadImage(file) {
+        let data = new FormData();
+        data.append("file", file);
+        data.append("_token", "{{ csrf_token() }}");
+
+        $.ajax({
+            url: "{{ route('summernote.upload') }}",
+            method: "POST",
+            data: data,
+            contentType: false,
+            processData: false,
+            success: function(url) {
+                $('#summernote').summernote('insertImage', url);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert("Image upload failed.");
+                console.error(textStatus + " " + errorThrown);
+            }
+        });
+    }
+});
+
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.select2').select2({
+            placeholder: "Select an option",
+            maximumSelectionLength: 1,
+        });
+    });
+
     const autoAssignOption = document.getElementById('auto-assign-option');
     const manualAssignOption = document.getElementById('manual-assign-option');
     const manualSalesPersonList = document.getElementById('manual-sales-person-list');
     const salesOptionValueField = document.getElementById('sales-option-value');
+
     autoAssignOption.addEventListener('change', () => {
         manualSalesPersonList.style.display = 'none';
         salesOptionValueField.value = autoAssignOption.value;
     });
+
     manualAssignOption.addEventListener('change', () => {
         manualSalesPersonList.style.display = 'block';
         salesOptionValueField.value = manualAssignOption.value;
     });
-    $(document).ready(function() {
-  var max_fields = 10;
-  var wrapper = $("#row-container");
-  var add_button = $(".add-row-btn");
-  var x = 1;
 
-  // Function to filter and update the dropdown list
-  function updateDropdownList() {
-    var selectedValues = $('input[name="model_line_id[]"]').map(function() {
-      return $(this).val();
-    }).get();
-
-    $('.new-select').each(function() {
-      var currentInput = $(this);
-      var datalistId = currentInput.attr('list');
-      var datalist = $('#' + datalistId);
-      var options = '';
-
-      $('#brandList option').each(function() {
-        if (selectedValues.indexOf($(this).val()) === -1) {
-          options += '<option value="' + $(this).val() + '" data-value="' + $(this).data('value') + '"></option>';
+    document.addEventListener('DOMContentLoaded', function () {
+        if (manualAssignOption.checked) {
+            manualSalesPersonList.style.display = 'block';
+            salesOptionValueField.value = manualAssignOption.value;
+        } else {
+            manualSalesPersonList.style.display = 'none';
+            salesOptionValueField.value = autoAssignOption.value;
         }
-      });
-
-      datalist.html(options);
     });
-  }
 
-  $(add_button).click(function(e) {
-    e.preventDefault();
-    if (x < max_fields) {
-      x++;
+    $(document).ready(function() {
+        var max_fields = 10;
+        var wrapper = $("#row-container");
+        var add_button = $(".add-row-btn");
+        var x = 1;
+
+        // Function to filter and update the dropdown list
+        function updateDropdownList() {
             var selectedValues = $('input[name="model_line_id[]"]').map(function() {
                 return $(this).val();
             }).get();
-            var datalist = $('<datalist id="brandList' + x + '"></datalist>');
-            var options = '';
-            $('#brandList option').each(function() {
-                if (selectedValues.indexOf($(this).val()) === -1) {
-                    options += '<option value="' + $(this).val() + '" data-value="' + $(this).data('value') + '"></option>';
-                }
+
+            $('.new-select').each(function() {
+                var currentInput = $(this);
+                var datalistId = currentInput.attr('list');
+                var datalist = $('#' + datalistId);
+                var options = '';
+
+                $('#brandList option').each(function() {
+                    if (selectedValues.indexOf($(this).val()) === -1) {
+                        options += '<option value="' + $(this).val() + '" data-value="' + $(this).data('value') + '"></option>';
+                    }
+                });
+
+                datalist.html(options);
             });
-            datalist.html(options);
-            var newRow = $('<div class="row"></div>');
-            var col1 = $('<div class="col-lg-4 col-md-6"></div>');
-            var input = $('<input type="text" placeholder="Select Brand & Model" name="model_line_id[]" class="form-control mb-1 new-select" id="brandInput' + x + '" list="brandList' + x + '" autocomplete="off" /><input type="hidden" name="model_line_ids[]" id="selectedBrandId' + x + '">');
-            col1.append(input);
-            col1.append(datalist);
-            var col2 = $('<div class="col-lg-4 col-md-6 align-self-end"></div>');
-            var removeBtn = $('<a href="#" class="remove-row-btn btn btn-danger"><i class="fas fa-minus"></i> Remove</a>');
-            col2.append(removeBtn);
-            newRow.append(col1);
-            newRow.append(col2);
-            $(wrapper).append(newRow);
-      updateDropdownList();
-    }
-  });
+        }
 
-  $(wrapper).on("click", ".remove-row-btn", function(e) {
-    e.preventDefault();
-    $(this).closest('.row').remove();
-    x--;
-    updateDropdownList();
-  });
+        $(add_button).click(function(e) {
+            e.preventDefault();
+            if (x < max_fields) {
+                x++;
+                var selectedValues = $('input[name="model_line_id[]"]').map(function() {
+                    return $(this).val();
+                }).get();
+                var datalist = $('<datalist id="brandList' + x + '"></datalist>');
+                var options = '';
+                $('#brandList option').each(function() {
+                    if (selectedValues.indexOf($(this).val()) === -1) {
+                        options += '<option value="' + $(this).val() + '" data-value="' + $(this).data('value') + '"></option>';
+                    }
+                });
+                datalist.html(options);
+                var newRow = $('<div class="row"></div>');
+                var col1 = $('<div class="col-lg-4 col-md-6"></div>');
+                var select = $('<select name="model_line_ids[]" class="form-control select2" multiple><option value="">Select Brand & Model</option></select>');
+                    @foreach ($modelLineMasters as $modelLineMaster)
+                        @php
+                            $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
+                            $combinedValue = $brand->brand_name . ' / ' . $modelLineMaster->model_line;
+                        @endphp
+                        select.append('<option value="{{ $modelLineMaster->id }}">{{ $combinedValue }}</option>');
+                    @endforeach
 
-  $(wrapper).on("input", "input[name='model_line_id[]']", function() {
-    var selectedBrandInput = $(this);
-    var selectedBrandIdInput = selectedBrandInput.next('input[name="model_line_ids[]"]');
-    var selectedOption = selectedBrandInput.val();
-    var selectedOptionId = selectedBrandInput.siblings('datalist').find('option[value="' + selectedOption + '"]').data('value');
-    selectedBrandIdInput.val(selectedOptionId);
-    updateDropdownList();
-  });
-});
+                col1.append(select);
+                select.select2({
+                    placeholder: "Select an option",
+                    maximumSelectionLength: 1
+                });
+                col1.append(datalist);
+                var col2 = $('<div class="col-lg-4 col-md-6 align-self-end"></div>');
+                var removeBtn = $('<a href="#" class="remove-row-btn btn btn-danger"><i class="fas fa-minus"></i> Remove</a>');
+                col2.append(removeBtn);
+                newRow.append(col1);
+                newRow.append(col2);
+                $(wrapper).append(newRow);
+                updateDropdownList();
+            }
+        });
+
+        $(wrapper).on("click", ".remove-row-btn", function(e) {
+            e.preventDefault();
+            $(this).closest('.row').remove();
+            x--;
+            updateDropdownList();
+        });
+
+        $(wrapper).on("input", "input[name='model_line_id[]']", function() {
+            var selectedBrandInput = $(this);
+            var selectedBrandIdInput = selectedBrandInput.next('input[name="model_line_ids[]"]');
+            var selectedOption = selectedBrandInput.val();
+            var selectedOptionId = selectedBrandInput.siblings('datalist').find('option[value="' + selectedOption + '"]').data('value');
+            selectedBrandIdInput.val(selectedOptionId);
+            updateDropdownList();
+        });
+    });
     $(document).ready(function() {
         $('#phone, #email').on('input', function() {
             var phone = $('#phone').val();
@@ -356,166 +481,198 @@ input[type=number]::-webkit-outer-spin-button {
             });
         });
     });
-    document.getElementById('languageInput').addEventListener('input', function(event) {
-        var input = event.target;
-        var list = input.getAttribute('list');
-        var options = document.querySelectorAll('#' + list + ' option');
-        var inputValue = input.value;
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
-            if (option.value === inputValue) {
-                input.setCustomValidity('');
-                return;
+    const languageInput = document.getElementById('languageInput');
+    if (languageInput) {
+        languageInput.addEventListener('input', function(event) {
+            var input = event.target;
+            var list = input.getAttribute('list');
+            var options = document.querySelectorAll('#' + list + ' option');
+            var inputValue = input.value;
+            for (var i = 0; i < options.length; i++) {
+                var option = options[i];
+                if (option.value === inputValue) {
+                    input.setCustomValidity('');
+                    return;
+                }
             }
-        }
-        input.setCustomValidity('Please select a valid Language from the list.');
-    });
-    document.getElementById('locationInput').addEventListener('input', function(event) {
-        var input = event.target;
-        var list = input.getAttribute('list');
-        var options = document.querySelectorAll('#' + list + ' option');
-        var inputValue = input.value;
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
+            input.setCustomValidity('Please select a valid Language from the list.');
+        });
+    }
 
-            if (option.value === inputValue) {
-                input.setCustomValidity('');
-                return;
+    const locationInput = document.getElementById('locationInput');
+    if (locationInput) {
+        locationInput.addEventListener('input', function(event) {
+            var input = event.target;
+            var list = input.getAttribute('list');
+            var options = document.querySelectorAll('#' + list + ' option');
+            var inputValue = input.value;
+            for (var i = 0; i < options.length; i++) {
+                var option = options[i];
+                if (option.value === inputValue) {
+                    input.setCustomValidity('');
+                    return;
+                }
             }
-        }
-        input.setCustomValidity('Please select a valid Location from the list.');
-    });
-    document.getElementById('milelemotorsInput').addEventListener('input', function(event) {
-        var input = event.target;
-        var list = input.getAttribute('list');
-        var options = document.querySelectorAll('#' + list + ' option');
-        var inputValue = input.value;
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
-            if (option.value === inputValue) {
-                input.setCustomValidity('');
-                return;
-            }
-        }
-        input.setCustomValidity('Please select a valid Source from the list.');
-    });
-    document.getElementById('typeInput').addEventListener('input', function(event) {
-        var input = event.target;
-        var list = input.getAttribute('list');
-        var options = document.querySelectorAll('#' + list + ' option');
-        var inputValue = input.value;
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
+            input.setCustomValidity('Please select a valid Location from the list.');
+        });
+    }
 
-            if (option.value === inputValue) {
-                input.setCustomValidity('');
-                return;
+    const milelemotorsInput = document.getElementById('milelemotorsInput');
+    if (milelemotorsInput) {
+        milelemotorsInput.addEventListener('input', function(event) {
+            var input = event.target;
+            var list = input.getAttribute('list');
+            var options = document.querySelectorAll('#' + list + ' option');
+            var inputValue = input.value;
+            for (var i = 0; i < options.length; i++) {
+                var option = options[i];
+                if (option.value === inputValue) {
+                    input.setCustomValidity('');
+                    return;
+                }
             }
-        }
-        input.setCustomValidity('Please select a valid Type from the list.');
-    });
-    document.getElementById('brandInput').addEventListener('input', function(event) {
-        var input = event.target;
-        var list = input.getAttribute('list');
-        var options = document.querySelectorAll('#' + list + ' option');
-        var inputValue = input.value;
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
+            input.setCustomValidity('Please select a valid Source from the list.');
+        });
+    }
 
-            if (option.value === inputValue) {
-                input.setCustomValidity('');
-                return;
+    const typeInput = document.getElementById('typeInput');
+    if (typeInput) {
+        typeInput.addEventListener('input', function(event) {
+            var input = event.target;
+            var list = input.getAttribute('list');
+            var options = document.querySelectorAll('#' + list + ' option');
+            var inputValue = input.value;
+            for (var i = 0; i < options.length; i++) {
+                var option = options[i];
+                if (option.value === inputValue) {
+                    input.setCustomValidity('');
+                    return;
+                }
             }
-        }
-        if (inputValue === '') {
-            input.setCustomValidity('');
-        } else {
-            input.setCustomValidity('Please select a valid Brand & Model from the list.');
-        }
-    });
-    document.getElementById('email').addEventListener('input', function(event) {
-        var emailInput = event.target;
-        var emailValue = emailInput.value;
-        var emailError = document.getElementById('emailError');
+            input.setCustomValidity('Please select a valid Type from the list.');
+        });
+    }
 
-        if (!validateEmail(emailValue)) {
-            emailInput.classList.add('invalid');
-            emailError.textContent = 'Please enter a valid email address.';
-        } else {
-            emailInput.classList.remove('invalid');
-            emailError.textContent = '';
-        }
-    });
-    document.getElementById('salesPersonInput').addEventListener('input', function(event) {
-        var input = event.target;
-        var list = input.getAttribute('list');
-        var options = document.querySelectorAll('#' + list + ' option');
-        var inputValue = input.value;
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
 
-            if (option.value === inputValue) {
-                input.setCustomValidity('');
-                return;
+    const emailInput = document.getElementById('email');
+    if (emailInput) {
+        emailInput.addEventListener('input', function(event) {
+            var emailValue = event.target.value;
+            var emailError = document.getElementById('emailError');
+
+            if (emailValue === '') {
+                emailInput.classList.remove('invalid');
+                if (emailError) emailError.textContent = '';
+            } else if (!validateEmail(emailValue)) {
+                emailInput.classList.add('invalid');
+                if (emailError) emailError.textContent = 'Please enter a valid email address.';
+            } else {
+                emailInput.classList.remove('invalid');
+                if (emailError) emailError.textContent = '';
             }
-        }
-        input.setCustomValidity('Please select a valid Sales Person from the list.');
-    });
+        });
+    }
+
+    // Reuse your email validation function safely
     function validateEmail(email) {
         var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     }
+
     const salesPersonInput = document.getElementById('salesPersonInput');
-    const selectedSalesPersonIdInput = document.getElementById('selectedSalesPersonId');
-    salesPersonInput.addEventListener('input', function() {
-        const selectedOption = Array.from(document.querySelectorAll('#salesList option')).find(option => option.value === salesPersonInput.value);
-        if (selectedOption) {
-            selectedSalesPersonIdInput.value = selectedOption.getAttribute('data-id');
-        } else {
-            selectedSalesPersonIdInput.value = '';
-        }
-    });
+    if (salesPersonInput) {
+        salesPersonInput.addEventListener('input', function(event) {
+            var input = event.target;
+            var list = input.getAttribute('list');
+            var options = document.querySelectorAll('#' + list + ' option');
+            var inputValue = input.value;
+            for (var i = 0; i < options.length; i++) {
+                var option = options[i];
+                if (option.value === inputValue) {
+                    input.setCustomValidity('');
+                    return;
+                }
+            }
+            input.setCustomValidity('Please select a valid Sales Person from the list.');
+        });
+
+        const selectedSalesPersonIdInput = document.getElementById('selectedSalesPersonId');
+        salesPersonInput.addEventListener('input', function() {
+            const selectedOption = Array.from(document.querySelectorAll('#salesList option')).find(option => option.value === salesPersonInput.value);
+            if (selectedOption && selectedSalesPersonIdInput) {
+                selectedSalesPersonIdInput.value = selectedOption.getAttribute('data-id');
+            } else if (selectedSalesPersonIdInput) {
+                selectedSalesPersonIdInput.value = '';
+            }
+        });
+    }
+
     const brandInput = document.getElementById('brandInput');
     const selectedBrandIdInput = document.getElementById('selectedBrandId');
 
-    brandInput.addEventListener('input', function() {
-        const selectedOption = Array.from(document.querySelectorAll('#brandList option')).find(option => option.value === brandInput.value);
-        
-        if (selectedOption) {
-            selectedBrandIdInput.value = selectedOption.getAttribute('data-value');
-        } else {
-            selectedBrandIdInput.value = '';
-        }
-    });
-    window.addEventListener('DOMContentLoaded', function() {
-    var input = document.querySelector("#phone");
-    var iti = window.intlTelInput(input, {
-        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
-        separateDialCode: false,
-        autoFormat: false,
-        nationalMode: false
-    });
-    input.addEventListener('input', function() {
-        var currentValue = input.value;
-        var newValue = currentValue.replace(/[^0-9]/g, '');
-        if (newValue.charAt(0) !== '+') {
-            newValue = '+' + newValue;
-        }
-        if (newValue.length > 15) {
-            newValue = newValue.slice(0, 15); // Truncate to 15 digits
-        }
-        input.value = newValue;
-    });
-    iti.events.on("countrychange", function() {
-        var countryCode = iti.getSelectedCountryData().dialCode;
-        if (input.value && input.value.charAt(0) === '+') {
-            input.value = "+" + countryCode + input.value.substr(4);
-        } else {
-            input.value = "+" + countryCode;
-        }
-    });
-});
+    if (brandInput) {
+        brandInput.addEventListener('input', function(event) {
+            var input = event.target;
+            var list = input.getAttribute('list');
+            var options = document.querySelectorAll('#' + list + ' option');
+            var inputValue = input.value;
+            let valid = false;
+
+            for (var i = 0; i < options.length; i++) {
+                if (options[i].value === inputValue) {
+                    valid = true;
+                    break;
+                }
+            }
+
+            input.setCustomValidity(valid || inputValue === '' ? '' : 'Please select a valid Brand & Model from the list.');
+
+            // Handle hidden field update safely
+            if (selectedBrandIdInput) {
+                const selectedOption = Array.from(options).find(option => option.value === inputValue);
+                selectedBrandIdInput.value = selectedOption ? selectedOption.getAttribute('data-value') : '';
+            }
+        });
+    }
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        var input = document.querySelector("#phone");
+        var iti = window.intlTelInput(input, {
+            separateDialCode: true,
+            preferredCountries: ["ae"],
+            hiddenInput: "full",
+            utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+        });
+
+        input.addEventListener('input', function() {
+            let value = input.value;
+
+            value = value.replace(/[^\d+]/g, '');
+
+            if (value.indexOf('+') > 0) {
+                value = value.replace(/\+/g, '');
+            }
+            if (value.indexOf('+') !== 0) {
+                value = value.replace(/\+/g, '');
+            }
+
+            input.value = value;
+        });
+
+        $("#calls").on("submit", function() {
+            var fullNumber = iti.getNumber();
+
+            $("<input>").attr({
+                type: "hidden",
+                name: "phone",
+                value: fullNumber
+            }).appendTo("#calls");
+
+        });
+    });
+</script>
+
+
 @endpush

@@ -1,4 +1,13 @@
 @extends('layouts.main')
+
+<style>
+    .custom-error {
+        color: red;
+        margin-top: 10px !important;
+    }
+</style>
+
+
 @section('content')
     @can('variants-create')
         @php
@@ -51,10 +60,11 @@
                                         <div class="row">
                                         <div class="col-lg-4 col-md-12 col-sm-12">
                                             <label class="form-label font-size-13 text-center">New Option Name</label>
+                                            <span class="text-danger">* </span>
                                         </div>
                                         <div class="col-lg-8 col-md-12 col-sm-12">
-                                            <input type="text" class="form-label" name="option_name" id="option_name" />
-                                            <input type ="hidden" name="specification-id-input" id="specification-id-input" />
+                                            <input type="text" class="form-control" placeholder="Enter Attribute Option" name="option_name" id="option_name" />
+                                            <input type ="hidden"  name="specification-id-input" id="specification-id-input" />
                                         </div>
                                         </div>
                                     </div>
@@ -168,7 +178,9 @@
                                         <option value="4.5" {{ old('engine') == '4.5' ? 'selected' : '' }}>4.5</option>
                                         <option value="4.6" {{ old('engine') == '4.6' ? 'selected' : '' }}>4.6</option>
                                         <option value="4.8" {{ old('engine') == '4.8' ? 'selected' : '' }}>4.8</option>
+                                        <option value="5.0" {{ old('engine') == '5.0' ? 'selected' : '' }}>5.0</option>
                                         <option value="5.3" {{ old('engine') == '5.3' ? 'selected' : '' }}>5.3</option>
+                                        <option value="5.5" {{ old('engine') == '5.5' ? 'selected' : '' }}>5.5</option>
                                         <option value="5.6" {{ old('engine') == '5.6' ? 'selected' : '' }}>5.6</option>
                                         <option value="5.7" {{ old('engine') == '5.7' ? 'selected' : '' }}>5.7</option>
                                         <option value="5.9" {{ old('engine') == '5.9' ? 'selected' : '' }}>5.9</option>
@@ -202,13 +214,13 @@
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Drive Train</label>
                                     <select class="form-control" autofocus name="drive_train" id="drive_train">
-                                    <option value="4x2" {{ old('geadrive_trainrbox') == '4x2' ? 'selected' : '' }}>4x2</option>
-                                    <option value="4x4" {{ old('geadrive_trainrbox') == '4x4' ? 'selected' : '' }}>4x4</option>
+                                    <option value="4X2" {{ old('geadrive_trainrbox') == '4X2' ? 'selected' : '' }}>4X2</option>
+                                    <option value="4X4" {{ old('geadrive_trainrbox') == '4X4' ? 'selected' : '' }}>4X4</option>
                                         <option value="AWD" {{ old('drive_train') == 'AWD' ? 'selected' : '' }}>AWD</option>
                                         <option value="4WD" {{ old('geadrive_trainrbox') == '4WD' ? 'selected' : '' }}>4WD</option>
                                         <option value="FWD" {{ old('geadrive_trainrbox') == 'FWD' ? 'selected' : '' }}>FWD</option>
                                         <option value="RWD" {{ old('geadrive_trainrbox') == 'RWD' ? 'selected' : '' }}>RWD</option>
-
+                                        <option value="4MATIC" {{ old('geadrive_trainrbox') == '4MATIC' ? 'selected' : '' }}>4MATIC</option>
                                     </select>
                                 </div>
                             </div>
@@ -304,6 +316,14 @@
                 brands_id:{
                     required:true,
                 },
+            },
+            errorPlacement: function(error, element) {
+                error.addClass('custom-error');
+                if (element.attr("name") === "master_model_lines_id") {
+                    error.insertAfter(element.next('.select2'));
+                } else {
+                    error.insertAfter(element);
+                }
             }
         });
     </script>
@@ -397,6 +417,19 @@ $(document).ready(function () {
                 $('[data-specification-id="' + specificationId + '"]').append(option);
                 alertify.success('Specification Option successfully Added');
                 $('#optionsmodal').modal('hide');
+            },
+            error: function (error) {
+                let errors = error.responseJSON.error;
+                let errorMessages = '';
+                $.each(errors, function(field, messages) {
+                    $.each(messages, function(index, message) {
+                        errorMessages += `<p>${message}</p>`;
+                    });
+                });
+                alertify.confirm(errorMessages).set({
+                            labels: {ok: "Retry", cancel: "Cancel"},
+                            title: "Error",
+                        });
             }
         });
     }
@@ -467,9 +500,17 @@ $(document).ready(function () {
         return 0;
     });
 
-    var modelDetail = selectedOptions.map(function (option) {
-        return option.value;
-    }).join(' ');
+    var modelDetail = selectedOptions.map(function (option, index, arr) {
+        if (option.fieldId === 'fuel' && arr[index - 1]?.fieldId === 'engine') {
+            // Combine engine and fuel values without a space
+            return arr[index - 1].value + option.value;
+        } else if (option.fieldId === 'engine' && arr[index + 1]?.fieldId === 'fuel') {
+            // Skip adding engine value, as it will be combined later with fuel
+            return '';
+        } else {
+            return option.value;
+        }
+    }).filter(Boolean).join(' ');
 
     $('.model_detail').val(modelDetail);
 }
@@ -533,25 +574,48 @@ $(document).ready(function () {
             }
         });
         $(document).ready(function () {
-    function updatevariantDetail() {
-        var selectedOptionsv = [];
-        $('input[name^="variantcheckbox"]:checked').each(function () {
-            var specificationId = $(this).data('specification-id');
-            var selectedValue = $('select[name="specification_' + specificationId + '"]').text();
-            var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text();
-            var displayValue = (selectedText.toUpperCase() === 'YES') ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text() : selectedText;
+            function updatevariantDetail() {
+    var selectedOptionsv = [];
+    var sfxValue = null;
+
+    $('input[name^="variantcheckbox"]:checked').each(function () {
+        var specificationId = $(this).data('specification-id');
+        var selectedValue = $('select[name="specification_' + specificationId + '"]').val();
+        var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text();
+        var displayValue = (selectedText.toUpperCase() === 'YES')
+            ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text()
+            : selectedText;
+
+        if (selectedText.toUpperCase() === 'SFX') {
+            // Capture sfxValue to ensure it comes first
+            sfxValue = '(' + displayValue + ')';
+        } else {
             selectedOptionsv.push({ specificationId: specificationId, value: displayValue });
-        });
-        $('input[name^="fieldvariants"]:checked').each(function () {
-            var fieldId = $(this).data('field-id');
-            var fieldValue = $('#' + fieldId + ' option:selected').text();
-            selectedOptionsv.push({ fieldId: fieldId, value: fieldValue });
-        });
-        var Detail = selectedOptionsv.map(function (option) {
-            return option.value;
-        }).join(', ');
-        $('.variant').val(Detail);
+        }
+    });
+
+    $('input[name^="fieldvariants"]:checked').each(function () {
+        var fieldId = $(this).data('field-id');
+        var fieldValue = $('#' + fieldId + ' option:selected').text();
+        selectedOptionsv.push({ fieldId: fieldId, value: fieldValue });
+    });
+
+    // Initialize the Detail array
+    var Detail = [];
+
+    // Add sfxValue first if it exists
+    if (sfxValue) {
+        Detail.push(sfxValue);
     }
+
+    // Concatenate other selected options
+    selectedOptionsv.forEach(function (option) {
+        Detail.push(option.value);
+    });
+
+    // Update the variant field
+    $('.variant').val(Detail.join(', '));
+}
             $(document).on('change', 'input[name^="variantcheckbox"], input[name^="fieldvariants"]', function () {
                 updatevariantDetail();
             });

@@ -23,5 +23,7 @@ class VariantRequest extends Model
         'status',
         'brands_id',
         'master_model_lines_id',
+        'int_colour',
+        'ex_colour',
     ];
 }

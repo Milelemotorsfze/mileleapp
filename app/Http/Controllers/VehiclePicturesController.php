@@ -164,6 +164,7 @@ class VehiclePicturesController extends Controller
                 'inspection.id',
                 'vehicles.id as vehicle_id', // Include the vehicle ID
                 'vehicles.vin',
+                'vehicles.inspection_status',
                 DB::raw('GROUP_CONCAT(inspection.stage SEPARATOR ", ") as stages'),
                 DB::raw('GROUP_CONCAT(DATE_FORMAT(inspection.created_at, "%d-%b-%Y") SEPARATOR ", ") as created_at_formatted'),
                 'varaints.name as variant',
@@ -173,14 +174,16 @@ class VehiclePicturesController extends Controller
                 'int_color.name as interior_color',
                 'ex_color.name as exterior_color',
                 'purchasing_order.po_number',
-                'grn.grn_number',
+                // 'grn.grn_number',
+                'movement_grns.grn_number',
                 DB::raw('GROUP_CONCAT(vehicle_pictures.vehicle_picture_link SEPARATOR ", ") as links'),
                 'so.so_number',
                 DB::raw('(SELECT GROUP_CONCAT(field) FROM vehicle_detail_approval_requests WHERE inspection_id = inspection.id) as changing_fields')
             ])
             ->leftJoin('vehicles', 'inspection.vehicle_id', '=', 'vehicles.id')
             ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
-            ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+            // ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+            ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
             ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
             ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
             ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')

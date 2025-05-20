@@ -10,6 +10,7 @@ class WorkOrder extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = "work_orders";
+    protected $dates = ['deleted_at'];
     protected $fillable = [
         'type',
         'date',
@@ -96,6 +97,8 @@ class WorkOrder extends Model
         'coe_office_approval_by',
         'coe_office_approved_at',
         'coe_office_direct_approval_comments',
+
+        'has_claim',
 
         'created_by',
         'updated_by',
@@ -719,6 +722,7 @@ class WorkOrder extends Model
 
     public function getTransportField($field)
     {
+  
         return match ($this->transport_type) {
             'air' => match ($field) {
                 'name' => $this->airline,

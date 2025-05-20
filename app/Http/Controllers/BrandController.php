@@ -18,7 +18,7 @@ class BrandController extends Controller
      */
     public function index(Builder $builder)
     {
-        (new UserActivityController)->createActivity('Open Brand info');
+        (new UserActivityController)->createActivity('Open Brand Listing Page');
         $brand = Brand::orderBy('id','DESC')->get();
         if (request()->ajax()) {
             return DataTables::of($brand)

@@ -44,8 +44,14 @@
 } */
 
 .nav-link:focus, .nav-link:hover {
-  color: aqua;
-}
+  color: white;
+  /* background: linear-gradient(
+    to right,
+    rgba(0, 101, 172, 0.8),
+    rgba(0, 101, 172, 0.8)
+  ); */
+  background-color: #00477ad9;
+  }
 
 .border-start{
   padding-left: 10px;
@@ -234,10 +240,10 @@ nav.navbar.navbar-light.navbar-expand-lg:active {
 }
 
 @media (min-width: 992px) {
-  .more-button-username-rolename-container {
-    margin: 0px 33px 0px -20px;
+  /* .more-button-username-rolename-container {
+    margin: 0px 33px 0px -2px;
     position: relative;
-  }
+  } */
   
   .rolename-username-main-div {
     display: flex;
@@ -247,14 +253,15 @@ nav.navbar.navbar-light.navbar-expand-lg:active {
 
 @media screen and (max-width: 991.99px) {
   .rolename-username-main-div {
-    padding-top: 8px;
+    padding-top: 0px;
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     flex-direction: column-reverse;
+    align-items: flex-end;
   }
   
   .more-button-username-rolename-container {
-    margin: 0px 0px 0px -10px;
+    margin: 0px 15px 0px -3rem;
     }
 
     .navbar-nav .dropdown-menu {

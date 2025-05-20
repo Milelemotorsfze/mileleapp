@@ -16,11 +16,16 @@ class WoDocsStatusController extends Controller
 {
     public function updateDocStatus(Request $request)
     {   
+        // Normalize the 'hasClaim' input to a valid boolean value
+        $request->merge([
+            'hasClaim' => filter_var($request->input('hasClaim'), FILTER_VALIDATE_BOOLEAN) ? 1 : 0
+        ]);
         // Validate the incoming request data
         $validatedData = $request->validate([
             'workOrderId' => 'required|exists:work_orders,id',
             'status' => 'required|in:Not Initiated,In Progress,Ready',
             'comment' => 'nullable|string',
+            'hasClaim' => 'nullable|in:0,1', // Only accept 0 or 1
             'boeData' => 'nullable|array', // BOE data is optional
             'boeData.*.boe_number' => 'string|nullable', // BOE number should be a string
             'boeData.*.boe' => 'string|nullable', // BOE field should be a string
@@ -66,8 +71,16 @@ class WoDocsStatusController extends Controller
                 }
             }
         }
+        // Determine the has_claim value for WorkOrder
+        $hasClaimValue = ($validatedData['status'] === 'Ready') 
+            ? ($validatedData['hasClaim'] ? 'yes' : 'no') 
+            : null;
         // Fetch the work order vehicle
         $workOrder = WorkOrder::findOrFail($validatedData['workOrderId']);
+        // Update the WorkOrders table with has_claim and status
+        $workOrder->update([
+            'has_claim' => $hasClaimValue,
+        ]);
 
         // Only send an email if the status is "Ready"
         if ($validatedData['status'] === 'Ready') {
@@ -97,6 +110,9 @@ class WoDocsStatusController extends Controller
             $salesPersonEmail = filter_var(optional($workOrder->salesPerson)->email, FILTER_VALIDATE_EMAIL);
             // $customerEmail = filter_var($workOrder->customer_email, FILTER_VALIDATE_EMAIL);
             $customerEmail = '';
+            // Fetch `DONT_SEND_EMAIL` and `REDIRECT_SALES_EMAIL_TO` from .env
+            $dontSendEmail = env('DONT_SEND_EMAIL');
+            $redirectSalesEmailTo = filter_var(env('REDIRECT_SALES_EMAIL_TO'), FILTER_VALIDATE_EMAIL);
             // Get all users with 'can_send_wo_email' set to 'yes'
             $managementEmails = \App\Models\User::where('can_send_wo_email', 'yes')->pluck('email')->filter(function($email) {
                 return filter_var($email, FILTER_VALIDATE_EMAIL);
@@ -122,9 +138,15 @@ class WoDocsStatusController extends Controller
             // Initialize recipient list with operations email and management emails from the database
             $recipients = array_filter(array_merge([$operationsEmail, $createdByEmail], $managementEmails));
 
-            // Add salesPersonEmail only if the condition is met
-            if ($shouldSendToSalesPerson && $salesPersonEmail) {
-                $recipients[] = $salesPersonEmail;
+            // Handle salesPersonEmail conditions
+            if ($shouldSendToSalesPerson) {
+                if ($salesPersonEmail && $salesPersonEmail !== $dontSendEmail) {
+                    // If salesperson's email is not blocked, add it
+                    $recipients[] = $salesPersonEmail;
+                } elseif ($salesPersonEmail === $dontSendEmail && $redirectSalesEmailTo) {
+                    // Redirect email if salesPersonEmail matches DONT_SEND_EMAIL
+                    $recipients[] = $redirectSalesEmailTo;
+                }
             }
 
             // Add customerEmail if valid

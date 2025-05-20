@@ -12,7 +12,7 @@
     cursor: pointer;
   }
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
-  padding: 4px 8px 4px 8px;
+  /* padding: 4px 8px 4px 8px; */
   text-align: center;
   vertical-align: middle;
 }
@@ -50,7 +50,7 @@
                     @endphp
                     @if ($hasPermission)
     <h4 class="card-title">
-     GRN Info
+     GDN Info
      <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </h4>
     <br>
@@ -59,7 +59,7 @@
         <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Pending Netsuite GDN</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Netsuite Netsuite GDN Info</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Netsuite GDN Info</a>
       </li>
     </ul>      
   </div>
@@ -73,7 +73,7 @@
       </div>
         <form id="netsuiteForm">
         <div class="modal-body">
-          <div class="form-group">
+          <div class="form-group pt-3">
             <label for="grnInput">Netsuite GDN</label>
             <input type="text" class="form-control" id="gdnInput" required>
           </div>
@@ -102,7 +102,7 @@
               <option value="add">Add New</option>
             </select>
           </div>
-          <div class="form-group">
+          <div class="form-group pt-3">
             <label for="grnInputupdate">Netsuite GDN</label>
             <input type="text" class="form-control" id="gdnInputupdate" required>
           </div>

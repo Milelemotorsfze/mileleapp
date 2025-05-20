@@ -32,16 +32,22 @@ class CheckLOIExpiry extends Command
         $letterOfIndents = LetterOfIndent::select('id','is_expired','client_id','date')
                             ->where('is_expired', false)->get();
         foreach($letterOfIndents as $letterOfIndent) {
-            info($letterOfIndent->id);
+        
             $LOItype = $letterOfIndent->client->customertype;
           
             $LOIExpiryCondition = LOIExpiryCondition::where('category_name', $LOItype)->first();
             
             if($LOIExpiryCondition) {        
                 $currentDate = Carbon::now();
-                $year = $LOIExpiryCondition->expiry_duration_year;
-                $expiryDate = Carbon::parse($letterOfIndent->date)->addYears($year);
-               
+                $duration = $LOIExpiryCondition->expiry_duration;
+
+                $expiryDurationType = $LOIExpiryCondition->expiry_duration_type;
+                if($expiryDurationType == LOIExpiryCondition::LOI_DURATION_TYPE_YEAR) {
+                    $expiryDate = Carbon::parse($letterOfIndent->date)->addYears($duration);
+                }else{
+                    $expiryDate = Carbon::parse($letterOfIndent->date)->addMonthsNoOverflow($duration);
+                }
+              
                 // do not make status expired, becasue to know at which status stage it got expired
                 if($currentDate->gt($expiryDate) == true) {
                     $letterOfIndent->is_expired = true;     
@@ -50,14 +56,6 @@ class CheckLOIExpiry extends Command
                     $letterOfIndent->save();  
                     (new UserActivityController)->createActivity('LOI '.$letterOfIndent->id.' Expired');
                 }
-                // else{
-                //     $letterOfIndent->is_expired = false;  
-                //     $letterOfIndent->expired_date = NULL;  
-                //     $letterOfIndent->timestamps = false;               
-                //     $letterOfIndent->save();  
-                //     // info($letterOfIndent);
-                //     info("else expiry shecduler");
-                // }
             }
         }
         

@@ -146,8 +146,6 @@ class ModelLinesController extends Controller
                 $brand->created_by = Auth::id();
                 $brand->save();
             }
-//            info($request->brandType);
-//            info($brand);
             $modelLine = new MasterModelLines();
             $modelLine->brand_id = $brand->id;
             $modelLine->model_line = $request->model_line;

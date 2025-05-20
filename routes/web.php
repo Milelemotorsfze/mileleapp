@@ -26,13 +26,15 @@ use App\Http\Controllers\HRM\Employee\SeparationController;
 use App\Http\Controllers\HRM\OnBoarding\JoiningReportController;
 use App\Http\Controllers\HRM\OnBoarding\AssetAllocationController;
 use App\Http\Controllers\WorkOrderController;
+use App\Http\Controllers\WorkOrderExportController;
 use App\Http\Controllers\WOApprovalsController;
 use App\Http\Controllers\WoDocsStatusController;
 use App\Http\Controllers\WoStatusController;
 use App\Http\Controllers\WoVehicleController;
 use App\Http\Controllers\WoPDIStatusController;
 use App\Http\Controllers\WOVehicleDeliveryStatusController;
-use App\Http\Controllers\VehiclePenaltyController;
+use App\Http\Controllers\BOEPenaltyController;
+use App\Http\Controllers\WOBOEClaimsController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -132,6 +134,12 @@ use App\Http\Controllers\LeadChatController;
 use App\Exports\UAEVehicleStockExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\BelgiumVehicleStockExport;
+use App\Http\Controllers\ModeldescriptionController;
+use App\Http\Controllers\MasterGradeController;
+use App\Http\Controllers\CompanyDomainController;
+use App\Http\Controllers\MasterChargesController;
+
+use App\Models\Grn;
 
 /*
 /*
@@ -447,8 +455,11 @@ Route::get('/d', function () {
     Route::resource('work-order', WorkOrderController::class)->only([
         'show','store','edit','update','create'
     ]);
+    Route::get('/export-work-orders', [WorkOrderExportController::class, 'export']);
     // Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments']);
     Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments'])->name('comments.get');
+    Route::delete('/workorder/{id}', [WorkOrderController::class, 'destroy'])->name('workorder.destroy');
+    Route::post('/is-exist-in-sales-order', [WorkOrderController::class, 'isExistInSalesOrder'])->name('work-order.is-exist-in-sales-ordder');
     Route::controller(WorkOrderController::class)->group(function(){
         Route::get('work-order-create/{type}', 'workOrderCreate')->name('work-order-create.create');
         Route::get('work-order-info/{type}', 'index')->name('work-order.index');
@@ -486,23 +497,39 @@ Route::get('/d', function () {
         Route::post('/update-vehicle-delivery-status', 'updateVehDeliveryStatus')->name('wo.updateVehDeliveryStatus');
         Route::get('/vehicle-delivery-status-log/{id}', 'vehDeliveryStatusHistory')->name('vehDeliveryStatusHistory');
     }); 
-    Route::controller(VehiclePenaltyController::class)->group(function(){
-        Route::get('/vehicle-penalty-report', 'getVehiclePenaltyReport')->name('getVehiclePenaltyReport');
+    Route::controller(BOEPenaltyController::class)->group(function(){
+        Route::get('/boe-penalty-report', 'getBOEPenaltyReport')->name('getBOEPenaltyReport');
         Route::get('/cleared-penalty-report', 'getClearedPenalties')->name('getClearedPenalties');
+        Route::get('/no-penalty-report', 'getNoPenalties')->name('getNoPenalties');
         Route::post('/vehicle-penalty/storeOrUpdate', 'storeOrUpdate')->name('penalty.storeOrUpdate');
     }); 
-    
+    Route::controller(WOBOEClaimsController::class)->group(function(){
+        Route::get('/pending-boe-claims', 'getPendingClaims')->name('getPendingClaims');
+        Route::get('/cleared-submitted-claims', 'getSubmittedClaims')->name('getSubmittedClaims');
+        Route::get('/cleared-approved-claims', 'getApprovedClaims')->name('getApprovedClaims');
+        Route::get('/cleared-cancelled-claims', 'getCancelledClaims')->name('getCancelledClaims');
+        Route::get('/claims-log/{id}', 'getClaimsLog')->name('claim.log');
+        Route::post('/boe-claims/storeOrUpdate', 'storeOrUpdate')->name('claim.storeOrUpdate');
+        Route::post('/boe-claims/updateStatus', 'updateStatus')->name('claim.updateStatus');
+    });    
     Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');
     // Route::get('/finance-approval-history-page/{id}', [WOApprovalsController::class, 'showFinanceApprovalHistoryPage'])->name('showFinanceApprovalHistoryPage');
 
     Route::get('/coo-approval-history/{id}', [WOApprovalsController::class, 'fetchCooApprovalHistory'])->name('fetchCooApprovalHistory');
     // Route::get('/coo-approval-history-page/{id}', [WOApprovalsController::class, 'showCooApprovalHistoryPage'])->fetch('showCooApprovalHistoryPage');
 
+    
+    // Company Domains 
+    Route::get('companyDomains/create', [CompanyDomainController::class, 'create'])->name('companyDomains.create');
+    Route::get('companyDomains/{id}/edit', [CompanyDomainController::class, 'edit'])->name('companyDomains.edit');
+    Route::post('companyDomains', [CompanyDomainController::class, 'store'])->name('companyDomains.store');
+    Route::put('companyDomains/{id}', [CompanyDomainController::class, 'update'])->name('companyDomains.update');
+    Route::delete('companyDomains/{id}', [CompanyDomainController::class, 'destroy'])->name('companyDomains.destroy');
+    Route::get('companyDomains', [CompanyDomainController::class, 'index'])->name('companyDomains.index');    
+
+    // GRN List 
+    Route::get('/grn-list', [VehiclesController::class, 'Grnlist'])->name('grn.index');   
     // Demand & Planning Module
-
-    // suppliers
-
-    //    Route::resource('demand-planning-suppliers', DemandPlanningSupplierController::class);
 
     // Demands
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
@@ -521,8 +548,6 @@ Route::get('/d', function () {
     Route::get('loi-country-criteria-check', [LoiCountryCriteriasController::class, 'CheckCountryCriteria'])->name('loi-country-criteria.check');
     Route::post('letter-of-indent/request-approval', [LetterOfIndentController::class, 'RequestApproval'])
         ->name('letter-of-indent.request-approval');
-    // Route::post('letter-of-indent/request-TTC-approval', [LetterOfIndentController::class, 'RequestTTCApproval'])
-    //     ->name('letter-of-indent.request-TTC-approval');
     Route::post('letter-of-indent/update-comment', [LetterOfIndentController::class, 'updateComment'])
     ->name('update-loi-comment');
 
@@ -542,7 +567,9 @@ Route::get('/d', function () {
     // PFI
     Route::post('/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);
     Route::get('pfi/pfi-document', [PFIController::class,'generatePFIDocument'])->name('pfi.pfi-document');
+    Route::get('pfi/get-PFI-brand', [PFIController::class,'getPfiBrand'])->name('pfi.get-pfi-brand');
     Route::resource('pfi', PFIController::class);
+   
     Route::get('pfi-item/list', [PFIController::class,'PFIItemList'])->name('pfi-item.list');
     // Route::post('pfi-payment-status/update/{id}', [PFIController::class, 'paymentStatusUpdate'])->name('pfi-payment-status-update');
     Route::post('pfi-released-amount/update', [PFIController::class, 'relaesedAmountUpdate'])->name('pfi-released-amount-update');
@@ -553,7 +580,12 @@ Route::get('/d', function () {
     Route::get('pfi-item/get-brand', [PFIController::class,'getBrand'])->name('pfi-item.get-brand');
     Route::get('pfi-item/get-customer-countries', [PFIController::class,'getCustomerCountries'])->name('pfi-item.customer-countries');
     // PO
-    Route::resource('demand-planning-purchase-orders', DemandPlanningPurchaseOrderController::class);
+    Route::resource('demand-planning-purchase-orders', DemandPlanningPurchaseOrderController::class)->only('create');
+    Route::get('dp-purchase-order/check-inventory-colour', [DemandPlanningPurchaseOrderController::class,'checkInventoryColour'])
+                                                                ->name('dp-purchase-order.inventory-check');
+    Route::get('dp-purchasing-order/check-po-number', [DemandPlanningPurchaseOrderController::class, 'uniqueCheckPONumber'])->name('dp-purchasing-order.checkPONumber');
+  
+    
 
     // Supplier Inventories
     Route::resource('supplier-inventories', SupplierInventoryController::class)->except('show');
@@ -605,6 +637,8 @@ Route::get('/d', function () {
     Route::resource('lead_source', LeadSourceController::class);
     Route::get('calls-bulk/createbulk', [CallsController::class,'createbulk'])->name('calls.createbulk');
     Route::post('/uploadingbulk', [CallsController::class, 'uploadingbulk'])->name('calls.uploadingbulk');
+    Route::post('/summernote/upload', [CallsController::class, 'upload'])->name('summernote.upload');
+
     Route::resource('strategy', StrategyController::class);
     Route::post('calls/check-existence', [CallsController::class, 'checkExistence'])->name('checkExistence');
     Route::post('calls/check-checkExistenceupdatecalls', [CallsController::class, 'checkExistenceupdatecalls'])->name('checkExistenceupdatecalls');
@@ -740,9 +774,9 @@ Route::get('/d', function () {
     Route::get('/vehicles/getVehicleDetails', [VehiclesController::class, 'getVehicleDetails'])->name('vehicles.getVehicleDetails');
 
     Route::get('vehiclesde/{id}', [VehiclesController::class, 'deletes'])->name('vehiclesde.deletes');
-    Route::get('grnlist/netsuitgrn', [MovementController::class, 'grnlist'])->name('grnlist.create');
-    Route::get('grnlist/grnsimplefile', [MovementController::class,'grnsimplefile'])->name('grnlist.grnsimplefile');
-    Route::post('grnlist/post-file', [MovementController::class, 'grnfilepost'])->name('grnlist.grnfilepost');
+    // Route::get('grnlist/netsuitgrn', [MovementController::class, 'grnlist'])->name('grnlist.create'); // not using anywhere
+    // Route::get('grnlist/grnsimplefile', [MovementController::class,'grnsimplefile'])->name('grnlist.grnsimplefile');
+    // Route::post('grnlist/post-file', [MovementController::class, 'grnfilepost'])->name('grnlist.grnfilepost'); // not using anywhere
     Route::post('/check-create-vins', [PurchasingOrderController::class, 'checkcreatevins'])->name('vehicles.check-create-vins');
     Route::post('/check-create-vins-inside', [PurchasingOrderController::class, 'checkcreatevinsinside'])->name('vehicles.check-create-vins-inside');
     Route::patch('/check-edit-vins', [PurchasingOrderController::class, 'checkeditvins'])->name('vehicles.check-edit-vins');
@@ -822,6 +856,8 @@ Route::get('/d', function () {
     Route::get('vehicles/viewalls', [VehiclesController::class, 'viewalls'])->name('vehicles.viewalls');
     Route::get('/get-updated-vehicle/{id}', [VehiclesController::class, 'getUpdatedVehicle'])->name('getUpdatedVehicle');
     Route::get('/getBrandsAndModelLines', [PurchasingOrderController::class, 'getBrandsAndModelLines']);
+    Route::post('movement/unique-check',[MovementController::class,'checkDuplicateMovement'])->name('movement.unique-check');
+
     //booking
     Route::get('booking/create/{call_id}', [BookingController::class, 'create'])->name('booking.create');
     Route::get('/get-model-lines/booking/{brandId}', [BookingController::class, 'getModelLines'])->name('booking.getmodel');
@@ -907,6 +943,11 @@ Route::get('/d', function () {
     Route::resource('dm-customers', CustomerController::class);
     Route::resource('model-year-calculation-rules', ModelYearCalculationRuleController::class);
     Route::resource('model-year-calculation-categories', ModelYearCalculationCategoriesController::class);
+    // Variant Attributes
+    Route::get('fetch-model-spectifications', [VariantController::class,'fetchModelSpecifications'])
+        ->name('fetch.model_spectifications');
+    Route::get('fetch-model-spectification-options', [VariantController::class,'fetchModelSpecificationOptions'])
+    ->name('fetch.model_spectification_options');
 
     Route::get('master-model/getLoiDescription', [MasterModelController::class,'getLoiDescription'])
         ->name('master-model.get-loi-description');
@@ -998,6 +1039,7 @@ Route::get('/d', function () {
     Route::post('/transition/action', [VendorAccountController::class, 'handleAction'])->name('transition.action');
 
     //Price Update Purchased Order
+    Route::post('vehicles/update-dp-prices', [PurchasingOrderController::class, 'updatePOPrices'])->name('vehicles.updateDPPrices');
     Route::get('purchasedorder/vehicles-data/{id}', [PurchasingOrderController::class, 'vehiclesdatagetting'])->name('vehicles.vehiclesdatagetting');
     Route::post('vehicles/update-prices', [PurchasingOrderController::class, 'updatePrices'])->name('vehicles.updatePrices');
     Route::post('/messagespurchased', [PurchasingOrderController::class, 'storeMessages']);
@@ -1024,7 +1066,7 @@ Route::get('/d', function () {
     Route::post('/update-purchasing-additionalpaymentcomplete', [PurchasingOrderController::class, 'completedadditionalpayment'])->name('purchasing.completedadditionalpayment');
     Route::get('netsuitegrn/addingnetsuitegrn', [ApprovalsController::class, 'addingnetsuitegrn'])->name('netsuitegrn.addingnetsuitegrn');
     Route::post('netsuitegrn/submit', [ApprovalsController::class, 'submitGrn'])->name('netsuitegrn.submit');
-    Route::post('netsuitegrn/add', [ApprovalsController::class, 'addGrn'])->name('netsuitegrn.add');
+    // Route::post('netsuitegrn/add', [ApprovalsController::class, 'addGrn'])->name('netsuitegrn.add');
     Route::get('/get-vehicles/{purchaseOrderId}', [PurchasingOrderController::class, 'getVehiclesByPurchaseOrderId']);
     Route::get('/getVehicles/{purchaseOrderId}', [PurchasingOrderController::class, 'getVehicles']);
     Route::get('/getVehicleDetails/{vehicleId}', [PurchasingOrderController::class, 'getVehicleDetails']);
@@ -1118,4 +1160,20 @@ Route::get('/d', function () {
     });
     Route::get('/get-onwership-data', [VehiclesController::class, 'getonwershipData']);
     Route::post('/onwership-update', [VehiclesController::class, 'saveonwership'])->name('vehicles.saveonwership');
+    Route::post('/purchasing-order/check-po-number-edit', [PurchasingOrderController::class, 'checkPoNumberedit'])->name('purchasing-order.checkPoNumberedit');
+    Route::post('/custom-documentstatus-update', [VehiclesController::class, 'customdocumentstatusupdate'])->name('vehicles.customdocumentstatusupdate');
+    Route::get('/variants/{id}/editvar', [VariantController::class, 'editvar'])->name('variants.editvar');
+    Route::post('/variants/storevar/{variant}', [VariantController::class, 'storevar'])->name('variants.storevar');
+    Route::resource('modeldescription', ModeldescriptionController::class);
+    Route::resource('mastergrade', MasterGradeController::class);
+    Route::resource('master-charges', MasterChargesController::class);
+    Route::get('/transfer_copy/send-email-to-supplier', [PurchasingOrderController::class, 'sendTransferCopy'])
+    ->name('send-transfer-copy.email');
+    Route::get('/swift_copy/send-email-to-supplier', [PurchasingOrderController::class, 'sendSwiftCopy'])
+    ->name('send-swift-copy.email');
+    Route::post('/check-vehicle-quantity', [VehiclesController::class, 'checkVehicleQuantity'])->name('check.vehicle.quantity');
+    Route::get('/salespersons/list', [SalesOrderController::class, 'getSalespersons'])->name('salespersons.list');
+    Route::post('/salesorder/updateSalesperson', [SalesOrderController::class, 'updateSalesperson'])->name('salesorder.updateSalesperson');
+    Route::post('po-payment-adjustment', [PurchasingOrderController::class, 'paymentAdjustment'])->name('po-payment-adjustment');
+  
 });

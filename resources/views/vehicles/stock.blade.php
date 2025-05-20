@@ -59,7 +59,7 @@ table.dataTable thead th select {
 
 /* Ensure the Select2 dropdown fits the full header width when opened */
 .select2-container {
-    width: 100% !important; /* Ensures the container takes full width */
+    /* width: 100% !important; */
 }
 
 /* Ensure the dropdown itself is properly styled */
@@ -67,6 +67,10 @@ table.dataTable thead th select {
     width: auto !important; /* Let the dropdown size adjust dynamically */
     min-width: 100%; /* Ensure the dropdown is at least the width of the select element */
     box-sizing: border-box; /* Makes sure the padding is included in width */
+}
+
+.select2-container--open .select2-dropdown--below {
+    position: inherit !important;
 }
 
 /* Ensure proper spacing between dropdown options */
@@ -542,7 +546,7 @@ table.dataTable thead th select {
       $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
       @endphp
       @if ($hasPermission)
-        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample7')">
+        <button type="button" class="btn btn-success mb-2" onclick="exportToExcel('dtBasicExample7')">
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
 @endif
@@ -569,6 +573,7 @@ table.dataTable thead th select {
             <th>Reservation Sales Person</th>
             <th>GDN</th>
             <th>GDN Date</th>
+            <th>Vehicle Document Status</th>
             <th>PDI Report</th>
             <th>Brand</th>
             <th>Model Line</th>
@@ -599,6 +604,7 @@ table.dataTable thead th select {
                   <th>Document Owership</th>
                   <th>Custom Inspection Number</th>
                   <th>Custom Inspection Status</th>
+                  <th>Work Order Date</th>
                   <th>Comments</th>
                 </tr>
               </thead>
@@ -670,10 +676,20 @@ table.dataTable thead th select {
         return ''; // If no date, return empty
     }
 },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                {
+{
+    data: 'grn_number',
+    name: 'movement_grns.grn_number',
+    render: function(data, type, row) {
+        if (row.inspection_status == 'Approved') {
+           
+            return data;
+        }
+        return ''; // If no data, return empty
+    }
+},
+{
     data: 'date',
-    name: 'grn.date',
+    name: 'movements_reference.date',
     render: function(data, type, row) {
         if (data) {
             // Assuming data is in Y-m-d format (default SQL date format)
@@ -766,6 +782,13 @@ table.dataTable thead th select {
         return ''; // If no date, return empty
     }
 },
+{ 
+        data: 'vehicle_document_status', 
+        name: 'vehicles.vehicle_document_status',
+        render: function(data, type, row) {
+            return data ? data : '';
+        }
+    },
         { 
             data: 'id', 
             name: 'id',
@@ -788,23 +811,24 @@ table.dataTable thead th select {
                 }
             },
             {
-                    data: 'variant_detail', // Updated to use the alias
-                    name: 'varaints.detail',
-                    render: function(data, type, row) {
-                        if (!data) {
-                            return ''; // Return an empty string if data is undefined or null
-                        }
-                        var words = data.split(' ');
-                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-                        var fullText = data;
-                        return `
-                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                ${firstFiveWords}
-                            </div>
-                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-                        `;
-                    }
-                },
+            data: 'variant_detail', // Updated to use the computed `variant_detail`
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (!data) {
+                    return ''; // Return an empty string if data is undefined or null
+                }
+                var words = data.split(' ');
+                var firstFiveWords = words.slice(0, 15).join(' ') + '...';
+                var fullText = data;
+                return `
+                    <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${firstFiveWords}
+                    </div>
+                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                    <span class="full-text" style="display: none;">${data}</span>
+                `;
+            }
+        },
                 {
     data: 'vin',
     name: 'vehicles.vin',
@@ -931,6 +955,20 @@ table.dataTable thead th select {
             return data ? data : '';
         }
     },
+    {
+        data: 'work_order_date',
+        name: 'work_orders.date',
+        render: function(data, type, row) {
+            if (data) {
+                var dateObj = new Date(data);
+                var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                    day: '2-digit', month: 'short', year: 'numeric'
+                });
+                return formattedDate;
+            }
+            return '';
+        }
+    },
         {
     data: null,
     name: 'chat',
@@ -953,7 +991,7 @@ table.dataTable thead th select {
         const buttonClass = messageCount > 0 ? 'btn-warning' : 'btn-primary';
 
         return `
-            <div style="position: relative; display: inline-block;">
+            <div style="display: inline-block;">
                 ${badgeHtml}
                 <button class="btn ${buttonClass} btn-sm" onclick="openChatModal(${row.id})">
                     Comments
@@ -971,8 +1009,8 @@ var columnMap = {
         2: 'purchasing_order.po_number',
         3: 'purchasing_order.po_date',
         4: 'vehicles.estimation_date',
-        5: 'grn.grn_number',
-        6: 'grn.date',
+        5: 'movement_grns.grn_number',
+        6: 'movements_reference.date',
         9: 'so.so_date',
         10: 'so.so_number',
         11: 'sp.name',
@@ -981,44 +1019,45 @@ var columnMap = {
         14: 'bp.name',
         15: 'gdn.gdn_number',
         16: 'gdn.date',
-        17: 'pdi_inspectionid',
-        18: 'brands.brand_name',
-        19: 'master_model_lines.model_line',
-        20: 'varaints.model_detail',
-        21: 'varaints.name',
-        22: 'varaints.detail',
-        23: 'vehicles.vin',
-        24: 'varaints.engine',
-        25: 'varaints.my',
-        26: 'varaints.steering',
-        27: 'varaints.fuel_type',
-        28: 'varaints.gear',
-        29: 'ex_color.name',
-        30: 'int_color.name',
-        31: 'varaints.upholestry',
-        32: 'vehicles.ppmmyyy',
-        33: 'warehouse.name',
-        34: 'vehicles.territory',
-        35: 'countries.name',
+        17: 'vehicles.vehicle_document_status',
+        18: 'pdi_inspectionid',
+        19: 'brands.brand_name',
+        20: 'master_model_lines.model_line',
+        21: 'varaints.model_detail',
+        22: 'varaints.name',
+        23: 'varaints.detail',
+        24: 'vehicles.vin',
+        25: 'varaints.engine',
+        26: 'varaints.my',
+        27: 'varaints.steering',
+        28: 'varaints.fuel_type',
+        29: 'varaints.gear',
+        30: 'ex_color.name',
+        31: 'int_color.name',
+        32: 'varaints.upholestry',
+        33: 'vehicles.ppmmyyy',
+        34: 'warehouse.name',
+        35: 'vehicles.territory',
+        36: 'countries.name',
     };
     // Extend columnMap based on permissions
 if (hasManagementPermission) {
-    columnMap[36] = 'costprice';
+    columnMap[37] = 'costprice';
+    columnMap[38] = 'vehicles.minimum_commission';
+    columnMap[39] = 'vehicles.price';
+    columnMap[40] = 'vehicles.ownership_type';
+    columnMap[41] = 'vehicles.custom_inspection_number';
+    columnMap[42] = 'vehicles.custom_inspection_status';
+} else if (hasPricePermission) {
     columnMap[37] = 'vehicles.minimum_commission';
     columnMap[38] = 'vehicles.price';
     columnMap[39] = 'vehicles.ownership_type';
     columnMap[40] = 'vehicles.custom_inspection_number';
     columnMap[41] = 'vehicles.custom_inspection_status';
-} else if (hasPricePermission) {
-    columnMap[36] = 'vehicles.minimum_commission';
-    columnMap[37] = 'vehicles.price';
-    columnMap[38] = 'vehicles.ownership_type';
-    columnMap[39] = 'vehicles.custom_inspection_number';
-    columnMap[40] = 'vehicles.custom_inspection_status';
 } else {
-    columnMap[36] = 'vehicles.ownership_type';
-    columnMap[37] = 'vehicles.custom_inspection_number';
-    columnMap[38] = 'vehicles.custom_inspection_status';
+    columnMap[37] = 'vehicles.ownership_type';
+    columnMap[38] = 'vehicles.custom_inspection_number';
+    columnMap[39] = 'vehicles.custom_inspection_status';
 }
         var table7 = $('#dtBasicExample7').DataTable({
           processing: true,
@@ -1034,7 +1073,7 @@ if (hasManagementPermission) {
                     var columnIndex = $(this).parent().index(); // Get the column index
                     var columnName = columnMap[columnIndex]; // Map index to column name
                     var value = $(this).val();
-                        console.log(columnIndex);
+                        // console.log(columnIndex);
                     // Send filter values using column names, including special `__NULL__` and `__Not EMPTY__`
                     if (value && columnName) {
                         if (value.includes('__NULL__') || value.includes('__Not EMPTY__')) {
@@ -1055,17 +1094,17 @@ if (hasManagementPermission) {
         {
             targets: 1,
             render: function (data, type, row) {
-                if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id == null) {
+                if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.movement_grn_id == null) {
                     return 'Incoming';
-                } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id != null) {
+                } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.movement_grn_id != null) {
                     return 'Pending Inspection';
-                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && row.grn_id != null && (row.reservation_end_date == null || new Date(row.reservation_end_date) < now)) {
+                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && row.movement_grn_id != null && (row.reservation_end_date == null || new Date(row.reservation_end_date) < now)) {
                     return 'Available Stock';
                   } else if (row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) >= now ) {
                     return 'Booked';
-                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.grn_id != null) {
+                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.movement_grn_id != null) {
                     return 'Sold';
-                } else if (row.inspection_date != null && row.gdn_id != null && row.grn_id != null) {
+                } else if (row.inspection_date != null && row.gdn_id != null && row.movement_grn_id != null) {
                     return 'Delivered';
                 } else {
                     return '';
@@ -1282,18 +1321,55 @@ handleModalShow('#variantview'); // Already existing modal
 });
 function exportToExcel(tableId) {
     var table = document.getElementById(tableId);
-    var rows = table.rows;
+    var theadRows = table.querySelectorAll("thead tr"); // Get header rows
+    var tbodyRows = table.querySelectorAll("tbody tr"); // Get data rows
     var csvContent = "";
-    for (var i = 0; i < rows.length; i++) {
-        var row = rows[i];
-        for (var j = 0; j < row.cells.length; j++) {
-            var cellText = row.cells[j].innerText || row.cells[j].textContent;
-            csvContent += '"' + cellText.replace(/"/g, '""') + '",';
+
+    // Add table headers
+    for (var i = 0; i < theadRows.length; i++) {
+        var row = theadRows[i];
+        if (i === 1) continue; // Skip the second row (index 1)
+
+        var cells = row.querySelectorAll("th"); // Only include <th> elements
+        var rowData = [];
+
+        for (var j = 0; j < cells.length; j++) {
+            var cell = cells[j];
+            var filterSelect = cell.querySelector('select'); // Check for filter dropdown
+            if (!filterSelect) { // Skip the filter dropdowns
+                var cellText = cell.innerText || cell.textContent;
+                rowData.push('"' + cellText.replace(/"/g, '""') + '"'); // Escape double quotes
+            }
         }
-        csvContent += "\n";
+
+        if (rowData.length > 0) { // Add header row only if it has content
+            csvContent += rowData.join(",") + "\n";
+        }
     }
+
+    // Add table body rows (data)
+    for (var i = 0; i < tbodyRows.length; i++) {
+        var row = tbodyRows[i];
+        var cells = row.querySelectorAll("td"); // Only include <td> elements
+        var rowData = [];
+
+        for (var j = 0; j < cells.length; j++) {
+            var cell = cells[j];
+
+            // Check if the cell contains the hidden full-text span
+            var fullTextSpan = cell.querySelector('.full-text');
+            var cellText = fullTextSpan ? fullTextSpan.textContent : cell.innerText || cell.textContent;
+
+            rowData.push('"' + cellText.replace(/"/g, '""') + '"'); // Escape double quotes
+        }
+
+        csvContent += rowData.join(",") + "\n"; // Add data row to CSV
+    }
+
     var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    if (navigator.msSaveBlob) { // IE 10+
+
+    if (navigator.msSaveBlob) {
+        // For IE 10+
         navigator.msSaveBlob(blob, 'export.csv');
     } else {
         var link = document.createElement("a");
@@ -1567,7 +1643,6 @@ $('#remarksForm').on('submit', function(e) {
     }
         },
         error: function(xhr) {
-    console.log(xhr.responseText); // Log full response for debugging
     var errors = xhr.responseJSON.errors;
     var errorMessages = '';
     for (var key in errors) {
@@ -1676,7 +1751,7 @@ function openeditingcolorModal(vehicleId) {
     }
         },
         error: function(xhr) {
-    console.log(xhr.responseText); // Log full response for debugging
+   // Log full response for debugging
 
     var errors = xhr.responseJSON.errors;
     var errorMessages = '';
@@ -1703,7 +1778,6 @@ $('#enhancementForm').on('submit', function(e) {
             location.reload();
         },
         error: function(xhr) {
-    console.log(xhr.responseText); // Log full response for debugging
 
     var errors = xhr.responseJSON.errors;
     var errorMessages = '';
@@ -1746,7 +1820,6 @@ $('#editColorForm').on('submit', function(e) {
     }
         },
         error: function(xhr) {
-    console.log(xhr.responseText); // Log full response for debugging
 
     var errors = xhr.responseJSON.errors;
     var errorMessages = '';
@@ -1773,7 +1846,6 @@ $('#custominspectionForm').on('submit', function(e) {
            // Update the corresponding row in the DataTable (assuming table7 is your DataTable variable)
            var table7 = $('#dtBasicExample7').DataTable();
            var vehicleId = $('#vehicle_idinspection').val();
-    console.log("Vehicle ID from form:", vehicleId);
 
     // Find the row in the DataTable using the 'id' field (since it's the unique identifier)
     var row = table7.row(function(idx, data, node) {
@@ -1793,7 +1865,6 @@ $('#custominspectionForm').on('submit', function(e) {
     }
         },
         error: function(xhr) {
-    console.log(xhr.responseText); // Log full response for debugging
 
     var errors = xhr.responseJSON.errors;
     var errorMessages = '';

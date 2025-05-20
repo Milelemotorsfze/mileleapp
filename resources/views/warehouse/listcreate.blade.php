@@ -1,4 +1,11 @@
 @extends('layouts.main')
+
+<style>
+    .error {
+        color: red;
+    }
+</style>
+
 @section('content')
     <div class="card-header">
         <h4 class="card-title">Add New Master Warehouse</h4>
@@ -40,8 +47,22 @@
                             <input type="text" value="{{ old('name') }}" name="name" class="form-control " placeholder="Warehouse Name" required>
                         </div>
                     </div>
+
+                    <div class="col-lg-3 col-md-6 col-sm-12 d-flex align-items-center justify-content-center">
+                        <div class="mb-3">
+                            <label class="form-label d-block"><span class="error">* </span>Status</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="status" id="statusYes" value="1" checked>
+                                <label class="form-check-label" for="statusYes">Active</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="status" id="statusNo" value="0">
+                                <label class="form-check-label" for="statusNo">In-Active</label>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-dark">Submit</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </div>
         </form>

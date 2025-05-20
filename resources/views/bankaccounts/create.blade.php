@@ -49,6 +49,8 @@
                             <option value="JPY">JPY</option>
                             <option value="CAD">CAD</option>
                             <option value="AED">AED</option>
+                            <option value="PHP">PHP</option>
+                            <option value="SAR">SAR</option>
                         </select>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">

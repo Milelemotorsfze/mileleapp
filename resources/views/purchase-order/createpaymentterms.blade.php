@@ -17,10 +17,10 @@
         font-weight: bold;
     }
 
-    /* Added CSS for setting equal width to the percentage dropdowns */
-    .milestone-percentage-select {
-        width: 30%; /* Adjust the width as needed */
+    .milestone-table td.select-cell {
+        width: 30%; 
     }
+
 </style>
 <div class="card-header">
     <h4 class="card-title">Create New Payment Terms</h4>
@@ -32,11 +32,11 @@
             @csrf
             <div class="row">
                 <div class="col-lg-2 col-md-6">
-                    <label for="from_port" class="form-label">Payment Term Name</label>
+                    <label for="from_port" class="form-label"> <span class="text-danger">*</span> <strong>Payment Term Name</strong></label>
                     <input type="text" name="name" class="form-control" required/>
                 </div>
                 <div class="col-lg-6 col-md-6">
-                    <label for="from_port" class="form-label">Payment Term Description</label>
+                    <label for="from_port" class="form-label"><strong>Payment Term Description</strong></label>
                     <input type="text" name="description" class="form-control" required/>
                 </div>
             </div>
@@ -58,7 +58,7 @@
                     <td>
                         <h5>{{ $milestone }}</h5>
                     </td>
-                    <td>
+                    <td class="select-cell">
                         <select name="milestones[{{ ($milestone) }}]" class="form-select milestone-percentage milestone-percentage-select" id="{{ ($milestone) }}" onchange="calculateTotalPercentage()">
                             <option value="" selected>Select a Percentage</option>
                             @php
@@ -93,7 +93,9 @@
 <script>
     $(document).ready(function () {
         $('.milestone-percentage').select2();
+        $('.select2-container').parent().css('width', '70%');
     });
+    
 
     function calculateTotalPercentage() {
         var totalPercentage = 0;

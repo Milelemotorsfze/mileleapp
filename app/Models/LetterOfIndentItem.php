@@ -52,12 +52,6 @@ class LetterOfIndentItem extends Model
         return $loiDescription;
     }
 
-
-    //    return $balanceQuantity;
-    // }
-  
-    //    return $balanceQuantity;
-    // }
     public function getInventoryQuantityAttribute()
     {
         $masterModel = MasterModel::find($this->master_model_id);

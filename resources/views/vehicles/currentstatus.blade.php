@@ -16,7 +16,7 @@
     }
 
     .card-body .row {
-        border-bottom: 1px solid #dee2e6; /* Light border for separation */
+        /* border-bottom: 1px solid #dee2e6;  */
         margin: 0;
     }
 

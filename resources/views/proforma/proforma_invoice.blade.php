@@ -512,13 +512,69 @@
                 Bank Name : CITI BANK N.A<br>
                 Branch Name : AL WASL BRANCH<br>
                 Bank Address : DUBAI UAE<br>
+                @elseif ($quotationDetail->selected_bank == "rak-eur")
+                Account Name : MlLELE MOTORS FZE<br>
+                IBAN : AE93040000082723910003<br>
+                Account No : 0882723910002<br>
+                Swift Code : NRAKAEAK<br>
+                Bank Name : RAK BANK<br>
+                Branch Name : DRAGON MART<br>
+                Bank Address : DUBAI UAE<br>
+                @elseif ($quotationDetail->selected_bank == "rak-aud")
+                Account Name : MlLELE MOTORS FZE<br>
+                IBAN : AE93040000082723910004<br>
+                Account No : 0882723910004<br>
+                Swift Code : NRAKAEAK<br>
+                Bank Name : RAK BANK<br>
+                Branch Name : DRAGON MART<br>
+                Bank Address : DUBAI UAE<br>
+                @elseif ($quotationDetail->selected_bank == "rak-jpy")
+                Account Name : MlLELE MOTORS FZE<br>
+                IBAN : AE93040000082723910005<br>
+                Account No : 0882723910005<br>
+                Swift Code : NRAKAEAK<br>
+                Bank Name : RAK BANK<br>
+                Branch Name : DRAGON MART<br>
+                Bank Address : DUBAI UAE<br>
+                @elseif ($quotationDetail->selected_bank == "hbz-aed")
+                Account Name : MlLELE MOTORS FZE<br>
+                IBAN : AE890290190210501040608<br>
+                Account No : 02-01-01-020311-105-1040608<br>
+                Swift Code : HBZUAEADXXX<br>
+                Bank Name : HBZ BANK<br>
+                Branch Name : Main Branch, Dubai<br>
+                Bank Address : DUBAI UAE<br>
+                @elseif ($quotationDetail->selected_bank == "hbz-usd")
+                Account Name : MlLELE MOTORS FZE<br>
+                IBAN : AE330290190233301040608<br>
+                Account No : 02-01-01-020311-333-1040608<br>
+                Swift Code : HBZUAEADXXX<br>
+                Bank Name : HBZ BANK<br>
+                Branch Name : Main Branch, Dubai<br>
+                Bank Address : DUBAI UAE<br>
+                @elseif ($quotationDetail->selected_bank == "hbz-eur")
+                Account Name : MlLELE MOTORS FZE<br>
+                IBAN : AE100290190297401040608<br>
+                Account No : 02-01-01-020311-974-1040608<br>
+                Swift Code : HBZUAEADXXX<br>
+                Bank Name : HBZ BANK<br>
+                Branch Name : Main Branch, Dubai<br>
+                Bank Address : DUBAI UAE<br>
+                @elseif ($quotationDetail->selected_bank == "hbz-jpy")
+                Account Name : MlLELE MOTORS FZE<br>
+                IBAN : AE500290190253401040608<br>
+                Account No : 02-01-01-020311-534-1040608<br>
+                Swift Code : HBZUAEADXXX<br>
+                Bank Name : HBZ BANK<br>
+                Branch Name : Main Branch, Dubai<br>
+                Bank Address : DUBAI UAE<br>
                 @else
                 Account Name : MlLELE MOTORS FZE<br>
-                IBAN : AE380211000000110720238<br>
-                Account No : 0110720238<br>
-                Swift Code : CITIAEAD<br>
-                Bank Name : CITI BANK N.A<br>
-                Branch Name : AL WASL BRANCH<br>
+                IBAN : AE230400000882723910001<br>
+                Account No : 0882723910001<br>
+                Swift Code : NRAKAEAK<br>
+                Bank Name : RAK BANK<br>
+                Branch Name : DRAGON MART<br>
                 Bank Address : DUBAI UAE<br>
                 @endif
             </div>
@@ -629,8 +685,32 @@
                     </table>
                 @endif
                 @endif
-    <br>
     
+                @if($quotation->nature_of_deal == 'letter_of_credit')
+                <br/>
+                <p><strong>Terms & Conditions:</strong></p>
+                <ol>
+                    <li><strong>Port Of Shipment:</strong> Jebel Ali Free Zone.</li>
+                    <li> <strong>Transshipment:</strong> Allowed.</li>
+                    <li><strong>LC Reimbursement Clause - Authorization to Debit or Claim:</strong> Issuing bank (Buyer Bank) authorizes the Negotiating Bank (Seller
+                    Bank) to debit their account with Negotiating Bank or claim reimbursement upon presentation of complying document.</li>
+                    <li> <strong>Pricing:</strong> Prices quoted are exclusive of insurance, taxes, or customs duties at destination.</li>
+                    <li><strong>Payment:</strong> All payments must be made in full before delivery unless otherwise agreed.</li>
+                    <li> <strong>Documentation:</strong> Original documents including Commercial Invoice, Packing List, Bill of Lading, and Certificate of Origin will be 
+                        provided upon shipment and payment confirmation.</li>
+                    <li> <strong>Warranty:</strong> Exported vehicles are sold on an 'as-is, where-is' basis with no warranties expressed or implied, unless explicitly stated
+                    in the sales agreement.</li>
+                    <li><strong>Force Majeure:</strong> The seller is not liable for delays caused by events beyond control including port delays, shipping congestion, or
+                    natural disasters.</li>
+                    <li> <strong>Governing Law:</strong> This transaction shall be governed by the laws of the UAE.</li>
+                    <li> <strong>LC charges:</strong> Any charges related to LC are borne by the buyer.</li>
+                    <li><strong>Other charges:</strong> Demurrages and any other charges when vehicles reached at port are the responsibility of the buyer.</li>
+                    <li><strong>Shipment Charges:</strong> Shipment charges will be paid by buyer at the time of booking.</li>
+                    <li><strong>Banking Channel:</strong> The Letter of Credit will only be accepted if it fully complies with our bank's terms and conditions.</li>
+                </ol>
+                @endif
+
+
         @if($quotation->document_type == 'Proforma Invoice')
         @php
         $due_date = $quotationDetail->due_date;
@@ -638,30 +718,39 @@
         @endphp
         <p style="font-weight: bolder">Payment Due Date:  {{$formatted_due_date}}</p>
         @endif
+
         <p style="text-align: justify;">
+        <strong>Acknowledgement: </strong>I hereby acknowledge my commitment to fulfill the payment by the stipulated due date.
+         Should I fail to remit the payment in a timely manner, I understand that I will forfeit my entitlement to the payments,
+          and my order may experience delays or may even be subject to cancellation. 
+
         I hereby acknowledge to honor the payment by the agreed due date.
         In case of my failure to clear payment on time, I stand to lose the right to my payments and my order may be delayed or subject to cancellation.
         @if($quotation->shipping_method == 'CNF')
         Customs clearance, taxes, duty, value added taxes or any other charges related to the above mentioned goods are the sole responsibility of the client.
         @endif
-            Any payments which are made to Milele Motors FZE are non refundable & the price will be changed based on the new market price, and seller has right to sell the cars
-            without prior notice to buyer.
-            Upon initiating any transaction with Milele Motors FZE, the buyer acknowledges and unconditionally agrees to our terms and conditions. It is expressly understood that any payment by the
-            buyer, whether as advances, deposits, or other payments, is non-refundable under any circumstances. The buyer confirms the sale and recognizes its binding nature by making
-            payments. Furthermore, any products or services procured are strictly non-exchangeable and non-returnable. Even without a physical signature, such a transfer signifies a binding and
-            unilateral acceptance of these terms. Before making any transaction, the buyer has had the full opportunity to review these terms in detail, thereby affirming their understanding and
-            acceptance.
+            All payments made to Milele Motors FZE are strictly non-refundable, and the pricing may be adjusted in accordance with
+            the prevailing market rates. The seller reserves the right to sell the vehicles without prior notification to the buyer.
+            By engaging in any transaction with Milele Motors FZE, the buyer acknowledges and unconditionally consents to our terms 
+            and conditions. It is explicitly understood that any payment made by the buyer, whether in the form of advances, deposits, 
+            or other types of payments, is non-refundable under any circumstances. The buyer affirms the sale and acknowledges its binding 
+            nature upon making any payments. Additionally, any products or services rendered are categorically non-exchangeable and 
+            non-returnable. Even in the absence of a physical signature, such a transaction constitutes a binding and unilateral acceptance 
+            of these terms. Prior to executing any transaction, the buyer has been afforded the complete opportunity to thoroughly review 
+            these terms, thereby confirming their understanding and acceptance.  
             </p>
         @if($quotation->shipping_method == 'EXW')
                <p style="font-weight: bolder"> Currency Exchange </p>
-               Bank Payments AED transfers at actuals. USD transfer at  {{ $aed_to_usd_rate->value }} and customer must remit $50 equivalent extra to cover for bank fees.
-                Cash Payments AED at actuals, USD New Bills $100 at {{ $aed_to_usd_rate->value }}, all other bills at 3.67.
-            @if($quotation->currency == 'EURO')
+               Bank payments for AED transfers will be processed at actual rates. 
+               USD transfers will be conducted at a rate of {{ $aed_to_usd_rate->value }}, and customers are required to remit an additional $50 to cover bank fees.
+                For cash payments, AED will be processed at actual rates, while new USD bills will be priced at $100 at a rate of {{ $aed_to_usd_rate->value }}, 
+                and all other bills will be priced at 3.670
+        <!-- @if($quotation->currency == 'EURO')
                 <p style="font-weight: bolder"> Currency Exchange </p>
 Bank Payments AED transfers at actuals. EUR transfer at {{ $aed_to_eru_rate->value }} and customer must remit EUR 50 equivalent extra to cover for bank fees.
 Cash Payments AED at actuals, USD New Bills EUR 100 at {{ $aed_to_eru_rate->value }}, all other bills at
-                    {{ $aed_to_eru_rate }}.
-            @endif
+                    {{ $aed_to_eru_rate->value }}.
+            @endif -->
         @endif
         <div class="footer">
         <p>Client Name: {{ $data['client_name'] }}</p>
@@ -671,4 +760,3 @@ Cash Payments AED at actuals, USD New Bills EUR 100 at {{ $aed_to_eru_rate->valu
     </div>
 </body>
 </html>
-

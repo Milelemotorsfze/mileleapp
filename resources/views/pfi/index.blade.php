@@ -54,8 +54,8 @@
                         <tr>
                             <th>Actions</th>
                             <th>S.NO</th>
-                            <!-- <th>Code</th> -->
                             <th>PFI Number</th>
+                            <th>PO Number</th>
                             <th>PFI Date</th>
                             <th>Customer Name </th>
                             <th>Country</th>                   
@@ -66,8 +66,6 @@
                             <th>Released Amount</th>
                             <th>Release Date</th>
                             <th>Comment</th>
-                            <!-- <th>Status</th> -->
-                            <!-- <th>Payment Status</th> -->
                             <th>Created Date</th>
                             <th>Created By</th>
                             <th>Updated Date</th>
@@ -75,8 +73,6 @@
                         </tr>
                         </thead>
                         <tbody>
-                        
-                
                         </tbody>
                     </table>
                 </div>
@@ -98,6 +94,7 @@
             {'data': 'action', 'name': 'action', orderable: false, searchable: false},
             { 'data': 'DT_RowIndex', 'name': 'DT_RowIndex', orderable: false, searchable: false },
             {'data' : 'pfi_reference_number', 'name' : 'pfi_reference_number', orderable: false },
+            {'data' : 'po_number', 'name' : 'po_number', orderable: false },
             {'data' : 'pfi_date', 'name' : 'pfi_date', orderable: false},
             {'data' : 'customer.name', 'name': 'customer.name', orderable: false },                    
             {'data' : 'country.name', 'name': 'country.name', orderable: false },        
@@ -108,7 +105,6 @@
             {'data' : 'released_amount', 'name': 'released_amount', orderable: false },          
             {'data' : 'released_date', 'name': 'released_date', orderable: false },        
             {'data' : 'comment', 'name': 'comment', orderable: false },      
-            // {'data' : 'status', 'name': 'status', orderable: false },  
             {'data' : 'created_at', 'name': 'created_at', orderable: false }, 
             {'data' : 'created_by', 'name': 'createdBy.name', orderable: false },    
             {'data' : 'updated_at', 'name': 'updated_at', orderable: false }, 

@@ -264,7 +264,6 @@
 						<i class="fa fa-eye" aria-hidden="true"></i> View Details
 					</a>
 				@endif
-
 				<a class="btn btn-sm btn-success ms-auto" id="submit-from-top">Submit</a>
 			</div>
 			<br>
@@ -635,6 +634,7 @@
 								</select>
 							</div>
 						</div>
+						
 						<div class="row">
 							<div class="col-xxl-12 col-lg-12 col-md-12 addon_outer" id="addon-dynamic-div">
 							</div>
@@ -651,7 +651,7 @@
 						</div>
 						</br>
 						<div class="row">
-							<div class="table-responsive">
+							<div class="table-responsive" >
 								<table id="myTable" class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
 									<tr style="border-bottom:1px solid #b3b3b3;">
 										<th>Action</th>
@@ -785,7 +785,7 @@
 									placeholder="Enter Delivery Date " value="{{ isset($workOrder) ? $workOrder->delivery_date : '' }}" autocomplete="delivery_date" autofocus
 									onkeyup="sanitizeInput(this)">
 							</div>
-						</div>
+						</div></br>
 						<div class="row" id="boe-div">
 							<div class="col-xxl-12 col-lg-12 col-md-12 form_field_outer" id="child">
 							</div>
@@ -1085,7 +1085,7 @@
 				<div class="card  no-border">
 					<div class="card-body">
 						<div class="col-xxl-12 col-lg-12 col-md-12">
-							<button style="float:left;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
+						<button style="float:left;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
 						</div>
 					</div>
 				</div>
@@ -1197,6 +1197,10 @@
 			var workOrder = {!! json_encode($workOrder) !!};
 		@else
 			var workOrder = null;
+			document.addEventListener("DOMContentLoaded", function() {
+				var today = new Date().toISOString().split('T')[0]; 
+				document.getElementById("delivery_date").setAttribute("min", today);
+			});
 		@endif
 
 		const mentions = ["@Alice", "@Bob", "@Charlie"]; 
@@ -1787,6 +1791,10 @@
 						submitFromTopButton.disabled = true;
 						submitFromTopButton.classList.add('disabled'); 
 					}
+					// document.addEventListener("DOMContentLoaded", function() {
+						var today = new Date().toISOString().split('T')[0]; 
+						document.getElementById("delivery_date").setAttribute("min", today);
+					// });
 				}
 			}
 			initializeMentions('#new-comment');
@@ -1835,10 +1843,6 @@
 				const commentId = $(this).closest('.comment').data('comment-id');
 				initializeMentions(`#reply-input-${commentId}`);
 			});
-		});
-		document.addEventListener("DOMContentLoaded", function() {
-			var today = new Date().toISOString().split('T')[0]; 
-			document.getElementById("delivery_date").setAttribute("min", today);
 		});
 			$.validator.addMethod("customEmail", function(value, element) {
 				return this.optional(element) || /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(value);
@@ -1921,6 +1925,31 @@
 			$.validator.addMethod("year4digits", function(value, element) {
 				return this.optional(element) || /^\d{4}$/.test(value);
 			}, "Please enter a valid year with 4 digits.");
+			$.validator.addMethod("isExistInSalesOrder", function(value, element) {
+                var result = false;
+				// Make an AJAX call to the backend to check if the SO number exists
+				$.ajax({
+					url: '/is-exist-in-sales-order', // Ensure this matches the route defined in web.php
+					type: 'POST',
+					async: false, // Use synchronous request to wait for the response
+					data: {
+						_token: $('meta[name="csrf-token"]').attr('content'), // Include CSRF token
+						so_number: value, // The SO number entered by the user
+					},
+					success: function(response) {
+						if (response.valid) {
+							result = true; // SO number exists
+						} else {
+							result = false; // SO number does not exist
+						}
+					},
+					error: function(xhr) {
+						console.error("An error occurred while checking SO number: ", xhr.responseText);
+						result = false; // Default to false on error
+					}
+				});
+                return result; 
+            }, "This SO number is not in the sales order.");
 
 		
 			$('#WOForm').validate({ 
@@ -1933,6 +1962,7 @@
 						noSpaces: true,
 						SONumberFormat: true,
 						notSO000000: true,
+						isExistInSalesOrder: true,
 						// uniqueWO: true,
 						// uniqueSO: true,
 						// greaterThanExisting: true, 
@@ -3307,31 +3337,17 @@
 				editWoId = workOrder.id;
 			}
 			console.log("isEdit is - "+editWoId);
+			// Ensure the SO Number is valid (including custom validation isExistInSalesOrder)
+			if (!$('#so_number').valid()) {
+				console.log("SO number validation failed.");
+				return; // Stop execution if validation fails
+			}
+			console.log("SO number validation passed. Proceeding with the AJAX call.");
 			var selectedBatch = '';
 			if ($('#batch').length && (type == 'export_exw' || type == 'export_cnf')) {
 				selectedBatch = $('#batch').val(); 
 			}
-			
-			if (SONumber === '') { 
-				document.getElementById('wo_number').value = ''; 
-				return; 
-			}
-			
-			let parts = SONumber.split("SO-");
-			if (parts.length !== 2 || parts[0] !== '') { 
-				document.getElementById('wo_number').value = ''; 
-				return; 
-			}
-			
-			let numberPart = parts[1];
-			if (numberPart === '' || numberPart.length !== 6) { 
-				document.getElementById('wo_number').value = ''; 
-				return; 
-			}
-			
-			if (type === 'local_sale') {
-				setWo();
-			} else {
+			// Call the additional AJAX request to process the SO Number
 				$.ajax({
 					url: '/check-so-number',
 					method: 'POST',
@@ -3377,7 +3393,6 @@
 						console.error(xhr.responseText); 
 					} 
 				}); 
-			}
 		}
 		function setWo() {
 		var SONumber = $('#so_number').val().trim(); 

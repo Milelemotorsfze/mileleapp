@@ -9,6 +9,7 @@ use App\Models\Booking;
 use App\Models\UserActivities;
 use App\Models\BookingRequest;
 use App\Models\Closed;
+use App\Models\ModelHasRoles;
 use App\Models\Calls;
 use App\Models\Vehicles;
 use Yajra\DataTables\DataTables;
@@ -35,42 +36,19 @@ class SalesOrderController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-        $useractivities = new UserActivities();
-        $useractivities->activity = "Open Sales Order";
-        $useractivities->users_id = Auth::id();
-        $useractivities->save();
-        if ($request->ajax()) {
-            $status = $request->input('status');
-            if($status === "SalesOrder")
-            {
-                $id = Auth::user()->id;
-                // info($id);
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
-        if($hasPermission)
-        {
-                $data = So::select([
-                    'calls.name as customername',
-                    'calls.email',
-                    'calls.phone',
-                    'quotations.created_at',
-                    'quotations.deal_value',
-                    'quotations.sales_notes',
-                    'quotations.file_path',
-                    'users.name',
-                    'so.so_number',
-                    'so.so_date',
-                    'quotations.calls_id',
-                ])
-                ->leftJoin('quotations', 'so.quotation_id', '=', 'quotations.id')
-                ->leftJoin('users', 'quotations.created_by', '=', 'users.id')
-                ->leftJoin('calls', 'quotations.calls_id', '=', 'calls.id')
-                ->groupby('so.id')
-                ->orderBy('so.so_date', 'desc');
-        }
-        else
-        {
-            $data = So::select([
+{
+    $useractivities = new UserActivities();
+    $useractivities->activity = "Open Sales Order";
+    $useractivities->users_id = Auth::id();
+    $useractivities->save();
+
+    if ($request->ajax()) {
+        $status = $request->input('status');
+        if ($status === "SalesOrder") {
+            $id = Auth::user()->id;
+
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+            $query = So::select([
                 'calls.name as customername',
                 'calls.email',
                 'calls.phone',
@@ -80,23 +58,48 @@ class SalesOrderController extends Controller
                 'quotations.file_path',
                 'users.name',
                 'so.so_number',
+                'so.id as soid',
                 'so.so_date',
                 'quotations.calls_id',
             ])
             ->leftJoin('quotations', 'so.quotation_id', '=', 'quotations.id')
-            ->leftJoin('users', 'quotations.created_by', '=', 'users.id')
+            ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
             ->leftJoin('calls', 'quotations.calls_id', '=', 'calls.id')
-            ->where('calls.sales_person', $id)
-            ->groupby('so.id')
-            ->orderBy('so.so_date', 'desc');  
+            ->groupBy('so.id');
+
+            if (!$hasPermission) {
+                $query->where('calls.sales_person', $id);
+            }
+
+            // Handle dynamic sorting
+            $columns = [
+                0 => 'so.so_number',
+                1 => 'so.so_date',
+                2 => 'users.name',
+                3 => 'calls.name',
+                4 => 'calls.phone',
+                5 => 'calls.email',
+                6 => 'quotations.created_at',
+                7 => 'quotations.deal_value',
+                8 => 'quotations.sales_notes'
+            ];
+
+            $orderColumnIndex = $request->input('order.0.column'); // Column index from request
+            $orderDirection = $request->input('order.0.dir', 'asc'); // Sort direction (asc/desc)
+
+            // Default to sorting by `so.so_date` if index is invalid
+            $orderColumn = $columns[$orderColumnIndex] ?? 'so.so_date';
+
+            // Apply the sorting dynamically
+            $query->orderBy($orderColumn, $orderDirection);
+
+            return DataTables::of($query)->toJson();
         }
-    }  
-            if ($data) {
-                return DataTables::of($data)->toJson();
-            }
-            }
-        return view('dailyleads.salesorder');
     }
+
+    return view('dailyleads.salesorder');
+}
+
 
     /**
      * Show the form for creating a new resource.
@@ -146,8 +149,10 @@ class SalesOrderController extends Controller
         //
     }
     public function createsalesorder($callId) {
+       
         $quotation = Quotation::where('calls_id', $callId)->first();
         $calls = Calls::find($callId);
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
         $customerdetails = QuotationDetail::with('country', 'shippingPort', 'shippingPortOfLoad', 'paymentterms')->where('quotation_id', $quotation->id)->first();
         $vehicles = [];
         if ($quotation) {
@@ -161,14 +166,30 @@ class SalesOrderController extends Controller
                 switch ($item->reference_type) {
                     case 'App\Models\Varaint':
                     $variantId = $item->reference_id;
-                    $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                    $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                    ->whereNull('so_id')
+                    ->whereNull('gdn_id')
+                    ->when(!$hasPermission, function ($query) {
+                        $query->where(function ($subQuery) {
+                            $subQuery->whereNull('booking_person_id')
+                                     ->orWhere('booking_person_id', Auth::id());
+                        });
+                    })->get()->toArray();
                     $vehicles[$item->id] = $variantVehicles;
                     break;
                 case 'App\Models\MasterModelLines':
+                   
                     $variants = Varaint::where('master_model_lines_id', $item->reference_id)->get();
                     foreach ($variants as $variant) {
-                        $variantId = $variant->id;
-                        $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                        $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                        ->whereNull('so_id')
+                        ->whereNull('gdn_id')
+                        ->when(!$hasPermission, function ($query) {
+                            $query->where(function ($subQuery) {
+                                $subQuery->whereNull('booking_person_id')
+                                         ->orWhere('booking_person_id', Auth::id());
+                            });
+                        })->get()->toArray();
                         $vehicles[$item->id] = $variantVehicles;
                     }
                     break;
@@ -176,7 +197,15 @@ class SalesOrderController extends Controller
                     $variants = Varaint::where('brand_id', $item->reference_id)->get();
                     foreach ($variants as $variant) {
                         $variantId = $variant->id;
-                        $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                        $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                        ->whereNull('so_id')
+                        ->whereNull('gdn_id')
+                        ->when(!$hasPermission, function ($query) {
+                            $query->where(function ($subQuery) {
+                                $subQuery->whereNull('booking_person_id')
+                                         ->orWhere('booking_person_id', Auth::id());
+                            });
+                        })->get()->toArray();
                         $vehicles[$item->id] = $variantVehicles;
                     }
                     break;
@@ -195,13 +224,17 @@ class SalesOrderController extends Controller
                 $so = New So();
                 $so->quotation_id = $quotationId;
                 $so->sales_person_id = $qoutation->created_by;
-                $so->so_number = $request->input('so_number');
+                $so_number = $request->input('so_number'); // Get the input value
+                $so->so_number = 'SO-' . $so_number;    // Concatenate "SO-00" with the input value
                 $so->so_date = $request->input('so_date');
                 $so->notes = $request->input('notes');
                 $so->total = $request->input('total_payment');
                 $so->receiving = $request->input('receiving_payment');
                 $so->paidinso = $request->input('payment_so');
                 $so->paidinperforma = $request->input('advance_payment_performa');
+                $so->created_by = auth()->id();
+                $so->created_at = Carbon::now();
+                $so->updated_at = Carbon::now();
                 $so->save();
                 $calls = Calls::find($qoutation->calls_id);
                 $calls->status = "Closed";
@@ -315,7 +348,11 @@ class SalesOrderController extends Controller
         {
             $quotation = Quotation::where('calls_id', $id)->first();
             $calls = Calls::find($id);
+
             $sodetails = So::where('quotation_id', $quotation->id)->first();
+           
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') 
+                 || Auth::user()->hasPermissionForSelectedRole('sales-view');
             $soitems = Soitems::with('vehicle') // Ensure that vehicle is eager loaded
                       ->where('so_id', $sodetails->id)
                       ->get();
@@ -332,14 +369,49 @@ class SalesOrderController extends Controller
                     switch ($item->reference_type) {
                         case 'App\Models\Varaint':
                         $variantId = $item->reference_id;
-                        $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                        $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                        ->where(function ($query) use ($sodetails) {
+                            $query->whereNull('so_id')
+                                  ->orWhere('so_id', $sodetails->id);
+                        })
+                        ->when(function ($query) use ($sodetails) {
+                            // Check if so_id exists with the same $sodetails->id
+                            return DB::table('vehicles')->where('so_id', $sodetails->id)->exists() === false;
+                        }, function ($query) {
+                            // Apply gdn_id condition only if so_id is not the same
+                            $query->whereNull('gdn_id');
+                        })
+                        ->when(!$hasPermission, function ($query) use($sodetails){
+                            $query->where(function ($subQuery) use($sodetails) {
+                                $subQuery->whereNull('booking_person_id')
+                                         ->orWhere('booking_person_id', $sodetails->sales_person_id);
+                            });
+                        })->get()->toArray();
+                      
                         $vehicles[$item->id] = $variantVehicles;
                         break;
                     case 'App\Models\MasterModelLines':
                         $variants = Varaint::where('master_model_lines_id', $item->reference_id)->get();
                         foreach ($variants as $variant) {
                             $variantId = $variant->id;
-                            $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                            $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                            ->where(function ($query) use ($sodetails) {
+                                $query->whereNull('so_id')
+                                      ->orWhere('so_id', $sodetails->id);
+                            })
+                            ->when(function ($query) use ($sodetails) {
+                                // Check if so_id exists with the same $sodetails->id
+                                return DB::table('vehicles')->where('so_id', $sodetails->id)->exists() === false;
+                            }, function ($query) {
+                                // Apply gdn_id condition only if so_id is not the same
+                                $query->whereNull('gdn_id');
+                            })
+                            ->when(!$hasPermission, function ($query) use($sodetails) {
+                                $query->where(function ($subQuery) use($sodetails){
+                                    $subQuery->whereNull('booking_person_id')
+                                             ->orWhere('booking_person_id', $sodetails->sales_person_id);
+                                });
+                            })->get()->toArray();
                             $vehicles[$item->id] = $variantVehicles;
                         }
                         break;
@@ -347,7 +419,24 @@ class SalesOrderController extends Controller
                         $variants = Varaint::where('brand_id', $item->reference_id)->get();
                         foreach ($variants as $variant) {
                             $variantId = $variant->id;
-                            $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                            $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                            ->where(function ($query) use ($sodetails) {
+                                $query->whereNull('so_id')
+                                      ->orWhere('so_id', $sodetails->id);
+                            })
+                            ->when(function ($query) use ($sodetails) {
+                                // Check if so_id exists with the same $sodetails->id
+                                return DB::table('vehicles')->where('so_id', $sodetails->id)->exists() === false;
+                            }, function ($query) {
+                                // Apply gdn_id condition only if so_id is not the same
+                                $query->whereNull('gdn_id');
+                            })
+                            ->when(!$hasPermission, function ($query) use($sodetails){
+                                $query->where(function ($subQuery)use($sodetails) {
+                                    $subQuery->whereNull('booking_person_id')
+                                             ->orWhere('booking_person_id', $sodetails->sales_person_id);
+                                });
+                            })->get()->toArray();
                             $vehicles[$item->id] = $variantVehicles;
                         }
                         break;
@@ -358,26 +447,35 @@ class SalesOrderController extends Controller
                         } 
                         $saleperson = User::find($quotation->created_by);
                         $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first(); 
+                      
                         return view('salesorder.update', compact('vehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails','sodetails', 'soitems', 'empProfile', 'saleperson'));  
         }
-        public function storesalesorderupdate(Request $request, $quotationId)
+public function storesalesorderupdate(Request $request, $quotationId)
 {
+    DB::beginTransaction();
+    try {
     // Validate and retrieve the Sales Order ID
     $so_id = $request->input('so_id');
     $so = So::findOrFail($so_id);
     // Update the Sales Order fields
-    $so->so_number = $request->input('so_number');
+    $so_number = $request->input('so_number'); // Get the input value
+    $so->so_number = 'SO-' . $so_number; 
     $so->so_date = $request->input('so_date');
     $so->notes = $request->input('notes');
     $so->total = $request->input('total_payment');
     $so->receiving = $request->input('receiving_payment');
     $so->paidinso = $request->input('payment_so');
     $so->paidinperforma = $request->input('advance_payment_performa');
+    $so->updated_by = auth()->id(); // or $request->user()->id
+    $so->updated_at = Carbon::now();
     $so->save();
 
     // Delete existing Soitems records related to the Sales Order ID
+    \Log::info('SO items deleted - Case 3-'.$so->id);
+    Soitems::where('so_id', $so->id)->update(['deleted_by' => Auth::id()]);
     Soitems::where('so_id', $so->id)->delete();
     Vehicles::where('so_id', $so->id)->update(['so_id' => null]);
+    \Log::info('Unassign SO id - Case 3-'.$so->id);
     // Process the selected VINs
     $vins = $request->input('vehicle_vin');
     $selectedVinsWithNull = [];
@@ -461,21 +559,49 @@ class SalesOrderController extends Controller
     $solog->so_id = $so->id;
     $solog->role = Auth::user()->selectedRole;
     $solog->save();
+
+    DB::commit();
     return redirect()->route('dailyleads.index')->with('success', 'Sales Order updated successfully.');
+} catch (\Exception $e) {
+    DB::rollBack(); // Rollback transaction in case of error
+     Log::error('Sales order updte faisls', ['error' => $e->getMessage()]);
+
+    return redirect()->back()->withErrors('An error occurred while updating sales order.');
+}
+  
 }
 public function cancel($id)
 {
-    info($id);
-    $quotation = Quotation::where('calls_id', $id)->first();
-    $calls = Calls::find($id);
-    $calls->status = 'Quoted';
-    $calls->save();
-    $leadclosed = Closed::where('call_id', $id)->first();
-    if($leadclosed)
-    {
-    $leadclosed->delete();
+    // $quotation = Quotation::where('calls_id', $id)->first();
+    // $calls = Calls::find($id);
+    // $calls->status = 'Quoted';
+    // $calls->save();
+    // $leadclosed = Closed::where('call_id', $id)->first();
+    // if($leadclosed)
+    // {
+    // $leadclosed->delete();
+    // }
+    // $so = So::where('quotation_id', $quotation->id)->first();
+
+    DB::beginTransaction();
+
+    try {
+
+    $so = SO::find($id);
+    if($so->quotation_id  && $so->quotation_id  != 0) {
+        $quotation = Quotation::where('id', $so->quotation_id)->first();
+        if($quotation){
+            $calls = Calls::find($quotation->calls_id);
+            $calls->status = 'Quoted';
+            $calls->save();
+            $leadclosed = Closed::where('call_id', $quotation->calls_id)->first();
+            if($leadclosed)
+            {
+                $leadclosed->delete();
+            }
+        }
+           
     }
-    $so = So::where('quotation_id', $quotation->id)->first();
     $soitems = Soitems::where('so_id', $so->id)->get();
     foreach ($soitems as $soitem) {
         $vehicle = Vehicles::find($soitem->vehicles_id);
@@ -485,11 +611,17 @@ public function cancel($id)
             $vehicle->reservation_end_date = null;
             $vehicle->booking_person_id = null;
             $vehicle->save();
+            \Log::info('Unassign SO id - Case 4-'.$so->id);
         }
     }
     foreach ($soitems as $soitem) {
+        $soitem->deleted_by = Auth::id();
+        $soitem->save();
+        \Log::info('SO items deleted - Case 4-'.$so->id);
+
         $soitem->delete();
     }
+
     $bookingrequest = BookingRequest::where('calls_id', $id)->first();
     if ($bookingrequest) {
         $bookingrequest->status = 'Rejected';
@@ -504,7 +636,15 @@ public function cancel($id)
     $solog->role = Auth::user()->selectedRole;
     $solog->save();
     $so->delete();
+
+    DB::commit();
     return redirect()->back()->with('success', 'Sales Order and related items canceled successfully.');
+} catch (\Exception $e) {
+    DB::rollBack(); 
+
+    Log::error('Sales Order Cancellation failed', ['error' => $e->getMessage()]);
+    return redirect()->back()->with('error', 'Sales Order Cancellation failed.');
+}
 }
 public function showSalesSummary($sales_person_id, $count_type)
 {
@@ -833,4 +973,33 @@ public function showSalespersonCommissions($sales_person_id, Request $request)
         'invoice_number' => $invoiceData->invoice_number
     ]);    
     }
+    public function getSalespersons()
+    {
+        // Fetch salespersons based on role_id (Assuming 7 is the role_id for Sales Person)
+        $salespersons = ModelHasRoles::where('role_id', 7)
+            ->join('users', 'users.id', '=', 'model_has_roles.model_id')
+            ->select('users.id', 'users.name')
+            ->get();
+    
+        return response()->json(['salespersons' => $salespersons]);
+    }
+
+    public function updateSalesperson(Request $request)
+{
+    $request->validate([
+        'sales_order_id' => 'required|exists:so,id', // Correct table name
+        'salesperson_id' => 'required|exists:users,id'
+    ]);
+
+    $salesOrder = So::find($request->sales_order_id);
+    info($salesOrder);
+    if ($salesOrder) {
+        $salesOrder->sales_person_id = $request->salesperson_id;
+        $salesOrder->save();
+        info($salesOrder);
+        return response()->json(['success' => true]);
+    }
+
+    return response()->json(['success' => false], 400);
+}
         }

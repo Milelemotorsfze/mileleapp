@@ -22,12 +22,12 @@
                             <label class="form-check-label" for="DeliveryReady_{{$vehicle->id}}" style="font-size: 14px;">Ready</label>
                         </div>
                         <div class="form-check flex-fill d-flex align-items-left justify-content-left">
-                            <input class="form-check-input me-1" type="radio" name="vehDeliveryStatus_{{$vehicle->id}}" id="vehDeliveryStatusDelivered_{{$vehicle->id}}" value="Delivered" {{ $vehicle->Delivery_status == 'Delivered' ? 'checked' : '' }}>
-                            <label class="form-check-label" for="DeliveryDelivered_{{$vehicle->id}}" style="font-size: 14px;">Delivered With Documents</label>
-                        </div>
-                        <div class="form-check flex-fill d-flex align-items-left justify-content-left">
                             <input class="form-check-input me-1" type="radio" name="vehDeliveryStatus_{{$vehicle->id}}" id="vehDeliveryStatusDocsHold_{{$vehicle->id}}" value="Delivered With Docs Hold" {{ $vehicle->Delivery_status == 'Delivered With Docs Hold' ? 'checked' : '' }}>
                             <label class="form-check-label" for="DeliveryDocsHold_{{$vehicle->id}}" style="font-size: 14px;">Delivered/Documents Hold</label>
+                        </div>
+                        <div class="form-check flex-fill d-flex align-items-left justify-content-left">
+                            <input class="form-check-input me-1" type="radio" name="vehDeliveryStatus_{{$vehicle->id}}" id="vehDeliveryStatusDelivered_{{$vehicle->id}}" value="Delivered" {{ $vehicle->Delivery_status == 'Delivered' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="DeliveryDelivered_{{$vehicle->id}}" style="font-size: 14px;">Delivered With Documents</label>
                         </div>
                     </div>
 

@@ -5,7 +5,7 @@
                     @endphp
                     @if ($hasPermission)
 <div class="card-header">
-        <h4 class="card-title">Movements Transtion</h4>
+        <h4 class="card-title">Movements Transition</h4>
     @if ($previousId)
     <a class="btn btn-sm btn-info" href="{{ route('movement.lastReference', ['currentId' => ($previousId)]) }}">
         <i class="fa fa-arrow-left" aria-hidden="true"></i>
@@ -82,14 +82,14 @@
                         $sonumber = DB::table('so')->where('id', $soids)->first();
                         $so_numbers = $sonumber ? $sonumber->so_number : '';
                         @endphp
-                        <td>SO - {{ $so_numbers }}</td>
+                        <td>{{ $so_numbers }}</td>
                         @php
                         $purchasingorderid = DB::table('vehicles')->where('vin', $movements->vin)->first();
                         $purchasingorderids = $purchasingorderid ? $purchasingorderid->purchasing_order_id : '';
                         $purchasing_orders = DB::table('purchasing_order')->where('id', $purchasingorderids)->first();
                         $po_number = $purchasing_orders ? $purchasing_orders->po_number : '';
                         @endphp
-                        <td>PO - {{ $po_number }}</td>
+                        <td>{{ $po_number }}</td>
                         @php
                         // Check if there is a more recent movement entry for the same VIN
                         $latestMovement = DB::table('movements')
@@ -101,11 +101,11 @@
                     @if($movementref->created_by == auth()->id())
                         @if ($latestMovement && $latestMovement->id == $movements->id)
                         <form action="{{ route('movement.revised', ['id' => $movements->id]) }}" method="POST" style="display:inline;">
-    @csrf
-    <button type="submit" class="btn btn-sm btn-danger">
-        Revise
-    </button>
-</form>
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                Revise
+                            </button>
+                        </form>
                         @endif
                         @endif
                     </td>

@@ -74,6 +74,7 @@ input[type=number]::-webkit-outer-spin-button {
                 <option value="AED" {{ old('currency', $currencyValue) === 'AED' ? 'selected' : '' }}>AED</option>
                 <option value="USD" {{ old('currency', $currencyValue) === 'USD' ? 'selected' : '' }}>USD</option>
                 <option value="EURO" {{ old('currency', $currencyValue) === 'EURO' ? 'selected' : '' }}>EURO</option>
+                <option value="SAR" {{ old('currency', $currencyValue) === 'SAR' ? 'selected' : '' }}>SAR</option>
             </select>
         </div>
         <div class="col-lg-2 col-md-6">

@@ -212,7 +212,6 @@ class EmployeeLiabilityController extends Controller
             return response()->json('success');
         } 
         catch (\Exception $e) {
-            // info($e);
             DB::rollback();
             info($e);
             $errorMsg ="Something went wrong! Contact your admin";

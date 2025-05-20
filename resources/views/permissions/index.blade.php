@@ -8,6 +8,8 @@
     @if ($hasPermission)
     <div class="card-header">
         <h4 class="card-title">List Permissions</h4>
+        <!-- <a  class="btn btn-sm btn-secondary float-end mr-2" href="{{ route('migrations.index') }}" >
+        <i class="fa fa-check" aria-hidden="true"></i> Migration Check</a>  -->
             @php
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-permission-create']);
             @endphp

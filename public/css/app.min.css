@@ -281,10 +281,10 @@ body[data-layout-mode=dark][data-topbar=light] .app-search .form-control {
     padding: 20px calc(20px / 2);
     position: absolute;
     right: 0;
-    background-image: linear-gradient(to right,#0065ac,#090e22,#0065ac);
+    /* background-image: linear-gradient(to right,#0065ac,#090e22,#0065ac); */
     left: 250px;
     height: 60px;
-    background-color: #fff;
+    background-color: #06203d;
     border-top: 1px solid #e9e9ef;
 }
 body[data-sidebar-size=md][data-sidebar-size=sm] .footer, body[data-sidebar-size=sm] .footer {
@@ -2745,6 +2745,16 @@ body[data-layout-mode=dark] .jvectormap-label {
 .auth-bg .bg-overlay {
     opacity: .9;
 }
+.auth-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 43, 77, 0.65); 
+    z-index: 1;
+}
 .auth-full-page-content {
     min-height: 100vh;
 }
@@ -3043,13 +3053,14 @@ body[data-sidebar=brand] #vertical-menu-btn, body[data-sidebar=dark] #vertical-m
     color: #e9ecef;
 }
 .topnav {
-    background-image: linear-gradient(to right,#0065ac,#090e22,#0065ac);
+    /* background-image: linear-gradient(to right,#0065ac,#090e22,#0065ac); */
+    background-color: #004d85e3;
 }
-.topnav .navbar-nav .nav-item:first-of-type .nav-link {
+/* .topnav .navbar-nav .nav-item:first-of-type .nav-link {
     padding-left: 0;
-}
+} */
 .topnav .dropdown-item {
-    padding: .5rem 1.5rem;
+    padding: .5rem 1rem;
     min-width: 150px;
 }
 .topnav .dropdown.mega-dropdown .mega-dropdown-menu {
@@ -3071,6 +3082,8 @@ body[data-sidebar=brand] #vertical-menu-btn, body[data-sidebar=dark] #vertical-m
     position: absolute;
     top: 0!important;
     left: 100%;
+    /* left: inherit; */
+    /* right: 100% !important; */
     display: none;
 }
 .topnav .dropdown:hover>.dropdown-menu, .topnav .dropdown:hover>.dropdown-menu>.dropdown:hover>.dropdown-menu {
@@ -3634,8 +3647,11 @@ body[data-layout-mode=dark] .chat-conversation .right .conversation-list .ctext-
 }.timeline .timeline-launch .timeline-text {
     width: 100%}
 @media (max-width:767px) {
-    div.dataTables_wrapper div.dataTables_filter {
-    text-align: center;
+    div.dataTables_wrapper div.dataTables_length {
+    text-align: start !important;
+}
+div.dataTables_wrapper div.dataTables_filter {
+    text-align: end !important;
 }
 .email-leftbar {
     float: none;

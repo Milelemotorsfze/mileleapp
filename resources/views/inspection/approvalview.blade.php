@@ -77,7 +77,7 @@
                  <input type="hidden" name="brands_id" value="{{$brands->id}}"/>
                 </td>
                 <td>
-                    @if($brand->id == $brands->id)
+                    @if($brand && $brands && $brand->id == $brands->id)
                         <i class="fas fa-check text-success"></i>
                         @else
                         <i class="fas fa-times text-danger"></i>
@@ -98,7 +98,7 @@
                  <input type="hidden" name="master_model_lines_id" value="{{$modal->id}}"/>
                 </td>
                 <td>
-                    @if($model_line->id == $modal->id)
+                    @if($model_line && $modal && $model_line->id == $modal->id)
                         <i class="fas fa-check text-success"></i>
                         @else
                         <i class="fas fa-times text-danger"></i>
@@ -142,13 +142,16 @@
                     <option value="2.8" @if($variant_request->engine == '2.8') selected @endif>2.8</option>
                     <option value="3" @if($variant_request->engine == '3') selected @endif>3</option>
                     <option value="3.3" @if($variant_request->engine == '3.3') selected @endif>3.3</option>
+                    <option value="3.4" @if($variant_request->engine == '3.4') selected @endif>3.4</option>
                     <option value="3.5" @if($variant_request->engine == '3.5') selected @endif>3.5</option>
                     <option value="4" @if($variant_request->engine == '4') selected @endif>4</option>
                     <option value="4.2" @if($variant_request->engine == '4.2') selected @endif>4.2</option>
                     <option value="4.4" @if($variant_request->engine == '4.4') selected @endif>4.4</option>
                     <option value="4.5" @if($variant_request->engine == '4.5') selected @endif>4.5</option>
                     <option value="4.8" @if($variant_request->engine == '4.8') selected @endif>4.8</option>
+                    <option value="5.0" @if($variant_request->engine == '5.0') selected @endif>5.0</option>
                     <option value="5.3" @if($variant_request->engine == '5.3') selected @endif>5.3</option>
+                    <option value="5.5" @if($variant_request->engine == '5.5') selected @endif>5.5</option>
                     <option value="5.6" @if($variant_request->engine == '5.6') selected @endif>5.6</option>
                     <option value="5.7" @if($variant_request->engine == '5.7') selected @endif>5.7</option>
                     <option value="5.9" @if($variant_request->engine == '5.9') selected @endif>5.9</option>
@@ -210,8 +213,8 @@
                 <td>{{$variant->gearbox}}</td>
                 <td>
                     <select class="form-control" name="gearbox">
-                    <option value="Auto" @if($variant_request->upholestry == 'Auto') selected @endif>Auto</option>
-                    <option value="Manual" @if($variant_request->upholestry == 'Manual') selected @endif>Manual</option>
+                    <option value="Auto" @if($variant_request->gearbox == 'AT') selected @endif>Auto</option>
+                    <option value="Manual" @if($variant_request->gearbox == 'MT') selected @endif>Manual</option>
                  </select>
                 </td>
                 <td>
@@ -260,11 +263,11 @@
         </select>
     </td>
     <td>
-        @if($intrequest && $vehiclecolour->id == $intrequest->id)
-        <i class="fas fa-check text-success"></i>
-        @else
-        <i class="fas fa-times text-danger"></i>
-        @endif
+            @if($intrequest && $vehiclecolour && $vehiclecolour->id == $intrequest->id)
+            <i class="fas fa-check text-success"></i>
+            @else
+            <i class="fas fa-times text-danger"></i>
+            @endif
     </td>
 </tr>
             <tr>
@@ -280,7 +283,7 @@
                  </select>
                 </td>
                 <td>
-                    @if($extrequest && $extvehicle->id == $extrequest->id)
+                    @if($extrequest && $extvehicle && $extvehicle->id == $extrequest->id)
                         <i class="fas fa-check text-success"></i>
                         @else
                         <i class="fas fa-times text-danger"></i>
@@ -1035,6 +1038,11 @@ function saveincidents() {
   function setButtonValue(value) {
     document.getElementById('buttonValue').value = value;
 
+    const selectedRadioVariantOption = document.querySelector('input[name="variantoption"]:checked');
+    if (!selectedRadioVariantOption) {
+        alertify.confirm('Please select Variant compare option in Input Remarks section',function (e) {
+        }).set({title:"Error"});
+    }
     // Get the selected variant option
     const selectedVariantOption = document.querySelector('input[name="variantoption"]:checked').value;
 

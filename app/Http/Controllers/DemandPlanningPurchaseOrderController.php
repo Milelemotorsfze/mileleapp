@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ApprovedLetterOfIndentItem;
 use App\Models\ColorCode;
-use App\Models\LOIItemPurchaseOrder;
+use App\Models\PfiItemPurchaseOrder;
 use App\Models\MasterModel;
 use App\Models\PFI;
 use App\Models\SupplierInventory;
@@ -13,7 +12,12 @@ use App\Models\SupplierType;
 use App\Models\Varaint;
 use App\Models\PaymentTerms;
 use Illuminate\Http\Request;
+use App\Models\PfiItem;
+use App\Models\Country;
 use Illuminate\Support\Facades\DB;
+use App\Models\MasterShippingPorts;
+use App\Models\PurchasingOrder;
+
 
 class DemandPlanningPurchaseOrderController extends Controller
 {
@@ -31,42 +35,96 @@ class DemandPlanningPurchaseOrderController extends Controller
     public function create(Request $request)
     {
         (new UserActivityController)->createActivity('Open Purchase Order create Section');
-
+        
         $pfi = Pfi::find($request->id);
-        $dealer = $pfi->letterOfIndent->dealers ?? '';
+        $pfiItemLatest = PfiItem::where('pfi_id', $request->id)
+                            ->where('is_parent', false)
+                            ->first();
+        $isToyotaPO = 0;
+        if($pfiItemLatest) {
+            // only toyota PFI have child , so if child exist it will be toyota PO
+            $isToyotaPO = 1;
+        }
+        // $dealer =  $pfiItemLatest->letterOfIndentItem->LOI->dealers ?? '';
+        $pfiItems = PfiItem::where('pfi_id', $request->id)
+                                ->where('is_parent', true)
+                                ->get();
 
-        $pfiVehicleVariants = ApprovedLetterOfIndentItem::select('*', DB::raw('sum(quantity) as quantity'))
-            ->where('pfi_id', $request->id)
-            ->groupBy('letter_of_indent_item_id')
-            ->get();
-        foreach ($pfiVehicleVariants as $pfiVehicleVariant) {
+        $totalPOqty = 0;
+        foreach ($pfiItems as $pfiItem) {
 
-            $alreadyAddedQuantity = LOIItemPurchaseOrder::where('approved_loi_id', $pfiVehicleVariant->id)
-                ->sum('quantity');
-
-            $pfiVehicleVariant->quantity = $pfiVehicleVariant->quantity - $alreadyAddedQuantity;
-
-            $masterModel = MasterModel::find($pfiVehicleVariant->letterOfIndentItem->masterModel->id);
-            $pfiVehicleVariant->masterModels = MasterModel::where('model', $masterModel->model)
+            $alreadyAddedQuantity = PfiItemPurchaseOrder::where('pfi_item_id', $pfiItem->id)
+                                                        ->sum('quantity');
+            $pfiItem->quantity = $pfiItem->pfi_quantity - $alreadyAddedQuantity;
+            $totalPOqty = $totalPOqty + $pfiItem->pfi_quantity;
+        
+            $masterModel = MasterModel::find($pfiItem->masterModel->id);
+            $pfiItem->masterModels = MasterModel::where('model', $masterModel->model)
                                             ->where('sfx', $masterModel->sfx)
                                             ->get();
-
-            $possibleModelIds = MasterModel::where('model', $masterModel->model)
-                                            ->where('sfx', $masterModel->sfx)->pluck('id');
-            $pfiVehicleVariant->inventoryQuantity = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
-                                                        ->whereNull('purchase_order_id')
-                                                        ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-                                                        ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-                                                        ->where('supplier_id', $pfi->supplier_id)
-                                                        ->where('whole_sales', $dealer)
-                                                        ->count();
+            // $possibleModelIds = MasterModel::where('model', $masterModel->model)
+            //                                 ->where('sfx', $masterModel->sfx)->pluck('id');
+            // $pfiItem->inventoryQuantity = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
+            //                                             ->whereNull('purchase_order_id')
+            //                                             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+            //                                             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+            //                                             ->where('supplier_id', $pfi->supplier_id)
+            //                                             ->where('whole_sales', $dealer)
+            //                                             ->count();
         }
-
-        $exColours = ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
-        $intColours = ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
+        $exColours = ColorCode::where('belong_to', 'ex')->orderBy('name', 'ASC')->get();
+        $intColours = ColorCode::where('belong_to', 'int')->orderBy('name', 'ASC')->get();
         $paymentTerms = PaymentTerms::all();
-        return view('purchase-order.create', compact('pfiVehicleVariants',
-            'exColours','intColours','pfi','paymentTerms'));
+        $countries = Country::select('id','name')->get();
+        return view('purchase-order.create', compact('pfiItems','exColours','isToyotaPO','intColours','pfi',
+        'paymentTerms','countries','totalPOqty'));
+    }
+    // public function checkInventoryColour(Request $request) {
+    //     $masterModels = $request->master_model_id;
+    //     $pfi = Pfi::findOrFail($request->pfi_id);
+    //     $childPfiItemLatest = PfiItem::where('pfi_id', $request->pfi_id)
+    //                             ->where('is_parent', false)
+    //                             ->first();
+    //     $dealer =  $childPfiItemLatest->letterOfIndentItem->LOI->dealers ?? '';
+    //     $alreadyAddedIds = [];
+    //     $data = [];
+    //     foreach($masterModels as $key => $masterModel)
+    //     {
+    //         // map to inventory
+    //         $masterModel = MasterModel::find($masterModel);
+    //         $possibleModelIds = MasterModel::where('model', $masterModel->model)
+    //                             ->where('sfx', $masterModel->sfx)->pluck('id');
+
+    //         $inventoryItem = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
+    //             ->whereNull('purchase_order_id')
+    //             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+    //             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+    //             ->where('supplier_id', $pfi->supplier_id)
+    //             ->whereNotIn('id', $alreadyAddedIds)
+    //             ->where('whole_sales', $dealer);
+               
+    //          // if exterior colour is coming check same colour is existing with inventory
+    //         if($request->ex_colours[$key] && $request->int_colours[$key]) {
+    //            $inventoryItem->where('exterior_color_code_id', $request->ex_colours[$key])
+    //                             ->where('interior_color_code_id', $request->int_colours[$key]);
+    //         }
+    //         if($inventoryItem->count() <= 0) {
+    //             // exact match not found
+    //             $data[] = $masterModel->model.'-'.$masterModel->sfx;
+    //         }
+    //     }
+    //     return response($data);
+           
+    // }
+    public function uniqueCheckPONumber(Request $request)
+    {
+        $poNumber = $request->input('poNumber');
+        $existingPO = PurchasingOrder::select('po_number')->where('po_number', $poNumber)->first();
+        if($existingPO) {
+            return response(true);
+        }else{
+            return response(false);
+        }
     }
 
     /**

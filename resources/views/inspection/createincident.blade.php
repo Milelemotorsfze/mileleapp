@@ -399,6 +399,10 @@ $(document).ready(function () {
             url: '{{ route("incident.updatevehicledetails") }}',
             data: { vin: selectedVIN },
             success: function (response) {
+                if (!response || Object.keys(response).length === 0) {
+                     alert("No vehicle data found for this VIN.");
+                     return;
+                 }
                 $('#brand').text(response.brand);
                 $('#modelline').text(response.modelLine);
                 $('#variantdetail').text(response.detail);
