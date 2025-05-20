@@ -123,7 +123,7 @@
         <div class="card-body">
         <div class="table-responsive" style="height: 74vh;">
             <table id="dtBasicExample2" class="table table-striped table-editable table-edits table table-bordered">
-            <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
+            <thead style="position: sticky; top: 0; background-color: #dcdde3">
             <tr>
                 <th>Creation Date</th>
                 <th>Movement Date</th>
@@ -236,6 +236,7 @@
 
     // Initialize DataTables with custom sorting applied to specific columns
     var table = $('#dtBasicExample1').DataTable({
+        order: [[0, 'desc']], // 0 = first column, 'desc' = descending
         columnDefs: [
             { type: 'mov-numeric', targets: 0 }, // Apply MOV - XXX sorting to the first column
             { type: 'custom-date', targets: [3, 4] } // Apply custom date sorting to the 4th and 5th columns (index 3 and 4)
