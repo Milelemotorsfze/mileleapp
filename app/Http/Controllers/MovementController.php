@@ -289,7 +289,7 @@ class MovementController extends Controller
             foreach ($vin as $index => $value) {
                 if (array_key_exists($index, $from) && array_key_exists($index, $to)) {
                     $vehicle = Vehicles::where('vin', $vin[$index])->first();
-                    if ($vehicle && $to[$index] === '2' && is_null($vehicle->inspection_date)) {
+                    if ($vehicle && $to[$index] == '2' && is_null($vehicle->inspection_date)) {
                         return redirect()->back()->withErrors([
                             'error' => "Movement for VIN {$vin[$index]} cannot proceed because the inspection date is not set.",
                         ]);
