@@ -32,8 +32,6 @@ yarn-error.log
 !/public/js/
 !/public/js/custom/
 !/public/js/custom/**
-!/public/addon_image/
-!/public/addon_image/**
 
 /latest
 /laravel-blog
