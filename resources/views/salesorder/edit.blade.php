@@ -639,6 +639,12 @@
                 if ($option.data('lock')) {
                     e.preventDefault(); 
                     alertify.confirm('This vehicle cannot be removed because it has a GDN assigned.').set({title: "Can't Remove this VIN"});
+                }else{
+                    // append vin from another dropdown
+                    let index = $('#vin-'+i).attr('index');
+                    let unSelectedvin = e.params.args.data.id;
+                    let vinText = e.params.args.data.text;
+                    appendVin(index,unSelectedvariant,vinText)
                 }
             });
         });
@@ -843,13 +849,24 @@
             var index = $(this).attr('index');
             let url = '{{ route('so.getVins') }}';
             let variant = $('#variant-'+index).val();
+            let totalIndex = $("#so-vehicles").find(".so-variant-add-section").length;
+             var selectedVinIds = [];
+
+            for (let i = 1; i < totalIndex; i++) {
+                var selectedOptions = $('#vin-' + i).val(); 
+                
+                if (selectedOptions && selectedOptions.length > 0) {
+                    selectedVinIds = selectedVinIds.concat(selectedOptions);
+                }
+            }
             $.ajax({
                 type: "GET",
                 url: url,
                 dataType: "json",
                 data: {
                     variant_id: variant[0],
-                    so_id: soId
+                    so_id: soId,
+                    selectedVinIds:selectedVinIds
                 },
                 success:function (data) {    
                     $('#vin-'+index).empty();
@@ -1040,41 +1057,42 @@
             }
         });
        
-        // function hideVariant(index) {
+        function hideVin(index) {
            
-        //     var totalIndex = $("#so-vehicles").find(".so-variant-add-section").length;
-        //     var variant = $('#variant-'+index).val();
-        //     for(let i=1; i<=totalIndex; i++)
-        //     {
-        //         if(i != index ) {
-        //             var currentId = 'variant-' + i;
-        //             $('#' + currentId + ' option[value=' + variant[0] + ']').detach();       
-        //         }
-        //     }
-        // }
+            var totalIndex = $("#so-vehicles").find(".so-variant-add-section").length;
+            var vin = $('#vin-'+index).val();
+            for(let i=1; i<=totalIndex; i++)
+            {
+                if(i != index ) {
+                    var currentId = 'vin-' + i;
+                    $('#' + currentId + ' option[value=' + vin[0] + ']').detach();       
+                }
+            }
+        }
 
-        // function appendVariant(index,unSelectedvariant,variantText) {
-        //     var totalIndex = $("#so-vehicles").find(".so-variant-add-section").length;
-        //     for(let i=1; i<=totalIndex; i++)
-        //     {
-        //         if(i != index) {
-        //             let Currentvariant = $('#variant-'+i).val();
-        //             if(unSelectedvariant !== Currentvariant[0] ) {
-        //                 var currentId = 'variant-'+i;    
-        //                 var isOptionExist = 'no';
-        //                 $('#' + currentId +' option').each(function () {
-        //                     if (this.id == Currentvariant[0]) {
-        //                         isOptionExist = 'yes';
-        //                         return false;
-        //                     }
-        //                 });
-        //                 if(isOptionExist == 'no'){
-        //                     $('#variant-'+i).append($('<option>', {value: unSelectedvariant, text : variantText}))
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        function appendVin(index,unSelectedVin,vinText) {
+            var totalIndex = $("#so-vehicles").find(".so-variant-add-section").length;
+            for(let i=1; i<=totalIndex; i++)
+            {
+                // Need to check all the vin array
+                if(i != index) {
+                    let Currentvin = $('#vin-'+i).val();
+                    if(unSelectedvariant !== Currentvin[0] ) {
+                        var currentId = 'vin-'+i;    
+                        var isOptionExist = 'no';
+                        $('#' + currentId +' option').each(function () {
+                            if (this.id == Currentvin[0]) {
+                                isOptionExist = 'yes';
+                                return false;
+                            }
+                        });
+                        if(isOptionExist == 'no'){
+                            $('#vin-'+i).append($('<option>', {value: unSelectedVin, text : vinText}))
+                        }
+                    }
+                }
+            }
+        }
         function initializeVinSelect2(index) {
             const quantity = parseInt($('#quantity-' + index).val()) || 1;
             $('#vin-' + index).select2('destroy').select2({

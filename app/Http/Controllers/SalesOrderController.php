@@ -1736,7 +1736,9 @@ public function showSalespersonCommissions($sales_person_id, Request $request)
     
       $data = [];
       $data['vehicles'] = Vehicles::where('varaints_id', $request->variant_id)
-                    ->whereNull('gdn_id')->wherenotNull('vin')
+                    ->whereNull('gdn_id')
+                    ->wherenotNull('vin')
+                    ->whereNotIn('id', $request->selectedVinIds)
                     ->where(function ($query) use ($request) {
                         $query->whereNull('so_id')
                               ->orWhere('so_id', $request->so_id);
