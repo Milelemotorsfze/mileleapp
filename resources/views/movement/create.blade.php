@@ -1,6 +1,17 @@
 @extends('layouts.main')
 @section('content')
 <style>
+    .error, p.is-invalid {
+        color: red;
+    }
+
+    p.is-invalid {
+        margin-top: 12px;
+    }
+    .select2-dropdown.select2-dropdown--below {
+        position: relative !important;
+        z-index: 3 !important;
+    }
     .is-invalid.invalid-feedback {
         margin-top: 10px;
     }
@@ -10,6 +21,9 @@
     }
     .select-po.select2-container, .select-so.select2-container {
         margin: 0px 0px 10px 0px !important;
+    }
+    .warehouse-from-location {
+        color: #AEB5BD !important;
     }
 </style>
 @php
@@ -85,7 +99,7 @@
         <div id ="rows-containertitle">
             <div class="row">
                 <div class="col-lg-2 col-md-6">
-                    <label for="basicpill-firstname-input" class="form-label">Vin</label>
+                    <label for="basicpill-firstname-input" class="form-label"><span class="error">* </span>Vin</label>
                 </div>
                 <div class="col-lg-1 col-md-6">
                     <label for="basicpill-firstname-input" class="form-label">PO</label>
@@ -97,10 +111,10 @@
                     <label for="basicpill-firstname-input" class="form-label">Ownership</label>
                 </div>
                 <div class="col-lg-1 col-md-6">
-                    <label for="basicpill-firstname-input" class="form-label">From</label>
+                    <label for="basicpill-firstname-input" class="form-label"><span class="error">* </span>From</label>
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <label for="basicpill-firstname-input" class="form-label">To </label>
+                    <label for="basicpill-firstname-input" class="form-label"><span class="error">* </span>To </label>
                 </div>
                 <div class="col-lg-1 col-md-6">
                     <label for="QTY" class="form-label">Brand</label>
@@ -213,19 +227,21 @@
                     </select>
                 </div>
                 <div class="col-lg-1 col-md-6">
-                    <select class="form-control mb-1" id="from${row}" readonly disabled>
+                    <select class="form-control mb-1 warehouse-from-location" id="from${row}" readonly disabled>
+                        <option value="" selected disabled>From</option>
                         @foreach ($warehouses as $warehouse)
-                        <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                         @endforeach
                     </select>
                     <input type="hidden" name="from[]" class="form-control mb-1" id="from-input${row}">
                 </div>
                 <div class="col-lg-2 col-md-6">
                     <select name="to[]" class="form-control mb-1" id="to${row}" required>
+                        <option value="" selected disabled>Select To</option>
                         @foreach ($warehouses as $warehouse)
-                        @if ($warehouse->name !== 'Supplier')
-                        <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                        @endif
+                            @if ($warehouse->name !== 'Supplier')
+                                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                            @endif
                         @endforeach
                     </select>
                 </div>
@@ -250,6 +266,12 @@
             $('#rows-container').append(newRow);
             $('#vin' + row).select2();
             $('#to' + row).select2();
+            let $fromSelect = $('#from' + row);
+            if ($fromSelect.find('option:selected').text().trim() === 'From') {
+                $fromSelect.addClass('warehouse-from-location');
+            } else {
+                $fromSelect.removeClass('warehouse-from-location');
+            }
         });
         $('#rows-container').on('change', '.vin', function() {
             let id = $(this).attr('id');
@@ -280,7 +302,12 @@
                     SoFeildinput.val(response.so_number);
                     ownershipFeildinput.val(response.ownership_type);
                     PoFeildinput.val(response.po_number);
-                }
+                    if (fromField.find("option:selected").text().trim() === "From") {
+                        fromField.addClass("warehouse-from-location");
+                    } else {
+                        fromField.removeClass("warehouse-from-location");
+                    }
+                },
             });
         });
         $('#rows-container').on('click', '.remove-row-btn', function() {
@@ -325,16 +352,12 @@
                                     </select>
                                 </div>
                                 <div class="col-lg-1 col-md-6">
-                                    <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
-                                    <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
+                                    <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames ?? ''}">
+                                    <input type="hidden" name="from[]" class="form-control mb-1" value="${vehicle.warehouseName ?? ''}">
                                 </div>
                                 <div class="col-lg-2 col-md-6">
-                                    <select name="to[]" class="form-control mb-1" id="to" required>
-                                        @foreach ($warehouses as $warehouse)
-                                            @if ($warehouse->name !== 'Supplier')
-                                                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                                            @endif
-                                        @endforeach
+                                    <select name="to[]" class="form-control to-select" required>
+                                        ${warehouseOptionsHtml}
                                     </select>
                                 </div>
                                 <div class="col-lg-1 col-md-6">
@@ -384,6 +407,11 @@
                         $("#rows-containerpo").append(rowHtml);
                     });
 
+                    $("#rows-containerpo select.to-select").each(function () {
+                        if (!$(this).hasClass("select2-hidden-accessible")) {
+                            $(this).select2();
+                        }
+                    });
                     // Attach the remove-row event handler after adding the rows
                     attachRemoveRowHandler();
                 },
@@ -404,6 +432,18 @@
         attachRemoveRowHandler();
     });
 </script>
+
+<script>
+    var warehouseOptionsHtml = `
+        <option value="" selected disabled>Select To</option>
+        @foreach ($warehouses as $warehouse)
+            @if ($warehouse->name !== 'Supplier')
+                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+            @endif
+        @endforeach
+    `;
+</script>
+
 <script>
  $(document).ready(function () {
         $("#generate-sobutton").click(function () {  // Bind to the Generate button's click event
@@ -441,17 +481,14 @@
                                     </select>
                                 </div>
                                 <div class="col-lg-1 col-md-6">
-                                    <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
-                                    <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
+                                    <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames ?? ''}">
+                                    <input type="hidden" name="from[]" class="form-control mb-1" value="${vehicle.warehouseName ?? ''}">
                                 </div>
                                 <div class="col-lg-2 col-md-6">
-                                    <select name="to[]" class="form-control mb-1" id="to" required>
-                                        @foreach ($warehouses as $warehouse)
-                                            @if ($warehouse->name !== 'Supplier')
-                                                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                                            @endif
-                                        @endforeach
-                                    </select>
+                                   <select name="to[]" class="form-control mb-1 to-select" required>
+    ${warehouseOptionsHtml}
+</select>
+
                                 </div>
                                 <div class="col-lg-1 col-md-6">
                                     <input type="text" name="brand" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.brand}">
@@ -498,6 +535,23 @@
                         // `;
                         // }
                         $("#rows-containerpo").append(rowHtml);
+// 1. Initialize select2
+$("#rows-containerpo").find("select[name='to[]']").select2();
+
+// 2. Add validation rules dynamically
+$("#rows-containerpo").find("select[name='to[]']").each(function () {
+    $(this).rules("add", {
+        required: true,
+        messages: {
+            required: "To location is required."
+        }
+    });
+});
+
+// 3. Validate on change
+$("#rows-containerpo").find("select[name='to[]']").on("change.select2", function () {
+    $(this).valid();
+});
                     });
                     $(".remove-row-btn").on("click", function () {
                         $(this).closest(".row").remove();
@@ -539,8 +593,8 @@
                 // console.log(response);
                 if (response.success) {
 
-                    // Clear any existing rows before inserting new ones
-                    $("#rows-containerpo").html("");
+                    // Clear any existing excel rows before inserting new ones
+                    $("#rows-containerpo .excel-uploaded-row").remove();
                     
                     response.vehicleDetails.forEach(function (vehicle) {
                         var rowHtml = `
@@ -568,17 +622,12 @@
                                     </select>
                                 </div>
                                 <div class="col-lg-1 col-md-6">
-                                <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
-                                    <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
+                                <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames ?? ''}">
+                                    <input type="hidden" name="from[]" class="form-control mb-1" value="${vehicle.warehouseName ?? ''}">
                                 </div>
                                 <div class="col-lg-2 col-md-6">
-                                    <select name="to[]" class="form-control mb-1" id="to" required>
-                                        <option value="">Select</option>
-                                        @foreach ($warehouses as $warehouse)
-                                            <option value="{{ $warehouse->id }}" ${vehicle.matchedWarehouseId == {{ $warehouse->id }} ? 'selected' : ''}>
-                                                {{ $warehouse->name }}
-                                            </option>
-                                        @endforeach
+                                    <select name="to[]" class="form-control to-select" required>
+                                        ${warehouseOptionsHtml}
                                     </select>
                                 </div>
                                 <div class="col-lg-1 col-md-6">
@@ -627,6 +676,12 @@
                                 //                 }
                         // rowHtml += `</div>`;
                         $("#rows-containerpo").append(rowHtml);
+
+                        $("#rows-containerpo .to-select").each(function () {
+                            if (!$(this).hasClass("select2-hidden-accessible")) {
+                                $(this).select2();
+                            }
+                        });
                     });
 
                     // Attach the remove-row event handler
@@ -647,24 +702,40 @@
             $(this).closest(".row").remove();
         });
     }
+
     $("#formCreate").validate({
-            ignore: [],
-            rules: {
-                "vin[]": {
-                    required: true
-                },
-                file: {
-                    extension: "csv",
-                },
-            },
-            messages: {
-                file: {
-                    extension: "Please upload file in .csv format "
-                },
-                
-            },
-            
-        });
+    ignore: [],
+    rules: {
+        "vin[]": {
+            required: true
+        },
+        "to[]": {
+            required: true
+        },
+        file: {
+            extension: "csv"
+        }
+    },
+    messages: {
+        "vin[]": {
+            required: "VIN is required."
+        },
+        "to[]": {
+            required: "To location is required."
+        },
+        file: {
+            extension: "Please upload file in .csv format."
+        }
+    },
+    errorPlacement: function (error, element) {
+        if (element.hasClass('select2-hidden-accessible')) {
+            error.insertAfter(element.next('.select2')); // places error after select2 span
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
 
         $.validator.prototype.checkForm = function (){
             this.prepareForm();
@@ -681,69 +752,99 @@
             return this.valid();
         };
 
-    $('#btn-submit').click(function (e) {
-        e.preventDefault();
-      
-        let vinArray = [];
-        let fromArray = [];
-        let toArray = [];
-            $("input[name='vin[]']").each(function () {
-                vinArray.push($(this).val());
+        $('#btn-submit').click(function (e) {
+            e.preventDefault();
+
+            let vinArray = [];
+            let duplicateVinMap = {};
+            let duplicateMessages = [];
+
+            let fromArray = [];
+            let toArray = [];
+            let errorMessages = [];
+
+            $("input[name='vin[]'], select[name='vin[]']").each(function () {
+                let vinVal = $(this).val();
+                if (vinVal) {
+                    vinArray.push(vinVal);
+                    duplicateVinMap[vinVal] = (duplicateVinMap[vinVal] || 0) + 1;
+                }
             });
-            if(vinArray.length <= 0) {
+
+            for (const vin in duplicateVinMap) {
+                if (duplicateVinMap[vin] > 1) {
+                    duplicateMessages.push(`❌ VIN ${vin} appears ${duplicateVinMap[vin]} times.`);
+                }
+            }
+
+            if (duplicateMessages.length > 0) {
+                alertify.alert("Duplicate VINs Found", duplicateMessages.join("<br>"));
+                return false;
+            }
+            if (vinArray.length <= 0) {
                 $("select[name='vin[]']").each(function () {
-                    let vinValue = $(this).val();
-                    vinArray.push(vinValue);
+                    vinArray.push($(this).val());
                 });
             }
-            $("input[name='from[]']").each(function () {
-                fromArray.push($(this).val());
+
+            $("input[name='from[]']").each(function (index, element) {
+                let fromVal = $(this).val();
+                fromArray.push(fromVal);
+
+                if (!fromVal || fromVal.trim() === "" || fromVal === "From" || fromVal === 'undefined' || fromVal === 'null') {
+                    let vinVal = vinArray[index] ?? 'Unknown';
+                    errorMessages.push(`❌ VIN ${vinVal} has no valid "From" location. Please contact IT Development team.`);
+                    $(this).closest('.row').addClass('border border-danger');
+                } else {
+                    $(this).closest('.row').removeClass('border border-danger');
+                }
             });
+
+            if (errorMessages.length > 0) {
+                alertify.alert("Invalid Data", errorMessages.join("<br>"));
+                console.warn("🚨 Validation blocked form submit");
+                return false; 
+            }
+
+            if (!$("#formCreate").valid()) {
+                console.log("Form validation failed");
+                return false;
+            }
+
             $("select[name='to[]']").each(function () {
                 toArray.push($(this).val());
             });
-        if($("#formCreate").valid()) {
 
+            // Ajax check after both validations
             let url = '{{ route('movement.unique-check') }}';
             $.ajax({
-                type:"POST",
-                url: url, 
+                type: "POST",
+                url: url,
                 headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // CSRF token for security
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 data: {
                     vin: vinArray,
-                    from: fromArray,
-                    to: toArray,
-
                 },
-                success: function(data) {
-                 if(data.length > 0) {
-                    
-                    let message = "The following duplicate entries were found:<br>";
-                    data.forEach(function(duplicate) {
-                        message += duplicate + "<br>";
-                    });
-                    alertify.confirm(message,function (e) {
-                    }).set({title:"Invalid Data"});
-                    
-                    return false;
-                 }else{
+                success: function (data) {
+                    if (data.length > 0) {
+                        let message = "The following duplicate VINs were found:<br>";
+                        data.forEach(function (duplicate) {
+                            message += duplicate + "<br>";
+                        });
+                        alertify.alert("Invalid VINs", message);
+                        return false;
+                    } else {
                         document.getElementById("formCreate").submit();
                     }
                 },
                 error: function (xhr, status, error) {
-                console.log("Error:", error);
-                alert("An error occurred. Please try again.");
+                    console.log("Error:", error);
+                    const isErrorMsg = "An error occurred. Please try again with all valid fields."
+                    alertify.alert(isErrorMsg);
                 }
             });
-       }else{
-        console.log("Form validation failed");
-       }
-       
-    });
-
-   
+        });
 });
 
 

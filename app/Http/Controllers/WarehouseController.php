@@ -30,6 +30,7 @@ class WarehouseController extends Controller
     {
         $this->validate($request, [
             'name' => 'string|required|max:255',
+            'status' => 'required|boolean',
         ]);
         $name = $request->input('name');
         $existingWarehouse = Warehouse::where('name', $name)->first();
@@ -38,6 +39,7 @@ class WarehouseController extends Controller
         }
         $warehouse = new Warehouse();
         $warehouse->name  = $name;
+        $warehouse->status = $request->input('status', 1); 
         $warehouse->created_by = auth()->user()->id;
         $warehouse->save();
         $warehouseId = $warehouse->id;
@@ -51,7 +53,8 @@ class WarehouseController extends Controller
         $warehouselog->created_by = auth()->user()->id;
         $warehouselog->save();
         $warehouselist = Warehouse::orderBy('id','DESC')->get();
-        return view('warehouse.list')->with(compact('warehouselist'))->with('success', 'Warehouse added successfully.');
+        // return view('warehouse.list')->with(compact('warehouselist'))->with('success', 'Warehouse added successfully.');
+        return redirect()->route('warehouse.index')->with('success', 'Warehouse created successfully.');
     }
     public function show(string $id)
     {
@@ -60,12 +63,18 @@ class WarehouseController extends Controller
     {
         $warehouse = Warehouse::findOrFail($id);
         $warehouselog = Warehouselog::where('warehouse_id', $id)->orderBy('created_at', 'desc')->get();
-        return view('warehouse.editlist',compact('warehouse','warehouselog'));
+        $usedByVehicles = Vehicles::where('latest_location', $id)
+        ->whereNotNull('vin')
+        ->whereNull('gdn_id')
+        ->exists();
+
+        return view('warehouse.editlist',compact('warehouse','warehouselog', 'usedByVehicles'));
     }
     public function update(Request $request, string $id)
     {
         $this->validate($request, [
             'name' => 'string|required|max:255',
+            'status' => 'required|boolean',
         ]);
         $name = $request->input('name');
         $existingColour = Warehouse::where('name', $name)->where('id', '!=', $id)->first();
@@ -75,6 +84,7 @@ class WarehouseController extends Controller
         $warehouse = Warehouse::findOrFail($id);   
         $oldValues = $warehouse->toArray();
         $warehouse->name  = $name;
+        $warehouse->status = $request->input('status');
         $changes = [];
         foreach ($oldValues as $field => $oldValue) {
             if ($field !== 'created_at' && $field !== 'updated_at') {
@@ -105,7 +115,8 @@ class WarehouseController extends Controller
         }
     }
     $warehouselist = Warehouse::orderBy('id','DESC')->get();
-    return view('warehouse.list', compact('warehouselist'))->with('success', 'Variant added successfully.');
+    // return view('warehouse.list', compact('warehouselist'))->with('success', 'Variant added successfully.');
+    return redirect()->route('warehouse.index')->with('success', 'Warehouse updated successfully.');
     }
     public function destroy(string $id)
     {

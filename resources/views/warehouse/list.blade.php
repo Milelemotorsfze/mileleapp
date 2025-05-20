@@ -33,6 +33,7 @@
                 <tr>
                     <th>Name</th>
                     <th>Created By</th>
+                    <th>Status</th>
                     <th>Action</th>
                 </tr>
                 </thead>
@@ -47,9 +48,17 @@
                         @endphp
                         {{ $created_bys ?? '' }}</td>
                         <td>
+                            @if($warehouselist->status == 1)
+                                <span class="badge bg-success fs-6">Active</span>
+                            @else
+                                <span class="badge bg-danger fs-6">Inactive</span>
+                            @endif
+                        </td>
+                        <td>
                             @can('warehouse-edit')
-                                <a data-placement="top" href="{{ route('warehouse.edit', $warehouselist->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i>
-                                </a>
+                                @if (!in_array(strtolower($warehouselist->name), ['supplier', 'customer']))
+                                    <a data-placement="top" href="{{ route('warehouse.edit', $warehouselist->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i></a>
+                                @endif
                             @endcan
                         </td>
                     </tr>
