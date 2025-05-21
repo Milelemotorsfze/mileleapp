@@ -120,22 +120,40 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('View-daily-movemnet
 @endsection
 
 @push('scripts')
+
 <script>
-    $(document).ready(function() {
-        $('.revise-btn').click(function() {
+    $(document).ready(function () {
+        let reviseFrom = null;
+
+        $('.revise-btn').click(function () {
             const id = $(this).data('id');
+            reviseFrom = $(this).closest('tr').find('td:nth-child(4)').text().trim(); 
+
             const formAction = `{{ url('movement/revised') }}/${id}`;
             $('#reviseForm').attr('action', formAction);
+
             const today = new Date().toISOString().split('T')[0];
             $('input[name="date"]').attr('max', today);
+
             $('#reviseModal').modal('show');
         });
 
-        $('#reviseModal').on('shown.bs.modal', function() {
+        $('#reviseModal').on('shown.bs.modal', function () {
             $('#revise-to-select').select2({
                 dropdownParent: $('#reviseModal')
             });
         });
+
+        $('#reviseForm').on('submit', function (e) {
+            const selectedToText = $('#revise-to-select option:selected').text().trim();
+
+            if (reviseFrom && selectedToText && reviseFrom === selectedToText) {
+                e.preventDefault();
+                const sameLocationErrors = 'From and To locations cannot be the same.';
+                alertify.alert("Location Conflict", sameLocationErrors);
+            }
+        });
     });
 </script>
+
 @endpush
