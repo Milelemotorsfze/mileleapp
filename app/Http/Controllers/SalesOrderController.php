@@ -160,6 +160,7 @@ class SalesOrderController extends Controller
            
             $customerdetails = QuotationDetail::with('country', 'shippingPort', 'shippingPortOfLoad', 'paymentterms')->where('quotation_id', $quotation->id)->first();
             $soVariants = SoVariant::where('so_id', $id)->get();
+         
             // if ($so->quotation_id) {
             //     $quotationItems = QuotationItem::where('quotation_id', $so->quotation_id)
             //         ->whereIn('reference_type', [
@@ -251,7 +252,11 @@ class SalesOrderController extends Controller
             $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first(); 
             foreach($soVariants as $soVariant) {
                 $selectedVehicleIds = $soVariant->so_items->pluck('vehicles_id')->toArray();
-                $soVariant->soVehicles = Vehicles::where('varaints_id', $soVariant->variant_id)
+                $selectedVehicles = Vehicles::whereIn('id', $selectedVehicleIds)
+                                    ->whereNotNull('vin')
+                                    ->select('id', 'vin', 'gdn_id')
+                                    ->get();
+                $availableVehicles = Vehicles::where('varaints_id', $soVariant->variant_id)
                                             ->whereNotNull('vin')
                                             ->whereNull('gdn_id')
                                             ->where(function ($query) use ($so) {
@@ -264,9 +269,11 @@ class SalesOrderController extends Controller
                                                             ->orWhere('booking_person_id', $so->sales_person_id);
                                                 });
                                             })
+                                            ->whereNotIn('id', $selectedVehicleIds) 
                                             ->select('id','gdn_id','vin')->get();
                                             
-                $soVariant->selectedVehicleIds = $selectedVehicleIds;
+            $soVariant->soVehicles = $selectedVehicles->merge($availableVehicles);
+            $soVariant->selectedVehicleIds = $selectedVehicleIds;
                $soVariant->isgdnExist = 0;
             //    return $selectedVehicleIds;
                foreach($selectedVehicleIds as $eachVehicle) {
@@ -1743,7 +1750,6 @@ public function showSalespersonCommissions($sales_person_id, Request $request)
         return response()->json(['success' => false], 400);
     }
     public function getVins(Request $request) {
-    info($request->all());
       $data = [];
       $data['vehicles'] = Vehicles::where('varaints_id', $request->variant_id)
                     ->whereNull('gdn_id')
