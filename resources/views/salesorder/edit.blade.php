@@ -622,18 +622,18 @@
                 placeholder : 'Select Variant',
                 maximumSelectionLength: 1
             });
-            $(document.body).on('select2:unselect', ".vins", function (e) {
-            // $('.vins').on('select2:unselecting', function (e) {
+            // $(document.body).on('select2:unselect', ".vins", function (e) {
+          $(document.body).on('select2:unselecting', ".vins", function (e) {
               
-                var $option = $(e.params.data.element);
+                var $option = $(e.params.args.data.element);
                 if ($option.data('lock')) {
                     e.preventDefault(); 
                     alertify.confirm('This vehicle cannot be removed because it has a GDN assigned.').set({title: "Can't Remove this VIN"});
                 }else{
                     // append vin from another dropdown
                     let index = $(this).attr('index');
-                    let unSelectedvin = e.params.data.id;
-                    let vinText = e.params.data.text;
+                    let unSelectedvin = e.params.args.data.id;
+                    let vinText = e.params.args.data.text;
                     let variant = $('#variant-'+index).val();
                     appendVin(index,unSelectedvin,vinText, variant[0])
                 }
@@ -743,7 +743,9 @@
             return this.optional(element) || /^\d{6}$/.test(value);
         }, "SO Number must be exactly 6 digits.");
 
-
+        $.validator.addMethod("spacing", function(value, element) {
+				return this.optional(element) || !/\s\s+/.test(value);
+			}, "No more than one consecutive space is allowed in the description");
         $("#form-update").validate({
             ignore: [],
             rules: {
@@ -756,7 +758,8 @@
                     required: true
                 },
                 "variants[*][description]": {
-                    required: true
+                    required: true,
+                    spacing:true
                 },
                 "variants[*][price]": {
                     required: true
@@ -872,7 +875,6 @@
                     });
                     $('#variant-description-'+index).val(data.variant_description);
                     $('.overlay').hide();  
-                    // hideVariant(index); 
                 }
             });                      
         });

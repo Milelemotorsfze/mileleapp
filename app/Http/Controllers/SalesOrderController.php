@@ -343,7 +343,11 @@ class SalesOrderController extends Controller
                                                 if($query->field_name == 'so_variant_id') {
                                                     return optional($query->SoVariant()->withTrashed()->first()->variant)->name ?? '';
                                                 }else if($query->field_name == 'vehicles_id'){
-                                                    return optional($query->so_item->vehicle()->withTrashed()->first())->vin ?? '';
+                                                  $soItem = $query->so_item;
+
+                                                    if ($soItem && $soItem->vehicle()) {
+                                                        return optional($soItem->vehicle()->withTrashed()->first())->vin ?? '';
+                                                    }
                                                 }else{
                                                     return $query->old_value ?? '';
                                                 }
@@ -377,7 +381,7 @@ class SalesOrderController extends Controller
      */
     public function update(Request $request, $id)
     {
-   
+        // return $request->all();
         DB::beginTransaction();
         try {
                 $so = SO::findorFail($id);
@@ -414,16 +418,21 @@ class SalesOrderController extends Controller
             $soVariants = $request->variants;
             if ($soVariants) {
                 // Find removed quotaion items
-                $existingVariantIds = SoVariant::where('so_id', $so->id)->pluck('quotation_item_id')->toArray();
-                $newVariantIds = array_column($soVariants, 'quotation_item_id');
+                $existingVariantIds = SoVariant::where('so_id', $so->id)->pluck('variant_id')->toArray();
+                $newVariantIds = array_column($soVariants, 'variant_id');
+                info("existing variants");
+                info($existingVariantIds);
+                  info("new variants");
+                info($newVariantIds);
             
                 $removedVariants = array_diff($existingVariantIds, $newVariantIds);
                 info("removed variants");
                 info($removedVariants);
               
                 foreach ($removedVariants as $variantId) {
-                    $removedVariant = SoVariant::where('quotation_item_id', $variantId)
+                    $removedVariant = SoVariant::where('variant_id', $variantId)
                                         ->where('so_id', $so->id)->first();
+                                        // need to chcek if the quottaion item id existing against removed varaint id
                     info($removedVariant);
                     $logEntries[] = [
                         'type' => 'Unset',
@@ -445,16 +454,21 @@ class SalesOrderController extends Controller
                     // Delete the variant itself
                     $removedVariant->delete();
                 }
+
+                // return $request->all();
                     
                 foreach ($soVariants as $key => $soVariant) {
                     info("each varaint looping");
                     // chek variant existing or not
-                    if(isset($soVariant['quotation_item_id'])) {
-                        $existingVariant = SoVariant::where('quotation_item_id', $soVariant['quotation_item_id'])
-                                                ->where('so_id', $id)->first();
-                    }else{
-                        $existingVariant = null;
-                    }
+                      $existingVariant = null;
+                    // if(isset($soVariant['quotation_item_id'])) {
+                        $existingVariant = SoVariant::where('variant_id', $soVariant['variant_id'])
+                                                ->where('so_id', $id)
+                                                ->where('quantity', $soVariant['quantity'])
+                                                 ->where('price', $soVariant['price'])->first();
+                    // }else{
+                    //   
+                    // }
 
                     if (!$existingVariant) {
                         // if(isset($soVariant['quotation_item_id'])) and existing varaint only 
