@@ -1058,7 +1058,7 @@ table.dataTable thead th select {
         25: 'varaints.my',
         26: 'varaints.steering',
         27: 'varaints.fuel_type',
-        28: 'varaints.gear',
+        28: 'varaints.gearbox',
         29: 'ex_color.name',
         30: 'int_color.name',
         31: 'varaints.upholestry',
