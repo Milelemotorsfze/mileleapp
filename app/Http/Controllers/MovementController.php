@@ -255,7 +255,16 @@ class MovementController extends Controller
             $date = $request->input('date');
             $createdBy = $request->user()->id;
 
-            $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
+            foreach ($from as $index => $fromVal) {
+                $toVal = $to[$index] ?? null;
+                if ($fromVal === $toVal) {
+                    return redirect()->back()->withErrors([
+                        "VIN {$vin[$index]} has the same 'From' and 'To' location. Please select different locations."
+                    ])->withInput();
+                }
+            }            
+
+            // $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
 
             $vinNotExist = [];
             foreach ($vin as $index => $vehicleVin) {
@@ -860,17 +869,19 @@ class MovementController extends Controller
         $previousGdnId = $vehicle->gdn_id;
         $movementDate = $request->input('date');
         $newTo = $request->input('to');
+
+        if ($movementLast->to == $newTo) {
+            return redirect()->back()->with('error', 'From and To locations cannot be the same.');
+        }
     
         DB::beginTransaction();
     
         try {
-            // Step 1: Create a new reference record
             $newReference = new MovementsReference();
             $newReference->date = $movementDate;
             $newReference->created_by = Auth::id();
             $newReference->save();
     
-            // Step 2: Create a new movement with that reference
             $revisedMovement = new Movement();
             $revisedMovement->from = $movementLast->to;
             $revisedMovement->to = $newTo;
@@ -878,29 +889,28 @@ class MovementController extends Controller
             $revisedMovement->reference_id = $newReference->id;
             $revisedMovement->remarks = 'Revised Movement';
             $revisedMovement->save();
-    
-            // Step 3: GDN logic
+
             if ($newTo == 2) {
                 $gdn = new Gdn();
                 $gdn->date = $movementDate;
                 $gdn->save();
-    
+            
                 $vehicle->gdn_id = $gdn->id;
             } else {
                 $vehicle->gdn_id = null;
-    
+            }
+            $vehicle->latest_location = $newTo;
+            $vehicle->save();
+            
+            if ($newTo != 2 && $previousGdnId) {
                 $otherUsageCount = Vehicles::where('gdn_id', $previousGdnId)->count();
-                if ($previousGdnId && $otherUsageCount === 0) {
+                if ($otherUsageCount === 0) {
                     $gdn = Gdn::find($previousGdnId);
                     if ($gdn) {
                         $gdn->delete();
                     }
                 }
             }
-    
-            // Step 4: Update vehicle location
-            $vehicle->latest_location = $newTo;
-            $vehicle->save();
     
             DB::commit();
             return redirect()->route('movement.index')->with('success', 'Movement revised under new batch MOV - ' . $newReference->id);
@@ -910,14 +920,10 @@ class MovementController extends Controller
             return redirect()->route('movement.index')->with('error', 'Something went wrong while revising the movement.');
         }
     }
-    
-    
-    
 
-
-public function uploadVinFile(Request $request)
-{
-    if ($request->hasFile('vin_file')) {
+    public function uploadVinFile(Request $request)
+    {
+        if ($request->hasFile('vin_file')) {
         $file = $request->file('vin_file');
         $vinData = [];
 
@@ -1014,9 +1020,9 @@ public function uploadVinFile(Request $request)
 
 
         return response()->json(['success' => true, 'vehicleDetails' => $vehicleDetails]);
-    } else {
-        return response()->json(['success' => false, 'message' => 'No file uploaded']);
-    }
+        } else {
+            return response()->json(['success' => false, 'message' => 'No file uploaded']);
+        }
     }
 
     public function checkDuplicateMovement(Request $request) {

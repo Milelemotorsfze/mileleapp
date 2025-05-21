@@ -757,9 +757,23 @@
             let duplicateVinMap = {};
             let duplicateMessages = [];
 
-            let fromArray = [];
-            let toArray = [];
-            let errorMessages = [];
+            let fromArray = $("input[name='from[]']").map(function () { return $(this).val(); }).get();
+            let toArray = $("select[name='to[]']").map(function () { return $(this).val(); }).get();
+            let vinInputs = $("input[name='vin[]'], select[name='vin[]']");
+
+            let locationConflictErrors = [];
+
+            for (let i = 0; i < fromArray.length; i++) {
+                if (fromArray[i] && toArray[i] && fromArray[i] === toArray[i]) {
+                    let vin = vinInputs.eq(i).val() || 'Unknown VIN';
+                    locationConflictErrors.push(`❌ VIN ${vin} has the same From and To location.`);
+                }
+            }
+
+            if (locationConflictErrors.length > 0) {
+                alertify.alert("Location Conflict", locationConflictErrors.join("<br>"));
+                return false;
+            }
 
             $("input[name='vin[]'], select[name='vin[]']").each(function () {
                 let vinVal = $(this).val();
