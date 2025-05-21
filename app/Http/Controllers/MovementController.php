@@ -518,11 +518,13 @@ class MovementController extends Controller
     $nextId = MovementsReference::where('id', '>', $id)->min('id');
     $movement = Movement::where('reference_id', $id)->get();
     $movementref = MovementsReference::where('id', $id)->first();
+    $warehouses = Warehouse::select('id', 'name')->where('status', 1)->get();
+
     return view('movement.view', [
            'currentId' => $id,
            'previousId' => $previousId,
            'nextId' => $nextId
-       ], compact('movement', 'movementref'));
+       ], compact('movement', 'movementref', 'warehouses'));
     }
     /**
      * Show the form for editing the specified resource.
@@ -552,11 +554,13 @@ class MovementController extends Controller
     $nextId = MovementsReference::where('id', '>', $currentId)->min('id');
     $movement = Movement::where('reference_id', $currentId)->get();
     $movementref = MovementsReference::where('id', $currentId)->first();
+    $warehouses = Warehouse::select('id', 'name')->where('status', 1)->get();
+
     return view('movement.view', [
            'currentId' => $currentId,
            'previousId' => $previousId,
            'nextId' => $nextId
-       ], compact('movement', 'movementref'));
+       ], compact('movement', 'movementref', 'warehouses'));
     }
     public function vehiclesdetails(Request $request)
     {
@@ -838,30 +842,79 @@ class MovementController extends Controller
             }
          return response()->json($vehicleDetails);
     }
+
     public function revise(Request $request, $id)
-{
-    $movementlast = Movement::findOrFail($id);
-    $vehicle = Vehicles::where('vin', $movementlast->vin)->first(); 
-    $revisedmovement = new Movement();
-    $revisedmovement->from = $movementlast->to;
-    $revisedmovement->to = $movementlast->from;
-    $revisedmovement->vin = $movementlast->vin;
-    $revisedmovement->reference_id = $movementlast->reference_id;
-    $revisedmovement->remarks = 'Revised Movement';
-    $revisedmovement->save();
-    if ($movementlast->from === 1) {
-        if ($vehicle) {
-            $vehicle->movement_grn_id = null;
-            $vehicle->save();
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'to' => 'required|integer|exists:warehouse,id',
+        ]);
+    
+        $movementLast = Movement::findOrFail($id);
+        $vehicle = Vehicles::where('vin', $movementLast->vin)->first();
+    
+        if (!$vehicle) {
+            return redirect()->route('movement.index')->with('error', 'Vehicle not found.');
         }
-    } else if ($movementlast->to === 2) {
-        if ($vehicle) {
-            $vehicle->gdn_id = null;
+    
+        $previousGdnId = $vehicle->gdn_id;
+        $movementDate = $request->input('date');
+        $newTo = $request->input('to');
+    
+        DB::beginTransaction();
+    
+        try {
+            // Step 1: Create a new reference record
+            $newReference = new MovementsReference();
+            $newReference->date = $movementDate;
+            $newReference->created_by = Auth::id();
+            $newReference->save();
+    
+            // Step 2: Create a new movement with that reference
+            $revisedMovement = new Movement();
+            $revisedMovement->from = $movementLast->to;
+            $revisedMovement->to = $newTo;
+            $revisedMovement->vin = $movementLast->vin;
+            $revisedMovement->reference_id = $newReference->id;
+            $revisedMovement->remarks = 'Revised Movement';
+            $revisedMovement->save();
+    
+            // Step 3: GDN logic
+            if ($newTo == 2) {
+                $gdn = new Gdn();
+                $gdn->date = $movementDate;
+                $gdn->save();
+    
+                $vehicle->gdn_id = $gdn->id;
+            } else {
+                $vehicle->gdn_id = null;
+    
+                $otherUsageCount = Vehicles::where('gdn_id', $previousGdnId)->count();
+                if ($previousGdnId && $otherUsageCount === 0) {
+                    $gdn = Gdn::find($previousGdnId);
+                    if ($gdn) {
+                        $gdn->delete();
+                    }
+                }
+            }
+    
+            // Step 4: Update vehicle location
+            $vehicle->latest_location = $newTo;
             $vehicle->save();
+    
+            DB::commit();
+            return redirect()->route('movement.index')->with('success', 'Movement revised under new batch MOV - ' . $newReference->id);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Revision failed', ['error' => $e->getMessage()]);
+            return redirect()->route('movement.index')->with('error', 'Something went wrong while revising the movement.');
         }
     }
-    return redirect()->route('movement.index')->with('success', 'Movement has been revised successfully.');
-}
+    
+    
+    
+
+
 public function uploadVinFile(Request $request)
 {
     if ($request->hasFile('vin_file')) {
