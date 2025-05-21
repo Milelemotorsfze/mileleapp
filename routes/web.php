@@ -1179,4 +1179,5 @@ Route::get('/d', function () {
     Route::get('so-variants', [SalesOrderController::class, 'getVariants'])->name('so.getVariants');
     Route::get('so-unique-check', [SalesOrderController::class, 'checkUniqueSoNumber'])->name('so.uniqueSoNumber');
     Route::post('so-approve-reject', [SalesOrderController::class, 'approveOrRejectSO'])->name('so.approveOrReject');
+    Route::get('so-quotation-versions/{id}', [SalesOrderController::class, 'viewQuotations'])->name('so.quotation-versions');
 });

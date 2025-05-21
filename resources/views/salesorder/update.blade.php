@@ -368,7 +368,7 @@
                 </div>
             </div>
 
-            <div class="card" id="branModaDiv">
+            <div class="card" >
                 <div class="card-header">
                     <h4 class="card-title">Sales Order Vehicles</h4>
                 </div>
@@ -380,7 +380,6 @@
                                     <h5>Total Vehicles - {{ $totalVehicles }}</h5>
                                     <div class="col-md-12 mt-3" id="so-vehicles">
                                         @foreach($quotationItems as $key => $quotationItem)
-                                          
                                             <div class="so-variant-add-section " id="variant-section-{{ $key + 1 }}">
                                                 <div class="row">
                                                     <div class="mb-2 col-sm-12 col-md-3 col-lg-3 col-xxl-3">
@@ -427,7 +426,6 @@
                                                     </div> 
                                                 </div>
                                             </div>
-                                            <!-- <input type="hidden" name="quotation_item_id[]" value="{{ $quotationItem->id }}"> -->
                                         @endforeach
                                     </div>
                                     <div class="row ">
@@ -450,7 +448,6 @@
                     </div>
                     <div class="card-body">
                         <div class="row gy-3">
-
                             <div class="col-lg-4 col-md-6 col-sm-12">
                                 <label for="currency"><strong>Currency</strong></label>
                                 <input type="text" class="form-control" id="currency" name="currency" value="{{$quotation->currency}}" readonly>

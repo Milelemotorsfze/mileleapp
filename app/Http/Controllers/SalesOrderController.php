@@ -129,9 +129,19 @@ class SalesOrderController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(SalesOrder $salesOrder)
+    public function show($id)
     {
-        //
+        
+    }
+    public function viewQuotations($id) {
+      $so = SO::findOrFail($id);
+      $quotation = Quotation::findOrFail($so->quotation_id);
+      $quotationVersionFiles = QuotationFile::where('quotation_id',$so->quotation_id)->get();
+      $quotationDetail = QuotationDetail::with('country', 'shippingPort', 'shippingPortOfLoad', 'paymentterms')->where('quotation_id', $quotation->id)->first();
+      $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first(); 
+      $call = Calls::findOrFail($quotation->calls_id);
+
+      return view('salesorder.quotation_versions', compact('quotationVersionFiles','quotation','quotationDetail','empProfile','call','so'));
     }
 
     /**
@@ -1733,12 +1743,12 @@ public function showSalespersonCommissions($sales_person_id, Request $request)
         return response()->json(['success' => false], 400);
     }
     public function getVins(Request $request) {
-    
+    info($request->all());
       $data = [];
       $data['vehicles'] = Vehicles::where('varaints_id', $request->variant_id)
                     ->whereNull('gdn_id')
                     ->wherenotNull('vin')
-                    ->whereNotIn('id', $request->selectedVinIds)
+                    ->whereNotIn('id', $request->selectedVinIds ?? [])
                     ->where(function ($query) use ($request) {
                         $query->whereNull('so_id')
                               ->orWhere('so_id', $request->so_id);
@@ -1798,4 +1808,5 @@ public function showSalespersonCommissions($sales_person_id, Request $request)
             'redirect' => route('salesorder.index')  
         ]);
     }
+   
 }

@@ -380,7 +380,9 @@ table.dataTable thead th select {
                   <th>Quotation Notes</th>
                   <th>View Quotation</th>
                   <th>SO Update</th>
+                  <th>Quotation Versions</th>
                   <th>SO Canacel</th>
+                 
                 </tr>
                 <tr>
         <th><select><option value="">All</option></select></th>
@@ -395,6 +397,7 @@ table.dataTable thead th select {
         <th><select><option value="">All</option></select></th>
         <th></th> <!-- No filter for the Update button -->
         <th></th> <!-- No filter for the Cancel button -->
+        <th></th>
     </tr>
               </thead>
               <tbody>
@@ -475,14 +478,27 @@ table.dataTable thead th select {
                 name: 'quotations.calls_id',
                 searchable: false,
                 render: function (data, type, row) {
-                    if (row.calls_id !== null) { // Check if quotation_id is not null
+                    if (row.calls_id !== null) {
                     // const updatesaleorder = `{{ url('salesorder/update') }}/${data}`;
                     let so_id = row.soid; // Check if quotation_id is not null
                     const updatesaleorder = `{{ route('salesorder.edit', ':id') }}`.replace(':id', so_id);
                     return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
                 }
-                return ''; // Return empty string to hide the button
-            }
+                return ''; 
+                }
+            },
+             {
+                data: 'calls_id',
+                name: 'quotations.calls_id',
+                searchable: false,
+                render: function (data, type, row) {
+                    if (row.calls_id !== null) { 
+                     let so_id = row.soid;
+                    const showSQuotations = `{{ route('so.quotation-versions', ':id') }}`.replace(':id', so_id);
+                    return `<a class="btn btn-sm btn-primary" href="${showSQuotations}" title="show Quotations"><i class="fa fa-eye" aria-hidden="true"></i></a>`;
+                }
+                return ''; 
+                }
             },
             {
                 data: 'soid',

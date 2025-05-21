@@ -249,7 +249,7 @@
                                             <div class="col-sm-6">
                                                 <label class="form-check-label">
                                                     @if ($customerdetails->shippingPort)
-                                                    {{$customerdetails->shippingPort->shipping_port_id}}
+                                                    {{$customerdetails->shippingPort->name ?? ''}}
                                                     @endif
                                                 </label>
                                             </div>
@@ -259,7 +259,7 @@
                                             <div class="col-sm-6">
                                                 <label class="form-check-label">
                                                     @if ($customerdetails->shippingPortOfLoad)
-                                                    {{$customerdetails->shippingPortOfLoad->to_shipping_port_id}}
+                                                    {{$customerdetails->shippingPortOfLoad->name ?? ''}}
                                                     @endif
                                                 </label>
                                             </div>
@@ -368,16 +368,6 @@
                                                 value="{{ preg_replace('/^SO-/', '', $so->so_number) }}" aria-label="Enter SO Number">
                                             </div>
                                         </div>
-                                        <!-- <div class="col-lg-3 col-md-6 col-sm-6">
-                                            <label for="text_input"><strong>Netsuit SO Number</strong></label>
-                                            <div class="input-wrapper d-flex align-items-center">
-                                                <span class="prefix">SO-</span>
-                                                <input type="text" class="form-control input-field" id="so_number" name="so_number"
-                                                    placeholder="Enter SO Number"
-                                                    value="{{ preg_replace('/^SO-/', '', $so->so_number) }}">
-                                            </div>
-                                            <span id="error_message" class="text-danger"></span>
-                                        </div> -->
 
                                         <div class="col-lg-6 col-md-6 col-sm-6">
                                             <label for="text_area"><strong>Sales Notes</strong></label>
@@ -390,7 +380,7 @@
                         </div>
                     </div>
 
-                    <div class="card" id="branModaDiv">
+                    <div class="card">
                         <div class="card-header">
                             <h4 class="card-title">Sales Order Vehicles</h4>
                         </div>
@@ -513,7 +503,6 @@
                     </div>
                     </br>
                     </br>
-                    <input type="hidden" name="so_id" value="{{ $so->id }}">
                     <button type="submit" class="btn btn-primary btn-submit">Submit</button>
                 </form>
                     <div class="card mt-3 shadow-sm">

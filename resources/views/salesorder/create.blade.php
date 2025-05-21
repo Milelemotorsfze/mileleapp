@@ -240,7 +240,7 @@
                         <div class="col-sm-6">
                         <label class="form-check-label" for="inlineCheckbox2">
                             @if ($customerdetails->shippingPort)
-                            {{$customerdetails->shippingPort->shipping_port_id}}
+                            {{$customerdetails->shippingPort->name ?? ''}}
                             @else
                             @endif
                         </label>
@@ -253,7 +253,7 @@
                         <div class="col-sm-6">
                         <label class="form-check-label" for="inlineCheckbox2">
                         @if ($customerdetails->shippingPortOfLoad)
-                        {{$customerdetails->shippingPortOfLoad->to_shipping_port_id}}
+                        {{$customerdetails->shippingPortOfLoad->name ?? ''}}
                         @else
                         @endif
                         </label>
