@@ -534,25 +534,23 @@
                         //     </div>
                         // `;
                         // }
+                        
                         $("#rows-containerpo").append(rowHtml);
-// 1. Initialize select2
-$("#rows-containerpo").find("select[name='to[]']").select2();
+                        $("#rows-containerpo").find("select[name='to[]']").select2();
 
-// 2. Add validation rules dynamically
-$("#rows-containerpo").find("select[name='to[]']").each(function () {
-    $(this).rules("add", {
-        required: true,
-        messages: {
-            required: "To location is required."
-        }
-    });
-});
+                        $("#rows-containerpo").find("select[name='to[]']").each(function () {
+                            $(this).rules("add", {
+                                required: true,
+                                messages: {
+                                    required: "To location is required."
+                                }
+                            });
+                        });
 
-// 3. Validate on change
-$("#rows-containerpo").find("select[name='to[]']").on("change.select2", function () {
-    $(this).valid();
-});
-                    });
+                        $("#rows-containerpo").find("select[name='to[]']").on("change.select2", function () {
+                            $(this).valid();
+                        });
+                                            });
                     $(".remove-row-btn").on("click", function () {
                         $(this).closest(".row").remove();
                     });

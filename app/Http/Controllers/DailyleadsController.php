@@ -219,9 +219,6 @@ class DailyleadsController extends Controller
                         });
                     }
                 }
-                
-                \Log::info('Search Term 11111 : ' . $searchValue);
-
             
                 $activelead = $activelead->groupBy('calls.id');
             

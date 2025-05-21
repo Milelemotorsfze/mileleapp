@@ -127,6 +127,7 @@
             <tr>
                 <th>Creation Date</th>
                 <th>Movement Date</th>
+                <th>Movement Batch</th>
                 <th>VIN</th>
                 <th>TRIM</th>
                 <th>From</th>
@@ -187,6 +188,13 @@
             "columns": [
                 { data: 'created_at', name: 'created_at' },
                 { data: 'date', name: 'date' },
+                { 
+                    data: 'reference_id', 
+                    name: 'reference_id',
+                    render: function (data, type, row) {
+                        return data ? `MOV - ${data}` : '';
+                    }
+                },
                 { data: 'vin', name: 'vin' },
                 { data: 'model_detail', name: 'model_detail' },
                 { data: 'from_name', name: 'from_name' },
