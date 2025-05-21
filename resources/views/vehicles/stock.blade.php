@@ -1031,7 +1031,7 @@ var columnMap = {
         26: 'varaints.my',
         27: 'varaints.steering',
         28: 'varaints.fuel_type',
-        29: 'varaints.gear',
+        29: 'varaints.gearbox',
         30: 'ex_color.name',
         31: 'int_color.name',
         32: 'varaints.upholestry',
