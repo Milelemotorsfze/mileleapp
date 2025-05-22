@@ -34,7 +34,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('View-daily-movemnet
     <div class="row">
         <div class="col-lg-2 col-md-6">
             <label class="form-label">Date Of Movement:</label>
-            <div>{{ \Carbon\Carbon::parse($movementref->date)->format('j-M-Y') }}</div>
+            @if ($movementref && $movementref->date)
+                <div>{{ \Carbon\Carbon::parse($movementref->date)->format('j-M-Y') }}</div>
+            @else
+                <div><em>No Date Available</em></div>
+            @endif
         </div>
     </div>
     <br>
