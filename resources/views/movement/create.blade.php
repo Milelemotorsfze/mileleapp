@@ -544,7 +544,7 @@
                                 messages: {
                                     required: "To location is required."
                                 }
-                            });
+                            }).valid();
                         });
 
                         $("#rows-containerpo").find("select[name='to[]']").on("change.select2", function () {
@@ -749,6 +749,14 @@
             }
             return this.valid();
         };
+        
+        $(document).on('select2:select', 'select[name="to[]"]', function () {
+            $(this).valid(); 
+            const $errorLabel = $(this).next('.select2').next('label.error');
+            if ($errorLabel.length) {
+                $errorLabel.hide();
+            }
+        });
 
         $('#btn-submit').click(function (e) {
             e.preventDefault();
