@@ -1176,4 +1176,6 @@ Route::get('/d', function () {
     Route::post('/salesorder/updateSalesperson', [SalesOrderController::class, 'updateSalesperson'])->name('salesorder.updateSalesperson');
     Route::post('po-payment-adjustment', [PurchasingOrderController::class, 'paymentAdjustment'])->name('po-payment-adjustment');
   
+    Route::get('/get-grades/{modelId}', [ModeldescriptionController::class, 'getGrades']);
+    Route::get('/get-model-details/{model_line_id}', [ModeldescriptionController::class, 'getModelDetails']);
 });

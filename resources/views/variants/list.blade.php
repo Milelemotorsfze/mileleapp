@@ -80,23 +80,26 @@
         <h4 class="card-title">
             Variants Info
         </h4>
+        @can('variants-create')
         @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
         @endphp
         @if ($hasPermission)
-        <a  class="btn btn-sm btn-info float-end" href="{{ route('variants.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create Varitants</a>
-        @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-description-info');
-        @endphp
-        @if ($hasPermission)
-        <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
-            <a  class="btn btn-sm btn-primary float-end" href="{{ route('modeldescription.index') }}" ><i class="fa fa-info-circle" aria-hidden="true"></i> Model Description</a>
-            @endif
+          <a  class="btn btn-sm btn-info float-end" href="{{ route('variants.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create Variants</a>
+       
+          @php
+          $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-description-info');
+          @endphp
+          @if ($hasPermission)
+              <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
+              <a  class="btn btn-sm btn-primary float-end" href="{{ route('modeldescription.index') }}" ><i class="fa fa-info-circle" aria-hidden="true"></i> Model Description</a>
+          @endif
             <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
             <a  class="btn btn-sm btn-primary float-end" href="{{ route('model-lines.index') }}" ><i class="fa fa-info-circle" aria-hidden="true"></i> Model Lines</a>
             <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
             <a  class="btn btn-sm btn-primary float-end" href="{{ route('brands.index') }}" ><i class="fa fa-info-circle" aria-hidden="true"></i> Brands</a>
         @endif
+        @endcan
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -117,7 +120,7 @@
             </div>
         @endif
         @if (Session::has('error'))
-            <div class="alert alert-error" id="error-alert">
+            <div class="alert alert-error alert-danger" id="error-alert">
                 <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
                 {{ Session::get('error') }}
             </div>

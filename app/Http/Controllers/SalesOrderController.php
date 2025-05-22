@@ -46,7 +46,6 @@ class SalesOrderController extends Controller
         $status = $request->input('status');
         if ($status === "SalesOrder") {
             $id = Auth::user()->id;
-
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
             $query = So::select([
                 'calls.name as customername',
@@ -66,7 +65,6 @@ class SalesOrderController extends Controller
             ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
             ->leftJoin('calls', 'quotations.calls_id', '=', 'calls.id')
             ->groupBy('so.id');
-
             if (!$hasPermission) {
                 $query->where('calls.sales_person', $id);
             }
