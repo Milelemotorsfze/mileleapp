@@ -756,6 +756,7 @@
             let vinArray = [];
             let duplicateVinMap = {};
             let duplicateMessages = [];
+            let errorMessages = [];
 
             let fromArray = $("input[name='from[]']").map(function () { return $(this).val(); }).get();
             let toArray = $("select[name='to[]']").map(function () { return $(this).val(); }).get();

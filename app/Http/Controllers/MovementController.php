@@ -522,11 +522,15 @@ class MovementController extends Controller
      */
     public function show($id)
     {
+    $movementref = MovementsReference::find($id);
+    if (!$movementref) {
+        return redirect()->route('movement.index')->with('error', 'Movement reference not found.');
+    }
     $lastIdDetails = MovementsReference::find($id);
     $previousId = MovementsReference::where('id', '<', $id)->max('id');
     $nextId = MovementsReference::where('id', '>', $id)->min('id');
     $movement = Movement::where('reference_id', $id)->get();
-    $movementref = MovementsReference::where('id', $id)->first();
+    // $movementref = MovementsReference::where('id', $id)->first();
     $warehouses = Warehouse::select('id', 'name')->where('status', 1)->get();
 
     return view('movement.view', [
