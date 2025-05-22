@@ -416,59 +416,43 @@ class SalesOrderController extends Controller
             $so->save();
            
             $soVariants = $request->variants;
-            if ($soVariants) {
-                // Find removed quotaion items
-                $existingVariantIds = SoVariant::where('so_id', $so->id)->pluck('variant_id')->toArray();
-                $newVariantIds = array_column($soVariants, 'variant_id');
-                info("existing variants");
-                info($existingVariantIds);
-                  info("new variants");
-                info($newVariantIds);
-            
-                $removedVariants = array_diff($existingVariantIds, $newVariantIds);
-                info("removed variants");
-                info($removedVariants);
-              
-                foreach ($removedVariants as $variantId) {
-                    $removedVariant = SoVariant::where('variant_id', $variantId)
-                                        ->where('so_id', $so->id)->first();
-                                        // need to chcek if the quottaion item id existing against removed varaint id
+
+            if(!empty($request->deleted_so_variant_ids)) {
+                foreach ($request->deleted_so_variant_ids as $soVariantId) {
+                    $removedVariant = SoVariant::find($soVariantId);
                     info($removedVariant);
-                    $logEntries[] = [
-                        'type' => 'Unset',
-                        'so_item_id' => null,
-                        'so_variant_id' => $removedVariant->id,
-                        'field_name' => 'so_variant_id',
-                        'old_value' => $variantId,
-                        'new_value' => null
-                    ];
+                    if($removedVariant) {
+                        $logEntries[] = [
+                            'type' => 'Unset',
+                            'so_item_id' => null,
+                            'so_variant_id' => $soVariantId,
+                            'field_name' => 'so_variant_id',
+                            'old_value' => $soVariantId,
+                            'new_value' => null
+                        ];
 
-                    // get all so item corresponding so varaint and log => delete
-                    $removeVehicleIds = Soitems::where('so_variant_id', $removedVariant->id)->pluck('vehicles_id')->toArray();
-                    info("removed soitems");
-                 if (!empty($removeVehicleIds)) {
-                          $logEntries = array_merge($logEntries, $this->removeSoItems($removedVariant->id, $removeVehicleIds));
-                         info($removeVehicleIds);
-                    }
-                   
-                    // Delete the variant itself
-                    $removedVariant->delete();
-                }
-
-                // return $request->all();
+                        $removeVehicleIds = Soitems::where('so_variant_id', $soVariantId)->pluck('vehicles_id')->toArray();
+                        info("removed soitems");
+                        if (!empty($removeVehicleIds)) {
+                        // get all so item corresponding so varaint and log => delete
+                            $logEntries = array_merge($logEntries, $this->removeSoItems($soVariantId, $removeVehicleIds));
+                            info($removeVehicleIds);
+                        }
                     
+                        // Delete the variant itself
+                        $removedVariant->delete();
+                    }
+                }
+            }
+
+            if ($soVariants) {
                 foreach ($soVariants as $key => $soVariant) {
                     info("each varaint looping");
                     // chek variant existing or not
-                      $existingVariant = null;
-                    // if(isset($soVariant['quotation_item_id'])) {
-                        $existingVariant = SoVariant::where('variant_id', $soVariant['variant_id'])
-                                                ->where('so_id', $id)
-                                                ->where('quantity', $soVariant['quantity'])
-                                                 ->where('price', $soVariant['price'])->first();
-                    // }else{
-                    //   
-                    // }
+                    $existingVariant = null;
+                    if(isset($soVariant['so_variant_id'])) {
+                        $existingVariant = SoVariant::find( $soVariant['so_variant_id']);
+                    }
 
                     if (!$existingVariant) {
                         // if(isset($soVariant['quotation_item_id'])) and existing varaint only 

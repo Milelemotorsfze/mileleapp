@@ -392,7 +392,6 @@
                                             <h5>Total Vehicles - {{ $totalVehicles }}</h5>
                                             <div class="col-md-12 mt-3" id="so-vehicles">
                                                 @foreach($soVariants as $key => $soVariant)
-                                                
                                                     <div class="so-variant-add-section " id="variant-section-{{ $key + 1 }}">
                                                         <div class="row">
                                                             <div class="mb-2 col-sm-12 col-md-3 col-lg-3 col-xxl-3">
@@ -404,8 +403,8 @@
                                                                         >{{ $variant->name ?? '' }}</option>
                                                                     @endforeach
                                                                 </select>
-                                                                <input type="hidden" name="variants[{{ $key + 1 }}][quotation_item_id]" class="quotation-items"
-                                                                 value="{{ $soVariant->quotation_item_id}}" id="quotation-item-{{ $key+1 }}"  >
+                                                                <input type="hidden" name="variants[{{ $key + 1 }}][so_variant_id]" class="so-variants" index="{{ $key+1 }}"
+                                                                 value="{{ $soVariant->id}}" id="so-variant-{{ $key+1 }}"  >
 
                                                             </div> 
                                                             <div class="mb-2 col-sm-12 col-md-4 col-lg-4 col-xxl-4">
@@ -424,7 +423,7 @@
                                                                 name="variants[{{$key+1}}][quantity]" placeholder="Quantity"  value="{{ $soVariant->quantity }}" id="quantity-{{ $key+1 }}" >
                                                             </div>
                                                             <div class="col-sm-12 col-md-1 col-lg-1 col-xxl-1">
-                                                                <a class="btn btn-sm btn-danger removeVariantButton" index="{{ $key+1}}" style="margin-top: 31px;" >
+                                                                <a class="btn btn-sm btn-danger removeVariantButton" index="{{ $key+1}}" style="margin-top: 31px;" data-variant-id="{{ $soVariant->id}}" >
                                                                     <i class="fas fa-trash-alt"></i>
                                                                 </a>
                                                             </div>
@@ -503,6 +502,8 @@
                     </div>
                     </br>
                     </br>
+                    <div id="deleted-ids"></div>
+
                     <button type="submit" class="btn btn-primary btn-submit">Submit</button>
                 </form>
                     <div class="card mt-3 shadow-sm">
@@ -586,6 +587,8 @@
         let QuotaionItemCount = '{{ $soVariants->count() }}';
         let isFormValid = 0;
         let variantsData = @json($variants);
+        let deletedVariantIds = [];
+
         $(document).ready(function() {
 
             var table1 = $('#so-logs').DataTable({      
@@ -950,6 +953,7 @@
         $(document.body).on('click', ".removeVariantButton", function (e) {
             var rowCount = $("#so-vehicles").find(".so-variant-add-section").length;
             var indexNumber = $(this).attr('index');
+            var soVariantId = $(this).attr('data-variant-id');
         
             if(rowCount > 1) {
                 var isGdn = $('#variant-'+indexNumber).attr('data-is-gdn');
@@ -960,75 +964,52 @@
                    
                     var variantText  = $('#variant-'+indexNumber).text();
                     var variant = $('#variant-'+indexNumber).val();
-                    // index,unSelectedVin,vinText,variant)
-
-                    // if(variantText) {
-                    //    let vins =  $('#vin-'+indexNumber).val();
-                    //     appendVin(indexNumber, unSelectedVin, vinText,variant);
-                    // }
 
                     if (variantText) {
-                        let vins = $('#vin-' + indexNumber).val(); // Get all selected VINs (array)
+                        let vins = $('#vin-' + indexNumber).val(); 
 
                         if (Array.isArray(vins) && vins.length > 0) {
                              $('#vin-' + indexNumber + ' option:selected').each(function () {
-                                const vinId = $(this).val();       // VIN value (vehicle ID)
-                                const vinText = $(this).text();    // VIN display text
-                                appendVin(indexNumber, vinId, vinText, variant);
+                                const vinId = $(this).val();      
+                                const vinText = $(this).text();    
+                                appendVin(indexNumber, vinId, vinText, variant[0]);
                             });
                         }
                     }
-                
+                      if (soVariantId !== undefined && !deletedVariantIds.includes(soVariantId)) {
+                            deletedVariantIds.push(soVariantId);
+
+                            // Append hidden input to form
+                            $('#deleted-ids').append(
+                                `<input type="hidden" name="deleted_so_variant_ids[]" value="${soVariantId}">`
+                            );
+                        }
+                    
                     $(this).closest('#variant-section-'+indexNumber).remove();
 
                     $('.so-variant-add-section').each(function(i){
                         var index = i + 1;
-                        // $(this).find('.variant-descriptions').attr('index', index); 
-                        // $(this).find('.variant-descriptions').attr('id', 'variant-description-'+index); 
-                        // $(this).find('.variant-descriptions').attr('name', 'variants['+index+'][description]'); 
-                        // $(this).attr('id', 'variant-section-'+index);
-                        // $(this).find('.variants').attr('index', index);
-                        // $(this).find('.variants').attr('id', 'variant-'+index);
-                        // $(this).find('.variants').attr('name', 'variants['+index+'][variant_id]');
-                        
-                        // $(this).find('.quotation-items').attr('index', index);
-                        // $(this).find('.quotation-items').attr('id', 'quotation-item-'+index);
-                        // $(this).find('.quotation-items').attr('name', 'variants['+index+'][quotation_item_id]');
-                        // $(this).find('.variant-prices').attr('index', index);
-                        // $(this).find('.variant-prices').attr('id', 'price-'+index);
-                        // $(this).find('.variant-prices').attr('name', 'variants['+index+'][price]');
-                        // $(this).find('.variant-quantities').attr('index', index);
-                        // $(this).find('.variant-quantities').attr('id', 'quantity-'+index);
-                        // $(this).find('.variant-quantities').attr('name', 'variants['+index+'][quantity]');
-                        // $(this).find('.vins').attr('index', index);
-                        // $(this).find('.vins').attr('id', 'vin-'+index);
-                        // $(this).find('.vins').attr('name', 'variants['+index+'][vehicles][]');
-                    
-                        // $(this).find('.removeVariantButton').attr('index', index);
+                       
                     $(this).find('.variant-descriptions').attr({
                     'index': index,
                     'id': 'variant-description-' + index,
                     'name': 'variants[' + index + '][description]'
                     });
 
-                    // Update variant section ID
                     $(this).attr('id', 'variant-section-' + index);
 
-                    // Update attributes for variant dropdown
                     $(this).find('.variants').attr({
                         'index': index,
                         'id': 'variant-' + index,
                         'name': 'variants[' + index + '][variant_id]'
                     });
 
-                    // Update attributes for quotation items
-                    $(this).find('.quotation-items').attr({
+                    $(this).find('.so-variants').attr({
                         'index': index,
-                        'id': 'quotation-item-' + index,
-                        'name': 'variants[' + index + '][quotation_item_id]'
+                        'id': 'so-variant-' + index,
+                        'name': 'variants[' + index + '][so_variant_id]'
                     });
 
-                    // Update attributes for price and quantity
                     $(this).find('.variant-prices').attr({
                         'index': index,
                         'id': 'price-' + index,
@@ -1040,7 +1021,6 @@
                         'name': 'variants[' + index + '][quantity]'
                     });
 
-                    // Update attributes for VIN dropdown
                     $(this).find('.vins').attr({
                         'index': index,
                         'id': 'vin-' + index,
@@ -1153,13 +1133,11 @@
 
             };
         }
-        
 
         $(document).on('input', '.variant-prices', function() { 
             calculateTotalSOAmount();
         });
 
-      
         function calculateTotalSOAmount() {
               var sum = 0;
             $('.variant-prices').each(function() {
