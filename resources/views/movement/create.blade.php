@@ -146,8 +146,8 @@
                     <div class="select-po">
                         <select name="po_number" class="form-control mx-4 mb-1" id="po_number">
                             <option value="" selected disabled>Select PO</option>
-                            @foreach ($purchasing_order as $purchasing_order)
-                            <option value="{{ $purchasing_order->id }}">{{ $purchasing_order->po_number }}</option>
+                            @foreach ($purchasing_order as $po)
+                                <option value="{{ $po->id }}">{{ $po->po_number }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -164,7 +164,7 @@
                         <select name="so_number" class="form-control mb-1" id="so_number">
                             <option value="" selected disabled>Select SO</option>
                             @foreach ($so as $so)
-                            <option value="{{ $so->id }}">{{ $so->so_number }}</option>
+                                <option value="{{ $so->id }}">{{ $so->so_number }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -215,7 +215,7 @@
                 </div>
                 <div class="col-lg-1 col-md-6">
                     <select id="ownership_type${row}" class="form-control" name="ownership_type[]">
-                        <option value="">Select Ownership</option>
+                        <option value="" disabled ${!vehicle.ownership_type ? 'selected' : ''}>Select Ownership</option>
                         <option value="Incoming">Incoming</option>
                         <option value="Milele Motors FZE">Milele Motors FZE</option>
                         <option value="Trans Car FZE">Trans Car FZE</option>
@@ -326,6 +326,11 @@
                 data: { po_id: selectedPOId },
                 dataType: "json",
                 success: function (response) {
+                    if (response.length === 0) {
+                        alertify.alert("No Eligible Vehicles", "All vehicles under this PO already have GDN or are not eligible.");
+                        return;
+                    }
+
                     response.forEach(function (vehicle) {
                         var rowHtml = `
                             <div class="row">
@@ -340,7 +345,7 @@
                                 </div>
                                 <div class="col-lg-1 col-md-6" >
                                     <select class="form-control" id="ownership_type" name="ownership_type[]">
-                                        <option value="">Select Ownership</option>
+                                        <option value="" disabled ${!vehicle.ownership_type ? 'selected' : ''}>Select Ownership</option>
                                         <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
                                         <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
                                         <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
@@ -455,6 +460,11 @@
                 data: { so_id: selectedSOId },
                 dataType: "json",
                 success: function (response) {
+                    if (response.length === 0) {
+                        alertify.alert("No Eligible Vehicles", "All vehicles under this SO already have GDN or are not eligible.");
+                        return;
+                    }
+                    
                     response.forEach(function (vehicle) {
                         var rowHtml = `
                             <div class="row">
@@ -469,7 +479,7 @@
                                 </div>
                                 <div class="col-lg-1 col-md-6" >
                                     <select class="form-control" id="ownership_type" name="ownership_type[]">
-                                        <option value="">Select Ownership</option>
+                                        <option value="" disabled ${!vehicle.ownership_type ? 'selected' : ''}>Select Ownership</option>
                                         <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
                                         <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
                                         <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
@@ -544,7 +554,7 @@
                                 messages: {
                                     required: "To location is required."
                                 }
-                            }).valid();
+                            });
                         });
 
                         $("#rows-containerpo").find("select[name='to[]']").on("change.select2", function () {
@@ -608,7 +618,7 @@
                                 </div>
                                 <div class="col-lg-1 col-md-6" >
                                     <select class="form-control" id="ownership_type" name="ownership_type[]">
-                                        <option value=""${!vehicle.ownership_type ? 'selected' : ''}>Select Ownership</option>
+                                        <option value=""${!vehicle.ownership_type ? 'selected' : ''} disabled>Select Ownership</option>
                                         <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
                                         <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
                                         <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
@@ -625,7 +635,10 @@
                                 </div>
                                 <div class="col-lg-2 col-md-6">
                                     <select name="to[]" class="form-control to-select" required>
-                                        ${warehouseOptionsHtml}
+                                        ${warehouseOptionsHtml.replace(
+                                            `value="${vehicle.matchedWarehouseId}"`,
+                                            `value="${vehicle.matchedWarehouseId}" selected`
+                                        )}
                                     </select>
                                 </div>
                                 <div class="col-lg-1 col-md-6">
@@ -685,8 +698,17 @@
                     // Attach the remove-row event handler
                     attachRemoveRowHandler();
                 } else {
-                    var confirm = alertify.confirm(response.message ,function (e) {
-                    }).set({title:"VIN Not Existing !"})
+                    let errors = response.failedVINs || [];
+                    if (errors.length > 0) {
+                        let message = "<strong>The following VIN(s) could not be added:</strong><br><ul>";
+                        errors.forEach(item => {
+                            message += `<li><strong>${item.vin}</strong>: ${item.reason}</li>`;
+                        });
+                        message += "</ul>";
+                        alertify.alert("VIN Upload Issues", message);
+                    } else {
+                        alertify.alert("Error", response.message || "Some VINs could not be processed.");
+                    }
                 }
             },
             error: function (error) {
