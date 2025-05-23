@@ -98,7 +98,7 @@
                         Sales Person :
                     </div>
                     <div class="col-sm-6">
-                        {{ $saleperson->name}}
+                        {{ $saleperson->name ?? ''}}
                     </div>
                 </div>
                 <div class="row mt-2">
@@ -143,7 +143,7 @@
                         Contact Person :
                     </div>
                     <div class="col-sm-6">
-                    <label class="form-check-label" for="inlineCheckbox2">{{$calls->name}}</label>
+                    <label class="form-check-label" for="inlineCheckbox2">{{$calls->name ?? ''}}</label>
                     </div>
                 </div>
                 <div class="row mt-2" id="company-div" >
@@ -160,7 +160,7 @@
                         <label for="timeRange">Customer :</label>
                     </div>
                     <div class="col-sm-6">
-                    <label class="form-check-label" for="inlineCheckbox2">{{$calls->name}}</label>
+                    <label class="form-check-label" for="inlineCheckbox2">{{$calls->name ?? ''}}</label>
                     </div>
                 </div>
                 <div class="row mt-2">
@@ -197,7 +197,7 @@
                         <div class="col-sm-6">
                         <label class="form-check-label">
                             @if ($customerdetails->country)
-                                {{ $customerdetails->country->name }}
+                                {{ $customerdetails->country->name ?? ''}}
                             @else
                             @endif
                         </label>
@@ -267,7 +267,7 @@
                     <div class="col-sm-6">
                     <label class="form-check-label" for="inlineCheckbox2">
                         @if ($customerdetails->paymentterms)
-                        {{$customerdetails->paymentterms->name}}
+                        {{$customerdetails->paymentterms->name ?? ''}}
                         @else
                         @endif
                     </label>
@@ -280,7 +280,7 @@
                         Rep Name :
                     </div>
                     <div class="col-sm-6">
-                    <label class="form-check-label" for="inlineCheckbox2">{{$customerdetails->representative_name}}</label>
+                    <label class="form-check-label" for="inlineCheckbox2">{{$customerdetails->representative_name ?? ''}}</label>
                     </div>
                 </div>
                 <div class="row mt-2">
@@ -298,7 +298,7 @@
                         CB Name:
                     </div>
                     <div class="col-sm-6">
-                    <label class="form-check-label" for="inlineCheckbox2">{{$customerdetails->cb_name}}</label>
+                    <label class="form-check-label" for="inlineCheckbox2">{{$customerdetails->cb_name ?? ''}}</label>
                 </div>
                 </div>
                 <div class="row mt-2">
@@ -306,7 +306,7 @@
                         CB No:
                     </div>
                     <div class="col-sm-6">
-                    <label class="form-check-label" for="inlineCheckbox2">{{$customerdetails->cb_number}}</label>
+                    <label class="form-check-label" for="inlineCheckbox2">{{$customerdetails->cb_number ?? ''}}</label>
                     </div>
                 </div>
             </div>
