@@ -158,14 +158,11 @@ class MovementController extends Controller
             ->pluck('vin');
             $purchasing_order = PurchasingOrder::where('status', 'Approved')
             ->whereHas('vehicles', function ($query) {
-            $query->whereNotNull('vin')
-            // ->where(function ($query) {
-            //     $query->whereNull('grn_id');
-            //         //   ->orWhereNotNull('inspection_date');
-            // })
-            ->where('status', 'Approved');
+                $query->whereNull('gdn_id')
+                      ->whereNotNull('vin')
+                      ->where('status', 'Approved');
             })
-            ->get();
+            ->get();        
             $po = PurchasingOrder::where('status', 'Approved')
             ->whereDoesntHave('vehicles', function ($query) {
                 $query->whereNull('movement_grn_id')
@@ -180,9 +177,10 @@ class MovementController extends Controller
             ->pluck('so_number');
             $so = So::whereHas('vehicles', function ($query) {
                 $query->whereNull('movement_grn_id')
+                    ->whereNull('gdn_id')
+                    ->whereNotNull('vin')
                     ->where('status', 'Approved');
-            })
-            ->get();     
+            })->get();               
         }
         else
         {
@@ -201,38 +199,39 @@ class MovementController extends Controller
         ->where('status', '=', 'Approved')
         ->pluck('vin'); 
         $purchasing_order = PurchasingOrder::where('status', 'Approved')
-    ->whereHas('vehicles', function ($query) {
-        $query->whereNull('gdn_id')
-        ->whereNotNull('vin')
-              ->where('status', 'Approved');
-    })
-    ->get();
-    $po = PurchasingOrder::where('status', 'Approved')
-    ->whereDoesntHave('vehicles', function ($query) {
-        $query->whereNotNull('gdn_id')
-        ->where('status', 'Approved');
-    })
-    ->pluck('po_number');
-    $so_number = So::whereDoesntHave('vehicles', function ($query) {
-        $query->whereNotNull('gdn_id')
-        ->whereNotNull('vin')
+        ->whereHas('vehicles', function ($query) {
+            $query->whereNull('gdn_id')
+                  ->whereNotNull('vin')
+                  ->where('status', 'Approved');
+        })
+        ->get();    
+        $po = PurchasingOrder::where('status', 'Approved')
+        ->whereDoesntHave('vehicles', function ($query) {
+            $query->whereNotNull('gdn_id')
+            ->where('status', 'Approved');
+        })
+        ->pluck('po_number');
+        $so_number = So::whereDoesntHave('vehicles', function ($query) {
+            $query->whereNotNull('gdn_id')
+            ->whereNotNull('vin')
+                    ->where('status', 'Approved');
+        })
+        ->pluck('so_number');
+        $so = So::whereHas('vehicles', function ($query) {
+            $query->whereNull('gdn_id')
+                ->whereNotNull('vin')
                 ->where('status', 'Approved');
-    })
-    ->pluck('so_number');
-    $so = So::whereHas('vehicles', function ($query) {
-        $query->whereNull('gdn_id')
-              ->where('status', 'Approved');
-    })
-    ->get();
+        })
+        ->get();        
         }      
 
-    $lastIdExists = MovementsReference::where('id', $movementsReferenceId - 1)->exists();
-    $NextIdExists = MovementsReference::where('id', $movementsReferenceId + 1)->exists();
-    return view('movement.create', [
-        'movementsReferenceId' => $movementsReferenceId,
-        'lastIdExists' => $lastIdExists,
-        'NextIdExists' => $NextIdExists,
-    ], compact('vehicles', 'warehouses','purchasing_order', 'so', 'po', 'so_number'));
+        $lastIdExists = MovementsReference::where('id', $movementsReferenceId - 1)->exists();
+        $NextIdExists = MovementsReference::where('id', $movementsReferenceId + 1)->exists();
+        return view('movement.create', [
+            'movementsReferenceId' => $movementsReferenceId,
+            'lastIdExists' => $lastIdExists,
+            'NextIdExists' => $NextIdExists,
+        ], compact('vehicles', 'warehouses','purchasing_order', 'so', 'po', 'so_number'));
     }
     /**
      * Store a newly created resource in storage.
@@ -255,7 +254,16 @@ class MovementController extends Controller
             $date = $request->input('date');
             $createdBy = $request->user()->id;
 
-            $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
+            foreach ($from as $index => $fromVal) {
+                $toVal = $to[$index] ?? null;
+                if ($fromVal === $toVal) {
+                    return redirect()->back()->withErrors([
+                        "VIN {$vin[$index]} has the same 'From' and 'To' location. Please select different locations."
+                    ])->withInput();
+                }
+            }            
+
+            // $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
 
             $vinNotExist = [];
             foreach ($vin as $index => $vehicleVin) {
@@ -286,16 +294,16 @@ class MovementController extends Controller
                 return redirect()->back()->with('error', 'Some of the VIN is not exist in system, please update this vin to create the movement');
             }
            
-        // foreach ($vin as $index => $value) {
-        //     if (array_key_exists($index, $from) && array_key_exists($index, $to)) {
-        //         $vehicle = Vehicles::where('vin', $vin[$index])->first();
-        //         if ($vehicle && $to[$index] === '2' && is_null($vehicle->inspection_date)) {
-        //             return redirect()->back()->withErrors([
-        //                 'error' => "Movement for VIN {$vin[$index]} cannot proceed because the inspection date is not set.",
-        //             ]);
-        //         }
-        //     }
-        // }
+            foreach ($vin as $index => $value) {
+                if (array_key_exists($index, $from) && array_key_exists($index, $to)) {
+                    $vehicle = Vehicles::where('vin', $vin[$index])->first();
+                    if ($vehicle && $to[$index] == '2' && is_null($vehicle->inspection_date)) {
+                        return redirect()->back()->withErrors([
+                            'error' => "Movement for VIN {$vin[$index]} cannot proceed because the inspection date is not set.",
+                        ]);
+                    }
+                }
+            }
             $movementsReference = new MovementsReference();
             $movementsReference->date = $date;
             $movementsReference->created_by = $createdBy;
@@ -307,9 +315,7 @@ class MovementController extends Controller
             foreach ($vin as $index => $value) {
                 if (array_key_exists($index, $from) && array_key_exists($index, $to)) {
                 $vehicle = Vehicles::where('vin', $vin[$index])->first();
-                $ownershipType = is_array($request->input('ownership_type')) 
-                    ? $request->input('ownership_type')[$index] 
-                    : $request->input('ownership_type');
+                $ownershipType = data_get($request->input('ownership_type'), $index, null);
                 $vehicle->ownership_type = $ownershipType;
                 $vehicle->save();
                 if ($vehicle) {
@@ -513,16 +519,22 @@ class MovementController extends Controller
      */
     public function show($id)
     {
+    $movementref = MovementsReference::find($id);
+    if (!$movementref) {
+        return redirect()->route('movement.index')->with('error', 'Movement reference not found.');
+    }
     $lastIdDetails = MovementsReference::find($id);
     $previousId = MovementsReference::where('id', '<', $id)->max('id');
     $nextId = MovementsReference::where('id', '>', $id)->min('id');
     $movement = Movement::where('reference_id', $id)->get();
-    $movementref = MovementsReference::where('id', $id)->first();
+    // $movementref = MovementsReference::where('id', $id)->first();
+    $warehouses = Warehouse::select('id', 'name')->where('status', 1)->get();
+
     return view('movement.view', [
            'currentId' => $id,
            'previousId' => $previousId,
            'nextId' => $nextId
-       ], compact('movement', 'movementref'));
+       ], compact('movement', 'movementref', 'warehouses'));
     }
     /**
      * Show the form for editing the specified resource.
@@ -552,11 +564,13 @@ class MovementController extends Controller
     $nextId = MovementsReference::where('id', '>', $currentId)->min('id');
     $movement = Movement::where('reference_id', $currentId)->get();
     $movementref = MovementsReference::where('id', $currentId)->first();
+    $warehouses = Warehouse::select('id', 'name')->where('status', 1)->get();
+
     return view('movement.view', [
            'currentId' => $currentId,
            'previousId' => $previousId,
            'nextId' => $nextId
-       ], compact('movement', 'movementref'));
+       ], compact('movement', 'movementref', 'warehouses'));
     }
     public function vehiclesdetails(Request $request)
     {
@@ -713,32 +727,12 @@ class MovementController extends Controller
     public function getVehiclesDataformovement(Request $request)
     {
         $selectedPOId = $request->input('po_id');
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
-        if($hasPermission)
-        {
-            $vehicles = Vehicles::where('purchasing_order_id', $selectedPOId)
-            ->whereNotNull('vin')
-            // ->where('status', '!=', 'cancel')
-            // ->where(function ($query) {
-            //     $query->whereNull('grn_id');
-            //         //   ->orWhereNotNull('inspection_date');
-            // })
-            ->where('status', '=', 'Approved')
-            ->pluck('id');
-        }
-        else
-        {
         $vehicles = Vehicles::where('purchasing_order_id', $selectedPOId)
-            ->whereNotNull('vin')
-            // ->where('status', '!=', 'cancel')
-            ->whereNull('gdn_id')
-            // ->where(function ($query) {
-            //     $query->whereNull('grn_id');
-            //         //   ->orWhereNotNull('inspection_date');
-            // })
-            ->where('status', '=', 'Approved')
-            ->pluck('id');
-        }
+        ->whereNotNull('vin')
+        ->whereNull('gdn_id')
+        ->where('status', '=', 'Approved')
+        ->pluck('id');
+
             $vehicleDetails = [];
             foreach($vehicles  as $key =>  $vehicle) {
                 $data = Vehicles::find($vehicle);
@@ -789,24 +783,29 @@ class MovementController extends Controller
             ->whereNotNull('vin')
             ->where('status', '!=', 'cancel')
             ->whereNull('gdn_id')
+            ->where('status', '=', 'Approved')
+            ->get();
+            // ->whereNotNull('vin')
+            // ->where('status', '!=', 'cancel')
+            // ->whereNull('gdn_id')
             // ->where(function ($query) {
             //     $query->whereNull('grn_id');
             //         //   ->orWhereNotNull('inspection_date');
             // })
-            ->where('status', '=', 'Approved')
-            ->pluck('id');
+            // ->where('status', '=', 'Approved')
+            // ->pluck('id');
             $vehicleDetails = [];
             foreach($vehicles  as $key =>  $vehicle) {
-                $data = Vehicles::find($vehicle);
-                $vehicleDetails[$key]['vin'] = $data->vin;
-                $vehicle = Vehicles::where('vin', $data->vin)->first();
+                // $data = Vehicles::find($vehicle);
+                $vehicleDetails[$key]['vin'] = $vehicle->vin;
+                // $vehicle = Vehicles::where('vin', $data->vin)->first();
                 $variant = Varaint::find($vehicle->varaints_id)->name;
                 $po_number = PurchasingOrder::find($vehicle->purchasing_order_id)->po_number;
                 $so_number = $vehicle->so_id ? So::find($vehicle->so_id)->so_number : '';
                 $modelLine = MasterModelLines::find($vehicle->variant->master_model_lines_id)->model_line;
                 $ownership_type = $vehicle->ownership_type;
                 $brand = Brand::find($vehicle->variant->brands_id)->brand_name;
-                $movement = Movement::where('vin', $data->vin)->pluck('to')->last();
+                $movement = Movement::where('vin', $vehicle->vin)->pluck('to')->last();
                 $warehouseName = Warehouse::where('id', $movement)->where('status', 1)->value('id');;
                 $warehouseNames = Warehouse::where('id', $movement)->where('status', 1)->value('name');;
                 if (empty($warehouseName)) {
@@ -838,133 +837,170 @@ class MovementController extends Controller
             }
          return response()->json($vehicleDetails);
     }
+
     public function revise(Request $request, $id)
-{
-    $movementlast = Movement::findOrFail($id);
-    $vehicle = Vehicles::where('vin', $movementlast->vin)->first(); 
-    $revisedmovement = new Movement();
-    $revisedmovement->from = $movementlast->to;
-    $revisedmovement->to = $movementlast->from;
-    $revisedmovement->vin = $movementlast->vin;
-    $revisedmovement->reference_id = $movementlast->reference_id;
-    $revisedmovement->remarks = 'Revised Movement';
-    $revisedmovement->save();
-    if ($movementlast->from === 1) {
-        if ($vehicle) {
-            $vehicle->movement_grn_id = null;
-            $vehicle->save();
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'to' => 'required|integer|exists:warehouse,id',
+        ]);
+    
+        $movementLast = Movement::findOrFail($id);
+        $vehicle = Vehicles::where('vin', $movementLast->vin)->first();
+    
+        if (!$vehicle) {
+            return redirect()->route('movement.index')->with('error', 'Vehicle not found.');
         }
-    } else if ($movementlast->to === 2) {
-        if ($vehicle) {
-            $vehicle->gdn_id = null;
+    
+        $previousGdnId = $vehicle->gdn_id;
+        $movementDate = $request->input('date');
+        $newTo = $request->input('to');
+
+        if ($movementLast->to == $newTo) {
+            return redirect()->back()->with('error', 'From and To locations cannot be the same.');
+        }
+    
+        DB::beginTransaction();
+    
+        try {
+            $newReference = new MovementsReference();
+            $newReference->date = $movementDate;
+            $newReference->created_by = Auth::id();
+            $newReference->save();
+    
+            $revisedMovement = new Movement();
+            $revisedMovement->from = $movementLast->to;
+            $revisedMovement->to = $newTo;
+            $revisedMovement->vin = $movementLast->vin;
+            $revisedMovement->reference_id = $newReference->id;
+            $revisedMovement->remarks = 'Revised Movement';
+            $revisedMovement->save();
+
+            if ($newTo == 2) {
+                $gdn = new Gdn();
+                $gdn->date = $movementDate;
+                $gdn->save();
+            
+                $vehicle->gdn_id = $gdn->id;
+            } else {
+                $vehicle->gdn_id = null;
+            }
+            $vehicle->latest_location = $newTo;
             $vehicle->save();
+            
+            if ($newTo != 2 && $previousGdnId) {
+                $otherUsageCount = Vehicles::where('gdn_id', $previousGdnId)->count();
+                if ($otherUsageCount === 0) {
+                    $gdn = Gdn::find($previousGdnId);
+                    if ($gdn) {
+                        $gdn->delete();
+                    }
+                }
+            }
+    
+            DB::commit();
+            return redirect()->route('movement.index')->with('success', 'Movement revised under new batch MOV - ' . $newReference->id);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Revision failed', ['error' => $e->getMessage()]);
+            return redirect()->route('movement.index')->with('error', 'Something went wrong while revising the movement.');
         }
     }
-    return redirect()->route('movement.index')->with('success', 'Movement has been revised successfully.');
-}
-public function uploadVinFile(Request $request)
-{
-    if ($request->hasFile('vin_file')) {
+
+    public function uploadVinFile(Request $request)
+    {
+        if (!$request->hasFile('vin_file')) {
+            return response()->json(['success' => false, 'message' => 'No file uploaded']);
+        }
+    
         $file = $request->file('vin_file');
         $vinData = [];
-
-        // Process CSV file
+    
+        // 1. Read CSV into array
         if (($handle = fopen($file, 'r')) !== false) {
             while (($data = fgetcsv($handle, 1000, ',')) !== false) {
                 $vinData[] = [
-                    'vin' => $data[0], // VIN number
-                    'to' => $data[1],   // Warehouse name (from file, you need to add this column)
-                    'ownership_type' => $data[2]
+                    'vin' => trim($data[0]),
+                    'to' => trim($data[1] ?? ''),
+                    'ownership_type' => trim($data[2] ?? '')
                 ];
             }
             fclose($handle);
         }
-
-        // $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
-        $vinNotExist = [];
-        foreach ($vinData as $index => $data) {
-            $vehicle = Vehicles::where('vin', $data['vin'])
-                                ->where('status', 'Approved')
-                                // ->whereNull($hasPermission ? 'movement_grn_id' : 'gdn_id')
-                                ->first();
-         
-            if(!$vehicle) {
-                $vinNotExist[] = $data['vin'];
-            }
-        }
-        
-        if(count($vinNotExist) > 0) {
-            return response()->json([
-                'error' => false, 
-                'message' => 'Some of the VIN not existing in the system: ' . implode(', ', $vinNotExist)
-            ]);
-        }
-
-        // Same permission check logic as before
-        // $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
+    
+        $vinErrors = [];
+        $validVins = [];
+    
         $vinNumbers = array_column($vinData, 'vin');
-
-        // // Retrieve vehicles based on permissions
-        $query = Vehicles::whereIn('vin', $vinNumbers)
+    
+        // 2. Bulk query vehicles
+        $vehicles = Vehicles::whereIn('vin', $vinNumbers)
             ->whereNotNull('vin')
-            ->where('status', 'Approved');
-            // ->where(function ($query) {
-            //     $query->whereNull('grn_id');
-            //         //   ->orWhereNotNull('inspection_date');
-            // })
-            // ->where('status', '!=', 'cancel')
-            // ->whereNull($hasPermission ? 'movement_grn_id' : 'gdn_id')
-            // ->where('status', 'Approved');
-
-        $vehicles = $query->get()->keyBy('vin'); // Retrieve vehicles and key them by VIN
-
-        // if ($vehicles->isEmpty()) {
-        //     return response()->json(['success' => false, 'message' => 'No matching VINs found']);
-        // }
-
-        // Prepare vehicle details in the same order as vinData
-        $vehicleDetails = [];
+            ->get()
+            ->keyBy('vin');
+    
         foreach ($vinData as $entry) {
             $vin = $entry['vin'];
-            $toWarehouse = $entry['to'];
-            $ownership_type = $entry['ownership_type'];
-            if (isset($vehicles[$vin])) {
-                $vehicle = $vehicles[$vin];
-                $variant = Varaint::find($vehicle->varaints_id)->name;
-                $po_number = PurchasingOrder::find($vehicle->purchasing_order_id)->po_number;
-                $so = $vehicle->so_id ? So::find($vehicle->so_id) : null;
-                $so_number = $so ? $so->so_number : '';
-                $modelLine = MasterModelLines::find($vehicle->variant->master_model_lines_id)->model_line;
-                $brand = Brand::find($vehicle->variant->brands_id)->brand_name;
-                $movement = Movement::where('vin', $vin)->pluck('to')->last();
-                $warehouseName = Warehouse::where('id', $movement)->where('status', 1)->value('id');;
-                $warehouseNames = Warehouse::where('id', $movement)->where('status', 1)->value('name');;
-                // Default to Supplier if no warehouse name found
-                $warehouseName = $warehouseName ?: ($vehicle->latest_location ? Warehouse::where('id', $vehicle->latest_location)->where('status', 1)->value('id') : 1);
-                $warehouseNames = $warehouseNames ?: ($vehicle->latest_location ? Warehouse::where('id', $vehicle->latest_location)->where('status', 1)->value('name') : "Supplier");
-                // Match the 'to' warehouse from the CSV and set as default
-                $matchedWarehouse = Warehouse::where('name', $toWarehouse)->where('status', 1)->first();
-                $vehicleDetails[] = [
-                    'vin' => $vin,
-                    'ownership_type' => $ownership_type,
-                    'variant' => $variant,
-                    'modelLine' => $modelLine,
-                    'brand' => $brand,
-                    'warehouseName' => $warehouseName,
-                    'warehouseNames' => $warehouseNames,
-                    'po_number' => $po_number,
-                    'so_number' => $so_number,
-                    'matchedWarehouseId' => $matchedWarehouse ? $matchedWarehouse->id : null // Store the matched warehouse ID
-                ];
+            $vehicle = $vehicles->get($vin);
+    
+            if (!$vehicle) {
+                $vinErrors[] = "$vin - Not found in system";
+                continue;
             }
+    
+            if ($vehicle->status !== 'Approved') {
+                $vinErrors[] = "$vin - Status not approved";
+                continue;
+            }
+    
+            if (!is_null($vehicle->gdn_id)) {
+                $vinErrors[] = "$vin - Already processed (GDN exists)";
+                continue;
+            }
+    
+            // Vehicle is valid, build response
+            $variant = Varaint::find($vehicle->varaints_id);
+            $brand = $variant ? Brand::find($variant->brands_id) : null;
+            $modelLine = $variant ? MasterModelLines::find($variant->master_model_lines_id) : null;
+            $po = PurchasingOrder::find($vehicle->purchasing_order_id);
+            $so = $vehicle->so_id ? So::find($vehicle->so_id) : null;
+    
+            $movement = Movement::where('vin', $vin)->pluck('to')->last();
+            $warehouseName = Warehouse::where('id', $movement)->where('status', 1)->value('id');
+            $warehouseNames = Warehouse::where('id', $movement)->where('status', 1)->value('name');
+    
+            if (!$warehouseName) {
+                $warehouseName = $vehicle->latest_location ?? 1;
+                $warehouseNames = Warehouse::where('id', $warehouseName)->value('name') ?? 'Supplier';
+            }
+    
+            $matchedWarehouse = Warehouse::where('name', $entry['to'])->where('status', 1)->first();
+    
+            $validVins[] = [
+                'vin' => $vin,
+                'ownership_type' => $entry['ownership_type'],
+                'variant' => $variant?->name,
+                'modelLine' => $modelLine?->model_line,
+                'brand' => $brand?->brand_name,
+                'warehouseName' => $warehouseName,
+                'warehouseNames' => $warehouseNames,
+                'po_number' => $po?->po_number,
+                'so_number' => $so?->so_number ?? '',
+                'matchedWarehouseId' => $matchedWarehouse?->id
+            ];
         }
-
-
-        return response()->json(['success' => true, 'vehicleDetails' => $vehicleDetails]);
-    } else {
-        return response()->json(['success' => false, 'message' => 'No file uploaded']);
+    
+        // 3. Respond accordingly
+        if (!empty($vinErrors)) {
+            return response()->json([
+                'success' => false,
+                'message' => "The following VINs could not be added:\n" . implode("\n", $vinErrors)
+            ]);
+        }
+    
+        return response()->json(['success' => true, 'vehicleDetails' => $validVins]);
     }
-    }
+    
 
     public function checkDuplicateMovement(Request $request) {
         $vin = $request->vin;

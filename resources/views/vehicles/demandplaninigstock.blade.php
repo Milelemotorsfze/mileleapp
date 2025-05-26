@@ -946,7 +946,7 @@ if (hasPricePermission) {
         23: 'varaints.my',
         24: 'varaints.steering',
         25: 'varaints.fuel_type',
-        26: 'varaints.gear',
+        26: 'varaints.gearbox',
         27: 'ex_color.name',
         28: 'int_color.name',
         29: 'varaints.upholestry',

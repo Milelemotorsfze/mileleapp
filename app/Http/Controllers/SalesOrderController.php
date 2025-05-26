@@ -151,7 +151,7 @@ class SalesOrderController extends Controller
     public function createsalesorder($callId) {
        
         $quotation = Quotation::where('calls_id', $callId)->first();
-        $calls = Calls::find($callId);
+        $calls = Calls::findOrFail($callId);
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
         $customerdetails = QuotationDetail::with('country', 'shippingPort', 'shippingPortOfLoad', 'paymentterms')->where('quotation_id', $quotation->id)->first();
         $vehicles = [];

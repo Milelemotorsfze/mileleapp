@@ -146,8 +146,8 @@
                     <div class="select-po">
                         <select name="po_number" class="form-control mx-4 mb-1" id="po_number">
                             <option value="" selected disabled>Select PO</option>
-                            @foreach ($purchasing_order as $purchasing_order)
-                            <option value="{{ $purchasing_order->id }}">{{ $purchasing_order->po_number }}</option>
+                            @foreach ($purchasing_order as $po)
+                                <option value="{{ $po->id }}">{{ $po->po_number }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -164,7 +164,7 @@
                         <select name="so_number" class="form-control mb-1" id="so_number">
                             <option value="" selected disabled>Select SO</option>
                             @foreach ($so as $so)
-                            <option value="{{ $so->id }}">{{ $so->so_number }}</option>
+                                <option value="{{ $so->id }}">{{ $so->so_number }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -193,7 +193,23 @@
     });
 </script>
 <script>
+
+    function applyRowValidation($element, shouldValidateNow = false) {
+        if ($element && $element.length) {
+            $element.rules("add", {
+                required: true,
+                messages: {
+                    required: "To location is required."
+                }
+            });
+            if (shouldValidateNow) {
+                $element.valid();
+            }
+        }
+    }
+
     $(document).ready(function() {
+
         var row = 1;
         $('.add-row-btn').click(function() {
             row++;
@@ -215,7 +231,7 @@
                 </div>
                 <div class="col-lg-1 col-md-6">
                     <select id="ownership_type${row}" class="form-control" name="ownership_type[]">
-                        <option value="">Select Ownership</option>
+                        <option value="" disabled selected>Select Ownership</option>
                         <option value="Incoming">Incoming</option>
                         <option value="Milele Motors FZE">Milele Motors FZE</option>
                         <option value="Trans Car FZE">Trans Car FZE</option>
@@ -266,6 +282,8 @@
             $('#rows-container').append(newRow);
             $('#vin' + row).select2();
             $('#to' + row).select2();
+            applyRowValidation($('#to' + row), false);
+
             let $fromSelect = $('#from' + row);
             if ($fromSelect.find('option:selected').text().trim() === 'From') {
                 $fromSelect.addClass('warehouse-from-location');
@@ -326,6 +344,11 @@
                 data: { po_id: selectedPOId },
                 dataType: "json",
                 success: function (response) {
+                    if (response.length === 0) {
+                        alertify.alert("No Eligible Vehicles", "All vehicles under this PO already have GDN or are not eligible.");
+                        return;
+                    }
+
                     response.forEach(function (vehicle) {
                         var rowHtml = `
                             <div class="row">
@@ -340,7 +363,7 @@
                                 </div>
                                 <div class="col-lg-1 col-md-6" >
                                     <select class="form-control" id="ownership_type" name="ownership_type[]">
-                                        <option value="">Select Ownership</option>
+                                        <option value="" disabled ${!vehicle.ownership_type ? 'selected' : ''}>Select Ownership</option>
                                         <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
                                         <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
                                         <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
@@ -405,6 +428,7 @@
                                 // }
                                
                         $("#rows-containerpo").append(rowHtml);
+                        applyRowValidation($("#rows-containerpo").find("select[name='to[]']").last(), false);
                     });
 
                     $("#rows-containerpo select.to-select").each(function () {
@@ -455,6 +479,11 @@
                 data: { so_id: selectedSOId },
                 dataType: "json",
                 success: function (response) {
+                    if (response.length === 0) {
+                        alertify.alert("No Eligible Vehicles", "All vehicles under this SO already have GDN or are not eligible.");
+                        return;
+                    }
+                    
                     response.forEach(function (vehicle) {
                         var rowHtml = `
                             <div class="row">
@@ -469,7 +498,7 @@
                                 </div>
                                 <div class="col-lg-1 col-md-6" >
                                     <select class="form-control" id="ownership_type" name="ownership_type[]">
-                                        <option value="">Select Ownership</option>
+                                        <option value="" disabled ${!vehicle.ownership_type ? 'selected' : ''}>Select Ownership</option>
                                         <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
                                         <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
                                         <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
@@ -534,25 +563,13 @@
                         //     </div>
                         // `;
                         // }
+                        
                         $("#rows-containerpo").append(rowHtml);
-// 1. Initialize select2
-$("#rows-containerpo").find("select[name='to[]']").select2();
+                        $("#rows-containerpo").find("select[name='to[]']").select2();
+                        applyRowValidation($("#rows-containerpo").find("select[name='to[]']").last(), false);
 
-// 2. Add validation rules dynamically
-$("#rows-containerpo").find("select[name='to[]']").each(function () {
-    $(this).rules("add", {
-        required: true,
-        messages: {
-            required: "To location is required."
-        }
-    });
-});
 
-// 3. Validate on change
-$("#rows-containerpo").find("select[name='to[]']").on("change.select2", function () {
-    $(this).valid();
-});
-                    });
+                                            });
                     $(".remove-row-btn").on("click", function () {
                         $(this).closest(".row").remove();
                     });
@@ -610,7 +627,7 @@ $("#rows-containerpo").find("select[name='to[]']").on("change.select2", function
                                 </div>
                                 <div class="col-lg-1 col-md-6" >
                                     <select class="form-control" id="ownership_type" name="ownership_type[]">
-                                        <option value=""${!vehicle.ownership_type ? 'selected' : ''}>Select Ownership</option>
+                                        <option value=""${!vehicle.ownership_type ? 'selected' : ''} disabled>Select Ownership</option>
                                         <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
                                         <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
                                         <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
@@ -627,7 +644,10 @@ $("#rows-containerpo").find("select[name='to[]']").on("change.select2", function
                                 </div>
                                 <div class="col-lg-2 col-md-6">
                                     <select name="to[]" class="form-control to-select" required>
-                                        ${warehouseOptionsHtml}
+                                        ${warehouseOptionsHtml.replace(
+                                            `value="${vehicle.matchedWarehouseId}"`,
+                                            `value="${vehicle.matchedWarehouseId}" selected`
+                                        )}
                                     </select>
                                 </div>
                                 <div class="col-lg-1 col-md-6">
@@ -676,6 +696,7 @@ $("#rows-containerpo").find("select[name='to[]']").on("change.select2", function
                                 //                 }
                         // rowHtml += `</div>`;
                         $("#rows-containerpo").append(rowHtml);
+                        applyRowValidation($("#rows-containerpo").find("select[name='to[]']").last(), false);
 
                         $("#rows-containerpo .to-select").each(function () {
                             if (!$(this).hasClass("select2-hidden-accessible")) {
@@ -687,8 +708,17 @@ $("#rows-containerpo").find("select[name='to[]']").on("change.select2", function
                     // Attach the remove-row event handler
                     attachRemoveRowHandler();
                 } else {
-                    var confirm = alertify.confirm(response.message ,function (e) {
-                    }).set({title:"VIN Not Existing !"})
+                    let errors = response.failedVINs || [];
+                    if (errors.length > 0) {
+                        let message = "<strong>The following VIN(s) could not be added:</strong><br><ul>";
+                        errors.forEach(item => {
+                            message += `<li><strong>${item.vin}</strong>: ${item.reason}</li>`;
+                        });
+                        message += "</ul>";
+                        alertify.alert("VIN Upload Issues", message);
+                    } else {
+                        alertify.alert("Error", response.message || "Some VINs could not be processed.");
+                    }
                 }
             },
             error: function (error) {
@@ -729,7 +759,7 @@ $("#rows-containerpo").find("select[name='to[]']").on("change.select2", function
     },
     errorPlacement: function (error, element) {
         if (element.hasClass('select2-hidden-accessible')) {
-            error.insertAfter(element.next('.select2')); // places error after select2 span
+            error.insertAfter(element.next('.select2'));
         } else {
             error.insertAfter(element);
         }
@@ -758,10 +788,25 @@ $("#rows-containerpo").find("select[name='to[]']").on("change.select2", function
             let vinArray = [];
             let duplicateVinMap = {};
             let duplicateMessages = [];
-
-            let fromArray = [];
-            let toArray = [];
             let errorMessages = [];
+
+            let fromArray = $("input[name='from[]']").map(function () { return $(this).val(); }).get();
+            let toArray = $("select[name='to[]']").map(function () { return $(this).val(); }).get();
+            let vinInputs = $("input[name='vin[]'], select[name='vin[]']");
+
+            let locationConflictErrors = [];
+
+            for (let i = 0; i < fromArray.length; i++) {
+                if (fromArray[i] && toArray[i] && fromArray[i] === toArray[i]) {
+                    let vin = vinInputs.eq(i).val() || 'Unknown VIN';
+                    locationConflictErrors.push(`❌ VIN ${vin} has the same From and To location.`);
+                }
+            }
+
+            if (locationConflictErrors.length > 0) {
+                alertify.alert("Location Conflict", locationConflictErrors.join("<br>"));
+                return false;
+            }
 
             $("input[name='vin[]'], select[name='vin[]']").each(function () {
                 let vinVal = $(this).val();
@@ -845,8 +890,18 @@ $("#rows-containerpo").find("select[name='to[]']").on("change.select2", function
                 }
             });
         });
-});
+    });
 
+    $(document).on('change', 'select[name="to[]"]', function () {
+        const $select = $(this);
+        // alert("select is : ");
+        $select.valid();
+
+    if ($select.val()) {
+            $select.removeClass('is-invalid');
+            $select.closest('.col-md-6, .col-lg-2, .col-lg-1').find('label.error, .is-invalid').remove();
+        }
+    });
 
 </script>
 @else

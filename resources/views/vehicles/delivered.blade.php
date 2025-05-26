@@ -965,7 +965,7 @@ var columns6 = [
         21: 'varaints.my',
         22: 'varaints.steering',
         23: 'varaints.fuel_type',
-        24: 'varaints.gear',
+        24: 'varaints.gearbox',
         25: 'ex_color.name',
         26: 'int_color.name',
         27: 'varaints.upholestry',
