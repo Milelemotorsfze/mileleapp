@@ -25,11 +25,11 @@
                 @csrf
                 <div class="row">
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <label for="master_grade" class="form-label">Master Grade Name</label>
+                        <label for="master_grade" class="form-label"><span class="text-danger">*</span> Master Grade Name</label>
                         <input type="text" name="master_grade" class="form-control" required/>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <label for="brand" class="form-label">Brand</label>
+                        <label for="brand" class="form-label"><span class="text-danger">*</span> Brand</label>
                         <select class="form-control select2" autofocus name="brands_id" id="brand" required>
                             <option value="" disabled selected>Please select brand</option>
                             @foreach($brands as $brand)
@@ -40,7 +40,7 @@
                         </select>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <label for="model" class="form-label">Model Line</label>
+                        <label for="model" class="form-label"><span class="text-danger">*</span> Model Line</label>
                         <select class="form-control select2" autofocus name="master_model_lines_id" id="model" required>
                             <option value="" disabled selected>Select a Model Line</option>
                         </select>
