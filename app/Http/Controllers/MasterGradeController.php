@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\UserActivityController;
 use App\Models\Brand;
-use App\Models\MasterModelLines;
 use App\Models\MasterGrades;
+use App\Models\MasterModelLines;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\UserActivityController;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class MasterGradeController extends Controller
 {
@@ -17,8 +18,9 @@ class MasterGradeController extends Controller
      */
     public function index()
     {
-        $mastergrades = MasterGrades::orderBy('id','DESC')->get();
+        $mastergrades = MasterGrades::orderBy('id', 'DESC')->get();
         (new UserActivityController)->createActivity('Open Master Model Lines Grades');
+
         return view('modeldescription.grade.index', compact('mastergrades'));
     }
 
@@ -30,7 +32,8 @@ class MasterGradeController extends Controller
         $brands = Brand::get();
         $masterModelLines = MasterModelLines::get();
         (new UserActivityController)->createActivity('Create Master Model Lines Grades');
-        return view('modeldescription.grade.create',compact('brands', 'masterModelLines'));
+
+        return view('modeldescription.grade.create', compact('brands', 'masterModelLines'));
     }
 
     /**
@@ -39,15 +42,24 @@ class MasterGradeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'master_grade' => 'required|string|max:255',
-            'brands_id' => 'required|exists:brands,id',
-            'master_model_lines_id' => 'required|exists:master_model_lines,id',
+            'brands_id' => ['required', 'exists:brands,id'],
+            'master_grade' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('master_vehicles_grades', 'grade_name')->where(function ($query) use ($request) {
+                    return $query->where('model_line_id', $request->input('master_model_lines_id'));
+                }),
+            ],
+            'master_model_lines_id' => ['required', 'exists:master_model_lines,id'],
         ]);
+
         MasterGrades::create([
-        'grade_name' => $request->input('master_grade'), // Master grade name
-        'model_line_id' => $request->input('master_model_lines_id'), // Related model line ID
-        'created_by' => auth()->user()->id, // Created by logged-in user
+            'grade_name' => $request->input('master_grade'), // Master grade name
+            'model_line_id' => $request->input('master_model_lines_id'), // Related model line ID
+            'created_by' => auth()->user()->id, // Created by logged-in user
         ]);
+
         return redirect()->route('mastergrade.index')->with('success', 'Master Grade created successfully!');
     }
 
@@ -62,18 +74,12 @@ class MasterGradeController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
-    {
-       
-    }
+    public function edit(string $id) {}
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-       
-    }
+    public function update(Request $request, string $id) {}
 
     /**
      * Remove the specified resource from storage.
