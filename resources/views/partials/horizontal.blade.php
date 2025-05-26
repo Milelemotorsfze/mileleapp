@@ -2101,6 +2101,16 @@
                                             </a>
                                         </div>
                                         @endif
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-grades-list');
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('mastergrade.index')}}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Grades </span>
+                                            </a>
+                                        </div>
+                                        @endif
                                     </div>
                                 </li>
                                 @endif
