@@ -193,7 +193,23 @@
     });
 </script>
 <script>
+
+    function applyRowValidation($element, shouldValidateNow = false) {
+        if ($element && $element.length) {
+            $element.rules("add", {
+                required: true,
+                messages: {
+                    required: "To location is required."
+                }
+            });
+            if (shouldValidateNow) {
+                $element.valid();
+            }
+        }
+    }
+
     $(document).ready(function() {
+
         var row = 1;
         $('.add-row-btn').click(function() {
             row++;
@@ -215,7 +231,7 @@
                 </div>
                 <div class="col-lg-1 col-md-6">
                     <select id="ownership_type${row}" class="form-control" name="ownership_type[]">
-                        <option value="" disabled ${!vehicle.ownership_type ? 'selected' : ''}>Select Ownership</option>
+                        <option value="" disabled selected>Select Ownership</option>
                         <option value="Incoming">Incoming</option>
                         <option value="Milele Motors FZE">Milele Motors FZE</option>
                         <option value="Trans Car FZE">Trans Car FZE</option>
@@ -266,6 +282,8 @@
             $('#rows-container').append(newRow);
             $('#vin' + row).select2();
             $('#to' + row).select2();
+            applyRowValidation($('#to' + row), false);
+
             let $fromSelect = $('#from' + row);
             if ($fromSelect.find('option:selected').text().trim() === 'From') {
                 $fromSelect.addClass('warehouse-from-location');
@@ -410,6 +428,7 @@
                                 // }
                                
                         $("#rows-containerpo").append(rowHtml);
+                        applyRowValidation($("#rows-containerpo").find("select[name='to[]']").last(), false);
                     });
 
                     $("#rows-containerpo select.to-select").each(function () {
@@ -547,19 +566,9 @@
                         
                         $("#rows-containerpo").append(rowHtml);
                         $("#rows-containerpo").find("select[name='to[]']").select2();
+                        applyRowValidation($("#rows-containerpo").find("select[name='to[]']").last(), false);
 
-                        $("#rows-containerpo").find("select[name='to[]']").each(function () {
-                            $(this).rules("add", {
-                                required: true,
-                                messages: {
-                                    required: "To location is required."
-                                }
-                            });
-                        });
 
-                        $("#rows-containerpo").find("select[name='to[]']").on("change.select2", function () {
-                            $(this).valid();
-                        });
                                             });
                     $(".remove-row-btn").on("click", function () {
                         $(this).closest(".row").remove();
@@ -687,6 +696,7 @@
                                 //                 }
                         // rowHtml += `</div>`;
                         $("#rows-containerpo").append(rowHtml);
+                        applyRowValidation($("#rows-containerpo").find("select[name='to[]']").last(), false);
 
                         $("#rows-containerpo .to-select").each(function () {
                             if (!$(this).hasClass("select2-hidden-accessible")) {
@@ -749,7 +759,7 @@
     },
     errorPlacement: function (error, element) {
         if (element.hasClass('select2-hidden-accessible')) {
-            error.insertAfter(element.next('.select2')); // places error after select2 span
+            error.insertAfter(element.next('.select2'));
         } else {
             error.insertAfter(element);
         }
@@ -771,14 +781,6 @@
             }
             return this.valid();
         };
-        
-        $(document).on('select2:select', 'select[name="to[]"]', function () {
-            $(this).valid(); 
-            const $errorLabel = $(this).next('.select2').next('label.error');
-            if ($errorLabel.length) {
-                $errorLabel.hide();
-            }
-        });
 
         $('#btn-submit').click(function (e) {
             e.preventDefault();
@@ -888,8 +890,18 @@
                 }
             });
         });
-});
+    });
 
+    $(document).on('change', 'select[name="to[]"]', function () {
+        const $select = $(this);
+        // alert("select is : ");
+        $select.valid();
+
+    if ($select.val()) {
+            $select.removeClass('is-invalid');
+            $select.closest('.col-md-6, .col-lg-2, .col-lg-1').find('label.error, .is-invalid').remove();
+        }
+    });
 
 </script>
 @else

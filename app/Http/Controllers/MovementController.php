@@ -315,9 +315,7 @@ class MovementController extends Controller
             foreach ($vin as $index => $value) {
                 if (array_key_exists($index, $from) && array_key_exists($index, $to)) {
                 $vehicle = Vehicles::where('vin', $vin[$index])->first();
-                $ownershipType = is_array($request->input('ownership_type')) 
-                    ? $request->input('ownership_type')[$index] 
-                    : $request->input('ownership_type');
+                $ownershipType = data_get($request->input('ownership_type'), $index, null);
                 $vehicle->ownership_type = $ownershipType;
                 $vehicle->save();
                 if ($vehicle) {
