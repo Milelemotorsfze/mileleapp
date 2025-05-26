@@ -20,9 +20,9 @@ return new class extends Migration
                 $table->string('window_type')->nullable();
             }
 
-            if (!Schema::hasColumn('varaints', 'master_model_descriptions_id')) {
-                $table->unsignedBigInteger('master_model_descriptions_id')->nullable();
-                $table->foreign('master_model_descriptions_id')
+            if (!Schema::hasColumn('varaints', 'master_model_description_id')) {
+                $table->unsignedBigInteger('master_model_description_id')->nullable();
+                $table->foreign('master_model_description_id')
                       ->references('id')
                       ->on('master_model_descriptions')
                       ->onDelete('cascade');
@@ -36,9 +36,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('varaints', function (Blueprint $table) {
-            if (Schema::hasColumn('varaints', 'master_model_descriptions_id')) {
-                $table->dropForeign(['master_model_descriptions_id']);
-                $table->dropColumn('master_model_descriptions_id');
+            if (Schema::hasColumn('varaints', 'master_model_description_id')) {
+                $table->dropForeign(['master_model_description_id']);
+                $table->dropColumn('master_model_description_id');
             }
 
             if (Schema::hasColumn('varaints', 'grade_name')) {
