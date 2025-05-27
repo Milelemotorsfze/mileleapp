@@ -1,7 +1,7 @@
 @extends('layouts.main')
 @section('content')
 @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-description');
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-master-grade');
 @endphp
 @if ($hasPermission)
     <div class="card">

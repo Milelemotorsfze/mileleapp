@@ -2102,7 +2102,7 @@
                                         </div>
                                         @endif
                                         @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-grades-list');
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-grade-list');
                                         @endphp
                                         @if ($hasPermission)
                                         <div class="dropdown">
