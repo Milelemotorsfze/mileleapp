@@ -14,11 +14,11 @@ class Movement extends Model
     }
     public function fromWarehouse()
     {
-        return $this->belongsTo(Warehouse::class, 'from', 'id');
+        return $this->belongsTo(Warehouse::class, 'from', 'id')->where('status', 1);
     }
     public function toWarehouse()
     {
-        return $this->belongsTo(Warehouse::class, 'to', 'id');
+        return $this->belongsTo(Warehouse::class, 'to', 'id')->where('status', 1);
     }
     public function Movementrefernce()
     {

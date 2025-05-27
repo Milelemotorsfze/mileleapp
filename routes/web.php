@@ -138,7 +138,7 @@ use App\Http\Controllers\ModeldescriptionController;
 use App\Http\Controllers\MasterGradeController;
 use App\Http\Controllers\CompanyDomainController;
 use App\Http\Controllers\MasterChargesController;
-
+use App\Models\Gdn;
 use App\Models\Grn;
 
 /*
@@ -1084,6 +1084,12 @@ Route::get('/d', function () {
     Route::post('/vehicles/hold/{id}', [VehiclesController::class, 'hold'])->name('vehicles.hold');
     Route::post('/transition/paymentconfirm', [PurchasingOrderController::class, 'paymentconfirm'])->name('transition.paymentconfirm');
     Route::get('/getdata', [PurchasingOrderController::class, 'getdata'])->name('purchased.getdata');
+
+
+Route::get('/check-trashed-gdn', function () {
+    $trashed = Gdn::onlyTrashed()->get();
+    dd($trashed);
+});
 
     //Netsuite GDN
     Route::get('netsuitegdn/addingnetsuitegdn', [ApprovalsController::class, 'addingnetsuitegdn'])->name('netsuitegdn.addingnetsuitegdn');
