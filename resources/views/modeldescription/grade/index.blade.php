@@ -37,6 +37,7 @@
                     <th>Model Line</th>
                     <th>Created By</th>
                     <th>Created At</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -47,6 +48,15 @@
                     <td>{{ $mastergrade->modelLine->model_line ?? 'N/A' }}</td>
                     <td>{{ $mastergrade->creator->name ?? 'N/A' }}</td>
                     <td>{{ $mastergrade->created_at->format('d M Y, H:i A') }}</td>
+                    <td>
+                        @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-master-grade');
+                        @endphp
+                        @if ($hasPermission && $mastergrade->modelDescriptions->isEmpty())
+                            <a href="{{ route('mastergrade.edit', $mastergrade->id ) }}" class="btn btn-info btn-sm">
+                                <i class="fa fa-edit" aria-hidden="true"></i></a>
+                        @endif
+                    </td>
                 </tr>
                 @endforeach
             </tbody>
