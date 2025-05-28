@@ -1548,17 +1548,6 @@
                                                 @endif
                                                 @endcan
 
-                                                @can('model-description-info')
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-description-info');
-                                                @endphp
-                                                @if ($hasPermission)
-                                                <a href="{{ route('modeldescription.index') }}" class="dropdown-item" data-key="t-login">
-                                                    @if(Auth::user()->empProfile->department->is_demand_planning == 1) DP @endif Model Descriptions
-                                                </a>
-                                                @endif
-                                                @endcan
-
                                                 @can('variants-view')
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-view');
@@ -2122,6 +2111,14 @@
                                                 <span data-key="t-utility">Grades </span>
                                             </a>
                                         </div>
+                                        @endif
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-model-description-list');
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <a href="{{ route('modeldescription.index') }}" class="dropdown-item" data-key="t-login">
+                                            @if(Auth::user()->empProfile->department->is_demand_planning == 1) DP @endif Model Descriptions
+                                        </a>
                                         @endif
                                     </div>
                                 </li>
