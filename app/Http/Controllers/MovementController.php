@@ -840,17 +840,37 @@ class MovementController extends Controller
 
     public function revise(Request $request, $id)
     {
-        $request->validate([
-            'date' => 'required|date',
-            'to' => 'required|integer|exists:warehouse,id',
-        ]);
-    
         $movementLast = Movement::findOrFail($id);
         $vehicle = Vehicles::where('vin', $movementLast->vin)->first();
     
         if (!$vehicle) {
             return redirect()->route('movement.index')->with('error', 'Vehicle not found.');
         }
+
+        if ($movementLast->to != 2) {
+            $revised = new Movement();
+            $revised->from = $movementLast->to;
+            $revised->to = $movementLast->from;
+            $revised->vin = $movementLast->vin;
+            $revised->reference_id = $movementLast->reference_id;
+            $revised->remarks = 'Revised Movement';
+            $revised->save();
+
+            if ($movementLast->from == 1) {
+                $vehicle->movement_grn_id = null;
+            } elseif ($movementLast->to == 2) {
+                $vehicle->gdn_id = null;
+            }
+            $vehicle->latest_location = $revised->to;
+            $vehicle->save();
+
+            return redirect()->route('movement.index')->with('success', 'Movement has been revised (old logic).');
+        }
+
+        $request->validate([
+            'date' => 'required|date',
+            'to' => 'required|integer|exists:warehouse,id',
+        ]);
     
         $previousGdnId = $vehicle->gdn_id;
         $movementDate = $request->input('date');
@@ -888,13 +908,10 @@ class MovementController extends Controller
             $vehicle->latest_location = $newTo;
             $vehicle->save();
             
-            if ($newTo != 2 && $previousGdnId) {
+            if ($previousGdnId) {
                 $otherUsageCount = Vehicles::where('gdn_id', $previousGdnId)->count();
                 if ($otherUsageCount === 0) {
-                    $gdn = Gdn::find($previousGdnId);
-                    if ($gdn) {
-                        $gdn->delete();
-                    }
+                    Gdn::where('id', $previousGdnId)->delete();
                 }
             }
     

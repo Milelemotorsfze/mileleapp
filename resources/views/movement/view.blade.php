@@ -75,11 +75,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('View-daily-movemnet
                     <td>{{ $so }}</td>
                     <td>{{ $po }}</td>
                     <td>
-                        @if($movementref->created_by == auth()->id() && $latestMovement && $latestMovement->id == $movements->id)
-                        <button type="button" class="btn btn-sm btn-danger revise-btn" data-id="{{ $movements->id }}">
-                            Revise
-                        </button>
+                    @if ($latestMovement && $latestMovement->id == $movements->id)
+                        @if($movements->to == 2)
+                            <button type="button" class="btn btn-sm btn-danger revise-btn" data-id="{{ $movements->id }}">
+                                Revise
+                            </button>
+                        @else
+                            <form action="{{ route('movement.revised', ['id' => $movements->id]) }}" method="POST" style="display:inline;">
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-danger">Revise</button>
+                            </form>
                         @endif
+                    @endif
                     </td>
                 </tr>
                 @endforeach
