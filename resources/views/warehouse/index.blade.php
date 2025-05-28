@@ -960,9 +960,9 @@ $pendingvendorfol = DB::table('purchasing_order')
                     </td>
                     <td style="vertical-align: middle; text-align: center;">
                         @if(isset($purchasingOrder->totalcost) && $purchasingOrder->totalcost != 0)
-                        {{ $purchasingOrder->currency }} {{ number_format($purchasingOrder->totalcost) }}
+                            {{ $purchasingOrder->currency }} {{ number_format($purchasingOrder->totalcost, 2) }}
                         @else
-                        N/A
+                            N/A
                         @endif
                     </td>
                     <td>
