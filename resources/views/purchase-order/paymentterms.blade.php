@@ -67,28 +67,19 @@
         </div>  
   </div>
   <script>
-        $(document).ready(function () {
-            $('#dtBasicExample2').DataTable({
-    processing: true,
-    serverSide: true,
-    ajax: "{{ route('paymentterms.index') }}",
-    columns: [
-        { data: 'id', name: 'payment_terms.id' },
-        { data: 'name', name: 'payment_terms.name' },
-        { data: 'description', name: 'payment_terms.description' },
-        {
-            data: 'milestones',
-            render: function (data) {
-                let html = '';
-                data.forEach(function (milestone) {
-                    html += milestone.type + ': ' + milestone.percentage + '%<br>';
-                });
-                return html;
-            },
-            name: 'milestones',
-        },
-    ],
-});
-  });
+      $(document).ready(function () {
+          $('#dtBasicExample2').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('paymentterms.index') }}",
+            columns: [
+                { data: 'id', name: 'payment_terms.id' },
+                { data: 'name', name: 'payment_terms.name' },
+                { data: 'description', name: 'payment_terms.description' },
+                { data: 'payment_milestone', name: 'payment_milestone', },
+              
+            ],
+        });
+      });
     </script>
 @endsection

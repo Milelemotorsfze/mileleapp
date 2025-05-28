@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class PaymentTerms extends Model
 {
     use HasFactory;
+    public function milestones()
+    {
+        return $this->hasMany(Milestone::class,'payment_terms_id','id');
+    }
 }

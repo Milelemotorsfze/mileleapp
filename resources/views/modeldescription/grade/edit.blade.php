@@ -1,12 +1,12 @@
 @extends('layouts.main')
 @section('content')
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole('create-master-grade');
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('update-master-grade');
 @endphp
 @if ($hasPermission)
 <div class="card">
     <div class="card-header">
-        <h4 class="card-title">Create Master Model Grades</h4>
+        <h4 class="card-title">Update Master Model Grades</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
@@ -21,19 +21,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-master-grade
             </ul>
         </div>
         @endif
-        <form id="form-create" action="{{ route('mastergrade.store') }}" method="post" enctype="multipart/form-data">
+        <form id="form-create" action="{{ route('mastergrade.update', $grade->id) }}" method="post" enctype="multipart/form-data">
             @csrf
+            @method('PUT')
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-3">
                     <label for="master_grade" class="form-label"><span class="text-danger">*</span> Master Grade Name</label>
-                    <input type="text" name="master_grade" class="form-control" required />
+                    <input type="text" name="master_grade" class="form-control" value="{{ old('master_grade', $grade->grade_name) }}" required />
                 </div>
                 <div class="col-lg-4 col-md-6 mb-3">
                     <label for="brand" class="form-label"><span class="text-danger">*</span> Brand</label>
                     <select class="form-control select2" autofocus name="brands_id" id="brand" required>
                         <option value="" disabled selected>Please select brand</option>
                         @foreach($brands as $brand)
-                        <option value="{{ $brand->id }}" {{ old('brands_id') == $brand->id ? 'selected' : '' }}>
+                        <option value="{{ $brand->id }}" {{ old('brands_id', $grade->modelLine->brand->id) == $brand->id ? 'selected' : '' }}>
                             {{ $brand->brand_name }}
                         </option>
                         @endforeach
@@ -42,7 +43,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-master-grade
                 <div class="col-lg-4 col-md-6 mb-3">
                     <label for="model" class="form-label"><span class="text-danger">*</span> Model Line</label>
                     <select class="form-control select2" autofocus name="master_model_lines_id" id="model" required>
-                        <option value="" disabled selected>Select a Model Line</option>
+                        <option value="{{ $grade->model_line_id }}" selected>{{ $grade->modelLine->model_line }}</option>
                     </select>
                 </div>
             </div>
@@ -113,6 +114,7 @@ redirect()->route('home')->send();
                     url: '/get-model-lines/' + selectedBrandId,
                     type: 'GET',
                     success: function(data) {
+                        console.log(data)
                         $('#model').empty();
                         $('#model').append('<option value="" disabled selected>Select a Model Line</option>');
                         $.each(data, function(index, modelLine) {

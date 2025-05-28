@@ -16,6 +16,7 @@ use App\Models\AddonTypes;
 use App\Models\AddonDetails;
 use Illuminate\Support\Facades\DB;
 use App\Models\ModifiedVariants;
+use App\Models\MasterModelDescription;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Carbon\CarbonTimeZone;
@@ -111,7 +112,14 @@ class VariantController extends Controller
      */
 public function store(Request $request)
 {
-    DB::beginTransaction(); // Start transaction
+    $this->validate($request, [
+        'brands_id' => 'required',
+        'master_model_lines_id' => 'required',
+        'model_detail' => 'required',
+
+    ]);
+
+    DB::beginTransaction();
 
     try {
     $selectedSpecifications = json_decode(request('selected_specifications'), true);
@@ -387,6 +395,7 @@ $existingspecifications = Varaint::with('VariantItems')
     }
     (new UserActivityController)->createActivity('Creating New Variant');
     $model_details= $request->input('model_detail');
+    $master_model_descriptions_id = $request->input('model_detail');
     if($model_details == null){
     $steering = $request->input('steering');
     $master_model_lines_id = $request->input('master_model_lines_id');
@@ -394,6 +403,10 @@ $existingspecifications = Varaint::with('VariantItems')
     $engine = $request->input('engine');
     $gearbox = $request->input('gearbox');
     $fuel_type = $request->input('fuel_type');
+    $window_type = $request->input('window_type');
+    $drive_train = $request->input('drive_train');
+    $grade_name = $request->input('grade_name');
+
     if($fuel_type == "Petrol")
         {
             $f = "P";
@@ -404,11 +417,11 @@ $existingspecifications = Varaint::with('VariantItems')
         }
         else if($fuel_type == "PHEV") 
         {
-            $f = "PHEV";
+            $f = "P HEV";
         }
         else if($fuel_type == "MHEV") 
         {
-            $f = "MHEV";
+            $f = "M HEV";
         }
         else if($fuel_type == "PH") 
         {
@@ -426,7 +439,29 @@ $existingspecifications = Varaint::with('VariantItems')
         {
             $gearbox = "MT";
         }
-        $model_details = $steering . ' ' . $model_line . ' ' . $engine . ' ' . $f . ' ' . $gearbox;
+        $model_details = $steering . ' ' . $model_line;
+
+if (!empty($grade_name)) {
+    $model_details .= ' ' . $grade_name;
+}
+
+$model_details .= ' ' . $engine . $f;
+
+if (!empty($gearbox)) {
+    $model_details .= ' ' . $gearbox;
+}
+
+if (!empty($drive_train)) {
+    $model_details .= ' ' . $drive_train;
+}
+
+if (!empty($window_type)) {
+    $model_details .= ' ' . $window_type;
+}
+        }
+        else
+        {
+            $model_details=  MasterModelDescription::where('id', $model_details)->pluck('model_description')->first();
         }
     $variant_details= $request->input('variant');
     if($variant_details == null)
@@ -479,6 +514,9 @@ $existingspecifications = Varaint::with('VariantItems')
     $variant->coo = $request->input('coo');
     $variant->drive_train = $request->input('drive_train');
     $variant->gearbox = $request->input('gearbox');
+    $variant->grade_name = $grade_name = $request->input('grade_name');
+    $variant->window_type = $request->input('window_type');
+    $variant->master_model_descriptions_id = $request->input('model_detail');
     $variant->name = $name;
     $variant->model_detail = $model_details;
     $variant->detail = $variant_details;
@@ -502,13 +540,11 @@ $existingspecifications = Varaint::with('VariantItems')
     $variantlog->variant_id = $variantId;
     $variantlog->created_by = auth()->user()->id;
     $variantlog->save();
-    DB::commit(); // Commit transaction if everything is successful
-
+    DB::commit();
     return redirect()->route('variants.index')->with('success', 'Variant added successfully.');
-
 } catch (\Exception $e) {
-    DB::rollBack(); // Rollback in case of error
-    return redirect()->route('variants.index')->with('error', 'Error adding variant: ' . $e->getMessage());
+DB::rollBack();
+return redirect()->back()->with('error', 'Failed to update variant: ' . $e->getMessage());
 }
 }
     /**
@@ -551,7 +587,9 @@ $existingspecifications = Varaint::with('VariantItems')
                 'options' => $options,
             ];
         }
-        return view('variants.duplicate',compact('countries','variant','brand','brands','masterModelLines', 'variantItems', 'data', 'masterModelLine'));
+        $selectedModelDescriptionId = $variant->master_model_descriptions_id;
+        $modelDescriptions = \App\Models\MasterModelDescription::where('model_line_id', $modelLineId)->get();
+        return view('variants.duplicate',compact('countries','variant','brand','brands','masterModelLines', 'variantItems', 'data', 'masterModelLine','modelDescriptions'));
     }
 
     /**
@@ -928,7 +966,11 @@ public function savespecification(Request $request)
                 'options' => $options,
             ];
         }
-        return view('variants.editvar',compact('countries','variant','brand','brands','masterModelLines', 'variantItems', 'data', 'masterModelLine'));
+        $modelDescriptions = \App\Models\MasterModelDescription::where('model_line_id', $modelLineId)
+        ->where('steering', $variant->steering)
+        ->where('engine', $variant->engine)
+        ->where('fuel_type', $variant->fuel_type)->get();
+        return view('variants.editvar',compact('countries','variant','brand','brands','masterModelLines', 'variantItems', 'data', 'masterModelLine','modelDescriptions'));
     }
     public function storevar(Request $request, $variant)
     {
@@ -956,7 +998,6 @@ public function savespecification(Request $request)
             })
             ->orderBy('created_at', 'desc')
             ->first();
-            info($request->input('fuel_type'));
         if ($existingVariantop) {
             // Check if all specifications and values match
             $matchedSpecifications = 0;
@@ -1059,11 +1100,17 @@ public function savespecification(Request $request)
             }
             $variant_details = $my . ',' . $steering . ',' . $model_line . ',' . $engine . ',' . $gearbox . ',' . $fuel_type . ',' . $gearbox . ',' . $coo . ',' . $drive_train . ',' . $upholestry;
         }
-        $variant->netsuite_name = $request->input('netsuite_name');
+
+        $variant->steering = $request->input('steering');
+        $variant->fuel_type = $request->input('fuel_type');
+        $variant->engine = $request->input('engine');
         $variant->upholestry = $request->input('upholestry');
         $variant->coo = $request->input('coo');
         $variant->drive_train = $request->input('drive_train');
         $variant->gearbox = $request->input('gearbox');
+        $variant->grade_name = $grade_name = $request->input('grade_name');
+        $variant->window_type = $request->input('window_type');
+        $variant->master_model_descriptions_id = $request->input('model_detail');
         $variant->model_detail = $model_details;
         $variant->detail = $variant_details;
         $variant->my = $request->input('my');
@@ -1087,13 +1134,11 @@ public function savespecification(Request $request)
         $variantlog->created_by = auth()->user()->id;
         $variantlog->save();
         DB::commit();
-
             return redirect()->route('variants.index')->with('success', 'Variant updated successfully.');
     } catch (\Exception $e) {
         DB::rollBack();
         return redirect()->back()->with('error', 'Failed to update variant: ' . $e->getMessage());
     }
-
     }
     function fetchModelSpecificationOptions(Request $request) {
 
@@ -1104,6 +1149,24 @@ public function savespecification(Request $request)
          return response()->json($modelSpecificationOptions);
 
     }
+    public function getModelDetails($id)
+{
+    $model = MasterModelLine::with('relatedDetails') // Adjust relationship as needed
+                ->where('id', $id)
+                ->first();
 
+    if ($model) {
+        return response()->json([
+            'success' => true,
+            'model_description' => $model->model_line,
+            'steering' => $model->steering,
+            'engine' => $model->engine_capacity,
+            'fuel_type' => $model->fuel_type,
+            'transmission' => $model->gearbox,
+            'drive_train' => $model->drive_train,
+        ]);
+    }
+    return response()->json(['success' => false], 404);
+}
 }
     

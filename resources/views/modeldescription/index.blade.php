@@ -7,7 +7,7 @@
 @if ($hasPermission)
   <div class="card-header">
     <h4 class="card-title">
-     Model Description
+     Model Descriptions
     </h4>
     <div class="d-flex justify-content-end">
   <!-- Back Button -->
@@ -17,11 +17,17 @@
   <a class="btn btn-sm btn-primary me-2" href="{{ route('mastergrade.index') }}">
     <i class="fa fa-plus" aria-hidden="true"></i> Master Grades
   </a>
-
-  <!-- Create Model Description Button -->
-  <a class="btn btn-sm btn-success" href="{{ route('modeldescription.create') }}">
-    <i class="fa fa-plus" aria-hidden="true"></i> Create Model Description
-  </a>
+  @can('create-model-description')
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-description');
+    @endphp
+    @if ($hasPermission)
+        <!-- Create Model Description Button -->
+        <a class="btn btn-sm btn-success" href="{{ route('modeldescription.create') }}">
+            <i class="fa fa-plus" aria-hidden="true"></i> Create Model Description
+        </a>
+    @endif
+  @endcan
 
   <!-- Master Grades Button -->
   
@@ -55,18 +61,35 @@
         </tr>
     </thead>
     <tbody>
+        @forelse ($MasterModelDescription as $description)
         <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td>{{ $description->model_description }}</td>
+            <td>{{ $description->modelLine->brand->brand_name ?? 'N/A' }}</td>
+            <td>{{ $description->modelLine->model_line ?? 'N/A' }}</td>
+            <td>{{ $description->user->name ?? 'System' }}</td>
+            <td>{{\Illuminate\Support\Carbon::parse($description->created_at)->format('d M Y') ?? ''}}</td>
             <td>
-            <a href="" class="btn btn-sm btn-warning shadow-sm">Edit</a>
+            @can('delete-model-description')
+                @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('delete-model-description');
+                @endphp
+                @if ($hasPermission)
+                    @if($description->is_deletable == true)
+                        <button data-url="{{ route('modeldescription.destroy', $description->id) }}" data-id="{{ $description->id }}"
+                            class="btn btn-danger btn-sm btn-delete"><i class="fa fa-trash"></i></button>
+                    @endif
+                @endif
+            @endcan
             </td>
         </tr>
+        @empty
+        <tr>
+            <td colspan="6" class="text-center">No data available</td>
+        </tr>
+        @endforelse
     </tbody>
 </table>
+
     </div>
 </div>
 </div>
@@ -76,3 +99,30 @@
     @endphp
 @endif
 @endsection
+@push('scripts')
+<script>
+ $('#dtBasicExample1').on('click', '.btn-delete', function (e) {
+        var url = $(this).data('url');
+        var id = $(this).data('id');
+        var confirm = alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
+            if (e) {
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        _method: 'DELETE',
+                        id: id,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success:function (data) {
+                        location.reload();
+                        alertify.success('Model Description Deleted successfully.');
+                    }
+                });
+            }
+        }).set({title:"Delete Item"})
+    });
+ </script>
+@endpush
+
