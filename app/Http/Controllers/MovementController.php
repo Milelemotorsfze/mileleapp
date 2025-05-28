@@ -864,7 +864,7 @@ class MovementController extends Controller
             $vehicle->latest_location = $revised->to;
             $vehicle->save();
 
-            return redirect()->route('movement.index')->with('success', 'Movement has been revised (old logic).');
+            return redirect()->route('movement.index')->with('success', 'Movement has been revised.');
         }
 
         $request->validate([

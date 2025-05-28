@@ -322,7 +322,7 @@
                                 <th>Model Line</th>
                                 <th>Variant</th>
                                 <th>VIN</th>
-                                <th>Total Pricess</th>
+                                <th>Total Price</th>
                                 <th>Initiate Amount</th>
                                 <th>Action</th>
                             </tr>
