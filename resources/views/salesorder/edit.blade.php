@@ -361,7 +361,7 @@
                                             <input type="date" class="form-control" id="so_date" name="so_date" value="{{$so->so_date}}">
                                         </div>
                                         <div class="col-md-2 mb-3">
-                                            <label for="so_number">Netsuit SO Number</label>
+                                            <label for="so_number"><span class="text-danger">*</span> Netsuit SO Number</label>
                                             <div class="input-group mb-3">
                                                 <span class="input-group-text">SO-</span>
                                                 <input type="text" class="form-control" placeholder="Enter SO Number" id="so_number" name="so_number"
@@ -742,20 +742,23 @@
             return isUnique;
         }, "SO Number already exists. Please enter a different one.");
 
-         $.validator.addMethod("sixDigit", function(value, element) {
-            return this.optional(element) || /^\d{6}$/.test(value);
-        }, "SO Number must be exactly 6 digits.");
-
         $.validator.addMethod("spacing", function(value, element) {
 				return this.optional(element) || !/\s\s+/.test(value);
 			}, "No more than one consecutive space is allowed in the description");
+
+        $.validator.addMethod("onlyDigitsNoSpaces", function(value, element) {
+                return this.optional(element) || /^\d+$/.test(value);
+            }, "Only numbers are allowed. No letters, symbols, or spaces.");
+
         $("#form-update").validate({
             ignore: [],
             rules: {
                  so_number: {
                     required: true,
                     uniqueSO: true,
-                    sixDigit:true
+                    minlength: 6,
+                    maxlength: 6,
+                    onlyDigitsNoSpaces: true
                 },
                 "variants[*][variant_id]": {
                     required: true
@@ -771,6 +774,13 @@
                     required: true
                 },
             },
+            messages: {
+                so_number: {
+                    required: "SO Number is required",
+                    minlength: "SO Number must be exactly 6 digits.",
+                    maxlength: "SO Number must be exactly 6 digits."
+                }
+            }
 
         });
 

@@ -56,7 +56,7 @@
             {{ Session::get('success') }}
         </div>
         @endif
-        <form action="{{ route('salesorder.storesalesorder', ['QuotationId' => $quotation->id]) }}" id="form-create" method="POST">
+        <form id="form-create" action="{{ route('salesorder.storesalesorder', ['QuotationId' => $quotation->id]) }}" method="POST">
             @csrf
             <div class="row">
                 <div class="col-sm-4">
@@ -363,7 +363,7 @@
                     <input type="date" class="form-control" id="so_date" name="so_date" value="<?php echo date("Y-m-d"); ?>">
                 </div>
                 <div class="col-md-2 mb-3">
-                    <label for="so_number">Netsuit SO Number</label>
+                    <label for="so_number"><span class="text-danger">*</span> Netsuit SO Number</label>
                     <div class="input-group mb-3">
                         <span class="input-group-text">SO-</span>
                         <input type="text" class="form-control" placeholder="Enter SO Number" id="so_number" name="so_number" aria-label="Enter SO Number">
@@ -501,10 +501,9 @@
                 return isUnique;
             }, "SO Number already exists. Please enter a different one.");
 
-            $.validator.addMethod("sixDigit", function(value, element) {
-                return this.optional(element) || /^\d{6}$/.test(value);
-            }, "SO Number must be exactly 6 digits.");
-
+            $.validator.addMethod("onlyDigitsNoSpaces", function(value, element) {
+                return this.optional(element) || /^\d+$/.test(value);
+            }, "Only numbers are allowed. No letters, symbols, or spaces.");
 
             $("#form-create").validate({
                 ignore: [],
@@ -512,7 +511,9 @@
                     so_number: {
                         required: true,
                         uniqueSO: true,
-                        sixDigit: true
+                        minlength: 6,
+                        maxlength: 6,
+                        onlyDigitsNoSpaces: true
 
                     },
                     payment_so: {
@@ -522,7 +523,8 @@
                 messages: {
                     so_number: {
                         required: "SO Number is required",
-                        uniqueSO: "This SO Number is already in use"
+                        minlength: "SO Number must be exactly 6 digits.",
+                        maxlength: "SO Number must be exactly 6 digits."
                     }
                 }
 
