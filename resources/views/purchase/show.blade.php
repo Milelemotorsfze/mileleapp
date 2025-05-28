@@ -322,7 +322,7 @@
                                 <th>Model Line</th>
                                 <th>Variant</th>
                                 <th>VIN</th>
-                                <th>Total Price</th>
+                                <th>Total Pricess</th>
                                 <th>Initiate Amount</th>
                                 <th>Action</th>
                             </tr>
@@ -1149,7 +1149,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
                             <span>{{ count($vehicles) }} /  
-                            {{ number_format($purchasingOrder->totalcost, 0, '.', ',') }} - {{ $purchasingOrder->currency }}
+                            {{ number_format($purchasingOrder->totalcost, 2, '.', ',') }} - {{ $purchasingOrder->currency }}
                         </span>
                         </div>
                     </div>
@@ -1158,7 +1158,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                             <label for="choices-single-default" class="form-label"><strong>Already Paid Amount</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
-                        <span> {{ number_format($alreadypaidamount, 0, '.', ',') }} - {{ $purchasingOrder->currency }}</span>
+                        <span> {{ number_format($alreadypaidamount, 2, '.', ',') }} - {{ $purchasingOrder->currency }}</span>
                         </div>
                     </div>
                     @if($totalSurcharges)
@@ -1168,7 +1168,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                         </div>
                         <div class="col-lg-2 col-md-4 col-sm-6">
                         <div style="background-color: red; color: white; padding: 1px; border-radius: 3px; display: inline-block;">
-                        {{ number_format($totalSurcharges, 0, '.', ',') }} - {{ $purchasingOrder->currency }}
+                        {{ number_format($totalSurcharges, 2, '.', ',') }} - {{ $purchasingOrder->currency }}
                         </div>
                         </div>
                         </div>
@@ -1180,7 +1180,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">  
                         <div style="background-color: green; color: white; padding: 1px; border-radius: 3px; display: inline-block;">
-                        {{ number_format($totalDiscounts, 0, '.', ',') }} - {{ $purchasingOrder->currency }}
+                        {{ number_format($totalDiscounts, 2, '.', ',') }} - {{ $purchasingOrder->currency }}
                         </div>
                         </div>
                     </div>
@@ -1190,7 +1190,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                             <label for="choices-single-default" class="form-label"><strong>Requested Initiated Amount</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
-                        <span>{{ number_format($intialamount, 0, '.', ',') }} - {{ $purchasingOrder->currency }}</span>
+                        <span>{{ number_format($intialamount, 2, '.', ',') }} - {{ $purchasingOrder->currency }}</span>
                         </div>
                     </div>
                     @if($vendorPaymentAdjustments)
@@ -1202,14 +1202,14 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
         @if ($vendorPaymentAdjustments->isNotEmpty())
             <span>
                 @foreach ($vendorPaymentAdjustments as $adjustment)
-                {{ number_format($adjustment->total_amount, 0, '.', ',') }} - {{ $purchasingOrder->currency }} 
+                {{ number_format($adjustment->total_amount, 2, '.', ',') }} - {{ $purchasingOrder->currency }} 
                         ({{ $adjustment->type }})
                     @if (!$loop->last)
                         , 
                     @endif
                                     @endforeach
                                 </span>
-                                <strong>Total : {{ number_format($totalSum, 0, '.', ',') }} - {{ $purchasingOrder->currency }} </strong>
+                                <strong>Total : {{ number_format($totalSum, 2, '.', ',') }} - {{ $purchasingOrder->currency }} </strong>
                             @endif
                         </div>
                     </div>
@@ -1272,10 +1272,10 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                         @endphp
                         @if (!empty($vehiclesAlreadyPaid) && !empty($vehiclesAlreadyPaidOrRemainingInStatuses))
                     @php
-    $additionalpaymentpendFormatted = $additionalpaymentpend > 0 ? number_format($additionalpaymentpend, 0, '', ',') : null;
-    $additionalpaymentintFormatted = $additionalpaymentintreq > 0 ? number_format($additionalpaymentintreq, 0, '', ',') : null;
-    $additionalpaymentapprovedFormatted = $additionalpaymentint > 0 ? number_format($additionalpaymentint, 0, '', ',') : null;
-    $additionalpaymentalreadyappFormatted = $additionalpaymentpapproved > 0 ? number_format($additionalpaymentpapproved, 0, '', ',') : null;
+    $additionalpaymentpendFormatted = $additionalpaymentpend > 0 ? number_format($additionalpaymentpend, 2, '', ',') : null;
+    $additionalpaymentintFormatted = $additionalpaymentintreq > 0 ? number_format($additionalpaymentintreq, 2, '', ',') : null;
+    $additionalpaymentapprovedFormatted = $additionalpaymentint > 0 ? number_format($additionalpaymentint, 2, '', ',') : null;
+    $additionalpaymentalreadyappFormatted = $additionalpaymentpapproved > 0 ? number_format($additionalpaymentpapproved, 2, '', ',') : null;
     $payments = array_filter([$additionalpaymentpendFormatted, $additionalpaymentintFormatted, $additionalpaymentapprovedFormatted, $additionalpaymentalreadyappFormatted]);
 @endphp
 @if(!empty($payments))
@@ -1887,7 +1887,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                             <a href="javascript:void(0);" class="read-more" data-full-detail="{{ ucfirst(strtolower($vehicles->variant->detail)) }}">Read more</a>
                             @endif
                         </td>
-                        <td>{{ number_format($vehicles->VehiclePurchasingCost->unit_price, 0, '.', ',') }}</td>
+                        <td>{{ number_format($vehicles->VehiclePurchasingCost->unit_price, 2, '.', ',') }}</td>
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                             @endphp
@@ -2443,7 +2443,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                             @endif
                         </td>
                         @if (!is_null($vehiclesdel->VehiclePurchasingCost->unit_price) && !is_numeric($vehiclesdel->VehiclePurchasingCost->unit_price))
-                        <td>{{ isset($vehiclesdel->VehiclePurchasingCost->unit_price) ? number_format($vehiclesdel->VehiclePurchasingCost->unit_price, 0, '', ',') : '' }}</td>
+                        <td>{{ isset($vehiclesdel->VehiclePurchasingCost->unit_price) ? number_format($vehiclesdel->VehiclePurchasingCost->unit_price, 2, '', ',') : '' }}</td>
                         @else
                         <td>{{ $vehiclesdel->VehiclePurchasingCost->unit_price }}</td>
                         @endif
@@ -2544,7 +2544,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                                 <td>{{ $transition->purchaseOrder->po_number ?? 'No Order Number' }} - {{ $transition->row_number }}</td>
                                 <td> {{ $transition->created_at->format('d M Y') }}</td>
                                 <td>{{ $transition->transaction_type }}</td>
-                                <td>{{ number_format($transition->transaction_amount, 0, '', ',') }}</td>
+                                <td>{{ number_format($transition->transaction_amount, 2, '.', ',') }}</td>
                                 <td>{{ $transition->account_currency }}</td>
                                 <td>{{ $transition->user->name }}</td>
                                 <td>{{ $transition->payment_relaesed_date ? \Illuminate\Support\Carbon::parse($transition->payment_relaesed_date)->format('d M Y') : ''}} </td>
@@ -3371,6 +3371,10 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                     }
                     $('#variants_id').val('');
                     $('#QTY').val('');
+                    $('#brands_id').val('');
+                    $('#master_model_lines_id').val('');
+                    $('#details').val('');
+                    $('#unit_price').val('');
                     $('#variantRowsContainer').show();
                 });
                 $(document).on('click', '.remove-row-btn', function() {
@@ -5159,30 +5163,39 @@ document.getElementById('fileUploadFormadditional').addEventListener('submit', f
 
     function formatPrice(price) {
         if (price === 'N/A') return price;
-        return parseInt(price).toLocaleString('en-US');
+            return parseInt(price).toLocaleString('en-US');
     }
+
+    function formatPrice(price) {
+        if (!price || isNaN(price)) return 'N/A';
+        return Number(price).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
     function modalforinitiated(transitionId) {
-  $('#paymentModal').modal('show');
-  document.getElementById('transitionId').value = transitionId;
-  fetch('/api/banks')
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok ' + response.statusText);
-      }
-      return response.json();
-    })
-    .then(data => {
-      const bankSelect = document.getElementById('bank');
-      bankSelect.innerHTML = '<option value="">Select Bank</option>';
-      data.forEach(bank => {
-        const option = document.createElement('option');
-        option.value = bank.id;
-        option.textContent = bank.bank_name;
-        bankSelect.appendChild(option);
-      });
-    })
-    .catch(error => console.error('There was a problem with the fetch operation:', error));
-}
+        $('#paymentModal').modal('show');
+        document.getElementById('transitionId').value = transitionId;
+        fetch('/api/banks')
+            .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+            })
+            .then(data => {
+            const bankSelect = document.getElementById('bank');
+            bankSelect.innerHTML = '<option value="">Select Bank</option>';
+            data.forEach(bank => {
+                const option = document.createElement('option');
+                option.value = bank.id;
+                option.textContent = bank.bank_name;
+                bankSelect.appendChild(option);
+            });
+        })
+        .catch(error => console.error('There was a problem with the fetch operation:', error));
+    }
 
 function fetchBankAccounts() {
   const bankId = document.getElementById('bank').value;

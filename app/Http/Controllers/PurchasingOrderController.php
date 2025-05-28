@@ -1129,7 +1129,7 @@ public function getBrandsAndModelLines(Request $request)
                 $vehicle->save();
                 $vehiclecost = New VehiclePurchasingCost();
                 $vehiclecost->currency = $request->input('currency');
-                $vehiclecost->unit_price = $unit_price;
+                $vehiclecost->unit_price = round($unit_price, 2);
                 $vehiclecost->vehicles_id = $vehicle->id;
                 $vehiclecost->save();
                 $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
@@ -1549,7 +1549,7 @@ public function getBrandsAndModelLines(Request $request)
                 $purchasingOrdertotal->save();
                 $vehiclecost = New VehiclePurchasingCost();
                 $vehiclecost->currency = $request->input('currency');
-                $vehiclecost->unit_price = $unit_price;
+                $vehiclecost->unit_price = round($unit_price, 2);
                 $vehiclecost->vehicles_id = $vehicle->id;
                 $vehiclecost->save();
                 $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');

@@ -351,11 +351,13 @@ $(document).ready(function() {
         return;
     }
     var qty = $('#QTY').val();
-    var unitPrice = $('#unit_price').val(); // Get the unit price
-    if (!unitPrice || unitPrice.trim() === '') {
+    var unitPriceRaw = $('#unit_price').val();
+    if (!unitPriceRaw || unitPriceRaw.trim() === '') {
         alert('Unit price cannot be null or blank');
         return;
     }
+    var unitPrice = parseFloat(unitPriceRaw);
+    unitPrice = Math.round(unitPrice * 100) / 100;
     var detail = variantOption.data('detail');
     console.log(detail);
     var brand = variantOption.data('brands_id');
@@ -373,7 +375,7 @@ $(document).ready(function() {
             var detailCol = $('<div class="col-lg-1 col-md-6"><textarea name="detail[]" class="form-control" readonly style="width: 100%;">' + detail + '</textarea></div>'); // Changed to textarea for full text display
             var exColourCol = $('<div class="col-lg-1 col-md-6"><select name="ex_colour[]" class="form-control"><option value="">Exterior Color</option></select></div>');
             var intColourCol = $('<div class="col-lg-1 col-md-6"><select name="int_colour[]" class="form-control"><option value="">Interior Color</option></select></div>');
-            var unitPriceCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="unit_prices[]" value="' + unitPrice + '" class="form-control" readonly></div>'); // Add unit price
+            var unitPriceCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="unit_prices[]" value="' + unitPrice.toFixed(2) + '" class="form-control" readonly></div>');
             var vinCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
             var estimatedCol = $('<div class="col-lg-1 col-md-6"><input type="date" name="estimated_arrival[]" class="form-control"></div>');
             var engineCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="engine_number[]" class="form-control" placeholder="Engine"></div>');
@@ -410,6 +412,10 @@ intColourDropdown.select2({
         $('#totalUnitPriceInputHidden').val(totalUnitPrice);
         $('#variants_id').val('');
         $('#QTY').val('');
+        $('#brands_id').val('');
+        $('#master_model_lines_id').val('');
+        $('#details').val('');
+        $('#unit_price').val('');
         $('#variantRowsContainer').show();
     });
 
