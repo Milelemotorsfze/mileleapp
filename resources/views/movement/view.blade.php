@@ -75,7 +75,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('View-daily-movemnet
                     <td>{{ $so }}</td>
                     <td>{{ $po }}</td>
                     <td>
-                    @if ($latestMovement && $latestMovement->id == $movements->id)
+                    @if ($latestMovement && $latestMovement->id == $movements->id && $movements->from != 2)
                         @if($movements->to == 2)
                             <button type="button" class="btn btn-sm btn-danger revise-btn" data-id="{{ $movements->id }}">
                                 Revise
