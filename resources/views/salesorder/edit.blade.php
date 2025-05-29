@@ -485,7 +485,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
                                 <label for="payment_so"><strong>Payment In SO</strong></label>
-                                <input type="number" class="form-control payment" id="payment_so" name="payment_so" value="{{$so->paidinso}}" required>
+                                <input type="number" class="form-control payment" id="payment_so" name="payment_so" value="{{$so->paidinso}}" required min="0">
                             </div>
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
@@ -804,6 +804,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                 maxlength: 6,
                 onlyDigitsNoSpaces: true
             },
+            payment_so: {
+                required: true,
+                number: true,
+                min: 0
+            },
             "variants[*][variant_id]": {
                 required: true
             },
@@ -823,6 +828,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                 required: "SO Number is required",
                 minlength: "SO Number must be exactly 6 digits.",
                 maxlength: "SO Number must be exactly 6 digits."
+            },
+            payment_so: {
+                required: "Payment in SO is required.",
+                number: "Only numeric values are allowed.",
+                min: "Negative values are not allowed."
             }
         }
 

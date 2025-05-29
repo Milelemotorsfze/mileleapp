@@ -426,7 +426,7 @@
             </div>
             <div class="col-md-2 mb-3">
                 <label for="payment_so">Payment In SO</label>
-                <input type="number" class="form-control payment" id="payment_so" name="payment_so" value="" required>
+                <input type="number" class="form-control payment" id="payment_so" name="payment_so" value="" required min="0">
             </div>
         </div>
     </div>
@@ -518,6 +518,8 @@
                     },
                     payment_so: {
                         required: true,
+                        number: true,
+                        min: 0
                     }
                 },
                 messages: {
@@ -525,6 +527,11 @@
                         required: "SO Number is required",
                         minlength: "SO Number must be exactly 6 digits.",
                         maxlength: "SO Number must be exactly 6 digits."
+                    },
+                    payment_so: {
+                        required: "Payment in SO is required.",
+                        number: "Only numeric values are allowed.",
+                        min: "Negative values are not allowed."
                     }
                 }
 
