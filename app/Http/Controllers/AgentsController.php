@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use App\Models\Agents;
 use Yajra\DataTables\DataTables;
@@ -9,187 +10,206 @@ use App\Models\AgentsCreating;
 use App\Models\AgentCommission;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
+use Illuminate\View\View;
+use Illuminate\Support\Facades\Storage;
 
 class AgentsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
+    private const ACTIVITY_VIEW = "View the Agents Master Details";
+    private const UPLOAD_PATH = 'agent_document';
+    
+    protected UserActivities $userActivities;
+    protected DataTables $datatables;
+
+    public function __construct(UserActivities $userActivities, DataTables $datatables)
     {
-        $useractivities = new UserActivities();
-        $useractivities->activity = "View the Agents Master Details";
-        $useractivities->users_id = Auth::id();
-        $useractivities->save();
+        $this->userActivities = $userActivities;
+        $this->datatables = $datatables;
+    }
+
+    public function index(Request $request): View|JsonResponse
+    {
+        $this->logUserActivity();
+
         if ($request->ajax()) {
             $status = $request->input('status');
-            $searchValue = $request->input('search.value');
-            if ($status === "summary") {
-                $data = Agents::select([
-                    'agents.id',
-                    'agents.name',
-                    'agents.email',
-                    'agents.phone',
-                    'agents.created_at',
-                    \DB::raw('SUM(agents_commission.commission) as total_commission'),
-                    \DB::raw('COUNT(DISTINCT agents_commission.quotation_id) as total_quotations'),
-                    \DB::raw('COUNT(DISTINCT agents_commission.so_id) as total_sales_orders'),
-                    \DB::raw('GROUP_CONCAT(DISTINCT users.name ORDER BY quotations.created_at DESC SEPARATOR \', \') as created_by_names'),
-                ])
-                ->leftJoin('agents_commission', 'agents_commission.agents_id', '=', 'agents.id')
-                ->leftJoin('quotations', 'quotations.id', '=', 'agents_commission.quotation_id')
-                ->leftJoin('users', 'users.id', '=', 'quotations.created_by')
-                ->groupBy('agents.id', 'agents.name', 'agents.email', 'agents.phone');
-            }
-            if ($status === "quotationwise") {
-                $data = Agents::select([
-                    'agents.id',
-                    'agents.name',
-                    'agents.email',
-                    'agents.phone',
-                    'agents_commission.commission',
-                    'agents_commission.quotation_id',
-                    'users.name as names',
-                ])
-                ->leftJoin('agents_commission', 'agents_commission.agents_id', '=', 'agents.id')
-                ->leftJoin('users', 'users.id', '=', 'agents_commission.created_by')
-                ->where('agents_commission.status', "Quotation")
-                ->groupBy('agents_commission.id');
-            }
-            if ($status === "sowise") {
-                $data = Agents::select([
-                    'agents.id',
-                    'agents.name',
-                    'agents.email',
-                    'agents.phone',
-                    'agents_commission.commission',
-                    'agents_commission.quotation_id',
-                    'agents_commission.so_id',
-                    'users.name as names',
-                ])
-                ->leftJoin('agents_commission', 'agents_commission.agents_id', '=', 'agents.id')
-                ->leftJoin('users', 'users.id', '=', 'agents_commission.created_by')
-                ->where('agents_commission.status', "SO")
-                ->groupBy('agents_commission.id');
-            }
-            return Datatables::of($data)
-                ->addColumn('action', function ($row) {
-                    // Add any additional columns or actions here
-                })
-                ->rawColumns(['action'])
-                ->make(true);
+            return $this->handleDatatableRequest($status);
         }
+
         return view('Agents.index');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    private function logUserActivity(): void
     {
-        //
+        $this->userActivities->create([
+            'activity' => self::ACTIVITY_VIEW,
+            'users_id' => Auth::id()
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-{
-    $existingAgent = null;
-    if ($request->id_number != null) {
-        $existingAgent = Agents::where('id_number', $request->id_number)
-            ->where('id_category', $request->id_category)
-            ->first();
+    private function handleDatatableRequest(?string $status): JsonResponse
+    {
+        $query = match ($status) {
+            'summary' => $this->getSummaryQuery(),
+            'quotationwise' => $this->getQuotationWiseQuery(),
+            'sowise' => $this->getSoWiseQuery(),
+            default => Agents::query(),
+        };
+
+        return $this->datatables->of($query)
+            ->addColumn('action', function ($row) {
+                // Add any additional columns or actions here
+                return '';
+            })
+            ->rawColumns(['action'])
+            ->make(true);
     }
-    if ($existingAgent == null && $request->email != null) {
-        $existingAgent = Agents::where('email', $request->email)->first();
+
+    private function getSummaryQuery()
+    {
+        return Agents::select([
+            'agents.id',
+            'agents.name',
+            'agents.email',
+            'agents.phone',
+            'agents.created_at',
+            DB::raw('SUM(agents_commission.commission) as total_commission'),
+            DB::raw('COUNT(DISTINCT agents_commission.quotation_id) as total_quotations'),
+            DB::raw('COUNT(DISTINCT agents_commission.so_id) as total_sales_orders'),
+            DB::raw('GROUP_CONCAT(DISTINCT users.name ORDER BY quotations.created_at DESC SEPARATOR \', \') as created_by_names'),
+        ])
+        ->leftJoin('agents_commission', 'agents_commission.agents_id', '=', 'agents.id')
+        ->leftJoin('quotations', 'quotations.id', '=', 'agents_commission.quotation_id')
+        ->leftJoin('users', 'users.id', '=', 'quotations.created_by')
+        ->groupBy('agents.id', 'agents.name', 'agents.email', 'agents.phone');
     }
-    if ($existingAgent == null) {
-        $existingAgent = Agents::where('name', $request->name)
+
+    private function getQuotationWiseQuery()
+    {
+        return Agents::select([
+            'agents.id',
+            'agents.name',
+            'agents.email',
+            'agents.phone',
+            'agents_commission.commission',
+            'agents_commission.quotation_id',
+            'users.name as names',
+        ])
+        ->leftJoin('agents_commission', 'agents_commission.agents_id', '=', 'agents.id')
+        ->leftJoin('users', 'users.id', '=', 'agents_commission.created_by')
+        ->where('agents_commission.status', "Quotation")
+        ->groupBy('agents_commission.id');
+    }
+
+    private function getSoWiseQuery()
+    {
+        return Agents::select([
+            'agents.id',
+            'agents.name',
+            'agents.email',
+            'agents.phone',
+            'agents_commission.commission',
+            'agents_commission.quotation_id',
+            'agents_commission.so_id',
+            'users.name as names',
+        ])
+        ->leftJoin('agents_commission', 'agents_commission.agents_id', '=', 'agents.id')
+        ->leftJoin('users', 'users.id', '=', 'agents_commission.created_by')
+        ->where('agents_commission.status', "SO")
+        ->groupBy('agents_commission.id');
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'required|string|max:20',
+            'id_category' => 'nullable|string',
+            'id_number' => 'nullable|string',
+            'identification_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048'
+        ]);
+
+        $existingAgent = $this->findExistingAgent($request);
+
+        if ($existingAgent) {
+            $this->createAgentCreating($existingAgent->id);
+            return $this->agentResponse($existingAgent);
+        }
+
+        $agent = $this->createNewAgent($request);
+        $this->createAgentCreating($agent->id);
+
+        return $this->agentResponse($agent);
+    }
+
+    private function findExistingAgent(Request $request): ?Agents
+    {
+        if ($request->id_number) {
+            $agent = Agents::where('id_number', $request->id_number)
+                ->where('id_category', $request->id_category)
+                ->first();
+            if ($agent) return $agent;
+        }
+
+        if ($request->email) {
+            $agent = Agents::where('email', $request->email)->first();
+            if ($agent) return $agent;
+        }
+
+        return Agents::where('name', $request->name)
             ->orWhere('phone', $request->phone)
             ->first();
     }
-    if ($existingAgent) {
-        $agentcreate = new AgentsCreating;
-        $agentcreate->agents_id = $existingAgent->id;
-        $agentcreate->created_by = Auth::id();
-        $agentcreate->save();
 
-        return response()->json([
-            'agent_id' => $existingAgent->id,
-            'name' => $existingAgent->name,
-            'phone' => $existingAgent->phone,
+    private function createNewAgent(Request $request): Agents
+    {
+        $agent = new Agents();
+        $agent->fill($request->only(['name', 'email', 'phone', 'id_category', 'id_number']));
+
+        if ($request->hasFile('identification_file')) {
+            $agent->identification_file = $this->handleFileUpload($request->file('identification_file'));
+        }
+
+        $agent->save();
+        return $agent;
+    }
+
+    private function handleFileUpload($file): string
+    {
+        $fileName = time() . '_' . $file->getClientOriginalName();
+        $filePath = self::UPLOAD_PATH . '/' . $fileName;
+        $file->move(public_path(self::UPLOAD_PATH), $fileName);
+        return $filePath;
+    }
+
+    private function createAgentCreating(int $agentId): void
+    {
+        AgentsCreating::create([
+            'agents_id' => $agentId,
+            'created_by' => Auth::id()
         ]);
     }
-    $agent = new Agents;
-    $agent->name = $request->name;
-    $agent->email = $request->email;
-    $agent->phone = $request->phone;
-    $agent->id_category = $request->id_category;
-    $agent->id_number = $request->id_number;
 
-    if ($request->hasFile('identification_file')) {
-        $file = $request->file('identification_file');
-        $fileName = time() . '_' . $file->getClientOriginalName();
-        $filePath = 'agent_document/' . $fileName;
-        $file->move(public_path('agent_document'), $fileName);
-        $agent->identification_file = $filePath;
-    }
-
-    $agent->save();
-    $agentcreate = new AgentsCreating;
-    $agentcreate->agents_id = $agent->id;
-    $agentcreate->created_by = Auth::id();
-    $agentcreate->save();
-
-    return response()->json([
-        'agent_id' => $agent->id,
-        'name' => $agent->name,
-        'phone' => $agent->phone,
-    ]);
-}
-    /**
-     * Display the specified resource.
-     */
-    public function show(Agents $agents)
+    private function agentResponse(Agents $agent): JsonResponse
     {
-        //
+        return response()->json([
+            'agent_id' => $agent->id,
+            'name' => $agent->name,
+            'phone' => $agent->phone,
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Agents $agents)
+    public function getAgentNames(): JsonResponse
     {
-        //
-    }
+        $query = Agents::select('agents.id', 'agents.name', 'agents.phone');
+        
+        if (!auth()->user()->hasPermissionForSelectedRole('sales-support-full-access')) {
+            $query->join('agents_creating', 'agents.id', '=', 'agents_creating.agents_id')
+                  ->where('agents_creating.created_by', auth()->id());
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Agents $agents)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Agents $agents)
-    {
-        //
-    }
-    public function getAgentNames()
-    {
-        $userId = auth()->user()->id;
-        $hasPermission = auth()->user()->hasPermissionForSelectedRole('sales-support-full-access');
-        $agentData = Agents::select('agents.id', 'agents.name', 'agents.phone');
-    if (!$hasPermission) {
-        $agentData->join('agents_creating', 'agents.id', '=', 'agents_creating.agents_id')
-                  ->where('agents_creating.created_by', $userId);
-    }
-
-    $agentData = $agentData->get();
-        return response()->json($agentData);
+        return response()->json($query->get());
     }
 }

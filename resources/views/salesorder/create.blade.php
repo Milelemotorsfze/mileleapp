@@ -1,31 +1,31 @@
 @extends('layouts.table')
 @section('content')
 <style>
-        .input-wrapper {
-            display: flex;
-            align-items: center;
-        }
+    .input-wrapper {
+        display: flex;
+        align-items: center;
+    }
 
-        .prefix {
-            background-color: #e9ecef;
-            border: 1px solid #ced4da;
-            padding: 6px 10px;
-            border-right: none;
-            border-radius: 4px 0 0 4px;
-            font-weight: bold;
-            color: #495057;
-        }
+    .prefix {
+        background-color: #e9ecef;
+        border: 1px solid #ced4da;
+        padding: 6px 10px;
+        border-right: none;
+        border-radius: 4px 0 0 4px;
+        font-weight: bold;
+        color: #495057;
+    }
 
-        .input-field {
-            border-radius: 0 4px 4px 0;
-            flex: 1;
-        }
+    .input-field {
+        border-radius: 0 4px 4px 0;
+        flex: 1;
+    }
 
-        .error-message {
-            color: red;
-            font-size: 0.9em;
-        }
-    </style>
+    .error-message {
+        color: red;
+        font-size: 0.9em;
+    }
+</style>
 <div class="card">
     <div class="card-header">
         <h4 class="card-title">
@@ -34,27 +34,27 @@
         </h4>
     </div>
     <div class="card-body">
-          @if (count($errors) > 0)
-            <div class="alert alert-danger">
-                <strong>Whoops!</strong> There were some problems with your input.<br><br>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
+        @if (count($errors) > 0)
+        <div class="alert alert-danger">
+            <strong>Whoops!</strong> There were some problems with your input.<br><br>
+            <ul>
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
         @endif
         @if (Session::has('error'))
-            <div class="alert alert-danger" >
-                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
-                {{ Session::get('error') }}
-            </div>
+        <div class="alert alert-danger">
+            <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+            {{ Session::get('error') }}
+        </div>
         @endif
         @if (Session::has('success'))
-            <div class="alert alert-success" id="success-alert">
-                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
-                {{ Session::get('success') }}
-            </div>
+        <div class="alert alert-success" id="success-alert">
+            <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+            {{ Session::get('success') }}
+        </div>
         @endif
     <form action="{{ route('salesorder.storesalesorder', ['QuotationId' => $quotation->id]) }}" id="form-create" method="POST">
     @csrf
@@ -450,106 +450,109 @@
      let QuotaionItemCount = '{{ $quotationItems->count() }}';
     $(document).ready(function() {
 
-          $('.vins').select2({
-            placeholder : 'Select VIN',
-        });
-
-        for(let i=1;i<= QuotaionItemCount;i++) {
-            let index = $('#vin-'+i).attr('index');
-            let quantity = $('#vin-'+i).attr('data-quantity');
-            initializeSelect2(index, quantity)
-        }
-        function initializeSelect2(index, quantity) {
-          
-           let $select = $('#vin-' + index);
-            if ($select.hasClass("select2-hidden-accessible")) {
-                let select2Instance = $select.data('select2');
-
-                select2Instance.options.options.maximumSelectionLength = quantity;
-
-                $select.select2('destroy').select2({
-                    placeholder: 'Select VIN',
-                    allowClear: true,
-                    width: '100%',
-                    maximumSelectionLength: quantity
-                });
-            } else {
-                $select.select2({
-                    placeholder: 'Select VIN',
-                    allowClear: true,
-                    width: '100%',
-                    maximumSelectionLength: quantity
-                });
-            }
-        }
-          $.validator.addMethod("uniqueSO", function(value, element) {
-            let isUnique = false;
-            $.ajax({
-                url: '/so-unique-check',    
-                type: 'GET',
-                data: {
-                    so_number: value,      
-                    _token: $('meta[name="csrf-token"]').attr('content') 
-                },
-                async: false,           
-                success: function(response) {
-                    isUnique = !response.exists;
-                }
+            $('.vins').select2({
+                placeholder: 'Select VIN',
             });
 
-            return isUnique;
-        }, "SO Number already exists. Please enter a different one.");
-
-         $.validator.addMethod("sixDigit", function(value, element) {
-            return this.optional(element) || /^\d{6}$/.test(value);
-        }, "SO Number must be exactly 6 digits.");
-
-
-        $("#form-create").validate({
-            ignore: [],
-            rules: {
-               so_number: {
-                    required: true,
-                    uniqueSO: true,
-                    sixDigit:true
-
-                },
-                payment_so :{
-                    required: true,
-                }
-            },
-            messages: {
-            so_number: {
-                required: "SO Number is required",
-                uniqueSO: "This SO Number is already in use"
+            for (let i = 1; i <= QuotaionItemCount; i++) {
+                let index = $('#vin-' + i).attr('index');
+                let quantity = $('#vin-' + i).attr('data-quantity');
+                initializeSelect2(index, quantity)
             }
+
+            function initializeSelect2(index, quantity) {
+
+                let $select = $('#vin-' + index);
+                if ($select.hasClass("select2-hidden-accessible")) {
+                    let select2Instance = $select.data('select2');
+
+                    select2Instance.options.options.maximumSelectionLength = quantity;
+
+                    $select.select2('destroy').select2({
+                        placeholder: 'Select VIN',
+                        allowClear: true,
+                        width: '100%',
+                        maximumSelectionLength: quantity
+                    });
+                } else {
+                    $select.select2({
+                        placeholder: 'Select VIN',
+                        allowClear: true,
+                        width: '100%',
+                        maximumSelectionLength: quantity
+                    });
+                }
+            }
+            $.validator.addMethod("uniqueSO", function(value, element) {
+                let isUnique = false;
+                $.ajax({
+                    url: '/so-unique-check',
+                    type: 'GET',
+                    data: {
+                        so_number: value,
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    async: false,
+                    success: function(response) {
+                        isUnique = !response.exists;
+                    }
+                });
+
+                return isUnique;
+            }, "SO Number already exists. Please enter a different one.");
+
+            $.validator.addMethod("onlyDigitsNoSpaces", function(value, element) {
+                return this.optional(element) || /^\d+$/.test(value);
+            }, "Only numbers are allowed. No letters, symbols, or spaces.");
+
+            $("#form-create").validate({
+                ignore: [],
+                rules: {
+                    so_number: {
+                        required: true,
+                        uniqueSO: true,
+                        minlength: 6,
+                        maxlength: 6,
+                        onlyDigitsNoSpaces: true
+
+                    },
+                    payment_so: {
+                        required: true,
+                    }
+                },
+                messages: {
+                    so_number: {
+                        required: "SO Number is required",
+                        minlength: "SO Number must be exactly 6 digits.",
+                        maxlength: "SO Number must be exactly 6 digits."
+                    }
+                }
+
+            });
+        });
+    </script>
+    <script>
+        function updateTotalReceivingPayment() {
+            var paymentPerforma = parseFloat(document.getElementById('advance_payment_performa').value) || 0;
+            var paymentSO = parseFloat(document.getElementById('payment_so').value) || 0;
+            var totalReceivingPayment = paymentPerforma + paymentSO;
+            document.getElementById('receiving_payment').value = totalReceivingPayment.toFixed(2);
         }
 
+        function updateBalancePayment() {
+            var totalPayment = parseFloat(document.getElementById('total_payment').value) || 0;
+            var totalReceivingPayment = parseFloat(document.getElementById('receiving_payment').value) || 0;
+            var balancePayment = totalPayment - totalReceivingPayment;
+            document.getElementById('balance_payment').value = balancePayment.toFixed(2);
+        }
+        document.querySelectorAll('.payment').forEach(function(element) {
+            element.addEventListener('input', function() {
+                updateTotalReceivingPayment();
+                updateBalancePayment();
+            });
         });
-    });
-      
-</script>
-<script>
-    function updateTotalReceivingPayment() {
-        var paymentPerforma = parseFloat(document.getElementById('advance_payment_performa').value) || 0;
-        var paymentSO = parseFloat(document.getElementById('payment_so').value) || 0;
-        var totalReceivingPayment = paymentPerforma + paymentSO;
-        document.getElementById('receiving_payment').value = totalReceivingPayment.toFixed(2);
-    }
-    function updateBalancePayment() {
-        var totalPayment = parseFloat(document.getElementById('total_payment').value) || 0;
-        var totalReceivingPayment = parseFloat(document.getElementById('receiving_payment').value) || 0;
-        var balancePayment = totalPayment - totalReceivingPayment;
-        document.getElementById('balance_payment').value = balancePayment.toFixed(2);
-    }
-    document.querySelectorAll('.payment').forEach(function(element) {
-        element.addEventListener('input', function() {
-            updateTotalReceivingPayment();
-            updateBalancePayment();
-        });
-    });
-</script>
-<!-- <script>
+    </script>
+    <!-- <script>
 // JavaScript code to check for duplicate VINs
 // function checkForDuplicateVINs() {
 //     var selectedVINs = {};
@@ -570,7 +573,7 @@
 //     return true; // No duplicate VINs found, allow form submission
 // }
 </script> -->
-<!-- <script>
+    <!-- <script>
     const soInput = document.getElementById('so_number');
     const errorMessage = document.getElementById('error_message');
 
@@ -589,4 +592,4 @@
 
    
 </script> -->
-@endpush
+    @endpush
