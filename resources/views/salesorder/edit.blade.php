@@ -902,8 +902,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
     $(document.body).on('select2:select', ".variants", function(e) {
         $('.overlay').show();
         var index = $(this).attr('index');
-        let url = '{{ route('
-        so.getVins ') }}';
+        let url = '{{ route('so.getVins') }}';
         let variant = $('#variant-' + index).val();
         let totalIndex = $("#so-vehicles").find(".so-variant-add-section").length;
         var selectedVinIds = [];
