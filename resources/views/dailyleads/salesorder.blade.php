@@ -405,6 +405,8 @@ table.dataTable thead th select {
             </table>
           </div> 
         </div>  
+        <div id="soCount" data-so-count="{{ $soCount }}"></div>
+
         <script>
    $(document).ready(function () {
     var dataTable8 = $('#dtBasicExample3').DataTable({
@@ -482,7 +484,12 @@ table.dataTable thead th select {
                     // const updatesaleorder = `{{ url('salesorder/update') }}/${data}`;
                     let so_id = row.soid; // Check if quotation_id is not null
                     const updatesaleorder = `{{ route('salesorder.edit', ':id') }}`.replace(':id', so_id);
-                    return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
+
+                    const soCount = document.getElementById('soCount').dataset.soCount;
+                    
+                    if(so_id > soCount) {
+                        return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
+                    }
                 }
                 return ''; 
                 }

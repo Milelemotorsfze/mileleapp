@@ -106,7 +106,8 @@ class SalesOrderController extends Controller
             }
         }
 
-        return view('dailyleads.salesorder');
+        $soCount = env('SO_PRIMAR_KEY');
+        return view('dailyleads.salesorder', compact('soCount'));
     }
 
 
