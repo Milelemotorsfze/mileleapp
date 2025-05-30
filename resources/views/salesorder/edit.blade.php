@@ -361,7 +361,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                                     <input type="date" class="form-control" id="so_date" name="so_date" value="{{$so->so_date}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
-                                    <label for="so_number"><span class="text-danger">*</span> Netsuit SO Number</label>
+                                <label for="so_number"><span class="text-danger">* </span> Netsuit SO Number</label>
                                     <div class="input-group mb-3">
                                         <span class="input-group-text">SO-</span>
                                         <input type="text" class="form-control" placeholder="Enter SO Number" id="so_number" name="so_number"
@@ -395,7 +395,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                                         <div class="so-variant-add-section " id="variant-section-{{ $key + 1 }}">
                                             <div class="row">
                                                 <div class="mb-2 col-sm-12 col-md-3 col-lg-3 col-xxl-3">
-                                                    <label class="form-label font-size-13">Choose Variant</label>
+                                                <span class="text-danger">* </span><label class="form-label font-size-13">Choose Variant</label>
                                                     <select name="variants[{{$key+1}}][variant_id]" required index="{{$key+1}}" id="variant-{{ $key+1 }}"
                                                         multiple class="variants form-control" data-is-gdn="{{ $soVariant->isgdnExist }}">
                                                         @foreach($variants as $variant)
@@ -407,17 +407,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
 
                                                 </div>
                                                 <div class="mb-2 col-sm-12 col-md-4 col-lg-4 col-xxl-4">
-                                                    <label class="form-label font-size-13">Description</label>
+                                                <span class="text-danger">* </span><label class="form-label font-size-13">Description</label>
                                                     <input type="text" class="variant-descriptions form-control widthinput" name="variants[{{ $key + 1 }}][description]" index="{{$key+1}}"
                                                         id="variant-description-{{ $key+1 }}" required value="{{ $soVariant->description ?? '' }}" placeholder="Decsription" />
                                                 </div>
                                                 <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
-                                                    <label class="form-label font-size-13">Price</label>
+                                                <span class="text-danger">* </span><label class="form-label font-size-13">Price</label>
                                                     <input type="number" class="form-control variant-prices widthinput" required name="variants[{{$key+1}}][price]" placeholder="Price"
                                                         value="{{ $soVariant->price }}" id="price-{{ $key+1 }}" index="{{$key+1}}">
                                                 </div>
                                                 <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
-                                                    <label class="form-label font-size-13">Quantity</label>
+                                                <span class="text-danger">* </span><label class="form-label font-size-13">Quantity</label>
                                                     <input type="number" class="form-control variant-quantities widthinput" required index="{{$key+1}}" min="1"
                                                         name="variants[{{$key+1}}][quantity]" placeholder="Quantity" value="{{ $soVariant->quantity }}" id="quantity-{{ $key+1 }}">
                                                 </div>
@@ -484,7 +484,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                             </div>
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
-                                <label for="payment_so"><strong>Payment In SO</strong></label>
+                            <span class="text-danger">* </span><label for="payment_so"><strong>Payment In SO</strong></label>
                                 <input type="number" class="form-control payment" id="payment_so" name="payment_so" value="{{$so->paidinso}}" required min="0">
                             </div>
 
@@ -555,7 +555,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                     <div class="modal-body">
                         <form id="rejectForm">
                             <div class="mb-3">
-                                <label for="reason" class="form-label">Rejection Reason</label>
+                            <span class="text-danger">* </span><label for="reason" class="form-label">Rejection Reason</label>
                                 <textarea id="reason" class="form-control" rows="4" placeholder="Enter reason for rejection" required></textarea>
                                 <input type="hidden" name="so_id">
                             </div>
@@ -859,24 +859,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                  
                     <div class="row">
                         <div class="mb-2 col-sm-12 col-md-3 col-lg-3 col-xxl-3">
-                         <label class="form-label font-size-13">Choose Variant</label>
+                         <span class="text-danger">* </span><label class="form-label font-size-13">Choose Variant</label>
                          
                             <select name="variants[${index}][variant_id]" index="${index}" id="variant-${index}"
                              class="variants form-control" multiple required  data-is-gdn="0">
                             </select>
                         </div> 
                         <div class="mb-2 col-sm-12 col-md-4 col-lg-4 col-xxl-4">
-                            <label class="form-label font-size-13">Description</label>
+                           <span class="text-danger">* </span> <label class="form-label font-size-13">Description</label>
                             <input type="text" class="variant-descriptions form-control widthinput" name="variants[${index}][description]" index="${index}"
                               required id="variant-description-${index}" placeholder="Decsription" />
                         </div>
                         <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
-                          <label class="form-label font-size-13">Price</label>
+                          <span class="text-danger">* </span><label class="form-label font-size-13">Price</label>
                         <input type="number" class="form-control variant-prices widthinput" required name="variants[${index}][price]" placeholder="Price"
                          id="price-${index}" index="${index}">
                         </div>
                         <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
-                          <label class="form-label font-size-13">Quantity</label>
+                          <span class="text-danger">* </span><label class="form-label font-size-13">Quantity</label>
                         <input type="number" class="form-control variant-quantities widthinput" required index="${index}" min="1" value="1" placeholder="Quantity"
                             name="variants[${index}][quantity]" id="quantity-${index}"  >
                         </div>

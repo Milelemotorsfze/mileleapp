@@ -363,7 +363,7 @@
                 <input type="date" class="form-control" id="so_date" name="so_date" value="<?php echo date("Y-m-d"); ?>">
             </div>
             <div class="col-md-2 mb-3">
-                <label for="so_number">Netsuit SO Number</label>
+            <span class="error">* </span><label for="so_number">Netsuit SO Number</label>
                 <div class="input-group mb-3">
                     <span class="input-group-text">SO-</span>
                     <input type="text" class="form-control" placeholder="Enter SO Number" id="so_number" name="so_number" aria-label="Enter SO Number">
@@ -425,7 +425,7 @@
                 <input type="number" class="form-control payment" id="advance_payment_performa" name="advance_payment_performa" value="{{$quotation->quotationdetails->advance_amount}}" readonly>
             </div>
             <div class="col-md-2 mb-3">
-                <label for="payment_so">Payment In SO</label>
+            <span class="error">* </span><label for="payment_so">Payment In SO</label>
                 <input type="number" class="form-control payment" id="payment_so" name="payment_so" value="" required min="0">
             </div>
         </div>
