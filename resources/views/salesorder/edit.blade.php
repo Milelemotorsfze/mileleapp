@@ -1021,6 +1021,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
         var soVariantId = $(this).attr('data-variant-id');
 
         if (rowCount > 1) {
+
+            var selectedVins = $('#vin-' + indexNumber).val();
+
+            if (Array.isArray(selectedVins) && selectedVins.length > 0) {
+                e.preventDefault();
+                alertify.confirm('Are you sure to remove this? You\'ll lose all the selected VINs.',
+                    function () {
+                        $('#vin-' + indexNumber).closest(".so-variant-add-section").remove();
+                    }
+                ).set({
+                    title: "VINs are Selected"
+                });
+
+            return;
+            }
+
             var isGdn = $('#variant-' + indexNumber).attr('data-is-gdn');
             if (isGdn == 1) {
                 e.preventDefault();
