@@ -773,7 +773,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             url: '/so-unique-check',
             type: 'GET',
             data: {
-                so_number: value,
+                so_number: "SO-" + value,
                 so_id: soId,
                 _token: $('meta[name="csrf-token"]').attr('content')
             },
@@ -784,15 +784,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
         });
 
         return isUnique;
-    }, "SO Number already exists. Please enter a different one.");
+    });
 
     $.validator.addMethod("spacing", function(value, element) {
         return this.optional(element) || !/\s\s+/.test(value);
     }, "No more than one consecutive space is allowed in the description");
 
     $.validator.addMethod("onlyDigitsNoSpaces", function(value, element) {
-        return this.optional(element) || /^\d+$/.test(value);
-    }, "Only numbers are allowed. No letters, symbols, or spaces.");
+        return this.optional(element) || /^\d{6}$/.test(value);
+    });
 
     $("#form-update").validate({
         ignore: [],
@@ -800,8 +800,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             so_number: {
                 required: true,
                 uniqueSO: true,
-                minlength: 6,
-                maxlength: 6,
                 onlyDigitsNoSpaces: true
             },
             payment_so: {
@@ -826,8 +824,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
         messages: {
             so_number: {
                 required: "SO Number is required",
-                minlength: "SO Number must be exactly 6 digits.",
-                maxlength: "SO Number must be exactly 6 digits."
+                onlyDigitsNoSpaces: "Only 6 numbers are allowed. No letters, symbols, or spaces."
             },
             payment_so: {
                 required: "Payment in SO is required.",

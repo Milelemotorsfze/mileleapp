@@ -489,7 +489,7 @@
                     url: '/so-unique-check',
                     type: 'GET',
                     data: {
-                        so_number: value,
+                        so_number: "SO-" + value,
                         _token: $('meta[name="csrf-token"]').attr('content')
                     },
                     async: false,
@@ -502,8 +502,8 @@
             }, "SO Number already exists. Please enter a different one.");
 
             $.validator.addMethod("onlyDigitsNoSpaces", function(value, element) {
-                return this.optional(element) || /^\d+$/.test(value);
-            }, "Only numbers are allowed. No letters, symbols, or spaces.");
+                return this.optional(element) || /^\d{6}$/.test(value);
+            });
 
             $("#form-create").validate({
                 ignore: [],
@@ -511,8 +511,6 @@
                     so_number: {
                         required: true,
                         uniqueSO: true,
-                        minlength: 6,
-                        maxlength: 6,
                         onlyDigitsNoSpaces: true
 
                     },
@@ -525,8 +523,7 @@
                 messages: {
                     so_number: {
                         required: "SO Number is required",
-                        minlength: "SO Number must be exactly 6 digits.",
-                        maxlength: "SO Number must be exactly 6 digits."
+                        onlyDigitsNoSpaces: "Only 6 numbers are allowed. No letters, symbols, or spaces."
                     },
                     payment_so: {
                         required: "Payment in SO is required.",
