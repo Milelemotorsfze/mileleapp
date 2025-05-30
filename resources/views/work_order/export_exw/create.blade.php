@@ -290,7 +290,7 @@
 									value="{{ isset($workOrder) && $workOrder->date ? \Carbon\Carbon::parse($workOrder->date)->format('d M Y') : \Carbon\Carbon::now()->format('d M Y') }}">
 							</div>
 							<div class="col-xxl-{{ $hasAllSalesPermission ? '2' : '3' }} col-lg-6 col-md-6">
-								<span class="error">* </span>
+								<span class="text-danger">*</span>
 								<label for="so_number" class="col-form-label text-md-end">{{ __('SO Number') }}</label>
 								<input id="so_number" name="so_number" type="text" class="form-control widthinput @error('so_number') is-invalid @enderror" placeholder="Enter SO Number"
 									value="{{ isset($workOrder) ? $workOrder->so_number : 'SO-00' }}" autocomplete="so_number" onkeyup="isSOExist()">
@@ -304,7 +304,7 @@
 								</div>
 								<div class="col-xxl-2 col-lg-4 col-md-4 select-button-main-div">
 									<div id="batchDropdownSection" class="dropdown-option-div" style="display: @if(isset($workOrder) && $workOrder->is_batch == 1) block @else none @endif;">							
-										<span class="error">* </span>
+										<span class="text-danger">*</span>
 										<label for="batch" class="col-form-label text-md-end">{{ __('Choose Batch') }}</label>
 										<select name="batch" id="batch" class="form-control widthinput" autofocus onchange="setWo()" @if(isset($canDisableBatch) && $canDisableBatch == true) disabled @endif>
 											<option value="">Choose Batch</option>
@@ -324,7 +324,7 @@
 							@if($hasAllSalesPermission)
 								<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div" id="sales-person-div">
 									<div class="dropdown-option-div">
-										<span class="error">* </span>
+										<span class="text-danger">*</span>
 										<label for="sales_person_id" class="col-form-label text-md-end">{{ __('Choose Sales Person') }}</label>
 										<select name="sales_person_id" id="sales_person_id" multiple="true" class="form-control widthinput" autofocus>
 											@foreach($salesPersons as $salesPerson)
@@ -463,7 +463,7 @@
 										@if(isset($workOrder) && $workOrder->temporary_exit == 'yes') checked @endif>
 							</div>
 							<div class="{{ in_array($type, ['export_exw', 'export_cnf']) ? 'col-xxl-2 col-lg-6 col-md-6' : 'col-xxl-4 col-lg-6 col-md-6' }}">
-								<span class="error">* </span>
+								<span class="text-danger">*</span>
 								<label for="port_of_loading" class="col-form-label text-md-end">{{ __('Port of Loading') }}</label>
 								<input id="port_of_loading" type="text" class="form-control widthinput @error('port_of_loading') is-invalid @enderror"
 									name="port_of_loading" onkeyup="sanitizeInput(this)"
@@ -471,7 +471,7 @@
 							</div>
 
 							<div class="{{ in_array($type, ['export_exw', 'export_cnf']) ? 'col-xxl-2 col-lg-6 col-md-6' : 'col-xxl-4 col-lg-6 col-md-6' }}">
-								<span class="error">* </span>
+								<span class="text-danger">*</span>
 								<label for="port_of_discharge" class="col-form-label text-md-end">{{ __('Port of Discharge') }}</label>
 								<input id="port_of_discharge" type="text" class="form-control widthinput @error('port_of_discharge') is-invalid @enderror"
 									name="port_of_discharge" onkeyup="sanitizeInput(this)"
@@ -479,7 +479,7 @@
 							</div>
 
 							<div class="{{ in_array($type, ['export_exw', 'export_cnf']) ? 'col-xxl-3 col-lg-6 col-md-6' : 'col-xxl-4 col-lg-6 col-md-6' }}">
-								<span class="error">* </span>
+								<span class="text-danger">*</span>
 								<label for="final_destination" class="col-form-label text-md-end">{{ __('Final Destination') }}</label>
 								<input id="final_destination" type="text" class="form-control widthinput @error('final_destination') is-invalid @enderror"
 									name="final_destination" onkeyup="sanitizeInput(this)"
