@@ -1967,7 +1967,7 @@ function saveRejection() {
           var escaped = selectedValues.map(function (val) {
             return '^' + val.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '$';
           }).join('|');
-          column.search(escaped, true, false).draw();
+          column.search(selectedValues.join('|'), false, true).draw();
         } else {
           column.search('', true, false).draw();
         }
@@ -3357,18 +3357,21 @@ $('#my-table_filter').hide();
     serverSide: true,
     ajax: "{{ route('dailyleads.index', ['status' => 'bulkleads']) }}",
     columns: [
-      {
+        {
             data: 'leaddate',
             name: 'calls.created_at',
-             render: function (data, type, row) {
-        if (type === 'display' || type === 'filter') {
-            if (!data || !moment(data).isValid()) {
-                return '';
-            }
-            return moment(data).format('DD-MMM-YYYY');
-        }
-        return data;
-    }
+            render: function (data, type, row) {
+            if (type === 'display' || type === 'filter') {
+              if (!data) return '';
+              const parts = data.split(' ');
+              if (parts.length === 3) {
+                  const dateStr = `${parts[0]}-${parts[1]}-${parts[2]}`;
+                  return moment(dateStr, 'YYYY-MM-DD').format('DD-MMM-YYYY');
+              }
+              return data;
+              }
+            return data;
+          }
         },
         { data: 'type', name: 'calls.type' },
         {
