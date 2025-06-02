@@ -591,6 +591,7 @@ class SalesOrderController extends Controller
             if ($totalAmount != $so->quotation->deal_value) {
                 $so->status = 'Pending';
                 $so->save();
+                $this->generateLatestQuotation($so->id);
             } else {
                 info("no price cahnging");
                 // no price cahnge keep version history of quotation
@@ -1822,7 +1823,6 @@ class SalesOrderController extends Controller
 
     public function checkUniqueSoNumber(Request $request)
     {
-
         $exists = SO::where('so_number', $request->so_number)
             ->when($request->filled('so_id'), function ($query) use ($request) {
                 return $query->where('id', '!=', $request->so_id);

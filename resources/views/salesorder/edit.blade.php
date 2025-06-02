@@ -767,7 +767,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
     });
 
     // validation start //
+    const originalSoNumber = "{{ preg_replace('/^SO-/', '', $so->so_number) }}";
     $.validator.addMethod("uniqueSO", function(value, element) {
+        if (value === originalSoNumber) { return true; }
         let isUnique = false;
         $.ajax({
             url: '/so-unique-check',
@@ -824,6 +826,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
         messages: {
             so_number: {
                 required: "SO Number is required",
+                uniqueSO: "SO Number already exists",
                 onlyDigitsNoSpaces: "Only 6 numbers are allowed. No letters, symbols, or spaces."
             },
             payment_so: {
