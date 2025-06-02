@@ -238,6 +238,7 @@ class DailyleadsController extends Controller
                     'calls.type',
                     'calls.location',
                     'calls.created_by',
+                    'calls.sales_person',
                     'users.name as createdby',
                     'calls.language',
                     'master_model_lines.model_line',
@@ -250,7 +251,6 @@ class DailyleadsController extends Controller
                 ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
                 ->whereNotNull('calls.leadtype');
-            
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
                 if(!$hasPermission) {
                     $bulkleads->where('calls.sales_person', $id);
