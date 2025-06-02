@@ -1,31 +1,31 @@
 @extends('layouts.table')
 @section('content')
 <style>
-        .input-wrapper {
-            display: flex;
-            align-items: center;
-        }
+    .input-wrapper {
+        display: flex;
+        align-items: center;
+    }
 
-        .prefix {
-            background-color: #e9ecef;
-            border: 1px solid #ced4da;
-            padding: 6px 10px;
-            border-right: none;
-            border-radius: 4px 0 0 4px;
-            font-weight: bold;
-            color: #495057;
-        }
+    .prefix {
+        background-color: #e9ecef;
+        border: 1px solid #ced4da;
+        padding: 6px 10px;
+        border-right: none;
+        border-radius: 4px 0 0 4px;
+        font-weight: bold;
+        color: #495057;
+    }
 
-        .input-field {
-            border-radius: 0 4px 4px 0;
-            flex: 1;
-        }
+    .input-field {
+        border-radius: 0 4px 4px 0;
+        flex: 1;
+    }
 
-        .error-message {
-            color: red;
-            font-size: 0.9em;
-        }
-    </style>
+    .error-message {
+        color: red;
+        font-size: 0.9em;
+    }
+</style>
 <div class="card">
     <div class="card-header">
         <h4 class="card-title">
@@ -34,7 +34,29 @@
         </h4>
     </div>
     <div class="card-body">
-    <form onsubmit="return checkForDuplicateVINs();" action="{{ route('salesorder.storesalesorder', ['QuotationId' => $quotation->id]) }}" id="form-create" method="POST">
+        @if (count($errors) > 0)
+        <div class="alert alert-danger">
+            <strong>Whoops!</strong> There were some problems with your input.<br><br>
+            <ul>
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+        @if (Session::has('error'))
+        <div class="alert alert-danger">
+            <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+            {{ Session::get('error') }}
+        </div>
+        @endif
+        @if (Session::has('success'))
+        <div class="alert alert-success" id="success-alert">
+            <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+            {{ Session::get('success') }}
+        </div>
+        @endif
+    <form action="{{ route('salesorder.storesalesorder', ['QuotationId' => $quotation->id]) }}" id="form-create" method="POST">
     @csrf
     <div class="row">
             <div class="col-sm-4">
@@ -73,7 +95,7 @@
         <hr>
         <div class="row">
             <div class="col-sm-4">
-<strong>Document Details</strong>
+            <strong>Document Details</strong>
             </div>
             <div class="col-sm-4">
             <strong>Client's Details</strong>
@@ -334,59 +356,45 @@
             </div>
         </div>
         <hr>
-            <div class="row">
+        <div class="row">
             <h6>SO Details</h6>
-        <div class="col-md-2 mb-3">
-            <label for="today_date">SO Date</label>
-            <input type="date" class="form-control" id="so_date" name="so_date" value="<?php echo date("Y-m-d"); ?>">
+            <div class="col-md-2 mb-3">
+                <label for="today_date">SO Date</label>
+                <input type="date" class="form-control" id="so_date" name="so_date" value="<?php echo date("Y-m-d"); ?>">
+            </div>
+            <div class="col-md-2 mb-3">
+            <span class="error">* </span><label for="so_number">Netsuit SO Number</label>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">SO-</span>
+                    <input type="text" class="form-control" placeholder="Enter SO Number" id="so_number" name="so_number" aria-label="Enter SO Number">
+                </div>
+            </div>
+            <div class="col-md-8 mb-3">
+                <label for="text_area">Sales Notes</label>
+                <textarea class="form-control" id="notes" name="notes"></textarea>
+            </div>
         </div>
-        <div class="col-md-2 mb-3">
-        <label for="so_number">Netsuit SO Number</label>
-        <div class="input-wrapper">
-    <span class="prefix">SO-</span>
-    <input type="text" class="form-control input-field" id="so_number" name="so_number" placeholder="Enter SO Number">
-</div>
-<span id="error_message" style="color: red;"></span>
-    </div>
-        <div class="col-md-8 mb-3">
-            <label for="text_area">Sales Notes</label>
-            <textarea class="form-control" id="notes" name="notes"></textarea>
-        </div>
-    </div>
         <hr>
         <div class="row">
-        @php
-    // Calculate the total number of vehicles
-    $totalVehicles = $quotationItems->sum('quantity');
-@endphp
-    <h6>Vehicles - Total Vehicles ({{ $totalVehicles }})</h6>
-    <div class="col-md-12">
-        @foreach($quotationItems as $quotationItem)
-        <div class="mb-1">
-            <h6>{{ $loop->iteration }} - {{ $quotationItem->description }} - ({{ $quotationItem->quantity }})</h6>
-            <div class="row">
-                @for ($i = 0; $i < $quotationItem->quantity; $i++)
-                <div class="col-md-2 mb-3">
-                    <select name="vehicle_vin[{{ $quotationItem->id }}][]" class="form-control select2">
-                        <option value="" selected>Select VIN</option>
-                        @foreach($vehicles[$quotationItem->id] as $vehicle)
-                        @php
-                            $selected = '';
-                            if ($quotationVin = $quotationItem->quotationVins->where('quotation_items_id', $vehicle->vin)->first()) {
-                                $selected = 'selected';
-                            }
-                        @endphp
-                        <option value="{{ $vehicle->vin }}" {{ $selected }}>{{ $vehicle->vin }}</option>
-                        @endforeach
-                    </select>
+            <h6>Vehicles - Total Vehicles ({{ $totalVehicles }})</h6>
+            <div class="col-md-12">
+            @foreach($quotationItems as $key => $quotationItem)
+                <h6>{{ $loop->iteration }} -{{ $quotationItem->description }} - ({{ $quotationItem->quantity }})</h6>
+                <div class="row">
+                    <input type="hidden" name="variants[{{$key+1}}][variant_id]" value="{{ $quotationItem->reference_id }}">
+                    <input type="hidden" name="variants[{{$key+1}}][quotation_item_id]" value="{{ $quotationItem->id }}">
+                    <div class="col-sm-12 col-md-11 col-lg-11 col-xxl-11 mb-4 ms-5">
+                        <label class="form-label font-size-13">Choose VIN</label>
+                        <select name="variants[{{$key+1}}][vehicles][]" data-quantity="{{$quotationItem->quantity}}" id="vin-{{ $key+1 }}" index="{{$key+1}}" class="vins form-control" multiple >
+                            @foreach($vehicles[$quotationItem->id] as $vehicle)
+                            <option value="{{ $vehicle->id }}"  >{{ $vehicle->vin ?? '' }}</option>
+                            @endforeach
+                        </select>
+                    </div> 
                 </div>
-                @endfor
-            </div>
-            <input type="hidden" name="quotation_item_id[]" value="{{ $quotationItem->id }}">
+            @endforeach
         </div>
-        @endforeach
     </div>
-</div>
         <hr>
         <h6>Payments</h6>
         <div class="row">
@@ -417,8 +425,8 @@
                 <input type="number" class="form-control payment" id="advance_payment_performa" name="advance_payment_performa" value="{{$quotation->quotationdetails->advance_amount}}" readonly>
             </div>
             <div class="col-md-2 mb-3">
-                <label for="payment_so">Payment In SO</label>
-                <input type="number" class="form-control payment" id="payment_so" name="payment_so" value="" required>
+            <span class="error">* </span><label for="payment_so">Payment In SO</label>
+                <input type="number" class="form-control payment" id="payment_so" name="payment_so" value="" required min="0">
             </div>
         </div>
     </div>
@@ -439,52 +447,137 @@
 @endsection
 @push('scripts')
 <script>
+     let QuotaionItemCount = '{{ $quotationItems->count() }}';
     $(document).ready(function() {
-        $('.select2').select2();
-    });
-</script>
-<script>
-    function updateTotalReceivingPayment() {
-        var paymentPerforma = parseFloat(document.getElementById('advance_payment_performa').value) || 0;
-        var paymentSO = parseFloat(document.getElementById('payment_so').value) || 0;
-        var totalReceivingPayment = paymentPerforma + paymentSO;
-        document.getElementById('receiving_payment').value = totalReceivingPayment.toFixed(2);
-    }
-    function updateBalancePayment() {
-        var totalPayment = parseFloat(document.getElementById('total_payment').value) || 0;
-        var totalReceivingPayment = parseFloat(document.getElementById('receiving_payment').value) || 0;
-        var balancePayment = totalPayment - totalReceivingPayment;
-        document.getElementById('balance_payment').value = balancePayment.toFixed(2);
-    }
-    document.querySelectorAll('.payment').forEach(function(element) {
-        element.addEventListener('input', function() {
-            updateTotalReceivingPayment();
-            updateBalancePayment();
-        });
-    });
-</script>
-<script>
-// JavaScript code to check for duplicate VINs
-function checkForDuplicateVINs() {
-    var selectedVINs = {};
-    var dropdowns = document.querySelectorAll('select[name^="vehicle_vin"]');
-    
-    for (var i = 0; i < dropdowns.length; i++) {
-        var selectedOption = dropdowns[i].value;
-        
-        if (selectedOption && selectedOption !== '') {
-            if (selectedVINs[selectedOption]) {
-                // Duplicate VIN found, display an error message and prevent form submission
-                alert('Duplicate VIN ' + selectedOption + ' selected. Please select a unique VIN for each vehicle.');
-                return false; // Prevent form submission
+
+            $('.vins').select2({
+                placeholder: 'Select VIN',
+            });
+
+            for (let i = 1; i <= QuotaionItemCount; i++) {
+                let index = $('#vin-' + i).attr('index');
+                let quantity = $('#vin-' + i).attr('data-quantity');
+                initializeSelect2(index, quantity)
             }
-            selectedVINs[selectedOption] = true;
+
+            function initializeSelect2(index, quantity) {
+
+                let $select = $('#vin-' + index);
+                if ($select.hasClass("select2-hidden-accessible")) {
+                    let select2Instance = $select.data('select2');
+
+                    select2Instance.options.options.maximumSelectionLength = quantity;
+
+                    $select.select2('destroy').select2({
+                        placeholder: 'Select VIN',
+                        allowClear: true,
+                        width: '100%',
+                        maximumSelectionLength: quantity
+                    });
+                } else {
+                    $select.select2({
+                        placeholder: 'Select VIN',
+                        allowClear: true,
+                        width: '100%',
+                        maximumSelectionLength: quantity
+                    });
+                }
+            }
+            $.validator.addMethod("uniqueSO", function(value, element) {
+                let isUnique = false;
+                $.ajax({
+                    url: '/so-unique-check',
+                    type: 'GET',
+                    data: {
+                        so_number: "SO-" + value,
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    async: false,
+                    success: function(response) {
+                        isUnique = !response.exists;
+                    }
+                });
+
+                return isUnique;
+            }, "SO Number already exists. Please enter a different one.");
+
+            $.validator.addMethod("onlyDigitsNoSpaces", function(value, element) {
+                return this.optional(element) || /^\d{6}$/.test(value);
+            });
+
+            $("#form-create").validate({
+                ignore: [],
+                rules: {
+                    so_number: {
+                        required: true,
+                        uniqueSO: true,
+                        onlyDigitsNoSpaces: true
+
+                    },
+                    payment_so: {
+                        required: true,
+                        number: true,
+                        min: 0
+                    }
+                },
+                messages: {
+                    so_number: {
+                        required: "SO Number is required",
+                        onlyDigitsNoSpaces: "Only 6 numbers are allowed. No letters, symbols, or spaces."
+                    },
+                    payment_so: {
+                        required: "Payment in SO is required.",
+                        number: "Only numeric values are allowed.",
+                        min: "Negative values are not allowed."
+                    }
+                }
+
+            });
+        });
+    </script>
+    <script>
+        function updateTotalReceivingPayment() {
+            var paymentPerforma = parseFloat(document.getElementById('advance_payment_performa').value) || 0;
+            var paymentSO = parseFloat(document.getElementById('payment_so').value) || 0;
+            var totalReceivingPayment = paymentPerforma + paymentSO;
+            document.getElementById('receiving_payment').value = totalReceivingPayment.toFixed(2);
         }
-    }
-    return true; // No duplicate VINs found, allow form submission
-}
-</script>
-<script>
+
+        function updateBalancePayment() {
+            var totalPayment = parseFloat(document.getElementById('total_payment').value) || 0;
+            var totalReceivingPayment = parseFloat(document.getElementById('receiving_payment').value) || 0;
+            var balancePayment = totalPayment - totalReceivingPayment;
+            document.getElementById('balance_payment').value = balancePayment.toFixed(2);
+        }
+        document.querySelectorAll('.payment').forEach(function(element) {
+            element.addEventListener('input', function() {
+                updateTotalReceivingPayment();
+                updateBalancePayment();
+            });
+        });
+    </script>
+    <!-- <script>
+// JavaScript code to check for duplicate VINs
+// function checkForDuplicateVINs() {
+//     var selectedVINs = {};
+//     var dropdowns = document.querySelectorAll('select[name^="vehicle_vin"]');
+    
+//     for (var i = 0; i < dropdowns.length; i++) {
+//         var selectedOption = dropdowns[i].value;
+        
+//         if (selectedOption && selectedOption !== '') {
+//             if (selectedVINs[selectedOption]) {
+//                 // Duplicate VIN found, display an error message and prevent form submission
+//                 alert('Duplicate VIN ' + selectedOption + ' selected. Please select a unique VIN for each vehicle.');
+//                 return false; // Prevent form submission
+//             }
+//             selectedVINs[selectedOption] = true;
+//         }
+//     }
+//     return true; // No duplicate VINs found, allow form submission
+// }
+</script> -->
+    <!-- <script>
     const soInput = document.getElementById('so_number');
     const errorMessage = document.getElementById('error_message');
 
@@ -500,5 +593,7 @@ function checkForDuplicateVINs() {
             soInput.setCustomValidity("");
         }
     });
-</script>
-@endpush
+
+   
+</script> -->
+    @endpush

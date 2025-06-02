@@ -1162,7 +1162,6 @@ class PFIController extends Controller
 
     public function getPfiBrand(Request $request)
     {
-      info($request->all());
         $masterModels = $request->master_model_ids;
         $brands = [];
         foreach($masterModels as $masterModel) {

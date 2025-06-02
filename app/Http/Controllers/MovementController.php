@@ -319,7 +319,7 @@ class MovementController extends Controller
                 $vehicle->ownership_type = $ownershipType;
                 $vehicle->save();
                 if ($vehicle) {
-                    if (($from[$index] === '1' && $to[$index] !== '3')) {
+                    if (($from[$index] === '1')) {
                         $grnVins[] = $vin[$index];
                     } elseif ($to[$index] === '2') {
                         $gdnVins[] = $vin[$index];

@@ -1239,7 +1239,6 @@
                     selectedModelIds.push(eachSelectedModelId);
                 }
             }
-            console.log(selectedModelIds);
            
             $.ajax({
                 url:"{{route('demand.getMasterModel')}}",

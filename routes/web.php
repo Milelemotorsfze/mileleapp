@@ -1181,5 +1181,9 @@ Route::get('/check-trashed-gdn', function () {
     Route::get('/salespersons/list', [SalesOrderController::class, 'getSalespersons'])->name('salespersons.list');
     Route::post('/salesorder/updateSalesperson', [SalesOrderController::class, 'updateSalesperson'])->name('salesorder.updateSalesperson');
     Route::post('po-payment-adjustment', [PurchasingOrderController::class, 'paymentAdjustment'])->name('po-payment-adjustment');
-  
+    Route::get('so-vins', [SalesOrderController::class, 'getVins'])->name('so.getVins');
+    Route::get('so-variants', [SalesOrderController::class, 'getVariants'])->name('so.getVariants');
+    Route::get('so-unique-check', [SalesOrderController::class, 'checkUniqueSoNumber'])->name('so.uniqueSoNumber');
+    Route::post('so-approve-reject', [SalesOrderController::class, 'approveOrRejectSO'])->name('so.approveOrReject');
+    Route::get('so-quotation-versions/{id}', [SalesOrderController::class, 'viewQuotations'])->name('so.quotation-versions');
 });

@@ -2339,7 +2339,6 @@ $('#shipping_port').select2();
     targets: -1,
     data: null,
             render: function (data, type, row, index) {
-                console.log(row);
                 var directAdd = 'Direct-Add';
                 var removeButtonHtml = '<button type="button" class="circle-buttonr remove-button" data-button-type="' + directAdd + '">Remove</button>';
                 if (row['button_type'] === 'Vehicle' || row['table_type'] === 'vehicle-table') {
@@ -2381,7 +2380,6 @@ $('#shipping_port').select2();
                         var addon = 1;
                         var uuid = row['rowId'];
                     }
-                    console.log(row['model_description_id']);
                     return '<input type="hidden" name="addon_types[]" value="'+ row['addon_type'] +'" > <input type="hidden" name="brand_ids[]" value="'+ row['brand_id'] +'" >' +
                         '<input type="hidden" name="model_line_ids[]" value="'+ row['model_line_id'] +'" >' +
                         '<input type="hidden" name="model_description_ids[]" value="'+ row['model_description_id'] +'" >' +
@@ -2467,7 +2465,6 @@ $('#shipping_port').select2();
 
                     // $('#checkbox-2').attr('disabled', true);
                     var arrayIndex = row['index'] - 1;
-
                     return '<div class="row" style="flex-wrap: unset;margin-left: 2px;">' +
                         '<input type="checkbox" style="height: 20px;width: 15px;margin-right: 5px;" data-table-type="'+ tableType +'" name="is_hide['+ arrayIndex  +']" value="yes" class="checkbox-hide"' +
                         ' checked id="checkbox-'+ row['index'] +'"> ' +
@@ -2951,7 +2948,7 @@ $('#shipping_port').select2();
         // enableOrDisableSubmit();
         showPriceInSelectedValue();
 
-        // console.log(rowData);
+        console.log(rowData);
     });
 
         $('#dtBasicExample2 tbody').on('input', '.price-editable', function(e) {
@@ -3414,12 +3411,10 @@ $('#shipping_port').select2();
                 if(modaltype == "ModelLine" || modaltype == "Brand" || modaltype == "Vehicle")
                 {
                 var modelLineId = rowbmid;
-                console.log(modelLineId);
-                console.log(modaltype);
+                
                 }
                 else
                 {
-                console.log($(this).data('model-line-id'));
                 var modelLineId = $(this).data('model-line-id');
                 }
                 $('#addonsModal').modal('show');

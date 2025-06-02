@@ -12,8 +12,8 @@ class Soitems extends Model
     protected $fillable = [
         'so_id',            // Sales Order ID
         'quotation_items_id', // Quotation Items ID
-        'vehicles_id',      // Vehicles ID
-        // Add any other attributes that you want to allow for mass assignment
+        'vehicles_id', 
+        'so_variant_id',     // Vehicles ID
     ];
     public function vehicle()
     {

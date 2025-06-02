@@ -4,15 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class QuotationItem extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
+     protected $fillable = [
+        'reference_id',
+        'description',
+        'unit_price',
+        'quantity',
+    ];
     public function reference()
     {
         return $this->morphTo();
     }
-    public function quotationVins()
+public function quotationVins()
 {
     return $this->hasMany(QuotationVins::class, 'quotation_items_id');
 }
@@ -35,6 +42,10 @@ public function shippingcertification()
 public function otherlogisticscharges()
 {
     return $this->belongsTo(OtherLogisticsCharges::class, 'reference_id');
+}
+public function soItems()
+{
+    return $this->hasMany(Soitems::class, 'quotation_items_id');
 }
     public $appends = [
         'quotation_addon_items',
