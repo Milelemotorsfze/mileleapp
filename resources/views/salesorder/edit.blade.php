@@ -834,7 +834,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                 number: "Only numeric values are allowed.",
                 min: "Negative values are not allowed."
             }
-        }
+        },
+            onkeyup: false,
+            onfocusout: function(element) {
+                $(element).valid();
+            }
 
     });
 

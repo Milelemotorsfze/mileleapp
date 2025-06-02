@@ -1149,8 +1149,8 @@ class SalesOrderController extends Controller
                                 // Apply gdn_id condition only if so_id is not the same
                                 $query->whereNull('gdn_id');
                             })
-                            ->when(!$hasPermission, function ($query) use ($so) {
-                                $query->where(function ($subQuery) use ($so) {
+                            ->when(!$hasPermission, function ($query) use ($sodetails) {
+                                $query->where(function ($subQuery) use ($sodetails) {
                                     $subQuery->whereNull('booking_person_id')
                                         ->orWhere('booking_person_id', $sodetails->sales_person_id);
                                 });
