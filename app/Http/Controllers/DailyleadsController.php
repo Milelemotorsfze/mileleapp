@@ -341,7 +341,8 @@ class DailyleadsController extends Controller
                 JOIN brands ON master_model_lines.brand_id = brands.id
                 WHERE calls_requirement.lead_id = calls.id) as models_brands'));
                 if (!empty($searchValue)) {
-                    $data->where(function ($query) use ($searchValue) {
+                    $searchValueWithoutCommas = str_replace(',', '', $searchValue);
+                    $data->where(function ($query) use ($searchValue, $searchValueWithoutCommas) {
                         $query->where('calls.name', 'LIKE', "%$searchValue%")
                             ->orWhere('calls.created_at', 'LIKE', "%$searchValue%")
                             ->orWhere('calls.email', 'LIKE', "%$searchValue%")
@@ -349,6 +350,21 @@ class DailyleadsController extends Controller
                             ->orWhere('calls.custom_brand_model', 'LIKE', "%$searchValue%")
                             ->orWhere('calls.location', 'LIKE', "%$searchValue%")
                             ->orWhere('calls.language', 'LIKE', "%$searchValue%")
+                            ->orWhere(function ($q) use ($searchValue, $searchValueWithoutCommas) {
+                                $q->where('quotations.deal_value', 'LIKE', "%$searchValueWithoutCommas%")
+                                    ->orWhere(DB::raw("REPLACE(FORMAT(quotations.deal_value, 0), ',', '')"), 'LIKE', "%$searchValueWithoutCommas%")
+                                    ->orWhere(DB::raw("CONCAT(FORMAT(quotations.deal_value, 0), ' ', quotations.currency)"), 'LIKE', "%$searchValue%");
+                            })
+                            ->orWhere(function ($q) use ($searchValue) {
+                                if (strtolower($searchValue) === 'not signed') {
+                                    $q->whereNull('quotations.signature_status')
+                                    ->orWhere('quotations.signature_status', '');
+                                } elseif (strtolower($searchValue) === 'signed') {
+                                    $q->where('quotations.signature_status', 'Signed');
+                                } else {
+                                    $q->where('quotations.signature_status', 'like', "%$searchValue%");
+                                }
+                            })
                             ->orWhereExists(function ($subquery) use ($searchValue) {
                                 $subquery->select(DB::raw(1))
                                     ->from('calls_requirement')
@@ -424,7 +440,8 @@ class DailyleadsController extends Controller
                 $data->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id');
 
                 if (!empty($searchValue)) {
-                $data->where(function ($query) use ($searchValue) {
+                $searchValueWithoutCommas = str_replace(',', '', $searchValue);
+                $data->where(function ($query) use ($searchValue, $searchValueWithoutCommas) {
                     $query->where('calls.name', 'LIKE', "%$searchValue%")
                         ->orWhere('calls.phone', 'LIKE', "%$searchValue%")
                         ->orWhere('calls.email', 'LIKE', "%$searchValue%")
@@ -435,9 +452,13 @@ class DailyleadsController extends Controller
                         ->orWhere('master_model_lines.model_line', 'LIKE', "%$searchValue%")
                         ->orWhere('calls.remarks', 'LIKE', "%$searchValue%")
                         ->orWhere('quotations.currency', 'LIKE', "%$searchValue%")
-                        ->orwhere('quotations.sales_notes', 'like', "%$searchValue%")
+                        ->orWhere('quotations.sales_notes', 'like', "%$searchValue%")
                         ->orWhere('users.name', 'like', "%$searchValue%")
-                        ->orWhere(DB::raw("CONCAT(FORMAT(quotations.deal_value, 0), ' ', quotations.currency)"), 'LIKE', "%$searchValue%")
+                        ->orWhere(function ($q) use ($searchValue, $searchValueWithoutCommas) {
+                            $q->where('quotations.deal_value', 'LIKE', "%$searchValueWithoutCommas%")
+                                ->orWhere(DB::raw("REPLACE(FORMAT(quotations.deal_value, 0), ',', '')"), 'LIKE', "%$searchValueWithoutCommas%")
+                                ->orWhere(DB::raw("CONCAT(FORMAT(quotations.deal_value, 0), ' ', quotations.currency)"), 'LIKE', "%$searchValue%");
+                        })
                         ->orWhere(function ($q) use ($searchValue) {
                             if (strtolower($searchValue) === 'not signed') {
                                 $q->whereNull('quotations.signature_status')
@@ -1079,7 +1100,7 @@ public function leaddetailpage($id)
         ->where('id', '>', $id)
         ->orderBy('id', 'asc')
         ->first();
-    }
+        }
     // Fetch Previous Lead
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
         if($hasPermission)
