@@ -524,7 +524,6 @@
             $("#form-create").validate({
                 onsubmit: true,
                 onfocusout: function(element) {
-                    // Only validate onlyDigitsNoSpaces for so_number on focusout
                     if (element.name === 'so_number') {
                         let tempRules = { onlyDigitsNoSpaces: true };
                         $(element).rules('remove', 'uniqueSO');
@@ -565,19 +564,13 @@
                         number: "Only numeric values are allowed.",
                         min: "Negative values are not allowed."
                     }
-                },
-                invalidHandler: function(form, validator) {
-                    if (!validator.numberOfInvalids()) {
-                        return;
-                    }
                 }
             });
 
-            // Prevent validation on keyup/blur for SO number, only validate on form submit
+            // Format validation on input
             $('#so_number').on('keyup blur', function(e) {
                 e.stopPropagation();
-                // Only validate the format, not uniqueness
-                if (!/^\d{6}$/.test($(this).val())) {
+                if (!/^\d{6}$/.test($(this).val()) && $(this).val() !== '') {
                     $(this).addClass('error');
                 } else {
                     $(this).removeClass('error');
