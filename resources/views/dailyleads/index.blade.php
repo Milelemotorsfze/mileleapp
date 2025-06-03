@@ -1979,7 +1979,7 @@ function saveRejection() {
       let uniqueValues = new Set();
       column.data().each(function (d) {
         let tempDiv = $('<div>').html(d);
-let textVal = tempDiv.text().trim();
+        let textVal = tempDiv.text().trim();
         if (textVal && !uniqueValues.has(textVal)) {
           uniqueValues.add(textVal);
         }
@@ -1988,6 +1988,61 @@ let textVal = tempDiv.text().trim();
         select.append('<option value="' + val + '">' + val + '</option>');
       });
     });
+  }
+
+  function applyFiltersFromFullData(table, fullData) {
+    table.columns().every(function (index) {
+      const column = this;
+      const colKey = column.dataSrc();
+
+      if (!colKey || ['DT_RowIndex', 'action'].includes(colKey)) return; 
+
+      const selectWrapper = $('<div class="select-wrapper"></div>');
+      const select = $('<select class="form-control my-1" multiple></select>')
+        .appendTo(selectWrapper)
+        .select2({ width: '100%' });
+
+      select.on('change', function () {
+        const val = $(this).val().filter(Boolean); 
+        if (val.length) {
+          const safePattern = val
+            .map(v => '^' + v.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '$')
+            .join('|');
+          column.search(safePattern, true, false).draw();
+        } else {
+          column.search('', true, false).draw();
+        }
+      });
+
+      selectWrapper.appendTo($(column.header()));
+      $(column.header()).addClass('nowrap-td');
+
+      const uniqueValues = new Map(); 
+
+      fullData.forEach(row => {
+        let raw = row[colKey];
+        let tempDiv = document.createElement('div');
+        tempDiv.innerHTML = raw || '';
+        let val = tempDiv.textContent.trim();
+
+        let normalized = val.toLowerCase(); 
+
+        if (val && !uniqueValues.has(normalized)) {
+          uniqueValues.set(normalized, val); 
+        }
+      });
+
+      Array.from(uniqueValues.values()).sort().forEach(val => {
+        select.append(`<option value="${val}">${val}</option>`);
+      });
+      // alertify.success(`🔍 ${colKey}: ${uniqueValues.size} options`);
+    });
+  }
+
+  function stripHtml(html) {
+    const div = document.createElement('div');
+    div.innerHTML = html || '';
+    return div.textContent || div.innerText || '';
   }
 </script>
 <script type="text/javascript">
@@ -2387,7 +2442,19 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         });
         $('#my-table_filter').hide();
 
-       dataTable4 = $('#dtBasicExample4').DataTable({
+  let fullQuotationData = [];
+  $.ajax({
+    url: "{{ route('dailyleads.index', ['status' => 'Quoted']) }}",
+    data: { length: -1 },
+    success: function(response) {
+      fullQuotationData = response.data || [];
+    },
+    complete: function () {
+      $('#my-table_filter').hide();
+          if ($.fn.DataTable.isDataTable('#dtBasicExample4')) {
+        $('#dtBasicExample4').DataTable().clear().destroy();
+      }
+       const dataTable4 = $('#dtBasicExample4').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('dailyleads.index', ['status' => 'Quoted']) }}",
@@ -2567,60 +2634,56 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 }
             },
             { data: 'created_by_name', name: 'created_by_name' },
-{ data: 'sales_person_name', name: 'sales_person_name' },
-@php
-$hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
-@endphp
-@if ($hasFullAccess)
-            {
-    data: 'id',
-    name: 'id',
-    render: function (data, type, row) {
-        const bookingUrl = `{{ url('booking/create') }}/${data}`;
-        const quotationUrlEdit = `{{ url('/proforma_invoice_edit/') }}/${data}`;
-        const soUrl = `{{ url('/saleorder/') }}/${data}`;
-        const preorderUrl = `{{ url('/preorder/') }}/${data}`;
-        let salesOrderOption = '';
-        let booking = '';
-        let preorder = '';
-        let signedlink = '';
-        let uploadedfile = '';
-        if (row.signature_status === 'Signed') {
-            salesOrderOption = `<li><a class="dropdown-item" href="${soUrl}">Sales Order</a></li>`;
-            preorder = `<li><a class="dropdown-item" href="${preorderUrl}">Pre Order</a></li>`;
-        } else {
-            signedlink = `<li><a class="dropdown-item" href="#" onclick="opensignaturelink(${data})">Signature Link</a></li>`;
-            uploadedfile = `<li><a class="dropdown-item" href="#" onclick="uploadingsignedquotation(${data})">Upload Signed Quotation</a></li>`;
-        }
-        return `
-            <div class="dropdown">
-                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
-                    <i class="fa fa-bars" aria-hidden="true"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item"href="${quotationUrlEdit}">Update Quotation</a></li>
-                    ${preorder}
-                    ${salesOrderOption}
-                    <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="openvins(${data})">VINs</a></li>
-                    ${signedlink}
-                    ${uploadedfile}
-                </ul>
-            </div>`;
-    }
-},
-@endif
+            { data: 'sales_person_name', name: 'sales_person_name' },
+            @php
+            $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+            @endphp
+            @if ($hasFullAccess)
+              {
+                data: 'id',
+                name: 'id',
+                render: function (data, type, row) {
+                    const bookingUrl = `{{ url('booking/create') }}/${data}`;
+                    const quotationUrlEdit = `{{ url('/proforma_invoice_edit/') }}/${data}`;
+                    const soUrl = `{{ url('/saleorder/') }}/${data}`;
+                    const preorderUrl = `{{ url('/preorder/') }}/${data}`;
+                    let salesOrderOption = '';
+                    let booking = '';
+                    let preorder = '';
+                    let signedlink = '';
+                    let uploadedfile = '';
+                    if (row.signature_status === 'Signed') {
+                        salesOrderOption = `<li><a class="dropdown-item" href="${soUrl}">Sales Order</a></li>`;
+                        preorder = `<li><a class="dropdown-item" href="${preorderUrl}">Pre Order</a></li>`;
+                    } else {
+                        signedlink = `<li><a class="dropdown-item" href="#" onclick="opensignaturelink(${data})">Signature Link</a></li>`;
+                        uploadedfile = `<li><a class="dropdown-item" href="#" onclick="uploadingsignedquotation(${data})">Upload Signed Quotation</a></li>`;
+                    }
+                    return `
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
+                                <i class="fa fa-bars" aria-hidden="true"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item"href="${quotationUrlEdit}">Update Quotation</a></li>
+                                ${preorder}
+                                ${salesOrderOption}
+                                <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="openvins(${data})">VINs</a></li>
+                                ${signedlink}
+                                ${uploadedfile}
+                            </ul>
+                        </div>`;
+                }
+              },
+            @endif
             ],
-            initComplete: function () {
-              applyColumnFilters('#dtBasicExample4', []);
-            },
-            createdRow: function (row, data, dataIndex) {
-        console.log(data.created_by);
-        if (data.created_by === {{ Auth::id() }}) {
-            $(row).css('background-color', '#FFE5B4');
-        }
-    }
-        });
+      initComplete: function () {
+        applyFiltersFromFullData(this.api(), fullQuotationData);
+      }
+    });
+  }
+});
         $('#my-table_filter').hide();
 
        dataTable5 =  $('#dtBasicExample5').DataTable({
@@ -2860,15 +2923,27 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         });
         $('#my-table_filter').hide();
 
-        dataTable7 =   $('#dtBasicExample7').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('dailyleads.index', ['status' => 'Rejected']) }}",
-            columns: [
-              {
-            data: 'created_at',
-            name: 'created_at',
-             render: function (data, type, row) {
+  let fullRejectedData = [];
+  $.ajax({
+    url: "{{ route('dailyleads.index', ['status' => 'Rejected']) }}",
+    data: { length: -1 },
+    success: function(response) {
+      fullRejectedData = response.data || [];
+    },
+    complete: function () {
+      $('#my-table_filter').hide();
+          if ($.fn.DataTable.isDataTable('#dtBasicExample7')) {
+        $('#dtBasicExample7').DataTable().clear().destroy();
+      }
+       const dataTable7 = $('#dtBasicExample7').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "{{ route('dailyleads.index', ['status' => 'Rejected']) }}",
+        columns: [
+          {
+          data: 'created_at',
+          name: 'created_at',
+          render: function (data, type, row) {
         if (type === 'display' || type === 'filter') {
             if (!data || !moment(data).isValid()) {
                 return '';
@@ -3064,22 +3139,31 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
 },
             ],
             initComplete: function () {
-              applyColumnFilters('#dtBasicExample7', []);
-            },
-            createdRow: function (row, data, dataIndex) {
-        console.log(data.created_by);
-        if (data.created_by === {{ Auth::id() }}) {
-            $(row).css('background-color', '#FFE5B4');
-        }
-    }
-        });
+        applyFiltersFromFullData(this.api(), fullRejectedData);
+      }
+    });
+  }
+});
+
         $('#my-table_filter').hide();
 
-    dataTable8 = $('#dtBasicExample8').DataTable({
-    processing: true,
-    serverSide: true,
-    ajax: "{{ route('dailyleads.index', ['status' => 'Preorder']) }}",
-    columns: [
+  let fullPreOrderData = [];
+  $.ajax({
+    url: "{{ route('dailyleads.index', ['status' => 'Preorder']) }}",
+    data: { length: -1 },
+    success: function(response) {
+      fullPreOrderData = response.data || [];
+    },
+    complete: function () {
+      $('#my-table_filter').hide();
+          if ($.fn.DataTable.isDataTable('#dtBasicExample8')) {
+        $('#dtBasicExample8').DataTable().clear().destroy();
+      }
+       const dataTable8 = $('#dtBasicExample8').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "{{ route('dailyleads.index', ['status' => 'Preorder']) }}",
+        columns: [
         { data: 'quotationsid', name: 'quotationsid' },
         {
             data: 'date_formatted',
@@ -3109,15 +3193,12 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         { data: 'status', name: 'status' },
     ],
     initComplete: function () {
-      applyColumnFilters('#dtBasicExample8', []);
-    },
-    createdRow: function (row, data, dataIndex) {
-        console.log(data.created_by);
-        if (data.created_by === {{ Auth::id() }}) {
-            $(row).css('background-color', '#FFE5B4');
-        }
-    }
+        applyFiltersFromFullData(this.api(), fullPreOrderData);
+      }
     });
+  }
+});
+
     $('#my-table_filter').hide();
 
     dataTable9 = $('#dtBasicExample9').DataTable({
@@ -3211,11 +3292,24 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
     });
     $('#my-table_filter').hide();
 
-    dataTable11 = $('#dtBasicExample11').DataTable({
-    processing: true,
-    serverSide: true,
-    ajax: "{{ route('dailyleads.index', ['status' => 'activelead']) }}",
-    columns: [
+  let fullActiveLeadData = [];
+
+  $.ajax({
+    url: "{{ route('dailyleads.index', ['status' => 'activelead']) }}",
+    data: { length: -1 }, 
+    success: function(response) {
+      fullActiveLeadData = response.data || [];
+    },
+    complete: function () {
+      $('#my-table_filter').hide();
+
+
+
+      dataTable11 = $('#dtBasicExample11').DataTable({
+      processing: true,
+      serverSide: true,
+      ajax: "{{ route('dailyleads.index', ['status' => 'activelead']) }}",
+      columns: [
         {
             data: 'priority',
             name: 'calls.priority',
@@ -3341,23 +3435,32 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         }
     ],
     initComplete: function () {
-      applyColumnFilters('#dtBasicExample11', []); 
-    },
-    createdRow: function (row, data, dataIndex) {
-        console.log(data.created_by);
-        if (data.created_by === {{ Auth::id() }}) {
-            $(row).css('background-color', '#FFE5B4');
-        }
-    }
+        applyFiltersFromFullData(this.api(), fullActiveLeadData);
+      }
+  });
+}
 });
+
 $('#my-table_filter').hide();
 
-    dataTable9 = $('#dtBasicExample10').DataTable({
-    processing: true,
-    serverSide: true,
-    ajax: "{{ route('dailyleads.index', ['status' => 'bulkleads']) }}",
-    columns: [
-        {
+ let fullBulkSpecialData = [];
+  $.ajax({
+    url: "{{ route('dailyleads.index', ['status' => 'bulkleads']) }}",
+    data: { length: -1 },
+    success: function(response) {
+      fullBulkSpecialData = response.data || [];
+    },
+    complete: function () {
+      $('#my-table_filter').hide();
+          if ($.fn.DataTable.isDataTable('#dtBasicExample10')) {
+        $('#dtBasicExample10').DataTable().clear().destroy();
+      }
+      const dataTable9 = $('#dtBasicExample10').DataTable({
+      processing: true,
+      serverSide: true,
+      ajax: "{{ route('dailyleads.index', ['status' => 'bulkleads']) }}",
+      columns: [
+          {
             data: 'leaddate',
             name: 'calls.created_at',
             render: function (data, type, row) {
@@ -3390,42 +3493,37 @@ $('#my-table_filter').hide();
         { data: 'language', name: 'calls.language' },
         { data: 'location', name: 'calls.location' },
         {
-  data: 'remarks',
-  name: 'calls.remarks',
-  title: 'Remarks & Messages',
-  render: function (data, type, row) {
-    const div = document.createElement('div');
-    div.innerHTML = data || '';
-    const plainText = div.textContent.trim();
+          data: 'remarks',
+          name: 'calls.remarks',
+          title: 'Remarks & Messages',
+          render: function (data, type, row) {
+            const div = document.createElement('div');
+            div.innerHTML = data || '';
+            const plainText = div.textContent.trim();
 
-    if (type !== 'display') return plainText;
+            if (type !== 'display') return plainText;
 
-    let shortText = plainText.substring(0, 20);
-    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+            let shortText = plainText.substring(0, 20);
+            let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
-    if (plainText.length > 20) {
-      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
-    }
+            if (plainText.length > 20) {
+              return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+            }
 
-    return plainText;
-  }
-},
-
+            return plainText;
+          }
+        },
         { data: 'createdby', name: 'users.name' },
     ],
     initComplete: function () {
-      applyColumnFilters('#dtBasicExample10', []);
-    },
-    createdRow: function (row, data, dataIndex) {
-        console.log(data.created_by);
-        if (data.created_by === {{ Auth::id() }}) {
-            $(row).css('background-color', '#FFE5B4');
-        }
-    }
+        applyFiltersFromFullData(this.api(), fullBulkSpecialData);
+      }
     });
+  }
+});
+
     $('#my-table_filter').hide();
 
-    });
     function toggleRemarks(uniqueId) {
     const $truncatedText = $('#' + uniqueId + '_truncated');
     const $fullText = $('#' + uniqueId + '_full');
@@ -3447,6 +3545,7 @@ document.getElementById('reason-reject').addEventListener('change', function() {
   } else {
     otherReasonInput.style.display = 'none';
   }
+});
 });
 </script>
 <script>
