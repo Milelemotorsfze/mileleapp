@@ -414,7 +414,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                                                 <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
                                                 <span class="text-danger">* </span><label class="form-label font-size-13">Price</label>
                                                     <input type="number" class="form-control variant-prices widthinput" required name="variants[{{$key+1}}][price]" placeholder="Price"
-                                                        value="{{ $soVariant->price }}" id="price-{{ $key+1 }}" index="{{$key+1}}">
+                                                        value="{{ $soVariant->price }}" id="price-{{ $key+1 }}" index="{{$key+1}}" min="0">
                                                 </div>
                                                 <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
                                                 <span class="text-danger">* </span><label class="form-label font-size-13">Quantity</label>
@@ -589,6 +589,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
     let deletedVariantIds = [];
 
     $(document).ready(function() {
+        // Prevent negative input via keyboard for prices
+        $(document).on('keydown', '.variant-prices', function(e) {
+            if (e.key === '-' || e.key === 'e') {
+                e.preventDefault();
+            }
+        });
+
+        // Ensure no negative values on change for prices
+        $(document).on('change', '.variant-prices', function() {
+            if ($(this).val() < 0) {
+                $(this).val(0);
+            }
+        });
 
         var table1 = $('#so-logs').DataTable({
             processing: true,
@@ -844,11 +857,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                 uniqueSO: true,
                 onlyDigitsNoSpaces: true
             },
-            payment_so: {
-                required: true,
-                number: true,
-                min: 0
-            },
             "variants[*][variant_id]": {
                 required: true
             },
@@ -857,7 +865,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                 spacing: true
             },
             "variants[*][price]": {
-                required: true
+                required: true,
+                number: true,
+                min: 0
             },
             "variants[*][quantity]": {
                 required: true
@@ -868,10 +878,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                 required: "SO Number is required",
                 onlyDigitsNoSpaces: "Only 6 numbers are allowed. No letters, symbols, or spaces."
             },
-            payment_so: {
-                required: "Payment in SO is required.",
-                number: "Only numeric values are allowed.",
-                min: "Negative values are not allowed."
+            "variants[*][price]": {
+                required: "Price is required",
+                number: "Please enter a valid number",
+                min: "Price cannot be negative"
             }
         },
         invalidHandler: function(form, validator) {
@@ -915,7 +925,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                         <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
                           <span class="text-danger">* </span><label class="form-label font-size-13">Price</label>
                         <input type="number" class="form-control variant-prices widthinput" required name="variants[${index}][price]" placeholder="Price"
-                         id="price-${index}" index="${index}">
+                         id="price-${index}" index="${index}" min="0">
                         </div>
                         <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
                           <span class="text-danger">* </span><label class="form-label font-size-13">Quantity</label>
@@ -1275,8 +1285,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
         });
         $('#total_payment').val(sum);
     }
-</script>
-<script>
+
     function updateTotalReceivingPayment() {
         var paymentPerforma = parseFloat(document.getElementById('advance_payment_performa').value) || 0;
         var paymentSO = parseFloat(document.getElementById('payment_so').value) || 0;

@@ -425,7 +425,7 @@
                 <input type="number" class="form-control payment" id="advance_payment_performa" name="advance_payment_performa" value="{{$quotation->quotationdetails->advance_amount}}" readonly>
             </div>
             <div class="col-md-2 mb-3">
-            <span class="error">* </span><label for="payment_so">Payment In SO</label>
+            <span class="text-danger">* </span><label for="payment_so">Payment In SO</label>
                 <input type="number" class="form-control payment" id="payment_so" name="payment_so" value="" required min="0">
             </div>
         </div>
@@ -577,8 +577,7 @@
                 }
             });
         });
-    </script>
-    <script>
+
         function updateTotalReceivingPayment() {
             var paymentPerforma = parseFloat(document.getElementById('advance_payment_performa').value) || 0;
             var paymentSO = parseFloat(document.getElementById('payment_so').value) || 0;
