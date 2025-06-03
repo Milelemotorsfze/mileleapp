@@ -1990,8 +1990,9 @@ function saveRejection() {
     });
   }
 
-  function applyFiltersFromFullData(table, fullData) {
+  function applyFiltersFromFullData(table, fullData, excludeColumns = []) {
     table.columns().every(function (index) {
+      if (excludeColumns.includes(index)) return ;
       const column = this;
       const colKey = column.dataSrc();
 
@@ -2059,7 +2060,7 @@ $(document).ready(function () {
   order: [[0, 'desc']],
   orderCellsTop: true,
   initComplete: function () {
-    applyColumnFilters('#dtBasicExample1', []); 
+    applyColumnFilters('#dtBasicExample1', [11]); 
   }
 });
 $('#my-table_filter').hide();
@@ -2588,7 +2589,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         return data;
     }
         },
-        { data: 'sales_person_name', name: 'sales_person_user.name' },
+        // { data: 'sales_person_name', name: 'sales_person_user.name' },
+         { 
+                    data: 'sales_person_name', 
+                    name: 'sales_person_user.name',
+                    render: function(data, type, row) {
+                        if (type === 'display') {
+                            return data || '';
+                        }
+                        return data;
+                    }
+                },
 
       {
         data: 'deal_value',
@@ -2688,7 +2699,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             @endif
             ],
       initComplete: function () {
-        applyFiltersFromFullData(this.api(), fullQuotationData);
+        applyFiltersFromFullData(this.api(), fullQuotationData, [9, 11, 17, 18, 19, 22]);
       }
     });
   }
@@ -3156,7 +3167,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 },
             ],
             initComplete: function () {
-        applyFiltersFromFullData(this.api(), fullRejectedData);
+        applyFiltersFromFullData(this.api(), fullRejectedData, [9, 11, 13, 16, 17, 21, 22]);
       }
     });
   }
@@ -3210,7 +3221,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         { data: 'status', name: 'pre_orders.status' },
     ],
     initComplete: function () {
-        applyFiltersFromFullData(this.api(), fullPreOrderData);
+        applyFiltersFromFullData(this.api(), fullPreOrderData, []);
       }
     });
   }
@@ -3452,7 +3463,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     ],
     initComplete: function () {
-        applyFiltersFromFullData(this.api(), fullActiveLeadData);
+        applyFiltersFromFullData(this.api(), fullActiveLeadData, []);
       }
   });
 }
@@ -3542,7 +3553,7 @@ $('#my-table_filter').hide();
         { data: 'createdby', name: 'users.name' },
     ],
     initComplete: function () {
-        applyFiltersFromFullData(this.api(), fullBulkSpecialData);
+        applyFiltersFromFullData(this.api(), fullBulkSpecialData, []);
       }
     });
   }
