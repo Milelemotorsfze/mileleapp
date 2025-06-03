@@ -1126,6 +1126,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                         placeholder: 'Select Vin',
                     });
 
+                    $(this).find('.variants').valid();
                 });
                 calculateTotalSOAmount();
             }
