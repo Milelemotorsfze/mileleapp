@@ -2025,6 +2025,10 @@ function saveRejection() {
         tempDiv.innerHTML = raw || '';
         let val = tempDiv.textContent.trim();
 
+        if (colKey === 'signature_status') {
+        val = val === 'Signed' ? 'Signed' : 'Not Signed';
+      }
+
         let normalized = val.toLowerCase(); 
 
         if (val && !uniqueValues.has(normalized)) {
@@ -2035,7 +2039,6 @@ function saveRejection() {
       Array.from(uniqueValues.values()).sort().forEach(val => {
         select.append(`<option value="${val}">${val}</option>`);
       });
-      // alertify.success(`🔍 ${colKey}: ${uniqueValues.size} options`);
     });
   }
 
@@ -2460,19 +2463,18 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             ajax: "{{ route('dailyleads.index', ['status' => 'Quoted']) }}",
             columns: [
               {
-            data: 'created_at',
-            name: 'created_at',
-             render: function (data, type, row) {
-        if (type === 'display' || type === 'filter') {
-            if (!data || !moment(data).isValid()) {
-                return '';
-            }
-            // Convert the date to your desired format
-            return moment(data).format('DD-MMM-YYYY');
-        }
-        return data;
-    }
-        },
+                data: 'created_at',
+                name: 'created_at',
+                render: function (data, type, row) {
+                  if (type === 'display' || type === 'filter') {
+                    if (!data || !moment(data).isValid()) {
+                        return '';
+                    }
+                    return moment(data).format('DD-MMM-YYYY');
+                  }
+                  return data;
+                }
+              },
                 { data: 'type', name: 'type' },
                 { data: 'name', name: 'name' },
                 { data: 'phone', name: 'phone' },
@@ -2520,7 +2522,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 },
                 {
     data: 'salesnotes',
-    name: 'salesnotes',
+    name: 'prospectings.salesnotes',
     searchable: false,
     render: function (data, type, row) {
         const maxLength = 20;
@@ -2586,11 +2588,18 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         return data;
     }
         },
-        { data: 'salespersonname', name: 'users.name' },
-                { data: 'ddealvalues', name: 'ddealvalues', searchable: false },
-                {
+        { data: 'sales_person_name', name: 'sales_person_user.name' },
+
+      {
+        data: 'deal_value',
+        name: 'deal_value',
+        render: function(data, type, row) {
+          return data || '';
+        }
+      },
+      {
     data: 'qsalesnotes',
-    name: 'qsalesnotes',
+    name: 'quotations.sales_notes',
     searchable: false,
     render: function (data, type, row) {
         const maxLength = 20;
@@ -3066,8 +3075,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         return data;
     }
         },
-                { data: 'qdealvalues', name: 'qdealvalues', searchable: false},
-                {
+
+      {
+        data: 'deal_value',
+        name: 'deal_value',
+        render: function(data) {
+            return data || '';
+        }
+      },
+
+    {
     data: 'qsalesnotes',
     name: 'qsalesnotes',
     searchable: false,
@@ -3164,7 +3181,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         serverSide: true,
         ajax: "{{ route('dailyleads.index', ['status' => 'Preorder']) }}",
         columns: [
-        { data: 'quotationsid', name: 'quotationsid' },
+        { data: 'quotationsid', name: 'quotations.id' },
         {
             data: 'date_formatted',
             name: 'quotations.date',
@@ -3188,9 +3205,9 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         { data: 'notes', name: 'pre_orders_items.notes' },
         { data: 'name', name: 'varaints.name' },
         { data: 'qty', name: 'pre_orders_items.qty' },
-        { data: 'countryname', name: 'countryname' },
-        { data: 'salesperson', name: 'salesperson' },
-        { data: 'status', name: 'status' },
+        { data: 'countryname', name: 'countries.name' },
+        { data: 'salesperson', name: 'users.name' },
+        { data: 'status', name: 'pre_orders.status' },
     ],
     initComplete: function () {
         applyFiltersFromFullData(this.api(), fullPreOrderData);
@@ -3316,7 +3333,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             title: 'Priority'
         },
         {
-            data: 'leaddate',
+            data: 'created_at',
             name: 'calls.created_at',
             title: 'Lead Date',
             render: function (data, type, row) {
@@ -3460,21 +3477,30 @@ $('#my-table_filter').hide();
       serverSide: true,
       ajax: "{{ route('dailyleads.index', ['status' => 'bulkleads']) }}",
       columns: [
-          {
-            data: 'leaddate',
+        {
+            data: 'created_at',
             name: 'calls.created_at',
+          //   render: function (data, type, row) {
+          //   if (type === 'display' || type === 'filter') {
+          //     if (!data) return '';
+          //     const parts = data.split(' ');
+          //     if (parts.length === 3) {
+          //         const dateStr = `${parts[0]}-${parts[1]}-${parts[2]}`;
+          //         return moment(dateStr, 'YYYY-MM-DD').format('DD-MMM-YYYY');
+          //     }
+          //     return data;
+          //     }
+          //   return data;
+          // }
             render: function (data, type, row) {
-            if (type === 'display' || type === 'filter') {
-              if (!data) return '';
-              const parts = data.split(' ');
-              if (parts.length === 3) {
-                  const dateStr = `${parts[0]}-${parts[1]}-${parts[2]}`;
-                  return moment(dateStr, 'YYYY-MM-DD').format('DD-MMM-YYYY');
+              if (type === 'display' || type === 'filter') {
+                if (!data || !moment(data).isValid()) {
+                    return '';
+                }
+                return moment(data).format('DD-MMM-YYYY');
               }
               return data;
-              }
-            return data;
-          }
+            }
         },
         { data: 'type', name: 'calls.type' },
         {

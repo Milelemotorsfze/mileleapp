@@ -127,13 +127,19 @@ class DailyleadsController extends Controller
                 ->where('pre_orders.requested_by', $id)
                 ->groupby('pre_orders.id')
                 ->when($search, function ($query, $search) {
-                    $query->where(function ($q) use ($search) {
-                        $q->where('quotations.sales_notes', 'like', "%$search%")
-                          ->orWhere('varaints.name', 'like', "%$search%")
-                          ->orWhere('countries.name', 'like', "%$search%")
-                          ->orWhere('users.name', 'like', "%$search%");
-                    });
+                $query->where(function ($q) use ($search) {
+                    $q->where('quotations.id', 'like', "%$search%")
+                    ->orWhere('quotations.date', 'like', "%$search%")
+                    ->orWhere('quotations.deal_value', 'like', "%$search%")
+                    ->orWhere('quotations.sales_notes', 'like', "%$search%")
+                    ->orWhere('pre_orders_items.qty', 'like', "%$search%")
+                    ->orWhere('pre_orders_items.notes', 'like', "%$search%")
+                    ->orWhere('varaints.name', 'like', "%$search%")
+                    ->orWhere('countries.name', 'like', "%$search%")
+                    ->orWhere('users.name', 'like', "%$search%")
+                    ->orWhere('pre_orders.status', 'like', "%$search%");
                 });
+            });
                 return DataTables::of($preorders)->toJson();  
             }
             else if($status === "followup")
@@ -188,7 +194,7 @@ class DailyleadsController extends Controller
                     'calls.language',
                     'master_model_lines.model_line',
                     'brands.brand_name',
-                    DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d') as leaddate"),
+                    'calls.created_at',
                     DB::raw("sales_person_user.name as sales_person_name"),
                     DB::raw("created_by_user.name as created_by_name")
                 ])
@@ -217,8 +223,6 @@ class DailyleadsController extends Controller
                             ->orWhere('master_model_lines.model_line', 'LIKE', "%$searchValue%");
                     });
                 }
-                \Log::info('Search Term 11111 : ' . $searchValue);
-
             
                 $activelead = $activelead->groupBy('calls.id');
             
@@ -244,7 +248,6 @@ class DailyleadsController extends Controller
                     'master_model_lines.model_line',
                     'brands.brand_name',
                     'calls.created_at',
-                    \DB::raw("DATE_FORMAT(calls.created_at, '%Y %m %d') as leaddate"),
                 ])
                 ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
                 ->leftJoin('users', 'calls.sales_person', '=', 'users.id')
@@ -261,19 +264,20 @@ class DailyleadsController extends Controller
                     $colName = $col['name'] ?? '';
                     $search = trim($col['search']['value'] ?? '');
 
-                    if ($colName === 'calls.created_at' && $search !== '') {
-                        $terms = explode('|', $search);
-                        foreach ($terms as $term) {
-                            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $term)) {
-                                $bulkleads->whereDate('calls.created_at', $term);
-                            }
-                        }
-                    }
+                    // if ($colName === 'calls.created_at' && $search !== '') {
+                    //     $terms = explode('|', $search);
+                    //     foreach ($terms as $term) {
+                    //         if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $term)) {
+                    //             $bulkleads->whereDate('calls.created_at', $term);
+                    //         }
+                    //     }
+                    // }
                 }
 
                 if (!empty($searchValue)) {
                     $bulkleads->where(function ($query) use ($searchValue) {
                         $query->where('calls.name', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.created_at', 'LIKE', "%$searchValue%")
                             ->orWhere('calls.phone', 'LIKE', "%$searchValue%")
                             ->orWhere('calls.email', 'LIKE', "%$searchValue%")
                             ->orWhere('calls.language', 'LIKE', "%$searchValue%")
@@ -284,9 +288,7 @@ class DailyleadsController extends Controller
                             ->orWhere('master_model_lines.model_line', 'LIKE', "%$searchValue%");
                     });
                 }
-            
-                \Log::info('Search Term bulkleads : ' . $searchValue);
-            
+                        
                 $bulkleads = $bulkleads->groupBy('calls.id');
             
                 return DataTables::of($bulkleads)->toJson();   
@@ -373,6 +375,7 @@ class DailyleadsController extends Controller
                     $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
                     $data->leftJoin('users as created_by_user', 'calls.created_by', '=', 'created_by_user.id');
                     $data->leftJoin('users as sales_person_user', 'calls.sales_person', '=', 'sales_person_user.id');
+
                 } elseif ($status === 'New Demand') {
                     $data->addSelect(
                         DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%Y %m %d'), '') as date"),
@@ -384,7 +387,8 @@ class DailyleadsController extends Controller
                     $data->addSelect(DB::raw("DATE_FORMAT(demand.date, '%Y %m %d') as ddate"), 'demand.salesnotes as dsalesnotes');
                     $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
                     $data->leftJoin('users as created_by_user', 'calls.created_by', '=', 'created_by_user.id');
-                $data->leftJoin('users as sales_person_user', 'calls.sales_person', '=', 'sales_person_user.id');
+                    $data->leftJoin('users as sales_person_user', 'calls.sales_person', '=', 'sales_person_user.id');
+
                 } elseif ($status === 'Quoted') {
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%Y %m %d'), '') as date"),
@@ -406,7 +410,10 @@ class DailyleadsController extends Controller
                     DB::raw("DATE_FORMAT(quotations.date, '%Y %m %d') as qdate"),
                     'quotations.sales_notes as qsalesnotes',
                     DB::raw("IFNULL(quotations.file_path, '') as file_path"),
-                    DB::raw("CONCAT(IFNULL(FORMAT(quotations.deal_value, 0), ''), ' ', IFNULL(quotations.currency, '')) as ddealvalues"),
+                    // DB::raw("CONCAT(IFNULL(FORMAT(quotations.deal_value, 0), ''), ' ', IFNULL(quotations.currency, '')) as ddealvalues"),
+                    'quotations.deal_value as raw_deal_value',
+                    'quotations.currency',
+                    DB::raw("CONCAT(FORMAT(quotations.deal_value, 0), ' ', quotations.currency) as deal_value"),                    
                     DB::raw("IFNULL(quotations.signature_status, '') as signature_status"),
                     'users.name as salespersonname',
                 ]);
@@ -417,18 +424,32 @@ class DailyleadsController extends Controller
                 $data->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id');
 
                 if (!empty($searchValue)) {
-                    $data->where(function ($query) use ($searchValue) {
-                        $query->where('calls.name', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.phone', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.email', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.language', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.location', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.type', 'LIKE', "%$searchValue%")
-                            ->orWhere('brands.brand_name', 'LIKE', "%$searchValue%")
-                            ->orWhere('master_model_lines.model_line', 'LIKE', "%$searchValue%")
-                            ->orWhere('calls.remarks', 'LIKE', "%$searchValue%"); 
+                $data->where(function ($query) use ($searchValue) {
+                    $query->where('calls.name', 'LIKE', "%$searchValue%")
+                        ->orWhere('calls.phone', 'LIKE', "%$searchValue%")
+                        ->orWhere('calls.email', 'LIKE', "%$searchValue%")
+                        ->orWhere('calls.language', 'LIKE', "%$searchValue%")
+                        ->orWhere('calls.location', 'LIKE', "%$searchValue%")
+                        ->orWhere('calls.type', 'LIKE', "%$searchValue%")
+                        ->orWhere('brands.brand_name', 'LIKE', "%$searchValue%")
+                        ->orWhere('master_model_lines.model_line', 'LIKE', "%$searchValue%")
+                        ->orWhere('calls.remarks', 'LIKE', "%$searchValue%")
+                        ->orWhere('quotations.currency', 'LIKE', "%$searchValue%")
+                        ->orwhere('quotations.sales_notes', 'like', "%$searchValue%")
+                        ->orWhere('users.name', 'like', "%$searchValue%")
+                        ->orWhere(DB::raw("CONCAT(FORMAT(quotations.deal_value, 0), ' ', quotations.currency)"), 'LIKE', "%$searchValue%")
+                        ->orWhere(function ($q) use ($searchValue) {
+                            if (strtolower($searchValue) === 'not signed') {
+                                $q->whereNull('quotations.signature_status')
+                                ->orWhere('quotations.signature_status', '');
+                            } elseif (strtolower($searchValue) === 'signed') {
+                                $q->where('quotations.signature_status', 'Signed');
+                            } else {
+                                $q->where('quotations.signature_status', 'like', "%$searchValue%");
+                            }
+                        });
                     });
-                }
+            }
                 
             } elseif ($status === 'Negotiation') {
                 $data->addSelect(
@@ -455,6 +476,7 @@ class DailyleadsController extends Controller
                     DB::raw("CONCAT(IFNULL(negotiations.dealvalues, ''), ' ', IFNULL(negotiations.currency, '')) as ndealvalues"),
                 );
                 $data->leftJoin('negotiations', 'calls.id', '=', 'negotiations.calls_id');
+
             } elseif ($status === 'Closed') {
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%Y %m %d'), '') as date"),
@@ -494,6 +516,8 @@ class DailyleadsController extends Controller
                 });
                 $data->addSelect('so.so_number');
                 $data->leftJoin('users', 'quotations.created_by', '=', 'users.id');
+
+
             } elseif ($status === 'Rejected') {
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%Y %m %d'), '') as date"),
@@ -511,7 +535,7 @@ class DailyleadsController extends Controller
                     DB::raw("IFNULL(DATE_FORMAT(quotations.date, '%Y %m %d'), '') as qdate"),
                     DB::raw("IFNULL(quotations.sales_notes, '') as qsalesnotes"),
                     DB::raw("IFNULL(quotations.file_path, '') as file_path"),
-                    DB::raw("CONCAT(IFNULL(quotations.deal_value, ''), ' ', IFNULL(quotations.currency, '')) as qdealvalues"),
+                    DB::raw("CONCAT(FORMAT(quotations.deal_value, 0), ' ', IFNULL(quotations.currency, '')) as deal_value")
                 );
                 $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
                 $data->addSelect(
