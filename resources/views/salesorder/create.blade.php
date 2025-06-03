@@ -457,156 +457,182 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
 <script>
      let QuotaionItemCount = '{{ $quotationItems->count() }}';
     $(document).ready(function() {
-
-            $('.vins').select2({
-                placeholder: 'Select VIN',
-            });
-
-            for (let i = 1; i <= QuotaionItemCount; i++) {
-                let index = $('#vin-' + i).attr('index');
-                let quantity = $('#vin-' + i).attr('data-quantity');
-                initializeSelect2(index, quantity)
+        // Prevent negative input via keyboard for all payment fields
+        $(document).on('keydown', '#total_payment, #receiving_payment, #advance_payment_performa, #payment_so', function(e) {
+            if (e.key === '-' || e.key === 'e') {
+                e.preventDefault();
             }
+        });
 
-            function initializeSelect2(index, quantity) {
-
-                let $select = $('#vin-' + index);
-                if ($select.hasClass("select2-hidden-accessible")) {
-                    let select2Instance = $select.data('select2');
-
-                    select2Instance.options.options.maximumSelectionLength = quantity;
-
-                    $select.select2('destroy').select2({
-                        placeholder: 'Select VIN',
-                        allowClear: true,
-                        width: '100%',
-                        maximumSelectionLength: quantity
-                    });
-                } else {
-                    $select.select2({
-                        placeholder: 'Select VIN',
-                        allowClear: true,
-                        width: '100%',
-                        maximumSelectionLength: quantity
-                    });
-                }
+        // Ensure no negative values on change for all payment fields
+        $(document).on('change', '#total_payment, #receiving_payment, #advance_payment_performa, #payment_so', function() {
+            if ($(this).val() < 0) {
+                $(this).val(0);
             }
-            $.validator.addMethod("uniqueSO", function(value, element, param) {
-                // Return if value is empty or not 6 digits
-                if (!value || !/^\d{6}$/.test(value)) {
-                    return true;
-                }
+        });
 
-                // Check if we already validated this value
-                let $element = $(element);
-                let lastValue = $element.data('lastCheckedValue');
-                let lastResult = $element.data('lastCheckResult');
-                
-                if (lastValue === value) {
-                    return lastResult;
-                }
+        $('.vins').select2({
+            placeholder: 'Select VIN',
+        });
 
-                let isUnique = false;
-                $.ajax({
-                    url: '/so-unique-check',
-                    type: 'GET',
-                    data: {
-                        so_number: "SO-" + value,
-                        _token: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    async: false,
-                    success: function(response) {
-                        isUnique = !response.exists;
-                        // Store the result for this value
-                        $element.data('lastCheckedValue', value);
-                        $element.data('lastCheckResult', isUnique);
-                    }
+        for (let i = 1; i <= QuotaionItemCount; i++) {
+            let index = $('#vin-' + i).attr('index');
+            let quantity = $('#vin-' + i).attr('data-quantity');
+            initializeSelect2(index, quantity)
+        }
+
+        function initializeSelect2(index, quantity) {
+
+            let $select = $('#vin-' + index);
+            if ($select.hasClass("select2-hidden-accessible")) {
+                let select2Instance = $select.data('select2');
+
+                select2Instance.options.options.maximumSelectionLength = quantity;
+
+                $select.select2('destroy').select2({
+                    placeholder: 'Select VIN',
+                    allowClear: true,
+                    width: '100%',
+                    maximumSelectionLength: quantity
                 });
-                return isUnique;
-            }, "SO Number already exists. Please enter a different one.");
+            } else {
+                $select.select2({
+                    placeholder: 'Select VIN',
+                    allowClear: true,
+                    width: '100%',
+                    maximumSelectionLength: quantity
+                });
+            }
+        }
+        $.validator.addMethod("uniqueSO", function(value, element, param) {
+            // Return if value is empty or not 6 digits
+            if (!value || !/^\d{6}$/.test(value)) {
+                return true;
+            }
 
-            $.validator.addMethod("onlyDigitsNoSpaces", function(value, element) {
-                return this.optional(element) || /^\d{6}$/.test(value);
-            });
+            // Check if we already validated this value
+            let $element = $(element);
+            let lastValue = $element.data('lastCheckedValue');
+            let lastResult = $element.data('lastCheckResult');
+            
+            if (lastValue === value) {
+                return lastResult;
+            }
 
-            $("#form-create").validate({
-                onsubmit: true,
-                onfocusout: function(element) {
-                    if (element.name === 'so_number') {
-                        let tempRules = { onlyDigitsNoSpaces: true };
-                        $(element).rules('remove', 'uniqueSO');
-                        $(element).valid();
-                        $(element).rules('add', { uniqueSO: true });
-                    }
+            let isUnique = false;
+            $.ajax({
+                url: '/so-unique-check',
+                type: 'GET',
+                data: {
+                    so_number: "SO-" + value,
+                    _token: $('meta[name="csrf-token"]').attr('content')
                 },
-                onkeyup: false,
-                onclick: false,
-                submitHandler: function(form) {
-                    if ($(form).valid()) {
-                        form.submit();
-                    }
-                },
-                showErrors: function(errorMap, errorList) {
-                    this.defaultShowErrors();
-                },
-                ignore: [],
-                rules: {
-                    so_number: {
-                        required: true,
-                        uniqueSO: true,
-                        onlyDigitsNoSpaces: true
-                    },
-                    payment_so: {
-                        required: true,
-                        number: true,
-                        min: 0
-                    }
-                },
-                messages: {
-                    so_number: {
-                        required: "SO Number is required",
-                        onlyDigitsNoSpaces: "Only 6 numbers are allowed. No letters, symbols, or spaces."
-                    },
-                    payment_so: {
-                        required: "Payment in SO is required.",
-                        number: "Only numeric values are allowed.",
-                        min: "Negative values are not allowed."
-                    }
+                async: false,
+                success: function(response) {
+                    isUnique = !response.exists;
+                    // Store the result for this value
+                    $element.data('lastCheckedValue', value);
+                    $element.data('lastCheckResult', isUnique);
                 }
             });
+            return isUnique;
+        }, "SO Number already exists. Please enter a different one.");
 
-            // Format validation on input
-            $('#so_number').on('keyup blur', function(e) {
-                e.stopPropagation();
-                if (!/^\d{6}$/.test($(this).val()) && $(this).val() !== '') {
-                    $(this).addClass('error');
-                } else {
-                    $(this).removeClass('error');
+        $.validator.addMethod("onlyDigitsNoSpaces", function(value, element) {
+            return this.optional(element) || /^\d{6}$/.test(value);
+        });
+
+        $("#form-create").validate({
+            onsubmit: true,
+            onfocusout: function(element) {
+                if (element.name === 'so_number') {
+                    let tempRules = { onlyDigitsNoSpaces: true };
+                    $(element).rules('remove', 'uniqueSO');
+                    $(element).valid();
+                    $(element).rules('add', { uniqueSO: true });
                 }
-            });
+            },
+            onkeyup: false,
+            onclick: false,
+            submitHandler: function(form) {
+                if ($(form).valid()) {
+                    form.submit();
+                }
+            },
+            showErrors: function(errorMap, errorList) {
+                this.defaultShowErrors();
+            },
+            ignore: [],
+            rules: {
+                so_number: {
+                    required: true,
+                    uniqueSO: true,
+                    onlyDigitsNoSpaces: true
+                },
+                payment_so: {
+                    required: true,
+                    number: true,
+                    min: 0
+                }
+            },
+            messages: {
+                so_number: {
+                    required: "SO Number is required",
+                    onlyDigitsNoSpaces: "Only 6 numbers are allowed. No letters, symbols, or spaces."
+                },
+                payment_so: {
+                    required: "Payment in SO is required.",
+                    number: "Only numeric values are allowed.",
+                    min: "Negative values are not allowed."
+                }
+            }
         });
-    </script>
-    <script>
-        function updateTotalReceivingPayment() {
-            var paymentPerforma = parseFloat(document.getElementById('advance_payment_performa').value) || 0;
-            var paymentSO = parseFloat(document.getElementById('payment_so').value) || 0;
-            var totalReceivingPayment = paymentPerforma + paymentSO;
-            document.getElementById('receiving_payment').value = totalReceivingPayment.toFixed(2);
-        }
 
-        function updateBalancePayment() {
-            var totalPayment = parseFloat(document.getElementById('total_payment').value) || 0;
-            var totalReceivingPayment = parseFloat(document.getElementById('receiving_payment').value) || 0;
-            var balancePayment = totalPayment - totalReceivingPayment;
-            document.getElementById('balance_payment').value = balancePayment.toFixed(2);
-        }
-        document.querySelectorAll('.payment').forEach(function(element) {
-            element.addEventListener('input', function() {
-                updateTotalReceivingPayment();
-                updateBalancePayment();
-            });
+        // Format validation on input
+        $('#so_number').on('keyup blur', function(e) {
+            e.stopPropagation();
+            if (!/^\d{6}$/.test($(this).val()) && $(this).val() !== '') {
+                $(this).addClass('error');
+            } else {
+                $(this).removeClass('error');
+            }
         });
-    </script>
+    });
+
+    function updateTotalReceivingPayment() {
+        var paymentPerforma = parseFloat(document.getElementById('advance_payment_performa').value) || 0;
+        var paymentSO = parseFloat(document.getElementById('payment_so').value) || 0;
+        // Ensure payment_so is not negative
+        if (paymentSO < 0) {
+            document.getElementById('payment_so').value = 0;
+            paymentSO = 0;
+        }
+        var totalReceivingPayment = paymentPerforma + paymentSO;
+        document.getElementById('receiving_payment').value = totalReceivingPayment.toFixed(2);
+    }
+
+    function updateBalancePayment() {
+        var totalPayment = parseFloat(document.getElementById('total_payment').value) || 0;
+        var totalReceivingPayment = parseFloat(document.getElementById('receiving_payment').value) || 0;
+        var balancePayment = totalPayment - totalReceivingPayment;
+        document.getElementById('balance_payment').value = balancePayment.toFixed(2);
+    }
+    document.querySelectorAll('.payment').forEach(function(element) {
+        element.addEventListener('input', function() {
+            if (this.id === 'payment_so' && parseFloat(this.value) < 0) {
+                this.value = 0;
+            }
+            updateTotalReceivingPayment();
+            updateBalancePayment();
+        });
+    });
+
+    // Update the payment input fields to have min="0"
+    document.getElementById('total_payment').setAttribute('min', '0');
+    document.getElementById('receiving_payment').setAttribute('min', '0');
+    document.getElementById('advance_payment_performa').setAttribute('min', '0');
+    document.getElementById('payment_so').setAttribute('min', '0');
+</script>
     <!-- <script>
 // JavaScript code to check for duplicate VINs
 // function checkForDuplicateVINs() {

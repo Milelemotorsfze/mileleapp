@@ -414,7 +414,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                                                 <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
                                                 <span class="text-danger">* </span><label class="form-label font-size-13">Price</label>
                                                     <input type="number" class="form-control variant-prices widthinput" required name="variants[{{$key+1}}][price]" placeholder="Price"
-                                                        value="{{ $soVariant->price }}" id="price-{{ $key+1 }}" index="{{$key+1}}">
+                                                        value="{{ $soVariant->price }}" id="price-{{ $key+1 }}" index="{{$key+1}}" min="0">
                                                 </div>
                                                 <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
                                                 <span class="text-danger">* </span><label class="form-label font-size-13">Quantity</label>
@@ -470,17 +470,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
                                 <label for="total_payment"><strong>Total Payment</strong></label>
-                                <input type="number" class="form-control" readonly id="total_payment" name="total_payment" value="{{$so->total}}">
+                                <input type="number" class="form-control" readonly id="total_payment" name="total_payment" value="{{$so->total}}" min="0">
                             </div>
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
                                 <label for="receiving_payment"><strong>Total Receiving Payment</strong></label>
-                                <input type="number" class="form-control" id="receiving_payment" name="receiving_payment" readonly value="{{$so->receiving}}">
+                                <input type="number" class="form-control" id="receiving_payment" name="receiving_payment" readonly value="{{$so->receiving}}" min="0">
                             </div>
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
                                 <label for="advance_payment_performa"><strong>Payment In Performa</strong></label>
-                                <input type="number" class="form-control payment" id="advance_payment_performa" name="advance_payment_performa" value="{{$so->paidinperforma}}">
+                                <input type="number" class="form-control payment" id="advance_payment_performa" name="advance_payment_performa" value="{{$so->paidinperforma}}" min="0">
                             </div>
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
@@ -589,6 +589,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
     let deletedVariantIds = [];
 
     $(document).ready(function() {
+        // Prevent negative input via keyboard for all payment fields
+        $(document).on('keydown', '#total_payment, #receiving_payment, #advance_payment_performa, #payment_so', function(e) {
+            if (e.key === '-' || e.key === 'e') {
+                e.preventDefault();
+            }
+        });
+
+        // Ensure no negative values on change for all payment fields
+        $(document).on('change', '#total_payment, #receiving_payment, #advance_payment_performa, #payment_so', function() {
+            if ($(this).val() < 0) {
+                $(this).val(0);
+            }
+        });
 
         var table1 = $('#so-logs').DataTable({
             processing: true,
@@ -844,11 +857,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                 uniqueSO: true,
                 onlyDigitsNoSpaces: true
             },
-            payment_so: {
-                required: true,
-                number: true,
-                min: 0
-            },
             "variants[*][variant_id]": {
                 required: true
             },
@@ -857,7 +865,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                 spacing: true
             },
             "variants[*][price]": {
-                required: true
+                required: true,
+                number: true,
+                min: 0
             },
             "variants[*][quantity]": {
                 required: true
@@ -868,10 +878,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                 required: "SO Number is required",
                 onlyDigitsNoSpaces: "Only 6 numbers are allowed. No letters, symbols, or spaces."
             },
-            payment_so: {
-                required: "Payment in SO is required.",
-                number: "Only numeric values are allowed.",
-                min: "Negative values are not allowed."
+            "variants[*][price]": {
+                required: "Price is required",
+                number: "Please enter a valid number",
+                min: "Price cannot be negative"
             }
         },
         invalidHandler: function(form, validator) {
@@ -915,7 +925,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                         <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
                           <span class="text-danger">* </span><label class="form-label font-size-13">Price</label>
                         <input type="number" class="form-control variant-prices widthinput" required name="variants[${index}][price]" placeholder="Price"
-                         id="price-${index}" index="${index}">
+                         id="price-${index}" index="${index}" min="0">
                         </div>
                         <div class="col-sm-12 col-md-2 col-lg-2 col-xxl-2">
                           <span class="text-danger">* </span><label class="form-label font-size-13">Quantity</label>
@@ -1275,11 +1285,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
         });
         $('#total_payment').val(sum);
     }
-</script>
-<script>
+
     function updateTotalReceivingPayment() {
         var paymentPerforma = parseFloat(document.getElementById('advance_payment_performa').value) || 0;
         var paymentSO = parseFloat(document.getElementById('payment_so').value) || 0;
+        // Ensure payment_so is not negative
+        if (paymentSO < 0) {
+            document.getElementById('payment_so').value = 0;
+            paymentSO = 0;
+        }
         var totalReceivingPayment = paymentPerforma + paymentSO;
         document.getElementById('receiving_payment').value = totalReceivingPayment.toFixed(2);
     }
@@ -1292,6 +1306,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
     }
     document.querySelectorAll('.payment').forEach(function(element) {
         element.addEventListener('input', function() {
+            if (this.id === 'payment_so' && parseFloat(this.value) < 0) {
+                this.value = 0;
+            }
             updateTotalReceivingPayment();
             updateBalancePayment();
         });
