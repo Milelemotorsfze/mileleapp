@@ -470,17 +470,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
                                 <label for="total_payment"><strong>Total Payment</strong></label>
-                                <input type="number" class="form-control" readonly id="total_payment" name="total_payment" value="{{$so->total}}">
+                                <input type="number" class="form-control" readonly id="total_payment" name="total_payment" value="{{$so->total}}" min="0">
                             </div>
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
                                 <label for="receiving_payment"><strong>Total Receiving Payment</strong></label>
-                                <input type="number" class="form-control" id="receiving_payment" name="receiving_payment" readonly value="{{$so->receiving}}">
+                                <input type="number" class="form-control" id="receiving_payment" name="receiving_payment" readonly value="{{$so->receiving}}" min="0">
                             </div>
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
                                 <label for="advance_payment_performa"><strong>Payment In Performa</strong></label>
-                                <input type="number" class="form-control payment" id="advance_payment_performa" name="advance_payment_performa" value="{{$so->paidinperforma}}">
+                                <input type="number" class="form-control payment" id="advance_payment_performa" name="advance_payment_performa" value="{{$so->paidinperforma}}" min="0">
                             </div>
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
@@ -589,15 +589,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
     let deletedVariantIds = [];
 
     $(document).ready(function() {
-        // Prevent negative input via keyboard for prices
-        $(document).on('keydown', '.variant-prices', function(e) {
+        // Prevent negative input via keyboard for all payment fields
+        $(document).on('keydown', '#total_payment, #receiving_payment, #advance_payment_performa, #payment_so', function(e) {
             if (e.key === '-' || e.key === 'e') {
                 e.preventDefault();
             }
         });
 
-        // Ensure no negative values on change for prices
-        $(document).on('change', '.variant-prices', function() {
+        // Ensure no negative values on change for all payment fields
+        $(document).on('change', '#total_payment, #receiving_payment, #advance_payment_performa, #payment_so', function() {
             if ($(this).val() < 0) {
                 $(this).val(0);
             }
@@ -1289,6 +1289,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
     function updateTotalReceivingPayment() {
         var paymentPerforma = parseFloat(document.getElementById('advance_payment_performa').value) || 0;
         var paymentSO = parseFloat(document.getElementById('payment_so').value) || 0;
+        // Ensure payment_so is not negative
+        if (paymentSO < 0) {
+            document.getElementById('payment_so').value = 0;
+            paymentSO = 0;
+        }
         var totalReceivingPayment = paymentPerforma + paymentSO;
         document.getElementById('receiving_payment').value = totalReceivingPayment.toFixed(2);
     }
@@ -1301,6 +1306,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
     }
     document.querySelectorAll('.payment').forEach(function(element) {
         element.addEventListener('input', function() {
+            if (this.id === 'payment_so' && parseFloat(this.value) < 0) {
+                this.value = 0;
+            }
             updateTotalReceivingPayment();
             updateBalancePayment();
         });
