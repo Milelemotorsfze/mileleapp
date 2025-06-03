@@ -26,6 +26,11 @@
         font-size: 0.9em;
     }
 </style>
+@can('edit-so')
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
+@endphp
+@if ($hasPermission)
 <div class="card">
     <div class="card-header">
         <h4 class="card-title">
@@ -363,7 +368,7 @@
                 <input type="date" class="form-control" id="so_date" name="so_date" value="<?php echo date("Y-m-d"); ?>">
             </div>
             <div class="col-md-2 mb-3">
-            <span class="error">* </span><label for="so_number">Netsuit SO Number</label>
+            <span class="text-danger">* </span><label for="so_number">Netsuit SO Number</label>
                 <div class="input-group mb-3">
                     <span class="input-group-text">SO-</span>
                     <input type="text" class="form-control" placeholder="Enter SO Number" id="so_number" name="so_number" aria-label="Enter SO Number">
@@ -425,7 +430,7 @@
                 <input type="number" class="form-control payment" id="advance_payment_performa" name="advance_payment_performa" value="{{$quotation->quotationdetails->advance_amount}}" readonly>
             </div>
             <div class="col-md-2 mb-3">
-            <span class="error">* </span><label for="payment_so">Payment In SO</label>
+            <span class="text-danger">* </span><label for="payment_so">Payment In SO</label>
                 <input type="number" class="form-control payment" id="payment_so" name="payment_so" value="" required min="0">
             </div>
         </div>
@@ -444,6 +449,9 @@
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
+@endif
+@endcan
+
 @endsection
 @push('scripts')
 <script>
@@ -483,7 +491,21 @@
                     });
                 }
             }
-            $.validator.addMethod("uniqueSO", function(value, element) {
+            $.validator.addMethod("uniqueSO", function(value, element, param) {
+                // Return if value is empty or not 6 digits
+                if (!value || !/^\d{6}$/.test(value)) {
+                    return true;
+                }
+
+                // Check if we already validated this value
+                let $element = $(element);
+                let lastValue = $element.data('lastCheckedValue');
+                let lastResult = $element.data('lastCheckResult');
+                
+                if (lastValue === value) {
+                    return lastResult;
+                }
+
                 let isUnique = false;
                 $.ajax({
                     url: '/so-unique-check',
@@ -495,9 +517,11 @@
                     async: false,
                     success: function(response) {
                         isUnique = !response.exists;
+                        // Store the result for this value
+                        $element.data('lastCheckedValue', value);
+                        $element.data('lastCheckResult', isUnique);
                     }
                 });
-
                 return isUnique;
             }, "SO Number already exists. Please enter a different one.");
 
@@ -506,13 +530,31 @@
             });
 
             $("#form-create").validate({
+                onsubmit: true,
+                onfocusout: function(element) {
+                    if (element.name === 'so_number') {
+                        let tempRules = { onlyDigitsNoSpaces: true };
+                        $(element).rules('remove', 'uniqueSO');
+                        $(element).valid();
+                        $(element).rules('add', { uniqueSO: true });
+                    }
+                },
+                onkeyup: false,
+                onclick: false,
+                submitHandler: function(form) {
+                    if ($(form).valid()) {
+                        form.submit();
+                    }
+                },
+                showErrors: function(errorMap, errorList) {
+                    this.defaultShowErrors();
+                },
                 ignore: [],
                 rules: {
                     so_number: {
                         required: true,
                         uniqueSO: true,
                         onlyDigitsNoSpaces: true
-
                     },
                     payment_so: {
                         required: true,
@@ -531,7 +573,16 @@
                         min: "Negative values are not allowed."
                     }
                 }
+            });
 
+            // Format validation on input
+            $('#so_number').on('keyup blur', function(e) {
+                e.stopPropagation();
+                if (!/^\d{6}$/.test($(this).val()) && $(this).val() !== '') {
+                    $(this).addClass('error');
+                } else {
+                    $(this).removeClass('error');
+                }
             });
         });
     </script>

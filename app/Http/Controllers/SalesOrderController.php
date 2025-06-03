@@ -106,7 +106,8 @@ class SalesOrderController extends Controller
             }
         }
 
-        return view('dailyleads.salesorder');
+        $soCount = env('SO_COUNT');
+        return view('dailyleads.salesorder', compact('soCount'));
     }
 
 
@@ -590,6 +591,7 @@ class SalesOrderController extends Controller
             if ($totalAmount != $so->quotation->deal_value) {
                 $so->status = 'Pending';
                 $so->save();
+                $this->generateLatestQuotation($so->id);
             } else {
                 info("no price cahnging");
                 // no price cahnge keep version history of quotation
@@ -1147,8 +1149,8 @@ class SalesOrderController extends Controller
                                 // Apply gdn_id condition only if so_id is not the same
                                 $query->whereNull('gdn_id');
                             })
-                            ->when(!$hasPermission, function ($query) use ($so) {
-                                $query->where(function ($subQuery) use ($so) {
+                            ->when(!$hasPermission, function ($query) use ($sodetails) {
+                                $query->where(function ($subQuery) use ($sodetails) {
                                     $subQuery->whereNull('booking_person_id')
                                         ->orWhere('booking_person_id', $sodetails->sales_person_id);
                                 });
@@ -1821,7 +1823,6 @@ class SalesOrderController extends Controller
 
     public function checkUniqueSoNumber(Request $request)
     {
-
         $exists = SO::where('so_number', $request->so_number)
             ->when($request->filled('so_id'), function ($query) use ($request) {
                 return $query->where('id', '!=', $request->so_id);
