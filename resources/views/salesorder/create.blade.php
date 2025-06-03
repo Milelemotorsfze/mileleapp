@@ -26,6 +26,11 @@
         font-size: 0.9em;
     }
 </style>
+@can('edit-so')
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
+@endphp
+@if ($hasPermission)
 <div class="card">
     <div class="card-header">
         <h4 class="card-title">
@@ -444,6 +449,9 @@
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
+@endif
+@endcan
+
 @endsection
 @push('scripts')
 <script>
