@@ -768,9 +768,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
 
     // validation start //
     const originalSoNumber = "{{ preg_replace('/^SO-/', '', $so->so_number) }}";
+
     $.validator.addMethod("uniqueSO", function(value, element, param) {
         // If the SO number hasn't changed, no need to check uniqueness
-        if (value === originalSoNumber) { return true; }
+        if (value === originalSoNumber) { 
+            return true; 
+        }
         
         // Return if value is empty or not 6 digits
         if (!value || !/^\d{6}$/.test(value)) {
@@ -817,7 +820,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
     $("#form-update").validate({
         onsubmit: true,
         onfocusout: function(element) {
-            // Only validate onlyDigitsNoSpaces for so_number on focusout
             if (element.name === 'so_number') {
                 let tempRules = { onlyDigitsNoSpaces: true };
                 $(element).rules('remove', 'uniqueSO');
@@ -879,11 +881,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
         }
     });
 
-    // Prevent validation on keyup/blur for SO number, only validate on form submit
+    // Format validation on input
     $('#so_number').on('keyup blur', function(e) {
         e.stopPropagation();
-        // Only validate the format, not uniqueness
-        if (!/^\d{6}$/.test($(this).val())) {
+        if (!/^\d{6}$/.test($(this).val()) && $(this).val() !== '') {
             $(this).addClass('error');
         } else {
             $(this).removeClass('error');
