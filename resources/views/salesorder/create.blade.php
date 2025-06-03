@@ -491,7 +491,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                     });
                 }
             }
-            $.validator.addMethod("uniqueSO", function(value, element) {
+            $.validator.addMethod("uniqueSO", function(value, element, param) {
+                // Return if value is empty or not 6 digits
+                if (!value || !/^\d{6}$/.test(value)) {
+                    return true;
+                }
+
+                // Check if we already validated this value
+                let $element = $(element);
+                let lastValue = $element.data('lastCheckedValue');
+                let lastResult = $element.data('lastCheckResult');
+                
+                if (lastValue === value) {
+                    return lastResult;
+                }
+
                 let isUnique = false;
                 $.ajax({
                     url: '/so-unique-check',
@@ -503,9 +517,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                     async: false,
                     success: function(response) {
                         isUnique = !response.exists;
+                        // Store the result for this value
+                        $element.data('lastCheckedValue', value);
+                        $element.data('lastCheckResult', isUnique);
                     }
                 });
-
                 return isUnique;
             }, "SO Number already exists. Please enter a different one.");
 
@@ -514,13 +530,32 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             });
 
             $("#form-create").validate({
+                onsubmit: true,
+                onfocusout: function(element) {
+                    // Only validate onlyDigitsNoSpaces for so_number on focusout
+                    if (element.name === 'so_number') {
+                        let tempRules = { onlyDigitsNoSpaces: true };
+                        $(element).rules('remove', 'uniqueSO');
+                        $(element).valid();
+                        $(element).rules('add', { uniqueSO: true });
+                    }
+                },
+                onkeyup: false,
+                onclick: false,
+                submitHandler: function(form) {
+                    if ($(form).valid()) {
+                        form.submit();
+                    }
+                },
+                showErrors: function(errorMap, errorList) {
+                    this.defaultShowErrors();
+                },
                 ignore: [],
                 rules: {
                     so_number: {
                         required: true,
                         uniqueSO: true,
                         onlyDigitsNoSpaces: true
-
                     },
                     payment_so: {
                         required: true,
@@ -539,11 +574,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                         min: "Negative values are not allowed."
                     }
                 },
-                onkeyup: false,
-                onfocusout: function(element) {
-                    $(element).valid();
+                invalidHandler: function(form, validator) {
+                    if (!validator.numberOfInvalids()) {
+                        return;
+                    }
                 }
+            });
 
+            // Prevent validation on keyup/blur for SO number, only validate on form submit
+            $('#so_number').on('keyup blur', function(e) {
+                e.stopPropagation();
+                // Only validate the format, not uniqueness
+                if (!/^\d{6}$/.test($(this).val())) {
+                    $(this).addClass('error');
+                } else {
+                    $(this).removeClass('error');
+                }
             });
         });
     </script>

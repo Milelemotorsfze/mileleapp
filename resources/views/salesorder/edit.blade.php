@@ -768,8 +768,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
 
     // validation start //
     const originalSoNumber = "{{ preg_replace('/^SO-/', '', $so->so_number) }}";
-    $.validator.addMethod("uniqueSO", function(value, element) {
+    $.validator.addMethod("uniqueSO", function(value, element, param) {
+        // If the SO number hasn't changed, no need to check uniqueness
         if (value === originalSoNumber) { return true; }
+        
+        // Return if value is empty or not 6 digits
+        if (!value || !/^\d{6}$/.test(value)) {
+            return true;
+        }
+
+        // Check if we already validated this value
+        let $element = $(element);
+        let lastValue = $element.data('lastCheckedValue');
+        let lastResult = $element.data('lastCheckResult');
+        
+        if (lastValue === value) {
+            return lastResult;
+        }
+
         let isUnique = false;
         $.ajax({
             url: '/so-unique-check',
@@ -782,11 +798,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             async: false,
             success: function(response) {
                 isUnique = !response.exists;
+                // Store the result for this value
+                $element.data('lastCheckedValue', value);
+                $element.data('lastCheckResult', isUnique);
             }
         });
-
         return isUnique;
-    });
+    }, "SO Number already exists. Please enter a different one.");
 
     $.validator.addMethod("spacing", function(value, element) {
         return this.optional(element) || !/\s\s+/.test(value);
@@ -797,6 +815,26 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
     });
 
     $("#form-update").validate({
+        onsubmit: true,
+        onfocusout: function(element) {
+            // Only validate onlyDigitsNoSpaces for so_number on focusout
+            if (element.name === 'so_number') {
+                let tempRules = { onlyDigitsNoSpaces: true };
+                $(element).rules('remove', 'uniqueSO');
+                $(element).valid();
+                $(element).rules('add', { uniqueSO: true });
+            }
+        },
+        onkeyup: false,
+        onclick: false,
+        submitHandler: function(form) {
+            if ($(form).valid()) {
+                form.submit();
+            }
+        },
+        showErrors: function(errorMap, errorList) {
+            this.defaultShowErrors();
+        },
         ignore: [],
         rules: {
             so_number: {
@@ -826,7 +864,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
         messages: {
             so_number: {
                 required: "SO Number is required",
-                uniqueSO: "SO Number already exists",
                 onlyDigitsNoSpaces: "Only 6 numbers are allowed. No letters, symbols, or spaces."
             },
             payment_so: {
@@ -835,26 +872,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                 min: "Negative values are not allowed."
             }
         },
-            onkeyup: false,
-            onfocusout: function(element) {
-                $(element).valid();
-            }
-
-    });
-
-    $.validator.prototype.checkForm = function() {
-        this.prepareForm();
-        for (var i = 0, elements = (this.currentElements = this.elements()); elements[i]; i++) {
-            if (this.findByName(elements[i].name).length != undefined && this.findByName(elements[i].name).length > 1) {
-                for (var cnt = 0; cnt < this.findByName(elements[i].name).length; cnt++) {
-                    this.check(this.findByName(elements[i].name)[cnt]);
-                }
-            } else {
-                this.check(elements[i]);
+        invalidHandler: function(form, validator) {
+            if (!validator.numberOfInvalids()) {
+                return;
             }
         }
-        return this.valid();
-    };
+    });
+
+    // Prevent validation on keyup/blur for SO number, only validate on form submit
+    $('#so_number').on('keyup blur', function(e) {
+        e.stopPropagation();
+        // Only validate the format, not uniqueness
+        if (!/^\d{6}$/.test($(this).val())) {
+            $(this).addClass('error');
+        } else {
+            $(this).removeClass('error');
+        }
+    });
 
     /// validation end ///
 
@@ -1126,6 +1160,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                         placeholder: 'Select Vin',
                     });
 
+                    $(this).find('.variants').valid();
                 });
                 calculateTotalSOAmount();
             }
