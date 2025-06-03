@@ -603,6 +603,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             }
         });
 
+        // Prevent negative input via keyboard for prices and quantities
+        $(document).on('keydown', '.variant-prices, .variant-quantities', function(e) {
+            if (e.key === '-' || e.key === 'e') {
+                e.preventDefault();
+            }
+        });
+
+        // Ensure no negative values on change for prices and quantities
+        $(document).on('change', '.variant-prices, .variant-quantities', function() {
+            if ($(this).val() < 0) {
+                $(this).val(0);
+            }
+        });
+
         var table1 = $('#so-logs').DataTable({
             processing: true,
             serverSide: true,
