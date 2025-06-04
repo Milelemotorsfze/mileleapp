@@ -537,7 +537,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('approve-so');
         @endphp
         @if ($hasPermission)
-        @if($so->status != 'Approved')
+        @if($so->status == 'Pending')
         <div class="row mt-2">
             <div class="col d-flex gap-2">
                 <button type="button" class="btn btn-success btn-approve" data-id="{{ $so->id }}" data-status="Approved">Approve</button>
