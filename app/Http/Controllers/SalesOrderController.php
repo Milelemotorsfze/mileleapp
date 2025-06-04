@@ -393,12 +393,12 @@ class SalesOrderController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // return $request->all();
         DB::beginTransaction();
         try {
             $so = SO::findorFail($id);
             $logEntries = [];
             $currentTimestamp = Carbon::now();
+            $priceChanged = false;
 
             // basic details Fields to check for changes
             $fields = [
@@ -427,58 +427,50 @@ class SalesOrderController extends Controller
             }
             $so->save();
 
-            $soVariants = $request->variants;
-
-            if (!empty($request->deleted_so_variant_ids)) {
-                foreach ($request->deleted_so_variant_ids as $soVariantId) {
-                    $removedVariant = SoVariant::find($soVariantId);
-                    info($removedVariant);
-                    if ($removedVariant) {
+            // Handle deleted variants
+            if ($request->has('deleted_so_variant_ids')) {
+                $deletedVariantIds = $request->input('deleted_so_variant_ids');
+                foreach ($deletedVariantIds as $variantId) {
+                    $variant = SoVariant::find($variantId);
+                    if ($variant) {
                         $logEntries[] = [
-                            'type' => 'Unset',
+                            'type' => 'Delete',
                             'so_item_id' => null,
-                            'so_variant_id' => $soVariantId,
-                            'field_name' => 'so_variant_id',
-                            'old_value' => $soVariantId,
+                            'so_variant_id' => $variantId,
+                            'field_name' => 'variant',
+                            'old_value' => $variant->variant->name ?? '',
                             'new_value' => null
                         ];
-
-                        $removeVehicleIds = Soitems::where('so_variant_id', $soVariantId)->pluck('vehicles_id')->toArray();
-                        info("removed soitems");
-                        if (!empty($removeVehicleIds)) {
-                            // get all so item corresponding so varaint and log => delete
-                            $logEntries = array_merge($logEntries, $this->removeSoItems($soVariantId, $removeVehicleIds));
-                            info($removeVehicleIds);
-                        }
-
-                        // Delete the variant itself
-                        $removedVariant->delete();
+                        // Remove the SO items and update the vehicle's SO ID
+                        $logEntries = array_merge($logEntries, $this->removeSoItems($variantId, $variant->soVehicles->pluck('vehicles_id')->toArray()));
+                        $variant->delete();
                     }
                 }
             }
 
+            // Process variants
+            $soVariants = $request->input('variants');
             if ($soVariants) {
                 foreach ($soVariants as $key => $soVariant) {
-                    info("each varaint looping");
-                    // chek variant existing or not
+                    // Check variant existing or not
                     $existingVariant = null;
                     if (isset($soVariant['so_variant_id'])) {
                         $existingVariant = SoVariant::find($soVariant['so_variant_id']);
                     }
 
                     if (!$existingVariant) {
-                        // if(isset($soVariant['quotation_item_id'])) and existing varaint only 
-                        info("notexisting add new varaint");
-                        // add to so variants 
-                        // need to log for descrfiption price and qty
-
-                        $soVariantdata  = new SoVariant();
+                        // New variant
+                        $soVariantdata = new SoVariant();
                         $soVariantdata->so_id = $so->id;
                         $soVariantdata->variant_id = $soVariant['variant_id'];
                         $soVariantdata->price = $soVariant['price'];
                         $soVariantdata->description = $soVariant['description'];
                         $soVariantdata->quantity = $soVariant['quantity'];
                         $soVariantdata->save();
+
+                        // New variant means price has changed
+                        $priceChanged = true;
+
                         foreach (['so_variant_id', 'description', 'price', 'quantity'] as $field) {
                             $logEntries[] = [
                                 'type' => 'Set',
@@ -489,12 +481,9 @@ class SalesOrderController extends Controller
                                 'new_value' => $field == 'so_variant_id' ? $soVariantdata->id : $soVariantdata->$field
                             ];
                         }
-                        // add all vins here for new variant
-                        info($soVariant);
+
                         if (isset($soVariant['vehicles'])) {
-                            info("vehicles found under new varaint");
                             foreach ($soVariant['vehicles'] as $eachVehicleId) {
-                                info("new vehicle id added" . $eachVehicleId);
                                 $soItem = Soitems::create(['vehicles_id' => $eachVehicleId, 'so_variant_id' => $soVariantdata->id]);
                                 $logEntries[] = [
                                     'type' => 'Set',
@@ -505,21 +494,26 @@ class SalesOrderController extends Controller
                                     'new_value' => $eachVehicleId
                                 ];
 
-                                // Update vehicle's SO ID
                                 Vehicles::where('id', $eachVehicleId)->update(['so_id' => $so->id]);
                             }
                         }
                     } else {
-                        info("variant found in the system" . $existingVariant->variant->name ?? '');
-                        // Check for changes in variant fields (description, price, quantity)
-                        foreach (['description', 'price', 'quantity'] as $field) {
-                            $oldValue = $existingVariant->$field;
-                            $newValue = $soVariant[$field];
+                        // Existing variant - check for changes
+                        $fields = [
+                            'variant_id' => $soVariant['variant_id'],
+                            'description' => $soVariant['description'],
+                            'price' => $soVariant['price'],
+                            'quantity' => $soVariant['quantity']
+                        ];
 
-                            if ($oldValue != $newValue) {
-                                info("change found in the variants");
-                                info($field);
-                                // Log the change
+                        foreach ($fields as $field => $newValue) {
+                            $oldValue = $existingVariant->$field;
+                            if ($newValue != $oldValue) {
+                                // If price has changed, set the flag
+                                if ($field === 'price' && $newValue != $oldValue) {
+                                    $priceChanged = true;
+                                }
+                                $existingVariant->$field = $newValue;
                                 $logEntries[] = [
                                     'type' => 'Change',
                                     'so_item_id' => null,
@@ -528,43 +522,34 @@ class SalesOrderController extends Controller
                                     'old_value' => $oldValue,
                                     'new_value' => $newValue
                                 ];
-                                $existingVariant->$field = $newValue;
                             }
                         }
                         $existingVariant->save();
 
-                        // Check for changes in associated vehicles
-                        $existingVehicleIds = $existingVariant ? $existingVariant->so_items->pluck('vehicles_id')->toArray() : [];
-                        $newVehicleIds = $soVariant['vehicles'] ?? [];
+                        // Handle vehicles
+                        if (isset($soVariant['vehicles'])) {
+                            $currentVehicles = $existingVariant->so_items->pluck('vehicles_id')->toArray();
+                            $newVehicles = $soVariant['vehicles'];
+                            
+                            $addedVehicles = array_diff($newVehicles, $currentVehicles);
+                            $removedVehicles = array_diff($currentVehicles, $newVehicles);
 
-                        // Find added and removed vehicles for each existing variant
-                        $addedVehicles = array_diff($newVehicleIds, $existingVehicleIds);
-                        info("newly added vehicles under variant" . $existingVariant->variant->name ?? '');
-                        info($addedVehicles);
-                        $removedVehicles = array_diff($existingVehicleIds, $newVehicleIds);
-                        info("removed vehicles under variant" . $existingVariant->variant->name ?? '');
-                        info($removedVehicles);
+                            foreach ($addedVehicles as $vehicleId) {
+                                $soItem = Soitems::create(['vehicles_id' => $vehicleId, 'so_variant_id' => $existingVariant->id]);
+                                $logEntries[] = [
+                                    'type' => 'Set',
+                                    'so_item_id' => $soItem->id,
+                                    'so_variant_id' => $existingVariant->id,
+                                    'field_name' => 'vehicles_id',
+                                    'old_value' => null,
+                                    'new_value' => $vehicleId
+                                ];
 
-                        // Log added vehicles
-                        foreach ($addedVehicles as $vehicleId) {
-                            // Add the vehicle to the SO items
-                            $soItem = Soitems::create(['vehicles_id' => $vehicleId, 'so_variant_id' => $existingVariant->id]);
+                                Vehicles::where('id', $vehicleId)->update(['so_id' => $so->id]);
+                            }
 
-                            $logEntries[] = [
-                                'type' => 'Set',
-                                'so_item_id' => $soItem->id,
-                                'so_variant_id' => $existingVariant->id,
-                                'field_name' => 'vehicles_id',
-                                'old_value' => null,
-                                'new_value' => $vehicleId
-                            ];
-
-                            // Update vehicle's SO ID
-                            Vehicles::where('id', $vehicleId)->update(['so_id' => $so->id]);
+                            $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $removedVehicles));
                         }
-
-                        // $removeSoItems = Soitems::where('so_variant_id', $removedVariant->id)->pluck('vehicles_id')->toArray();
-                        $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $removedVehicles));
                     }
                 }
             }
@@ -584,29 +569,20 @@ class SalesOrderController extends Controller
                 SalesOrderHistoryDetail::insert($logEntries);
             }
 
-            $totalAmount = SoVariant::where('so_id', $id)
-                ->selectRaw('SUM(quantity * price) as total_amount')
-                ->value('total_amount');
-
-            if ($totalAmount != $so->quotation->deal_value) {
+            // Set status to Pending if price has changed
+            if ($priceChanged) {
                 $so->status = 'Pending';
                 $so->save();
-                $this->generateLatestQuotation($so->id);
-            } else {
-                info("no price cahnging");
-                // no price cahnge keep version history of quotation
-                // update the quotation items 
-
-                // need to keep quotation 
-                $file = $this->generateLatestQuotation($so->id);
             }
+
+            // Generate latest quotation
+            $file = $this->generateLatestQuotation($so->id);
 
             DB::commit();
             return redirect()->back()->with('success', 'Sales Order updated successfully.');
         } catch (\Exception $e) {
-            DB::rollBack(); // Rollback transaction in case of error
-            Log::error('Sales order updte faisls', ['error' => $e->getMessage()]);
-
+            DB::rollBack();
+            Log::error('Sales order update fails', ['error' => $e->getMessage()]);
             return redirect()->back()->withErrors('An error occurred while updating sales order.');
         }
     }
