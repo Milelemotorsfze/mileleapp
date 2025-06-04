@@ -623,7 +623,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             searching: true,
             ajax: {
                 url: "{{ route('salesorder.edit', $so->id) }}",
-
+                error: function (xhr, error, thrown) {
+                    console.error('DataTable error:', error);
+                    alertify.error('Error loading log history data');
+                }
             },
             columns: [{
                     'data': 'DT_RowIndex',
@@ -634,45 +637,101 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                 {
                     'data': 'version',
                     'name': 'version',
-                    orderable: false
+                    orderable: false,
+                    searchable: true,
+                    render: function(data, type, row) {
+                        return data || '-';
+                    }
                 },
                 {
                     'data': 'so_variant_id',
                     'name': 'SoVariant.variant.name',
-                    orderable: false
+                    orderable: false,
+                    searchable: true,
+                    render: function(data, type, row) {
+                        return data || '-';
+                    }
                 },
                 {
                     'data': 'field_name',
                     'name': 'field_name',
-                    orderable: false
+                    orderable: false,
+                    searchable: true,
+                    render: function(data, type, row) {
+                        return data || '-';
+                    }
                 },
                 {
                     'data': 'type',
                     'name': 'type',
-                    orderable: false
+                    orderable: false,
+                    searchable: true,
+                    render: function(data, type, row) {
+                        return data || '-';
+                    }
                 },
                 {
                     'data': 'old_value',
                     'name': 'old_value',
-                    orderable: false
+                    orderable: false,
+                    searchable: true,
+                    render: function(data, type, row) {
+                        return data || '-';
+                    }
                 },
                 {
                     'data': 'new_value',
                     'name': 'new_value',
-                    orderable: false
+                    orderable: false,
+                    searchable: true,
+                    render: function(data, type, row) {
+                        return data || '-';
+                    }
                 },
                 {
                     'data': 'created_at',
                     'name': 'created_at',
-                    orderable: true
+                    orderable: true,
+                    searchable: true,
+                    render: function(data, type, row) {
+                        return data || '-';
+                    }
                 },
                 {
                     'data': 'created_by',
                     'name': 'salesOrderHistory.user.name',
-                    orderable: true
-                },
+                    orderable: true,
+                    searchable: true,
+                    render: function(data, type, row) {
+                        return data || '-';
+                    }
+                }
+            ],
+            language: {
+                processing: '<div class="spinner-border text-primary" role="status"></div>',
+                zeroRecords: 'No records found',
+                emptyTable: 'No data available in table',
+                paginate: {
+                    previous: "<i class='fas fa-chevron-left'>",
+                    next: "<i class='fas fa-chevron-right'>"
+                }
+            },
+            drawCallback: function(settings) {
+                if (settings.json) {
+                    if (settings.json.error) {
+                        alertify.error(settings.json.error);
+                    }
+                }
+            }
+        });
 
-            ]
+        // Refresh table on error
+        table1.on('error.dt', function(e, settings, techNote, message) {
+            console.error('DataTable error:', message);
+            alertify.error('An error occurred while loading the data. The table will refresh automatically.');
+            setTimeout(function() {
+                table1.ajax.reload();
+            }, 5000);
         });
 
         $('.vins').select2({
