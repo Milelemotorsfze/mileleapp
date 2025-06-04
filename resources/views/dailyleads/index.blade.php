@@ -2616,6 +2616,10 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         const maxLength = 20;
         const uniqueId = 'qsalesnotes_' + row.id;
 
+        if (!data) {
+            return `<span class="remarks-text"></span>`;
+        }
+
         if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
@@ -2699,7 +2703,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             @endif
             ],
       initComplete: function () {
-        applyFiltersFromFullData(this.api(), fullQuotationData, [9, 11, 17, 18, 19, 22]);
+        applyFiltersFromFullData(this.api(), fullQuotationData, [9, 11, 13, 17, 18, 19, 22]);
       }
     });
   }
