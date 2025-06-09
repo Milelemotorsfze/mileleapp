@@ -2589,17 +2589,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         return data;
     }
         },
-        // { data: 'sales_person_name', name: 'sales_person_user.name' },
-         { 
-                    data: 'sales_person_name', 
-                    name: 'sales_person_user.name',
-                    render: function(data, type, row) {
-                        if (type === 'display') {
-                            return data || '';
-                        }
-                        return data;
-                    }
-                },
+        { data: 'sales_person_name', name: 'sales_person_name' },
 
       {
         data: 'deal_value',
