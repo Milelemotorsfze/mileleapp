@@ -719,7 +719,7 @@ input[type=number]::-webkit-outer-spin-button
           </div>
           <div class="row mb-3">
             <div class="col-md-4">
-              <label for="document-upload" class="form-label">Upload Re-Qoutation:</label>
+              <label for="document-upload" class="form-label">Upload Re-Quotation:</label>
             </div>
             <div class="col-md-8">
               <input type="file" class="form-control" id="document-upload-negotiation">
@@ -1019,11 +1019,11 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Prospectings Notes</th>
                   <th>Demand Date</th>
                   <th>Demand Notes</th>
-                  <th>Qoutation Date</th>
+                  <th>Quotation Date</th>
                   <th>Sales Person</th>
                   <th>Deal Values</th>
-                  <th>Qoutation Notes</th>
-                  <th>View Qoutation</th>
+                  <th>Quotation Notes</th>
+                  <th>View Quotation</th>
                   <th>Signature Status</th>
                   <th>Created By</th>
                   <th>Assigned To</th>
@@ -1065,14 +1065,14 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                   <th>Prospectings Notes</th>
                   <th>Demand Date</th>
                   <th>Demand Notes</th>
-                  <th>Qoutation Date</th>
+                  <th>Quotation Date</th>
                   <th>Deal Values</th>
-                  <th>Qoutation Notes</th>
-                  <th>View Qoutation</th>
+                  <th>Quotation Notes</th>
+                  <th>View Quotation</th>
                   <th>Negotiation Date</th>
                   <th>Deal Values</th>
                   <th>Negotiation Notes</th>
-                  <th>View Re-Qoutation</th>
+                  <th>View Re-Quotation</th>
                   <th>Created By</th>
                   <th>Assigned To</th>
                 </tr>
@@ -1093,10 +1093,10 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
             <table id="dtBasicExample8" class="table table-striped table-editable table-edits table" style = "width:100%;">
             <thead class="bg-soft-secondary">
                 <tr>
-                  <th>Qoutation ID</th>
-                  <th>Qoutation Date</th>
-                  <th>Qoutation Values</th>
-                  <th>Qoutation Notes</th>
+                  <th>Quotation ID</th>
+                  <th>Quotation Date</th>
+                  <th>Quotation Values</th>
+                  <th>Quotation Notes</th>
                   <th>Variant</th>
                   <th>Qty</th>
                   <th>Country</th>
@@ -1134,14 +1134,14 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                   <th>Prospectings Notes</th>
                   <th>Demand Date</th>
                   <th>Demand Notes</th>
-                  <th>Qoutation Date</th>
-                  <th>Qoutation Values</th>
-                  <th>Qoutation Notes</th>
-                  <th>View Qoutation</th>
+                  <th>Quotation Date</th>
+                  <th>Quotation Values</th>
+                  <th>Quotation Notes</th>
+                  <th>View Quotation</th>
                   <!-- <th>Negotiation Date</th>
                   <th>Negotiation Values</th>
                   <th>Negotiation Notes</th>
-                  <th>View Re-Qoutation</th> -->
+                  <th>View Re-Quotation</th> -->
                   <th>Created By</th>
                   <th>Assigned To</th>
                   <th>Reject Date</th>
@@ -2926,7 +2926,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item"href="${qoutationUrlEdit}">Update Qoutation</a></li>
+                                <li><a class="dropdown-item"href="${qoutationUrlEdit}">Update Quotation</a></li>
                                 <li><a class="dropdown-item"href="${soUrl}">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                                 </ul>
