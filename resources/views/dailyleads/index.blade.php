@@ -2179,7 +2179,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 {
     data: 'salesnotes',
     name: 'salesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'salesnotes_' + row.id;
@@ -2213,7 +2213,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'dsalesnotes_' + row.id;
@@ -2233,7 +2233,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 {
     data: 'purchaserremarks',
     name: 'purchaserremarks',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'purchaserremarks_' + row.id;
@@ -2259,7 +2259,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 // {
                 //     data: 'id',
                 //     name: 'id',
-                //     searchable: false,
+                //     searchable: true,
                 //     render: function (data, type, row) {
                 //       const bookingUrl = `{{ url('booking/create') }}/${data}`;
                 //       const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
@@ -2370,7 +2370,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 {
     data: 'salesnotes',
     name: 'salesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'salesnotes_' + row.id;
@@ -2404,7 +2404,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'dsalesnotes_' + row.id;
@@ -2426,7 +2426,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 // {
                 //     data: 'id',
                 //     name: 'id',
-                //     searchable: false,
+                //     searchable: true,
                 //     render: function (data, type, row) {
                 //       const bookingUrl = `{{ url('booking/create') }}/${data}`;
                 //       const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
@@ -2484,29 +2484,27 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'custom_brand_model', name: 'custom_brand_model' },
                 { data: 'language', name: 'language' },
                 { data: 'location', name: 'location' },
-{
-  data: 'remarks',
-  name: 'calls.remarks',
-  title: 'Remarks & Messages',
-  render: function (data, type, row) {
-    const div = document.createElement('div');
-    div.innerHTML = data || '';
-    const plainText = div.textContent.trim();
+                {
+                  data: 'remarks',
+                  name: 'calls.remarks',
+                  title: 'Remarks & Messages',
+                  render: function (data, type, row) {
+                    const div = document.createElement('div');
+                    div.innerHTML = data || '';
+                    const plainText = div.textContent.trim();
 
-    if (type !== 'display') return plainText;
+                    if (type !== 'display') return plainText;
 
-    let shortText = plainText.substring(0, 20);
-    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+                    let shortText = plainText.substring(0, 20);
+                    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
-    if (plainText.length > 20) {
-      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
-    }
+                    if (plainText.length > 20) {
+                      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+                    }
 
-    return plainText;
-  }
-},
-
-
+                    return plainText;
+                  }
+                },
                 {
                     data: 'date',
                     name: 'date',
@@ -2523,8 +2521,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 },
                 {
     data: 'salesnotes',
-    name: 'prospectings.salesnotes',
-    searchable: false,
+    name: 'salesnotes',
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'salesnotes_' + row.id;
@@ -2558,7 +2556,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'dsalesnotes_' + row.id;
@@ -2600,8 +2598,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
       },
       {
     data: 'qsalesnotes',
-    name: 'quotations.sales_notes',
-    searchable: false,
+    name: 'qsalesnotes',
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'qsalesnotes_' + row.id;
@@ -2693,7 +2691,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             @endif
             ],
       initComplete: function () {
-        applyFiltersFromFullData(this.api(), fullQuotationData, [9, 11, 13, 17, 18, 19, 22]);
+        applyFiltersFromFullData(this.api(), fullQuotationData, [ 18, 19, 22]);
       }
     });
   }
@@ -2766,7 +2764,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 {
     data: 'salesnotes',
     name: 'salesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'salesnotes_' + row.id;
@@ -2800,7 +2798,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'dsalesnotes_' + row.id;
@@ -2831,11 +2829,11 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         return data;
     }
         },
-                { data: 'qdealvalues', name: 'qdealvalues', searchable: false },
+                { data: 'qdealvalues', name: 'qdealvalues', searchable: true },
                 {
     data: 'qsalesnotes',
     name: 'qsalesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'qsalesnotes_' + row.id;
@@ -2877,11 +2875,11 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 return data;
             }
         },
-                { data: 'ndealvalues', name: 'ndealvalues', searchable: false },
+                { data: 'ndealvalues', name: 'ndealvalues', searchable: true },
                 {
     data: 'nsalesnotes',
     name: 'nsalesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'nsalesnotes_' + row.id;
@@ -2977,28 +2975,28 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'location', name: 'location'},
                 { data: 'language', name: 'language'},
                 {
-  data: 'remarks',
-  name: 'calls.remarks',
-  title: 'Remarks & Messages',
-  render: function (data, type, row) {
-    const div = document.createElement('div');
-    div.innerHTML = data || '';
-    const plainText = div.textContent.trim();
+                  data: 'remarks',
+                  name: 'calls.remarks',
+                  title: 'Remarks & Messages',
+                  render: function (data, type, row) {
+                    const div = document.createElement('div');
+                    div.innerHTML = data || '';
+                    const plainText = div.textContent.trim();
 
-    if (type !== 'display') return plainText;
+                    if (type !== 'display') return plainText;
 
-    let shortText = plainText.substring(0, 20);
-    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+                    let shortText = plainText.substring(0, 20);
+                    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
-    if (plainText.length > 20) {
-      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
-    }
+                    if (plainText.length > 20) {
+                      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+                    }
 
-    return plainText;
-  }
-},
+                    return plainText;
+                  }
+                },
 
-{
+          {
             data: 'date',
             name: 'date',
              render: function (data, type, row) {
@@ -3015,7 +3013,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 {
     data: 'salesnotes',
     name: 'salesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'salesnotes_' + row.id;
@@ -3049,7 +3047,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'dsalesnotes_' + row.id;
@@ -3092,7 +3090,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
     {
     data: 'qsalesnotes',
     name: 'qsalesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'qsalesnotes_' + row.id;
@@ -3139,29 +3137,31 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         return data;
     }
         },
-                { data: 'reason', name: 'reason', searchable: false },
+                { data: 'reason', name: 'reason', searchable: true },
                 {
-    data: 'rsalesnotes',
-    name: 'rsalesnotes',
-    searchable: false,
-    render: function (data, type, row) {
-        const maxLength = 20;
-        const uniqueId = 'rsalesnotes_' + row.id;
-        if (data && data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
-            return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-            `;
-        } else {
-            return `<span class="remarks-text">${data}</span>`;
-        }
-    }
-},
+                  data: 'rsalesnotes',
+                  name: 'rsalesnotes',
+                  searchable: true,
+                  render: function (data, type, row) {
+                      data = data || ''; 
+                      const maxLength = 20;
+                      const uniqueId = 'rsalesnotes_' + row.id;
+                      
+                      if (data && data.length > maxLength) {
+                          const truncatedText = data.substring(0, maxLength);
+                          return `
+                              <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                              <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                              <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+                          `;
+                      } else {
+                          return `<span class="remarks-text">${data}</span>`;
+                      }
+                  }
+              },
             ],
             initComplete: function () {
-        applyFiltersFromFullData(this.api(), fullRejectedData, [9, 11, 13, 16, 17, 21, 22]);
+        applyFiltersFromFullData(this.api(), fullRejectedData, [17]);
       }
     });
   }
@@ -3392,26 +3392,26 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             title: 'Location'
         },
         {
-  data: 'remarks',
-  name: 'calls.remarks',
-  title: 'Remarks & Messages',
-  render: function (data, type, row) {
-    const div = document.createElement('div');
-    div.innerHTML = data || '';
-    const plainText = div.textContent.trim();
+          data: 'remarks',
+          name: 'calls.remarks',
+          title: 'Remarks & Messages',
+          render: function (data, type, row) {
+            const div = document.createElement('div');
+            div.innerHTML = data || '';
+            const plainText = div.textContent.trim();
 
-    if (type !== 'display') return plainText;
+            if (type !== 'display') return plainText;
 
-    let shortText = plainText.substring(0, 20);
-    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+            let shortText = plainText.substring(0, 20);
+            let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
-    if (plainText.length > 20) {
-      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
-    }
+            if (plainText.length > 20) {
+              return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+            }
 
-    return plainText;
-  }
-},
+            return plainText;
+          }
+        },
 
         {
             data: 'status',
