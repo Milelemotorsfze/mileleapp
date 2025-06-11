@@ -588,7 +588,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
     let variantsData = @json($variants);
     let deletedVariantIds = [];
 
+    function normalizeSpacing(str) {
+        return str ? str.replace(/\s+/g, ' ').trim() : '';
+    }
+
     $(document).ready(function() {
+        // Initialize with normalized spacing for existing descriptions
+        $('.variant-descriptions').each(function() {
+            $(this).val(normalizeSpacing($(this).val()));
+        });
+
+        // for input for variant descriptions
+        $(document).on('input', '.variant-descriptions', function() {
+            $(this).val(normalizeSpacing($(this).val()));
+        });
+
         // Prevent negative input via keyboard for all payment fields
         $(document).on('keydown', '#total_payment, #receiving_payment, #advance_payment_performa, #payment_so', function(e) {
             if (e.key === '-' || e.key === 'e') {
