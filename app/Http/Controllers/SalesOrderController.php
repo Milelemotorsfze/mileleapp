@@ -850,6 +850,7 @@ class SalesOrderController extends Controller
 
                         $variants = Varaint::where('master_model_lines_id', $item->reference_id)->get();
                         foreach ($variants as $variant) {
+                            $variantId = $variant->id;
                             $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
                                 ->whereNull('so_id')
                                 ->whereNull('gdn_id')
