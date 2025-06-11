@@ -2005,13 +2005,17 @@ function saveRejection() {
 
       select.on('change', function () {
         const val = $(this).val().filter(Boolean); 
-        if (val.length) {
-          const safePattern = val
-            .map(v => '^' + v.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '$')
+        let safePattern;
+        if (colKey === 'created_at') {
+          safePattern = val
+            .map(v => v.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'))
             .join('|');
           column.search(safePattern, true, false).draw();
         } else {
-          column.search('', true, false).draw();
+          safePattern = val
+            .map(v => '^' + v.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '$')
+            .join('|');
+          column.search(safePattern, true, false).draw();
         }
       });
 
@@ -2025,6 +2029,10 @@ function saveRejection() {
         let tempDiv = document.createElement('div');
         tempDiv.innerHTML = raw || '';
         let val = tempDiv.textContent.trim();
+
+        if (colKey === 'created_at' && val) {
+          val = val.split(' ')[0];
+        }
 
         if (colKey === 'signature_status') {
         val = val === 'Signed' ? 'Signed' : 'Not Signed';
