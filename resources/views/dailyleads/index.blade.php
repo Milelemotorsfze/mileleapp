@@ -2708,7 +2708,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             @endif
             ],
       initComplete: function () {
-        applyFiltersFromFullData(this.api(), fullQuotationData, [ 18, 19, 22]);
+        applyFiltersFromFullData(this.api(), fullQuotationData, [9, 18, 19, 22]);
             setupGlobalDateSearchFix(this.api()); 
       }
     });
@@ -3179,7 +3179,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
               },
             ],
             initComplete: function () {
-        applyFiltersFromFullData(this.api(), fullRejectedData, [17]);
+        applyFiltersFromFullData(this.api(), fullRejectedData, [9, 17]);
             setupGlobalDateSearchFix(this.api()); 
       }
     });
@@ -3477,7 +3477,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     ],
     initComplete: function () {
-        applyFiltersFromFullData(this.api(), fullActiveLeadData, []);
+        applyFiltersFromFullData(this.api(), fullActiveLeadData, [9]);
             setupGlobalDateSearchFix(this.api()); 
 
       }
