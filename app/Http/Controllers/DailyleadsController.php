@@ -128,10 +128,15 @@ class DailyleadsController extends Controller
                 ->where('pre_orders.requested_by', $id)
                 ->groupby('pre_orders.id')
                 ->when($search, function ($query, $search) {
-                $query->where(function ($q) use ($search) {
+                    $searchNumeric = preg_replace('/[^0-9.]/', '', $search);
+                    log::info("searching data is : ". $search);
+                    log::info("searchNumeric data is : ". $searchNumeric);
+
+                $query->where(function ($q) use ($search, $searchNumeric) {
                     $q->where('quotations.id', 'like', "%$search%")
                     ->orWhere('quotations.date', 'like', "%$search%")
-                    ->orWhere('quotations.deal_value', 'like', "%$search%")
+                    ->orWhere(DB::raw("CAST(quotations.deal_value AS CHAR)"), 'LIKE', "%$searchNumeric%")
+                    ->orWhere(DB::raw("REPLACE(FORMAT(quotations.deal_value, 0), ',', '')"), 'LIKE', "%$searchNumeric%")
                     ->orWhere('quotations.sales_notes', 'like', "%$search%")
                     ->orWhere('pre_orders_items.qty', 'like', "%$search%")
                     ->orWhere('pre_orders_items.notes', 'like', "%$search%")
@@ -213,13 +218,16 @@ class DailyleadsController extends Controller
             
                 if (!empty($searchValue)) {
                     $activelead->where(function ($query) use ($searchValue) {
-                        $query->where('calls.name', 'LIKE', "%$searchValue%")
+                        $query->where('calls.priority', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.created_at', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.name', 'LIKE', "%$searchValue%")
                             ->orWhere('calls.phone', 'LIKE', "%$searchValue%")
                             ->orWhere('calls.email', 'LIKE', "%$searchValue%")
                             ->orWhere('calls.language', 'LIKE', "%$searchValue%")
                             ->orWhere('calls.location', 'LIKE', "%$searchValue%")
                             ->orWhere('calls.remarks', 'LIKE', "%$searchValue%")
                             ->orWhere('calls.type', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.status', 'LIKE', "%$searchValue%")
                             ->orWhere('brands.brand_name', 'LIKE', "%$searchValue%")
                             ->orWhere('sales_person_user.name', 'LIKE', "%$searchValue%")
                             ->orWhere('created_by_user.name', 'LIKE', "%$searchValue%")
@@ -431,7 +439,8 @@ class DailyleadsController extends Controller
                 if (!empty($searchValue)) {
                 $searchValueWithoutCommas = str_replace(',', '', $searchValue);
                 $data->where(function ($query) use ($searchValue, $searchValueWithoutCommas) {
-                    $query->where('calls.name', 'LIKE', "%$searchValue%")
+                    $query->where('calls.created_at', 'LIKE', "%$searchValue%")
+                        ->orWhere('calls.name', 'LIKE', "%$searchValue%")
                         ->orWhere('calls.phone', 'LIKE', "%$searchValue%")
                         ->orWhere('calls.email', 'LIKE', "%$searchValue%")
                         ->orWhere('calls.language', 'LIKE', "%$searchValue%")
@@ -446,6 +455,10 @@ class DailyleadsController extends Controller
                         ->orWhere('prospectings.salesnotes', 'LIKE', "%$searchValue%")
                         ->orWhere('demand.salesnotes', 'LIKE', "%$searchValue%")
                         ->orWhere('users.name', 'like', "%$searchValue%")
+                        ->orWhere(DB::raw("DATE_FORMAT(quotations.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
+                        ->orWhere(DB::raw("DATE_FORMAT(prospectings.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
+                        ->orWhere(DB::raw("DATE_FORMAT(demand.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
+                        ->orWhere(DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
                         ->orWhere(function ($q) use ($searchValue, $searchValueWithoutCommas) {
                             $q->where('quotations.deal_value', 'LIKE', "%$searchValueWithoutCommas%")
                                 ->orWhere(DB::raw("REPLACE(FORMAT(quotations.deal_value, 0), ',', '')"), 'LIKE', "%$searchValueWithoutCommas%")
@@ -574,8 +587,7 @@ class DailyleadsController extends Controller
                 $searchValueWithoutCommas = str_replace(',', '', $searchValue);
 
                 $data->where(function ($query) use ($searchValue, $searchValueWithoutCommas) {
-                    $query->where('calls.created_at', 'LIKE', "%$searchValue%")
-                        ->orWhere('calls.type', 'LIKE', "%$searchValue%")
+                    $query->where('calls.type', 'LIKE', "%$searchValue%")
                         ->orWhere('calls.name', 'LIKE', "%$searchValue%")
                         ->orWhere('calls.phone', 'LIKE', "%$searchValue%")
                         ->orWhere('calls.email', 'LIKE', "%$searchValue%")
@@ -592,6 +604,12 @@ class DailyleadsController extends Controller
                         ->orWhere('prospectings.salesnotes', 'LIKE', "%$searchValue%")
                         ->orWhere('demand.salesnotes', 'LIKE', "%$searchValue%")
                         ->orWhere('quotations.sales_notes', 'LIKE', "%$searchValue%")
+                        ->orWhere(DB::raw("DATE_FORMAT(lead_rejection.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
+                        ->orWhere(DB::raw("DATE_FORMAT(quotations.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
+                        ->orWhere(DB::raw("DATE_FORMAT(prospectings.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
+                        ->orWhere(DB::raw("DATE_FORMAT(demand.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
+                        ->orWhere(DB::raw("DATE_FORMAT(negotiations.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
+                        ->orWhere(DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
                         ->orWhere(function ($q) use ($searchValue, $searchValueWithoutCommas) {
                             $q->where('quotations.deal_value', 'LIKE', "%$searchValueWithoutCommas%")
                                 ->orWhere(DB::raw("REPLACE(FORMAT(quotations.deal_value, 0), ',', '')"), 'LIKE', "%$searchValueWithoutCommas%")

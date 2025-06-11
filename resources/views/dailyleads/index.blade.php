@@ -2006,7 +2006,7 @@ function saveRejection() {
       select.on('change', function () {
         const val = $(this).val().filter(Boolean); 
         let safePattern;
-        if (colKey === 'created_at') {
+      if (['created_at', 'qdate', 'date', 'ddate', 'rdate', 'cdate', 'ndate', 'date_formatted'].includes(colKey)) {
           safePattern = val
             .map(v => v.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'))
             .join('|');
@@ -2030,8 +2030,13 @@ function saveRejection() {
         tempDiv.innerHTML = raw || '';
         let val = tempDiv.textContent.trim();
 
-        if (colKey === 'created_at' && val) {
-          val = val.split(' ')[0];
+      if (['created_at', 'qdate', 'date', 'ddate', 'rdate', 'cdate', 'ndate', 'date_formatted'].includes(colKey) && val) {
+          const rawDate = val.split(' ')[0];
+          const parts = rawDate.split('-');
+          const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+          const displayDate = `${parts[2]}-${monthNames[parseInt(parts[1], 10) - 1]}-${parts[0]}`;
+          uniqueValues.set(displayDate, rawDate);
+          return;
         }
 
         if (colKey === 'signature_status') {
@@ -2045,8 +2050,12 @@ function saveRejection() {
         }
       });
 
-      Array.from(uniqueValues.values()).sort().forEach(val => {
-        select.append(`<option value="${val}">${val}</option>`);
+      const sortedEntries = Array.from(uniqueValues.entries()).sort((a, b) => {
+        return a[1].localeCompare(b[1]); // Sort by raw date
+      });
+
+      sortedEntries.forEach(([display, actualValue]) => {
+        select.append(`<option value="${actualValue}">${display}</option>`);
       });
     });
   }
@@ -2700,6 +2709,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             ],
       initComplete: function () {
         applyFiltersFromFullData(this.api(), fullQuotationData, [ 18, 19, 22]);
+            setupGlobalDateSearchFix(this.api()); 
       }
     });
   }
@@ -3170,6 +3180,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             ],
             initComplete: function () {
         applyFiltersFromFullData(this.api(), fullRejectedData, [17]);
+            setupGlobalDateSearchFix(this.api()); 
       }
     });
   }
@@ -3224,6 +3235,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
     ],
     initComplete: function () {
         applyFiltersFromFullData(this.api(), fullPreOrderData, []);
+            setupGlobalDateSearchFix(this.api()); 
       }
     });
   }
@@ -3466,6 +3478,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
     ],
     initComplete: function () {
         applyFiltersFromFullData(this.api(), fullActiveLeadData, []);
+            setupGlobalDateSearchFix(this.api()); 
+
       }
   });
 }
@@ -3556,6 +3570,7 @@ $('#my-table_filter').hide();
     ],
     initComplete: function () {
         applyFiltersFromFullData(this.api(), fullBulkSpecialData, []);
+            setupGlobalDateSearchFix(this.api()); 
       }
     });
   }
@@ -3714,6 +3729,32 @@ $('#saveClientSelection').on('click', function() {
     });
 });
     </script>
+
+<script>
+  function setupGlobalDateSearchFix(tableInstance) {
+    tableInstance.on('preXhr.dt', function (e, settings, data) {
+      const globalSearch = data.search.value.trim();
+
+      const match = globalSearch.match(/^(\d{2})-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-(\d{4})$/i);
+      if (match) {
+        const day = match[1];
+        const monthShort = match[2].toLowerCase();
+        const year = match[3];
+
+        const monthMap = {
+          jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06',
+          jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12'
+        };
+
+        const month = monthMap[monthShort];
+        if (month) {
+          const formatted = `${year}-${month}-${day}`;
+          data.search.value = formatted;
+        }
+      }
+    });
+  }
+</script>
 @else
     @php
         redirect()->route('home')->send();
