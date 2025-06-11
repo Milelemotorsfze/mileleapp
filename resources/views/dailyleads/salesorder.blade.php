@@ -486,10 +486,7 @@ table.dataTable thead th select {
                     const updatesaleorder = `{{ route('salesorder.edit', ':id') }}`.replace(':id', so_id);
 
                     const soCount = document.getElementById('soCount').dataset.soCount;
-                    
-                    if(so_id > soCount || so_id == '5202') {
                         return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
-                    }
                 }
                 return ''; 
                 }
