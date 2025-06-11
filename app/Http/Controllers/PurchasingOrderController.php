@@ -1303,12 +1303,12 @@ public function getBrandsAndModelLines(Request $request)
     ->get();
         $totalSum = $vendorPaymentAdjustments->sum('total_amount');
     $alreadypaidamount = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)->where('status', 'Paid')->sum('amount');
-    $totalSurcharges = intval(PurchasedOrderPriceChanges::where('purchasing_order_id', $id)
+    $totalSurcharges = round((float) PurchasedOrderPriceChanges::where('purchasing_order_id', $id)
     ->where('change_type', 'Surcharge')
-    ->sum('price_change'));
-    $totalDiscounts = intval(PurchasedOrderPriceChanges::where('purchasing_order_id', $id)
+    ->sum('price_change'), 2);
+    $totalDiscounts = round((float) PurchasedOrderPriceChanges::where('purchasing_order_id', $id)
     ->where('change_type', 'discount')
-    ->sum('price_change'));
+    ->sum('price_change'), 2);
     $intialamount = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)->where('status', 'Request For Payment')->sum('amount');
     $purchasingOrder = PurchasingOrder::with(['polPort', 'podPort', 'fdCountry'])->findOrFail($id);
     $paymentterms = PaymentTerms::findorfail($purchasingOrder->payment_term_id);
@@ -1322,7 +1322,7 @@ public function getBrandsAndModelLines(Request $request)
                                ->select('current_balance', 'currency')
                                ->first();
                                if ($vendorstatus) {
-                                $vendorBalance = number_format(intval($vendorstatus->current_balance), 0, '.', ',');
+                                $vendorBalance = number_format((float) $vendorstatus->current_balance, 2, '.', ',');
                                 $vendorCurrency = $vendorstatus->currency;
                                 $vendorDisplay = $vendorBalance . ' - ' . $vendorCurrency;
                             } else {
@@ -3905,7 +3905,7 @@ public function vehiclesdatagetting($id)
         $vehicleData[] = [
             'vehicle_id' => $vehicle->id,
             'vin' => $vehicle->vin,
-            'price' => intval($price),
+            'price' => number_format($price, 2, '.', ''),
         ];
     }
     return response()->json($vehicleData);
@@ -3959,7 +3959,7 @@ public function updatePOPrices(Request $request) {
 public function updatePrices(Request $request)
 {
     $prices = $request->input('prices');
-    $totalPrice = intval($request->input('total_price'));
+    $totalPrice = round((float) $request->input('total_price'), 2);
     $purchasingOrderId = $request->input('purchasing_order_id');
     $userId = auth()->id();
     $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
