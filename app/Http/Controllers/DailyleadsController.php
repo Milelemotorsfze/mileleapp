@@ -411,7 +411,7 @@ class DailyleadsController extends Controller
                 );
                 $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
                 $data->addSelect([
-                    'calls.remarks',
+                    DB::raw("IFNULL(calls.remarks, '') as remarks"),              
                     DB::raw("DATE_FORMAT(quotations.date, '%Y %m %d') as qdate"),
                     DB::raw("IFNULL(quotations.sales_notes, '') as qsalesnotes"),                    
                     DB::raw("IFNULL(quotations.file_path, '') as file_path"),
@@ -532,13 +532,13 @@ class DailyleadsController extends Controller
 
 
             } elseif ($status === 'Rejected') {
-                $data->addSelect(
-                    'calls.remarks',
+                $data->addSelect([
+                    DB::raw("IFNULL(calls.remarks, '') as remarks"),                    
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%Y %m %d'), '') as date"),
                     DB::raw("IFNULL(prospectings.salesnotes, '') as salesnotes"),
                     DB::raw("created_by_user.name as created_by_name"),
                     DB::raw("sales_person_user.name as sales_person_name")
-                );
+                ]);
                 $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(demand.date, '%Y %m %d'), '') as ddate"),

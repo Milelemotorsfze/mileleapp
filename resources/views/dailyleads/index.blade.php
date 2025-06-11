@@ -2486,7 +2486,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'location', name: 'location' },
                 {
                   data: 'remarks',
-                  name: 'calls.remarks',
+                  name: 'remarks',
                   title: 'Remarks & Messages',
                   render: function (data, type, row) {
                     const div = document.createElement('div');
@@ -2976,7 +2976,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'language', name: 'language'},
                 {
                   data: 'remarks',
-                  name: 'calls.remarks',
+                  name: 'remarks',
                   title: 'Remarks & Messages',
                   render: function (data, type, row) {
                     const div = document.createElement('div');
