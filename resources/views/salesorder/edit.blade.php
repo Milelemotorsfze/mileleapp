@@ -637,6 +637,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             searching: true,
             ajax: {
                 url: "{{ route('salesorder.edit', $so->id) }}",
+                type: 'GET',
+                data: function(d) {
+                    d.draw = d.draw || 1;
+                    d.start = d.start || 0;
+                    d.length = d.length || 10;
+                },
                 error: function (xhr, error, thrown) {
                     console.error('DataTable error:', error);
                     alertify.error('Error loading log history data');
@@ -705,47 +711,28 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                 {
                     'data': 'created_at',
                     'name': 'created_at',
-                    orderable: true,
+                    orderable: false,
                     searchable: true,
                     render: function(data, type, row) {
-                        return data || '-';
+                        return data ? moment(data).format('YYYY-MM-DD HH:mm:ss') : '-';
                     }
                 },
                 {
                     'data': 'created_by',
-                    'name': 'salesOrderHistory.user.name',
-                    orderable: true,
+                    'name': 'created_by',
+                    orderable: false,
                     searchable: true,
                     render: function(data, type, row) {
                         return data || '-';
                     }
                 }
             ],
+            order: [[0, 'desc']],
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
             language: {
-                processing: '<div class="spinner-border text-primary" role="status"></div>',
-                zeroRecords: 'No records found',
-                emptyTable: 'No data available in table',
-                paginate: {
-                    previous: "<i class='fas fa-chevron-left'>",
-                    next: "<i class='fas fa-chevron-right'>"
-                }
-            },
-            drawCallback: function(settings) {
-                if (settings.json) {
-                    if (settings.json.error) {
-                        alertify.error(settings.json.error);
-                    }
-                }
+                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>'
             }
-        });
-
-        // Refresh table on error
-        table1.on('error.dt', function(e, settings, techNote, message) {
-            console.error('DataTable error:', message);
-            alertify.error('An error occurred while loading the data. The table will refresh automatically.');
-            setTimeout(function() {
-                table1.ajax.reload();
-            }, 5000);
         });
 
         $('.vins').select2({
