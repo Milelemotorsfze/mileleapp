@@ -204,7 +204,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                                 </div>
                                 <div class="row mb-2">
                                     <div class="col-sm-6"><strong>Sales Person:</strong></div>
-                                    <div class="col-sm-6">{{ $saleperson->name }}</div>
+                                    <div class="col-sm-6">{{ $saleperson->name ?? '' }}</div>
                                 </div>
                                 <div class="row mb-2">
                                     <div class="col-sm-6"><strong>Sales Office:</strong></div>
@@ -212,7 +212,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                                 </div>
                                 <div class="row mb-2">
                                     <div class="col-sm-6"><strong>Sales Email ID:</strong></div>
-                                    <div class="col-sm-6">{{ $saleperson->email }}</div>
+                                    <div class="col-sm-6">{{ $saleperson->email ?? '' }}</div>
                                 </div>
                                 <div class="row mb-2">
                                     <div class="col-sm-6"><strong>Sales Contact No:</strong></div>
