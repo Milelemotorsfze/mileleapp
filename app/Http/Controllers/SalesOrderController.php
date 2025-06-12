@@ -443,7 +443,7 @@ class SalesOrderController extends Controller
                             'new_value' => null
                         ];
                         // Remove the SO items and update the vehicle's SO ID
-                        $logEntries = array_merge($logEntries, $this->removeSoItems($variantId, $variant->soVehicles->pluck('vehicles_id')->toArray()));
+                        $logEntries = array_merge($logEntries, $this->removeSoItems($variantId, $variant->soVehicles ? $variant->soVehicles->pluck('vehicles_id')->toArray() : []));
                         $variant->delete();
                     }
                 }
@@ -484,7 +484,7 @@ class SalesOrderController extends Controller
                         }
 
                         if (isset($soVariant['vehicles'])) {
-                            $currentVehicles = $existingVariant->so_items->pluck('vehicles_id')->toArray();
+                            $currentVehicles = $existingVariant && $existingVariant->so_items ? $existingVariant->so_items->pluck('vehicles_id')->toArray() : [];
                             $newVehicles = $soVariant['vehicles'];
                             
                             // If no vehicles are selected, remove all existing ones
@@ -516,7 +516,7 @@ class SalesOrderController extends Controller
                             }
                         } else {
                             // If vehicles array is not set, remove all existing vehicles
-                            $currentVehicles = $existingVariant->so_items->pluck('vehicles_id')->toArray();
+                            $currentVehicles = $existingVariant && $existingVariant->so_items ? $existingVariant->so_items->pluck('vehicles_id')->toArray() : [];
                             if (!empty($currentVehicles)) {
                                 $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $currentVehicles));
                             }
@@ -552,7 +552,7 @@ class SalesOrderController extends Controller
 
                         // Handle vehicles
                         if (isset($soVariant['vehicles'])) {
-                            $currentVehicles = $existingVariant->so_items->pluck('vehicles_id')->toArray();
+                            $currentVehicles = $existingVariant && $existingVariant->so_items ? $existingVariant->so_items->pluck('vehicles_id')->toArray() : [];
                             $newVehicles = $soVariant['vehicles'];
                             
                             // If no vehicles are selected, remove all existing ones
@@ -584,7 +584,7 @@ class SalesOrderController extends Controller
                             }
                         } else {
                             // If vehicles array is not set, remove all existing vehicles
-                            $currentVehicles = $existingVariant->so_items->pluck('vehicles_id')->toArray();
+                            $currentVehicles = $existingVariant && $existingVariant->so_items ? $existingVariant->so_items->pluck('vehicles_id')->toArray() : [];
                             if (!empty($currentVehicles)) {
                                 $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $currentVehicles));
                             }

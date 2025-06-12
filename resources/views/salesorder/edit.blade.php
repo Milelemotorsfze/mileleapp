@@ -990,6 +990,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                             <select name="variants[${index}][variant_id]" index="${index}" id="variant-${index}"
                              class="variants form-control" multiple required  data-is-gdn="0">
                             </select>
+                            <input type="hidden" name="variants[${index}][so_variant_id]" class="so-variants" index="${index}"
+                                value="" id="so-variant-${index}">
                         </div> 
                         <div class="mb-2 col-sm-12 col-md-4 col-lg-4 col-xxl-4">
                            <span class="text-danger">* </span> <label class="form-label font-size-13">Description</label>
@@ -1147,116 +1149,99 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
         var soVariantId = $(this).attr('data-variant-id');
 
         if (rowCount > 1) {
-
             var selectedVins = $('#vin-' + indexNumber).val();
-
-            if (Array.isArray(selectedVins) && selectedVins.length > 0) {
-                e.preventDefault();
-                alertify.confirm('Are you sure to remove this? You\'ll lose all the selected VINs.',
-                    function () {
-                        $('#vin-' + indexNumber).closest(".so-variant-add-section").remove();
-                    }
-                ).set({
-                    title: "VINs are Selected"
-                });
-
-            return;
-            }
-
             var isGdn = $('#variant-' + indexNumber).attr('data-is-gdn');
+
             if (isGdn == 1) {
                 e.preventDefault();
                 alertify.confirm('This Variant cannot be removed because it has a GDN assigned vehicles.').set({
                     title: "Can't Remove this Variant"
                 });
             } else {
-
-                var variantText = $('#variant-' + indexNumber).text();
-                var variant = $('#variant-' + indexNumber).val();
-
-                if (variantText) {
-                    let vins = $('#vin-' + indexNumber).val();
-
-                    if (Array.isArray(vins) && vins.length > 0) {
-                        $('#vin-' + indexNumber + ' option:selected').each(function() {
-                            const vinId = $(this).val();
-                            const vinText = $(this).text();
-                            appendVin(indexNumber, vinId, vinText, variant[0]);
-                        });
-                    }
+                if (Array.isArray(selectedVins) && selectedVins.length > 0) {
+                    e.preventDefault();
+                    alertify.confirm('Are you sure to remove this? You\'ll lose all the selected VINs.',
+                        function () {
+                            if (soVariantId !== undefined && !deletedVariantIds.includes(soVariantId)) {
+                                deletedVariantIds.push(soVariantId);
+                                $('#deleted-ids').append(
+                                    `<input type="hidden" name="deleted_so_variant_ids[]" value="${soVariantId}">`
+                                );
+                            }
+                            $('#vin-' + indexNumber).closest(".so-variant-add-section").remove();
+                        }
+                    ).set({
+                        title: "VINs are Selected"
+                    });
+                    return;
                 }
+
                 if (soVariantId !== undefined && !deletedVariantIds.includes(soVariantId)) {
                     deletedVariantIds.push(soVariantId);
-
-                    // Append hidden input to form
                     $('#deleted-ids').append(
                         `<input type="hidden" name="deleted_so_variant_ids[]" value="${soVariantId}">`
                     );
                 }
 
                 $(this).closest('#variant-section-' + indexNumber).remove();
-
-                $('.so-variant-add-section').each(function(i) {
-                    var index = i + 1;
-
-                    $(this).find('.variant-descriptions').attr({
-                        'index': index,
-                        'id': 'variant-description-' + index,
-                        'name': 'variants[' + index + '][description]'
-                    });
-
-                    $(this).attr('id', 'variant-section-' + index);
-
-                    $(this).find('.variants').attr({
-                        'index': index,
-                        'id': 'variant-' + index,
-                        'name': 'variants[' + index + '][variant_id]'
-                    });
-
-                    $(this).find('.so-variants').attr({
-                        'index': index,
-                        'id': 'so-variant-' + index,
-                        'name': 'variants[' + index + '][so_variant_id]'
-                    });
-
-                    $(this).find('.variant-prices').attr({
-                        'index': index,
-                        'id': 'price-' + index,
-                        'name': 'variants[' + index + '][price]'
-                    });
-                    $(this).find('.variant-quantities').attr({
-                        'index': index,
-                        'id': 'quantity-' + index,
-                        'name': 'variants[' + index + '][quantity]'
-                    });
-
-                    $(this).find('.vins').attr({
-                        'index': index,
-                        'id': 'vin-' + index,
-                        'name': 'variants[' + index + '][vehicles][]'
-                    });
-
-                    $(this).find('.removeVariantButton').attr('index', index);
-
-                    $('#vin-' + index).select2('destroy');
-
-                    ReinitializeSelect2('#variant-' + index);
-                    $('#vin-' + index).select2({
-                        placeholder: 'Select Vin',
-                    });
-
-                    $(this).find('.variants').valid();
-                });
-                calculateTotalSOAmount();
             }
-
         } else {
             var confirm = alertify.confirm('You are not able to remove this row, Atleast one Variant is Required', function(e) {}).set({
                 title: "Can't Remove Variant"
-            })
-
+            });
         }
     });
+
+    function reindexVariants() {
+        $('.so-variant-add-section').each(function(i) {
+            var index = i + 1;
+            $(this).find('.variant-descriptions').attr({
+                'index': index,
+                'id': 'variant-description-' + index,
+                'name': 'variants[' + index + '][description]'
+            });
+
+            $(this).attr('id', 'variant-section-' + index);
+
+            $(this).find('.variants').attr({
+                'index': index,
+                'id': 'variant-' + index,
+                'name': 'variants[' + index + '][variant_id]'
+            });
+
+            $(this).find('.so-variants').attr({
+                'index': index,
+                'id': 'so-variant-' + index,
+                'name': 'variants[' + index + '][so_variant_id]'
+            });
+
+            $(this).find('.variant-prices').attr({
+                'index': index,
+                'id': 'price-' + index,
+                'name': 'variants[' + index + '][price]'
+            });
+
+            $(this).find('.variant-quantities').attr({
+                'index': index,
+                'id': 'quantity-' + index,
+                'name': 'variants[' + index + '][quantity]'
+            });
+
+            $(this).find('.vins').attr({
+                'index': index,
+                'id': 'vin-' + index,
+                'name': 'variants[' + index + '][vehicles][]'
+            });
+
+            $(this).find('.removeVariantButton').attr('index', index);
+
+            $('#vin-' + index).select2('destroy');
+            ReinitializeSelect2('#variant-' + index);
+            $('#vin-' + index).select2({
+                placeholder: 'Select Vin',
+            });
+        });
+    }
 
     function hideVin(index, vin) {
         var totalIndex = $("#so-vehicles").find(".so-variant-add-section").length;
