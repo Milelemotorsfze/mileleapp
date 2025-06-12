@@ -26,6 +26,11 @@
         font-size: 0.9em;
     }
 </style>
+@can('edit-so')
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
+@endphp
+@if ($hasPermission)
 <div class="card">
     <div class="card-header">
         <h4 class="card-title">
@@ -363,7 +368,7 @@
                 <input type="date" class="form-control" id="so_date" name="so_date" value="<?php echo date("Y-m-d"); ?>">
             </div>
             <div class="col-md-2 mb-3">
-            <span class="error">* </span><label for="so_number">Netsuit SO Number</label>
+            <span class="text-danger">* </span><label for="so_number">Netsuit SO Number</label>
                 <div class="input-group mb-3">
                     <span class="input-group-text">SO-</span>
                     <input type="text" class="form-control" placeholder="Enter SO Number" id="so_number" name="so_number" aria-label="Enter SO Number">
@@ -444,6 +449,9 @@
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
+@endif
+@endcan
+
 @endsection
 @push('scripts')
 <script>

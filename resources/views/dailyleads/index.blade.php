@@ -719,7 +719,7 @@ input[type=number]::-webkit-outer-spin-button
           </div>
           <div class="row mb-3">
             <div class="col-md-4">
-              <label for="document-upload" class="form-label">Upload Re-Qoutation:</label>
+              <label for="document-upload" class="form-label">Upload Re-Quotation:</label>
             </div>
             <div class="col-md-8">
               <input type="file" class="form-control" id="document-upload-negotiation">
@@ -1019,11 +1019,11 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Prospectings Notes</th>
                   <th>Demand Date</th>
                   <th>Demand Notes</th>
-                  <th>Qoutation Date</th>
+                  <th>Quotation Date</th>
                   <th>Sales Person</th>
                   <th>Deal Values</th>
-                  <th>Qoutation Notes</th>
-                  <th>View Qoutation</th>
+                  <th>Quotation Notes</th>
+                  <th>View Quotation</th>
                   <th>Signature Status</th>
                   <th>Created By</th>
                   <th>Assigned To</th>
@@ -1065,14 +1065,14 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                   <th>Prospectings Notes</th>
                   <th>Demand Date</th>
                   <th>Demand Notes</th>
-                  <th>Qoutation Date</th>
+                  <th>Quotation Date</th>
                   <th>Deal Values</th>
-                  <th>Qoutation Notes</th>
-                  <th>View Qoutation</th>
+                  <th>Quotation Notes</th>
+                  <th>View Quotation</th>
                   <th>Negotiation Date</th>
                   <th>Deal Values</th>
                   <th>Negotiation Notes</th>
-                  <th>View Re-Qoutation</th>
+                  <th>View Re-Quotation</th>
                   <th>Created By</th>
                   <th>Assigned To</th>
                 </tr>
@@ -1093,10 +1093,10 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
             <table id="dtBasicExample8" class="table table-striped table-editable table-edits table" style = "width:100%;">
             <thead class="bg-soft-secondary">
                 <tr>
-                  <th>Qoutation ID</th>
-                  <th>Qoutation Date</th>
-                  <th>Qoutation Values</th>
-                  <th>Qoutation Notes</th>
+                  <th>Quotation ID</th>
+                  <th>Quotation Date</th>
+                  <th>Quotation Values</th>
+                  <th>Quotation Notes</th>
                   <th>Variant</th>
                   <th>Qty</th>
                   <th>Country</th>
@@ -1134,14 +1134,14 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                   <th>Prospectings Notes</th>
                   <th>Demand Date</th>
                   <th>Demand Notes</th>
-                  <th>Qoutation Date</th>
-                  <th>Qoutation Values</th>
-                  <th>Qoutation Notes</th>
-                  <th>View Qoutation</th>
+                  <th>Quotation Date</th>
+                  <th>Quotation Values</th>
+                  <th>Quotation Notes</th>
+                  <th>View Quotation</th>
                   <!-- <th>Negotiation Date</th>
                   <th>Negotiation Values</th>
                   <th>Negotiation Notes</th>
-                  <th>View Re-Qoutation</th> -->
+                  <th>View Re-Quotation</th> -->
                   <th>Created By</th>
                   <th>Assigned To</th>
                   <th>Reject Date</th>
@@ -1967,7 +1967,7 @@ function saveRejection() {
           var escaped = selectedValues.map(function (val) {
             return '^' + val.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '$';
           }).join('|');
-          column.search(escaped, true, false).draw();
+          column.search(selectedValues.join('|'), false, true).draw();
         } else {
           column.search('', true, false).draw();
         }
@@ -1979,7 +1979,7 @@ function saveRejection() {
       let uniqueValues = new Set();
       column.data().each(function (d) {
         let tempDiv = $('<div>').html(d);
-let textVal = tempDiv.text().trim();
+        let textVal = tempDiv.text().trim();
         if (textVal && !uniqueValues.has(textVal)) {
           uniqueValues.add(textVal);
         }
@@ -1988,6 +1988,82 @@ let textVal = tempDiv.text().trim();
         select.append('<option value="' + val + '">' + val + '</option>');
       });
     });
+  }
+
+  function applyFiltersFromFullData(table, fullData, excludeColumns = []) {
+    table.columns().every(function (index) {
+      if (excludeColumns.includes(index)) return ;
+      const column = this;
+      const colKey = column.dataSrc();
+
+      if (!colKey || ['DT_RowIndex', 'action'].includes(colKey)) return; 
+
+      const selectWrapper = $('<div class="select-wrapper"></div>');
+      const select = $('<select class="form-control my-1" multiple></select>')
+        .appendTo(selectWrapper)
+        .select2({ width: '100%' });
+
+      select.on('change', function () {
+        const val = $(this).val().filter(Boolean); 
+        let safePattern;
+      if (['created_at', 'qdate', 'date', 'ddate', 'rdate', 'cdate', 'ndate', 'date_formatted'].includes(colKey)) {
+          safePattern = val
+            .map(v => v.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'))
+            .join('|');
+          column.search(safePattern, true, false).draw();
+        } else {
+          safePattern = val
+            .map(v => '^' + v.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '$')
+            .join('|');
+          column.search(safePattern, true, false).draw();
+        }
+      });
+
+      selectWrapper.appendTo($(column.header()));
+      $(column.header()).addClass('nowrap-td');
+
+      const uniqueValues = new Map(); 
+
+      fullData.forEach(row => {
+        let raw = row[colKey];
+        let tempDiv = document.createElement('div');
+        tempDiv.innerHTML = raw || '';
+        let val = tempDiv.textContent.trim();
+
+      if (['created_at', 'qdate', 'date', 'ddate', 'rdate', 'cdate', 'ndate', 'date_formatted'].includes(colKey) && val) {
+          const rawDate = val.split(' ')[0];
+          const parts = rawDate.split('-');
+          const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+          const displayDate = `${parts[2]}-${monthNames[parseInt(parts[1], 10) - 1]}-${parts[0]}`;
+          uniqueValues.set(displayDate, rawDate);
+          return;
+        }
+
+        if (colKey === 'signature_status') {
+        val = val === 'Signed' ? 'Signed' : 'Not Signed';
+      }
+
+        let normalized = val.toLowerCase(); 
+
+        if (val && !uniqueValues.has(normalized)) {
+          uniqueValues.set(normalized, val); 
+        }
+      });
+
+      const sortedEntries = Array.from(uniqueValues.entries()).sort((a, b) => {
+        return a[1].localeCompare(b[1]); // Sort by raw date
+      });
+
+      sortedEntries.forEach(([display, actualValue]) => {
+        select.append(`<option value="${actualValue}">${display}</option>`);
+      });
+    });
+  }
+
+  function stripHtml(html) {
+    const div = document.createElement('div');
+    div.innerHTML = html || '';
+    return div.textContent || div.innerText || '';
   }
 </script>
 <script type="text/javascript">
@@ -2001,7 +2077,7 @@ $(document).ready(function () {
   order: [[0, 'desc']],
   orderCellsTop: true,
   initComplete: function () {
-    applyColumnFilters('#dtBasicExample1', []); 
+    applyColumnFilters('#dtBasicExample1', [11]); 
   }
 });
 $('#my-table_filter').hide();
@@ -2120,7 +2196,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 {
     data: 'salesnotes',
     name: 'salesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'salesnotes_' + row.id;
@@ -2154,7 +2230,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'dsalesnotes_' + row.id;
@@ -2174,7 +2250,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 {
     data: 'purchaserremarks',
     name: 'purchaserremarks',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'purchaserremarks_' + row.id;
@@ -2200,7 +2276,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 // {
                 //     data: 'id',
                 //     name: 'id',
-                //     searchable: false,
+                //     searchable: true,
                 //     render: function (data, type, row) {
                 //       const bookingUrl = `{{ url('booking/create') }}/${data}`;
                 //       const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
@@ -2311,7 +2387,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 {
     data: 'salesnotes',
     name: 'salesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'salesnotes_' + row.id;
@@ -2345,7 +2421,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'dsalesnotes_' + row.id;
@@ -2367,7 +2443,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 // {
                 //     data: 'id',
                 //     name: 'id',
-                //     searchable: false,
+                //     searchable: true,
                 //     render: function (data, type, row) {
                 //       const bookingUrl = `{{ url('booking/create') }}/${data}`;
                 //       const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
@@ -2387,25 +2463,36 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         });
         $('#my-table_filter').hide();
 
-       dataTable4 = $('#dtBasicExample4').DataTable({
+  let fullQuotationData = [];
+  $.ajax({
+    url: "{{ route('dailyleads.index', ['status' => 'Quoted']) }}",
+    data: { length: -1 },
+    success: function(response) {
+      fullQuotationData = response.data || [];
+    },
+    complete: function () {
+      $('#my-table_filter').hide();
+          if ($.fn.DataTable.isDataTable('#dtBasicExample4')) {
+        $('#dtBasicExample4').DataTable().clear().destroy();
+      }
+       const dataTable4 = $('#dtBasicExample4').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('dailyleads.index', ['status' => 'Quoted']) }}",
             columns: [
               {
-            data: 'created_at',
-            name: 'created_at',
-             render: function (data, type, row) {
-        if (type === 'display' || type === 'filter') {
-            if (!data || !moment(data).isValid()) {
-                return '';
-            }
-            // Convert the date to your desired format
-            return moment(data).format('DD-MMM-YYYY');
-        }
-        return data;
-    }
-        },
+                data: 'created_at',
+                name: 'created_at',
+                render: function (data, type, row) {
+                  if (type === 'display' || type === 'filter') {
+                    if (!data || !moment(data).isValid()) {
+                        return '';
+                    }
+                    return moment(data).format('DD-MMM-YYYY');
+                  }
+                  return data;
+                }
+              },
                 { data: 'type', name: 'type' },
                 { data: 'name', name: 'name' },
                 { data: 'phone', name: 'phone' },
@@ -2414,29 +2501,27 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'custom_brand_model', name: 'custom_brand_model' },
                 { data: 'language', name: 'language' },
                 { data: 'location', name: 'location' },
-{
-  data: 'remarks',
-  name: 'calls.remarks',
-  title: 'Remarks & Messages',
-  render: function (data, type, row) {
-    const div = document.createElement('div');
-    div.innerHTML = data || '';
-    const plainText = div.textContent.trim();
+                {
+                  data: 'remarks',
+                  name: 'remarks',
+                  title: 'Remarks & Messages',
+                  render: function (data, type, row) {
+                    const div = document.createElement('div');
+                    div.innerHTML = data || '';
+                    const plainText = div.textContent.trim();
 
-    if (type !== 'display') return plainText;
+                    if (type !== 'display') return plainText;
 
-    let shortText = plainText.substring(0, 20);
-    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+                    let shortText = plainText.substring(0, 20);
+                    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
-    if (plainText.length > 20) {
-      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
-    }
+                    if (plainText.length > 20) {
+                      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+                    }
 
-    return plainText;
-  }
-},
-
-
+                    return plainText;
+                  }
+                },
                 {
                     data: 'date',
                     name: 'date',
@@ -2454,7 +2539,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 {
     data: 'salesnotes',
     name: 'salesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'salesnotes_' + row.id;
@@ -2488,7 +2573,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'dsalesnotes_' + row.id;
@@ -2519,15 +2604,26 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         return data;
     }
         },
-        { data: 'salespersonname', name: 'users.name' },
-                { data: 'ddealvalues', name: 'ddealvalues', searchable: false },
-                {
+        { data: 'sales_person_name', name: 'sales_person_name' },
+
+      {
+        data: 'deal_value',
+        name: 'deal_value',
+        render: function(data, type, row) {
+          return data || '';
+        }
+      },
+      {
     data: 'qsalesnotes',
     name: 'qsalesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'qsalesnotes_' + row.id;
+
+        if (!data) {
+            return `<span class="remarks-text"></span>`;
+        }
 
         if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
@@ -2567,60 +2663,57 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 }
             },
             { data: 'created_by_name', name: 'created_by_name' },
-{ data: 'sales_person_name', name: 'sales_person_name' },
-@php
-$hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
-@endphp
-@if ($hasFullAccess)
-            {
-    data: 'id',
-    name: 'id',
-    render: function (data, type, row) {
-        const bookingUrl = `{{ url('booking/create') }}/${data}`;
-        const quotationUrlEdit = `{{ url('/proforma_invoice_edit/') }}/${data}`;
-        const soUrl = `{{ url('/saleorder/') }}/${data}`;
-        const preorderUrl = `{{ url('/preorder/') }}/${data}`;
-        let salesOrderOption = '';
-        let booking = '';
-        let preorder = '';
-        let signedlink = '';
-        let uploadedfile = '';
-        if (row.signature_status === 'Signed') {
-            salesOrderOption = `<li><a class="dropdown-item" href="${soUrl}">Sales Order</a></li>`;
-            preorder = `<li><a class="dropdown-item" href="${preorderUrl}">Pre Order</a></li>`;
-        } else {
-            signedlink = `<li><a class="dropdown-item" href="#" onclick="opensignaturelink(${data})">Signature Link</a></li>`;
-            uploadedfile = `<li><a class="dropdown-item" href="#" onclick="uploadingsignedquotation(${data})">Upload Signed Quotation</a></li>`;
-        }
-        return `
-            <div class="dropdown">
-                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
-                    <i class="fa fa-bars" aria-hidden="true"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item"href="${quotationUrlEdit}">Update Quotation</a></li>
-                    ${preorder}
-                    ${salesOrderOption}
-                    <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="openvins(${data})">VINs</a></li>
-                    ${signedlink}
-                    ${uploadedfile}
-                </ul>
-            </div>`;
-    }
-},
-@endif
+            { data: 'sales_person_name', name: 'sales_person_name' },
+            @php
+            $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+            @endphp
+            @if ($hasFullAccess)
+              {
+                data: 'id',
+                name: 'id',
+                render: function (data, type, row) {
+                    const bookingUrl = `{{ url('booking/create') }}/${data}`;
+                    const quotationUrlEdit = `{{ url('/proforma_invoice_edit/') }}/${data}`;
+                    const soUrl = `{{ url('/saleorder/') }}/${data}`;
+                    const preorderUrl = `{{ url('/preorder/') }}/${data}`;
+                    let salesOrderOption = '';
+                    let booking = '';
+                    let preorder = '';
+                    let signedlink = '';
+                    let uploadedfile = '';
+                    if (row.signature_status === 'Signed') {
+                        salesOrderOption = `<li><a class="dropdown-item" href="${soUrl}">Sales Order</a></li>`;
+                        preorder = `<li><a class="dropdown-item" href="${preorderUrl}">Pre Order</a></li>`;
+                    } else {
+                        signedlink = `<li><a class="dropdown-item" href="#" onclick="opensignaturelink(${data})">Signature Link</a></li>`;
+                        uploadedfile = `<li><a class="dropdown-item" href="#" onclick="uploadingsignedquotation(${data})">Upload Signed Quotation</a></li>`;
+                    }
+                    return `
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
+                                <i class="fa fa-bars" aria-hidden="true"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item"href="${quotationUrlEdit}">Update Quotation</a></li>
+                                ${preorder}
+                                ${salesOrderOption}
+                                <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="openvins(${data})">VINs</a></li>
+                                ${signedlink}
+                                ${uploadedfile}
+                            </ul>
+                        </div>`;
+                }
+              },
+            @endif
             ],
-            initComplete: function () {
-              applyColumnFilters('#dtBasicExample4', []);
-            },
-            createdRow: function (row, data, dataIndex) {
-        console.log(data.created_by);
-        if (data.created_by === {{ Auth::id() }}) {
-            $(row).css('background-color', '#FFE5B4');
-        }
-    }
-        });
+      initComplete: function () {
+        applyFiltersFromFullData(this.api(), fullQuotationData, [9, 18, 19, 22]);
+            setupGlobalDateSearchFix(this.api()); 
+      }
+    });
+  }
+});
         $('#my-table_filter').hide();
 
        dataTable5 =  $('#dtBasicExample5').DataTable({
@@ -2689,7 +2782,7 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                 {
     data: 'salesnotes',
     name: 'salesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'salesnotes_' + row.id;
@@ -2723,7 +2816,7 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'dsalesnotes_' + row.id;
@@ -2754,11 +2847,11 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         return data;
     }
         },
-                { data: 'qdealvalues', name: 'qdealvalues', searchable: false },
+                { data: 'qdealvalues', name: 'qdealvalues', searchable: true },
                 {
     data: 'qsalesnotes',
     name: 'qsalesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'qsalesnotes_' + row.id;
@@ -2800,11 +2893,11 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                 return data;
             }
         },
-                { data: 'ndealvalues', name: 'ndealvalues', searchable: false },
+                { data: 'ndealvalues', name: 'ndealvalues', searchable: true },
                 {
     data: 'nsalesnotes',
     name: 'nsalesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'nsalesnotes_' + row.id;
@@ -2849,7 +2942,7 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item"href="${qoutationUrlEdit}">Update Qoutation</a></li>
+                                <li><a class="dropdown-item"href="${qoutationUrlEdit}">Update Quotation</a></li>
                                 <li><a class="dropdown-item"href="${soUrl}">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                                 </ul>
@@ -2860,15 +2953,27 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         });
         $('#my-table_filter').hide();
 
-        dataTable7 =   $('#dtBasicExample7').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('dailyleads.index', ['status' => 'Rejected']) }}",
-            columns: [
-              {
-            data: 'created_at',
-            name: 'created_at',
-             render: function (data, type, row) {
+  let fullRejectedData = [];
+  $.ajax({
+    url: "{{ route('dailyleads.index', ['status' => 'Rejected']) }}",
+    data: { length: -1 },
+    success: function(response) {
+      fullRejectedData = response.data || [];
+    },
+    complete: function () {
+      $('#my-table_filter').hide();
+          if ($.fn.DataTable.isDataTable('#dtBasicExample7')) {
+        $('#dtBasicExample7').DataTable().clear().destroy();
+      }
+       const dataTable7 = $('#dtBasicExample7').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "{{ route('dailyleads.index', ['status' => 'Rejected']) }}",
+        columns: [
+          {
+          data: 'created_at',
+          name: 'created_at',
+          render: function (data, type, row) {
         if (type === 'display' || type === 'filter') {
             if (!data || !moment(data).isValid()) {
                 return '';
@@ -2888,28 +2993,28 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                 { data: 'location', name: 'location'},
                 { data: 'language', name: 'language'},
                 {
-  data: 'remarks',
-  name: 'calls.remarks',
-  title: 'Remarks & Messages',
-  render: function (data, type, row) {
-    const div = document.createElement('div');
-    div.innerHTML = data || '';
-    const plainText = div.textContent.trim();
+                  data: 'remarks',
+                  name: 'remarks',
+                  title: 'Remarks & Messages',
+                  render: function (data, type, row) {
+                    const div = document.createElement('div');
+                    div.innerHTML = data || '';
+                    const plainText = div.textContent.trim();
 
-    if (type !== 'display') return plainText;
+                    if (type !== 'display') return plainText;
 
-    let shortText = plainText.substring(0, 20);
-    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+                    let shortText = plainText.substring(0, 20);
+                    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
-    if (plainText.length > 20) {
-      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
-    }
+                    if (plainText.length > 20) {
+                      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+                    }
 
-    return plainText;
-  }
-},
+                    return plainText;
+                  }
+                },
 
-{
+          {
             data: 'date',
             name: 'date',
              render: function (data, type, row) {
@@ -2926,7 +3031,7 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                 {
     data: 'salesnotes',
     name: 'salesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'salesnotes_' + row.id;
@@ -2960,7 +3065,7 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'dsalesnotes_' + row.id;
@@ -2991,11 +3096,19 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         return data;
     }
         },
-                { data: 'qdealvalues', name: 'qdealvalues', searchable: false},
-                {
+
+      {
+        data: 'deal_value',
+        name: 'deal_value',
+        render: function(data) {
+            return data || '';
+        }
+      },
+
+    {
     data: 'qsalesnotes',
     name: 'qsalesnotes',
-    searchable: false,
+    searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'qsalesnotes_' + row.id;
@@ -3042,45 +3155,57 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         return data;
     }
         },
-                { data: 'reason', name: 'reason', searchable: false },
+                { data: 'reason', name: 'reason', searchable: true },
                 {
-    data: 'rsalesnotes',
-    name: 'rsalesnotes',
-    searchable: false,
-    render: function (data, type, row) {
-        const maxLength = 20;
-        const uniqueId = 'rsalesnotes_' + row.id;
-        if (data && data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
-            return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-            `;
-        } else {
-            return `<span class="remarks-text">${data}</span>`;
-        }
-    }
-},
+                  data: 'rsalesnotes',
+                  name: 'rsalesnotes',
+                  searchable: true,
+                  render: function (data, type, row) {
+                      data = data || ''; 
+                      const maxLength = 20;
+                      const uniqueId = 'rsalesnotes_' + row.id;
+                      
+                      if (data && data.length > maxLength) {
+                          const truncatedText = data.substring(0, maxLength);
+                          return `
+                              <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                              <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                              <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+                          `;
+                      } else {
+                          return `<span class="remarks-text">${data}</span>`;
+                      }
+                  }
+              },
             ],
             initComplete: function () {
-              applyColumnFilters('#dtBasicExample7', []);
-            },
-            createdRow: function (row, data, dataIndex) {
-        console.log(data.created_by);
-        if (data.created_by === {{ Auth::id() }}) {
-            $(row).css('background-color', '#FFE5B4');
-        }
-    }
-        });
+        applyFiltersFromFullData(this.api(), fullRejectedData, [9, 17]);
+            setupGlobalDateSearchFix(this.api()); 
+      }
+    });
+  }
+});
+
         $('#my-table_filter').hide();
 
-    dataTable8 = $('#dtBasicExample8').DataTable({
-    processing: true,
-    serverSide: true,
-    ajax: "{{ route('dailyleads.index', ['status' => 'Preorder']) }}",
-    columns: [
-        { data: 'quotationsid', name: 'quotationsid' },
+  let fullPreOrderData = [];
+  $.ajax({
+    url: "{{ route('dailyleads.index', ['status' => 'Preorder']) }}",
+    data: { length: -1 },
+    success: function(response) {
+      fullPreOrderData = response.data || [];
+    },
+    complete: function () {
+      $('#my-table_filter').hide();
+          if ($.fn.DataTable.isDataTable('#dtBasicExample8')) {
+        $('#dtBasicExample8').DataTable().clear().destroy();
+      }
+       const dataTable8 = $('#dtBasicExample8').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "{{ route('dailyleads.index', ['status' => 'Preorder']) }}",
+        columns: [
+        { data: 'quotationsid', name: 'quotations.id' },
         {
             data: 'date_formatted',
             name: 'quotations.date',
@@ -3104,20 +3229,18 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         { data: 'notes', name: 'pre_orders_items.notes' },
         { data: 'name', name: 'varaints.name' },
         { data: 'qty', name: 'pre_orders_items.qty' },
-        { data: 'countryname', name: 'countryname' },
-        { data: 'salesperson', name: 'salesperson' },
-        { data: 'status', name: 'status' },
+        { data: 'countryname', name: 'countries.name' },
+        { data: 'salesperson', name: 'users.name' },
+        { data: 'status', name: 'pre_orders.status' },
     ],
     initComplete: function () {
-      applyColumnFilters('#dtBasicExample8', []);
-    },
-    createdRow: function (row, data, dataIndex) {
-        console.log(data.created_by);
-        if (data.created_by === {{ Auth::id() }}) {
-            $(row).css('background-color', '#FFE5B4');
-        }
-    }
+        applyFiltersFromFullData(this.api(), fullPreOrderData, []);
+            setupGlobalDateSearchFix(this.api()); 
+      }
     });
+  }
+});
+
     $('#my-table_filter').hide();
 
     dataTable9 = $('#dtBasicExample9').DataTable({
@@ -3211,18 +3334,31 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
     });
     $('#my-table_filter').hide();
 
-    dataTable11 = $('#dtBasicExample11').DataTable({
-    processing: true,
-    serverSide: true,
-    ajax: "{{ route('dailyleads.index', ['status' => 'activelead']) }}",
-    columns: [
+  let fullActiveLeadData = [];
+
+  $.ajax({
+    url: "{{ route('dailyleads.index', ['status' => 'activelead']) }}",
+    data: { length: -1 }, 
+    success: function(response) {
+      fullActiveLeadData = response.data || [];
+    },
+    complete: function () {
+      $('#my-table_filter').hide();
+
+
+
+      dataTable11 = $('#dtBasicExample11').DataTable({
+      processing: true,
+      serverSide: true,
+      ajax: "{{ route('dailyleads.index', ['status' => 'activelead']) }}",
+      columns: [
         {
             data: 'priority',
             name: 'calls.priority',
             title: 'Priority'
         },
         {
-            data: 'leaddate',
+            data: 'created_at',
             name: 'calls.created_at',
             title: 'Lead Date',
             render: function (data, type, row) {
@@ -3276,26 +3412,26 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
             title: 'Location'
         },
         {
-  data: 'remarks',
-  name: 'calls.remarks',
-  title: 'Remarks & Messages',
-  render: function (data, type, row) {
-    const div = document.createElement('div');
-    div.innerHTML = data || '';
-    const plainText = div.textContent.trim();
+          data: 'remarks',
+          name: 'calls.remarks',
+          title: 'Remarks & Messages',
+          render: function (data, type, row) {
+            const div = document.createElement('div');
+            div.innerHTML = data || '';
+            const plainText = div.textContent.trim();
 
-    if (type !== 'display') return plainText;
+            if (type !== 'display') return plainText;
 
-    let shortText = plainText.substring(0, 20);
-    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+            let shortText = plainText.substring(0, 20);
+            let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
-    if (plainText.length > 20) {
-      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
-    }
+            if (plainText.length > 20) {
+              return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+            }
 
-    return plainText;
-  }
-},
+            return plainText;
+          }
+        },
 
         {
             data: 'status',
@@ -3341,34 +3477,57 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         }
     ],
     initComplete: function () {
-      applyColumnFilters('#dtBasicExample11', []); 
-    },
-    createdRow: function (row, data, dataIndex) {
-        console.log(data.created_by);
-        if (data.created_by === {{ Auth::id() }}) {
-            $(row).css('background-color', '#FFE5B4');
-        }
-    }
+        applyFiltersFromFullData(this.api(), fullActiveLeadData, [9]);
+            setupGlobalDateSearchFix(this.api()); 
+
+      }
+  });
+}
 });
+
 $('#my-table_filter').hide();
 
-    dataTable9 = $('#dtBasicExample10').DataTable({
-    processing: true,
-    serverSide: true,
-    ajax: "{{ route('dailyleads.index', ['status' => 'bulkleads']) }}",
-    columns: [
-      {
-            data: 'leaddate',
+ let fullBulkSpecialData = [];
+  $.ajax({
+    url: "{{ route('dailyleads.index', ['status' => 'bulkleads']) }}",
+    data: { length: -1 },
+    success: function(response) {
+      fullBulkSpecialData = response.data || [];
+    },
+    complete: function () {
+      $('#my-table_filter').hide();
+          if ($.fn.DataTable.isDataTable('#dtBasicExample10')) {
+        $('#dtBasicExample10').DataTable().clear().destroy();
+      }
+      const dataTable9 = $('#dtBasicExample10').DataTable({
+      processing: true,
+      serverSide: true,
+      ajax: "{{ route('dailyleads.index', ['status' => 'bulkleads']) }}",
+      columns: [
+        {
+            data: 'created_at',
             name: 'calls.created_at',
-             render: function (data, type, row) {
-        if (type === 'display' || type === 'filter') {
-            if (!data || !moment(data).isValid()) {
-                return '';
+          //   render: function (data, type, row) {
+          //   if (type === 'display' || type === 'filter') {
+          //     if (!data) return '';
+          //     const parts = data.split(' ');
+          //     if (parts.length === 3) {
+          //         const dateStr = `${parts[0]}-${parts[1]}-${parts[2]}`;
+          //         return moment(dateStr, 'YYYY-MM-DD').format('DD-MMM-YYYY');
+          //     }
+          //     return data;
+          //     }
+          //   return data;
+          // }
+            render: function (data, type, row) {
+              if (type === 'display' || type === 'filter') {
+                if (!data || !moment(data).isValid()) {
+                    return '';
+                }
+                return moment(data).format('DD-MMM-YYYY');
+              }
+              return data;
             }
-            return moment(data).format('DD-MMM-YYYY');
-        }
-        return data;
-    }
         },
         { data: 'type', name: 'calls.type' },
         {
@@ -3387,42 +3546,38 @@ $('#my-table_filter').hide();
         { data: 'language', name: 'calls.language' },
         { data: 'location', name: 'calls.location' },
         {
-  data: 'remarks',
-  name: 'calls.remarks',
-  title: 'Remarks & Messages',
-  render: function (data, type, row) {
-    const div = document.createElement('div');
-    div.innerHTML = data || '';
-    const plainText = div.textContent.trim();
+          data: 'remarks',
+          name: 'calls.remarks',
+          title: 'Remarks & Messages',
+          render: function (data, type, row) {
+            const div = document.createElement('div');
+            div.innerHTML = data || '';
+            const plainText = div.textContent.trim();
 
-    if (type !== 'display') return plainText;
+            if (type !== 'display') return plainText;
 
-    let shortText = plainText.substring(0, 20);
-    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+            let shortText = plainText.substring(0, 20);
+            let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
-    if (plainText.length > 20) {
-      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
-    }
+            if (plainText.length > 20) {
+              return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+            }
 
-    return plainText;
-  }
-},
-
+            return plainText;
+          }
+        },
         { data: 'createdby', name: 'users.name' },
     ],
     initComplete: function () {
-      applyColumnFilters('#dtBasicExample10', []);
-    },
-    createdRow: function (row, data, dataIndex) {
-        console.log(data.created_by);
-        if (data.created_by === {{ Auth::id() }}) {
-            $(row).css('background-color', '#FFE5B4');
-        }
-    }
+        applyFiltersFromFullData(this.api(), fullBulkSpecialData, []);
+            setupGlobalDateSearchFix(this.api()); 
+      }
     });
+  }
+});
+
     $('#my-table_filter').hide();
 
-    });
     function toggleRemarks(uniqueId) {
     const $truncatedText = $('#' + uniqueId + '_truncated');
     const $fullText = $('#' + uniqueId + '_full');
@@ -3444,6 +3599,7 @@ document.getElementById('reason-reject').addEventListener('change', function() {
   } else {
     otherReasonInput.style.display = 'none';
   }
+});
 });
 </script>
 <script>
@@ -3573,6 +3729,32 @@ $('#saveClientSelection').on('click', function() {
     });
 });
     </script>
+
+<script>
+  function setupGlobalDateSearchFix(tableInstance) {
+    tableInstance.on('preXhr.dt', function (e, settings, data) {
+      const globalSearch = data.search.value.trim();
+
+      const match = globalSearch.match(/^(\d{2})-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-(\d{4})$/i);
+      if (match) {
+        const day = match[1];
+        const monthShort = match[2].toLowerCase();
+        const year = match[3];
+
+        const monthMap = {
+          jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06',
+          jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12'
+        };
+
+        const month = monthMap[monthShort];
+        if (month) {
+          const formatted = `${year}-${month}-${day}`;
+          data.search.value = formatted;
+        }
+      }
+    });
+  }
+</script>
 @else
     @php
         redirect()->route('home')->send();

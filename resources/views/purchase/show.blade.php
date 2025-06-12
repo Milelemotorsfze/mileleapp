@@ -4323,10 +4323,11 @@ function confirmPayment(status, orderId, current_amount, totalamount, remainingA
                 method: 'GET',
                 success: function(response) {
                     var tableId = 'dtBasicExample6_' + id; // Unique table ID
+                    
                     var tableHtml = '<div class="table-responsive"><table id="' + tableId + '" class="table table-striped table-editable table-edits table table-bordered"><thead class="bg-soft-secondary"><tr><th>Ref No</th><th>VIN</th><th>Current Price</th><th>New Price</th></tr></thead><tbody>';
                     $.each(response, function(index, vehicle) {
                         var vin = vehicle.vin ? vehicle.vin : '';
-                        tableHtml += '<tr><td>' + vehicle.vehicle_id + '</td><td>' + vin + '</td><td>' + vehicle.price + '</td><td><input type="text" class="form-control new-price" data-vehicle-id="' + vehicle.vehicle_id + '" value="' + vehicle.price + '"></td></tr>';
+                        tableHtml += '<tr><td>' + vehicle.vehicle_id + '</td><td>' + vin + '</td><td>' + parseFloat(vehicle.price).toFixed(2) + '</td><td><input type="text" class="form-control new-price" data-vehicle-id="' + vehicle.vehicle_id + '" value="' + parseFloat(vehicle.price).toFixed(2) + '"></td></tr>';
                     });
                     tableHtml += '</tbody><tfoot><tr><th colspan="3" class="text-right">Total Price:</th><th id="totalPrice">0.00</th></tr></tfoot></table></div>';
                     
@@ -4470,10 +4471,11 @@ $('#savevariantBtn').click(function(){
             $('.new-price').each(function() {
                 var price = parseFloat($(this).val());
                 if (!isNaN(price)) {
+                    price = parseFloat(price.toFixed(2));
                     totalPrice += price;
                 }
             });
-            $('#totalPrice').text(totalPrice.toFixed(2)); // Update the total price in the table footer
+            $('#totalPrice').text(totalPrice.toFixed(2));
         }
     
         $('#updatePriceBtn').click(function() {
