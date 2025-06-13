@@ -56,7 +56,7 @@
                                     <p><strong>Sales Person ID:</strong></p>
                                 </div>
                                 <div class="col-lg-10 col-md-8 col-sm-6">
-                                    <p>{{ $so->sales_person_id }}</p>
+                                    <p>{{ $so->salesperson->name ?? $so->sales_person_id }}</p>
                                 </div>
                             </div>
 
@@ -83,7 +83,7 @@
                                     <p><strong>Created By:</strong></p>
                                 </div>
                                 <div class="col-lg-10 col-md-8 col-sm-6">
-                                    <p>{{ $so->created_by }}</p>
+                                    <p>{{ $so->createdByUser->name ?? $so->created_by }}</p>
                                 </div>
                             </div>
 
@@ -322,23 +322,21 @@
                                 <hr>
                             </div>
 
-
-                            @if($so->quotationVersionFiles && $so->quotationVersionFiles->count())
-                            <h5 class="mt-3">Quotation Files</h5>
-                            @foreach($so->quotationVersionFiles as $index => $doc)
+                            @if($so->quotation && $so->quotation->file_path)
+                            <h5 class="mt-3">Quotation File</h5>
                             <div class="mb-3">
-                                <strong>Document {{ $index + 1 }}:</strong>
+                                <strong>Document:</strong>
                                 <div class="mt-1">
-                                    <a href="{{ asset('storage/quotation_files/' . $doc->file_name) }}" target="_blank" class="btn btn-primary btn-sm me-2">
+                                    <a href="{{ asset('storage/' . $so->quotation->file_path) }}" target="_blank" class="btn btn-primary btn-sm me-2">
                                         <i class="fa fa-eye"></i> View
                                     </a>
-                                    <a href="{{ asset('storage/quotation_files/' . $doc->file_name) }}" download class="btn btn-secondary btn-sm">
+                                    <a href="{{ asset('storage/' . $so->quotation->file_path) }}" download class="btn btn-secondary btn-sm">
                                         <i class="fa fa-download"></i> Download
                                     </a>
                                 </div>
                             </div>
-                            @endforeach
                             @endif
+
                         </div>
                     </div>
                 </div>

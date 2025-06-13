@@ -81,7 +81,6 @@ class SoFinalizationController extends Controller
             'quotationDetail.shippingPort',
             'quotationDetail.shippingPortOfLoad',
             'quotationDetail.paymentterms',
-            'quotationVersionFiles',
             'call',
             'empProfile'
         ])
