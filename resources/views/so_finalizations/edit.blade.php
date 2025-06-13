@@ -326,10 +326,16 @@
                             @if($so->quotationVersionFiles && $so->quotationVersionFiles->count())
                             <h5 class="mt-3">Quotation Files</h5>
                             @foreach($so->quotationVersionFiles as $index => $doc)
-                            <div class="mb-2">
-                                <strong>Document {{ $index + 1 }}:</strong><br>
-                                <a href="{{ asset('storage/quotation_files/' . $doc->file_name) }}" target="_blank">View</a> |
-                                <a href="{{ asset('storage/quotation_files/' . $doc->file_name) }}" download>Download</a>
+                            <div class="mb-3">
+                                <strong>Document {{ $index + 1 }}:</strong>
+                                <div class="mt-1">
+                                    <a href="{{ asset('storage/quotation_files/' . $doc->file_name) }}" target="_blank" class="btn btn-primary btn-sm me-2">
+                                        <i class="fa fa-eye"></i> View
+                                    </a>
+                                    <a href="{{ asset('storage/quotation_files/' . $doc->file_name) }}" download class="btn btn-secondary btn-sm">
+                                        <i class="fa fa-download"></i> Download
+                                    </a>
+                                </div>
                             </div>
                             @endforeach
                             @endif
