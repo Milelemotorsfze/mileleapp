@@ -8,7 +8,7 @@
     <div class="card">
         <div class="card-header">
             <h4 class="card-title">
-            Quottaion File Versions
+            Quotation File Versions
                 <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
             </h4>
         </div>
