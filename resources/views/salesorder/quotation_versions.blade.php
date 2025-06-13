@@ -113,7 +113,7 @@
                                     <div class="row mb-2">
                                         <div class="col-sm-6"><strong>Email:</strong></div>
                                         <div class="col-sm-6">
-                                            <label class="form-check-label">{{$call->email}}</label>
+                                            <label class="form-check-label">{{$call->email ?? ''}}</label>
                                         </div>
                                     </div>
                                     <div class="row mb-2">
@@ -148,7 +148,7 @@
                                     </div>
                                     <div class="row mb-2">
                                         <div class="col-sm-6"><strong>Sales Email ID:</strong></div>
-                                        <div class="col-sm-6">{{ $quotation->createdBy->email }}</div>
+                                        <div class="col-sm-6">{{ $quotation->createdBy->email ?? '' }}</div>
                                     </div>
                                     <div class="row mb-2">
                                         <div class="col-sm-6"><strong>Sales Contact No:</strong></div>
