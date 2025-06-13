@@ -106,8 +106,7 @@ class SalesOrderController extends Controller
             }
         }
 
-        $soCount = env('SO_COUNT');
-        return view('dailyleads.salesorder', compact('soCount'));
+        return view('dailyleads.salesorder');
     }
 
 
@@ -131,14 +130,33 @@ class SalesOrderController extends Controller
 
     public function viewQuotations($id)
     {
-        $so = SO::findOrFail($id);
-        $quotation = Quotation::findOrFail($so->quotation_id);
-        $quotationVersionFiles = QuotationFile::where('quotation_id', $so->quotation_id)->get();
-        $quotationDetail = QuotationDetail::with('country', 'shippingPort', 'shippingPortOfLoad', 'paymentterms')->where('quotation_id', $quotation->id)->first();
-        $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first();
-        $call = Calls::findOrFail($quotation->calls_id);
+        try {
+            $so = SO::findOrFail($id);
+            $quotation = Quotation::findOrFail($so->quotation_id);
+            $quotationVersionFiles = QuotationFile::where('quotation_id', $so->quotation_id)->get();
+            $quotationDetail = QuotationDetail::with(['country', 'shippingPort', 'shippingPortOfLoad', 'paymentterms'])
+                ->where('quotation_id', $quotation->id)
+                ->first();
+            
+            if (!$quotationDetail) {
+                return redirect()->back()->with('error', 'Quotation details not found.');
+            }
 
-        return view('salesorder.quotation_versions', compact('quotationVersionFiles', 'quotation', 'quotationDetail', 'empProfile', 'call', 'so'));
+            $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first();
+            $call = Calls::findOrFail($quotation->calls_id);
+
+            return view('salesorder.quotation_versions', compact(
+                'quotationVersionFiles',
+                'quotation',
+                'quotationDetail',
+                'empProfile',
+                'call',
+                'so'
+            ));
+        } catch (\Exception $e) {
+            \Log::error('Error in viewQuotations: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while loading the quotation versions.');
+        }
     }
 
     /**
@@ -347,15 +365,14 @@ class SalesOrderController extends Controller
                             return optional($query->SoVariant()->withTrashed()->first()->variant)->name ?? '';
                         } else if ($query->field_name == 'vehicles_id') {
                             $soItem = $query->so_item;
-
-                            if ($soItem && $soItem->vehicle()) {
+                            if ($soItem) {
                                 return optional($soItem->vehicle()->withTrashed()->first())->vin ?? '';
                             }
+                            return '';
                         } else {
                             return $query->old_value ?? '';
                         }
                     }
-
                     return "";
                 })
                 ->editColumn('new_value', function ($query) {
@@ -363,12 +380,15 @@ class SalesOrderController extends Controller
                         if ($query->field_name == 'so_variant_id') {
                             return optional($query->SoVariant()->withTrashed()->first()->variant)->name ?? '';
                         } else if ($query->field_name == 'vehicles_id') {
-                            return optional($query->so_item->vehicle()->withTrashed()->first())->vin ?? '';
+                            $soItem = $query->so_item;
+                            if ($soItem) {
+                                return optional($soItem->vehicle()->withTrashed()->first())->vin ?? '';
+                            }
+                            return '';
                         } else {
                             return $query->new_value ?? '';
                         }
                     }
-
                     return "";
                 })
                 ->rawColumns(['version', 'so_variant_id', 'created_by'])
@@ -442,7 +462,7 @@ class SalesOrderController extends Controller
                             'new_value' => null
                         ];
                         // Remove the SO items and update the vehicle's SO ID
-                        $logEntries = array_merge($logEntries, $this->removeSoItems($variantId, $variant->soVehicles->pluck('vehicles_id')->toArray()));
+                        $logEntries = array_merge($logEntries, $this->removeSoItems($variantId, $variant->soVehicles ? $variant->soVehicles->pluck('vehicles_id')->toArray() : []));
                         $variant->delete();
                     }
                 }
@@ -483,18 +503,41 @@ class SalesOrderController extends Controller
                         }
 
                         if (isset($soVariant['vehicles'])) {
-                            foreach ($soVariant['vehicles'] as $eachVehicleId) {
-                                $soItem = Soitems::create(['vehicles_id' => $eachVehicleId, 'so_variant_id' => $soVariantdata->id]);
-                                $logEntries[] = [
-                                    'type' => 'Set',
-                                    'so_item_id' => $soItem->id,
-                                    'so_variant_id' => $soVariantdata->id,
-                                    'field_name' => 'vehicle_id',
-                                    'old_value' => null,
-                                    'new_value' => $eachVehicleId
-                                ];
+                            $currentVehicles = $existingVariant && $existingVariant->so_items ? $existingVariant->so_items->pluck('vehicles_id')->toArray() : [];
+                            $newVehicles = $soVariant['vehicles'];
+                            
+                            // If no vehicles are selected, remove all existing ones
+                            if (empty($newVehicles)) {
+                                $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $currentVehicles));
+                            } else {
+                                $addedVehicles = array_diff($newVehicles, $currentVehicles);
+                                $removedVehicles = array_diff($currentVehicles, $newVehicles);
 
-                                Vehicles::where('id', $eachVehicleId)->update(['so_id' => $so->id]);
+                                // Add new vehicles
+                                foreach ($addedVehicles as $vehicleId) {
+                                    $soItem = Soitems::create(['vehicles_id' => $vehicleId, 'so_variant_id' => $existingVariant->id]);
+                                    $logEntries[] = [
+                                        'type' => 'Set',
+                                        'so_item_id' => $soItem->id,
+                                        'so_variant_id' => $existingVariant->id,
+                                        'field_name' => 'vehicles_id',
+                                        'old_value' => null,
+                                        'new_value' => $vehicleId
+                                    ];
+
+                                    Vehicles::where('id', $vehicleId)->update(['so_id' => $so->id]);
+                                }
+
+                                // Remove unselected vehicles
+                                if (!empty($removedVehicles)) {
+                                    $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $removedVehicles));
+                                }
+                            }
+                        } else {
+                            // If vehicles array is not set, remove all existing vehicles
+                            $currentVehicles = $existingVariant && $existingVariant->so_items ? $existingVariant->so_items->pluck('vehicles_id')->toArray() : [];
+                            if (!empty($currentVehicles)) {
+                                $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $currentVehicles));
                             }
                         }
                     } else {
@@ -528,27 +571,42 @@ class SalesOrderController extends Controller
 
                         // Handle vehicles
                         if (isset($soVariant['vehicles'])) {
-                            $currentVehicles = $existingVariant->so_items->pluck('vehicles_id')->toArray();
+                            $currentVehicles = $existingVariant && $existingVariant->so_items ? $existingVariant->so_items->pluck('vehicles_id')->toArray() : [];
                             $newVehicles = $soVariant['vehicles'];
                             
-                            $addedVehicles = array_diff($newVehicles, $currentVehicles);
-                            $removedVehicles = array_diff($currentVehicles, $newVehicles);
+                            // If no vehicles are selected, remove all existing ones
+                            if (empty($newVehicles)) {
+                                $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $currentVehicles));
+                            } else {
+                                $addedVehicles = array_diff($newVehicles, $currentVehicles);
+                                $removedVehicles = array_diff($currentVehicles, $newVehicles);
 
-                            foreach ($addedVehicles as $vehicleId) {
-                                $soItem = Soitems::create(['vehicles_id' => $vehicleId, 'so_variant_id' => $existingVariant->id]);
-                                $logEntries[] = [
-                                    'type' => 'Set',
-                                    'so_item_id' => $soItem->id,
-                                    'so_variant_id' => $existingVariant->id,
-                                    'field_name' => 'vehicles_id',
-                                    'old_value' => null,
-                                    'new_value' => $vehicleId
-                                ];
+                                // Add new vehicles
+                                foreach ($addedVehicles as $vehicleId) {
+                                    $soItem = Soitems::create(['vehicles_id' => $vehicleId, 'so_variant_id' => $existingVariant->id]);
+                                    $logEntries[] = [
+                                        'type' => 'Set',
+                                        'so_item_id' => $soItem->id,
+                                        'so_variant_id' => $existingVariant->id,
+                                        'field_name' => 'vehicles_id',
+                                        'old_value' => null,
+                                        'new_value' => $vehicleId
+                                    ];
 
-                                Vehicles::where('id', $vehicleId)->update(['so_id' => $so->id]);
+                                    Vehicles::where('id', $vehicleId)->update(['so_id' => $so->id]);
+                                }
+
+                                // Remove unselected vehicles
+                                if (!empty($removedVehicles)) {
+                                    $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $removedVehicles));
+                                }
                             }
-
-                            $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $removedVehicles));
+                        } else {
+                            // If vehicles array is not set, remove all existing vehicles
+                            $currentVehicles = $existingVariant && $existingVariant->so_items ? $existingVariant->so_items->pluck('vehicles_id')->toArray() : [];
+                            if (!empty($currentVehicles)) {
+                                $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $currentVehicles));
+                            }
                         }
                     }
                 }
@@ -850,6 +908,7 @@ class SalesOrderController extends Controller
 
                         $variants = Varaint::where('master_model_lines_id', $item->reference_id)->get();
                         foreach ($variants as $variant) {
+                            $variantId = $variant->id;
                             $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
                                 ->whereNull('so_id')
                                 ->whereNull('gdn_id')

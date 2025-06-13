@@ -404,8 +404,7 @@ table.dataTable thead th select {
               </tbody>
             </table>
           </div> 
-        </div>  
-        <div id="soCount" data-so-count="{{ $soCount }}"></div>
+        </div>
 
         <script>
    $(document).ready(function () {
@@ -485,8 +484,7 @@ table.dataTable thead th select {
                     let so_id = row.soid; // Check if quotation_id is not null
                     const updatesaleorder = `{{ route('salesorder.edit', ':id') }}`.replace(':id', so_id);
 
-                    const soCount = document.getElementById('soCount').dataset.soCount;
-                        return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
+                    return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
                 }
                 return ''; 
                 }
