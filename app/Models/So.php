@@ -44,7 +44,6 @@ class So extends Model
     {
         return $this->hasOneThrough(Calls::class, Quotation::class, 'id', 'id', 'quotation_id', 'calls_id');
     }
-    // need to remove
     public function so_variants()
     {
         return $this->hasMany(SoVariant::class, 'so_id');
@@ -67,5 +66,9 @@ class So extends Model
     public function empProfile()
     {
         return $this->hasOne(EmployeeProfile::class, 'user_id', 'created_by');
+    }
+    public function createdByUser()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }
