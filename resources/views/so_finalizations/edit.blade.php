@@ -83,7 +83,7 @@
                                     <p><strong>Created By:</strong></p>
                                 </div>
                                 <div class="col-lg-10 col-md-8 col-sm-6">
-                                    <p>{{ $so->createdByUser->name ?? $so->created_by }}</p> H
+                                    <p>{{ $so->createdByUser->name ?? $so->created_by }}</p>
                                 </div>
                             </div>
 
