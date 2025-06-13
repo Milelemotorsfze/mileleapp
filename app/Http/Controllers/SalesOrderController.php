@@ -130,14 +130,33 @@ class SalesOrderController extends Controller
 
     public function viewQuotations($id)
     {
-        $so = SO::findOrFail($id);
-        $quotation = Quotation::findOrFail($so->quotation_id);
-        $quotationVersionFiles = QuotationFile::where('quotation_id', $so->quotation_id)->get();
-        $quotationDetail = QuotationDetail::with('country', 'shippingPort', 'shippingPortOfLoad', 'paymentterms')->where('quotation_id', $quotation->id)->first();
-        $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first();
-        $call = Calls::findOrFail($quotation->calls_id);
+        try {
+            $so = SO::findOrFail($id);
+            $quotation = Quotation::findOrFail($so->quotation_id);
+            $quotationVersionFiles = QuotationFile::where('quotation_id', $so->quotation_id)->get();
+            $quotationDetail = QuotationDetail::with(['country', 'shippingPort', 'shippingPortOfLoad', 'paymentterms'])
+                ->where('quotation_id', $quotation->id)
+                ->first();
+            
+            if (!$quotationDetail) {
+                return redirect()->back()->with('error', 'Quotation details not found.');
+            }
 
-        return view('salesorder.quotation_versions', compact('quotationVersionFiles', 'quotation', 'quotationDetail', 'empProfile', 'call', 'so'));
+            $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first();
+            $call = Calls::findOrFail($quotation->calls_id);
+
+            return view('salesorder.quotation_versions', compact(
+                'quotationVersionFiles',
+                'quotation',
+                'quotationDetail',
+                'empProfile',
+                'call',
+                'so'
+            ));
+        } catch (\Exception $e) {
+            \Log::error('Error in viewQuotations: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while loading the quotation versions.');
+        }
     }
 
     /**
