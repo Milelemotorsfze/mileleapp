@@ -56,7 +56,7 @@
                                     <p><strong>Sales Person ID:</strong></p>
                                 </div>
                                 <div class="col-lg-10 col-md-8 col-sm-6">
-                                    <p>{{ $so->sales_person_id }}</p>
+                                    <p>{{ $so->salesperson->name ?? $so->sales_person_id }}</p>
                                 </div>
                             </div>
 
