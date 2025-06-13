@@ -138,6 +138,7 @@ use App\Http\Controllers\ModeldescriptionController;
 use App\Http\Controllers\MasterGradeController;
 use App\Http\Controllers\CompanyDomainController;
 use App\Http\Controllers\MasterChargesController;
+use App\Http\Controllers\SoFinalizationController;
 use App\Models\Gdn;
 use App\Models\Grn;
 
@@ -1008,6 +1009,12 @@ Route::get('/d', function () {
     Route::post('/get-vehicles-vin-first', [QuotationController::class, 'getVehiclesvinsfirst']);
     Route::get('/salesorder/update/{id}', [SalesOrderController::class, 'updatesalesorder'])->name('salesorder.updatesalesorder');
     Route::get('/customer-quotation-direct/{id}', [QuotationController::class, 'directquotationtocustomer']);
+
+    Route::prefix('so-finalizations')->group(function () {
+        Route::get('/', [SoFinalizationController::class, 'index'])->name('so_finalizations.index');
+        Route::post('/', [SoFinalizationController::class, 'store'])->name('so_finalizations.store');
+        Route::get('/edit/{so_number}', [SoFinalizationController::class, 'edit'])->name('so_finalizations.edit');
+    });
 
     //Pre Order
     Route::resource('preorder', PreOrderController::class);
