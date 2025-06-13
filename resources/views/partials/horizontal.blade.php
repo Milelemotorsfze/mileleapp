@@ -1637,6 +1637,14 @@
                                     </li>
                                 @endif
                             @endif
+                            @if ($hasFullAccess || $hasSalesView)
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('so_finalizations.index') }}" id="topnav-more" role="button">
+                                        <i data-feather="check-circle"></i>
+                                        <span data-key="t-extra-pages">Update SO Duplicates </span>
+                                    </a>
+                                </li>
+                            @endif
                                 <!-- @can('sales-view') -->
                                 <!-- @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
