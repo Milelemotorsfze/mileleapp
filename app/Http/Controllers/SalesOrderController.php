@@ -702,7 +702,7 @@ class SalesOrderController extends Controller
             // Delete the quotation items
             QuotationItem::whereIn('id', $removedQuotationItemIds)->delete();
         }
-        // get all so varianta and create new entry in quottaion items if quotation id is null => new entry
+        // get all so varianta and create new entry in Quotation items if quotation id is null => new entry
         $soVariants = SoVariant::where('so_id', $id)->get();
 
         foreach ($soVariants as $soVariant) {
