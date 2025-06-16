@@ -151,7 +151,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-2 col-md-6 col-sm-12" id="fuel">
+                            <!-- <div class="col-lg-2 col-md-6 col-sm-12" id="fuel">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Fuel Type</label>
                                     <select class="form-control" autofocus name="fuel_type" id="fuel">
@@ -216,7 +216,7 @@
             <option value="RHD" {{ isset($variant) && $variant->steering == 'RHD' ? 'selected' : '' }}>RHD</option>
         </select>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="col-lg-2 col-md-6 col-sm-12" id="coo">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">COO</label>
