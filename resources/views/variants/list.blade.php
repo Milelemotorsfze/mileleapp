@@ -88,7 +88,7 @@
           <a  class="btn btn-sm btn-info float-end" href="{{ route('variants.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create Variants</a>
        
           @php
-          $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-description-info');
+          $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-model-description-list');
           @endphp
           @if ($hasPermission)
               <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
