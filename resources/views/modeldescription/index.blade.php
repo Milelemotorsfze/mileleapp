@@ -22,7 +22,6 @@
     <i class="fa fa-plus" aria-hidden="true"></i> Master Grades
   </a>
   @endif
-  @can('create-model-description')
     @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-description');
     @endphp
@@ -32,7 +31,6 @@
             <i class="fa fa-plus" aria-hidden="true"></i> Create Model Description
         </a>
     @endif
-  @endcan
 
   <!-- Master Grades Button -->
   
