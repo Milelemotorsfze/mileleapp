@@ -26,7 +26,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-master-grade
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-3">
                     <label for="master_grade" class="form-label"><span class="text-danger">*</span> Master Grade Name</label>
-                    <input type="text" name="master_grade" class="form-control" required />
+                    <input type="text" name="master_grade" placeholder="Enter Master Grade Name" class="form-control" required />
                 </div>
                 <div class="col-lg-4 col-md-6 mb-3">
                     <label for="brand" class="form-label"><span class="text-danger">*</span> Brand</label>
