@@ -44,7 +44,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-master-grade
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-3">
                     <label for="master_grade" class="form-label"><span class="text-danger">*</span> Master Grade Name</label>
-                    <input type="text" name="master_grade" class="form-control" value="{{ old('master_grade', $grade->grade_name) }}" required />
+                    <input type="text" name="master_grade" class="form-control" placeholder="Enter Master Grade Name" value="{{ old('master_grade', $grade->grade_name) }}" required />
                 </div>
                 <div class="col-lg-4 col-md-6 mb-3">
                     <label for="brand" class="form-label"><span class="text-danger">*</span> Brand</label>

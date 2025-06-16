@@ -9,7 +9,12 @@
     <h4 class="card-title">Master Grades</h4>
     <div class="d-flex justify-content-end">
       <a style="float: right;" class="btn btn-sm btn-info me-2" href="{{ url()->previous() }}"><i class="fa fa-arrow-left"></i> Back</a>
+      @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-master-grade');
+      @endphp
+      @if ($hasPermission)
       <a class="btn btn-sm btn-success" href="{{ route('mastergrade.create') }}"><i class="fa fa-plus"></i> Create Model Grades</a>
+      @endif
     </div>
     <br>
   </div>
@@ -53,7 +58,7 @@
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-master-grade');
                         @endphp
                         @if ($hasPermission && $mastergrade->modelDescriptions->isEmpty())
-                            <a href="{{ route('mastergrade.edit', $mastergrade->id ) }}" class="btn btn-info btn-sm">
+                            <a href="{{ route('mastergrade.edit', $mastergrade->id ) }}" class="btn btn-info btn-sm" title="Edit Grade">
                                 <i class="fa fa-edit" aria-hidden="true"></i></a>
                         @endif
                     </td>
