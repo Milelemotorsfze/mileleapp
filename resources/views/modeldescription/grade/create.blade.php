@@ -1,5 +1,17 @@
 @extends('layouts.main')
 @section('content')
+
+<style>
+    .is-invalid {
+        color: red !important;
+    }
+
+    .custom-error {
+        color: red !important;
+        padding-top: 10px;
+    }
+</style>
+
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-master-grade');
 @endphp
@@ -66,6 +78,10 @@ redirect()->route('home')->send();
         // Initialize select2
         $('.select2').select2();
 
+        $('.select2').on('change', function () {
+            $(this).valid();
+        });
+
         $.validator.addMethod("noLeadingTrailingSpaces", function(value, element) {
             return this.optional(element) || !/^\s|\s$/.test(value);
         }, "No leading or trailing spaces are allowed.");
@@ -101,6 +117,14 @@ redirect()->route('home')->send();
                     onlyAlphaNumPlusMinus: true,
                     noSpaceAroundSymbols: true,
                     noConsecutiveSymbols: true
+                }
+            },
+            errorPlacement: function(error, element) {
+                if (element.attr("name") === "brands_id" || element.attr("name") === "master_model_lines_id") {
+                    error.addClass('custom-error');
+                    error.insertAfter(element.next('.select2'));
+                } else {
+                    error.insertAfter(element);
                 }
             }
         });
