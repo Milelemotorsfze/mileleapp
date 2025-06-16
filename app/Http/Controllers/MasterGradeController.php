@@ -68,7 +68,7 @@ class MasterGradeController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator);
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
         MasterGrades::create([
@@ -101,8 +101,9 @@ class MasterGradeController extends Controller
 
         $grade = MasterGrades::with('modelLine.brand')->findOrFail($id);
         $brands = Brand::get();
+        $modelLines = MasterModelLines::where('brand_id', $grade->modelLine->brand->id)->get();
 
-        return view('modeldescription.grade.edit', compact('grade', 'brands'));
+        return view('modeldescription.grade.edit', compact('grade', 'brands', 'modelLines'));
     }
 
     /**
@@ -125,7 +126,7 @@ class MasterGradeController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator);
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
         MasterGrades::where('id', $id)->update([
