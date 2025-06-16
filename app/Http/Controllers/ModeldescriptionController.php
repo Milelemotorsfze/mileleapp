@@ -19,6 +19,12 @@ class ModeldescriptionController extends Controller
      */
     public function index()
     {
+        // Check if user has the permission
+        if (!Auth::user()->hasPermissionForSelectedRole('view-model-description-list')) {
+            $errorMsg ="Sorry ! You don't have permission to access this page";
+            return view('hrm.notaccess',compact('errorMsg'));
+        }
+
         $MasterModelDescription = MasterModelDescription::orderBy('updated_at','DESC')->get();
         (new UserActivityController)->createActivity('Open Master Model Lines Description');
         return view('modeldescription.index', compact('MasterModelDescription'));

@@ -2,7 +2,7 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @section('content')
 @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-description-info');
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-model-description-list');
 @endphp
 @if ($hasPermission)
   <div class="card-header">
