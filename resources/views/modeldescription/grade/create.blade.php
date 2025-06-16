@@ -1,5 +1,22 @@
 @extends('layouts.main')
 @section('content')
+
+<style>
+    .is-invalid,
+    .is-invalid-border {
+        border-color: red !important;
+    }
+
+    .is-invalid {
+        color: red !important;
+    }
+
+    .custom-error {
+        color: red !important;
+        padding-top: 10px;
+    }
+</style>
+
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-master-grade');
 @endphp
@@ -86,6 +103,9 @@ redirect()->route('home')->send();
                 }
             });
         }
+        $('.select2').on('change', function() {
+            $(this).valid();
+        });
 
         $.validator.addMethod("noLeadingTrailingSpaces", function(value, element) {
             return this.optional(element) || !/^\s|\s$/.test(value);
@@ -122,6 +142,30 @@ redirect()->route('home')->send();
                     onlyAlphaNumPlusMinus: true,
                     noSpaceAroundSymbols: true,
                     noConsecutiveSymbols: true
+                }
+            },
+            errorPlacement: function(error, element) {
+                if (element.attr("name") === "brands_id" || element.attr("name") === "master_model_lines_id") {
+                    error.addClass('custom-error');
+                    error.insertAfter(element.next('.select2'));
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                if ($(element).hasClass('select2-hidden-accessible')) {
+                    $(element).next('.select2-container').find('.select2-selection--single').addClass('is-invalid-border');
+                    $(element).next('.select2-container').find('.select2-selection__rendered').addClass('is-invalid-border');
+                } else {
+                    $(element).addClass('is-invalid-border');
+                }
+            },
+            unhighlight: function(element) {
+                if ($(element).hasClass('select2-hidden-accessible')) {
+                    $(element).next('.select2-container').find('.select2-selection--single').removeClass('is-invalid-border');
+                    $(element).next('.select2-container').find('.select2-selection__rendered').removeClass('is-invalid-border');
+                } else {
+                    $(element).removeClass('is-invalid-border');
                 }
             }
         });

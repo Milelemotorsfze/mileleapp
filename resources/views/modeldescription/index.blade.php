@@ -14,9 +14,14 @@
   <a class="btn btn-sm btn-info me-2" href="{{ url()->previous() }}">
     <i class="fa fa-arrow-left" aria-hidden="true"></i> Back
   </a>
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-grade-list');
+    @endphp
+    @if ($hasPermission)
   <a class="btn btn-sm btn-primary me-2" href="{{ route('mastergrade.index') }}">
     <i class="fa fa-plus" aria-hidden="true"></i> Master Grades
   </a>
+  @endif
   @can('create-model-description')
     @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-description');

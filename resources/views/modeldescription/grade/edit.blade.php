@@ -1,5 +1,22 @@
 @extends('layouts.main')
 @section('content')
+
+<style>
+    .is-invalid,
+    .is-invalid-border {
+        border-color: red !important;
+    }
+
+    .is-invalid {
+        color: red !important;
+    }
+
+    .custom-error {
+        color: red !important;
+        padding-top: 10px;
+    }
+</style>
+
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-master-grade');
 @endphp
@@ -27,14 +44,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-master-grade
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-3">
                     <label for="master_grade" class="form-label"><span class="text-danger">*</span> Master Grade Name</label>
-                    <input type="text" name="master_grade" class="form-control" value="{{ old('master_grade', $grade->grade_name) }}" required />
+                    <input type="text" name="master_grade" class="form-control" placeholder="Enter Master Grade Name" value="{{ old('master_grade', $grade->grade_name) }}" required />
                 </div>
                 <div class="col-lg-4 col-md-6 mb-3">
                     <label for="brand" class="form-label"><span class="text-danger">*</span> Brand</label>
                     <select class="form-control select2" autofocus name="brands_id" id="brand" required>
                         <option value="" disabled selected>Please select brand</option>
                         @foreach($brands as $brand)
-                        <option value="{{ $brand->id }}" {{ old('brands_id', $grade->modelLine->brand->id) == $brand->id ? 'selected' : '' }}>
+                        <option value="{{ $brand->id }}"
+                            {{ old('brands_id', optional(optional($grade->modelLine)->brand)->id) == $brand->id ? 'selected' : '' }}>
                             {{ $brand->brand_name }}
                         </option>
                         @endforeach
@@ -45,9 +63,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-master-grade
                     <select class="form-control select2" autofocus name="master_model_lines_id" id="model" required>
                         <option value="" disabled>Select a Model Line</option>
                         @foreach($modelLines as $modelLine)
-                            <option value="{{ $modelLine->id }}" {{ old('master_model_lines_id', $grade->model_line_id) == $modelLine->id ? 'selected' : '' }}>
-                                {{ $modelLine->model_line }}
-                            </option>
+                        <option value="{{ $modelLine->id }}" {{ old('master_model_lines_id', $grade->model_line_id) == $modelLine->id ? 'selected' : '' }}>
+                            {{ $modelLine->model_line }}
+                        </option>
                         @endforeach
                     </select>
                 </div>
@@ -96,45 +114,72 @@ redirect()->route('home')->send();
                 $('#model').append('<option value="" disabled selected>Select a Model Line</option>');
                 $('#model').prop('disabled', true);
             }
-        });
+            $('.select2').on('change', function() {
+                $(this).valid();
+            });
 
-        $.validator.addMethod("noLeadingTrailingSpaces", function(value, element) {
-            return this.optional(element) || !/^\s|\s$/.test(value);
-        }, "No leading or trailing spaces are allowed.");
+            $.validator.addMethod("noLeadingTrailingSpaces", function(value, element) {
+                return this.optional(element) || !/^\s|\s$/.test(value);
+            }, "No leading or trailing spaces are allowed.");
 
-        // No multiple consecutive spaces
-        $.validator.addMethod("noMultipleSpaces", function(value, element) {
-            return this.optional(element) || !/\s{2,}/.test(value);
-        }, "Multiple consecutive spaces are not allowed.");
+            // No multiple consecutive spaces
+            $.validator.addMethod("noMultipleSpaces", function(value, element) {
+                return this.optional(element) || !/\s{2,}/.test(value);
+            }, "Multiple consecutive spaces are not allowed.");
 
-        // Only alphanumeric, +, and -
-        $.validator.addMethod("onlyAlphaNumPlusMinus", function(value, element) {
-            return this.optional(element) || /^[a-zA-Z0-9+\-\s]+$/.test(value);
-        }, "Only letters, numbers, plus (+), and minus (-) symbols are allowed.");
+            // Only alphanumeric, +, and -
+            $.validator.addMethod("onlyAlphaNumPlusMinus", function(value, element) {
+                return this.optional(element) || /^[a-zA-Z0-9+\-\s]+$/.test(value);
+            }, "Only letters, numbers, plus (+), and minus (-) symbols are allowed.");
 
-        // No spaces around + or -
-        $.validator.addMethod("noSpaceAroundSymbols", function(value, element) {
-            return this.optional(element) || !/\s[+-]|[+-]\s/.test(value);
-        }, "No spaces are allowed around '+' or '-' symbols.");
+            // No spaces around + or -
+            $.validator.addMethod("noSpaceAroundSymbols", function(value, element) {
+                return this.optional(element) || !/\s[+-]|[+-]\s/.test(value);
+            }, "No spaces are allowed around '+' or '-' symbols.");
 
-        // No multiple consecutive symbols like ++, --, +-, -+
-        $.validator.addMethod("noConsecutiveSymbols", function(value, element) {
-            return this.optional(element) || !/([+-]){2,}/.test(value) && !/[\+\-]{2,}/.test(value);
-        }, "Multiple consecutive symbols (+ or -) are not allowed.");
+            // No multiple consecutive symbols like ++, --, +-, -+
+            $.validator.addMethod("noConsecutiveSymbols", function(value, element) {
+                return this.optional(element) || !/([+-]){2,}/.test(value) && !/[\+\-]{2,}/.test(value);
+            }, "Multiple consecutive symbols (+ or -) are not allowed.");
 
-        $("#form-create").validate({
-            ignore: [],
-            rules: {
-                master_grade: {
-                    required: true,
-                    maxlength: 255,
-                    noLeadingTrailingSpaces: true,
-                    noMultipleSpaces: true,
-                    onlyAlphaNumPlusMinus: true,
-                    noSpaceAroundSymbols: true,
-                    noConsecutiveSymbols: true
+            $("#form-create").validate({
+                ignore: [],
+                rules: {
+                    master_grade: {
+                        required: true,
+                        maxlength: 255,
+                        noLeadingTrailingSpaces: true,
+                        noMultipleSpaces: true,
+                        onlyAlphaNumPlusMinus: true,
+                        noSpaceAroundSymbols: true,
+                        noConsecutiveSymbols: true
+                    }
+                },
+                errorPlacement: function(error, element) {
+                    if (element.attr("name") === "brands_id" || element.attr("name") === "master_model_lines_id") {
+                        error.addClass('custom-error');
+                        error.insertAfter(element.next('.select2'));
+                    } else {
+                        error.insertAfter(element);
+                    }
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next('.select2-container').find('.select2-selection--single').addClass('is-invalid-border');
+                        $(element).next('.select2-container').find('.select2-selection__rendered').addClass('is-invalid-border');
+                    } else {
+                        $(element).addClass('is-invalid-border');
+                    }
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next('.select2-container').find('.select2-selection--single').removeClass('is-invalid-border');
+                        $(element).next('.select2-container').find('.select2-selection__rendered').removeClass('is-invalid-border');
+                    } else {
+                        $(element).removeClass('is-invalid-border');
+                    }
                 }
-            }
+            });
         });
     });
 </script>

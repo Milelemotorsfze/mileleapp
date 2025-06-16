@@ -19,8 +19,14 @@ class MasterGradeController extends Controller
      */
     public function index()
     {
+        // Check if user has the permission
+        if (!Auth::user()->hasPermissionForSelectedRole('master-grade-list')) {
+            $errorMsg ="Sorry ! You don't have permission to access this page";
+            return view('hrm.notaccess',compact('errorMsg'));
+        }
+
         $mastergrades = MasterGrades::with('modelDescriptions')->orderBy('id', 'DESC')->get();
-        (new UserActivityController)->createActivity('Open Master Model Lines Grades');
+        (new UserActivityController)->createActivity('Open Master Grades');
 
         return view('modeldescription.grade.index', compact('mastergrades'));
     }
@@ -30,6 +36,12 @@ class MasterGradeController extends Controller
      */
     public function create()
     {
+        // Check if user has the permission
+        if (!Auth::user()->hasPermissionForSelectedRole('create-master-grade')) {
+            $errorMsg ="Sorry ! You don't have permission to access this page";
+            return view('hrm.notaccess',compact('errorMsg'));
+        }
+
         $brands = Brand::get();
         $masterModelLines = MasterModelLines::get();
         (new UserActivityController)->createActivity('Create Master Model Lines Grades');
