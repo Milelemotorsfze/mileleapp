@@ -26,12 +26,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-master-grade
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-3">
                     <label for="master_grade" class="form-label"><span class="text-danger">*</span> Master Grade Name</label>
-                    <input type="text" name="master_grade" class="form-control" required />
+                    <input type="text" name="master_grade" class="form-control" value="{{ old('master_grade') }}" required />
                 </div>
                 <div class="col-lg-4 col-md-6 mb-3">
                     <label for="brand" class="form-label"><span class="text-danger">*</span> Brand</label>
                     <select class="form-control select2" autofocus name="brands_id" id="brand" required>
-                        <option value="" disabled selected>Please select brand</option>
+                        <option value="" disabled {{ old('brands_id') ? '' : 'selected' }}>Please select brand</option>
                         @foreach($brands as $brand)
                         <option value="{{ $brand->id }}" {{ old('brands_id') == $brand->id ? 'selected' : '' }}>
                             {{ $brand->brand_name }}
@@ -42,7 +42,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-master-grade
                 <div class="col-lg-4 col-md-6 mb-3">
                     <label for="model" class="form-label"><span class="text-danger">*</span> Model Line</label>
                     <select class="form-control select2" autofocus name="master_model_lines_id" id="model" required>
-                        <option value="" disabled selected>Select a Model Line</option>
+                        <option value="" disabled {{ old('master_model_lines_id') ? '' : 'selected' }}>Select a Model Line</option>
                     </select>
                 </div>
             </div>
@@ -65,6 +65,27 @@ redirect()->route('home')->send();
     $(document).ready(function() {
         // Initialize select2
         $('.select2').select2();
+
+        // If there's an old brand value, load its model lines
+        var oldBrandId = "{{ old('brands_id') }}";
+        if (oldBrandId) {
+            $.ajax({
+                url: '/get-model-lines/' + oldBrandId,
+                type: 'GET',
+                success: function(data) {
+                    $('#model').empty();
+                    $('#model').append('<option value="" disabled>Select a Model Line</option>');
+                    $.each(data, function(index, modelLine) {
+                        var selected = modelLine.id == "{{ old('master_model_lines_id') }}" ? 'selected' : '';
+                        $('#model').append('<option value="' + modelLine.id + '" ' + selected + '>' + modelLine.model_line + '</option>');
+                    });
+                    $('#model').prop('disabled', false);
+                },
+                error: function(error) {
+                    console.log('Error fetching model lines:', error);
+                }
+            });
+        }
 
         $.validator.addMethod("noLeadingTrailingSpaces", function(value, element) {
             return this.optional(element) || !/^\s|\s$/.test(value);
@@ -114,7 +135,7 @@ redirect()->route('home')->send();
                     type: 'GET',
                     success: function(data) {
                         $('#model').empty();
-                        $('#model').append('<option value="" disabled selected>Select a Model Line</option>');
+                        $('#model').append('<option value="" disabled>Select a Model Line</option>');
                         $.each(data, function(index, modelLine) {
                             $('#model').append('<option value="' + modelLine.id + '">' + modelLine.model_line + '</option>');
                         });

@@ -43,7 +43,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-master-grade
                 <div class="col-lg-4 col-md-6 mb-3">
                     <label for="model" class="form-label"><span class="text-danger">*</span> Model Line</label>
                     <select class="form-control select2" autofocus name="master_model_lines_id" id="model" required>
-                        <option value="{{ $grade->model_line_id }}" selected>{{ $grade->modelLine->model_line }}</option>
+                        <option value="" disabled>Select a Model Line</option>
+                        @foreach($modelLines as $modelLine)
+                            <option value="{{ $modelLine->id }}" {{ old('master_model_lines_id', $grade->model_line_id) == $modelLine->id ? 'selected' : '' }}>
+                                {{ $modelLine->model_line }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
             </div>
@@ -66,6 +71,32 @@ redirect()->route('home')->send();
     $(document).ready(function() {
         // Initialize select2
         $('.select2').select2();
+
+        // Handle brand change event
+        $('#brand').on('change', function() {
+            var selectedBrandId = $(this).val();
+            if (selectedBrandId) {
+                $.ajax({
+                    url: '/get-model-lines/' + selectedBrandId,
+                    type: 'GET',
+                    success: function(data) {
+                        $('#model').empty();
+                        $('#model').append('<option value="" disabled>Select a Model Line</option>');
+                        $.each(data, function(index, modelLine) {
+                            $('#model').append('<option value="' + modelLine.id + '">' + modelLine.model_line + '</option>');
+                        });
+                        $('#model').prop('disabled', false);
+                    },
+                    error: function(error) {
+                        console.log('Error fetching model lines:', error);
+                    }
+                });
+            } else {
+                $('#model').empty();
+                $('#model').append('<option value="" disabled selected>Select a Model Line</option>');
+                $('#model').prop('disabled', true);
+            }
+        });
 
         $.validator.addMethod("noLeadingTrailingSpaces", function(value, element) {
             return this.optional(element) || !/^\s|\s$/.test(value);
@@ -103,33 +134,6 @@ redirect()->route('home')->send();
                     noSpaceAroundSymbols: true,
                     noConsecutiveSymbols: true
                 }
-            }
-        });
-
-        // Handle brand change event
-        $('#brand').on('change', function() {
-            var selectedBrandId = $(this).val();
-            if (selectedBrandId) {
-                $.ajax({
-                    url: '/get-model-lines/' + selectedBrandId,
-                    type: 'GET',
-                    success: function(data) {
-                        console.log(data)
-                        $('#model').empty();
-                        $('#model').append('<option value="" disabled selected>Select a Model Line</option>');
-                        $.each(data, function(index, modelLine) {
-                            $('#model').append('<option value="' + modelLine.id + '">' + modelLine.model_line + '</option>');
-                        });
-                        $('#model').prop('disabled', false);
-                    },
-                    error: function(error) {
-                        console.log('Error fetching model lines:', error);
-                    }
-                });
-            } else {
-                $('#model').empty();
-                $('#model').append('<option value="" disabled selected>Select a Model Line</option>');
-                $('#model').prop('disabled', true);
             }
         });
     });
