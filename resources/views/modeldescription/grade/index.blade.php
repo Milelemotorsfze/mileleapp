@@ -53,7 +53,7 @@
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-master-grade');
                         @endphp
                         @if ($hasPermission && $mastergrade->modelDescriptions->isEmpty())
-                            <a href="{{ route('mastergrade.edit', $mastergrade->id ) }}" class="btn btn-info btn-sm">
+                            <a href="{{ route('mastergrade.edit', $mastergrade->id ) }}" class="btn btn-info btn-sm" title="Edit Grade">
                                 <i class="fa fa-edit" aria-hidden="true"></i></a>
                         @endif
                     </td>
