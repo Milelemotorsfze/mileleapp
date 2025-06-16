@@ -9,7 +9,12 @@
     <h4 class="card-title">Master Grades</h4>
     <div class="d-flex justify-content-end">
       <a style="float: right;" class="btn btn-sm btn-info me-2" href="{{ url()->previous() }}"><i class="fa fa-arrow-left"></i> Back</a>
+      @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-master-grade');
+      @endphp
+      @if ($hasPermission)
       <a class="btn btn-sm btn-success" href="{{ route('mastergrade.create') }}"><i class="fa fa-plus"></i> Create Model Grades</a>
+      @endif
     </div>
     <br>
   </div>

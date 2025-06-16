@@ -36,6 +36,12 @@ class MasterGradeController extends Controller
      */
     public function create()
     {
+        // Check if user has the permission
+        if (!Auth::user()->hasPermissionForSelectedRole('create-master-grade')) {
+            $errorMsg ="Sorry ! You don't have permission to access this page";
+            return view('hrm.notaccess',compact('errorMsg'));
+        }
+
         $brands = Brand::get();
         $masterModelLines = MasterModelLines::get();
         (new UserActivityController)->createActivity('Create Master Model Lines Grades');
