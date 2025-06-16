@@ -2,6 +2,11 @@
 @section('content')
 
 <style>
+    .is-invalid,
+    .is-invalid-border {
+        border-color: red !important;
+    }
+
     .is-invalid {
         color: red !important;
     }
@@ -78,7 +83,7 @@ redirect()->route('home')->send();
         // Initialize select2
         $('.select2').select2();
 
-        $('.select2').on('change', function () {
+        $('.select2').on('change', function() {
             $(this).valid();
         });
 
@@ -125,6 +130,22 @@ redirect()->route('home')->send();
                     error.insertAfter(element.next('.select2'));
                 } else {
                     error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                if ($(element).hasClass('select2-hidden-accessible')) {
+                    $(element).next('.select2-container').find('.select2-selection--single').addClass('is-invalid-border');
+                    $(element).next('.select2-container').find('.select2-selection__rendered').addClass('is-invalid-border');
+                } else {
+                    $(element).addClass('is-invalid-border');
+                }
+            },
+            unhighlight: function(element) {
+                if ($(element).hasClass('select2-hidden-accessible')) {
+                    $(element).next('.select2-container').find('.select2-selection--single').removeClass('is-invalid-border');
+                    $(element).next('.select2-container').find('.select2-selection__rendered').removeClass('is-invalid-border');
+                } else {
+                    $(element).removeClass('is-invalid-border');
                 }
             }
         });

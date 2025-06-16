@@ -1,5 +1,22 @@
 @extends('layouts.main')
 @section('content')
+
+<style>
+    .is-invalid,
+    .is-invalid-border {
+        border-color: red !important;
+    }
+
+    .is-invalid {
+        color: red !important;
+    }
+
+    .custom-error {
+        color: red !important;
+        padding-top: 10px;
+    }
+</style>
+
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-master-grade');
 @endphp
@@ -34,7 +51,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-master-grade
                     <select class="form-control select2" autofocus name="brands_id" id="brand" required>
                         <option value="" disabled selected>Please select brand</option>
                         @foreach($brands as $brand)
-                        <option value="{{ $brand->id }}" {{ old('brands_id', $grade->modelLine->brand->id) == $brand->id ? 'selected' : '' }}>
+                        <option value="{{ $brand->id }}"
+                            {{ old('brands_id', optional(optional($grade->modelLine)->brand)->id) == $brand->id ? 'selected' : '' }}>
                             {{ $brand->brand_name }}
                         </option>
                         @endforeach
@@ -43,7 +61,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-master-grade
                 <div class="col-lg-4 col-md-6 mb-3">
                     <label for="model" class="form-label"><span class="text-danger">*</span> Model Line</label>
                     <select class="form-control select2" autofocus name="master_model_lines_id" id="model" required>
-                        <option value="{{ $grade->model_line_id }}" selected>{{ $grade->modelLine->model_line }}</option>
+                        <option value="{{ $grade->model_line_id ?? '' }}" selected>{{ optional($grade->modelLine)->model_line ?? 'Select a Model Line' }}</option>
                     </select>
                 </div>
             </div>
@@ -66,6 +84,10 @@ redirect()->route('home')->send();
     $(document).ready(function() {
         // Initialize select2
         $('.select2').select2();
+
+        $('.select2').on('change', function() {
+            $(this).valid();
+        });
 
         $.validator.addMethod("noLeadingTrailingSpaces", function(value, element) {
             return this.optional(element) || !/^\s|\s$/.test(value);
@@ -102,6 +124,30 @@ redirect()->route('home')->send();
                     onlyAlphaNumPlusMinus: true,
                     noSpaceAroundSymbols: true,
                     noConsecutiveSymbols: true
+                }
+            },
+            errorPlacement: function(error, element) {
+                if (element.attr("name") === "brands_id" || element.attr("name") === "master_model_lines_id") {
+                    error.addClass('custom-error');
+                    error.insertAfter(element.next('.select2'));
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                if ($(element).hasClass('select2-hidden-accessible')) {
+                    $(element).next('.select2-container').find('.select2-selection--single').addClass('is-invalid-border');
+                    $(element).next('.select2-container').find('.select2-selection__rendered').addClass('is-invalid-border');
+                } else {
+                    $(element).addClass('is-invalid-border');
+                }
+            },
+            unhighlight: function(element) {
+                if ($(element).hasClass('select2-hidden-accessible')) {
+                    $(element).next('.select2-container').find('.select2-selection--single').removeClass('is-invalid-border');
+                    $(element).next('.select2-container').find('.select2-selection__rendered').removeClass('is-invalid-border');
+                } else {
+                    $(element).removeClass('is-invalid-border');
                 }
             }
         });
