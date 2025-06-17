@@ -29,4 +29,9 @@ class MasterModelLines extends Model
 
         return $this->hasMany(LoiAllowedOrRestrictedModelLines::class,'model_line_id','id');
     }
+
+    public function modelDescriptions()
+    {
+        return $this->hasMany(MasterModelDescription::class, 'model_line_id');
+    }
 }
