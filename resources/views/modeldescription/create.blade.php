@@ -194,7 +194,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-descri
                 <div class="col-lg-12 text-center">
                     <input type="submit" name="submit" value="Submit" class="btn btn-success" />
                 </div>
-                <div class="col-lg-12 col-md-12">
+                <div class="col-lg-12 col-md-12" id="model-detail-section">
                     <label for="summary" class="form-label">Model Detail</label>
                     <input type="text" class="form-control" id="summary" name="model_description" readonly>
                 </div>
@@ -298,7 +298,7 @@ redirect()->route('home')->send();
                     required: true,
                 },
                 model_description: {
-                    required: true,
+                    // required: true,
                     spaceCheck: true,
                     maxlength: 255,
                     noSpaces: true
@@ -419,8 +419,22 @@ redirect()->route('home')->send();
                 .filter(Boolean)
                 .join(' ');
 
-            // Convert everything to uppercase
-            $('#summary').val(summary.toUpperCase());
+            // Check if all required fields are filled
+            let allRequiredFilled = true;
+            if (!steering || !brand || !model || !fuel || !gear) {
+                allRequiredFilled = false;
+            }
+
+            // Conditionally check engine field if fuel is NOT EV
+            if (allRequiredFilled && fuel !== 'EV' && !engine) {
+                allRequiredFilled = false;
+            }
+
+            if (allRequiredFilled) {
+                $('#summary').val(summary.toUpperCase());
+            } else {
+                $('#summary').val('');
+            }
         }
         $('#steering, #brand, #model, #grade, #specialEditions, #engine, #fuel, #gear, #drive_train, #window_type, #others').on('change input', updateSummary);
     });
@@ -432,13 +446,14 @@ redirect()->route('home')->send();
             if ($(this).val() === 'EV') {
                 // Reset and disable engine selection
                 engineSelect.val(null).trigger('change'); // Reset value and update select2 UI
-                engineSelect.prop('disabled', true); // Disable the dropdown
                 engineSelect.rules('remove', 'required'); // Remove required rule for validation
+                engineSelect.prop('disabled', true); // Disable the dropdown
             } else {
                 // Enable and make required
                 engineSelect.prop('disabled', false); // Enable the dropdown
                 engineSelect.rules('add', 'required'); // Add required rule for validation
             }
+            updateSummary(); // Always call updateSummary after fuel type changes just to align with EV type
         });
     });
 </script>
