@@ -8,6 +8,21 @@
     .error {
         color: red;
     }
+
+    .is-invalid {
+        color: red !important;
+    }
+
+    .custom-error {
+        color: red !important;
+        padding-top: 10px;
+        margin-bottom: 5px !important;
+    }
+
+    .single-input-field {
+        padding-bottom: 30px;
+    }
+
 </style>
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-description');
@@ -45,7 +60,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-descri
         <form id="form-create" action="{{ route('modeldescription.store') }}" method="post" enctype="multipart/form-data">
             @csrf
             <div class="row">
-                <div class="col-lg-4 col-md-6 mb-3">
+                <div class="col-lg-4 col-md-6 single-input-field">
                     <label for="choices-single-default" class="form-label">Steering</label>
                     <span class="error">* </span>
                     <select class="form-control select2" autofocus name="steering" id="steering" required>
@@ -53,7 +68,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-descri
                         <option value="RHD" {{ old('steering') == 'RHD' ? 'selected' : '' }}>RHD</option>
                     </select>
                 </div>
-                <div class="col-lg-4 col-md-6 mb-3">
+                <div class="col-lg-4 col-md-6">
                     <label for="choices-single-default" class="form-label">Brand</label>
                     <span class="error">* </span>
                     <select class="form-control select2 mb-2" autofocus name="brands_id" id="brand" required>
@@ -65,24 +80,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-descri
                         @endforeach
                     </select>
                 </div>
-                <div class="col-lg-4 col-md-6 mb-3">
+                <div class="col-lg-4 col-md-6">
                     <label for="model" class="form-label">Model Line</label>
                     <span class="error">* </span>
                     <select class="form-control select2" autofocus name="master_model_lines_id" id="model" required>
                         <option value="" disabled selected>Select a Model Line</option>
                     </select>
                 </div>
-                <div class="col-lg-4 col-md-6 mb-3">
+                <div class="col-lg-4 col-md-6 single-input-field">
                     <label for="grade" class="form-label">Grade</label>
                     <select class="form-control select2" name="grade" id="grade">
                         <option value="" disabled selected>Select a Grade</option>
                     </select>
                 </div>
-                <div class="col-lg-4 col-md-6 mb-3">
+                <div class="col-lg-4 col-md-6 single-input-field">
                     <label for="specialEditions" class="form-label">Special Editions</label>
                     <input type="text" class="form-control" id="specialEditions" name="specialEditions" placeholder="Enter special edition details">
                 </div>
-                <div class="col-lg-4 col-md-6 mb-3">
+                <div class="col-lg-4 col-md-6">
                     <label for="choices-single-default" class="form-label">Engine</label>
                     <span class="error">* </span>
                     <select class="form-control select2" autofocus name="engine" id="engine" required>
@@ -124,19 +139,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-descri
                         <option value="6.7" {{ old('engine') == '6.7' ? 'selected' : '' }}>6.7</option>
                     </select>
                 </div>
-                <div class="col-lg-4 col-md-6 mb-3">
+                <div class="col-lg-4 col-md-6 single-input-field">
                     <label for="choices-single-default" class="form-label">Fuel Type</label>
                     <span class="error">* </span>
                     <select class="form-control select2" autofocus name="fuel_type" id="fuel" required>
                         <option value="Petrol" {{ old('fuel_type') == 'Petrol' ? 'selected' : '' }}>Petrol</option>
                         <option value="Diesel" {{ old('fuel_type') == 'Diesel' ? 'selected' : '' }}>Diesel</option>
                         <option value="PH" {{ old('fuel_type') == 'PH' ? 'selected' : '' }}>P HEV (Petrol hybrid electrical)</option>
-                        <option value="P HEV" {{ old('fuel_type') == 'P HEV' ? 'selected' : '' }}>PHEV (Plug in electrical hybrid)</option>
+                        <option value="P HEV" {{ old('fuel_type') == 'P HEV' ? 'selected' : '' }}>PHEV (Plug in electrical hybrid)</option>
                         <option value="M HEV" {{ old('fuel_type') == 'M HEV' ? 'selected' : '' }}>M HEV</option>
                         <option value="EV" {{ old('fuel_type') == 'EV' ? 'selected' : '' }}>EV</option>
                     </select>
                 </div>
-                <div class="col-lg-4 col-md-6 mb-3">
+                <div class="col-lg-4 col-md-6 single-input-field">
                     <label for="choices-single-default" class="form-label">Gear</label>
                     <span class="error">* </span>
                     <select class="form-control select2" autofocus name="gearbox" id="gear" required>
@@ -144,7 +159,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-descri
                         <option value="MT" {{ old('gearbox') == 'MT' ? 'selected' : '' }}>MT</option>
                     </select>
                 </div>
-                <div class="col-lg-4 col-md-6 mb-3">
+                <div class="col-lg-4 col-md-6 single-input-field">
                     <label for="choices-single-default" class="form-label">Drive Train</label>
                     <select class="form-control select2" autofocus name="drive_train" id="drive_train">
                         <option value="" disabled selected>Drive Train</option>
@@ -157,7 +172,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-descri
 
                     </select>
                 </div>
-                <div class="col-lg-4 col-md-6 mb-3">
+                <div class="col-lg-4 col-md-6 single-input-field">
                     <label for="choices-single-default" class="form-label">Window Type</label>
                     <select class="form-control select2" autofocus name="window_type" id="window_type">
                         <option value="" disabled selected>Select Window Type</option>
@@ -165,7 +180,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-descri
                         <option value="M.Window" {{ old('gearbox') == 'M.Window' ? 'selected' : '' }}>M.Window</option>
                     </select>
                 </div>
-                <div class="col-lg-4 col-md-6 mb-3">
+                <div class="col-lg-4 col-md-6 single-input-field">
                     <label for="specialEditions" class="form-label">Others Important Option</label>
                     <input type="text" class="form-control" id="others" name="others" placeholder="Enter Other details">
                 </div>
@@ -174,7 +189,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-descri
                 <div class="col-lg-12 text-center">
                     <input type="submit" name="submit" value="Submit" class="btn btn-success" />
                 </div>
-                <div class="col-lg-12 col-md-12 mb-3">
+                <div class="col-lg-12 col-md-12">
                     <label for="summary" class="form-label">Model Detail</label>
                     <input type="text" class="form-control" id="summary" name="model_description" readonly>
                 </div>
@@ -192,6 +207,10 @@ redirect()->route('home')->send();
 <script>
     $(document).ready(function() {
         $('.select2').select2({});
+
+        $('.select2').on('change', function() {
+            $(this).valid();
+        });
 
         $('#brand').select2({
             placeholder: 'Select Brand',
@@ -245,6 +264,15 @@ redirect()->route('home')->send();
                     alphanumeric: true
                 }
             },
+            errorPlacement: function(error, element) {
+                const arrName = ["steering", "brands_id", "master_model_lines_id", "engine", "fuel_type", "gearbox"];
+                if (arrName.includes(element.attr("name"))) {
+                    error.addClass('custom-error');
+                    error.insertAfter(element.next('.select2'));
+                } else {
+                    error.insertAfter(element);
+                }
+            }
         });
 
 
