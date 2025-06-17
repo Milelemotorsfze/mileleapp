@@ -289,7 +289,7 @@ redirect()->route('home')->send();
         });
 
         $("#form-create").validate({
-            ignore: [],
+            ignore: ":hidden:not(.ignore), :disabled",
             rules: {
                 brands_id: {
                     required: true,
@@ -433,12 +433,11 @@ redirect()->route('home')->send();
                 // Reset and disable engine selection
                 engineSelect.val(null).trigger('change'); // Reset value and update select2 UI
                 engineSelect.prop('disabled', true); // Disable the dropdown
-                engineSelect.removeAttr('required'); // Remove required attribute
+                engineSelect.rules('remove', 'required'); // Remove required rule for validation
             } else {
                 // Enable and make required
                 engineSelect.prop('disabled', false); // Enable the dropdown
-                engineSelect.attr('required', 'required'); // Add required attribute
-                engineSelect.val(null).trigger('change'); // Reset value and update select2 UI
+                engineSelect.rules('add', 'required'); // Add required rule for validation
             }
         });
     });
