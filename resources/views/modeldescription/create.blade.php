@@ -129,6 +129,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-descri
                         <option value="4.6" {{ old('engine') == '4.6' ? 'selected' : '' }}>4.6</option>
                         <option value="4.8" {{ old('engine') == '4.8' ? 'selected' : '' }}>4.8</option>
                         <option value="5.0" {{ old('engine') == '5.0' ? 'selected' : '' }}>5.0</option>
+                        <option value="5.2" {{ old('engine') == '5.2' ? 'selected' : '' }}>5.2</option>
                         <option value="5.3" {{ old('engine') == '5.3' ? 'selected' : '' }}>5.3</option>
                         <option value="5.5" {{ old('engine') == '5.5' ? 'selected' : '' }}>5.5</option>
                         <option value="5.6" {{ old('engine') == '5.6' ? 'selected' : '' }}>5.6</option>
@@ -166,7 +167,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-descri
                         <option value="4X2" {{ old('geadrive_trainrbox') == '4X2' ? 'selected' : '' }}>4X2</option>
                         <option value="4X4" {{ old('geadrive_trainrbox') == '4X4' ? 'selected' : '' }}>4X4</option>
                         <option value="AWD" {{ old('drive_train') == 'AWD' ? 'selected' : '' }}>AWD</option>
-                        <option value="4WD" {{ old('geadrive_trainrbox') == '4WD' ? 'selected' : '' }}>4WD</option>
+                        <!-- <option value="4WD" {{ old('geadrive_trainrbox') == '4WD' ? 'selected' : '' }}>4WD</option> -->
                         <option value="FWD" {{ old('geadrive_trainrbox') == 'FWD' ? 'selected' : '' }}>FWD</option>
                         <option value="RWD" {{ old('geadrive_trainrbox') == 'RWD' ? 'selected' : '' }}>RWD</option>
 
