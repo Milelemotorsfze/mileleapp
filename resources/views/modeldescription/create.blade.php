@@ -263,8 +263,23 @@ redirect()->route('home')->send();
             return this.optional(element) || !/--/.test(value);
         }, "Multiple hyphens are not allowed");
 
-        // Convert specialEditions input to uppercase
-        $('#specialEditions').on('input', function() {
+        // Validation method for allowed symbols for others' input
+        $.validator.addMethod("allowedSpecialSymbols", function(value, element) {
+            return this.optional(element) || /^[A-Z0-9\s\/\+]+$/.test(value);
+        }, "Only capital letters, numbers, spaces, / and + are allowed.");
+
+        // Validation method for no spaces around symbols for others' input 
+        $.validator.addMethod("noSpaceAroundSpecialSymbols", function(value, element) {
+            return this.optional(element) || !/\s[\/\+]|[\/\+]\s/.test(value);
+        }, "No spaces are allowed around / or + symbols.");
+
+        // Validation method for no multiple symbols for others' input
+        $.validator.addMethod("noMultipleSpecialSymbols", function(value, element) {
+            return this.optional(element) || !/\/\/|\+\+/.test(value);
+        }, "Multiple / or + symbols are not allowed.");
+
+        // Convert specialEditions and others input to uppercase
+        $('#specialEditions, #others').on('input', function() {
             this.value = this.value.toUpperCase();
         });
 
@@ -289,9 +304,11 @@ redirect()->route('home')->send();
                     noSpaces: true
                 },
                 others: {
-                    spaceCheck: true,
-                    noSpaces: true,
-                    alphanumericDot: true
+                    noLeadingTrailingSpaces: true,
+                    noMultipleSpaces: true,
+                    allowedSpecialSymbols: true,
+                    noSpaceAroundSpecialSymbols: true,
+                    noMultipleSpecialSymbols: true
                 },
                 specialEditions: {
                     noLeadingTrailingSpaces: true,
