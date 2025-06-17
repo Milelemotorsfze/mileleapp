@@ -23,6 +23,10 @@
         padding-bottom: 30px;
     }
 
+    .form-control.is-invalid,
+    .was-validated .form-control:invalid {
+        color: black !important;
+    }
 </style>
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-description');
