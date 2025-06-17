@@ -132,7 +132,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-descri
                         <option value="Petrol" {{ old('fuel_type') == 'Petrol' ? 'selected' : '' }}>Petrol</option>
                         <option value="Diesel" {{ old('fuel_type') == 'Diesel' ? 'selected' : '' }}>Diesel</option>
                         <option value="PH" {{ old('fuel_type') == 'PH' ? 'selected' : '' }}>P HEV (Petrol hybrid electrical)</option>
-                        <option value="P HEV" {{ old('fuel_type') == 'P HEV' ? 'selected' : '' }}>PHEV (Plug in electrical hybrid)</option>
+                        <option value="P HEV" {{ old('fuel_type') == 'P HEV' ? 'selected' : '' }}>PHEV (Plug in electrical hybrid)</option>
                         <option value="M HEV" {{ old('fuel_type') == 'M HEV' ? 'selected' : '' }}>M HEV</option>
                         <option value="EV" {{ old('fuel_type') == 'EV' ? 'selected' : '' }}>EV</option>
                     </select>
@@ -220,6 +220,36 @@ redirect()->route('home')->send();
             return this.optional(element) || /^[a-zA-Z0-9.]+$/.test(value);
         }, "Only letters, numbers, and dots are allowed.");
 
+        $.validator.addMethod("noLeadingTrailingSpaces", function(value, element) {
+            return this.optional(element) || !/^\s|\s$/.test(value);
+        }, "No leading or trailing spaces are allowed");
+
+        $.validator.addMethod("noMultipleSpaces", function(value, element) {
+            return this.optional(element) || !/\s{2,}/.test(value);
+        }, "Multiple consecutive spaces are not allowed.");
+
+        $.validator.addMethod("onlyHyphenAllowed", function(value, element) {
+            return this.optional(element) || /^[A-Z0-9\s-]+$/.test(value);
+        }, "Only capital letters, numbers, spaces, and hyphen (-) are allowed");
+
+        $.validator.addMethod("noSpaceAroundHyphen", function(value, element) {
+            return this.optional(element) || !/\s-|-\s/.test(value);
+        }, "No spaces are allowed around hyphen (-)");
+
+        $.validator.addMethod("noMultipleHyphens", function(value, element) {
+            return this.optional(element) || !/--/.test(value);
+        }, "Multiple hyphens are not allowed");
+
+        // Convert specialEditions input to uppercase
+        $('#specialEditions').on('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+
+        // Convert model_description input to uppercase
+        $('#model_description').on('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+
         $("#form-create").validate({
             ignore: [],
             rules: {
@@ -241,11 +271,19 @@ redirect()->route('home')->send();
                     alphanumericDot: true
                 },
                 specialEditions: {
-                    spaceCheck: true,
-                    noSpaces: true,
-                    alphanumeric: true
+                    noLeadingTrailingSpaces: true,
+                    noMultipleSpaces: true,
+                    onlyHyphenAllowed: true,
+                    noSpaceAroundHyphen: true,
+                    noMultipleHyphens: true
                 }
             },
+            highlight: function(element) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function(element) {
+                $(element).removeClass('is-invalid');
+            }
         });
 
 
@@ -333,12 +371,12 @@ redirect()->route('home')->send();
                 .filter(Boolean)
                 .join(' ');
 
-            $('#summary').val(summary);
+            // Convert everything to uppercase
+            $('#summary').val(summary.toUpperCase());
         }
-        $('#steering, #brand, #model, #grade, #specialEditions, #engine, #fuel, #gear, #drive_train, #window_type, #others').on('change', updateSummary);
+        $('#steering, #brand, #model, #grade, #specialEditions, #engine, #fuel, #gear, #drive_train, #window_type, #others').on('change input', updateSummary);
     });
-</script>
-<script>
+
     $(document).ready(function() {
         $('#fuel').on('change', function() {
             const engineSelect = $('#engine');
