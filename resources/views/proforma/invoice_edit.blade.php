@@ -2805,10 +2805,11 @@ $('#shipping_port').select2();
             resetIndex();
     });
     $('#submit-button').on('click', function(e) {
-        var salesperson = $('#salespersons').val();
-        
-        if (!salesperson) {
+       const $salesDropdown = $('#salespersons');
+
+        if ($salesDropdown.length && !$salesDropdown.val()) {
             alert('Please select a salesperson.');
+            e.preventDefault();
             return false;
         }
 

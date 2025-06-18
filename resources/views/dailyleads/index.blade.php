@@ -2604,7 +2604,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         return data;
     }
         },
-        { data: 'sales_person_name', name: 'sales_person_name' },
+        { data: 'quoted_by_name', name: 'quoted_by_user.name' },
 
       {
         data: 'deal_value',
