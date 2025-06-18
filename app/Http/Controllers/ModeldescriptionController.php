@@ -52,7 +52,7 @@ class ModeldescriptionController extends Controller
     public function store(Request $request)
     {
     // Validate the request
-    $request->validate([
+    $validator = Validator::make($request->all(), [
         'steering' => 'required|string',
         'brands_id' => 'required|exists:brands,id',
         'master_model_lines_id' => 'required|exists:master_model_lines,id',
@@ -66,6 +66,12 @@ class ModeldescriptionController extends Controller
     [
         'model_description.unique' => 'Model detail is already existing !'
     ]);
+
+    if ($validator->fails()) {
+        return redirect()->back()
+            ->withErrors($validator)
+            ->withInput();
+    }
 
     try {
         // Use a database transaction

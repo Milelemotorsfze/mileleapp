@@ -30,6 +30,12 @@
 </style>
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-description');
+// Minimal old value handling for dynamic dropdowns
+$oldBrandId = old('brands_id');
+$oldModelId = old('master_model_lines_id');
+$oldGradeId = old('grade');
+$modelLines = $oldBrandId ? \App\Models\MasterModelLines::where('brand_id', $oldBrandId)->get() : collect();
+$grades = $oldModelId ? \App\Models\MasterGrades::where('model_line_id', $oldModelId)->get() : collect();
 @endphp
 @if ($hasPermission)
 <div class="card">
@@ -89,17 +95,27 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-descri
                     <span class="error">* </span>
                     <select class="form-control select2" autofocus name="master_model_lines_id" id="model" required>
                         <option value="" disabled selected>Select a Model Line</option>
+                        @foreach($modelLines as $modelLine)
+                            <option value="{{ $modelLine->id }}" {{ $oldModelId == $modelLine->id ? 'selected' : '' }}>
+                                {{ $modelLine->model_line }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="col-lg-4 col-md-6 single-input-field">
                     <label for="grade" class="form-label">Grade</label>
                     <select class="form-control select2" name="grade" id="grade">
                         <option value="" disabled selected>Select a Grade</option>
+                        @foreach($grades as $grade)
+                            <option value="{{ $grade->id }}" {{ $oldGradeId == $grade->id ? 'selected' : '' }}>
+                                {{ $grade->grade_name }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="col-lg-4 col-md-6 single-input-field">
                     <label for="specialEditions" class="form-label">Special Editions</label>
-                    <input type="text" class="form-control" id="specialEditions" name="specialEditions" placeholder="Enter special edition details">
+                    <input type="text" class="form-control" id="specialEditions" name="specialEditions" placeholder="Enter special edition details" value="{{ old('specialEditions') }}">
                 </div>
                 <div class="col-lg-4 col-md-6">
                     <label for="choices-single-default" class="form-label">Engine</label>
@@ -168,12 +184,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-descri
                     <label for="choices-single-default" class="form-label">Drive Train</label>
                     <select class="form-control select2" autofocus name="drive_train" id="drive_train">
                         <option value="" disabled selected>Drive Train</option>
-                        <option value="4X2" {{ old('geadrive_trainrbox') == '4X2' ? 'selected' : '' }}>4X2</option>
-                        <option value="4X4" {{ old('geadrive_trainrbox') == '4X4' ? 'selected' : '' }}>4X4</option>
+                        <option value="4X2" {{ old('drive_train') == '4X2' ? 'selected' : '' }}>4X2</option>
+                        <option value="4X4" {{ old('drive_train') == '4X4' ? 'selected' : '' }}>4X4</option>
                         <option value="AWD" {{ old('drive_train') == 'AWD' ? 'selected' : '' }}>AWD</option>
-                        <!-- <option value="4WD" {{ old('geadrive_trainrbox') == '4WD' ? 'selected' : '' }}>4WD</option> -->
-                        <option value="FWD" {{ old('geadrive_trainrbox') == 'FWD' ? 'selected' : '' }}>FWD</option>
-                        <option value="RWD" {{ old('geadrive_trainrbox') == 'RWD' ? 'selected' : '' }}>RWD</option>
+                        <!-- <option value="4WD" {{ old('drive_train') == '4WD' ? 'selected' : '' }}>4WD</option> -->
+                        <option value="FWD" {{ old('drive_train') == 'FWD' ? 'selected' : '' }}>FWD</option>
+                        <option value="RWD" {{ old('drive_train') == 'RWD' ? 'selected' : '' }}>RWD</option>
 
                     </select>
                 </div>
@@ -181,13 +197,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-descri
                     <label for="choices-single-default" class="form-label">Window Type</label>
                     <select class="form-control select2" autofocus name="window_type" id="window_type">
                         <option value="" disabled selected>Select Window Type</option>
-                        <option value="P.Window" {{ old('gearbox') == 'P.Window' ? 'selected' : '' }}>P.Window</option>
-                        <option value="M.Window" {{ old('gearbox') == 'M.Window' ? 'selected' : '' }}>M.Window</option>
+                        <option value="P.Window" {{ old('window_type') == 'P.Window' ? 'selected' : '' }}>P.Window</option>
+                        <option value="M.Window" {{ old('window_type') == 'M.Window' ? 'selected' : '' }}>M.Window</option>
                     </select>
                 </div>
                 <div class="col-lg-4 col-md-6 single-input-field">
                     <label for="specialEditions" class="form-label">Others Important Option</label>
-                    <input type="text" class="form-control" id="others" name="others" placeholder="Enter Other details">
+                    <input type="text" class="form-control" id="others" name="others" placeholder="Enter Other details" value="{{ old('others') }}">
                 </div>
             </div>
             <div class="row mt-3">
@@ -196,7 +212,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-descri
                 </div>
                 <div class="col-lg-12 col-md-12" id="model-detail-section">
                     <label for="summary" class="form-label">Model Detail</label>
-                    <input type="text" class="form-control" id="summary" name="model_description" readonly>
+                    <input type="text" class="form-control" id="summary" name="model_description" readonly value="{{ old('model_description') }}">
                 </div>
             </div>
         </form>
@@ -437,25 +453,30 @@ redirect()->route('home')->send();
             }
         });
 
+        // Set brand dropdown if old value exists
+        var oldBrandId = '{{ old("brands_id") }}';
+        if (oldBrandId) {
+            $('#brand').val(oldBrandId).trigger('change');
+        }
+
         // Set up event listeners for summary updates
         $('#steering, #brand, #model, #grade, #specialEditions, #engine, #fuel, #gear, #drive_train, #window_type, #others').on('change input', updateSummary);
 
         // Handle fuel type changes
         $('#fuel').on('change', function() {
             const engineSelect = $('#engine');
-
             if ($(this).val() === 'EV') {
-                // Reset and disable engine selection
-                engineSelect.val(null).trigger('change'); // Reset value and update select2 UI
-                engineSelect.rules('remove', 'required'); // Remove required rule for validation
-                engineSelect.prop('disabled', true); // Disable the dropdown
+                engineSelect.val(null).trigger('change').prop('disabled', true).rules('remove', 'required');
             } else {
-                // Enable and make required
-                engineSelect.prop('disabled', false); // Enable the dropdown
-                engineSelect.rules('add', 'required'); // Add required rule for validation
+                engineSelect.prop('disabled', false).rules('add', 'required');
             }
-            updateSummary(); // Call updateSummary after fuel type changes
+            updateSummary();
         });
+
+        // Call updateSummary on page load if old values exist
+        if ('{{ old("steering") }}' || '{{ old("engine") }}' || '{{ old("fuel_type") }}' || '{{ old("gearbox") }}' || '{{ old("drive_train") }}' || '{{ old("window_type") }}' || '{{ old("specialEditions") }}' || '{{ old("others") }}') {
+            updateSummary();
+        }
     });
 </script>
 @endpush
