@@ -211,7 +211,7 @@ $grades = $oldModelId ? \App\Models\MasterGrades::where('model_line_id', $oldMod
                     <input type="submit" name="submit" value="Submit" class="btn btn-success" />
                 </div>
                 <div class="col-lg-12 col-md-12" id="model-detail-section">
-                    <label for="summary" class="form-label">Model Detail</label>
+                    <label for="summary" class="form-label">Model Description</label>
                     <input type="text" class="form-control" id="summary" name="model_description" readonly value="{{ old('model_description') }}">
                 </div>
             </div>
