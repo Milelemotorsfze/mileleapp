@@ -69,7 +69,7 @@
             <td>{{ $description->model_description }}</td>
             <td>{{ $description->modelLine->brand->brand_name ?? 'N/A' }}</td>
             <td>{{ $description->modelLine->model_line ?? 'N/A' }}</td>
-            <td>{{ $description->user->name ?? 'System' }}</td>
+            <td>{{ $description->user->name ?? '' }}</td>
             <td>{{\Illuminate\Support\Carbon::parse($description->created_at)->format('d M Y') ?? ''}}</td>
             <td>
             @can('delete-model-description')
