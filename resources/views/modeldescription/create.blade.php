@@ -117,7 +117,19 @@ $grades = $oldModelId ? \App\Models\MasterGrades::where('model_line_id', $oldMod
                     <label for="specialEditions" class="form-label">Special Editions</label>
                     <input type="text" class="form-control" id="specialEditions" name="specialEditions" placeholder="Enter special edition details" value="{{ old('specialEditions') }}">
                 </div>
-                <div class="col-lg-4 col-md-6">
+                <div class="col-lg-4 col-md-6 single-input-field">
+                    <label for="choices-single-default" class="form-label">Fuel Type</label>
+                    <span class="error">* </span>
+                    <select class="form-control select2" autofocus name="fuel_type" id="fuel" required>
+                        <option value="Petrol" {{ old('fuel_type') == 'Petrol' ? 'selected' : '' }}>Petrol</option>
+                        <option value="Diesel" {{ old('fuel_type') == 'Diesel' ? 'selected' : '' }}>Diesel</option>
+                        <option value="PH" {{ old('fuel_type') == 'PH' ? 'selected' : '' }}>P HEV (Petrol hybrid electrical)</option>
+                        <option value="P HEV" {{ old('fuel_type') == 'P HEV' ? 'selected' : '' }}>PHEV (Plug in electrical hybrid)</option>
+                        <option value="M HEV" {{ old('fuel_type') == 'M HEV' ? 'selected' : '' }}>M HEV</option>
+                        <option value="EV" {{ old('fuel_type') == 'EV' ? 'selected' : '' }}>EV</option>
+                    </select>
+                </div>
+                <div class="col-lg-4 col-md-6" id="engine-block">
                     <label for="choices-single-default" class="form-label">Engine</label>
                     <span class="error">* </span>
                     <select class="form-control select2" autofocus name="engine" id="engine" required>
@@ -158,18 +170,6 @@ $grades = $oldModelId ? \App\Models\MasterGrades::where('model_line_id', $oldMod
                         <option value="6.0" {{ old('engine') == '6.0' ? 'selected' : '' }}>6.0</option>
                         <option value="6.2" {{ old('engine') == '6.2' ? 'selected' : '' }}>6.2</option>
                         <option value="6.7" {{ old('engine') == '6.7' ? 'selected' : '' }}>6.7</option>
-                    </select>
-                </div>
-                <div class="col-lg-4 col-md-6 single-input-field">
-                    <label for="choices-single-default" class="form-label">Fuel Type</label>
-                    <span class="error">* </span>
-                    <select class="form-control select2" autofocus name="fuel_type" id="fuel" required>
-                        <option value="Petrol" {{ old('fuel_type') == 'Petrol' ? 'selected' : '' }}>Petrol</option>
-                        <option value="Diesel" {{ old('fuel_type') == 'Diesel' ? 'selected' : '' }}>Diesel</option>
-                        <option value="PH" {{ old('fuel_type') == 'PH' ? 'selected' : '' }}>P HEV (Petrol hybrid electrical)</option>
-                        <option value="P HEV" {{ old('fuel_type') == 'P HEV' ? 'selected' : '' }}>PHEV (Plug in electrical hybrid)</option>
-                        <option value="M HEV" {{ old('fuel_type') == 'M HEV' ? 'selected' : '' }}>M HEV</option>
-                        <option value="EV" {{ old('fuel_type') == 'EV' ? 'selected' : '' }}>EV</option>
                     </select>
                 </div>
                 <div class="col-lg-4 col-md-6 single-input-field">
@@ -483,6 +483,17 @@ redirect()->route('home')->send();
         if ('{{ old("steering") }}' || '{{ old("engine") }}' || '{{ old("fuel_type") }}' || '{{ old("gearbox") }}' || '{{ old("drive_train") }}' || '{{ old("window_type") }}' || '{{ old("specialEditions") }}' || '{{ old("others") }}') {
             updateSummary();
         }
+
+        // toggle engine input based on fuel type
+        function toggleEngineBlock() {
+            if ($('#fuel').val() === 'EV') {
+                $('#engine-block').hide();
+            } else {
+                $('#engine-block').show();
+            }
+        }
+        toggleEngineBlock();
+        $('#fuel').on('change', toggleEngineBlock);
     });
 </script>
 @endpush
