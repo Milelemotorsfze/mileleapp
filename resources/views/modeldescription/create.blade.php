@@ -210,6 +210,59 @@ redirect()->route('home')->send();
 @endsection
 @push('scripts')
 <script>
+    // Defining updating summary function globally
+    function updateSummary() {
+        var steering = $('#steering').val() || '';
+        var brand = $('#brand option:selected').text() || '';
+        var model = $('#model option:selected').text() || '';
+        var grade = $('#grade').val() && $('#grade').val() !== 'Select a Grade' ? $('#grade option:selected').text() : '';
+        var engine = $('#engine').val() || '';
+        var fuel = $('#fuel').val() || '';
+        if (fuel === 'Petrol') {
+            fuel = 'P';
+        } else if (fuel === 'Diesel') {
+            fuel = 'D';
+        } else if (fuel === 'PH') {
+            fuel = 'P HEV';
+        }
+        var gear = $('#gear').val() ? $('#gear').val() : '';
+        var driveTrain = $('#drive_train').val() ? $('#drive_train').val() : '';
+        var windowType = $('#window_type').val() ? $('#window_type').val() : '';
+        var specialEditions = $('#specialEditions').val() ? $('#specialEditions').val() : '';
+        var others = $('#others').val() ? $('#others').val() : '';
+        var engineFuel = engine + fuel;
+        var summary = [
+                steering,
+                model,
+                grade,
+                specialEditions,
+                engineFuel,
+                gear,
+                driveTrain,
+                windowType,
+                others
+            ]
+            .filter(Boolean)
+            .join(' ');
+
+        // Check if all required fields are filled
+        let allRequiredFilled = true;
+        if (!steering || !brand || !model || !fuel || !gear) {
+            allRequiredFilled = false;
+        }
+
+        // Conditionally check engine field if fuel is NOT EV
+        if (allRequiredFilled && fuel !== 'EV' && !engine) {
+            allRequiredFilled = false;
+        }
+
+        if (allRequiredFilled) {
+            $('#summary').val(summary.toUpperCase());
+        } else {
+            $('#summary').val('');
+        }
+    }
+
     $(document).ready(function() {
         $('.select2').select2({});
 
@@ -383,63 +436,11 @@ redirect()->route('home')->send();
                 $('#grade').prop('disabled', true);
             }
         });
-    });
-    $(document).ready(function() {
-        function updateSummary() {
-            var steering = $('#steering').val() || '';
-            var brand = $('#brand option:selected').text() || '';
-            var model = $('#model option:selected').text() || '';
-            var grade = $('#grade').val() && $('#grade').val() !== 'Select a Grade' ? $('#grade option:selected').text() : '';
-            var engine = $('#engine').val() || '';
-            var fuel = $('#fuel').val() || '';
-            if (fuel === 'Petrol') {
-                fuel = 'P';
-            } else if (fuel === 'Diesel') {
-                fuel = 'D';
-            } else if (fuel === 'PH') {
-                fuel = 'P HEV';
-            }
-            var gear = $('#gear').val() ? $('#gear').val() : '';
-            var driveTrain = $('#drive_train').val() ? $('#drive_train').val() : '';
-            var windowType = $('#window_type').val() ? $('#window_type').val() : '';
-            var specialEditions = $('#specialEditions').val() ? $('#specialEditions').val() : '';
-            var others = $('#others').val() ? $('#others').val() : '';
-            var engineFuel = engine + fuel;
-            var summary = [
-                    steering,
-                    model,
-                    grade,
-                    specialEditions,
-                    engineFuel,
-                    gear,
-                    driveTrain,
-                    windowType,
-                    others
-                ]
-                .filter(Boolean)
-                .join(' ');
 
-            // Check if all required fields are filled
-            let allRequiredFilled = true;
-            if (!steering || !brand || !model || !fuel || !gear) {
-                allRequiredFilled = false;
-            }
-
-            // Conditionally check engine field if fuel is NOT EV
-            if (allRequiredFilled && fuel !== 'EV' && !engine) {
-                allRequiredFilled = false;
-            }
-
-            if (allRequiredFilled) {
-                $('#summary').val(summary.toUpperCase());
-            } else {
-                $('#summary').val('');
-            }
-        }
+        // Set up event listeners for summary updates
         $('#steering, #brand, #model, #grade, #specialEditions, #engine, #fuel, #gear, #drive_train, #window_type, #others').on('change input', updateSummary);
-    });
 
-    $(document).ready(function() {
+        // Handle fuel type changes
         $('#fuel').on('change', function() {
             const engineSelect = $('#engine');
 
@@ -453,7 +454,7 @@ redirect()->route('home')->send();
                 engineSelect.prop('disabled', false); // Enable the dropdown
                 engineSelect.rules('add', 'required'); // Add required rule for validation
             }
-            updateSummary(); // Always call updateSummary after fuel type changes just to align with EV type
+            updateSummary(); // Call updateSummary after fuel type changes
         });
     });
 </script>
