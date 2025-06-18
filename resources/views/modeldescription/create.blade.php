@@ -259,7 +259,8 @@ redirect()->route('home')->send();
                 others
             ]
             .filter(Boolean)
-            .join(' ');
+            .join(' ')
+            .replace(/\s{2,}/g, ' '); // Collapse multiple spaces into one
 
         // Check if all required fields are filled
         let allRequiredFilled = true;
