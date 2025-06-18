@@ -418,6 +418,11 @@ redirect()->route('home')->send();
                             $('#model').append('<option value="' + modelLine.id + '">' + modelLine.model_line + '</option>');
                         });
                         $('#model').prop('disabled', false);
+                        // Set old value after AJAX populates options
+                        var oldModelId = '{{ old('master_model_lines_id') }}';
+                        if (oldModelId) {
+                            $('#model').val(oldModelId).trigger('change.select2');
+                        }
                     },
                     error: function(error) {
                         console.log('Error fetching model lines:', error);
