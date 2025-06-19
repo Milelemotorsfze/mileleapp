@@ -28,6 +28,7 @@ class So extends Model
         'updated_by',
     ];
     public $timestamps = false;
+    
     public function vehicles()
     {
         return $this->hasMany(Vehicles::class);

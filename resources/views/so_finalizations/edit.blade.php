@@ -322,6 +322,58 @@
                                 <hr>
                             </div>
 
+                            @if($so->vehicles->count())
+                            <div class="col-12">
+                                <h5 class="mt-3">Linked Vehicles</h5>
+                                <table class="table table-bordered table-sm">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>VIN</th>
+                                            <th>Variant</th>
+                                            <!-- <th>PO ID</th> -->
+                                            <th>Interior Color</th>
+                                            <th>Exterior Color</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($so->vehicles as $vehicle)
+                                        <tr>
+                                            <td>{{ $vehicle->vin }}</td>
+                                            <td>{{ $vehicle->variant->name ?? '-' }}</td>
+                                            <!-- <td>{{ $vehicle->purchasing_order_id ?? '-' }}</td> -->
+                                            <td>{{ $vehicle->interior->name ?? $vehicle->int_colour }}</td>
+                                            <td>{{ $vehicle->exterior->name ?? $vehicle->ex_colour }}</td>
+                                        </tr>
+
+                                        @if($vehicle->purchasingOrder)
+                                        <tr>
+                                            <td colspan="5" class="bg-light">
+                                                <strong>PO Number:</strong> {{ $vehicle->purchasingOrder->po_number ?? '-' }} |
+                                                <strong>Date:</strong> {{ $vehicle->purchasingOrder->po_date ?? '-' }} |
+                                                <strong>Total Cost:</strong> {{ $vehicle->purchasingOrder->totalcost ?? '-' }} {{ $vehicle->purchasingOrder->currency ?? '' }}
+                                                @if($vehicle->purchasingOrder->pl_file_path)
+                                                <br>
+                                                <strong>PO Created By:</strong> {{ $vehicle->purchasingOrder->createdBy->name ?? '-' }} | 
+                                                <strong>PO Document:</strong>
+                                                <a href="{{ asset('storage/' . $vehicle->purchasingOrder->pl_file_path) }}" target="_blank" class="btn btn-primary btn-sm me-2">
+                                                    <i class="fa fa-eye"></i> View PO File
+                                                </a>
+                                                <!-- <a href="{{ asset('storage/' . $vehicle->purchasingOrder->pl_file_path) }}" target="_blank">View File</a> -->
+                                                @endif
+                                                <br />
+                                                <br />
+                                            </td>
+                                        </tr>
+                                        @endif
+
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            @endif
+
+
+
                             @if($so->quotation && $so->quotation->file_path)
                             <h5 class="mt-3">Quotation File</h5>
                             <div class="mb-3">

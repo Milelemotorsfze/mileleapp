@@ -82,7 +82,11 @@ class SoFinalizationController extends Controller
             'quotationDetail.shippingPortOfLoad',
             'quotationDetail.paymentterms',
             'call',
-            'empProfile'
+            'empProfile',
+            'vehicles.variant',
+            'vehicles.purchasingOrder',
+            'vehicles.interior',
+            'vehicles.exterior',
         ])
             ->whereNotNull('so_number')
             ->get()
