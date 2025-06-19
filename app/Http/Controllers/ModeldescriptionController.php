@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserActivityController;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Exception;
 
 class ModeldescriptionController extends Controller
@@ -19,15 +20,23 @@ class ModeldescriptionController extends Controller
      */
     public function index()
     {
-        // Check if user has the permission
-        if (!Auth::user()->hasPermissionForSelectedRole('view-model-description-list')) {
-            $errorMsg ="Sorry ! You don't have permission to access this page";
-            return view('hrm.notaccess',compact('errorMsg'));
-        }
+        try {
+            if (!Auth::user()->hasPermissionForSelectedRole('view-model-description-list')) {
+                $errorMsg = "Sorry! You don't have permission to access this page";
+                return view('hrm.notaccess', compact('errorMsg'));
+            }
 
-        $MasterModelDescription = MasterModelDescription::orderBy('updated_at','DESC')->get();
-        (new UserActivityController)->createActivity('Open Master Model Lines Description');
-        return view('modeldescription.index', compact('MasterModelDescription'));
+            $MasterModelDescription = MasterModelDescription::orderBy('updated_at', 'DESC')->get();
+            (new UserActivityController)->createActivity('Open Master Model Lines Description');
+
+            return view('modeldescription.index', compact('MasterModelDescription'));
+        } catch (\Exception $e) {
+            Log::error('Failed to load model descriptions list', [
+                'error' => $e->getMessage(),
+                'user_id' => auth()->id()
+            ]);
+            abort(500, 'Something went wrong.');
+        }
     }
 
     /**
@@ -35,15 +44,23 @@ class ModeldescriptionController extends Controller
      */
     public function create()
     {
-        // Check if user has the permission
-        if (!Auth::user()->hasPermissionForSelectedRole('create-model-description')) {
-            $errorMsg ="Sorry ! You don't have permission to access this page";
-            return view('hrm.notaccess',compact('errorMsg'));
+        try {
+            if (!Auth::user()->hasPermissionForSelectedRole('create-model-description')) {
+                $errorMsg = "Sorry! You don't have permission to access this page";
+                return view('hrm.notaccess', compact('errorMsg'));
+            }
+    
+            $masterModelLines = MasterModelLines::get();
+            $brands = Brand::get();
+    
+            return view('modeldescription.create', compact('masterModelLines', 'brands'));
+        } catch (\Exception $e) {
+            Log::error('Failed to load create model description form', [
+                'error' => $e->getMessage(),
+                'user_id' => auth()->id()
+            ]);
+            abort(500, 'Something went wrong.');
         }
-
-        $masterModelLines = MasterModelLines::get();
-        $brands = Brand::get();
-        return view('modeldescription.create',compact('masterModelLines', 'brands'));
     }
 
     /**
@@ -129,40 +146,69 @@ class ModeldescriptionController extends Controller
      */
     public function destroy(string $id)
     {
-        $modelDescription = MasterModelDescription::find($id);
-        $modelDescription->delete();
-
-        return response(true);
-
+        try {
+            DB::transaction(function () use ($id) {
+                $modelDescription = MasterModelDescription::findOrFail($id);
+                $modelDescription->delete();
+            });
+    
+            return response(true);
+        } catch (\Exception $e) {
+            Log::error('Failed to delete Master Model Description', [
+                'error' => $e->getMessage(),
+                'id' => $id,
+                'user_id' => auth()->id()
+            ]);
+            return response()->json(['success' => false, 'message' => 'Failed to delete model description.'], 500);
+        }
     }
     public function getGrades($modelId)
     {
-    $grades = MasterGrades::where('model_line_id', $modelId)->get(['id', 'grade_name']);
-    return response()->json($grades);
+        try {
+            $grades = MasterGrades::where('model_line_id', $modelId)->get(['id', 'grade_name']);
+            return response()->json($grades);
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch grades', [
+                'error' => $e->getMessage(),
+                'model_id' => $modelId,
+                'user_id' => auth()->id()
+            ]);
+            return response()->json(['success' => false, 'message' => 'Failed to fetch grades.'], 500);
+        }
     }
     public function getModelDetails($model_line_id)
-{
-    $models = DB::table('master_model_descriptions')
-        ->leftJoin('master_vehicles_grades', 'master_model_descriptions.master_vehicles_grades_id', '=', 'master_vehicles_grades.id')
-        ->where('master_model_descriptions.model_line_id', $model_line_id)
-        ->select(
-            'master_model_descriptions.id',
-            'master_model_descriptions.model_description',
-            'master_model_descriptions.steering',
-            'master_model_descriptions.engine',
-            'master_model_descriptions.fuel_type',
-            'master_model_descriptions.transmission',
-            'master_model_descriptions.window_type',
-            'master_model_descriptions.drive_train',
-            'master_model_descriptions.specialEditions',
-            'master_model_descriptions.others',
-            'master_vehicles_grades.grade_name as grade_name'
-        )
-        ->get();
+    {
+        try {
+            $models = DB::table('master_model_descriptions')
+                ->leftJoin('master_vehicles_grades', 'master_model_descriptions.master_vehicles_grades_id', '=', 'master_vehicles_grades.id')
+                ->where('master_model_descriptions.model_line_id', $model_line_id)
+                ->select(
+                    'master_model_descriptions.id',
+                    'master_model_descriptions.model_description',
+                    'master_model_descriptions.steering',
+                    'master_model_descriptions.engine',
+                    'master_model_descriptions.fuel_type',
+                    'master_model_descriptions.transmission',
+                    'master_model_descriptions.window_type',
+                    'master_model_descriptions.drive_train',
+                    'master_model_descriptions.specialEditions',
+                    'master_model_descriptions.others',
+                    'master_vehicles_grades.grade_name as grade_name'
+                )
+                ->get();
     
-    if ($models->isEmpty()) {
-        return response()->json(['success' => false, 'message' => 'No details found for the selected model.'], 404);
+            if ($models->isEmpty()) {
+                return response()->json(['success' => false, 'message' => 'No details found for the selected model.'], 404);
+            }
+    
+            return response()->json($models);
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch model details', [
+                'error' => $e->getMessage(),
+                'model_line_id' => $model_line_id,
+                'user_id' => auth()->id()
+            ]);
+            return response()->json(['success' => false, 'message' => 'Failed to retrieve model details.'], 500);
+        }
     }
-    return response()->json($models);
 }
-    }
