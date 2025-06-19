@@ -601,7 +601,7 @@
                                 Net Total In AED:
                             </td>
                             <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
-                                {{ $quotation->currency ." ". number_format($so->total) }}
+                                {{ $quotation->currency . " " . number_format($quotation->total) }}
                             </td>
                         </tr>
                         @endif
