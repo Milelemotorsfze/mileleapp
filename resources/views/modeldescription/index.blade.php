@@ -70,7 +70,7 @@
             <td>{{ $description->modelLine->brand->brand_name ?? 'N/A' }}</td>
             <td>{{ $description->modelLine->model_line ?? 'N/A' }}</td>
             <td>{{ $description->user->name ?? '' }}</td>
-            <td>{{\Illuminate\Support\Carbon::parse($description->created_at)->format('d M Y') ?? ''}}</td>
+            <td>@if(!empty($description->created_at)){{ \Illuminate\Support\Carbon::parse($description->created_at)->format('d M Y') }}@endif</td>
             <td>
             @can('delete-model-description')
                 @php
