@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use PhpParser\Builder\Use_;
 
 class PurchasingOrder extends Model
 {
@@ -94,5 +95,8 @@ class PurchasingOrder extends Model
     {
         return $this->belongsTo(Supplier::class, 'vendors_id','id');
     }
-    
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

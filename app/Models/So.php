@@ -28,6 +28,7 @@ class So extends Model
         'updated_by',
     ];
     public $timestamps = false;
+
     public function vehicles()
     {
         return $this->hasMany(Vehicles::class);
@@ -70,5 +71,13 @@ class So extends Model
     public function createdByUser()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+    public function leadClosed()
+    {
+        return $this->hasOne(Closed::class, 'so_id');
+    }
+    public function soItems()
+    {
+        return $this->hasMany(Soitems::class, 'so_id');
     }
 }
