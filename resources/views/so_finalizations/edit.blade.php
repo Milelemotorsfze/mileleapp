@@ -355,7 +355,7 @@
                                                 <br>
                                                 <strong>PO Created By:</strong> {{ $vehicle->purchasingOrder->createdBy->name ?? '-' }} |
                                                 <strong>PO Document:</strong>
-                                                <a href="{{ asset$vehicle->purchasingOrder->pl_file_path) }}" target="_blank" class="btn btn-primary btn-sm me-2">
+                                                <a href="{{ asset($vehicle->purchasingOrder->pl_file_path) }}" target="_blank" class="btn btn-primary btn-sm me-2">
                                                     <i class="fa fa-eye"></i> View PO File
                                                 </a>
                                                 <!-- <a href="{{ asset($vehicle->purchasingOrder->pl_file_path) }}" target="_blank">View File</a> -->
