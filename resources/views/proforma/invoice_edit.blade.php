@@ -281,7 +281,7 @@
                         <label class="form-check-label" for="inlineCheckbox1">Quotation</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input document_type" type="checkbox" name="document_type" id="inlineCheckbox2" value="Proforma" {{ $quotation->document_type == 'Proforma' ? 'checked' : '' }}>
+                        <input class="form-check-input document_type" type="checkbox" name="document_type" id="inlineCheckbox2" value="Proforma" {{ $quotation->document_type == 'Proforma Invoice' ? 'checked' : '' }}>
                         <label class="form-check-label" for="inlineCheckbox2">Proforma Invoice</label>
                     </div>
                 </div>
