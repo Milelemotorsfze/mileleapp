@@ -353,7 +353,7 @@
                                                 <strong>Total Cost:</strong> {{ $vehicle->purchasingOrder->totalcost ?? '-' }} {{ $vehicle->purchasingOrder->currency ?? '' }}
                                                 @if($vehicle->purchasingOrder->pl_file_path)
                                                 <br>
-                                                <strong>PO Created By:</strong> {{ $vehicle->purchasingOrder->createdBy->name ?? '-' }} | 
+                                                <strong>PO Created By:</strong> {{ $vehicle->purchasingOrder->createdBy->name ?? '-' }} |
                                                 <strong>PO Document:</strong>
                                                 <a href="{{ asset('storage/' . $vehicle->purchasingOrder->pl_file_path) }}" target="_blank" class="btn btn-primary btn-sm me-2">
                                                     <i class="fa fa-eye"></i> View PO File
@@ -370,9 +370,78 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <hr>
                             @endif
 
 
+                            @if($so->leadClosed)
+                            <div class="col-12 mt-3">
+                                <h5>Lead Closed Details</h5>
+                                <table class="table table-bordered table-sm">
+                                    <tbody>
+                                        <tr>
+                                            <th>Deal Value</th>
+                                            <td>{{ $so->leadClosed->dealvalues ?? '-' }} {{ $so->leadClosed->currency ?? '' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Sales Note for Lead</th>
+                                            <td>{{ $so->leadClosed->sales_notes ?? '-' }}</td>
+                                        </tr>
+                                        @if($so->leadClosed->call)
+                                        <tr>
+                                            <th>Customer Name</th>
+                                            <td>{{ $so->leadClosed->call->name ?? '-' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Phone Number</th>
+                                            <td>{{ $so->leadClosed->call->phone ?? '-' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Email</th>
+                                            <td>{{ $so->leadClosed->call->email ?? '-' }}</td>
+                                        </tr>
+                                        @endif
+                                    </tbody>
+                                </table>
+                            </div>
+                            <hr>
+                            @endif
+
+                            @if($so->soItems->count())
+                            <div class="col-12 mt-3">
+                                <h5>Quotation Items</h5>
+                                <table class="table table-bordered table-sm">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Description</th>
+                                            <th>Unit Price</th>
+                                            <th>Quantity</th>
+                                            <th>Total Amount</th>
+                                            <th>Model Line</th>
+                                            <th>Model Description</th>
+                                            <th>Brand</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($so->soItems as $item)
+                                        @php $qi = $item->quotationItem; @endphp
+                                        @if($qi)
+                                        <tr>
+                                            <td>{{ $qi->description ?? '-' }}</td>
+                                            <td>{{ number_format($qi->unit_price, 2) ?? '-' }}</td>
+                                            <td>{{ $qi->quantity ?? '-' }}</td>
+                                            <td>{{ number_format($qi->total_amount, 2) ?? '-' }}</td>
+                                            <td>{{ $qi->modelLine->model_line ?? '-' }}</td>
+                                            <td>{{ $qi->modelDescription->model_description ?? '-' }}</td>
+                                            <td>{{ $qi->brand->brand_name ?? '-' }}</td>
+                                        </tr>
+                                        @endif
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            <hr>
+                            @endif
 
                             @if($so->quotation && $so->quotation->file_path)
                             <h5 class="mt-3">Quotation File</h5>
@@ -388,7 +457,6 @@
                                 </div>
                             </div>
                             @endif
-
                         </div>
                     </div>
                 </div>

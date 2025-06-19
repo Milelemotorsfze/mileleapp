@@ -87,6 +87,10 @@ class SoFinalizationController extends Controller
             'vehicles.purchasingOrder',
             'vehicles.interior',
             'vehicles.exterior',
+            'leadClosed.call',
+            'soItems.quotationItem.modelLine',
+            'soItems.quotationItem.modelDescription',
+            'soItems.quotationItem.brand',
         ])
             ->whereNotNull('so_number')
             ->get()
