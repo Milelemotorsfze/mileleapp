@@ -829,6 +829,7 @@ class SalesOrderController extends Controller
         $multiplecp = MuitlpleAgents::where('quotations_id', $quotation->id)->where('agents_id', '!=', $quotationDetail->agents_id)->get();
 
         $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact(
+            'so',
             'multiplecp',
             'quotation',
             'data',

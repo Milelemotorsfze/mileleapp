@@ -601,7 +601,7 @@
                                 Net Total In AED:
                             </td>
                             <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
-                                {{ $quotation->currency ." ". number_format($quotation->deal_value) }}
+                                {{ $quotation->currency ." ". number_format($so->total) }}
                             </td>
                         </tr>
                         @endif
@@ -611,7 +611,7 @@
                                 Net Total In USD:
                             </td>
                             <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
-                                {{ $quotation->currency ." ". number_format($quotation->deal_value) }}
+                                {{ $quotation->currency ." ". number_format($so->total) }}
                             </td>
                         </tr>
                         <tr>
@@ -619,7 +619,7 @@
                                 Net Total In AED:
                             </td>
                             <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
-                                {{"AED ". number_format($quotation->deal_value * 3.675) }}
+                                {{"AED ". number_format($so->total * 3.675) }}
                             </td>
                         </tr>
                         @endif
@@ -629,7 +629,7 @@
                                 Net Total In EUR:
                             </td>
                             <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
-                                {{ $quotation->currency ." ". number_format($quotation->deal_value) }}
+                                {{ $quotation->currency ." ". number_format($so->total) }}
                             </td>
                         </tr>
                         <tr>
@@ -637,7 +637,7 @@
                                 Net Total In AED:
                             </td>
                             <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
-                                {{"AED ". number_format($quotation->deal_value * 4) }}
+                                {{"AED ". number_format($so->total * 4) }}
                             </td>
                         </tr>
                         @endif
@@ -647,7 +647,7 @@
                                 Advance Paid:
                             </td>
                             <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px;">
-                                {{ $quotation->currency ." ". number_format($quotationDetail->advance_amount, 2) }}
+                                {{ $quotation->currency ." ". number_format($so->receiving, 2) }}
                             </td>
                         </tr>
                         <tr>
@@ -655,7 +655,7 @@
                                 Remaining Amount({{ $quotation->currency }}):
                             </td>
                             <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px;">
-                                {{ $quotation->currency ." ". number_format($quotation->deal_value - $quotationDetail->advance_amount) }}
+                                {{ $quotation->currency ." ". number_format($so->total - $so->receiving) }}
                             </td>
                         </tr>
                         @if($quotation->currency != 'AED' && $quotation->shippingDocument == 'EXW')
@@ -665,9 +665,9 @@
                             </td>
                             <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px;">
                                 @if($quotation->currency == 'USD')
-                                {{ $quotation->currency ." ". number_format(($quotation->deal_value - $quotationDetail->advance_amount)  * $aed_to_usd_rate->value, 2) }}
+                                {{ $quotation->currency ." ". number_format(($so->total - $so->receiving)  * $aed_to_usd_rate->value, 2) }}
                                 @elseif($quotation->currency == 'EUR')
-                                {{ $quotation->currency ." ". number_format(($quotation->deal_value - $quotationDetail->advance_amount)  * $aed_to_eru_rate->value, 2) }}
+                                {{ $quotation->currency ." ". number_format(($so->total - $so->receiving)  * $aed_to_eru_rate->value, 2) }}
                                 @endif
                             </td>
                         </tr>
@@ -684,7 +684,7 @@
             </tr>
         </table>
         @if($quotation->document_type == 'Proforma Invoice')
-        @if($quotationDetail->advance_amount)
+        @if($so->receiving)
         <br>
         <table>
             <tr style="font-size: 12px;">
@@ -693,7 +693,7 @@
             </tr>
             <tr>
                 <td colspan="4">Deposit</td>
-                <td> {{ $quotation->currency ." ". number_format($quotationDetail->advance_amount, 2) }}</td>
+                <td> {{ $quotation->currency ." ". number_format($so->receiving, 2) }}</td>
             </tr>
         </table>
         @endif
