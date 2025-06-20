@@ -105,7 +105,7 @@ $grades = $oldModelId ? \App\Models\MasterGrades::where('model_line_id', $oldMod
                 <div class="col-lg-4 col-md-6 single-input-field">
                     <label for="grade" class="form-label">Grade</label>
                     <select class="form-control select2" name="grade" id="grade">
-                        <option value="" disabled selected>Select a Grade</option>
+                        <option value="">-- None --</option>
                         @foreach($grades as $grade)
                             <option value="{{ $grade->id }}" {{ $oldGradeId == $grade->id ? 'selected' : '' }}>
                                 {{ $grade->grade_name }}
@@ -183,22 +183,21 @@ $grades = $oldModelId ? \App\Models\MasterGrades::where('model_line_id', $oldMod
                 <div class="col-lg-4 col-md-6 single-input-field">
                     <label for="choices-single-default" class="form-label">Drive Train</label>
                     <select class="form-control select2" autofocus name="drive_train" id="drive_train">
-                        <option value="" disabled selected>Drive Train</option>
+                        <option value="">-- None --</option>
                         <option value="4X2" {{ old('drive_train') == '4X2' ? 'selected' : '' }}>4X2</option>
                         <option value="4X4" {{ old('drive_train') == '4X4' ? 'selected' : '' }}>4X4</option>
                         <option value="AWD" {{ old('drive_train') == 'AWD' ? 'selected' : '' }}>AWD</option>
-                        <!-- <option value="4WD" {{ old('drive_train') == '4WD' ? 'selected' : '' }}>4WD</option> -->
+                        <option value="4WD" {{ old('drive_train') == '4WD' ? 'selected' : '' }}>4WD</option>
                         <option value="FWD" {{ old('drive_train') == 'FWD' ? 'selected' : '' }}>FWD</option>
                         <option value="RWD" {{ old('drive_train') == 'RWD' ? 'selected' : '' }}>RWD</option>
-
                     </select>
                 </div>
                 <div class="col-lg-4 col-md-6 single-input-field">
                     <label for="choices-single-default" class="form-label">Window Type</label>
                     <select class="form-control select2" autofocus name="window_type" id="window_type">
-                        <option value="" disabled selected>Select Window Type</option>
+                        <option value="">-- None --</option>
                         <option value="P.Window" {{ old('window_type') == 'P.Window' ? 'selected' : '' }}>P.Window</option>
-                        <option value="M.Window" {{ old('window_type') == 'M.Window' ? 'selected' : '' }}>M.Window</option>
+                        <option value="MT" {{ old('window_type') == 'MT' ? 'selected' : '' }}>MT</option>
                     </select>
                 </div>
                 <div class="col-lg-4 col-md-6 single-input-field">
