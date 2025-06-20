@@ -503,7 +503,7 @@ class SalesOrderController extends Controller
                         }
 
                         if (isset($soVariant['vehicles'])) {
-                            $currentVehicles = $existingVariant && $existingVariant->so_items ? $existingVariant->so_items->pluck('vehicles_id')->toArray() : [];
+                            $currentVehicles = $soVariantdata->so_items ? $soVariantdata->so_items->pluck('vehicles_id')->toArray() : [];
                             $newVehicles = $soVariant['vehicles'];
                             
                             // If no vehicles are selected, remove all existing ones
