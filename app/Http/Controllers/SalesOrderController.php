@@ -640,7 +640,12 @@ class SalesOrderController extends Controller
             return redirect()->back()->with('success', 'Sales Order updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Sales order update fails', ['error' => $e->getMessage()]);
+            Log::error('Sales order update fails', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return redirect()->back()->withErrors('An error occurred while updating sales order.');
         }
     }
