@@ -503,41 +503,18 @@ class SalesOrderController extends Controller
                         }
 
                         if (isset($soVariant['vehicles'])) {
-                            $currentVehicles = $existingVariant && $existingVariant->so_items ? $existingVariant->so_items->pluck('vehicles_id')->toArray() : [];
                             $newVehicles = $soVariant['vehicles'];
-                            
-                            // If no vehicles are selected, remove all existing ones
-                            if (empty($newVehicles)) {
-                                $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $currentVehicles));
-                            } else {
-                                $addedVehicles = array_diff($newVehicles, $currentVehicles);
-                                $removedVehicles = array_diff($currentVehicles, $newVehicles);
-
-                                // Add new vehicles
-                                foreach ($addedVehicles as $vehicleId) {
-                                    $soItem = Soitems::create(['vehicles_id' => $vehicleId, 'so_variant_id' => $existingVariant->id]);
-                                    $logEntries[] = [
-                                        'type' => 'Set',
-                                        'so_item_id' => $soItem->id,
-                                        'so_variant_id' => $existingVariant->id,
-                                        'field_name' => 'vehicles_id',
-                                        'old_value' => null,
-                                        'new_value' => $vehicleId
-                                    ];
-
-                                    Vehicles::where('id', $vehicleId)->update(['so_id' => $so->id]);
-                                }
-
-                                // Remove unselected vehicles
-                                if (!empty($removedVehicles)) {
-                                    $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $removedVehicles));
-                                }
-                            }
-                        } else {
-                            // If vehicles array is not set, remove all existing vehicles
-                            $currentVehicles = $existingVariant && $existingVariant->so_items ? $existingVariant->so_items->pluck('vehicles_id')->toArray() : [];
-                            if (!empty($currentVehicles)) {
-                                $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $currentVehicles));
+                            foreach ($newVehicles as $vehicleId) {
+                                $soItem = Soitems::create(['vehicles_id' => $vehicleId, 'so_variant_id' => $soVariantdata->id]);
+                                $logEntries[] = [
+                                    'type' => 'Set',
+                                    'so_item_id' => $soItem->id,
+                                    'so_variant_id' => $soVariantdata->id,
+                                    'field_name' => 'vehicles_id',
+                                    'old_value' => null,
+                                    'new_value' => $vehicleId
+                                ];
+                                Vehicles::where('id', $vehicleId)->update(['so_id' => $so->id]);
                             }
                         }
                     } else {
