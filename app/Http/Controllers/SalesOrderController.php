@@ -420,6 +420,21 @@ class SalesOrderController extends Controller
             $currentTimestamp = Carbon::now();
             $priceChanged = false;
 
+            // VIN uniqueness validation across all variants
+            $soVariantsInput = $request->input('variants', []);
+            $allVins = [];
+            foreach ($soVariantsInput as $variant) {
+                if (isset($variant['vehicles']) && is_array($variant['vehicles'])) {
+                    foreach ($variant['vehicles'] as $vinId) {
+                        if (in_array($vinId, $allVins)) {
+                            DB::rollBack();
+                            return redirect()->back()->withErrors('A VIN cannot be assigned to more than one variant. Please ensure all VINs are unique across variants.');
+                        }
+                        $allVins[] = $vinId;
+                    }
+                }
+            }
+
             // basic details Fields to check for changes
             $fields = [
                 'so_number' => 'SO-' . $request->input('so_number'),
@@ -517,7 +532,7 @@ class SalesOrderController extends Controller
                                 Vehicles::where('id', $vehicleId)->update(['so_id' => $so->id]);
                             }
                         }
-                    } else {
+                    } else if ($existingVariant) {
                         // Existing variant - check for changes
                         $fields = [
                             'variant_id' => $soVariant['variant_id'],
@@ -550,14 +565,12 @@ class SalesOrderController extends Controller
                         if (isset($soVariant['vehicles'])) {
                             $currentVehicles = $existingVariant && $existingVariant->so_items ? $existingVariant->so_items->pluck('vehicles_id')->toArray() : [];
                             $newVehicles = $soVariant['vehicles'];
-                            
                             // If no vehicles are selected, remove all existing ones
                             if (empty($newVehicles)) {
                                 $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $currentVehicles));
                             } else {
                                 $addedVehicles = array_diff($newVehicles, $currentVehicles);
                                 $removedVehicles = array_diff($currentVehicles, $newVehicles);
-
                                 // Add new vehicles
                                 foreach ($addedVehicles as $vehicleId) {
                                     $soItem = Soitems::create(['vehicles_id' => $vehicleId, 'so_variant_id' => $existingVariant->id]);
@@ -569,10 +582,8 @@ class SalesOrderController extends Controller
                                         'old_value' => null,
                                         'new_value' => $vehicleId
                                     ];
-
                                     Vehicles::where('id', $vehicleId)->update(['so_id' => $so->id]);
                                 }
-
                                 // Remove unselected vehicles
                                 if (!empty($removedVehicles)) {
                                     $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $removedVehicles));
@@ -585,7 +596,7 @@ class SalesOrderController extends Controller
                                 $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $currentVehicles));
                             }
                         }
-                    }
+                    } // end else if $existingVariant
                 }
             }
 

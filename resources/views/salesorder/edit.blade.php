@@ -1035,12 +1035,36 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
     });
 
     $(document.body).on('select2:select', ".variants", function(e) {
-        $('.overlay').show();
         var index = $(this).attr('index');
-        let url = '{{ route('so.getVins') }}';
-        let variant = $('#variant-' + index).val();
+        let variantId = $('#variant-' + index).val() ? $('#variant-' + index).val()[0] : '';
+        let description = $('#variant-description-' + index).val() ? $('#variant-description-' + index).val().trim() : '';
+        let price = $('#price-' + index).val() ? $('#price-' + index).val().trim() : '';
+        let duplicateFound = false;
         let totalIndex = $("#so-vehicles").find(".so-variant-add-section").length;
-        var selectedVinIds = [];
+        alert("hello");
+        for (let i = 1; i <= totalIndex; i++) {
+            if (i == index) continue;
+            let otherVariantId = $('#variant-' + i).val() ? $('#variant-' + i).val()[0] : '';
+            let otherDescription = $('#variant-description-' + i).val() ? $('#variant-description-' + i).val().trim() : '';
+            let otherPrice = $('#price-' + i).val() ? $('#price-' + i).val().trim() : '';
+            if (variantId && otherVariantId && description && otherDescription && price && otherPrice) {
+                if (variantId == otherVariantId && description == otherDescription && price == otherPrice) {
+                    duplicateFound = true;
+                    break;
+                }
+            }
+        }
+        if (duplicateFound) {
+            alert('You already have a variant with the same Variant, Description, and Price. Please add VINs to that variant instead.');
+            // Optionally, clear the selection
+            // $('#variant-' + index).val(null).trigger('change');
+            // $('.overlay').hide();
+            return false;
+        }
+        $('.overlay').show();
+        var url = '{{ route('so.getVins') }}';
+        let variant = $('#variant-' + index).val();
+        let selectedVinIds = [];
 
         for (let i = 1; i < totalIndex; i++) {
             var selectedOptions = $('#vin-' + i).val();
