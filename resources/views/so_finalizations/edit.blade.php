@@ -369,6 +369,164 @@
                                         @endforeach
                                     </tbody>
                                 </table>
+                                @if($vehicle->incidents->count())
+                                <h6 class="mt-3">Incidents</h6>
+                                <table class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Remark</th>
+                                            <th>Stage</th>
+                                            <th>Processing Date</th>
+                                            <th>Process Remarks</th>
+                                            <th>Reason</th>
+                                            <th>File</th>
+                                            <th>Detail</th>
+                                            <th>Reported Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($vehicle->incidents as $i)
+                                        <tr>
+                                            <td>{{ $i->remark }}</td>
+                                            <td>{{ $i->stage }}</td>
+                                            <td>{{ $i->processing_date }}</td>
+                                            <td>{{ $i->process_remarks }}</td>
+                                            <td>{{ $i->reason }}</td>
+                                            <td>
+                                                @if($i->file_path)
+                                                <a href="{{ asset('storage/'.$i->file_path) }}" target="_blank">View</a>
+                                                @endif
+                                            </td>
+                                            <td>{{ $i->detail }}</td>
+                                            <td>{{ $i->reported_date }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                                @endif
+
+
+                                @if($vehicle->pdis->count())
+                                <h6 class="mt-3">PDI Checks</h6>
+                                <ul>
+                                    @foreach($vehicle->pdis as $pdi)
+                                    <li>{{ $pdi->checking_item }}</li>
+                                    @endforeach
+                                </ul>
+                                @endif
+
+
+                                @if($vehicle->netsuiteCosts->count())
+                                <h6 class="mt-3">NetSuite Costs</h6>
+                                <ul>
+                                    @foreach($vehicle->netsuiteCosts as $nsc)
+                                    <li>{{ $nsc->cost }}</li>
+                                    @endforeach
+                                </ul>
+                                @endif
+
+
+                                @if($vehicle->purchasingCosts->count())
+                                <h6 class="mt-3">Purchasing Costs</h6>
+                                <ul>
+                                    @foreach($vehicle->purchasingCosts as $pc)
+                                    <li>{{ $pc->unit_price }} {{ $pc->currency }}</li>
+                                    @endforeach
+                                </ul>
+                                @endif
+
+                                <!-- @if($vehicle->purchasedOrderChanges->count())
+                                <h6 class="mt-3">PO Price Changes</h6>
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Original</th>
+                                            <th>New</th>
+                                            <th>Change</th>
+                                            <th>Type</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($vehicle->purchasedOrderChanges as $change)
+                                        <tr>
+                                            <td>{{ $change->original_price }}</td>
+                                            <td>{{ $change->new_price }}</td>
+                                            <td>{{ $change->price_change }}</td>
+                                            <td>{{ $change->change_type }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                                @endif -->
+
+                                @php
+    static $shownPurchasingOrders = [];
+@endphp
+
+@if($vehicle->purchasing_order_id && !in_array($vehicle->purchasing_order_id, $shownPurchasingOrders))
+    @php
+        $shownPurchasingOrders[] = $vehicle->purchasing_order_id;
+
+        // Find all vehicles with same PO ID
+        $vehiclesWithSamePO = $so->vehicles->filter(function ($v) use ($vehicle) {
+            return $v->purchasing_order_id == $vehicle->purchasing_order_id;
+        });
+
+        // We'll take changes from the first matching vehicle
+        $firstMatchingVehicle = $vehiclesWithSamePO->first();
+    @endphp
+
+    @if($firstMatchingVehicle && $firstMatchingVehicle->purchasedOrderChanges->count())
+        <h6 class="mt-3">PO Price Changes</h6>
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Original</th>
+                    <th>New</th>
+                    <th>Change</th>
+                    <th>Type</th>
+                    <th>Vehicle VIN(s)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($firstMatchingVehicle->purchasedOrderChanges as $change)
+                    <tr>
+                        <td>{{ $change->original_price }}</td>
+                        <td>{{ $change->new_price }}</td>
+                        <td>{{ $change->price_change }}</td>
+                        <td>{{ $change->change_type }}</td>
+                        <td>
+                            @foreach($vehiclesWithSamePO as $v)
+                                <span class="badge bg-secondary">{{ $v->vin }}</span>
+                            @endforeach
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
+@endif
+
+
+                                @if($vehicle->woVehicle->count())
+                                <h6 class="mt-3">WO Vehicle Info</h6>
+                                @foreach($vehicle->woVehicle as $wo)
+                                <p><strong>Engine:</strong> {{ $wo->engine }}<br>
+                                    <strong>Model Desc:</strong> {{ $wo->new_model_description }}<br>
+                                    <strong>Warehouse:</strong> {{ $wo->warehouse }}<br>
+                                    <strong>Territory:</strong> {{ $wo->territory }}
+                                </p>
+
+                                @if($wo->deliveryStatusRelation && is_object($wo->deliveryStatusRelation))
+                                <p><strong>GDN Number:</strong> {{ $wo->deliveryStatusRelation->gdn_number }}</p>
+                                @endif
+
+                                @endforeach
+                                @endif
+
+
+
+
                             </div>
                             <hr>
                             @endif
@@ -457,6 +615,27 @@
                                 </div>
                             </div>
                             @endif
+
+                            @if($so->so_variants->count())
+                            <h5>SO Variant Pricing</h5>
+                            <table class="table table-bordered table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Price</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($so->so_variants as $variant)
+                                    <tr>
+                                        <td>{{ $variant->price }}</td>
+                                        <td>{{ $variant->description }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                            @endif
+
                         </div>
                     </div>
                 </div>

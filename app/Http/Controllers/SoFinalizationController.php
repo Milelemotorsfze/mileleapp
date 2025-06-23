@@ -87,10 +87,17 @@ class SoFinalizationController extends Controller
             'vehicles.purchasingOrder',
             'vehicles.interior',
             'vehicles.exterior',
+            'vehicles.incidents',
+            'vehicles.pdis',
+            'vehicles.netsuiteCosts',
+            'vehicles.purchasingCosts',
+            'vehicles.purchasedOrderChanges',
+            'vehicles.woVehicle.deliveryStatusRelation',
             'leadClosed.call',
             'soItems.quotationItem.modelLine',
             'soItems.quotationItem.modelDescription',
             'soItems.quotationItem.brand',
+            'so_variants'
         ])
             ->whereNotNull('so_number')
             ->get()
