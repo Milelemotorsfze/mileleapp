@@ -72,7 +72,11 @@ class Vehicles extends Model
     {
         return $this->belongsTo(MasterModel::class, 'model_id', 'id');
     }
-    public function purchasingCosts()
+    public function vehiclePurchasingCost()
+    {
+        return $this->hasOne(VehiclePurchasingCost::class, 'vehicles_id');
+    }
+        public function purchasingCosts()
     {
         return $this->hasMany(VehiclePurchasingCost::class, 'vehicles_id');
     }
