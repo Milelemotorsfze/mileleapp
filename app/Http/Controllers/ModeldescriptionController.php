@@ -12,6 +12,7 @@ use App\Http\Controllers\UserActivityController;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use App\Http\Requests\modeldescription\ModelDescriptionRequest;
 
 class ModeldescriptionController extends Controller
 {
@@ -66,30 +67,8 @@ class ModeldescriptionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ModelDescriptionRequest $request)
     {
-    // Validate the request
-    $validator = Validator::make($request->all(), [
-        'steering' => 'required|string',
-        'brands_id' => 'required|exists:brands,id',
-        'master_model_lines_id' => 'required|exists:master_model_lines,id',
-        'grade' => 'nullable|string',
-        'fuel_type' => 'required|string',
-        'gearbox' => 'nullable|string',
-        'drive_train' => 'nullable|string',
-        'window_type' => 'nullable|string',
-        'model_description' => 'required|string|unique:master_model_descriptions,model_description'
-    ],
-    [
-        'model_description.unique' => 'Model detail is already existing !'
-    ]);
-
-    if ($validator->fails()) {
-        return redirect()->back()
-            ->withErrors($validator)
-            ->withInput();
-    }
-
     try {
         // Use a database transaction
         DB::transaction(function () use ($request) {
@@ -132,14 +111,50 @@ class ModeldescriptionController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        try {
+            if (!Auth::user()->hasPermissionForSelectedRole('update-model-description')) {
+                $errorMsg = "Sorry! You don't have permission to access this page";
+                return view('hrm.notaccess', compact('errorMsg'));
+            }
+            $modelDescription = MasterModelDescription::findOrFail($id);
+            $brands = Brand::get();
+            $masterModelLines = MasterModelLines::get();
+            $grades = MasterGrades::where('model_line_id', $modelDescription->model_line_id)->get();
+            return view('modeldescription.edit', compact('modelDescription', 'brands', 'masterModelLines', 'grades'));
+        } catch (\Exception $e) {
+            Log::error('Failed to load edit model description form', [
+                'error' => $e->getMessage(),
+                'user_id' => auth()->id()
+            ]);
+            abort(500, 'Something went wrong.');
+        }
     }
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(ModelDescriptionRequest $request, string $id)
     {
-        //
+        $modelDescription = MasterModelDescription::findOrFail($id);
+        try {
+            DB::transaction(function () use ($request, $modelDescription) {
+                $modelDescription->steering = $request->input('steering');
+                $modelDescription->model_line_id = $request->input('master_model_lines_id');
+                $modelDescription->master_vehicles_grades_id = $request->input('grade');
+                $modelDescription->engine = $request->input('engine');
+                $modelDescription->fuel_type = $request->input('fuel_type');
+                $modelDescription->transmission = $request->input('gearbox');
+                $modelDescription->drive_train = $request->input('drive_train');
+                $modelDescription->window_type = $request->input('window_type');
+                $modelDescription->specialEditions = $request->input('specialEditions');
+                $modelDescription->others = $request->input('others');
+                $modelDescription->model_description = $request->input('model_description');
+                $modelDescription->save();
+            });
+            return redirect()->route('modeldescription.index')->with('success', 'Master Model Description updated successfully.');
+        } catch (Exception $e) {
+            \Log::error('Error updating Master Model Description: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to update Master Model Description. Please try again.');
+        }
     }
     /**
      * Remove the specified resource from storage.
