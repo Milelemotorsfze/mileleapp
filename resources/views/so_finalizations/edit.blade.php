@@ -460,52 +460,62 @@
                                 @endif -->
 
                                 @php
-    static $shownPurchasingOrders = [];
-@endphp
+                                static $shownPurchasingOrders = [];
+                                @endphp
 
-@if($vehicle->purchasing_order_id && !in_array($vehicle->purchasing_order_id, $shownPurchasingOrders))
-    @php
-        $shownPurchasingOrders[] = $vehicle->purchasing_order_id;
+                                @if($vehicle->purchasing_order_id && !in_array($vehicle->purchasing_order_id, $shownPurchasingOrders))
+                                @php
+                                $shownPurchasingOrders[] = $vehicle->purchasing_order_id;
 
-        // Find all vehicles with same PO ID
-        $vehiclesWithSamePO = $so->vehicles->filter(function ($v) use ($vehicle) {
-            return $v->purchasing_order_id == $vehicle->purchasing_order_id;
-        });
+                                // Get all vehicles sharing this PO
+                                $vehiclesWithSamePO = $so->vehicles->filter(function ($v) use ($vehicle) {
+                                return $v->purchasing_order_id == $vehicle->purchasing_order_id;
+                                });
 
-        // We'll take changes from the first matching vehicle
-        $firstMatchingVehicle = $vehiclesWithSamePO->first();
-    @endphp
+                                $firstMatchingVehicle = $vehiclesWithSamePO->first();
 
-    @if($firstMatchingVehicle && $firstMatchingVehicle->purchasedOrderChanges->count())
-        <h6 class="mt-3">PO Price Changes</h6>
-        <table class="table table-sm">
-            <thead>
-                <tr>
-                    <th>Original</th>
-                    <th>New</th>
-                    <th>Change</th>
-                    <th>Type</th>
-                    <th>Vehicle VIN(s)</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($firstMatchingVehicle->purchasedOrderChanges as $change)
-                    <tr>
-                        <td>{{ $change->original_price }}</td>
-                        <td>{{ $change->new_price }}</td>
-                        <td>{{ $change->price_change }}</td>
-                        <td>{{ $change->change_type }}</td>
-                        <td>
-                            @foreach($vehiclesWithSamePO as $v)
-                                <span class="badge bg-secondary">{{ $v->vin }}</span>
-                            @endforeach
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    @endif
-@endif
+                                // Group changes uniquely by their price + change + type
+                                $groupedChanges = collect();
+                                if ($firstMatchingVehicle && $firstMatchingVehicle->purchasedOrderChanges) {
+                                foreach ($firstMatchingVehicle->purchasedOrderChanges as $change) {
+                                $key = "{$change->original_price}-{$change->new_price}-{$change->price_change}-{$change->change_type}";
+                                if (!$groupedChanges->has($key)) {
+                                $groupedChanges->put($key, $change);
+                                }
+                                }
+                                }
+                                @endphp
+
+                                @if($groupedChanges->count())
+                                <h6 class="mt-3">PO Price Changes</h6>
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Original</th>
+                                            <th>New</th>
+                                            <th>Change</th>
+                                            <th>Type</th>
+                                            <th>Vehicle VIN(s)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($groupedChanges as $change)
+                                        <tr>
+                                            <td>{{ number_format($change->original_price, 2) }}</td>
+                                            <td>{{ number_format($change->new_price, 2) }}</td>
+                                            <td>{{ number_format($change->price_change, 2) }}</td>
+                                            <td>{{ $change->change_type }}</td>
+                                            <td>
+                                                @foreach($vehiclesWithSamePO as $v)
+                                                <span class="badge bg-secondary">{{ $v->vin }}</span>
+                                                @endforeach
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                                @endif
+                                @endif
 
 
                                 @if($vehicle->woVehicle->count())
