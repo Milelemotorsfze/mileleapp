@@ -529,16 +529,20 @@
                 </thead>
                 <tbody>
                     <tr data-id="{{$call_id}}">
+                    @php
+                        $priority = strtolower(trim($calls->priority ?? ''));
+                    @endphp
+
                     <td>
-                    @if ($calls->priority == "High")
-                        <i class="fas fa-circle blink" style="color: red;"> Hot</i>
-                    @elseif ($calls->priority == "Normal")
-                        <i class="fas fa-circle" style="color: green;"> Normal</i>
-                    @elseif ($calls->priority == "Low")
-                        <i class="fas fa-circle" style="color: orange;"> Low</i>
-                    @else
-                        <i class="fas fa-circle" style="color: black;"> Regular</i>
-                    @endif
+                        @if ($priority === 'hot' || $priority === 'high')
+                            <i class="fas fa-circle blink" style="color: red;"> Hot</i>
+                        @elseif ($priority === 'normal')
+                            <i class="fas fa-circle" style="color: green;"> Normal</i>
+                        @elseif ($priority === 'low')
+                            <i class="fas fa-circle" style="color: orange;"> Low</i>
+                        @else
+                            <i class="fas fa-circle" style="color: black;"> Regular</i>
+                        @endif
                     </td>
                     <td>{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
                     <td>{{ $calls->type }}</td>
