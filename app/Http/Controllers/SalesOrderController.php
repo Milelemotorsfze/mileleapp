@@ -413,9 +413,12 @@ class SalesOrderController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $so = SO::find($id);
+        if (!$so) {
+            return redirect()->back()->withErrors('Sales Order not found.');
+        }
         DB::beginTransaction();
         try {
-            $so = SO::findorFail($id);
             $logEntries = [];
             $currentTimestamp = Carbon::now();
             $priceChanged = false;
@@ -467,19 +470,18 @@ class SalesOrderController extends Controller
                 $deletedVariantIds = $request->input('deleted_so_variant_ids');
                 foreach ($deletedVariantIds as $variantId) {
                     $variant = SoVariant::find($variantId);
-                    if ($variant) {
-                        $logEntries[] = [
-                            'type' => 'Delete',
-                            'so_item_id' => null,
-                            'so_variant_id' => $variantId,
-                            'field_name' => 'variant',
-                            'old_value' => $variant->variant->name ?? '',
-                            'new_value' => null
-                        ];
-                        // Remove the SO items and update the vehicle's SO ID
-                        $logEntries = array_merge($logEntries, $this->removeSoItems($variantId, $variant->soVehicles ? $variant->soVehicles->pluck('vehicles_id')->toArray() : []));
-                        $variant->delete();
-                    }
+                    if (!$variant) continue; // Null check added
+                    $logEntries[] = [
+                        'type' => 'Delete',
+                        'so_item_id' => null,
+                        'so_variant_id' => $variantId,
+                        'field_name' => 'variant',
+                        'old_value' => $variant->variant->name ?? '',
+                        'new_value' => null
+                    ];
+                    // Remove the SO items and update the vehicle's SO ID
+                    $logEntries = array_merge($logEntries, $this->removeSoItems($variantId, $variant->soVehicles ? $variant->soVehicles->pluck('vehicles_id')->toArray() : []));
+                    $variant->delete();
                 }
             }
 
@@ -521,6 +523,7 @@ class SalesOrderController extends Controller
                             $newVehicles = $soVariant['vehicles'];
                             foreach ($newVehicles as $vehicleId) {
                                 $soItem = Soitems::create(['vehicles_id' => $vehicleId, 'so_variant_id' => $soVariantdata->id]);
+                                if (!$soItem) continue; // Null check added
                                 $logEntries[] = [
                                     'type' => 'Set',
                                     'so_item_id' => $soItem->id,
@@ -574,6 +577,7 @@ class SalesOrderController extends Controller
                                 // Add new vehicles
                                 foreach ($addedVehicles as $vehicleId) {
                                     $soItem = Soitems::create(['vehicles_id' => $vehicleId, 'so_variant_id' => $existingVariant->id]);
+                                    if (!$soItem) continue; // Null check added
                                     $logEntries[] = [
                                         'type' => 'Set',
                                         'so_item_id' => $soItem->id,

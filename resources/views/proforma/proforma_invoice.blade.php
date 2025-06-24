@@ -581,13 +581,40 @@
         </td>
         <td style="vertical-align: top;width: 30%;">
     <table style="width: 100%;">
+    @php
+        $netTotal = 0;
+        // If SO total exists
+        if (isset($so) && !empty($so->total)) {
+            $netTotal = $so->total;
+            // Add other relevant QuotationItem collections if they exist and have values
+            $collections = [
+                'shippingCharges',
+                'shippingDocuments',
+                'addons',
+                'OtherAddons',
+                'shippingCertifications',
+                'otherDocuments',
+            ];
+            foreach ($collections as $col) {
+                if (isset($$col) && !empty($$col) && count($$col) > 0) {
+                    foreach ($$col as $item) {
+                        $netTotal += $item->total_amount ?? 0;
+                    }
+                }
+            }
+        } else {
+            // If SO does not exist, use deal_value only
+            $netTotal = $quotation->deal_value;
+        }
+    @endphp
+
     @if($quotation->currency == "AED")
     <tr>
             <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
                 Net Total In AED:
             </td>
             <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
-                {{ $quotation->currency ." ". number_format($quotation->deal_value) }}
+                {{ $quotation->currency . " " . number_format($netTotal, 2) }}
             </td>
         </tr>
     @endif
@@ -597,7 +624,7 @@
                 Net Total In USD:
             </td>
             <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
-                {{ $quotation->currency ." ". number_format($quotation->deal_value) }}
+                {{ $quotation->currency . " " . number_format($netTotal, 2) }}
             </td>
         </tr>
         <tr>
@@ -605,7 +632,7 @@
                 Net Total In AED:
             </td>
             <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
-                {{"AED ". number_format($quotation->deal_value * 3.675) }}
+                {{ "AED " . number_format($netTotal * 3.675, 2) }}
             </td>
         </tr>
         @endif
@@ -615,7 +642,7 @@
                 Net Total In EUR:
             </td>
             <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
-                {{ $quotation->currency ." ". number_format($quotation->deal_value) }}
+                {{ $quotation->currency . " " . number_format($netTotal, 2) }}
             </td>
         </tr>
         <tr>
@@ -623,7 +650,7 @@
                 Net Total In AED:
             </td>
             <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
-                {{"AED ". number_format($quotation->deal_value * 4) }}
+                {{ "AED " . number_format($netTotal * 4, 2) }}
             </td>
         </tr>
         @endif
@@ -636,7 +663,7 @@
                 @php
                     $advancePaid = $quotationDetail->advance_amount;
                     if (isset($so) && !empty($so) && !empty($so->paidinso)) {
-                        $advancePaid += $so->paidinso;
+                        $advancePaid = $so->receiving;
                     }
                 @endphp
                 {{ $quotation->currency ." ". number_format($advancePaid, 2) }}
@@ -650,9 +677,9 @@
                 @php
                     $advancePaid = $quotationDetail->advance_amount;
                     if (isset($so) && !empty($so) && !empty($so->paidinso)) {
-                        $advancePaid += $so->paidinso;
+                        $advancePaid = $so->receiving;
                     }
-                    $advanceAmount = $quotation->deal_value - $advancePaid;
+                    $advanceAmount = ((isset($so) && !empty($so->total)) ? $so->total : $quotation->deal_value) - $advancePaid;
                 @endphp
                 {{ $quotation->currency ." ". number_format($advanceAmount) }}
             </td>
@@ -666,9 +693,9 @@
                 @php
                     $advancePaid = $quotationDetail->advance_amount;
                     if (isset($so) && !empty($so) && !empty($so->paidinso)) {
-                        $advancePaid += $so->paidinso;
+                        $advancePaid = $so->receiving;
                     }
-                    $advanceAmount = $quotation->deal_value - $advancePaid;
+                    $advanceAmount = ((isset($so) && !empty($so->total)) ? $so->total : $quotation->deal_value) - $advancePaid;
                 @endphp
                 @if($quotation->currency == 'USD')
                 {{ $quotation->currency ." ". number_format($advanceAmount * $aed_to_usd_rate->value, 2) }}
@@ -703,7 +730,7 @@
                             @php
                                 $advancePaid = $quotationDetail->advance_amount;
                                 if (isset($so) && !empty($so) && !empty($so->paidinso)) {
-                                    $advancePaid += $so->paidinso;
+                                    $advancePaid = $so->receiving;
                                 }
                             @endphp
                             {{ $quotation->currency ." ". number_format($advancePaid, 2) }}
