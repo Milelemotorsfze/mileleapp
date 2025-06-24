@@ -1143,13 +1143,14 @@ $(document).ready(function() {
 
     if (td.find('select').length === 0 && td.find('input').length === 0) {
         if (field === 'priority') {
+            var normalizedValue = currentValue?.toLowerCase().trim();
             var dropdown = `
                 <select class="form-control">
-                    <option value="Hot" ${currentValue === 'Hot' ? 'selected' : ''}>Hot</option>
-                    <option value="Normal" ${currentValue === 'Normal' ? 'selected' : ''}>Normal</option>
-                    <option value="Low" ${currentValue === 'Low' ? 'selected' : ''}>Low</option>
-                    <option value="Regular" ${currentValue === 'Regular' ? 'selected' : ''}>Regular</option>
-                    <option value="High" ${currentValue === 'High' ? 'selected' : ''}>High</option>
+                    <option value="Hot" ${normalizedValue === 'hot' ? 'selected' : ''}>Hot</option>
+                    <option value="Normal" ${normalizedValue === 'normal' ? 'selected' : ''}>Normal</option>
+                    <option value="Low" ${normalizedValue === 'low' ? 'selected' : ''}>Low</option>
+                    <option value="Regular" ${normalizedValue === 'regular' ? 'selected' : ''}>Regular</option>
+                    <option value="High" ${normalizedValue === 'high' ? 'selected' : ''}>High</option>
                 </select>`;
             td.html(dropdown);
             editButton.html('<i class="fas fa-save"></i>');

@@ -418,6 +418,7 @@ class DailyleadsController extends Controller
                     DB::raw("IFNULL(demand.salesnotes, '') as dsalesnotes")
                 );
                 $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
+                $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
                 $data->addSelect([
                     DB::raw("IFNULL(calls.remarks, '') as remarks"),              
                     DB::raw("DATE_FORMAT(quotations.date, '%Y-%m-%d') as qdate"),
@@ -430,7 +431,9 @@ class DailyleadsController extends Controller
                     DB::raw("IFNULL(quotations.signature_status, '') as signature_status"),
                     'users.name as salespersonname',
                 ]);
-                $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
+                $data->leftJoin('users as quoted_by_user', 'quotations.created_by', '=', 'quoted_by_user.id');
+                $data->addSelect('quoted_by_user.name as quoted_by_name');
+
                 $data->leftJoin('users', 'quotations.created_by', '=', 'users.id');
                 $data->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id');
                 $data->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id');

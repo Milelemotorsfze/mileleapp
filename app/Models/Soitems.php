@@ -12,11 +12,15 @@ class Soitems extends Model
     protected $fillable = [
         'so_id',            // Sales Order ID
         'quotation_items_id', // Quotation Items ID
-        'vehicles_id', 
+        'vehicles_id',
         'so_variant_id',     // Vehicles ID
     ];
     public function vehicle()
     {
         return $this->belongsTo(Vehicles::class, 'vehicles_id');
+    }
+    public function quotationItem()
+    {
+        return $this->belongsTo(QuotationItem::class, 'quotation_items_id');
     }
 }

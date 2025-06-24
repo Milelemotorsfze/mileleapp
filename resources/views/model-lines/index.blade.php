@@ -62,7 +62,7 @@
                             @foreach ($modelLines as $key => $modelLine)
                                 <tr>
                                     <td>{{ ++$i }}</td>
-                                    <td>{{ $modelLine->brand->brand_name }}</td>
+                                    <td>{{ $modelLine->brand->brand_name ?? '' }}</td>
                                     <td>{{ $modelLine->model_line ?? ''}}</td>
                                     <td>
                                     <a data-placement="top" href="{{ route('model-lines.specification', $modelLine->id) }}" class="btn btn-primary btn-sm">

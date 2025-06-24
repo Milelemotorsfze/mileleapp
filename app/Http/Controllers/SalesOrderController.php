@@ -632,7 +632,12 @@ class SalesOrderController extends Controller
             return redirect()->back()->with('success', 'Sales Order updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Sales order update fails', ['error' => $e->getMessage()]);
+            Log::error('Sales order update fails', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return redirect()->back()->withErrors('An error occurred while updating sales order.');
         }
     }
@@ -821,7 +826,6 @@ class SalesOrderController extends Controller
         $multiplecp = MuitlpleAgents::where('quotations_id', $quotation->id)->where('agents_id', '!=', $quotationDetail->agents_id)->get();
 
         $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact(
-            'so',
             'multiplecp',
             'quotation',
             'data',
