@@ -8,8 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 class Agents extends Model
 {
     use HasFactory;
+
+     protected $fillable = [
+        'name',
+        'email',
+        'phone',
+        'identification_file',
+        'id_number',
+        'id_category'
+    ];
+
     public function multipleAgents() {
-        return $this->hasMany(MultipleAgents::class, 'agents_id', 'id');
+        return $this->hasMany(MuitlpleAgents::class, 'agents_id', 'id');
     }
     public function commissions()
     {
@@ -22,6 +32,6 @@ class Agents extends Model
 
     public function salesOrders()
     {
-        return $this->hasManyThrough(SalesOrder::class, AgentCommission::class, 'agents_id', 'id', 'id', 'so_id');
+        return $this->hasManyThrough(So::class, AgentCommission::class, 'agents_id', 'id', 'id', 'so_id');
     }
 }
