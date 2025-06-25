@@ -179,6 +179,12 @@ input[type=number]::-webkit-outer-spin-button
               {{ Session::get('success') }}
           </div>
       @endif
+       @if (Session::has('error'))
+          <div class="alert alert-danger" >
+              <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+              {{ Session::get('error') }}
+          </div>
+       @endif
 
     <div class="row align-items-center daily-leads-menus-button-container">
         <div class=" col-xxl-9 col-lg-12 col-md-12 mb-3 mb-lg-0">

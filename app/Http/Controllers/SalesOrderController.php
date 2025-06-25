@@ -69,11 +69,16 @@ class SalesOrderController extends Controller
                     'so.so_number',
                     'so.id as soid',
                     'so.so_date',
+                    'so.status',
                     'quotations.calls_id',
                 ])
                     ->leftJoin('quotations', 'so.quotation_id', '=', 'quotations.id')
                     ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
                     ->leftJoin('calls', 'quotations.calls_id', '=', 'calls.id')
+                   ->where(function ($query) {
+                        $query->where('so.status', '!=', 'Cancelled')
+                            ->orWhereNull('so.status');
+                    })
                     ->groupBy('so.id');
 
                 if (!$hasPermission) {
@@ -1394,8 +1399,13 @@ class SalesOrderController extends Controller
                 return redirect()->back()->with('error', 'Sales Order not found.');
             }
 
-            // Get related quotation and call
+            // Get related quotation and call and change status of quotation to show the relevent quottaion to list in quotaions
             $quotation = Quotation::where('id', $so->quotation_id)->first();
+            if($quotation){
+                $call = Calls::find($quotation->calls_id);
+                $call->status = 'Quoted';
+                $call->save();
+            }
             $calls = $quotation ? Calls::find($quotation->calls_id) : null;
 
             // 1. Unassign vehicles
@@ -1406,33 +1416,29 @@ class SalesOrderController extends Controller
                 'booking_person_id' => null,
             ]);
 
-            // 2. Delete Soitems
-            Soitems::where('so_id', $so->id)->delete();
+            // 2. Delete SalesOrderHistoryDetail and SalesOrderHistory
+            // $historyIds = SalesOrderHistory::where('so_id', $so->id)->pluck('id');
+            // SalesOrderHistoryDetail::whereIn('sales_order_history_id', $historyIds)->delete();
+            // SalesOrderHistory::where('so_id', $so->id)->delete();
 
-            // 3. Delete SoVariant
-            SoVariant::where('so_id', $so->id)->delete();
+            //3.  Delete SoVariant
+            $soVariantIds = SoVariant::where('so_id', $so->id)->pluck('id');
+            // SoVariant::where('so_id', $so->id)->delete();
 
-            // 4. Delete SalesOrderHistoryDetail and SalesOrderHistory
-            $historyIds = SalesOrderHistory::where('so_id', $so->id)->pluck('id');
-            SalesOrderHistoryDetail::whereIn('sales_order_history_id', $historyIds)->delete();
-            SalesOrderHistory::where('so_id', $so->id)->delete();
+            // 4. Delete Soitems
+            Soitems::whereIn('so_variant_id', $soVariantIds)->delete();
 
-            // 5. Delete Solog
-            Solog::where('so_id', $so->id)->delete();
-
-            // 6. Delete Closed
+            // 5. Delete the closed leads
             Closed::where('so_id', $so->id)->delete();
 
-            // 7. Delete QuotationFile
-            QuotationFile::where('quotation_id', $so->quotation_id)->delete();
-
-            // 8. Set BookingRequest status to 'Rejected'
+            // 6. Set BookingRequest status to 'Rejected'
             if ($calls) {
                 BookingRequest::where('calls_id', $calls->id)->update(['status' => 'Rejected']);
             }
 
-            // 9. Delete the SO
-            $so->delete();
+            // 7. update so status (unable to make soft deletes due to so_id is linked to softdeleted data)
+            $so->status = "Cancelled";
+            $so->save();
 
             DB::commit();
             return redirect()->back()->with('success', 'Sales Order and related items canceled successfully.');
@@ -1838,6 +1844,9 @@ class SalesOrderController extends Controller
         $exists = SO::where('so_number', $request->so_number)
             ->when($request->filled('so_id'), function ($query) use ($request) {
                 return $query->where('id', '!=', $request->so_id);
+            })
+           ->where(function ($query) {
+                $query->where('status', '!=', 'Cancelled')->orWhereNull('status');
             })
             ->whereDoesntHave('so_logs', function ($query) {
                 $query->where('status', 'SO Cancel');

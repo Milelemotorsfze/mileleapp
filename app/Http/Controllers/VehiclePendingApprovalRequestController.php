@@ -176,7 +176,11 @@ class VehiclePendingApprovalRequestController extends Controller
             }
 
         }else if($field == 'so_number') {
-            $existingSo = So::where('so_number', $newValue)->first();
+            $existingSo = So::where('so_number', $newValue)
+                ->where(function ($query) {
+                $query->where('status', '!=', 'Cancelled')
+                    ->orWhereNull('status');
+            })->first();
 
             if($existingSo) {
                 if($existingSo->so_number != $newValue)
