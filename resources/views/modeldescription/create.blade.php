@@ -96,25 +96,37 @@ $grades = $oldModelId ? \App\Models\MasterGrades::where('model_line_id', $oldMod
                     <select class="form-control select2" autofocus name="master_model_lines_id" id="model" required>
                         <option value="" disabled selected>Select a Model Line</option>
                         @foreach($modelLines as $modelLine)
-                            <option value="{{ $modelLine->id }}" {{ $oldModelId == $modelLine->id ? 'selected' : '' }}>
-                                {{ $modelLine->model_line }}
-                            </option>
+                        <option value="{{ $modelLine->id }}" {{ $oldModelId == $modelLine->id ? 'selected' : '' }}>
+                            {{ $modelLine->model_line }}
+                        </option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-lg-4 col-md-6 single-input-field">
-                    <label for="grade" class="form-label">Grade</label>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <label for="grade" class="form-label mb-0">Grade</label>
+                        <div class="form-check mb-0">
+                            <input class="form-check-input include-in-summary" type="checkbox" value="1" id="include_grade">
+                            <label class="form-check-label" for="include_grade">Display in Description</label>
+                        </div>
+                    </div>
                     <select class="form-control select2" name="grade" id="grade">
                         <option value="">-- None --</option>
                         @foreach($grades as $grade)
-                            <option value="{{ $grade->id }}" {{ $oldGradeId == $grade->id ? 'selected' : '' }}>
-                                {{ $grade->grade_name }}
-                            </option>
+                        <option value="{{ $grade->id }}" {{ $oldGradeId == $grade->id ? 'selected' : '' }}>
+                            {{ $grade->grade_name }}
+                        </option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-lg-4 col-md-6 single-input-field">
-                    <label for="specialEditions" class="form-label">Special Editions</label>
+                     <div class="d-flex justify-content-between align-items-center">
+                        <label for="specialEditions" class="form-label mb-0">Special Editions</label>
+                        <div class="form-check mb-0">
+                            <input class="form-check-input include-in-summary" type="checkbox" value="1" id="include_special_editions">
+                            <label class="form-check-label" for="include_special_editions">Display in Description</label>
+                        </div>
+                    </div>
                     <input type="text" class="form-control" id="specialEditions" name="specialEditions" placeholder="Enter special edition details" value="{{ old('specialEditions') }}">
                 </div>
                 <div class="col-lg-4 col-md-6 single-input-field">
@@ -181,7 +193,13 @@ $grades = $oldModelId ? \App\Models\MasterGrades::where('model_line_id', $oldMod
                     </select>
                 </div>
                 <div class="col-lg-4 col-md-6 single-input-field">
-                    <label for="choices-single-default" class="form-label">Drive Train</label>
+                     <div class="d-flex justify-content-between align-items-center">
+                        <label for="choices-single-default" class="form-label mb-0">Drive Train</label>
+                        <div class="form-check mb-0">
+                            <input class="form-check-input include-in-summary" type="checkbox" value="1" id="include_drive_train">
+                            <label class="form-check-label" for="include_drive_train">Display in Description</label>
+                        </div>
+                    </div>
                     <select class="form-control select2" autofocus name="drive_train" id="drive_train">
                         <option value="">-- None --</option>
                         <option value="4X2" {{ old('drive_train') == '4X2' ? 'selected' : '' }}>4X2</option>
@@ -193,7 +211,13 @@ $grades = $oldModelId ? \App\Models\MasterGrades::where('model_line_id', $oldMod
                     </select>
                 </div>
                 <div class="col-lg-4 col-md-6 single-input-field">
-                    <label for="choices-single-default" class="form-label">Window Type</label>
+                     <div class="d-flex justify-content-between align-items-center">
+                        <label for="choices-single-default" class="form-label mb-0">Window Type</label>
+                        <div class="form-check mb-0">
+                            <input class="form-check-input include-in-summary" type="checkbox" value="1" id="include_window_type">
+                            <label class="form-check-label" for="include_window_type">Display in Description</label>
+                        </div>
+                    </div>
                     <select class="form-control select2" autofocus name="window_type" id="window_type">
                         <option value="">-- None --</option>
                         <option value="P.Window" {{ old('window_type') == 'P.Window' ? 'selected' : '' }}>P.Window</option>
@@ -201,7 +225,13 @@ $grades = $oldModelId ? \App\Models\MasterGrades::where('model_line_id', $oldMod
                     </select>
                 </div>
                 <div class="col-lg-4 col-md-6 single-input-field">
-                    <label for="specialEditions" class="form-label">Others Important Option</label>
+                     <div class="d-flex justify-content-between align-items-center">
+                        <label for="specialEditions" class="form-label mb-0">Others Important Option</label>
+                        <div class="form-check mb-0">
+                            <input class="form-check-input include-in-summary" type="checkbox" value="1" id="include_others">
+                            <label class="form-check-label" for="include_others">Display in Description</label>
+                        </div>
+                    </div>
                     <input type="text" class="form-control" id="others" name="others" placeholder="Enter Other details" value="{{ old('others') }}">
                 </div>
             </div>
@@ -230,7 +260,13 @@ redirect()->route('home')->send();
         var steering = $('#steering').val() || '';
         var brand = $('#brand option:selected').text() || '';
         var model = $('#model option:selected').text() || '';
-        var grade = $('#grade').val() && $('#grade').val() !== 'Select a Grade' ? $('#grade option:selected').text() : '';
+        var grade = '';
+        if ($('#include_grade').is(':checked')) {
+            var gradeVal = $('#grade').val();
+            if (gradeVal && gradeVal !== '' && gradeVal !== 'Select a Grade') {
+                grade = $('#grade option:selected').text();
+            }
+        }
         var engine = $('#engine').val() || '';
         var fuel = $('#fuel').val() || '';
         if (fuel === 'Petrol') {
@@ -241,10 +277,10 @@ redirect()->route('home')->send();
             fuel = 'P HEV';
         }
         var gear = $('#gear').val() ? $('#gear').val() : '';
-        var driveTrain = $('#drive_train').val() ? $('#drive_train').val() : '';
-        var windowType = $('#window_type').val() ? $('#window_type').val() : '';
-        var specialEditions = $('#specialEditions').val() ? $('#specialEditions').val() : '';
-        var others = $('#others').val() ? $('#others').val() : '';
+        var driveTrain = $('#include_drive_train').is(':checked') ? $('#drive_train').val().trim() : '';
+        var windowType = $('#include_window_type').is(':checked') ? $('#window_type').val().trim() : '';
+        var specialEditions = $('#include_special_editions').is(':checked') ? $('#specialEditions').val().trim() : '';
+        var others = $('#include_others').is(':checked') ? $('#others').val().trim() : '';
         var engineFuel = engine + fuel;
         var summary = [
                 steering,
@@ -280,6 +316,8 @@ redirect()->route('home')->send();
     }
 
     $(document).ready(function() {
+        $('.include-in-summary').on('change', updateSummary);
+
         $('.select2').select2({});
 
         $('.select2').on('change', function() {
