@@ -1386,74 +1386,58 @@ class SalesOrderController extends Controller
 
     public function cancel($id)
     {
-        // $quotation = Quotation::where('calls_id', $id)->first();
-        // $calls = Calls::find($id);
-        // $calls->status = 'Quoted';
-        // $calls->save();
-        // $leadclosed = Closed::where('call_id', $id)->first();
-        // if($leadclosed)
-        // {
-        // $leadclosed->delete();
-        // }
-        // $so = So::where('quotation_id', $quotation->id)->first();
-
         DB::beginTransaction();
-
         try {
-
             $so = SO::find($id);
-            if ($so->quotation_id  && $so->quotation_id  != 0) {
-                $quotation = Quotation::where('id', $so->quotation_id)->first();
-                if ($quotation) {
-                    $calls = Calls::find($quotation->calls_id);
-                    $calls->status = 'Quoted';
-                    $calls->save();
-                    $leadclosed = Closed::where('call_id', $quotation->calls_id)->first();
-                    if ($leadclosed) {
-                        $leadclosed->delete();
-                    }
-                }
-            }
-            $soitems = Soitems::where('so_id', $so->id)->get();
-            foreach ($soitems as $soitem) {
-                $vehicle = Vehicles::find($soitem->vehicles_id);
-                if ($vehicle) {
-                    $vehicle->so_id = null;
-                    $vehicle->reservation_start_date = null;
-                    $vehicle->reservation_end_date = null;
-                    $vehicle->booking_person_id = null;
-                    $vehicle->save();
-                    \Log::info('Unassign SO id - Case 4-' . $so->id);
-                }
-            }
-            foreach ($soitems as $soitem) {
-                $soitem->deleted_by = Auth::id();
-                $soitem->save();
-                \Log::info('SO items deleted - Case 4-' . $so->id);
-
-                $soitem->delete();
+            if (!$so) {
+                DB::rollBack();
+                return redirect()->back()->with('error', 'Sales Order not found.');
             }
 
-            $bookingrequest = BookingRequest::where('calls_id', $id)->first();
-            if ($bookingrequest) {
-                $bookingrequest->status = 'Rejected';
-                $bookingrequest->save();
+            // Get related quotation and call
+            $quotation = Quotation::where('id', $so->quotation_id)->first();
+            $calls = $quotation ? Calls::find($quotation->calls_id) : null;
+
+            // 1. Unassign vehicles
+            Vehicles::where('so_id', $so->id)->update([
+                'so_id' => null,
+                'reservation_start_date' => null,
+                'reservation_end_date' => null,
+                'booking_person_id' => null,
+            ]);
+
+            // 2. Delete Soitems
+            Soitems::where('so_id', $so->id)->delete();
+
+            // 3. Delete SoVariant
+            SoVariant::where('so_id', $so->id)->delete();
+
+            // 4. Delete SalesOrderHistoryDetail and SalesOrderHistory
+            $historyIds = SalesOrderHistory::where('so_id', $so->id)->pluck('id');
+            SalesOrderHistoryDetail::whereIn('sales_order_history_id', $historyIds)->delete();
+            SalesOrderHistory::where('so_id', $so->id)->delete();
+
+            // 5. Delete Solog
+            Solog::where('so_id', $so->id)->delete();
+
+            // 6. Delete Closed
+            Closed::where('so_id', $so->id)->delete();
+
+            // 7. Delete QuotationFile
+            QuotationFile::where('quotation_id', $so->quotation_id)->delete();
+
+            // 8. Set BookingRequest status to 'Rejected'
+            if ($calls) {
+                BookingRequest::where('calls_id', $calls->id)->update(['status' => 'Rejected']);
             }
-            $solog = new Solog();
-            $solog->time = now()->format('H:i:s');
-            $solog->date = now()->format('Y-m-d');
-            $solog->status = 'SO Cancel';
-            $solog->created_by = Auth::id();
-            $solog->so_id = $so->id;
-            $solog->role = Auth::user()->selectedRole;
-            $solog->save();
+
+            // 9. Delete the SO
             $so->delete();
 
             DB::commit();
             return redirect()->back()->with('success', 'Sales Order and related items canceled successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-
             Log::error('Sales Order Cancellation failed', ['error' => $e->getMessage()]);
             return redirect()->back()->with('error', 'Sales Order Cancellation failed.');
         }
