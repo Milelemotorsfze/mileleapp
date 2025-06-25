@@ -61,7 +61,10 @@ class VehicleInvoiceController extends Controller
     public function create()
     {
         (new UserActivityController)->createActivity('Open Create New Vehicle Invoice Page');
-        $so = So::all();
+        $so = So::where(function ($query) {
+            $query->where('status', '!=', 'Cancelled')
+                  ->orWhereNull('status');
+        })->get();
         return view('vehicles.deliveryinvoicecreate', compact('so'));
     }
 
