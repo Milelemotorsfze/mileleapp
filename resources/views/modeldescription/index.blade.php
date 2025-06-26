@@ -87,7 +87,7 @@
                 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-model-description');
                 @endphp
-                @if($description->is_deletable == true) //same condition for delete & edit
+                @if($description->is_deletable == true)
                     <a href="{{ route('modeldescription.edit', $description->id) }}" class="btn btn-info btn-sm" title="Edit Description">
                         <i class="fa fa-edit" aria-hidden="true"></i>
                     </a>

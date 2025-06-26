@@ -108,11 +108,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
                     <label for="choices-single-default" class="form-label">Model Line<span style="color: red;">*</span></label>
                     <select class="form-control" autofocus name="master_model_lines_id" id="model" required>
                         <option value="" disabled selected>Select a Model Line</option>
-                        @foreach($masterModelLines as $masterModelLine)
-                        <option value="{{ $masterModelLine->id }}" {{ old('master_model_lines_id') == $masterModelLine->id ? 'selected' : '' }}>
-                            {{ $masterModelLine->model_line }}
-                        </option>
-                        @endforeach
+                        {{-- Model lines will be loaded via AJAX after brand selection --}}
                     </select>
                 </div>
             </div>
@@ -405,6 +401,27 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
         function clearModelDetails() {
             $('#steering, #engine, #fuel_type, #transmission, #window_type, #drive_train, #netsuite_name').val('');
         }
+
+        // On page load, if a brand is pre-selected, load its model lines
+        var initialBrandId = $('#brand').val();
+        if (initialBrandId) {
+            $.ajax({
+                url: '/get-model-lines/' + initialBrandId,
+                type: 'GET',
+                success: function(data) {
+                    $('#model').empty();
+                    $('#model').append('<option value="" disabled selected>Select a Model Line</option>');
+                    $.each(data, function(index, modelLine) {
+                        var selected = "";
+                        if ("{{ old('master_model_lines_id') }}" == modelLine.id) selected = "selected";
+                        $('#model').append('<option value="' + modelLine.id + '" ' + selected + '>' + modelLine.model_line + '</option>');
+                    });
+                },
+                error: function(error) {
+                    console.log('Error fetching model lines:', error);
+                }
+            });
+        }
     });
 </script>
 <script>
@@ -424,9 +441,45 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
     })
     $('#brand').on('change', function() {
         $('#brand-error').remove();
+        // Clear all related fields
+        $('#model_detail').val('').trigger('change');
+        // Clear model description dropdown options except default
+        if ($('#model_detail').is('select')) {
+            $('#model_detail').empty().append('<option value="">Select a Model</option>').val('').trigger('change');
+        }
+        $('#steering').val('');
+        $('#engine').val('');
+        $('#fuel_type').val('');
+        $('#transmission').val('');
+        $('#window_type').val('');
+        $('#drive_train').val('');
+        $('#netsuite_name').val('');
+        $('#specialEditions').val('');
+        $('#others').val('');
+        // Clear all specification selects
+        $('#specification-details-container').empty();
+        $('#selected_specifications').val('');
     })
     $('#model').on('change', function() {
         $('#model-error').remove();
+        // Clear all related fields
+        $('#model_detail').val('').trigger('change');
+        // Clear model description dropdown options except default
+        if ($('#model_detail').is('select')) {
+            $('#model_detail').empty().append('<option value="">Select a Model</option>').val('').trigger('change');
+        }
+        $('#steering').val('');
+        $('#engine').val('');
+        $('#fuel_type').val('');
+        $('#transmission').val('');
+        $('#window_type').val('');
+        $('#drive_train').val('');
+        $('#netsuite_name').val('');
+        $('#specialEditions').val('');
+        $('#others').val('');
+        // Clear all specification selects
+        $('#specification-details-container').empty();
+        $('#selected_specifications').val('');
     })
     $("#form-create").validate({
         ignore: [],
@@ -567,144 +620,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
     }
 </script>
 <script>
-    // $(document).ready(function () {
-    //     function updateModelDetail() {
-    //     var selectedOptions = [];
-    //     var fieldIdOrder = ['steering', 'model', 'engine', 'fuel', 'gear'];
-    //     var gradeOption = null;
-
-    //     $('input[name^="field_checkbox"]:checked').each(function () {
-    //         var fieldId = $(this).data('field-id');
-    //         var fieldValue = $('#' + fieldId + ' option:selected').text();
-    //         if (fieldId === 'fuel') {
-    //     if (fieldValue === 'Petrol') {
-    //         fieldValue = 'P';
-    //     } else if (fieldValue === 'Diesel') {
-    //         fieldValue = 'D';
-    //     } else if (fieldValue === 'PHEV') {
-    //         fieldValue = 'PHEV';
-    //     } else if (fieldValue === 'MHEV') {
-    //         fieldValue = 'MHEV';
-    //     } else if (fieldValue === 'PH') {
-    //         fieldValue = 'PH';
-    //     } else {
-    //         fieldValue = 'EV';
-    //     }
-    // }
-    //         selectedOptions.push({ fieldId: fieldId, value: fieldValue });
-
-    //         // Check if the field is "model" and save the grade option
-    //         if (fieldId === 'model') {
-    //             gradeOption = selectedOptions.find(option => option.fieldId === 'model');
-    //         }
-    //     });
-
-    //     $('input[name^="specification_checkbox"]:checked').each(function () {
-    //         var specificationId = $(this).data('specification-id');
-    //         var selectedValue = $('select[name="specification_' + specificationId + '"]').text();
-    //         var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text();
-    //         var displayValue = (selectedText.toUpperCase() === 'YES') ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text() : selectedText;
-    //         var specificationName = $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text();
-    //         if (specificationName === 'Grade') {
-    //             // If specificationName is "Grade," update the gradeOption
-    //             if (gradeOption) {
-    //                 gradeOption.value += ' ' + displayValue;
-    //             } else {
-    //                 selectedOptions.push({ fieldId: 'model', value: displayValue });
-    //             }
-    //         } else {
-    //             selectedOptions.push({ specificationId: specificationId, value: displayValue });
-    //         }
-    //     });
-
-    //     selectedOptions.sort(function (a, b) {
-    //         var orderA = fieldIdOrder.indexOf(a.fieldId);
-    //         var orderB = fieldIdOrder.indexOf(b.fieldId);
-    //         if (orderA !== -1 && orderB !== -1) {
-    //             return orderA - orderB;
-    //         }
-    //         if (orderA !== -1) {
-    //             return -1;
-    //         }
-    //         if (orderB !== -1) {
-    //             return 1;
-    //         }
-    //         return 0;
-    //     });
-
-    //     var modelDetail = selectedOptions.map(function (option, index, arr) {
-    //         if (option.fieldId === 'fuel' && arr[index - 1]?.fieldId === 'engine') {
-    //             // Combine engine and fuel values without a space
-    //             return arr[index - 1].value + option.value;
-    //         } else if (option.fieldId === 'engine' && arr[index + 1]?.fieldId === 'fuel') {
-    //             // Skip adding engine value, as it will be combined later with fuel
-    //             return '';
-    //         } else {
-    //             return option.value;
-    //         }
-    //     }).filter(Boolean).join(' ');
-
-    //     $('.model_detail').val(modelDetail);
-    // }
-    //             $(document).on('change', 'input[name^="specification_checkbox"], input[name^="field_checkbox"]', function () {
-    //                 updateModelDetail();
-    //             });
-    //             $('#model_detail').on('click', function () {
-    //                 createSpecificationCheckboxes();
-    //                 createFieldCheckboxes();
-    //             });
-    //             function createSpecificationCheckboxes() {
-    //     $('.specification-checkbox-container').remove();
-
-    //     $('select[name^="specification_"]').each(function () {
-    //         var specificationId = $(this).data('specification-id');
-    //         var selectedOption = $(this).val();
-
-    //         if (selectedOption && selectedOption !== '' && selectedOption !== null && selectedOption !== 'null') {
-    //             var checkboxId = 'checkbox_specification_' + specificationId;
-    //             var checkbox = $('<input type="checkbox">')
-    //                 .attr('id', checkboxId)
-    //                 .attr('name', 'specification_checkbox')
-    //                 .data('specification-id', specificationId);
-    //             var label = $('<label>')
-    //                 .attr('for', checkboxId)
-    //                 .text('\u00A0Model');
-    //             var checkboxContainer = $('<div class="specification-checkbox-container">')
-    //                 .append(checkbox)
-    //                 .append(label);
-    //             $(this).closest('.col-lg-4').append(checkboxContainer);
-    //         }
-    //     });
-    // }
-    //             function createFieldCheckboxes() {
-    //                 $('.field-checkbox-container').remove();
-    //                 var fields = [
-    //                     { id: 'steering', label: 'Steering' },
-    //                     { id: 'model', label: 'model' },
-    //                     { id: 'coo', label: 'COO' },
-    //                     { id: 'my', label: 'Model Year' },
-    //                     { id: 'drive_train', label: 'Drive Train' },
-    //                     { id: 'gear', label: 'gearbox' },
-    //                     { id: 'fuel', label: 'fuel_type' },
-    //                     { id: 'engine', label: 'Engine' },
-    //                     { id: 'upholstery', label: 'Upholstery' }
-    //                 ];
-    //                 fields.forEach(function (field) {
-    //                     var checkboxId = 'checkbox_field_' + field.id;
-    //                     var checkbox = $('<input type="checkbox">')
-    //                         .attr('id', checkboxId)
-    //                         .attr('name', 'field_checkbox')
-    //                         .data('field-id', field.id);
-    //                     var label = $('<label>')
-    //                         .attr('for', checkboxId)
-    //                         .text('\u00A0Model');
-    //                     var checkboxContainer = $('<div class="field-checkbox-container">')
-    //                         .append(checkbox)
-    //                         .append(label);
-    //                     $('#' + field.id).closest('.col-lg-2').append(checkboxContainer);
-    //                 });
-    //             }
-    //         });
     $(document).ready(function() {
         function updatevariantDetail() {
             var selectedOptionsv = [];
@@ -833,27 +748,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
         });
 
         function createSpecificationCheckboxesv() {
-            // $('.specification-details-container').remove();
-
-            // $('select[name^="specification_"]').each(function () {
-            //     var specificationId = $(this).data('specification-id');
-            //     var selectedOption = $(this).val();
-
-            //     if (selectedOption && selectedOption !== '' && selectedOption !== null && selectedOption !== 'null') {
-            //         var checkboxIdv = 'checkbox_specification_' + specificationId;
-            //         var checkboxv = $('<input type="checkbox">')
-            //             .attr('id', checkboxIdv)
-            //             .attr('name', 'variantcheckbox')
-            //             .data('specification-id', specificationId);
-            //         var label = $('<label>')
-            //             .attr('for', checkboxIdv)
-            //             .text('\u00A0Variant');
-            //         var checkboxContainerv = $('<div class="specification-details-container">')
-            //             .append(checkboxv)
-            //             .append(label);
-            //         $(this).closest('.col-lg-4').append(checkboxContainerv);
-            //     }
-            // });
             $('select[name^="specification_"]').each(function() {
                 var specificationId = $(this).data('specification-id');
                 var selectedOption = $(this).val();
@@ -874,33 +768,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
                     $(this).closest('.col-lg-4').append(checkboxContainerv);
                 }
             });
-
         }
 
         function createFieldCheckboxesv() {
-            // $('.field-checkbox-containerv').remove();
-            // var fields = [
-            //     { id: 'brands_id', label: 'Brand' },
-            //     { id: 'master_model_lines_id', label: 'Model Line' },
-            //     { id: 'coo', label: 'COO' },
-            //     { id: 'my', label: 'Model Year' },
-            //     { id: 'gear', label: 'Gear' },
-            //     { id: 'upholstery', label: 'Upholstery' }
-            // ];
-            // fields.forEach(function (field) {
-            //     var checkboxIdv = 'checkbox_field_' + field.id;
-            //     var checkbox = $('<input type="checkbox">')
-            //         .attr('id', checkboxIdv)
-            //         .attr('name', 'fieldvariants')
-            //         .data('field-id', field.id);
-            //     var label = $('<label>')
-            //         .attr('for', checkboxIdv)
-            //         .text('\u00A0Variant');
-            //     var checkboxContainerv = $('<div class="field-checkbox-containerv">')
-            //         .append(checkbox)
-            //         .append(label);
-            //     $('#' + field.id).closest('.col-lg-2').append(checkboxContainerv);
-            // });
             var fields = [{
                     id: 'brands_id',
                     label: 'Brand'
@@ -916,10 +786,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
                 {
                     id: 'my',
                     label: 'Model Year'
-                },
-                {
-                    id: 'gear',
-                    label: 'Gear'
                 },
                 {
                     id: 'gear',
