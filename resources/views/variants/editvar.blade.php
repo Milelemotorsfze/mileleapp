@@ -113,6 +113,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
                     </select>
                 </div>
             </div>
+            <div class="col-lg-6 col-md-6 col-sm-6">
+                <div class="mb-3">
+                    <label for="model_detail" class="form-label">Model Description</label>
+                    <select class="form-control select2" name="model_detail" id="model_detail" required>
+                        @foreach ($modelDescriptions as $description)
+                        <option value="{{ $description->id }}"
+                            {{ $variant->master_model_descriptions_id == $description->id ? 'selected' : '' }}>
+                            {{ $description->model_description }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
             <div class="col-lg-2 col-md-6 col-sm-12">
                 <div class="mb-3">
                     <label for="steering" class="form-label">Steering</label>
@@ -271,19 +284,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
                     </select>
                 </div>
             </div>
-            <div class="col-lg-12 col-md-12 col-sm-12">
-                <div class="mb-3">
-                    <label for="model_detail" class="form-label">Model Description</label>
-                    <select class="form-control select2" name="model_detail" id="model_detail" required>
-                        @foreach ($modelDescriptions as $description)
-                        <option value="{{ $description->id }}"
-                            {{ $variant->master_model_descriptions_id == $description->id ? 'selected' : '' }}>
-                            {{ $description->model_description }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
             <div class="col-lg-12 col-md-12 col-sm-12" id="variant">
                 <div class="mb-3">
                     <label for="choices-single-default" class="form-label">Variant Details</label>
@@ -326,7 +326,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
 @push('scripts')
 <script>
     $(document).ready(function() {
-        $('#model_detail').select2({});
+        $('#model_detail').select2({
+            placeholder: "Select a Model",
+            allowClear: true
+        }).on('change', function() {
+            $('#model_detail-error').remove();
+        });
         $('#model_detail').change(function() {
             const selectedModelId = $(this).val();
             if (selectedModelId) {
