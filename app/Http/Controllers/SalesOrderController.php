@@ -714,9 +714,13 @@ class SalesOrderController extends Controller
                 $quotationItem->quotation_id = $so->quotation_id;
                 $quotationItem->reference_type = 'App\Models\Varaint';
                 $quotationItem->reference_id  = $soVariant->variant_id;
+                $quotationItem->model_line_id  = $soVariant->variant->master_model_lines->id ?? NULL;
+                $quotationItem->brand_id  =    $soVariant->variant->brand->id ?? NULL;
                 $quotationItem->description =  $soVariant->description;
                 $quotationItem->unit_price =  $soVariant->price;
                 $quotationItem->quantity =    $soVariant->quantity;
+                $quotationItem->is_addon =   0;
+                $quotationItem->is_enable =  1;
                 $quotationItem->total_amount =  $soVariant->quantity *  $soVariant->price;
                 $quotationItem->save();
 
@@ -727,9 +731,13 @@ class SalesOrderController extends Controller
                 // Update the existing quotation item
                 QuotationItem::where('id', $soVariant->quotation_item_id)->update([
                     'reference_id' => $soVariant->variant_id,
+                    'model_line_id' => $soVariant->variant->master_model_lines->id ?? NULL,
+                    'brand_id'  => $soVariant->variant->brand->id ?? NULL,
                     'description' => $soVariant->description,
                     'unit_price' => $soVariant->price,
                     'quantity' => $soVariant->quantity,
+                    'is_addon' => 0,
+                    'is_enable' => 1,
                     'total_amount' => $soVariant->quantity * $soVariant->price,
                 ]);
             }
