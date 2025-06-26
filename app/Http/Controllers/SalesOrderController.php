@@ -38,6 +38,7 @@ use App\Models\MuitlpleAgents;
 use App\Models\QuotationFile;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Html\Builder;
+use Illuminate\Support\Str;
 
 class SalesOrderController extends Controller
 {
@@ -974,10 +975,10 @@ class SalesOrderController extends Controller
         DB::beginTransaction();
         try {
 
-            $qoutation = Quotation::find($quotationId);
+            $quotation = Quotation::find($quotationId);
             $so = new So();
             $so->quotation_id = $quotationId;
-            $so->sales_person_id = $qoutation->created_by;
+            $so->sales_person_id = $quotation->created_by;
             $so_number = $request->input('so_number'); // Get the input value
             $so->so_number = 'SO-' . $so_number;    // Concatenate "SO-00" with the input value
             $so->so_date = $request->input('so_date');
@@ -991,16 +992,16 @@ class SalesOrderController extends Controller
             $so->created_at = Carbon::now();
             $so->updated_at = Carbon::now();
             $so->save();
-            $calls = Calls::find($qoutation->calls_id);
+            $calls = Calls::find($quotation->calls_id);
             $calls->status = "Closed";
             $calls->save();
             $closed = new Closed();
             $closed->date = $request->input('so_date');
             $closed->sales_notes = $request->input('notes');
             $closed->call_id = $calls->id;
-            $closed->created_by = $qoutation->created_by;
+            $closed->created_by = $quotation->created_by;
             $closed->dealvalues = $request->input('total_payment');
-            $closed->currency = $qoutation->currency;
+            $closed->currency = $quotation->currency;
             $closed->so_id = $so->id;
             $closed->save();
             // $vins = $request->input('vehicle_vin');
@@ -1139,6 +1140,15 @@ class SalesOrderController extends Controller
                 $solog->so_id = $so->id;
                 $solog->role = Auth::user()->selectedRole;
                 $solog->save();
+
+                // add the file into quotaion files also
+                $quotationFile = new QuotationFile();
+                $quotationFile->quotation_id = $quotation->id;
+                $file = $quotation->file_path;
+                $filename = Str::after($file, 'quotation_files/');
+                $quotationFile->file_name = $filename;
+                $quotationFile->save();
+             
             } else {
                 return redirect()->back()->with('error', 'Failed to create So, vehicle variant required to create so!');
             }
