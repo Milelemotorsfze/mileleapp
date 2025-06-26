@@ -49,20 +49,20 @@ class Vehicles extends Model
 
     ];
     public function dn()
-{
-    return $this->belongsTo(VehicleDn::class, 'dn_id');
-}
+    {
+        return $this->belongsTo(VehicleDn::class, 'dn_id');
+    }
     public function variant()
     {
-        return $this->belongsTo(Varaint::class,'varaints_id');
+        return $this->belongsTo(Varaint::class, 'varaints_id');
     }
     public function interior()
     {
-        return $this->belongsTo(ColorCode::class,'int_colour','id');
+        return $this->belongsTo(ColorCode::class, 'int_colour', 'id');
     }
     public function exterior()
     {
-        return $this->belongsTo(ColorCode::class,'ex_colour','id');
+        return $this->belongsTo(ColorCode::class, 'ex_colour', 'id');
     }
     public function purchasingOrder()
     {
@@ -70,14 +70,18 @@ class Vehicles extends Model
     }
     public function masterModel()
     {
-        return $this->belongsTo(MasterModel::class,'model_id','id');
+        return $this->belongsTo(MasterModel::class, 'model_id', 'id');
     }
     public function vehiclePurchasingCost()
     {
         return $this->hasOne(VehiclePurchasingCost::class, 'vehicles_id');
-    }    
+    }
+        public function purchasingCosts()
+    {
+        return $this->hasMany(VehiclePurchasingCost::class, 'vehicles_id');
+    }
 
-public function latestRemarkSales()
+    public function latestRemarkSales()
     {
         return $this->hasOne(Remarks::class)
             ->where('department', 'sales')
@@ -92,7 +96,7 @@ public function latestRemarkSales()
     }
     public function vehicleDetailApprovalRequests()
     {
-        return $this->hasMany(VehicleApprovalRequests::class,'vehicle_id','id');
+        return $this->hasMany(VehicleApprovalRequests::class, 'vehicle_id', 'id');
     }
     public function so()
     {
@@ -120,11 +124,29 @@ public function latestRemarkSales()
     }
     public function warehouseLocation()
     {
-        return $this->belongsTo(Warehouse::class, 'latest_location','id');
+        return $this->belongsTo(Warehouse::class, 'latest_location', 'id');
     }
     public function woVehicle()
     {
-        return $this->hasOne(WOVehicles::class, 'vehicle_id', 'id');
+        return $this->hasMany(WOVehicles::class, 'vehicle_id', 'id');
+    }
+    public function incidents()
+    {
+        return $this->hasMany(Incident::class, 'vehicle_id');
+    }
+
+    public function pdis()
+    {
+        return $this->hasMany(Pdi::class, 'vehicle_id');
+    }
+
+    public function netsuiteCosts()
+    {
+        return $this->hasMany(VehicleNetsuiteCost::class, 'vehicles_id');
+    }
+    public function purchasedOrderChanges()
+    {
+        return $this->hasMany(PurchasedOrderPriceChanges::class, 'purchasing_order_id', 'purchasing_order_id');
     }
 
     // public function getSimilarVehiclesWithInactiveStockAttribute()

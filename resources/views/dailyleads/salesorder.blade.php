@@ -378,7 +378,7 @@ table.dataTable thead th select {
                   <th>Quotation Date</th>
                   <th>Quotation Value</th>
                   <th>Quotation Notes</th>
-                  <th>View Quotation</th>
+                  <th>View First Quotation</th>
                   <th>SO Update</th>
                   <th>Quotation Versions</th>
                   <th>SO Canacel</th>

@@ -9,4 +9,9 @@ class AgentsCreating extends Model
 {
     use HasFactory;
     protected $table = "agents_creating";
+
+    protected $fillable = [
+        'agents_id',
+        'created_by',
+    ];
 }

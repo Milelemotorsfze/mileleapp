@@ -266,17 +266,21 @@ input[type=number]::-webkit-outer-spin-button
             $highlightRow = $created_by && $created_by->id == Auth::id() ? 'highlight-orange' : '';
         @endphp
                     <tr data-id="{{$calls->id}}" class="{{ $highlightRow }}">
-                <td>
-                    @if ($calls->priority == "High")
-                        <i class="fas fa-circle blink" style="color: red;"> Hot</i>
-                    @elseif ($calls->priority == "Normal")
-                        <i class="fas fa-circle" style="color: green;"> Normal</i>
-                    @elseif ($calls->priority == "Low")
-                        <i class="fas fa-circle" style="color: orange;"> Low</i>
-                    @else
-                        <i class="fas fa-circle" style="color: black;"> Regular</i>
-                    @endif
-                </td>
+                    @php
+                        $priority = strtolower(trim($calls->priority ?? ''));
+                    @endphp
+
+                    <td>
+                        @if ($priority === 'hot' || $priority === 'high')
+                            <i class="fas fa-circle blink" style="color: red;"> Hot</i>
+                        @elseif ($priority === 'normal')
+                            <i class="fas fa-circle" style="color: green;"> Normal</i>
+                        @elseif ($priority === 'low')
+                            <i class="fas fa-circle" style="color: orange;"> Low</i>
+                        @else
+                            <i class="fas fa-circle" style="color: black;"> Regular</i>
+                        @endif
+                    </td>
                     <td>{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
                     <td id="remaining-time-{{ $key }}" data-assign-time="{{ $calls->assign_time }}"></td>
                     <td>{{ $calls->type }}</td>
@@ -2610,7 +2614,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         return data;
     }
         },
-        { data: 'sales_person_name', name: 'sales_person_name' },
+        { data: 'quoted_by_name', name: 'quoted_by_user.name' },
 
       {
         data: 'deal_value',

@@ -17,4 +17,10 @@ class Closed extends Model
         'sales_notes',
     ];
     public $timestamps = false;
+
+    public function call()
+    {
+        return $this->belongsTo(Calls::class, 'call_id');
+    }
+
 }

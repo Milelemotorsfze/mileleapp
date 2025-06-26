@@ -309,7 +309,7 @@
             <div class="col-sm-4">
                 <div class="row">
                     <div class="col-sm-4">
-                        Nature of Deal :
+                        Nature of Deal : <span class="text-danger">*</span></label>
                     </div>
                     <div class="col-sm-6">
                         <div class="form-check form-check-inline">
@@ -374,7 +374,7 @@
                     @if ($hasPermission)
                     <div class="row mt-2">
                     <div class="col-sm-6">
-                        Sales Person :
+                        Sales Person : <span class="text-danger">*</span></label>
                     </div>
                     <div class="col-sm-6">
                     <select id="salespersons" name="salespersons" class="form-select" required>
@@ -397,7 +397,7 @@
                 @endphp
                 <div class="row mt-2">
                     <div class="col-sm-6">
-                        Sales Person :
+                        Sales Person : 
                     </div>
                     <div class="col-sm-6">
                         {{ Auth::user()->name }}
@@ -718,7 +718,7 @@
         <br>
         <div class="card">
             <div class="card-header">
-                <h4>Quotation Items</h4>
+                <h4>Quotation Items<span class="text-danger">*</span></label></h4>
             </div>
             <div class="card-body">
                 <div class="row mt-3">
@@ -1482,10 +1482,10 @@ $(document).ready(function () {
     $('#form-update2_492').submit(function (e) {
         var name = $('#name').val().trim();
         var phone = $('#phone').val().trim();
-    if (name === "" || phone === "") {
-        alert('Name and phone number cannot be blank.');
-        return false;
-    }
+        if (name === "" || phone === "") {
+            alert('Name and phone number cannot be blank.');
+            return false;
+        }
         e.preventDefault();
         var formData = new FormData($(this)[0]);
         $.ajax({
@@ -2591,6 +2591,14 @@ $('#shipping_port').select2();
             resetIndex();
     });
     $('#submit-button').on('click', function(e) {
+
+        const $salesDropdown = $('#salespersons');
+
+        if ($salesDropdown.length && !$salesDropdown.val()) {
+            alert('Please select a salesperson.');
+            e.preventDefault();
+            return false;
+        }
         
         $('.text-danger').hide();
         let hasError = false;
