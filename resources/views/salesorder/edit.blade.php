@@ -584,6 +584,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
 <script>
     let soId = '{{ $so->id }}';
     let QuotaionItemCount = '{{ $soVariants->count() }}';
+    let quotationPriceWithoutVehicles = '{{ $quotationPriceWithoutVehicles }}';
+console.log(quotationPriceWithoutVehicles);
     let isFormValid = 0;
     let variantsData = @json($variants);
     let deletedVariantIds = [];
@@ -1342,7 +1344,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
 
             sum = sum + eachItemTotal;
         });
-        $('#total_payment').val(sum);
+        
+        let totalAmount = sum + parseFloat(quotationPriceWithoutVehicles);
+        $('#total_payment').val(totalAmount);
     }
 
     function updateTotalReceivingPayment() {

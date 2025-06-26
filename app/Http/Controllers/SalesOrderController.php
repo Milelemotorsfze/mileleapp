@@ -272,6 +272,8 @@ class SalesOrderController extends Controller
 
         $saleperson = User::find($quotation->created_by);
         $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first();
+        $quotationPriceWithoutVehicles =  QuotationItem::whereNot("reference_type", 'App\Models\Varaint')
+                ->where('quotation_id', $quotation->id)->sum('total_amount');
 
         foreach ($soVariants as $soVariant) {
             $selectedVehicleIds = $soVariant->so_items->pluck('vehicles_id')->toArray();
@@ -410,7 +412,8 @@ class SalesOrderController extends Controller
             'so',
             'empProfile',
             'saleperson',
-            'soVariants'
+            'soVariants',
+            'quotationPriceWithoutVehicles'
         ));
     }
 
@@ -686,7 +689,7 @@ class SalesOrderController extends Controller
         $so = SO::findOrFail($id);
         $quotation = Quotation::findOrFail($so->quotation_id);
         $call = Calls::findOrFail($quotation->calls_id);
-
+       
         $existingQuotationItemIds = QuotationItem::where('reference_type', 'App\Models\Varaint')->where('quotation_id', $so->quotation_id)->pluck('id')->toArray();
         $latestQuotationItemsExistingIds = SoVariant::where('so_id', $id)->pluck('quotation_item_id')->toArray();
 
@@ -835,6 +838,9 @@ class SalesOrderController extends Controller
             $shippingChargeDistriAmount = 0;
         }
 
+        $quotation->deal_value = $so->total ?? 0;
+        $quotation->save();
+        
         $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
         $multiplecp = MuitlpleAgents::where('quotations_id', $quotation->id)->where('agents_id', '!=', $quotationDetail->agents_id)->get();
@@ -873,6 +879,9 @@ class SalesOrderController extends Controller
         $quotationFile->quotation_id = $quotation->id;
         $quotationFile->file_name = $file;
         $quotationFile->save();
+        info($so->total);
+        info("total");
+      
 
         return $file;
     }
