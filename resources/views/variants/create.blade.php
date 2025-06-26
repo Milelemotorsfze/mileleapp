@@ -116,6 +116,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
                     </select>
                 </div>
             </div>
+            <div class="col-lg-6 col-md-6 col-sm-6">
+                <div class="mb-3">
+                    <label for="model_detail" class="form-label">Model Description <span style="color: red;">*</span></label>
+                    <select class="form-control select2" name="model_detail" id="model_detail">
+                        <option value="">Select a Model</option>
+                    </select>
+                </div>
+            </div>
             <div class="col-lg-2 col-md-6 col-sm-12">
                 <div class="mb-3">
                     <label for="steering" class="form-label">Steering</label>
@@ -279,14 +287,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
                         <option value="Fabric" {{ old('upholstery') == 'Fabric' ? 'selected' : '' }}>Fabric</option>
                         <option value="Vinyl" {{ old('upholstery') == 'Vinyl' ? 'selected' : '' }}>Vinyl</option>
                         <option value="Leather & Fabric" {{ old('upholstery') == 'Leather & Fabric' ? 'selected' : '' }}>Leather & Fabric</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-lg-12 col-md-12 col-sm-12">
-                <div class="mb-3">
-                    <label for="model_detail" class="form-label">Model Description <span style="color: red;">*</span></label>
-                    <select class="form-control select2" name="model_detail" id="model_detail">
-                        <option value="">Select a Model</option>
                     </select>
                 </div>
             </div>
