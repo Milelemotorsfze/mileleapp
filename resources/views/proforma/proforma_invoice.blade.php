@@ -633,13 +633,8 @@
                         Advance Paid:
                     </td>
                     <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px;">
-                        @php
-                            $advancePaid = $quotationDetail->advance_amount;
-                            if (isset($so) && !empty($so) && !empty($so->paidinso)) {
-                                $advancePaid = $so->receiving;
-                            }
-                        @endphp
-                        {{ $quotation->currency ." ". number_format($advancePaid, 2) }}
+                       
+                        {{ $quotation->currency ." ". number_format($quotationDetail->advance_amount, 2) }}
                     </td>
                 </tr>
                 <tr>
@@ -647,14 +642,8 @@
                         Remaining Amount({{ $quotation->currency }}):
                     </td>
                     <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px;">
-                        @php
-                            $advancePaid = $quotationDetail->advance_amount;
-                            if (isset($so) && !empty($so) && !empty($so->paidinso)) {
-                                $advancePaid = $so->receiving;
-                            }
-                            $advanceAmount = ((isset($so) && !empty($so->total)) ? $so->total : $quotation->deal_value) - $advancePaid;
-                        @endphp
-                        {{ $quotation->currency ." ". number_format($advanceAmount) }}
+                       
+                        {{ $quotation->currency ." ". number_format($quotation->deal_value - $quotationDetail->advance_amount) }}
                     </td>
                 </tr>
                 @if($quotation->currency != 'AED' && $quotation->shippingDocument == 'EXW')
@@ -663,17 +652,11 @@
                         Remaining Amount(AED):
                     </td>
                     <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px;">
-                        @php
-                            $advancePaid = $quotationDetail->advance_amount;
-                            if (isset($so) && !empty($so) && !empty($so->paidinso)) {
-                                $advancePaid = $so->receiving;
-                            }
-                            $advanceAmount = ((isset($so) && !empty($so->total)) ? $so->total : $quotation->deal_value) - $advancePaid;
-                        @endphp
+                      
                         @if($quotation->currency == 'USD')
-                        {{ $quotation->currency ." ". number_format($advanceAmount * $aed_to_usd_rate->value, 2) }}
+                        {{ $quotation->currency ." ". number_format(($quotation->deal_value - $quotationDetail->advance_amount)  * $aed_to_usd_rate->value, 2) }}
                         @elseif($quotation->currency == 'EUR')
-                        {{ $quotation->currency ." ". number_format($advanceAmount * $aed_to_eru_rate->value, 2) }}
+                        {{ $quotation->currency ." ". number_format(($quotation->deal_value - $quotationDetail->advance_amount)  * $aed_to_eru_rate->value, 2) }}
                         @endif
                     </td>
                 </tr>
@@ -699,13 +682,7 @@
                     <tr>
                         <td colspan="4">Deposit</td>
                         <td> 
-                            @php
-                                $advancePaid = $quotationDetail->advance_amount;
-                                if (isset($so) && !empty($so) && !empty($so->paidinso)) {
-                                    $advancePaid = $so->receiving;
-                                }
-                            @endphp
-                            {{ $quotation->currency ." ". number_format($advancePaid, 2) }}
+                            {{ $quotation->currency ." ". number_format($quotationDetail->advance_amount, 2) }}
                         </td>
                     </tr>
                     </table>
