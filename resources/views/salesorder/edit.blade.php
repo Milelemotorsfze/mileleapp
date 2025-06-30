@@ -479,7 +479,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                             </div>
 
                             <div class="col-lg-4 col-md-6 col-sm-12">
-                                <label for="advance_payment_performa"><strong>Payment In Performa</strong></label>
+                                <label for="advance_payment_performa"><strong>Advance Payment In Performa</strong></label>
                                 <input type="number" class="form-control payment" id="advance_payment_performa" name="advance_payment_performa" value="{{$so->paidinperforma}}" min="0">
                             </div>
 

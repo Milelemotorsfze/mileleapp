@@ -426,7 +426,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                 <input type="number" class="form-control" id="receiving_payment" name="receiving_payment" value="" readonly>
             </div>
             <div class="col-md-2 mb-3">
-                <label for="advance_payment_performa">Payment In Performa</label>
+                <label for="advance_payment_performa">Advance Payment In Performa</label>
                 <input type="number" class="form-control payment" id="advance_payment_performa" name="advance_payment_performa" value="{{$quotation->quotationdetails->advance_amount}}" readonly>
             </div>
             <div class="col-md-2 mb-3">
