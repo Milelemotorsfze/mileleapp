@@ -1494,7 +1494,7 @@ public function simplefile()
         $useractivities->activity = "Export Simple File for Bulk Leads";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-    $filePath = storage_path('app/calls.xlsx'); // Path to the Excel file
+        $filePath = storage_path('app/calls.xlsx'); // Path to the Excel file
 
     if (file_exists($filePath)) {
         // Generate a response with appropriate headers
@@ -1506,6 +1506,22 @@ public function simplefile()
         return redirect()->back()->with('error', 'The requested file does not exist.');
     }
 }
+public function bulkLeadsExcelDataUplaod()
+    {
+        $useractivities =  New UserActivities();
+            $useractivities->activity = "Export Simple File for Bulk Leads";
+            $useractivities->users_id = Auth::id();
+            $useractivities->save();
+            $filePath = public_path('storage/calls.xlsx');
+
+        if (file_exists($filePath)) {
+            return Response::download($filePath, 'calls.xlsx', [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]);
+        } else {
+            return redirect()->back()->with('error', 'The requested file does not exist.');
+        }
+    }
 public function varinatinfo()
 {
     $useractivities =  New UserActivities();
