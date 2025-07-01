@@ -1034,7 +1034,7 @@ public function uploadingbulk(Request $request)
         $sheet = $spreadsheet->getActiveSheet();
         $headers = [
             'Name', 'Phone', 'Email', 'Location', 'Sales Person', 'Source Name', 'Language',
-             'Brand', 'Model Line Name', 'Custom Brand Model', 'Remarks', 'Strategies', 'Priority','Error Description'
+             'Brand', 'Model Line Name', 'Custom Brand Model', 'Strategies', 'Priority', 'Error Description'
         ];
         $sheet->fromArray($headers, null, 'A1');
 
