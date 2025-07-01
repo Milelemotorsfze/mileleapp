@@ -381,7 +381,7 @@ table.dataTable thead th select {
                   <th>View First Quotation</th>
                   <th>SO Update</th>
                   <th>Quotation Versions</th>
-                  <th>SO Canacel</th>
+                  <th>SO Cancel</th>
                  
                 </tr>
                 <tr>
