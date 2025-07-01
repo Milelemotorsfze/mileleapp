@@ -49,7 +49,7 @@
             @foreach ($modelLineMasters as $modelLineMaster)
         @php
             $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
-            $brand_name = $brand->brand_name;
+            $brand_name = $brand ? $brand->brand_name : 'Unknown Brand';
         @endphp 
         <option value="{{ $modelLineMaster->model_line }}" data-value="{{ $modelLineMaster->id }}">{{ $brand_name }} / {{ $modelLineMaster->model_line }}</option>
     @endforeach
@@ -125,6 +125,26 @@ $(document).ready(function () {
   $('#location').select2();
   $('#language').select2();
   $('#source').select2();
+
+  let today = new Date().toISOString().split('T')[0];
+    $('#fromDate, #toDate').attr('max', today);
+
+    $('form').on('submit', function (e) {
+        const from = $('#fromDate').val();
+        const to = $('#toDate').val();
+
+        if (!from || !to) {
+            e.preventDefault();
+            alert('Both From and To dates are required.');
+            return;
+        }
+
+        if (from > to) {
+            e.preventDefault();
+            alert('From date must be less than or equal to To date.');
+            return;
+        }
+    });
 });
 </script>
 @endpush
