@@ -646,7 +646,7 @@ Route::get('/d', function () {
     Route::get('customers/repeatedcustomers', [Repeatedcustomers::class, 'repeatedcustomers'])->name('repeatedcustomers');
     Route::put('/strategy-updates/{id}', [StrategyController::class, 'updaters'])->name('strategy.updaters');
     Route::post('/update-priority', [StrategyController::class, 'updatePriority'])->name('strategy.updatePriority');
-    Route::get('/simplefile', [CallsController::class,'simplefile'])->name('calls.simplefile');
+    Route::get('/bulkLeadsExcelDataUplaod', [CallsController::class,'bulkLeadsExcelDataUplaod'])->name('calls.bulkLeadsExcelDataUplaod');
     Route::post('/calls/removerow', [CallsController::class, 'removeRow'])->name('calls.removerow');
     Route::post('/calls/updaterow', [CallsController::class, 'updaterow'])->name('calls.updaterow');
     Route::post('/calls/updatehol', [CallsController::class, 'updatehol'])->name('calls.updatehol');

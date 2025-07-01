@@ -54,6 +54,9 @@
         appearance: none;
         margin: 0;
     }
+    .remarks-single-div-container{
+        text-align: left !important;
+    }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')
@@ -256,7 +259,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                     @foreach ($modelLineMasters as $modelLineMaster)
                                         @php
                                             $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
-                                            $combined = $brand->brand_name . ' / ' . $modelLineMaster->model_line;
+                                            $combined      = $brand ? $brand->brand_name . ' / ' . $modelLineMaster->model_line : 'Unknown Brand / ' . $modelLineMaster->model_line;
                                         @endphp
                                         <option value="{{ $modelLineMaster->id }}" {{ $id == $modelLineMaster->id ? 'selected' : '' }}>
                                             {{ $combined }}
@@ -284,7 +287,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                     @foreach ($modelLineMasters as $modelLineMaster)
                                         @php
                                             $loopBrand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
-                                            $combinedName = $loopBrand->brand_name . ' / ' . $modelLineMaster->model_line;
+                                            $brandName = $loopBrand && $loopBrand->brand_name ? $loopBrand->brand_name : 'Unknown Brand';
+                                            $combinedName = $brandName . ' / ' . $modelLineMaster->model_line;
                                             $isSelected = ($modelLineMaster->id == $model_line_idssss->model_line_id) ? 'selected' : '';
                                         @endphp
                                         <option value="{{ $modelLineMaster->id }}" {{ $isSelected }}>
@@ -312,8 +316,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             @foreach ($modelLineMasters as $modelLineMaster)
                                 @php
                                     $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
+                                    $brandName = $brand && $brand->brand_name ? $brand->brand_name : 'Unknown Brand';
                                 @endphp
-                                <option value="{{ $modelLineMaster->id }}">{{ $brand->brand_name }} / {{ $modelLineMaster->model_line }}</option>
+                                <option value="{{ $modelLineMaster->id }}">{{ $brandName }} / {{ $modelLineMaster->model_line }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -339,10 +344,125 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <input type="text" placeholder="Custom Brand Model" name="custom_brand_model" class="form-control" value="{{ old('custom_brand_model', $calls->custom_brand_model) }}">
             </div>
 
-            <div class="col-lg-12 col-md-12 mt-3">
+            <!-- <div class="col-lg-12 col-md-12 mt-3">
                 <label for="basicpill-firstname-input" class="form-label">Remarks : </label>
                 <textarea name="remarks" id="summernote">{{ old('remarks', $calls->remarks) }}</textarea>
+            </div> -->
+
+
+            <div class="col-lg-12 col-md-12 mt-3">
+                <label class="form-label"><strong>Lead Summary - Qualification Notes:</strong></label>
+                <div class="row">
+                    @php
+                        $parsedRemarks = [];
+                        $rawRemarks = old('remarks', $calls->remarks ?? '');
+
+                        if (strpos($rawRemarks, '###SEP###') !== false) {
+                            $lines = explode('###SEP###', $rawRemarks);
+
+                            foreach ($lines as $line) {
+                                $line = trim($line);
+                                $line = preg_replace('/^\d+\.\s*/', '', $line);
+
+                                foreach ([
+                                    'Car Interested In',
+                                    'Purpose of Purchase',
+                                    'End User',
+                                    'Destination Country',
+                                    'Planned Units',
+                                    'Experience with UAE Sourcing',
+                                    'Shipping Assistance Required',
+                                    'Payment Method',
+                                    'Previous Purchase History',
+                                    'Purchase Timeline',
+                                    'General Remark / Additional Notes',
+                                ] as $label) {
+                                    if (Str::startsWith($line, "$label:")) {
+                                        $parsedRemarks[$label] = trim(Str::replaceFirst("$label:", '', $line));
+                                        break;
+                                    }
+                                }
+                            }
+                        } else {
+                            if (Str::startsWith($rawRemarks, 'General Remark / Additional Notes:')) {
+                                $parsedRemarks['General Remark / Additional Notes'] = trim(Str::replaceFirst('General Remark / Additional Notes:', '', $rawRemarks));
+                            }
+                        }
+                    @endphp
+
+                    <div class="col-lg-4 col-md-6 col-sm-12 remarks-single-div-container">
+                        <label>Car Interested In:</label>
+                        <input type="text" name="car_model" class="form-control mb-3" id="car_model" placeholder="Interested car model"
+                            value="{{ old('car_model', $parsedRemarks['Car Interested In'] ?? '') }}">
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12 remarks-single-div-container">
+                        <label>Purpose of Purchase:</label>
+                        <input type="text" name="purchase_purpose" class="form-control mb-3" id="purchase_purpose" placeholder="Purpose of Purchasing"
+                            value="{{ old('purchase_purpose', $parsedRemarks['Purpose of Purchase'] ?? '') }}">
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12 remarks-single-div-container">
+                        <label>End User:</label>
+                        <select class="form-control mb-3" name="end_user" id="end_user">
+                            <option value="">Select</option>
+                            <option value="Yes" {{ strtolower(old('end_user', $parsedRemarks['End User'] ?? '')) == 'yes' ? 'selected' : '' }}>Yes</option>
+                            <option value="No" {{ strtolower(old('end_user', $parsedRemarks['End User'] ?? '')) == 'no' ? 'selected' : '' }}>No</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12 remarks-single-div-container">
+                        <label for="destination_country" class="form-label">Destination Country:</label>
+                        <select class="form-control mb-3 select2" name="destination_country" id="destination_country" multiple>
+                            @foreach ($countries as $country)
+                                <option value="{{ $country }}"
+                                    {{ in_array($country, (array) old('destination_country', [$parsedRemarks['Destination Country'] ?? ''])) ? 'selected' : '' }}>
+                                    {{ $country }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12 remarks-single-div-container">
+                        <label>Planned Units:</label>
+                        <input type="text" name="planned_units" class="form-control mb-3" id="planned_units" placeholder="Planned Units"
+                            value="{{ old('planned_units', $parsedRemarks['Planned Units'] ?? '') }}">
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12 remarks-single-div-container">
+                        <label>Experience with UAE Sourcing:</label>
+                         <select class="form-control mb-3" name="source_experience" id="source_experience">
+                            <option value="">Select Value</option>
+                            <option value="Yes" {{ strtolower(old('source_experience', $parsedRemarks['Experience with UAE Sourcing'] ?? '')) == 'yes' ? 'selected' : '' }}>Yes</option>
+                            <option value="No" {{ strtolower(old('source_experience', $parsedRemarks['Experience with UAE Sourcing'] ?? '')) == 'no' ? 'selected' : '' }}>No</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12 remarks-single-div-container">
+                        <label>Shipping Assistance Required:</label>
+                        <select class="form-control mb-3" name="shipping_required" id="shipping_required">
+                            <option value="">Select</option>
+                            <option value="Yes" {{ strtolower(old('shipping_required', $parsedRemarks['Shipping Assistance Required'] ?? '')) == 'yes' ? 'selected' : '' }}>Yes</option>
+                            <option value="No" {{ strtolower(old('shipping_required', $parsedRemarks['Shipping Assistance Required'] ?? '')) == 'no' ? 'selected' : '' }}>No</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12 remarks-single-div-container">
+                        <label>Payment Method:</label>
+                        <input type="text" name="payment_method" class="form-control mb-3" id="payment_method" placeholder="Payment Method" value="{{ old('payment_method', $parsedRemarks['Payment Method'] ?? '') }}">
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12 remarks-single-div-container">
+                        <label>Previous Purchase History:</label>
+                        <input type="text" name="prev_purchase_history" class="form-control mb-3" id="prev_purchase_history" placeholder="Previous Purchase History" value="{{ old('prev_purchase_history', $parsedRemarks['Previous Purchase History'] ?? '') }}">
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12 remarks-single-div-container">
+                        <label>Purchase Timeline:</label>
+                        <input type="text" name="purchase_timeline" class="form-control mb-3" id="purchase_timeline" placeholder="Purchase Timeline" value="{{ old('purchase_timeline', $parsedRemarks['Purchase Timeline'] ?? '') }}">
+                    </div>
+                    <div class="col-md-12 remarks-single-div-container">
+                        <label>General Remark / Additional Notes:</label>
+                        <textarea class="form-control" name="general_remark" id="general_remark" placeholder="Additional Extra Remarks/Notes">{{ old('general_remark', $parsedRemarks['General Remark / Additional Notes'] ?? '') }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Hidden field to compile structured remarks before submit -->
+                <input type="hidden" name="remarks" id="compiled_remarks">
             </div>
+
+
         </div>
 
         </br>
@@ -368,46 +488,46 @@ redirect()->route('home')->send();
 
 
 <script>
-$(document).ready(function() {
-    $('#summernote').summernote({
-        height: 300,
-        toolbar: [
-            ['style', ['bold', 'italic', 'underline', 'clear']],
-            ['font', ['strikethrough', 'superscript', 'subscript']],
-            ['fontsize', ['fontsize']],
-            ['color', ['color']],
-            ['para', ['ul', 'ol', 'paragraph']],
-            ['insert', ['picture', 'link', 'video']],
-            ['view', ['fullscreen', 'codeview', 'help']]
-        ],
-        callbacks: {
-            onImageUpload: function(files) {
-                uploadImage(files[0]);
-            }
-        }
-    });
-
-    function uploadImage(file) {
-        let data = new FormData();
-        data.append("file", file);
-        data.append("_token", "{{ csrf_token() }}");
-
-        $.ajax({
-            url: "{{ route('summernote.upload') }}",
-            method: "POST",
-            data: data,
-            contentType: false,
-            processData: false,
-            success: function(url) {
-                $('#summernote').summernote('insertImage', url);
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                alert("Image upload failed.");
-                console.error(textStatus + " " + errorThrown);
+    $(document).ready(function() {
+            $('#summernote').summernote({
+            height: 300,
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['font', ['strikethrough', 'superscript', 'subscript']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['insert', ['picture', 'link', 'video']],
+                ['view', ['fullscreen', 'codeview', 'help']]
+            ],
+            callbacks: {
+                onImageUpload: function(files) {
+                    uploadImage(files[0]);
+                }
             }
         });
-    }
-});
+
+        function uploadImage(file) {
+            let data = new FormData();
+            data.append("file", file);
+            data.append("_token", "{{ csrf_token() }}");
+
+            $.ajax({
+                url: "{{ route('summernote.upload') }}",
+                method: "POST",
+                data: data,
+                contentType: false,
+                processData: false,
+                success: function(url) {
+                    $('#summernote').summernote('insertImage', url);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Image upload failed.");
+                    console.error(textStatus + " " + errorThrown);
+                }
+            });
+        }
+    });
 
 </script>
 
@@ -492,7 +612,7 @@ $(document).ready(function() {
                     @foreach ($modelLineMasters as $modelLineMaster)
                         @php
                             $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
-                            $combinedValue = $brand->brand_name . ' / ' . $modelLineMaster->model_line;
+                            $combinedValue = $brand ? $brand->brand_name . ' / ' . $modelLineMaster->model_line : 'Unknown Brand / ' . $modelLineMaster->model_line;
                         @endphp
                         select.append('<option value="{{ $modelLineMaster->id }}">{{ $combinedValue }}</option>');
                     @endforeach
@@ -742,6 +862,49 @@ $(document).ready(function() {
     });
   });
 </script>
+
+<script>
+    $(document).ready(function () {
+        $('#calls').on('submit', function () {
+            const SEP = '###SEP###';
+            let lines = [];
+
+            const model = $('#car_model').val();
+            const purpose = $('#purchase_purpose').val();
+            const endUser = $('#end_user').val();
+            const destinationCountries = $('#destination_country').val() || [];
+            const plannedUnits = $('#planned_units').val();
+            const experience = $('#source_experience').val();
+            const shipping = $('#shipping_required').val();
+            const paymentMethod = $('#payment_method').val();
+            const prevPurchaseHistory = $('#prev_purchase_history').val();
+            const purchaseTimeline = $('#purchase_timeline').val();
+            const general = $('#general_remark').val();
+
+            if (model || purpose || endUser || destinationCountries.length || plannedUnits || experience || shipping || paymentMethod || prevPurchaseHistory || purchaseTimeline) {
+                lines.push('Lead Summary - Qualification Notes:');
+                if (model) lines.push(`1. Car Interested In: ${model}`);
+                if (purpose) lines.push(`2. Purpose of Purchase: ${purpose}`);
+                if (endUser) lines.push(`3. End User: ${endUser}`);
+                if (destinationCountries.length) lines.push(`4. Destination Country: ${destinationCountries.join(', ')}`);
+                if (plannedUnits) lines.push(`5. Planned Units: ${plannedUnits}`);
+                if (experience) lines.push(`6. Experience with UAE Sourcing: ${experience}`);
+                if (shipping) lines.push(`7. Shipping Assistance Required: ${shipping}`);
+                if (paymentMethod) lines.push(`8. Payment Method: ${paymentMethod}`);
+                if (prevPurchaseHistory) lines.push(`9. Previous Purchase History: ${prevPurchaseHistory}`);
+                if (purchaseTimeline) lines.push(`10. Purchase Timeline: ${purchaseTimeline}`);
+            }
+
+            if (general && general.trim() !== '') {
+                lines.push(`General Remark / Additional Notes: ${general}`);
+            }
+
+            $('#compiled_remarks').val(lines.join(SEP));
+        });
+    });
+</script>
+
+
 
 <script>
     $(document).ready(function () {

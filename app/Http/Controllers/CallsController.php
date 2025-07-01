@@ -933,9 +933,9 @@ public function uploadingbulk(Request $request)
         $brand = $row[7];
         $model_line_name = $row[8];
         $custom_brand_model = $row[9];
-        $remarks = $row[10];
-        $strategies = $row[11];
-        $priority = strtolower(trim($row[12]));
+        // $remarks = $row[10];
+        $strategies = $row[10];
+        $priority = strtolower(trim($row[11]));
 
         $cleanPhone = preg_replace('/[\s\-]/', '', $rawPhone); 
         
@@ -1070,9 +1070,41 @@ public function uploadingbulk(Request $request)
             $brand =  $row[7];
             $model_line_name = $row[8];
             $custom_brand_model = $row[9];
-            $remarks = $row[10];
-            $strategies = $row[11];
-            $priority = strtolower(trim($row[12]));
+            $strategies = $row[10];
+            $priority = strtolower(trim($row[11]));
+            $carInterested = trim($row[12]);
+            $purchasePurpose = trim($row[13]);
+            $endUser = trim($row[14]);
+            $destinationCountry = trim($row[15]);
+            $plannedUnits = trim($row[16]);
+            $experience = trim($row[17]);
+            $shipping = trim($row[18]);
+            $paymentMethod = trim($row[19]);
+            $prevPurchase = trim($row[20]);
+            $timeline = trim($row[21]);
+            $additionalNotes = trim($row[22]);
+
+            $remarksArray = [];
+
+            if ($carInterested || $purchasePurpose || $endUser || $destinationCountry || $plannedUnits || $experience || $shipping || $paymentMethod || $prevPurchase || $timeline) {
+                $remarksArray[] = 'Lead Summary - Qualification Notes:';
+                if ($carInterested) $remarksArray[] = "1. Car Interested In: $carInterested";
+                if ($purchasePurpose) $remarksArray[] = "2. Purpose of Purchase: $purchasePurpose";
+                if ($endUser) $remarksArray[] = "3. End User: $endUser";
+                if ($destinationCountry) $remarksArray[] = "4. Destination Country: $destinationCountry";
+                if ($plannedUnits) $remarksArray[] = "5. Planned Units: $plannedUnits";
+                if ($experience) $remarksArray[] = "6. Experience with UAE Sourcing: $experience";
+                if ($shipping) $remarksArray[] = "7. Shipping Assistance Required: $shipping";
+                if ($paymentMethod) $remarksArray[] = "8. Payment Method: $paymentMethod";
+                if ($prevPurchase) $remarksArray[] = "9. Previous Purchase History: $prevPurchase";
+                if ($timeline) $remarksArray[] = "10. Purchase Timeline: $timeline";
+            }
+            if ($additionalNotes) {
+                $remarksArray[] = "General Remark / Additional Notes: $additionalNotes";
+            }
+
+            $remarksData = implode('###SEP###', $remarksArray);
+
             $errorDescription = '';
             if ($sales_person == null) {
                 $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
@@ -1328,7 +1360,7 @@ public function uploadingbulk(Request $request)
                 $call->email = !empty(trim($row[2])) ? trim($row[2]) : null;
                 $call->assign_time = Carbon::now();
                 $call->custom_brand_model = $row[9];
-                $call->remarks = $row[10];
+                $call->remarks = $remarksData;
                 $call->source = $lead_source_id;
                 $call->strategies_id = $strategies_id;
                 $call->priority = $priority;
@@ -1462,7 +1494,7 @@ public function simplefile()
         $useractivities->activity = "Export Simple File for Bulk Leads";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-    $filePath = storage_path('app/calls.xlsx'); // Path to the Excel file
+        $filePath = storage_path('app/calls.xlsx'); // Path to the Excel file
 
     if (file_exists($filePath)) {
         // Generate a response with appropriate headers
@@ -1474,6 +1506,22 @@ public function simplefile()
         return redirect()->back()->with('error', 'The requested file does not exist.');
     }
 }
+public function bulkLeadsExcelDataUplaod()
+    {
+        $useractivities =  New UserActivities();
+            $useractivities->activity = "Export Simple File for Bulk Leads";
+            $useractivities->users_id = Auth::id();
+            $useractivities->save();
+            $filePath = public_path('storage/calls.xlsx');
+
+        if (file_exists($filePath)) {
+            return Response::download($filePath, 'calls.xlsx', [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]);
+        } else {
+            return redirect()->back()->with('error', 'The requested file does not exist.');
+        }
+    }
 public function varinatinfo()
 {
     $useractivities =  New UserActivities();
