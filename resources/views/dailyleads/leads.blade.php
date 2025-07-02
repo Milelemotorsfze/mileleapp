@@ -751,21 +751,42 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                             <div class="col-md-6 col-sm-12 mb-3">
                                 <div class="card">
                                     <div class="card-body">
-                                        <h5 class="text-center">Remarks</h5>
-                                        </br>
-                                        @php
-                                            $text = $lead->remarks;
-                                            $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
-                                        @endphp
+    <h5 class="text-center">Remarks</h5>
+    <br>
 
-                                        <div class="rich-text-content">
-                                            @if (!empty(trim(strip_tags($remarks))))
-                                                {!! $remarks !!}
-                                            @else
-                                                <p class="text-muted">No remarks.</p>
-                                            @endif
-                                        </div>
-                                    </div>
+    @php
+    $text = $lead->remarks ?? '';
+    $cleanText = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
+    $hasContent = trim(strip_tags($cleanText)) ? true : false;
+@endphp
+
+<div class="rich-text-content">
+    @if ($hasContent)
+        @php
+            $formatted = str_replace('###SEP###', '<br>', $cleanText);
+
+            // Bold numbered labels
+            $formatted = preg_replace(
+                '/(\d+\.\s*[^:\n]+):/',
+                '<strong>$1:</strong>',
+                $formatted
+            );
+
+            // Bold unnumbered labels (like general remarks or headers)
+            $formatted = preg_replace(
+                '/(^|\n)([^:\n]+):/',
+                '$1<strong>$2:</strong>',
+                $formatted
+            );
+        @endphp
+        {!! nl2br($formatted) !!}
+    @else
+        <p class="text-muted">No remarks.</p>
+    @endif
+</div>
+
+</div>
+
                                 </div>
                             </div>
                     </div>
