@@ -80,6 +80,7 @@ class SalesOrderController extends Controller
                         $query->where('so.status', '!=', 'Cancelled')
                             ->orWhereNull('so.status');
                     })
+                    ->whereNull('so.deleted_at')
                     ->groupBy('so.id');
 
                 if (!$hasPermission) {
