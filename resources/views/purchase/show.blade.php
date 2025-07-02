@@ -1772,7 +1772,6 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                         @if ($hasPermission)
                             <a href="#" class="btn btn-sm btn-primary float-end edit-btn me-2">Edit</a>
                             <a href="#" class="btn btn-sm btn-success float-end update-btn me-2" style="display: none;">Update</a>
-                            <a href="#" class="btn btn-sm btn-primary float-end import-btn me-2" style="display: none;">Import CSV</a>
                         @endif
                         @php
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-po-price');
@@ -1845,6 +1844,21 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                             <tbody>
                             @foreach($vehicles as $vehicles)
                                 <tr>
+{{--                                @php--}}
+{{--                            $variant = DB::table('varaints')->where('id', $vehicles->varaints_id)->first();--}}
+{{--                            $name = $variant->name;--}}
+{{--                            $exColour = $vehicles->ex_colour ? DB::table('color_codes')->where('id', $vehicles->ex_colour)->first() : null;--}}
+{{--                            $ex_colours = $exColour ? $exColour->name : null;--}}
+{{--                            $intColour = $vehicles->int_colour ? DB::table('color_codes')->where('id', $vehicles->int_colour)->first() : null;--}}
+{{--                            $int_colours = $intColour ? $intColour->name : null;--}}
+{{--                            $detail = $variant->detail;--}}
+{{--                            $brands_id = $variant->brands_id;--}}
+{{--                            $master_model_lines_id = $variant->master_model_lines_id;--}}
+{{--                            $brand = DB::table('brands')->where('id', $brands_id)->first();--}}
+{{--                            $brand_names = $brand->brand_name;--}}
+{{--                            $master_model_lines_ids = DB::table('master_model_lines')->where('id', $master_model_lines_id)->first();--}}
+{{--                            $model_line = $master_model_lines_ids->model_line;--}}
+{{--                            @endphp--}}
                             <td>{{ $vehicles->id }}</td>
                             @can('view-vehicle-model-sfx')
                                 @php
@@ -3179,13 +3193,11 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
         <script>
             const editableFields = document.querySelectorAll('.editable-field');
             const editBtn = document.querySelector('.edit-btn');
-            const importBtn = document.querySelector('.import-btn');
             const updateBtn = document.querySelector('.update-btn');
-            if (editBtn && updateBtn && importBtn) {
+            if (editBtn && updateBtn) {
             editBtn.addEventListener('click', () => {
                 editBtn.style.display = 'none';
                 updateBtn.style.display = 'block';
-                importBtn.style.display = 'block';
                 editableFields.forEach(field => {
                     field.contentEditable = true;
                     field.classList.add('editing');
@@ -3227,7 +3239,6 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
             return;
         } else {
             updateBtn.style.display = 'none';
-            importBtn.style.display = 'none';
             editBtn.style.display = 'block';
             editableFields.forEach(field => {
                 field.contentEditable = false;
@@ -5666,112 +5677,5 @@ $.ajax({
     
 
 </script>
-<!-- Import CSV Modal for vehicles details-->
-<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <form id="importForm" enctype="multipart/form-data">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="importModalLabel">Import CSV</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <input type="file" name="import_file" class="form-control" accept=".csv" required>
-          <input type="hidden" name="po_number" id="po_number" value="{{ $purchasingOrder->po_number }}">
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Upload</button>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
-<script>
-$(document).ready(function() {
-    $('.import-btn').on('click', function(e) {
-        e.preventDefault();
-        $('#importModal').modal('show');
-    });
-
-    $('#importForm').on('submit', function(e) {
-        e.preventDefault();
-        var formData = new FormData(this);
-        formData.set('po_number', $('#po_number').val());
-        $.ajax({
-            url: '/import-csv-file',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(response) {
-                $('#importModal').modal('hide');
-                console.log(response.vehiclesData);
-                if (response.vehiclesData && Array.isArray(response.vehiclesData)) {
-                    response.vehiclesData.forEach(function(vehicle) {
-                        $('#dtBasicExample1 tbody tr').each(function() {
-                            var $row = $(this);
-                            // Find the cell with the variant
-                            var variantCell = $row.find('td').filter(function() {
-                                return $(this).text().trim().toLowerCase() === (vehicle.variant || '').trim().toLowerCase();
-                            });
-                            if (variantCell.length > 0) {
-                                $row.find('.vin').text(vehicle.vin);
-                                $row.find('.engine').text(vehicle.engine);
-                                // Update Exterior Color (if select)
-                                if (vehicle.ex_colour) {
-                                    var $exSelect = $row.find('.ex_colour select');
-                                    var exVal = '';
-                                    var csvColor = vehicle.ex_colour.trim().toLowerCase().replace(/\s+/g, '');
-                                    $exSelect.find('option').each(function() {
-                                        var optionText = $(this).text().trim().toLowerCase().replace(/\s+/g, '');
-                                        if (optionText === csvColor) {
-                                            exVal = $(this).val();
-                                        }
-                                    });
-                                    if (exVal) {
-                                        $exSelect.val(exVal).trigger('change');
-                                    } else {
-                                        // Debug: log what was not matched
-                                        console.log('No match for exterior color:', vehicle.ex_colour, 'in', $exSelect.html());
-                                    }
-                                }
-                                // Update Interior Color (if select)
-                                if (vehicle.int_colour) {
-                                    var $intSelect = $row.find('.int_colour select');
-                                    var intVal = '';
-                                    $intSelect.find('option').each(function() {
-                                        if ($(this).text().trim().toLowerCase() === vehicle.int_colour.trim().toLowerCase()) {
-                                            intVal = $(this).val();
-                                        }
-                                    });
-                                    if (intVal) {
-                                        $intSelect.val(intVal).trigger('change');
-                                    }
-                                }
-                                // Update Production Month
-                                var $prodInput = $row.find('.ppmmyyy input[type="date"]');
-                                if ($prodInput.length > 0) {
-                                    $prodInput.val(vehicle.prod_month);
-                                } else {
-                                    $row.find('.ppmmyyy').text(vehicle.prod_month);
-                                }
-                            }
-                        });
-                    });
-                }
-            },
-            error: function(xhr) {
-                let msg = 'Import failed.';
-                if(xhr.responseJSON && xhr.responseJSON.message) {
-                    msg = xhr.responseJSON.message;
-                }
-                alert(msg);
-            }
-        });
-    });
-});
-</script>
 @endsection
+

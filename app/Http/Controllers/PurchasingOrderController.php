@@ -1049,7 +1049,6 @@ class PurchasingOrderController extends Controller
         $purchasingOrder->save();
         $purchasingOrderId = $purchasingOrder->id;
         $variantNames = $request->input('variant_id');
-        $variantsQuantity = null;
         if ($variantNames != null) {
             $variantIds = Varaint::whereIn('name', $variantNames)->pluck('id')->all();
             $variantsQuantity = array_count_values($variantNames);
@@ -1249,6 +1248,7 @@ class PurchasingOrderController extends Controller
      */
     public function show($id)
     {
+
         $user = Auth::user();
         if (!$user->hasPermissionForSelectedRole('view-purchased-order-single-page')) {
             return redirect()->route('not_access_page');
@@ -1468,87 +1468,6 @@ class PurchasingOrderController extends Controller
             'purchaseOrders'
         ));
     }
-
-    public function importCsvFile(Request $request)
-    {
-        $request->validate([
-            'import_file' => 'required|file|mimes:csv,txt',
-            'po_number' => 'required|string',
-        ]);
-
-        $file = $request->file('import_file');
-        $poNumber = trim($request->input('po_number'));
-        $filtered = [];
-        $header = null;
-        $poIndex = null;
-
-        if (($handle = fopen($file->getRealPath(), 'r')) !== false) {
-            try {
-                while (($row = fgetcsv($handle, 0, ',')) !== false) {
-                    if (!$header) {
-                        $header = array_map('trim', $row);
-                        // Find the PO column index
-                        $poIndex = null;
-                        foreach ($header as $idx => $col) {
-                            if (strtolower($col) === 'po') {
-                                $poIndex = $idx;
-                                break;
-                            }
-                        }
-                        if ($poIndex === null) {
-                            fclose($handle);
-                            return response()->json(['message' => 'PO column not found in CSV.'], 422);
-                        }
-                        continue;
-                    }
-                    if (count($row) !== count($header)) {
-                        continue;
-                    }
-                    if (isset($row[$poIndex]) && trim($row[$poIndex]) === $poNumber) {
-                        $filtered[] = array_combine($header, $row);
-                    }
-                }
-            } finally {
-                fclose($handle);
-            }
-        } else {
-            return response()->json(['message' => 'Unable to open uploaded file.'], 500);
-        }
-
-        // Map CSV columns to a structure for frontend
-        $vehiclesData = collect($filtered)->map(function($row) {
-            // Extract exterior and interior color from 'color' column if present
-            $ex_colour = '';
-            $int_colour = '';
-            if (!empty($row['color'] ?? $row['Color'] ?? '')) {
-                $colorValue = $row['color'] ?? $row['Color'];
-                $parts = explode('/', $colorValue);
-                $ex_colour = trim($parts[0] ?? '');
-                $int_colour = trim($parts[1] ?? '');
-            }
-            // Format prod_month as YYYY-MM-01 if present
-            $prod_month_raw = $row['Production Date'] ?? $row['prod_month'] ?? '';
-            $prod_month = '';
-            if (preg_match('/^\d{6}$/', $prod_month_raw)) {
-                $year = substr($prod_month_raw, 0, 4);
-                $month = substr($prod_month_raw, 4, 2);
-                $prod_month = $year . '-' . $month . '-01';
-            }
-            return [
-                'variant' => $row['Variant'] ?? $row['variant'] ?? '',
-                'vin' => $row['VIN Number'] ?? $row['vin'] ?? '',
-                'engine' => $row['Engine Number'] ?? $row['engine'] ?? '',
-                'prod_month' => $prod_month,
-                'ex_colour' => $ex_colour,
-                'int_colour' => $int_colour,
-            ];
-        })->toArray();
-
-        return response()->json([
-            'vehiclesData' => $vehiclesData
-        ]);
-    }
-
     public function edit($id)
     {
         $variants = Varaint::join('brands', 'varaints.brands_id', '=', 'brands.id')
@@ -1572,7 +1491,6 @@ class PurchasingOrderController extends Controller
         $useractivities->save();
         $purchasingOrderId = $id;
         $variantNames = $request->input('variant_id');
-        $variantsQuantity = null;
         if ($variantNames != null) {
             $variantIds = Varaint::whereIn('name', $variantNames)->pluck('id')->all();
             $variantsQuantity = array_count_values($variantNames);
@@ -1695,16 +1613,14 @@ class PurchasingOrderController extends Controller
             }
         }
 
-        if ($variantsQuantity !== null) {
-            foreach ($variantsQuantity as $variant => $quantity) {
-                $description = $variant . ' with ' . $quantity . ' qty';
-                $purchasingordereventsLog = new PurchasingOrderEventsLog();
-                $purchasingordereventsLog->event_type = "Add New Vehicles";
-                $purchasingordereventsLog->created_by = auth()->user()->id;
-                $purchasingordereventsLog->purchasing_order_id = $purchasingOrderId;
-                $purchasingordereventsLog->description = $description;
-                $purchasingordereventsLog->save();
-            }
+        foreach ($variantsQuantity as $variant => $quantity) {
+            $description = $variant . ' with ' . $quantity . ' qty';
+            $purchasingordereventsLog = new PurchasingOrderEventsLog();
+            $purchasingordereventsLog->event_type = "Add New Vehicles";
+            $purchasingordereventsLog->created_by = auth()->user()->id;
+            $purchasingordereventsLog->purchasing_order_id = $purchasingOrderId;
+            $purchasingordereventsLog->description = $description;
+            $purchasingordereventsLog->save();
         }
         DB::commit();
         return back()->with('success', 'Added Vehicles In PO successfully!');
@@ -2611,6 +2527,31 @@ class PurchasingOrderController extends Controller
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
 
+            // if($vehicle->model_id) {
+            //     // get the loi item and update the utilization quantity
+            //     $approvedIds = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
+            //         ->pluck('approved_loi_id');
+
+            //     $loiItemIds = ApprovedLetterOfIndentItem::whereIn('id', $approvedIds)->pluck('letter_of_indent_item_id');
+            //     $possibleIds = MasterModel::where('model', $vehicle->masterModel->model)
+            //         ->where('sfx', $vehicle->masterModel->sfx)->pluck('id')->toArray();
+            //     foreach ($loiItemIds as $loiItemId) {
+            //         $item = LetterOfIndentItem::find($loiItemId);
+            //         if(in_array($item->master_model_id, $possibleIds)) {
+            //             if($item->utilized_quantity < $item->total_loi_quantity) {
+            //                 $item->utilized_quantity = $item->utilized_quantity + 1;
+            //                 $item->save();
+            //                 // get the total utilized qty and update against LOI
+            //                 // $LOI = LetterOfIndent::find($item->letter_of_indent_id);
+            //                 // $utilized_quantity =  LetterOfIndentItem::where('letter_of_indent_id', $LOI->id)
+            //                 //                         ->sum('utilized_quantity');
+            //                 // $LOI->utilized_quantity  = $utilized_quantity;
+            //                 // $LOI->save();
+            //                 break;
+            //             }
+            //         }
+            //     }
+            // }
             DB::commit();
             return redirect()->back()->with('success', 'Payment Payment Release Approved confirmed. Vehicle status updated.');
         }
@@ -2619,6 +2560,7 @@ class PurchasingOrderController extends Controller
     public function paymentreleasesrejected(Request $request, $id)
     {
 
+        // info($id);
         $vehicle = Vehicles::find($id);
         if ($vehicle) {
             $vehicle->status = 'Payment Rejected';
@@ -2644,6 +2586,7 @@ class PurchasingOrderController extends Controller
     }
     public function paymentrelconfirmdebited(Request $request, $id)
     {
+        // need to test
         $vehicle = Vehicles::find($id);
         $vehicleCount = $vehicle->count();
         if ($request->hasFile('paymentFile')) {
@@ -2737,6 +2680,33 @@ class PurchasingOrderController extends Controller
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
+            //            if($vehicle->master_model_id) {
+            //                $masterModel = MasterModel::find($vehicle->master_model_id);
+            //                $similarModelIds = MasterModel::where('model', $masterModel->model)
+            //                    ->where('steering', $masterModel->steering)
+            //                    ->where('sfx', $masterModel->sfx)
+            //                    ->where('model_year', $masterModel->model_year)
+            //                    ->pluck('id')->toArray();
+            //                // find the supplier and dealer
+            //               $supplier_id = $vehicle->purchasingOrder->LOIPurchasingOrder->approvedLOI->letterOfIndent->supplier_id ?? '';
+            //               $dealer = $vehicle->purchasingOrder->LOIPurchasingOrder->approvedLOI->letterOfIndent->dealers ?? '';
+            //              // dd($supplier_id);
+            //                // check the eta import date update time
+            //               $supplierInventory = SupplierInventory::where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+            //                   ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+            //                   ->where('supplier_id', $supplier_id)
+            //                   ->where('whole_sales', $dealer)
+            //                   ->whereIn('master_model_id', $similarModelIds)
+            //                    ->whereNull('delivery_note')
+            //                   ->first();
+            ////               info($supplierInventory->id);
+            //               if($supplierInventory) {
+            //                   $supplierInventory->veh_status = SupplierInventory::VEH_STATUS_VENDOR_CONFIRMED;
+            //                   $supplierInventory->save();
+            //               }
+            //
+            //            }
+
             return redirect()->back()->with('success', 'Vendor Confirmed confirmed. Vehicle status updated.');
         }
         return redirect()->back()->with('error', 'Vehicle not found.');
@@ -2896,16 +2866,29 @@ class PurchasingOrderController extends Controller
                         ->pluck('approved_loi_id');
 
                     $loiItemIds = ApprovedLetterOfIndentItem::whereIn('id', $approvedIds)->pluck('letter_of_indent_item_id');
+                    // info($loiItemIds);
                     $masterModel = MasterModel::find($vehicle->model_id);
                     $possibleIds = MasterModel::where('model', $masterModel->model)
                         ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
+                    // info($possibleIds);
 
                     foreach ($loiItemIds as $loiItemId) {
                         $item = LetterOfIndentItem::find($loiItemId);
+                        // info($item);
                         if (in_array($item->master_model_id, $possibleIds)) {
+                            // info("master model id including li item");
                             if ($item->utilized_quantity < $item->approved_quantity) {
+                                // info("total quantity < utilized_quantity");
                                 $item->utilized_quantity = $item->utilized_quantity + 1;
                                 $item->save();
+
+                                // get the total utilized qty and update against LOI
+                                // $LOI = LetterOfIndent::find($item->letter_of_indent_id);
+                                // $utilized_quantity =  LetterOfIndentItem::where('letter_of_indent_id', $LOI->id)
+                                //                         ->sum('utilized_quantity');
+                                // $LOI->utilized_quantity  = $utilized_quantity;
+                                // $LOI->save();
+
                                 break;
                             }
                         }
@@ -4032,7 +4015,7 @@ class PurchasingOrderController extends Controller
 
                 if ($orderCurrency !== $accountCurrency) {
                     $priceDifferenceInAccountCurrency = $this->convertCurrency($priceDifference, $orderCurrency, $accountCurrency, $conversionRates);
-        } else {
+                } else {
                     $priceDifferenceInAccountCurrency = $priceDifference;
                 }
 
