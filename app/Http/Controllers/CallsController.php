@@ -35,6 +35,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Validator; 
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 class CallsController extends Controller
 {
@@ -1506,13 +1507,14 @@ public function simplefile()
         return redirect()->back()->with('error', 'The requested file does not exist.');
     }
 }
-public function bulkExcelDataUplaod()
+public function bulkLeadsDataUplaodExcel()
     {
         $useractivities =  New UserActivities();
             $useractivities->activity = "Export Simple File for Bulk Leads";
             $useractivities->users_id = Auth::id();
             $useractivities->save();
             $filePath = public_path('storage/calls.xlsx');
+            Log::info("File path is : ". $filePath);
 
         if (file_exists($filePath)) {
             return Response::download($filePath, 'calls.xlsx', [
