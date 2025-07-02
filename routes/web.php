@@ -1084,6 +1084,7 @@ Route::get('/d', function () {
     Route::post('/vehicles/hold/{id}', [VehiclesController::class, 'hold'])->name('vehicles.hold');
     Route::post('/transition/paymentconfirm', [PurchasingOrderController::class, 'paymentconfirm'])->name('transition.paymentconfirm');
     Route::get('/getdata', [PurchasingOrderController::class, 'getdata'])->name('purchased.getdata');
+    Route::post('/import-csv-file', [PurchasingOrderController::class, 'importCsvFile']);
 
     //Netsuite GDN
     Route::get('netsuitegdn/addingnetsuitegdn', [ApprovalsController::class, 'addingnetsuitegdn'])->name('netsuitegdn.addingnetsuitegdn');
