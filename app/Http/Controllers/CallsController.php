@@ -1506,7 +1506,7 @@ public function simplefile()
         return redirect()->back()->with('error', 'The requested file does not exist.');
     }
 }
-public function bulkLeadsExcelDataUplaod()
+public function bulkExcelDataUplaod()
     {
         $useractivities =  New UserActivities();
             $useractivities->activity = "Export Simple File for Bulk Leads";
