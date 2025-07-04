@@ -42,6 +42,7 @@ use App\Models\PurchasingOrder;
 use App\Mail\QCUpdateNotification;
 use App\Models\DepartmentNotifications;
 use App\Models\Dnaccess;
+use Illuminate\Support\Facades\Log;
 
 class ApprovalsController extends Controller
 {  
@@ -75,7 +76,7 @@ class ApprovalsController extends Controller
                     'varaints.model_detail',
                     'varaints.detail',
                     'varaints.seat',
-                    'varaints.upholestry',
+                    'varaints.upholestry', 
                     'varaints.steering',
                     'varaints.my',
                     'varaints.fuel_type',
@@ -382,7 +383,8 @@ class ApprovalsController extends Controller
         $incident->save();
         return response()->json(['message' => 'Data saved successfully']);
     }
-    public function savevariantsd(Request $request) {
+    public function savevariantsd(Request $request) 
+    {
         $useractivities =  New UserActivities();
         $useractivities->activity = "Create New Variant";
         $useractivities->users_id = Auth::id();
@@ -453,6 +455,48 @@ class ApprovalsController extends Controller
         $variant->steering = $steering;
         $variant->seat = $seat;
         $variant->upholestry = $upholestry;
+        $oldVariantData = $variant->exists ? $variant->toArray() : [];
+        $newVariantData = [
+            'name' => $variantname,
+            'model_detail' => $modeldetail,
+            'my' => $my,
+            'detail' => $detail,
+            'engine' => $engine,
+            'gearbox' => $gearbox,
+            'fuel_type' => $fueltype,
+            'steering' => $steering,
+            'seat' => $seat,
+            'upholestry' => $upholestry,
+        ];
+
+        $diffs = [];
+        foreach ($newVariantData as $key => $newVal) {
+            $oldVal = $oldVariantData[$key] ?? null;
+            if ((string) $oldVal !== (string) $newVal) {
+                $diffs[$key] = [
+                    'old' => $oldVal,
+                    'new' => $newVal
+                ];
+            }
+        }
+
+        if (!empty($diffs)) {
+            Log::info('Variant Change Detected 1. Vehicle varaints_id updated (savevariantsd)', [
+                'action' => 'Variant Save',
+                'variant_id' => $variant->id,
+                'changes' => $diffs,
+                'vehicle_id' => $vehicle->id ?? null,
+                'old_varaints_id' => $vehicle->varaints_id ?? null,
+                'inspection_id' => $inspection_id,
+                'approval_request_id' => $approvalRequest->id ?? null,
+                'is_new_variant' => $newvariantid ? false : true,
+                'user_id' => Auth::id(),
+                'user_name' => Auth::user()->name ?? 'N/A',
+                'source' => 'savevariantsd',
+                'timestamp' => now()->toDateTimeString(),
+            ]);
+        }
+
         $variant->save();
         if($newvariantid)
         {
@@ -466,7 +510,17 @@ class ApprovalsController extends Controller
         {
             $approvalRequest->field = "Variant Change";
             $approvalRequest->new_value = $variant->id;
-            $approvalRequest->save();   
+            $approvalRequest->save();  
+            Log::info('Variant Change Detected 2. ApprovalRequest updated with new variant ID (savevariantsd)', [
+                'source' => 'savevariantsd',
+                'action' => 'Update ApprovalRequest',
+                'approval_request_id' => $approvalRequest->id,
+                'new_variant_id' => $variant->id,
+                'inspection_id' => $inspection_id,
+                'user_id' => Auth::id(),
+                'user_name' => Auth::user()->name ?? 'N/A',
+                'timestamp' => now()->toDateTimeString()
+            ]); 
         }
         else{
             $inspection = Inspection::find($inspection_id);
@@ -480,6 +534,19 @@ class ApprovalsController extends Controller
             $changeapprovalRequest->updated_by = auth()->user()->id;
             $changeapprovalRequest->inspection_id = $inspection_id;
             $changeapprovalRequest->save();
+
+            Log::info('Variant Change Detected 3. New Variant Change ApprovalRequest created (savevariantsd)', [
+                'source' => 'savevariantsd',
+                'action' => 'Create ApprovalRequest',
+                'approval_request_id' => $changeapprovalRequest->id ?? null,
+                'vehicle_id' => $vehicle->id,
+                'old_varaints_id' => $vehicle->varaints_id,
+                'new_variant_id' => $variant->id,
+                'inspection_id' => $inspection_id,
+                'user_id' => Auth::id(),
+                'user_name' => Auth::user()->name ?? 'N/A',
+                'timestamp' => now()->toDateTimeString()
+            ]);
         }
        }
        else if($variantType == "change"){
@@ -493,6 +560,19 @@ class ApprovalsController extends Controller
         ->first();
         if ($approvalRequest) {
             $approvalRequest->update(['new_value' => $variant]); 
+
+            Log::info('Variant Change Detected 4. Variant Change Request updated in change mode (savevariantsd)', [
+                'source' => 'savevariantsd',
+                'action' => 'Change Variant',
+                'approval_request_id' => $approvalRequest->id,
+                'new_variant_id' => $variant,
+                'vehicle_id' => $vehicle->id,
+                'old_varaints_id' => $vehicle->varaints_id,
+                'inspection_id' => $inspection_id,
+                'user_id' => Auth::id(),
+                'user_name' => Auth::user()->name ?? 'N/A',
+                'timestamp' => now()->toDateTimeString()
+            ]);
         } else {
             VehicleApprovalRequests::create([
                 'inspection_id' => $inspection_id,
@@ -501,6 +581,17 @@ class ApprovalsController extends Controller
                 'old_value' => $vehicle->varaints_id,
                 'new_value' => $variant,
                 'status' => 'Pending'  
+            ]);
+            Log::info('Variant Change Detected 5. Variant Change Request created in change mode (savevariantsd)', [
+                'source' => 'savevariantsd',
+                'action' => 'Change Variant - New Request',
+                'vehicle_id' => $vehicle->id,
+                'old_varaints_id' => $vehicle->varaints_id,
+                'new_variant_id' => $variant,
+                'inspection_id' => $inspection_id,
+                'user_id' => Auth::id(),
+                'user_name' => Auth::user()->name ?? 'N/A',
+                'timestamp' => now()->toDateTimeString()
             ]);
         }   
        }
@@ -516,6 +607,17 @@ class ApprovalsController extends Controller
        }
        if ($approvalRequest) {
         $approvalRequest->update(['status' => 'Rejected']); 
+
+        Log::info('Variant Change Detected 6. ApprovalRequest marked as Rejected (savevariantsd)', [
+            'source' => 'savevariantsd',
+            'action' => 'Reject ApprovalRequest',
+            'approval_request_id' => $approvalRequest->id,
+            'vehicle_id' => $approvalRequest->vehicle_id ?? null,
+            'inspection_id' => $inspection_id,
+            'user_id' => Auth::id(),
+            'user_name' => Auth::user()->name ?? 'N/A',
+            'timestamp' => now()->toDateTimeString()
+        ]);
     }
         return response()->json(['message' => 'Data saved successfully']);
     }
@@ -667,6 +769,15 @@ class ApprovalsController extends Controller
                     $newvariantstorehistory->save();
                 }
                 Vehicles::where('id', $inspection->vehicle_id)->update(['varaints_id' => $existingVariantId]);
+                Log::info('Variant Change Detected 7. Vehicle Variant ID updated (approveInspection)', [
+                    'source' => 'variant decision block',
+                    'vehicle_id' => $inspection->vehicle_id,
+                    'old_varaints_id' => $vehicle->varaints_id,
+                    'new_varaints_id' => $existingVariantId,
+                    'user_id' => auth()->id(),
+                    'user_name' => auth()->user()->name ?? 'N/A',
+                    'timestamp' => now()->toDateTimeString()
+                ]);
                 $updatedVehicle = Vehicles::find($inspection->vehicle_id);
                 $vehicleslog = new Vehicleslog();
                 $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
@@ -1015,6 +1126,15 @@ class ApprovalsController extends Controller
         }
                 Vehicles::where('id', $inspection->vehicle_id)
                 ->update(['varaints_id' => $variantId]);
+                Log::info('Variant Change Detected 8. Vehicle varaints_id updated (approveInspection)', [
+                    'source' => 'variant update block (approval/inspection)',
+                    'vehicle_id' => $inspection->vehicle_id,
+                    'old_varaints_id' => $vehicle->varaints_id,
+                    'new_varaints_id' => $variantId,
+                    'user_id' => auth()->id(),
+                    'user_name' => auth()->user()->name ?? 'N/A',
+                    'timestamp' => now()->toDateTimeString()
+                ]);
                 $vehicleslog = new Vehicleslog();
                 $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                 $currentDateTime = Carbon::now($dubaiTimeZone);

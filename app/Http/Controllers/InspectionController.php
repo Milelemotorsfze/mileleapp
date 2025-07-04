@@ -1290,6 +1290,15 @@ class InspectionController extends Controller
                 $vehicle = Vehicles::find($id);
                 $vehicle->inspection_status = "Approved";
                 $vehicle->varaints_id = $matchingVariantId;
+                Log::info('Variant Change Detected 9. Vehicle varaints_id updated after specification match (reupdatespec)', [
+                    'vehicle_id' => $vehicle->id,
+                    'old_varaints_id' => $vehicle->getOriginal('varaints_id'),
+                    'new_varaints_id' => $vehicle->varaints_id,
+                    'user_id' => auth()->id(),
+                    'user_name' => auth()->user()->name ?? 'N/A',
+                    'source' => 'specification reinspection match',
+                    'timestamp' => now()->toDateTimeString()
+                ]);
                 $vehicle->save();
                 return redirect()->route('inspection.index')->with('success', 'Variant details updated successfully');
             } else {
