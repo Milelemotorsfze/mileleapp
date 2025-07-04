@@ -4230,6 +4230,19 @@ public function updateVariants(Request $request)
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicle->varaints_id = $variant['variant_id'];
             $vehicle->save();
+            if ($vehicle->varaints_id != $vehicleslog->old_value) {
+                Log::info('Variant Change Detected 10. Vehicle varaints_id updated (updateVariants)', [
+                    'vehicle_id' => $vehicle->id,
+                    'vin' => $vehicle->vin,
+                    'old_varaints_id' => $vehicleslog->old_value,
+                    'new_varaints_id' => $vehicleslog->new_value,
+                    'user_id' => auth()->id(),
+                    'user_name' => auth()->user()->name ?? 'N/A',
+                    'purchasing_order_id' => $purchasingOrderId,
+                    'source' => 'bulk variant update (PO)',
+                    'timestamp' => now()->toDateTimeString()
+                ]);
+            }
             // Collect data for the email
             if($vehicleslog->old_value != $vehicleslog->new_value)
             {

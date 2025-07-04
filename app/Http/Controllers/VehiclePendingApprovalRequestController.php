@@ -19,6 +19,7 @@ use Carbon\CarbonTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class VehiclePendingApprovalRequestController extends Controller
 {
@@ -146,6 +147,18 @@ class VehiclePendingApprovalRequestController extends Controller
             }else {
                 $vehicle->price = null;
             }
+
+            Log::info('Variant Change Detected 11. Vehicle varaints_id updated via approval (ApproveOrRejectVehicleDetails)', [
+                'vehicle_id' => $vehicle->id,
+                'vin' => $vehicle->vin,
+                'old_varaints_id' => $oldValue,
+                'new_varaints_id' => $newValue,
+                'user_id' => auth()->id(),
+                'user_name' => auth()->user()->name ?? 'N/A',
+                'approval_request_id' => $pendingApprovalRequest->id,
+                'source' => 'VehiclePendingApprovalRequestController@ApproveOrRejectVehicleDetails',
+                'timestamp' => now()->toDateTimeString()
+            ]);
         }
 
         if( $field == 'so_date')
