@@ -678,6 +678,13 @@ class SalesOrderController extends Controller
             // Remove the SO item and update the vehicle's SO ID
             $soItem->delete();
             Vehicles::where('id', $soItem->vehicles_id)->update(['so_id' => null]);
+
+            Log::info('Vehicle SO ID updated during SO item removal. (so_id update Detected 2. removeSoItems)', [
+                'vehicle_id' => $soItem->vehicles_id,
+                'new_so_id' => null,
+                'updated_by' => auth()->user()->email ?? 'system',
+                'timestamp' => now(),
+            ]);
         }
 
         return $logEntries;

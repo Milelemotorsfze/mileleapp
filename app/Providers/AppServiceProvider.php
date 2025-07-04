@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Vehicles;
+use App\Observers\VehicleObserver;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Auth;
@@ -20,6 +22,8 @@ class AppServiceProvider extends ServiceProvider
     }
     public function boot(): void
     {
+        Vehicles::observe(VehicleObserver::class);
+
         View::composer('partials.horizontal', function ($view) {
             $user = Auth::user();
             $assignedRoles = $user ? $user->roles : [];
