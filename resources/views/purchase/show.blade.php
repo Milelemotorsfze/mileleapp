@@ -5722,17 +5722,34 @@ $(document).ready(function() {
             },
             success: function(response) {
                 $('#importModal').modal('hide');
-                console.log(response.vehiclesData);
                 if (response.vehiclesData && Array.isArray(response.vehiclesData)) {
+                    // Check forr DN Number
+                    var dnNumbers = {};
                     response.vehiclesData.forEach(function(vehicle) {
+                        if (vehicle.dn) {
+                            dnNumbers[vehicle.dn] = true;
+                        }
+                    });
+                    var uniqueDnNumbers = Object.keys(dnNumbers);
+                    if (uniqueDnNumbers.length > 1) {
+                        var msg = 'Warning: Multiple DN Numbers found in the uploaded data:\n' + uniqueDnNumbers.join(', ') + '\nDo you want to continue and fill the data?';
+                        if (!confirm(msg)) {
+                            location.reload();
+                            return;
+                        }
+                    }
+                    var usedVins = {};
+                    response.vehiclesData.forEach(function(vehicle) {
+                        var updated = false;
+                        // 1. If a row with the same VIN exists, update it
                         $('#dtBasicExample1 tbody tr').each(function() {
                             var $row = $(this);
-                            // Find the cell with the variant
-                            var variantCell = $row.find('td').filter(function() {
-                                return $(this).text().trim().toLowerCase() === (vehicle.variant || '').trim().toLowerCase();
-                            });
-                            if (variantCell.length > 0) {
-                                $row.find('.vin').text(vehicle.vin);
+                            var vinCell = $row.find('.vin');
+                            if (
+                                vinCell.length > 0 &&
+                                vinCell.text().trim().toLowerCase() === (vehicle.vin || '').trim().toLowerCase() &&
+                                vehicle.vin
+                            ) {
                                 $row.find('.dn').text(vehicle.dn);
                                 $row.find('.engine').text(vehicle.engine);
                                 // Update Exterior Color (if select)
@@ -5749,7 +5766,6 @@ $(document).ready(function() {
                                     if (exVal) {
                                         $exSelect.val(exVal).trigger('change');
                                     } else {
-                                        // Debug: log what was not matched
                                         console.log('No match for exterior color:', vehicle.ex_colour, 'in', $exSelect.html());
                                     }
                                 }
@@ -5773,8 +5789,69 @@ $(document).ready(function() {
                                 } else {
                                     $row.find('.ppmmyyy').text(vehicle.prod_month);
                                 }
+                                usedVins[vehicle.vin] = true;
+                                updated = true;
+                                return false; // break .each for this vehicle
                             }
                         });
+                        // 2. Otherwise, find first row with same variant and empty VIN, and fill it
+                        if (!updated && vehicle.vin && !usedVins[vehicle.vin]) {
+                            $('#dtBasicExample1 tbody tr').each(function() {
+                                var $row = $(this);
+                                var vinCell = $row.find('.vin');
+                                var variantCell = $row.find('td').filter(function() {
+                                    return $(this).text().trim().toLowerCase() === (vehicle.variant || '').trim().toLowerCase();
+                                });
+                                if (
+                                    variantCell.length > 0 &&
+                                    vinCell.length > 0 &&
+                                    (!vinCell.text().trim() || vinCell.text().trim() === '-')
+                                ) {
+                                    vinCell.text(vehicle.vin);
+                                    $row.find('.dn').text(vehicle.dn);
+                                    $row.find('.engine').text(vehicle.engine);
+                                    // Update Exterior Color (if select)
+                                    if (vehicle.ex_colour) {
+                                        var $exSelect = $row.find('.ex_colour select');
+                                        var exVal = '';
+                                        var csvColor = vehicle.ex_colour.trim().toLowerCase().replace(/\s+/g, '');
+                                        $exSelect.find('option').each(function() {
+                                            var optionText = $(this).text().trim().toLowerCase().replace(/\s+/g, '');
+                                            if (optionText === csvColor) {
+                                                exVal = $(this).val();
+                                            }
+                                        });
+                                        if (exVal) {
+                                            $exSelect.val(exVal).trigger('change');
+                                        } else {
+                                            console.log('No match for exterior color:', vehicle.ex_colour, 'in', $exSelect.html());
+                                        }
+                                    }
+                                    // Update Interior Color (if select)
+                                    if (vehicle.int_colour) {
+                                        var $intSelect = $row.find('.int_colour select');
+                                        var intVal = '';
+                                        $intSelect.find('option').each(function() {
+                                            if ($(this).text().trim().toLowerCase() === vehicle.int_colour.trim().toLowerCase()) {
+                                                intVal = $(this).val();
+                                            }
+                                        });
+                                        if (intVal) {
+                                            $intSelect.val(intVal).trigger('change');
+                                        }
+                                    }
+                                    // Update Production Month
+                                    var $prodInput = $row.find('.ppmmyyy input[type="date"]');
+                                    if ($prodInput.length > 0) {
+                                        $prodInput.val(vehicle.prod_month);
+                                    } else {
+                                        $row.find('.ppmmyyy').text(vehicle.prod_month);
+                                    }
+                                    usedVins[vehicle.vin] = true;
+                                    return false; // break .each for this vehicle
+                                }
+                            });
+                        }
                     });
                 }
             },
