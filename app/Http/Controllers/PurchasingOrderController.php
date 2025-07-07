@@ -1288,7 +1288,7 @@ class PurchasingOrderController extends Controller
         $purchasingOrder = PurchasingOrder::with(['polPort', 'podPort', 'fdCountry'])->findOrFail($id);
         $paymentterms = PaymentTerms::findorfail($purchasingOrder->payment_term_id);
         $payments = PaymentTerms::get();
-        $vehicles = Vehicles::where('purchasing_order_id', $id)->get();
+        $vehicles = Vehicles::with(['dn:id,dn_number'])->where('purchasing_order_id', $id)->get();
         $vehiclesdel = Vehicles::onlyTrashed()->where('purchasing_order_id', $id)->get();
         $vendorsname = Supplier::where('id', $purchasingOrder->vendors_id)->value('supplier');
         $vehicleslog = Vehicleslog::whereNull('category')->whereIn('vehicles_id', $vehicles->pluck('id'))->get();
@@ -1541,6 +1541,7 @@ class PurchasingOrderController extends Controller
                 'prod_month' => $prod_month,
                 'ex_colour' => $ex_colour,
                 'int_colour' => $int_colour,
+                'dn' => $row['dn'] ?? $row['DN'] ?? '',
             ];
         })->toArray();
 
@@ -1840,9 +1841,8 @@ class PurchasingOrderController extends Controller
         }
         return response()->json('unique');
     }
-    public function updatepurchasingData(Request $request)
+    public function updatepurchasingData(Request $request) //working here
     {
-
         $updatedData = $request->json()->all();
         $updatedVins = [];
         foreach ($updatedData as $data) {
@@ -1852,8 +1852,10 @@ class PurchasingOrderController extends Controller
             $vehicle = Vehicles::find($vehicleId);
             if ($vehicle) {
                 $oldValues = $vehicle->getAttributes();
-                $vehicle->setAttribute($fieldName, $fieldValue);
-                $vehicle->save();
+                if ($fieldName !== 'dn') {
+                    $vehicle->setAttribute($fieldName, $fieldValue);
+                    $vehicle->save();
+                }
                 $changes = [];
                 foreach ($oldValues as $field => $oldValue) {
                     if ($field !== 'created_at' && $field !== 'updated_at') {
@@ -1867,8 +1869,10 @@ class PurchasingOrderController extends Controller
                     }
                 }
                 // info($changes);
-                if (!empty($changes)) {
-                    $vehicle->save();
+                if (!empty($changes) || $fieldName === 'dn') {
+                    if ($fieldName !== 'dn') {
+                        $vehicle->save();
+                    }
                     $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                     $currentDateTime = Carbon::now($dubaiTimeZone);
                     $vinChanges = [];
@@ -1934,6 +1938,30 @@ class PurchasingOrderController extends Controller
                         $purchasingordereventsLog->new_value = $namevalue;
                         $purchasingordereventsLog->description = $description;
                         $purchasingordereventsLog->save();
+                    }
+
+                    if ($fieldName === 'dn') {
+                        // Check if this DN number already exists for this vehicle
+                        $existingDn = VehicleDn::where('vehicles_id', $vehicleId)
+                            ->where('dn_number', $fieldValue)
+                            ->first();
+                        if (!$existingDn) {
+                            $latestVehicleDn = VehicleDn::where('vehicles_id', $vehicleId)
+                                ->orderBy('created_at', 'desc')
+                                ->first();
+                            $batchNumber = ($latestVehicleDn && $latestVehicleDn->batch) ? ($latestVehicleDn->batch + 1) : 1;
+                            $vehicledn = new VehicleDn();
+                            $vehicledn->dn_number = $fieldValue;
+                            $vehicledn->vehicles_id = $vehicleId;
+                            $vehicledn->created_by = auth()->user()->id;
+                            $vehicledn->batch = $batchNumber;
+                            $vehicledn->save();
+                            $vehicle->dn_id = $vehicledn->id;
+                            $vehicle->save();
+                        } else {
+                            $vehicle->dn_id = $existingDn->id;
+                            $vehicle->save();
+                        }
                     }
                     $purchasingOrderId = $vehicle->purchasing_order_id;
                     $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
@@ -3379,7 +3407,7 @@ class PurchasingOrderController extends Controller
         $id = $request->input('orderId');
         $status = $request->input('status');
         $vehicles = DB::table('vehicles')
-            ->where('purchasing_order_id', $id)
+            ->where('purchasing_order', $id)
             ->where('status', 'Vendor Confirmed')
             ->where('payment_status', 'Vendor Confirmed')
             ->get();
@@ -5657,17 +5685,23 @@ class PurchasingOrderController extends Controller
 
             // Loop through each vehicle and assign the same DN number
             foreach ($vehicles as $vehicle) {
-                // Create a new entry in the VehicleDn table
-                $vehicledn = new VehicleDn();
-                $vehicledn->dn_number = $dnNumber;
-                $vehicledn->vehicles_id = $vehicle->id;
-                $vehicledn->created_by = Auth::id();
-                $vehicledn->batch = $batchNumber;
-                $vehicledn->save();
-
-                // Update the vehicle's dn_id field with the new VehicleDn record's ID
-                $vehicle->dn_id = $vehicledn->id;
-                $vehicle->save();
+                // Check if this DN number already exists for this vehicle
+                $existingDn = VehicleDn::where('vehicles_id', $vehicle->id)
+                    ->where('dn_number', $dnNumber)
+                    ->first();
+                if (!$existingDn) {
+                    $vehicledn = new VehicleDn();
+                    $vehicledn->dn_number = $dnNumber;
+                    $vehicledn->vehicles_id = $vehicle->id;
+                    $vehicledn->created_by = Auth::id();
+                    $vehicledn->batch = $batchNumber;
+                    $vehicledn->save();
+                    $vehicle->dn_id = $vehicledn->id;
+                    $vehicle->save();
+                } else {
+                    $vehicle->dn_id = $existingDn->id;
+                    $vehicle->save();
+                }
             }
         } else if ($type == 'vehicle') {
             // Retrieve vehicles associated with the purchasing order

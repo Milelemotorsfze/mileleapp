@@ -1819,6 +1819,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                                 <th style="vertical-align: middle;" id="int_color">Exterior Color</th>
                                 <th style="vertical-align: middle;" id="ex_color">Interior Color</th>
                                 <th>VIN Number</th>
+                                <th>DN Number</th>
                                 <th>Engine Number</th>
                                 <th>Territory</th>
                                 <th style="vertical-align: middle;" id="estimated">Estimated Arrival</th>
@@ -1905,6 +1906,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                                 </select>
                             </td>
                             <td class="editable-field vin" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
+                            <td class="editable-field dn" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->dn->dn_number ?? '' }}</td>
                             <td class="editable-field engine" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td class="editable-field territory" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td class="editable-field estimation_date" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
@@ -1935,6 +1937,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                                 </select>
                             </td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
+                            <td class="editable-field dn" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->dn->dn_number ?? '' }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
@@ -1966,6 +1969,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                                 </select>
                             </td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
+                            <td class="editable-field dn" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->dn->dn_number ?? '' }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
@@ -5575,11 +5579,16 @@ $(document).ready(function () {
                     alert('DN Number saved successfully for Full PO!');
                     $('#addDNModalUnique').modal('hide');
                     setTimeout(function() {
-        location.reload();
-    }, 500); 
+                        location.reload();
+                    }, 500);
                 },
                 error: function (xhr, status, error) {
                     alert('Error saving DN Number: ' + error);
+                },
+                complete: function () {
+                    $btn.prop('disabled', false);
+                    $loader.addClass('d-none');
+                    $btnText.text('Save DN Numbers');
                 }
             });
         } else {
@@ -5596,26 +5605,31 @@ $(document).ready(function () {
                 }
             });
             // Prepare data for "Individual Vehicles" and send AJAX request
-$.ajax({
-    url: '/save-dn-numbers',
-    type: 'POST',
-    contentType: 'application/json',
-    data: JSON.stringify({
-        purchasingOrderId: purchasingOrderId,
-        vehicleDNData: vehicleData, // Make sure this name matches what the backend expects
-        type: 'vehicle'
-    }),
-    success: function (response) {
-        alert('DN Numbers saved successfully for individual vehicles!');
-        $('#addDNModalUnique').modal('hide');
-        setTimeout(function() {
-        location.reload();
-    }, 500); 
-    },
-    error: function (xhr, status, error) {
-        alert('Error saving DN Numbers: ' + error);
-    }
-});
+            $.ajax({
+                url: '/save-dn-numbers',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    purchasingOrderId: purchasingOrderId,
+                    vehicleDNData: vehicleData, // Make sure this name matches what the backend expects
+                    type: 'vehicle'
+                }),
+                success: function (response) {
+                    alert('DN Numbers saved successfully for individual vehicles!');
+                    $('#addDNModalUnique').modal('hide');
+                    setTimeout(function() {
+                        location.reload();
+                    }, 500);
+                },
+                error: function (xhr, status, error) {
+                    alert('Error saving DN Numbers: ' + error);
+                },
+                complete: function () {
+                    $btn.prop('disabled', false);
+                    $loader.addClass('d-none');
+                    $btnText.text('Save DN Numbers');
+                }
+            });
         }
     });
 });
@@ -5719,6 +5733,7 @@ $(document).ready(function() {
                             });
                             if (variantCell.length > 0) {
                                 $row.find('.vin').text(vehicle.vin);
+                                $row.find('.dn').text(vehicle.dn);
                                 $row.find('.engine').text(vehicle.engine);
                                 // Update Exterior Color (if select)
                                 if (vehicle.ex_colour) {
