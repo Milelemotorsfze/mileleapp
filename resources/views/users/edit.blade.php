@@ -50,9 +50,9 @@
         </div>
         <div class="col-md-4">
             <label for="lauguages" class="form-label">Languages</label>
-            <select name="lauguages[]" id="lauguages" class="form-select" multiple>
+            <select name="languages[]" id="languages" class="form-select" multiple>
                 @foreach($language as $lang)
-                    <option value="{{ $lang }}" {{ in_array($lang, old('lauguages', $userLanguages)) ? 'selected' : '' }}>{{ $lang }}</option>
+                    <option value="{{ $lang }}" {{ in_array($lang, old('languages', $userLanguages)) ? 'selected' : '' }}>{{ $lang }}</option>
                 @endforeach
             </select>
         </div>
@@ -116,7 +116,7 @@
 <script>
     $(document).ready(function () {
         $('#roles').select2();
-        $('#lauguages').select2();
+        $('#languages').select2();
         $('#department').select2();
         $('#designation').select2();
     });

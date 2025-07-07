@@ -122,7 +122,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             <div class="col-lg-4 col-md-6 pt-3">
                 <span class="error">*</span>
                 <label for="languageSelect" class="form-label">Preferred Language:</label>
-                <select name="language" class="form-control select2" id="languageSelect" multiple>
+                <select name="language[]" class="form-control select2" id="languageSelect" multiple>
                     <option value="">Select Language</option>
                     @foreach ($Language as $language)
                     <option value="{{ $language->name }}" {{ old('language') == $language->name ? 'selected' : '' }}>
