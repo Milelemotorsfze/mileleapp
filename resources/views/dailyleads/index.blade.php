@@ -2136,6 +2136,33 @@ function s2ab(s) {
 }
 });
 </script>
+
+<script>
+function formatRemarks(rawData, limit = 20) {
+  
+    if (!rawData) return '';
+    let data = $('<div>').html(rawData).text();
+    data = data.replace(/###SEP###/g, '<br>');
+    data = data.replace(/^Lead Summary - Qualification Notes:/i, '<strong>Lead Summary - Qualification Notes:</strong><br><br>');
+    data = data.replace(/(\d+\.\s*[^:\n]+):/g, '<strong>$1:</strong>');
+    data = data.replace(/(General Remark\s*\/\s*Additional Notes:)/i, '<strong>$1</strong>');
+    data = data.replace(/^(?=\d+\.\s)/m, '<br>');
+    data = data.replace(/(\d+\.\s*[^:\n]+:.*)(?=<br>General Remark|<br><br>General Remark|General Remark)/is, '$1<br>');
+
+    const tempDiv = $('<div>').html(data);
+    const plainText = tempDiv.text().trim();
+
+    if (plainText.length > limit) {
+        let shortText = plainText.substring(0, limit) + '...';
+        let escapedData = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+        return `${shortText} <a href="#" class="text-primary read-more-link" data-remarks="${escapedData}">Read More</a>`;
+    }
+
+    return data;
+}
+</script>
+
 <script>
 let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
     $(document).ready(function () {
@@ -2167,29 +2194,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
                 {
-  data: 'remarks',
-  name: 'calls.remarks',
-  title: 'Remarks & Messages',
-  render: function (data, type, row) {
-    const div = document.createElement('div');
-    div.innerHTML = data || '';
-    const plainText = div.textContent.trim();
+                  data: 'remarks',
+                  name: 'calls.remarks',
+                  title: 'Remarks & Messages',
+                  render: function (data, type, row) {
+                    if (type !== 'display') {
+                      const div = document.createElement('div');
+                      div.innerHTML = data || '';
+                      return div.textContent.trim();
+                    }
 
-    if (type !== 'display') return plainText;
-
-    let shortText = plainText.substring(0, 20);
-    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-
-    if (plainText.length > 20) {
-      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
-    }
-
-    return plainText;
-  }
-},
-
-
-{
+                    return formatRemarks(data);
+                  }
+                },
+          {
             data: 'date',
             name: 'date',
              render: function (data, type, row) {
@@ -2359,26 +2377,19 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
                 {
-  data: 'remarks',
-  name: 'calls.remarks',
-  title: 'Remarks & Messages',
-  render: function (data, type, row) {
-    const div = document.createElement('div');
-    div.innerHTML = data || '';
-    const plainText = div.textContent.trim();
+                  data: 'remarks',
+                  name: 'calls.remarks',
+                  title: 'Remarks & Messages',
+                  render: function (data, type, row) {
+                    if (type !== 'display') {
+                      const div = document.createElement('div');
+                      div.innerHTML = data || '';
+                      return div.textContent.trim();
+                    }
 
-    if (type !== 'display') return plainText;
-
-    let shortText = plainText.substring(0, 20);
-    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-
-    if (plainText.length > 20) {
-      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
-    }
-
-    return plainText;
-  }
-},
+                    return formatRemarks(data);
+                  }
+                },
 
 {
             data: 'date',
@@ -2511,25 +2522,18 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'custom_brand_model', name: 'custom_brand_model' },
                 { data: 'language', name: 'language' },
                 { data: 'location', name: 'location' },
-                {
+                                {
                   data: 'remarks',
-                  name: 'remarks',
+                  name: 'calls.remarks',
                   title: 'Remarks & Messages',
                   render: function (data, type, row) {
-                    const div = document.createElement('div');
-                    div.innerHTML = data || '';
-                    const plainText = div.textContent.trim();
-
-                    if (type !== 'display') return plainText;
-
-                    let shortText = plainText.substring(0, 20);
-                    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-
-                    if (plainText.length > 20) {
-                      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+                    if (type !== 'display') {
+                      const div = document.createElement('div');
+                      div.innerHTML = data || '';
+                      return div.textContent.trim();
                     }
 
-                    return plainText;
+                    return formatRemarks(data);
                   }
                 },
                 {
@@ -2753,27 +2757,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'custom_brand_model', name: 'custom_brand_model' },
                 { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
-                {
-  data: 'remarks',
-  name: 'calls.remarks',
-  title: 'Remarks & Messages',
-  render: function (data, type, row) {
-    const div = document.createElement('div');
-    div.innerHTML = data || '';
-    const plainText = div.textContent.trim();
+                                {
+                  data: 'remarks',
+                  name: 'calls.remarks',
+                  title: 'Remarks & Messages',
+                  render: function (data, type, row) {
+                    if (type !== 'display') {
+                      const div = document.createElement('div');
+                      div.innerHTML = data || '';
+                      return div.textContent.trim();
+                    }
 
-    if (type !== 'display') return plainText;
-
-    let shortText = plainText.substring(0, 20);
-    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-
-    if (plainText.length > 20) {
-      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
-    }
-
-    return plainText;
-  }
-},
+                    return formatRemarks(data);
+                  }
+                },
 
 {
             data: 'date',
@@ -3002,25 +2999,18 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'custom_brand_model', name: 'custom_brand_model'},
                 { data: 'location', name: 'location'},
                 { data: 'language', name: 'language'},
-                {
+                                {
                   data: 'remarks',
-                  name: 'remarks',
+                  name: 'calls.remarks',
                   title: 'Remarks & Messages',
                   render: function (data, type, row) {
-                    const div = document.createElement('div');
-                    div.innerHTML = data || '';
-                    const plainText = div.textContent.trim();
-
-                    if (type !== 'display') return plainText;
-
-                    let shortText = plainText.substring(0, 20);
-                    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-
-                    if (plainText.length > 20) {
-                      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+                    if (type !== 'display') {
+                      const div = document.createElement('div');
+                      div.innerHTML = data || '';
+                      return div.textContent.trim();
                     }
 
-                    return plainText;
+                    return formatRemarks(data);
                   }
                 },
 
@@ -3280,26 +3270,19 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         { data: 'language', name: 'calls.language' },
         { data: 'location', name: 'calls.location' },
         {
-  data: 'remarks',
-  name: 'calls.remarks',
-  title: 'Remarks & Messages',
-  render: function (data, type, row) {
-    const div = document.createElement('div');
-    div.innerHTML = data || '';
-    const plainText = div.textContent.trim();
+          data: 'remarks',
+          name: 'calls.remarks',
+          title: 'Remarks & Messages',
+          render: function (data, type, row) {
+            if (type !== 'display') {
+              const div = document.createElement('div');
+              div.innerHTML = data || '';
+              return div.textContent.trim();
+            }
 
-    if (type !== 'display') return plainText;
-
-    let shortText = plainText.substring(0, 20);
-    let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-
-    if (plainText.length > 20) {
-      return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
-    }
-
-    return plainText;
-  }
-},
+            return formatRemarks(data);
+          }
+        },
       {
             data: 'datefol',
             name: 'datefol',
@@ -3426,20 +3409,13 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
           name: 'calls.remarks',
           title: 'Remarks & Messages',
           render: function (data, type, row) {
-            const div = document.createElement('div');
-            div.innerHTML = data || '';
-            const plainText = div.textContent.trim();
-
-            if (type !== 'display') return plainText;
-
-            let shortText = plainText.substring(0, 20);
-            let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-
-            if (plainText.length > 20) {
-              return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+            if (type !== 'display') {
+              const div = document.createElement('div');
+              div.innerHTML = data || '';
+              return div.textContent.trim();
             }
 
-            return plainText;
+            return formatRemarks(data);
           }
         },
 
@@ -3560,20 +3536,13 @@ $('#my-table_filter').hide();
           name: 'calls.remarks',
           title: 'Remarks & Messages',
           render: function (data, type, row) {
-            const div = document.createElement('div');
-            div.innerHTML = data || '';
-            const plainText = div.textContent.trim();
-
-            if (type !== 'display') return plainText;
-
-            let shortText = plainText.substring(0, 20);
-            let fullText = (data || '').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-
-            if (plainText.length > 20) {
-              return `${shortText}... <a href="#" class="text-primary read-more-link" data-remarks="${fullText}">Read More</a>`;
+            if (type !== 'display') {
+              const div = document.createElement('div');
+              div.innerHTML = data || '';
+              return div.textContent.trim();
             }
 
-            return plainText;
+            return formatRemarks(data);
           }
         },
         { data: 'createdby', name: 'users.name' },

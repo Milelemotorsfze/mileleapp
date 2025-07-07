@@ -764,21 +764,32 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
     @if ($hasContent)
         @php
             $formatted = str_replace('###SEP###', '<br>', $cleanText);
+            $formatted = preg_replace(
+                '/^Lead Summary - Qualification Notes:/i',
+                '<strong>Lead Summary - Qualification Notes:</strong><br>',
+                $formatted
+            );
+            $formatted = preg_replace('/^(?=\d+\.\s)/m', '<br>', $formatted, 1);
 
-            // Bold numbered labels
+            $formatted = preg_replace(
+                '/(\d+\.\s*[^:\n]+:.*)(?=<br>General Remark|<br>General Remark|General Remark)/is',
+                '$1<br>',
+                $formatted
+            );
+
             $formatted = preg_replace(
                 '/(\d+\.\s*[^:\n]+):/',
                 '<strong>$1:</strong>',
                 $formatted
             );
 
-            // Bold unnumbered labels (like general remarks or headers)
             $formatted = preg_replace(
-                '/(^|\n)([^:\n]+):/',
-                '$1<strong>$2:</strong>',
+                '/(General Remark\s*\/\s*Additional Notes:)/i',
+                '<strong>$1</strong>',
                 $formatted
             );
         @endphp
+
         {!! nl2br($formatted) !!}
     @else
         <p class="text-muted">No remarks.</p>
