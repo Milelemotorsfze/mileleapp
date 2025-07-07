@@ -217,12 +217,12 @@
                     <td class="nowrap-td">{{ ucwords(strtolower($calls->location))}}</td>
                     <td class="nowrap-td">
                       @php
-                          $stripped = strip_tags($calls->remarks);
+                          $stripped = strip_tags($calls->testing_remarks_data_migration);
                           $shortText = Str::limit($stripped, 20);
                       @endphp
                       {!! $shortText !!}
                       @if(strlen($stripped) > 20)
-                          <a href="#" class="text-primary read-more-link" data-remarks="{!! htmlspecialchars($calls->remarks, ENT_QUOTES) !!}">Read More</a>
+                          <a href="#" class="text-primary read-more-link" data-remarks="{!! htmlspecialchars($calls->testing_remarks_data_migration, ENT_QUOTES) !!}">Read More</a>
                       @endif
                     </td>
 
@@ -329,12 +329,12 @@
                     <td class="nowrap-td">{{ ucwords(strtolower($calls->location))}}</td>
                     <td class="nowrap-td">
                       @php
-                          $stripped = strip_tags($calls->remarks);
+                          $stripped = strip_tags($calls->testing_remarks_data_migration);
                           $shortText = Str::limit($stripped, 20); // show 20 characters
                       @endphp
                       {!! $shortText !!}
                       @if(strlen($stripped) > 20)
-                          <a href="#" class="text-primary read-more-link" data-remarks="{!! htmlspecialchars($calls->remarks, ENT_QUOTES) !!}">Read More</a>
+                          <a href="#" class="text-primary read-more-link" data-remarks="{!! htmlspecialchars($calls->testing_remarks_data_migration, ENT_QUOTES) !!}">Read More</a>
                       @endif
                   </td>
 
@@ -435,12 +435,12 @@
                     <td class="nowrap-td">{{ ucwords(strtolower($calls->location))}}</td>
                     <td class="nowrap-td">
                       @php
-                          $stripped = strip_tags($calls->remarks);
+                          $stripped = strip_tags($calls->testing_remarks_data_migration);
                           $shortText = Str::limit($stripped, 20);
                       @endphp
                       {!! $shortText !!}
                       @if(strlen($stripped) > 20)
-                          <a href="#" class="text-primary read-more-link" data-remarks="{!! htmlspecialchars($calls->remarks, ENT_QUOTES) !!}">Read More</a>
+                          <a href="#" class="text-primary read-more-link" data-remarks="{!! htmlspecialchars($calls->testing_remarks_data_migration, ENT_QUOTES) !!}">Read More</a>
                       @endif
                     </td>
                     <!-- @php
