@@ -329,12 +329,18 @@ input[type=number]::-webkit-outer-spin-button
                     <td>{{ $calls->location }}</td>
                     <td class="nowrap-td">
                       @php
-                          $stripped = strip_tags($calls->remarks);
-                          $shortText = Str::limit($stripped, 20);
+                          $rawRemarks = $calls->remarks ?? '';
+                          $escaped = e($rawRemarks);
+                          $stripped = strip_tags($rawRemarks);
                       @endphp
-                      {!! $shortText !!}
+
+                      {{ \Illuminate\Support\Str::limit($stripped, 20) }}
+
                       @if(strlen($stripped) > 20)
-                          <a href="#" class="text-primary read-more-link" data-remarks="{!! htmlspecialchars($calls->remarks, ENT_QUOTES) !!}">Read More</a>
+                          <a href="#" class="text-primary read-more-link"
+                            data-remarks-raw="{{ $escaped }}">
+                            Read More
+                          </a>
                       @endif
                     </td>
                     <td>
@@ -1268,9 +1274,11 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
   <script>
     $(document).on('click', '.read-more-link', function(e) {
         e.preventDefault();
-        var remarks = $(this).data('remarks');
-        $('#remarksModalBody').html(remarks);
-        $('#remarksModal').modal('show');
+      const rawRemarks = $(this).data('remarks-raw') || $(this).data('remarks');
+      const formatted = formatRemarks(rawRemarks, 0);
+
+      $('#remarksModalBody').html(formatted);
+      $('#remarksModal').modal('show');
     });
 </script>
 
@@ -2139,11 +2147,13 @@ function s2ab(s) {
 
 <script>
 function formatRemarks(rawData, limit = 20) {
-  
+
     if (!rawData) return '';
+
     let data = $('<div>').html(rawData).text();
+    
     data = data.replace(/###SEP###/g, '<br>');
-    data = data.replace(/^Lead Summary - Qualification Notes:/i, '<strong>Lead Summary - Qualification Notes:</strong><br><br>');
+    data = data.replace(/^Lead Summary - Qualification Notes:/i, '<strong>Lead Summary - Qualification Notes:</strong><br>');
     data = data.replace(/(\d+\.\s*[^:\n]+):/g, '<strong>$1:</strong>');
     data = data.replace(/(General Remark\s*\/\s*Additional Notes:)/i, '<strong>$1</strong>');
     data = data.replace(/^(?=\d+\.\s)/m, '<br>');
@@ -2152,7 +2162,7 @@ function formatRemarks(rawData, limit = 20) {
     const tempDiv = $('<div>').html(data);
     const plainText = tempDiv.text().trim();
 
-    if (plainText.length > limit) {
+    if (limit > 0 && plainText.length > limit) {
         let shortText = plainText.substring(0, limit) + '...';
         let escapedData = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
