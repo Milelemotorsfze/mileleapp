@@ -5723,6 +5723,13 @@ $(document).ready(function() {
             success: function(response) {
                 $('#importModal').modal('hide');
                 if (response.vehiclesData && Array.isArray(response.vehiclesData)) {
+                    // check number of vehicles in csv with available vehicles
+                    var availableVehicles = $('#dtBasicExample1 tbody .vin').length;
+                    if (response.vehiclesData.length > availableVehicles) {
+                        alert('Waring: Quantity of variants is more than available vehicles in PO. Please check your CSV file.');
+                        location.reload();
+                        return;
+                    }
                     // Check forr DN Number
                     var dnNumbers = {};
                     response.vehiclesData.forEach(function(vehicle) {
