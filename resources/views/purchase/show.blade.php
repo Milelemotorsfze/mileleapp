@@ -2080,7 +2080,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
 											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmvendors', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
 											Incoming Confirmed
 											</a>
-                                           @endif
+											@endif
 											@endif
 											@endif -->
                                         <!-- @php
@@ -2707,6 +2707,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
     </div>
   </div>
 </div>
+</div>
             @endif
             <div class="card">
                 <div class="card-header">
@@ -2796,134 +2797,6 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                     </div>
                 </div>
             </div>
-            <!-- <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">PO's Log Details</h4>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered">
-                            <thead class="bg-soft-secondary">
-                            <tr>
-                                <th>Action</th>
-                                <th>Variant</th>
-                                <th>Exterior Color</th>
-                                <th>Interior Color</th>
-                                <th>QTY</th>
-                                <th>Territory</th>
-                                <th>Estimated Arrival</th>
-                                <th>Update Date</th>
-                                <th>Updated By</th>
-                                <th>Role</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @php
-                                $previousLog = null;
-                                $qty = 0;
-                            @endphp
-                            @foreach($purchasinglog as $log)
-                                @php
-                                    // Check if current row is the same as the previous row
-                                    $isSameAsPrevious = ($previousLog &&
-                                    $log->created_by== $previousLog->created_by &&
-                                    $log->estimation_date == $previousLog->estimation_date &&
-                                    $log->territory == $previousLog->territory &&
-                                    $log->ex_colour == $previousLog->ex_colour &&
-                                    $log->int_colour == $previousLog->int_colour &&
-                                    $log->variant == $previousLog->variant &&
-                                    $log->status == $previousLog->status &&
-                                    $log->role == $previousLog->role);
-                                    if (!$isSameAsPrevious) {
-                                    if ($qty > 0) {
-                                    // Output the row with the previous quantity count
-                                    echo '
-                                    <tr>
-                                       ';
-                                       $change_by = DB::table('users')->where('id', $previousLog->created_by)->first();
-                                       $change_bys = $change_by->name;
-                                       $variant = $previousLog->variant ? DB::table('varaints')->where('id', $previousLog->variant)->first() : null;
-                                        $variant_name = $variant ? $variant->name: null;
-                                       echo '
-                                       <td>'. $previousLog->status .'</td>
-                                       ';
-                                       echo '
-                                       <td>'. ucfirst(strtolower($variant_name)) .'</td>
-                                       ';
-                                       $exColour = $previousLog->ex_colour ? DB::table('color_codes')->where('id', $previousLog->ex_colour)->first() : null;
-                                       $ex_colours = $exColour ? $exColour->name : null;
-                                       $intColour = $previousLog->int_colour ? DB::table('color_codes')->where('id', $previousLog->int_colour)->first() : null;
-                                       $int_colours = $intColour ? $intColour->name : null;
-                                       echo '
-                                       <td>'. $ex_colours .'</td>
-                                       ';
-                                       echo '
-                                       <td>'. $int_colours .'</td>
-                                       ';
-                                       echo '
-                                       <td>'. $qty .'</td>
-                                       ';
-                                       echo '
-                                       <td>'. ucfirst(strtolower($previousLog->territory)) .'</td>
-                                       ';
-                                       echo '
-                                       <td>'. $previousLog->estimation_date .'</td>
-                                       ';
-                                       echo '
-                                       <td>'. date('d-M-Y', strtotime($previousLog->date)) .' '. $previousLog->time .'</td>
-                                       ';
-                                       echo '
-                                       <td>'. ucfirst(strtolower($change_bys)) .'</td>
-                                       ';
-                                       $selected = DB::table('roles')->where('id', $previousLog->role)->first();
-                                       $roleselected = $selected ? $selected->name : null;
-                                       echo '
-                                       <td>'. $roleselected .'</td>
-                                       ';
-                                       echo '
-                                    </tr>
-                                    ';
-                                    }
-                                    // Reset the quantity count and update the previous log
-                                    $qty = 1;
-                                    $previousLog = $log;
-                                    } else {
-                                    $qty++; // Increment the quantity count
-                                    }
-                                @endphp
-                            @endforeach
-                            {{-- Output the last group if it exists --}}
-                            @if ($qty > 0)
-                                <tr>
-                                    @php
-                                        $change_by = DB::table('users')->where('id', $previousLog->created_by)->first();
-                                        $change_bys = $change_by->name;
-                                        $variant = $previousLog->variant ? DB::table('varaints')->where('id', $previousLog->variant)->first() : null;
-                                        $variant_name = $variant ? $variant->name: null;
-                                        $exColour = $previousLog->ex_colour ? DB::table('color_codes')->where('id', $previousLog->ex_colour)->first() : null;
-                                        $ex_colours = $exColour ? $exColour->name : null;
-                                        $intColour = $previousLog->int_colour ? DB::table('color_codes')->where('id', $previousLog->int_colour)->first() : null;
-                                        $int_colours = $intColour ? $intColour->name : null;
-                                        $selected = DB::table('roles')->where('id', $previousLog->role)->first();
-                                        $roleselected = $selected ? $selected->name : null;
-                                    @endphp
-                                    <td>{{ $previousLog->status }}</td>
-                                    <td>{{ ucfirst(strtolower($variant_name)) }}</td>
-                                    <td>{{ $ex_colours }}</td>
-                                    <td>{{ $int_colours }}</td>
-                                    <td>{{ $qty }}</td>
-                                    <td>{{ ucfirst(strtolower($previousLog->territory)) }}</td>
-                                    <td>{{ $previousLog->estimation_date }}</td>
-                                    <td>{{ date('d-M-Y', strtotime($previousLog->date)) }} {{ $previousLog->time }}</td>
-                                    <td>{{ ucfirst(strtolower($change_bys)) }}</td>
-                                    <td>{{ $roleselected }}</td>
-                                </tr>
-                            @endif
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div> -->
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">PO Events Log</h4>
@@ -5727,6 +5600,23 @@ $(document).ready(function() {
                     var availableVehicles = $('#dtBasicExample1 tbody .vin').length;
                     if (response.vehiclesData.length > availableVehicles) {
                         alert('Waring: Quantity of variants is more than available vehicles in PO. Please check your CSV file.');
+                        location.reload();
+                        return;
+                    }
+                    // Check for duplicate VINs in the uploaded CSV
+                    var vinCount = {};
+                    var duplicateVins = [];
+                    response.vehiclesData.forEach(function(vehicle) {
+                        var vin = (vehicle.vin || '').trim();
+                        if (vin) {
+                            vinCount[vin] = (vinCount[vin] || 0) + 1;
+                            if (vinCount[vin] === 2) {
+                                duplicateVins.push(vin);
+                            }
+                        }
+                    });
+                    if (duplicateVins.length > 0) {
+                        alert('Warning: Duplicate VIN(s) found in CSV: ' + duplicateVins.join(', ') + '. Please check your CSV file.');
                         location.reload();
                         return;
                     }
