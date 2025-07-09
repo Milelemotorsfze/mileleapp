@@ -338,18 +338,20 @@ class CallsController extends Controller
     public function create()
     {
         $countries = CountryListFacade::getList('en');
+        $africanCountries = Country::where('is_african_country', 1)->pluck('name')->toArray();
         $Language = Language::get();
         $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
         $strategy = Strategy::get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
         $sales_persons = User::where('manual_lead_assign', 1)
+        ->select('id', 'name', 'is_dubai_sales_rep') 
         ->orderBy('name', 'asc')
         ->get();
         $useractivities =  New UserActivities();
         $useractivities->activity = "Create New Lead";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-        return view('calls.create', compact('countries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'Language', 'strategy'));
+        return view('calls.create', compact('countries', 'africanCountries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'Language', 'strategy'));
     }
     /**
      * Store a newly created resource in storage.
@@ -700,11 +702,12 @@ class CallsController extends Controller
         $calls = Calls::findOrFail($id);
         $Language = Language::get();
         $countries = CountryListFacade::getList('en');
+        $africanCountries = Country::where('is_african_country', 1)->pluck('name')->toArray();
         $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
         $strategy = Strategy::get();
         $currentStrategyName = optional(Strategy::find($calls->strategies_id))->name;
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
-        $sales_persons = User::select('id', 'name') 
+        $sales_persons = User::select('id', 'name', 'is_dubai_sales_rep') 
             ->where('manual_lead_assign', 1)
             ->where('status', 'active')
             ->orderBy('name')
@@ -713,7 +716,7 @@ class CallsController extends Controller
         $useractivities->activity = "Open Edit Page of Leads";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-        return view('calls.edit', compact('calls','countries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'Language', 'strategy', 'currentStrategyName'));
+        return view('calls.edit', compact('calls','countries', 'africanCountries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'Language', 'strategy', 'currentStrategyName'));
     }
 
     /**

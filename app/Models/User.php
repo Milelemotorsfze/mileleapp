@@ -33,6 +33,7 @@ class User extends Authenticatable
         'sales_rap',
         'is_management',
         'is_sales_rep',
+        'is_dubai_sales_rep',
         'can_send_wo_email',
         'pfi_access',
         'manual_lead_assign',

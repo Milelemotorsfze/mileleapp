@@ -29,6 +29,12 @@
         border-radius: 10px;
     }
 
+    .sales-person-multiple-error-message {
+        font-family: inherit;        
+        color: red;
+        font-size: 14px !important;
+    }
+
     /* Media Query for small screens */
     @media (max-width: 767px) {
         .col-lg-12.col-md-12 {
@@ -138,8 +144,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
             <div class="col-lg-4 col-md-6 pt-3">
                 <span class="error">* </span>
-                <label for="locationSelect" class="form-label">Destination:</label>
-                <select name="location" class="form-control select2" id="locationSelect" multiple>
+                <label for="destination_country" class="form-label">Destination:</label>
+                <select name="location" class="form-control select2" id="destination_country" multiple>
                     <option value="">Select Destination</option>
                     @foreach ($countries as $country)
                     <option value="{{ $country }}" {{ old('location') == $country ? 'selected' : '' }}>
@@ -203,13 +209,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <span class="error">* </span>
                 <label for="sales_person" class="form-label">Sales Person:</label>
                 <select name="sales_person_id" id="salesPersonSelect" class="form-control select2" multiple>
-                    <option value="">Select Sales Person</option>
+                    <!-- <option value="" >Select Sales Person</option> -->
                     @foreach ($sales_persons as $sales_person)
-                    <option value="{{ $sales_person->id }}" {{ old('sales_person_id') == $sales_person->id ? 'selected' : '' }}>
+                        @php
+                            $isDubai = in_array($sales_person->is_dubai_sales_rep, [1, '1', 'Yes'], true) ? '1' : '0';
+                        @endphp
+                    <option value="{{ $sales_person->id }}" {{ old('sales_person_id') == $sales_person->id ? 'selected' : '' }}  data-dubai="{{ $isDubai }}">
                         {{ $sales_person->name }}
                     </option>
                     @endforeach
+                    
                 </select>
+                <div id="sales-person-warning" class="sales-person-multiple-error-message" style="font-size: 13px; display: none;">You can only select 1 Sales Person</div>
             </div>
         </div>
         <div class="maindd">
@@ -239,7 +250,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <div class="row">
                         <div class="col-lg-4 col-md-6">
                             <label for="brandModelSelect" class="form-label">Brand & Model:</label>
-                            <select name="model_line_ids[]" class="form-control select2" multiple>
+                            <select name="model_line_ids[]" class="form-control select2" id="brandModelSelect" multiple>
                                 <option value="">Select Brand & Model</option>
                                 @foreach ($modelLineMasters as $modelLineMaster)
                                     @php
@@ -292,11 +303,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </select>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12 remarks-single-div-container">
-                    <label for="destination_country" class="form-label">Destination Country:</label>
-                    <select class="form-control mb-3 select2" name="destination_country" id="destination_country" multiple>
+                    <label for="destination_country_remarks" class="form-label">Destination Country:</label>
+                    <select class="form-control mb-3 select2" name="destination_country_remarks" id="destination_country_remarks" multiple>
                         <option value="">Select Destination</option>
                         @foreach ($countries as $country)
-                            <option value="{{ $country }}" {{ old('destination_country') == $country ? 'selected' : '' }}>{{ $country }}</option>
+                            <option value="{{ $country }}" {{ old('destination_country_remarks') == $country ? 'selected' : '' }}>{{ $country }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -405,10 +416,118 @@ redirect()->route('home')->send();
 
 </script>
 
+<script>
+    const africanCountries = @json($africanCountries);
+
+    function filterSalesPersonsByDestination() {
+        const selectedCountries = $('#destination_country').val() || [];
+
+        if (selectedCountries.length === 0) {
+            $('#salesPersonSelect option').prop('disabled', false);
+            $('#salesPersonSelect').select2('destroy').select2();
+            return;
+        }
+
+        const isAfricanSelected = selectedCountries.some(c =>
+            africanCountries.map(a => a.trim().toLowerCase()).includes(c.trim().toLowerCase())
+        );
+
+        $('#salesPersonSelect option').each(function () {
+            if (!$(this).val()) return;
+
+            const isDubaiRep = $(this).data('dubai') == 1;
+            if (isAfricanSelected && !isDubaiRep) {
+                $(this).prop('disabled', true);
+            } else {
+                $(this).prop('disabled', false);
+            }
+        });
+
+        $('#salesPersonSelect').val(null);
+        $('#salesPersonSelect').select2('destroy').select2();
+
+        $('#salesPersonSelect').on('change', function () {
+            const selected = $(this).val();
+            if (!selected || selected.length === 0) {
+                $('#sales-person-warning').hide();
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        
+        $('#destination_country').select2({
+            placeholder: "Select Destination Country",
+            maximumSelectionLength: 1,
+        });
+
+        $('#salesPersonSelect').select2({
+            placeholder: "Select Sales Person",
+            maximumSelectionLength: 1,
+             allowClear: true,
+             width: '100%',
+        });
+
+        $('#salesPersonSelect').on('select2:opening', function (e) {
+            const selected = $(this).val();
+            if (selected && selected.length >= 1) {
+                e.preventDefault();
+                $('#sales-person-warning').show();
+            } else {
+                $('#sales-person-warning').hide();
+            }
+        });
+
+        $('#destination_country').on('change select2:select select2:unselect', filterSalesPersonsByDestination);
+        filterSalesPersonsByDestination();
+    });
+</script>
+
+
 <script type="text/javascript">
     $(document).ready(function() {
-        $('.select2').select2({
-            placeholder: "Select an option",
+        // $('.select2').select2({
+        //     placeholder: "Select an option",
+        //     maximumSelectionLength: 1,
+        // });
+        $('#milelemotorsSelect').select2({
+            placeholder: "Select Source",
+            maximumSelectionLength: 1,
+        });
+        $('#typeSelect').select2({
+            placeholder: "Select Lead type",
+            maximumSelectionLength: 1,
+        });
+        $('#strategyInput').select2({
+            placeholder: "Select Lead Strategy",
+            maximumSelectionLength: 1,
+        });
+        $('#prioritySelect').select2({
+            placeholder: "Select Lead Priority",
+            maximumSelectionLength: 1,
+        });
+        $('#brandModelSelect').select2({
+            placeholder: "Select Brand and Model",
+            maximumSelectionLength: 1, 
+        });
+        $('#destination_country_remarks').select2({
+            placeholder: "Select Destination for Remarks",
+            maximumSelectionLength: 1,
+        });
+        $('#destination_country').select2({
+            placeholder: "Select Destination Country",
+            maximumSelectionLength: 1,
+        });
+
+        $('#salesPersonSelect').select2({
+            placeholder: "Select Sales Person",
+            maximumSelectionLength: 1,
+             allowClear: true,
+             width: '100%',
+        });
+
+        $('#languageSelect').select2({
+            placeholder: "Select Language",
             maximumSelectionLength: 1,
         });
     });
@@ -719,7 +838,7 @@ redirect()->route('home')->send();
             const model = $('#car_model').val();
             const purpose = $('#purchase_purpose').val();
             const endUser = $('#end_user').val();
-            const destinationCountries = $('#destination_country').val() || [];
+            const destinationCountries = $('#destination_country_remarks').val() || [];
             const plannedUnits = $('#planned_units').val();
             const experience = $('#source_experience').val();
             const shipping = $('#shipping_required').val();

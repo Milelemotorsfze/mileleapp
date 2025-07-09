@@ -126,7 +126,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                     
                     </br>
                     <div class="maindd">
-                        <div id="row-container">
+                        <div class="row-container">
                             <div class="row">
                                 <div class="col-lg-4 col-md-6">
                                     <label for="brandInput" class="form-label">Brand & Models:</label>
@@ -135,9 +135,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                                         @foreach ($modelLineMasters as $modelLineMaster)
                                             @php
                                                 $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
-                                                $brand_name = $brand->brand_name;
+                                                $brand_name = $brand ? $brand->brand_name : 'Unknown Brand';
                                             @endphp 
-                                            <option value="{{ $brand_name }} / {{ $modelLineMaster->model_line }}" data-value="{{ $modelLineMaster->id }}">{{ $brand_name }} / {{ $modelLineMaster->model_line }}</option>
+                                            <option value="{{ $brand_name }} / {{ $modelLineMaster->model_line }}" data-value="{{ $modelLineMaster->id }}">
+                                                {{ $brand_name }} / {{ $modelLineMaster->model_line }}
+                                            </option>
                                         @endforeach
                                     </datalist>
                                     <input type="hidden" name="model_line_ids" id="selectedBrandIds">
