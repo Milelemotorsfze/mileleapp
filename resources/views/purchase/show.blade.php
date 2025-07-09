@@ -5496,9 +5496,11 @@ $(document).ready(function() {
                                     $row.find('.dn').text(vehicle.dn);
                                     $row.find('.engine').text(vehicle.engine);
                                     // Update Exterior Color (if select)
-                                    if (vehicle.ex_colour) {
-                                        var $exSelect = $row.find('.ex_colour select');
-                                        var exVal = '';
+                                    var $exSelect = $row.find('.ex_colour select');
+                                    var exVal = '';
+                                    if (vehicle.ex_colour_id) {
+                                        exVal = vehicle.ex_colour_id;
+                                    } else if (vehicle.ex_colour) {
                                         var csvColor = vehicle.ex_colour.trim().toLowerCase().replace(/\s+/g, '');
                                         $exSelect.find('option').each(function() {
                                             var optionText = $(this).text().trim().toLowerCase().replace(/\s+/g, '');
@@ -5506,24 +5508,33 @@ $(document).ready(function() {
                                                 exVal = $(this).val();
                                             }
                                         });
-                                        if (exVal) {
-                                            $exSelect.val(exVal).trigger('change');
-                                        } else {
-                                            console.log('No match for exterior color:', vehicle.ex_colour, 'in', $exSelect.html());
-                                        }
                                     }
+                                    if (exVal) {
+                                        $exSelect.prop('disabled', false);
+                                        $exSelect.val(exVal).trigger('change');
+                                        $exSelect.prop('disabled', true);
+                                        console.log('Set exterior color select to', exVal, 'for VIN', vehicle.vin);
+                                    } else {
+                                        console.log('No match for exterior color:', vehicle.ex_colour, 'in', $exSelect.html());
+                                    }
+
                                     // Update Interior Color (if select)
-                                    if (vehicle.int_colour) {
-                                        var $intSelect = $row.find('.int_colour select');
-                                        var intVal = '';
+                                    var $intSelect = $row.find('.int_colour select');
+                                    var intVal = '';
+                                    if (vehicle.int_colour_id) {
+                                        intVal = vehicle.int_colour_id;
+                                    } else if (vehicle.int_colour) {
                                         $intSelect.find('option').each(function() {
                                             if ($(this).text().trim().toLowerCase() === vehicle.int_colour.trim().toLowerCase()) {
                                                 intVal = $(this).val();
                                             }
                                         });
-                                        if (intVal) {
-                                            $intSelect.val(intVal).trigger('change');
-                                        }
+                                    }
+                                    if (intVal) {
+                                        $intSelect.prop('disabled', false);
+                                        $intSelect.val(intVal).trigger('change');
+                                        $intSelect.prop('disabled', true);
+                                        console.log('Set interior color select to', intVal, 'for VIN', vehicle.vin);
                                     }
                                     // Update Production Month
                                     var $prodInput = $row.find('.ppmmyyy input[type="date"]');
@@ -5551,9 +5562,11 @@ $(document).ready(function() {
                                     $row.find('.dn').text(vehicle.dn);
                                     $row.find('.engine').text(vehicle.engine);
                                     // Update Exterior Color (if select)
-                                    if (vehicle.ex_colour) {
-                                        var $exSelect = $row.find('.ex_colour select');
-                                        var exVal = '';
+                                    var $exSelect = $row.find('.ex_colour select');
+                                    var exVal = '';
+                                    if (vehicle.ex_colour_id) {
+                                        exVal = vehicle.ex_colour_id;
+                                    } else if (vehicle.ex_colour) {
                                         var csvColor = vehicle.ex_colour.trim().toLowerCase().replace(/\s+/g, '');
                                         $exSelect.find('option').each(function() {
                                             var optionText = $(this).text().trim().toLowerCase().replace(/\s+/g, '');
@@ -5561,24 +5574,33 @@ $(document).ready(function() {
                                                 exVal = $(this).val();
                                             }
                                         });
-                                        if (exVal) {
-                                            $exSelect.val(exVal).trigger('change');
-                                        } else {
-                                            console.log('No match for exterior color:', vehicle.ex_colour, 'in', $exSelect.html());
-                                        }
                                     }
+                                    if (exVal) {
+                                        $exSelect.prop('disabled', false);
+                                        $exSelect.val(exVal).trigger('change');
+                                        $exSelect.prop('disabled', true);
+                                        console.log('Set exterior color select to', exVal, 'for VIN', vehicle.vin);
+                                    } else {
+                                        console.log('No match for exterior color:', vehicle.ex_colour, 'in', $exSelect.html());
+                                    }
+
                                     // Update Interior Color (if select)
-                                    if (vehicle.int_colour) {
-                                        var $intSelect = $row.find('.int_colour select');
-                                        var intVal = '';
+                                    var $intSelect = $row.find('.int_colour select');
+                                    var intVal = '';
+                                    if (vehicle.int_colour_id) {
+                                        intVal = vehicle.int_colour_id;
+                                    } else if (vehicle.int_colour) {
                                         $intSelect.find('option').each(function() {
                                             if ($(this).text().trim().toLowerCase() === vehicle.int_colour.trim().toLowerCase()) {
                                                 intVal = $(this).val();
                                             }
                                         });
-                                        if (intVal) {
-                                            $intSelect.val(intVal).trigger('change');
-                                        }
+                                    }
+                                    if (intVal) {
+                                        $intSelect.prop('disabled', false);
+                                        $intSelect.val(intVal).trigger('change');
+                                        $intSelect.prop('disabled', true);
+                                        console.log('Set interior color select to', intVal, 'for VIN', vehicle.vin);
                                     }
                                     // Update Production Month
                                     var $prodInput = $row.find('.ppmmyyy input[type="date"]');
@@ -5610,9 +5632,11 @@ $(document).ready(function() {
                                     $row.find('.dn').text(vehicle.dn);
                                     $row.find('.engine').text(vehicle.engine);
                                     // Update Exterior Color (if select)
-                                    if (vehicle.ex_colour) {
-                                        var $exSelect = $row.find('.ex_colour select');
-                                        var exVal = '';
+                                    var $exSelect = $row.find('.ex_colour select');
+                                    var exVal = '';
+                                    if (vehicle.ex_colour_id) {
+                                        exVal = vehicle.ex_colour_id;
+                                    } else if (vehicle.ex_colour) {
                                         var csvColor = vehicle.ex_colour.trim().toLowerCase().replace(/\s+/g, '');
                                         $exSelect.find('option').each(function() {
                                             var optionText = $(this).text().trim().toLowerCase().replace(/\s+/g, '');
@@ -5620,24 +5644,33 @@ $(document).ready(function() {
                                                 exVal = $(this).val();
                                             }
                                         });
-                                        if (exVal) {
-                                            $exSelect.val(exVal).trigger('change');
-                                        } else {
-                                            console.log('No match for exterior color:', vehicle.ex_colour, 'in', $exSelect.html());
-                                        }
                                     }
+                                    if (exVal) {
+                                        $exSelect.prop('disabled', false);
+                                        $exSelect.val(exVal).trigger('change');
+                                        $exSelect.prop('disabled', true);
+                                        console.log('Set exterior color select to', exVal, 'for VIN', vehicle.vin);
+                                    } else {
+                                        console.log('No match for exterior color:', vehicle.ex_colour, 'in', $exSelect.html());
+                                    }
+
                                     // Update Interior Color (if select)
-                                    if (vehicle.int_colour) {
-                                        var $intSelect = $row.find('.int_colour select');
-                                        var intVal = '';
+                                    var $intSelect = $row.find('.int_colour select');
+                                    var intVal = '';
+                                    if (vehicle.int_colour_id) {
+                                        intVal = vehicle.int_colour_id;
+                                    } else if (vehicle.int_colour) {
                                         $intSelect.find('option').each(function() {
                                             if ($(this).text().trim().toLowerCase() === vehicle.int_colour.trim().toLowerCase()) {
                                                 intVal = $(this).val();
                                             }
                                         });
-                                        if (intVal) {
-                                            $intSelect.val(intVal).trigger('change');
-                                        }
+                                    }
+                                    if (intVal) {
+                                        $intSelect.prop('disabled', false);
+                                        $intSelect.val(intVal).trigger('change');
+                                        $intSelect.prop('disabled', true);
+                                        console.log('Set interior color select to', intVal, 'for VIN', vehicle.vin);
                                     }
                                     // Update Production Month
                                     var $prodInput = $row.find('.ppmmyyy input[type="date"]');

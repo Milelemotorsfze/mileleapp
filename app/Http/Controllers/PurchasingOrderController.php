@@ -1526,14 +1526,67 @@ class PurchasingOrderController extends Controller
 
         // Map CSV columns to a structure for frontend
         $vehiclesData = collect($filtered)->map(function($row) {
-            // Extract exterior and interior color from 'color' column if present
+            // --- COLOR LOGIC START ---
             $ex_colour = '';
             $int_colour = '';
-            if (!empty($row['color'] ?? $row['Color'] ?? '')) {
-                $colorValue = $row['color'] ?? $row['Color'];
-                $parts = explode('/', $colorValue);
-                $ex_colour = trim($parts[0] ?? '');
-                $int_colour = trim($parts[1] ?? '');
+            $ex_colour_id = null;
+            $int_colour_id = null;
+            $ex_colour_name = '';
+            $int_colour_name = '';
+            $colorCodeRaw = $row['COLOR CODE'] ?? $row['Color Code'] ?? $row['color_code'] ?? $row['colorcode'] ?? '';
+            $colorRaw = $row['COLOR'] ?? $row['Color'] ?? $row['color'] ?? '';
+            // 1. Try COLOR CODE first
+            if ($colorCodeRaw) {
+                $code = preg_replace('/\D/', '', $colorCodeRaw);
+                if (strlen($code) === 4) {
+                    $code = '0' . $code;
+                }
+                if (strlen($code) === 5) {
+                    $exCode = substr($code, 0, 3);
+                    $intCode = substr($code, 3, 2);
+                    $exColor = ColorCode::where('code', $exCode)->where('belong_to', 'ex')->first();
+                    $intColor = ColorCode::where('code', $intCode)->where('belong_to', 'int')->first();
+                    if ($exColor) {
+                        $ex_colour = $exColor->name;
+                        $ex_colour_id = $exColor->id;
+                        $ex_colour_name = $exColor->name;
+                    } else {
+                        $ex_colour = '';
+                    }
+                    if ($intColor) {
+                        $int_colour = $intColor->name;
+                        $int_colour_id = $intColor->id;
+                        $int_colour_name = $intColor->name;
+                    } else {
+                        $int_colour = '';
+                    }
+                }
+            }
+            // 2. Fallback to COLOR column for any missing color
+            if ((!$ex_colour || !$int_colour) && $colorRaw) {
+                $parts = explode('/', $colorRaw);
+                if (!$ex_colour && isset($parts[0])) {
+                    $exPart = trim($parts[0]);
+                    $exColor = ColorCode::where('name', 'like', $exPart)->where('belong_to', 'ex')->first();
+                    if ($exColor) {
+                        $ex_colour = $exColor->name;
+                        $ex_colour_id = $exColor->id;
+                        $ex_colour_name = $exColor->name;
+                    } else {
+                        $ex_colour = $exPart;
+                    }
+                }
+                if (!$int_colour && isset($parts[1])) {
+                    $intPart = trim($parts[1]);
+                    $intColor = ColorCode::where('name', 'like', $intPart)->where('belong_to', 'int')->first();
+                    if ($intColor) {
+                        $int_colour = $intColor->name;
+                        $int_colour_id = $intColor->id;
+                        $int_colour_name = $intColor->name;
+                    } else {
+                        $int_colour = $intPart;
+                    }
+                }
             }
             // Format prod_month as YYYY-MM-01 if present
             $prod_month_raw = $row['Production Date'] ?? $row['prod_month'] ?? '';
@@ -1551,6 +1604,10 @@ class PurchasingOrderController extends Controller
                 'prod_month' => $prod_month,
                 'ex_colour' => $ex_colour,
                 'int_colour' => $int_colour,
+                'ex_colour_id' => $ex_colour_id,
+                'int_colour_id' => $int_colour_id,
+                'ex_colour_name' => $ex_colour_name,
+                'int_colour_name' => $int_colour_name,
                 'dn' => $row['dn'] ?? $row['DN'] ?? '',
             ];
         })->toArray();
@@ -1851,7 +1908,7 @@ class PurchasingOrderController extends Controller
         }
         return response()->json('unique');
     }
-    public function updatepurchasingData(Request $request) //working here
+    public function updatepurchasingData(Request $request)
     {
         $updatedData = $request->json()->all();
         $updatedVins = [];
@@ -1910,13 +1967,13 @@ class PurchasingOrderController extends Controller
                             $oldval = ColorCode::find($change['old_value']);
                             $oldvalue = $oldval ? $oldval->name : "";
                             $newval = ColorCode::find($change['new_value']);
-                            $namevalue = $newval->name;
+                            $namevalue = $newval ? $newval->name : "";
                         } elseif ($field == 'ex_colour') {
                             $newfield = "Exterior Colour";
                             $oldval = ColorCode::find($change['old_value']);
                             $oldvalue = $oldval ? $oldval->name : "";
                             $newval = ColorCode::find($change['new_value']);
-                            $namevalue = $newval->name;
+                            $namevalue = $newval ? $newval->name : "";
                         } elseif ($field == 'engine') {
                             $newfield = "Engine Number";
                             $oldvalue = $change['old_value'] ?? "";
@@ -1953,14 +2010,14 @@ class PurchasingOrderController extends Controller
                     if ($fieldName === 'dn') {
                         // Check if this DN number already exists for this vehicle
                         $existingDn = VehicleDn::where('vehicles_id', $vehicleId)
-                            ->where('dn_number', $fieldValue)
-                            ->first();
+                        ->where('dn_number', $fieldValue)
+                        ->first();
                         if (!$existingDn) {
                             $latestVehicleDn = VehicleDn::where('vehicles_id', $vehicleId)
-                                ->orderBy('created_at', 'desc')
+                            ->orderBy('created_at', 'desc')
                                 ->first();
-                            $batchNumber = ($latestVehicleDn && $latestVehicleDn->batch) ? ($latestVehicleDn->batch + 1) : 1;
-                            $vehicledn = new VehicleDn();
+                                $batchNumber = ($latestVehicleDn && $latestVehicleDn->batch) ? ($latestVehicleDn->batch + 1) : 1;
+                                $vehicledn = new VehicleDn();
                             $vehicledn->dn_number = $fieldValue;
                             $vehicledn->vehicles_id = $vehicleId;
                             $vehicledn->created_by = auth()->user()->id;
@@ -1976,9 +2033,6 @@ class PurchasingOrderController extends Controller
                     $purchasingOrderId = $vehicle->purchasing_order_id;
                     $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
                     if ($purchasingOrder) {
-                        //    info ($fieldName);
-                        //                    check the po is under demand planning
-
                         $purchasingOrderPFI = PFIItemPurchaseOrder::where('purchase_order_id', $purchasingOrderId)->first();
                         if ($purchasingOrderPFI) {
                             $supplierInventory = SupplierInventory::find($vehicle->supplier_inventory_id);
