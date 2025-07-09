@@ -489,12 +489,38 @@
 
   <script src="{{ asset('libs/jquery/jquery.min.js') }}"></script>
   <script>
-    $(document).on('click', '.read-more-link', function(e) {
-        e.preventDefault();
-        var remarks = $(this).data('remarks');
-        $('#remarksModalBody').html(remarks);
-        $('#remarksModal').modal('show');
-    });
+$(document).on('click', '.read-more-link', function(e) {
+    e.preventDefault();
+    var remarks = $(this).data('remarks');
+
+    if (remarks.includes('###SEP###')) {
+        const lines = remarks.split('###SEP###');
+        const formatted = lines.map((line, index) => {
+            const colonIndex = line.indexOf(':');
+            if (colonIndex !== -1) {
+                const label = line.substring(0, colonIndex + 1).trim();
+                const value = line.substring(colonIndex + 1).trim();
+
+                if (label.toLowerCase() === 'lead summary - qualification notes:') {
+                    return `<div><strong>${label}</strong>${value}</div><br>`;
+                }
+
+                if (label.toLowerCase() === 'general remark / additional notes:') {
+                    return `<br><div><strong>${label}</strong>${value}</div>`;
+                }
+
+                return `<div><strong>${label}</strong>${value}</div>`;
+            } else {
+                return `<div>${line}</div>`;
+            }
+        }).join('');
+        $('#remarksModalBody').html(formatted);
+      } else {
+          $('#remarksModalBody').html(`<div>${remarks}</div>`);
+      }
+
+      $('#remarksModal').modal('show');
+  });
 </script>
 
   <script type="text/javascript">

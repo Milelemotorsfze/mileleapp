@@ -171,4 +171,8 @@ class WOVehicles extends Model
                               });
                     });
     }    
+    public function deliveryStatusRelation()
+    {
+        return $this->hasOne(WOVehicleDeliveryStatus::class, 'w_o_vehicle_id');
+    }
 }

@@ -1357,6 +1357,15 @@ class VehiclesController extends Controller
             if ($variant) {
                 Vehicles::where('id', $vehiclesId)
                 ->update(['varaints_id' => $variant->id]);
+                Log::info('Variant Change Detected 12. Variant Changed in (updatevehiclesdata)', [
+                'vehicle_id' => $vehiclesId,
+                'new_variant_id' => $variant->id,
+                'variant_name' => $variant->name,
+                'user_id' => auth()->id(),
+                'user_name' => auth()->user()->name ?? 'N/A',
+                'source' => 'updatevehiclesinvehiclesConroller',
+                'timestamp' => now()->toDateTimeString()
+            ]);
             }
         }
         if($column === "import_type")
@@ -3280,7 +3289,7 @@ public function allvariantpriceupdate(Request $request)
         ->first();
     return response()->json($reservation);
 }
-public function saveenhancement(Request $request)
+    public function saveenhancement(Request $request)
     {
         $vehicleId = $request->input('vehicle_id');
         $variantId = $request->input('variant_id');
@@ -3289,6 +3298,18 @@ public function saveenhancement(Request $request)
         if ($vehicle) {
             $vehicle->varaints_id = $variantId;
             $vehicle->save();
+            if ($oldValue != $variantId) {
+                Log::info('Variant Change Detected 13. Vehicle varaints_id updated (saveenhancement)', [
+                    'vehicle_id' => $vehicle->id,
+                    'vin' => $vehicle->vin,
+                    'old_varaints_id' => $oldValue,
+                    'new_varaints_id' => $variantId,
+                    'user_id' => auth()->id(),
+                    'user_name' => auth()->user()->name ?? 'N/A',
+                    'source' => 'saveenhancementinvehiclecontroller',
+                    'timestamp' => now()->toDateTimeString()
+                ]);
+            }
         }
         $currentDateTime = Carbon::now();
         $vehicleslog = new Vehicleslog();

@@ -656,6 +656,10 @@ class MovementController extends Controller
     {
     $selectedSo = $request->input('so');
     $so_id = So::where('so_number', $selectedSo)
+     ->where(function ($query) {
+            $query->where('status', '!=', 'Cancelled')
+                  ->orWhereNull('status');
+        })
     ->pluck('id');
     $vehiclesWithSelectedSo = Vehicles::where('so_id', $so_id)->where('gdn_id', null)->pluck('vin');
     $purchasing_order_id = Vehicles::where('so_id', $so_id)->whereNull('gdn_id')->pluck('purchasing_order_id');

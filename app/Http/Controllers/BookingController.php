@@ -22,6 +22,7 @@ use App\Models\QuotationItem;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class BookingController extends Controller
 {
@@ -525,6 +526,12 @@ public function approval(Request $request)
         if ($closedRow) {
             $so_id = $closedRow->so_id;
             $vehicle->forceFill(['so_id' => $so_id])->save();
+            Log::info('Vehicle SO ID updated during approval. (so_id update Detected 1. approval)', [
+                'vehicle_id' => $vehicle->id,
+                'new_so_id' => $so_id,
+                'updated_by' => Auth::user()->email ?? 'system',
+                'timestamp' => now(),
+            ]);
         }
         event(new DataUpdatedEvent(['id' => $vehicle_id, 'message' => "Data Update"]));
         }

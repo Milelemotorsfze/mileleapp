@@ -81,7 +81,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
         <a href="{{ session('success')['fileLink'] }}" class="btn btn-primary">Click here</a> to download the rejected records.
     </div>
     @endif
-    <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('calls.simplefile') }}" text-align: right><i class="fa fa-download" aria-hidden="true"></i> Download Sample File</a>
+    <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('calls.bulkLeadsDataUplaodExcel') }}" text-align: right><i class="fa fa-download" aria-hidden="true"></i> Download Sample File</a>
     <br>
     <div class="row">
     </div>

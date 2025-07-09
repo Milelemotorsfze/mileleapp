@@ -38,6 +38,7 @@ use App\Models\MuitlpleAgents;
 use App\Models\QuotationFile;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Html\Builder;
+use Illuminate\Support\Str;
 
 class SalesOrderController extends Controller
 {
@@ -69,11 +70,17 @@ class SalesOrderController extends Controller
                     'so.so_number',
                     'so.id as soid',
                     'so.so_date',
+                    'so.status',
                     'quotations.calls_id',
                 ])
                     ->leftJoin('quotations', 'so.quotation_id', '=', 'quotations.id')
                     ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
                     ->leftJoin('calls', 'quotations.calls_id', '=', 'calls.id')
+                   ->where(function ($query) {
+                        $query->where('so.status', '!=', 'Cancelled')
+                            ->orWhereNull('so.status');
+                    })
+                    ->whereNull('so.deleted_at')
                     ->groupBy('so.id');
 
                 if (!$hasPermission) {
@@ -266,6 +273,8 @@ class SalesOrderController extends Controller
 
         $saleperson = User::find($quotation->created_by);
         $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first();
+        $quotationPriceWithoutVehicles =  QuotationItem::whereNot("reference_type", 'App\Models\Varaint')
+                ->where('quotation_id', $quotation->id)->sum('total_amount');
 
         foreach ($soVariants as $soVariant) {
             $selectedVehicleIds = $soVariant->so_items->pluck('vehicles_id')->toArray();
@@ -404,7 +413,8 @@ class SalesOrderController extends Controller
             'so',
             'empProfile',
             'saleperson',
-            'soVariants'
+            'soVariants',
+            'quotationPriceWithoutVehicles'
         ));
     }
 
@@ -413,12 +423,30 @@ class SalesOrderController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $so = SO::find($id);
+        if (!$so) {
+            return redirect()->back()->withErrors('Sales Order not found.');
+        }
         DB::beginTransaction();
         try {
-            $so = SO::findorFail($id);
             $logEntries = [];
             $currentTimestamp = Carbon::now();
             $priceChanged = false;
+
+            // VIN uniqueness validation across all variants
+            $soVariantsInput = $request->input('variants', []);
+            $allVins = [];
+            foreach ($soVariantsInput as $variant) {
+                if (isset($variant['vehicles']) && is_array($variant['vehicles'])) {
+                    foreach ($variant['vehicles'] as $vinId) {
+                        if (in_array($vinId, $allVins)) {
+                            DB::rollBack();
+                            return redirect()->back()->withErrors('A VIN cannot be assigned to more than one variant. Please ensure all VINs are unique across variants.');
+                        }
+                        $allVins[] = $vinId;
+                    }
+                }
+            }
 
             // basic details Fields to check for changes
             $fields = [
@@ -452,19 +480,18 @@ class SalesOrderController extends Controller
                 $deletedVariantIds = $request->input('deleted_so_variant_ids');
                 foreach ($deletedVariantIds as $variantId) {
                     $variant = SoVariant::find($variantId);
-                    if ($variant) {
-                        $logEntries[] = [
-                            'type' => 'Delete',
-                            'so_item_id' => null,
-                            'so_variant_id' => $variantId,
-                            'field_name' => 'variant',
-                            'old_value' => $variant->variant->name ?? '',
-                            'new_value' => null
-                        ];
-                        // Remove the SO items and update the vehicle's SO ID
-                        $logEntries = array_merge($logEntries, $this->removeSoItems($variantId, $variant->soVehicles ? $variant->soVehicles->pluck('vehicles_id')->toArray() : []));
-                        $variant->delete();
-                    }
+                    if (!$variant) continue; // Null check added
+                    $logEntries[] = [
+                        'type' => 'Delete',
+                        'so_item_id' => null,
+                        'so_variant_id' => $variantId,
+                        'field_name' => 'variant',
+                        'old_value' => $variant->variant->name ?? '',
+                        'new_value' => null
+                    ];
+                    // Remove the SO items and update the vehicle's SO ID
+                    $logEntries = array_merge($logEntries, $this->removeSoItems($variantId, $variant->soVehicles ? $variant->soVehicles->pluck('vehicles_id')->toArray() : []));
+                    $variant->delete();
                 }
             }
 
@@ -503,44 +530,22 @@ class SalesOrderController extends Controller
                         }
 
                         if (isset($soVariant['vehicles'])) {
-                            $currentVehicles = $existingVariant && $existingVariant->so_items ? $existingVariant->so_items->pluck('vehicles_id')->toArray() : [];
                             $newVehicles = $soVariant['vehicles'];
-                            
-                            // If no vehicles are selected, remove all existing ones
-                            if (empty($newVehicles)) {
-                                $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $currentVehicles));
-                            } else {
-                                $addedVehicles = array_diff($newVehicles, $currentVehicles);
-                                $removedVehicles = array_diff($currentVehicles, $newVehicles);
-
-                                // Add new vehicles
-                                foreach ($addedVehicles as $vehicleId) {
-                                    $soItem = Soitems::create(['vehicles_id' => $vehicleId, 'so_variant_id' => $existingVariant->id]);
-                                    $logEntries[] = [
-                                        'type' => 'Set',
-                                        'so_item_id' => $soItem->id,
-                                        'so_variant_id' => $existingVariant->id,
-                                        'field_name' => 'vehicles_id',
-                                        'old_value' => null,
-                                        'new_value' => $vehicleId
-                                    ];
-
-                                    Vehicles::where('id', $vehicleId)->update(['so_id' => $so->id]);
-                                }
-
-                                // Remove unselected vehicles
-                                if (!empty($removedVehicles)) {
-                                    $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $removedVehicles));
-                                }
-                            }
-                        } else {
-                            // If vehicles array is not set, remove all existing vehicles
-                            $currentVehicles = $existingVariant && $existingVariant->so_items ? $existingVariant->so_items->pluck('vehicles_id')->toArray() : [];
-                            if (!empty($currentVehicles)) {
-                                $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $currentVehicles));
+                            foreach ($newVehicles as $vehicleId) {
+                                $soItem = Soitems::create(['vehicles_id' => $vehicleId, 'so_variant_id' => $soVariantdata->id]);
+                                if (!$soItem) continue; // Null check added
+                                $logEntries[] = [
+                                    'type' => 'Set',
+                                    'so_item_id' => $soItem->id,
+                                    'so_variant_id' => $soVariantdata->id,
+                                    'field_name' => 'vehicles_id',
+                                    'old_value' => null,
+                                    'new_value' => $vehicleId
+                                ];
+                                Vehicles::where('id', $vehicleId)->update(['so_id' => $so->id]);
                             }
                         }
-                    } else {
+                    } else if ($existingVariant) {
                         // Existing variant - check for changes
                         $fields = [
                             'variant_id' => $soVariant['variant_id'],
@@ -573,17 +578,16 @@ class SalesOrderController extends Controller
                         if (isset($soVariant['vehicles'])) {
                             $currentVehicles = $existingVariant && $existingVariant->so_items ? $existingVariant->so_items->pluck('vehicles_id')->toArray() : [];
                             $newVehicles = $soVariant['vehicles'];
-                            
                             // If no vehicles are selected, remove all existing ones
                             if (empty($newVehicles)) {
                                 $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $currentVehicles));
                             } else {
                                 $addedVehicles = array_diff($newVehicles, $currentVehicles);
                                 $removedVehicles = array_diff($currentVehicles, $newVehicles);
-
                                 // Add new vehicles
                                 foreach ($addedVehicles as $vehicleId) {
                                     $soItem = Soitems::create(['vehicles_id' => $vehicleId, 'so_variant_id' => $existingVariant->id]);
+                                    if (!$soItem) continue; // Null check added
                                     $logEntries[] = [
                                         'type' => 'Set',
                                         'so_item_id' => $soItem->id,
@@ -592,10 +596,8 @@ class SalesOrderController extends Controller
                                         'old_value' => null,
                                         'new_value' => $vehicleId
                                     ];
-
                                     Vehicles::where('id', $vehicleId)->update(['so_id' => $so->id]);
                                 }
-
                                 // Remove unselected vehicles
                                 if (!empty($removedVehicles)) {
                                     $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $removedVehicles));
@@ -608,7 +610,7 @@ class SalesOrderController extends Controller
                                 $logEntries = array_merge($logEntries, $this->removeSoItems($existingVariant->id, $currentVehicles));
                             }
                         }
-                    }
+                    } // end else if $existingVariant
                 }
             }
 
@@ -677,6 +679,13 @@ class SalesOrderController extends Controller
             // Remove the SO item and update the vehicle's SO ID
             $soItem->delete();
             Vehicles::where('id', $soItem->vehicles_id)->update(['so_id' => null]);
+
+            Log::info('Vehicle SO ID updated during SO item removal. (so_id update Detected 2. removeSoItems)', [
+                'vehicle_id' => $soItem->vehicles_id,
+                'new_so_id' => null,
+                'updated_by' => auth()->user()->email ?? 'system',
+                'timestamp' => now(),
+            ]);
         }
 
         return $logEntries;
@@ -688,7 +697,7 @@ class SalesOrderController extends Controller
         $so = SO::findOrFail($id);
         $quotation = Quotation::findOrFail($so->quotation_id);
         $call = Calls::findOrFail($quotation->calls_id);
-
+       
         $existingQuotationItemIds = QuotationItem::where('reference_type', 'App\Models\Varaint')->where('quotation_id', $so->quotation_id)->pluck('id')->toArray();
         $latestQuotationItemsExistingIds = SoVariant::where('so_id', $id)->pluck('quotation_item_id')->toArray();
 
@@ -717,9 +726,13 @@ class SalesOrderController extends Controller
                 $quotationItem->quotation_id = $so->quotation_id;
                 $quotationItem->reference_type = 'App\Models\Varaint';
                 $quotationItem->reference_id  = $soVariant->variant_id;
+                $quotationItem->model_line_id  = $soVariant->variant->master_model_lines->id ?? NULL;
+                $quotationItem->brand_id  =    $soVariant->variant->brand->id ?? NULL;
                 $quotationItem->description =  $soVariant->description;
                 $quotationItem->unit_price =  $soVariant->price;
                 $quotationItem->quantity =    $soVariant->quantity;
+                $quotationItem->is_addon =   0;
+                $quotationItem->is_enable =  1;
                 $quotationItem->total_amount =  $soVariant->quantity *  $soVariant->price;
                 $quotationItem->save();
 
@@ -730,9 +743,13 @@ class SalesOrderController extends Controller
                 // Update the existing quotation item
                 QuotationItem::where('id', $soVariant->quotation_item_id)->update([
                     'reference_id' => $soVariant->variant_id,
+                    'model_line_id' => $soVariant->variant->master_model_lines->id ?? NULL,
+                    'brand_id'  => $soVariant->variant->brand->id ?? NULL,
                     'description' => $soVariant->description,
                     'unit_price' => $soVariant->price,
                     'quantity' => $soVariant->quantity,
+                    'is_addon' => 0,
+                    'is_enable' => 1,
                     'total_amount' => $soVariant->quantity * $soVariant->price,
                 ]);
             }
@@ -829,6 +846,12 @@ class SalesOrderController extends Controller
             $shippingChargeDistriAmount = 0;
         }
 
+        $quotation->deal_value = $so->total ?? 0;
+        $quotation->save();
+        
+        $quotationDetail->advance_amount = $so->paidinperforma;
+        $quotationDetail->save();
+        
         $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
         $multiplecp = MuitlpleAgents::where('quotations_id', $quotation->id)->where('agents_id', '!=', $quotationDetail->agents_id)->get();
@@ -867,6 +890,9 @@ class SalesOrderController extends Controller
         $quotationFile->quotation_id = $quotation->id;
         $quotationFile->file_name = $file;
         $quotationFile->save();
+        info($so->total);
+        info("total");
+      
 
         return $file;
     }
@@ -973,10 +999,10 @@ class SalesOrderController extends Controller
         DB::beginTransaction();
         try {
 
-            $qoutation = Quotation::find($quotationId);
+            $quotation = Quotation::find($quotationId);
             $so = new So();
             $so->quotation_id = $quotationId;
-            $so->sales_person_id = $qoutation->created_by;
+            $so->sales_person_id = $quotation->created_by;
             $so_number = $request->input('so_number'); // Get the input value
             $so->so_number = 'SO-' . $so_number;    // Concatenate "SO-00" with the input value
             $so->so_date = $request->input('so_date');
@@ -990,16 +1016,16 @@ class SalesOrderController extends Controller
             $so->created_at = Carbon::now();
             $so->updated_at = Carbon::now();
             $so->save();
-            $calls = Calls::find($qoutation->calls_id);
+            $calls = Calls::find($quotation->calls_id);
             $calls->status = "Closed";
             $calls->save();
             $closed = new Closed();
             $closed->date = $request->input('so_date');
             $closed->sales_notes = $request->input('notes');
             $closed->call_id = $calls->id;
-            $closed->created_by = $qoutation->created_by;
+            $closed->created_by = $quotation->created_by;
             $closed->dealvalues = $request->input('total_payment');
-            $closed->currency = $qoutation->currency;
+            $closed->currency = $quotation->currency;
             $closed->so_id = $so->id;
             $closed->save();
             // $vins = $request->input('vehicle_vin');
@@ -1138,6 +1164,15 @@ class SalesOrderController extends Controller
                 $solog->so_id = $so->id;
                 $solog->role = Auth::user()->selectedRole;
                 $solog->save();
+
+                // add the file into quotaion files also
+                $quotationFile = new QuotationFile();
+                $quotationFile->quotation_id = $quotation->id;
+                $file = $quotation->file_path;
+                $filename = Str::after($file, 'quotation_files/');
+                $quotationFile->file_name = $filename;
+                $quotationFile->save();
+             
             } else {
                 return redirect()->back()->with('error', 'Failed to create So, vehicle variant required to create so!');
             }
@@ -1398,74 +1433,59 @@ class SalesOrderController extends Controller
 
     public function cancel($id)
     {
-        // $quotation = Quotation::where('calls_id', $id)->first();
-        // $calls = Calls::find($id);
-        // $calls->status = 'Quoted';
-        // $calls->save();
-        // $leadclosed = Closed::where('call_id', $id)->first();
-        // if($leadclosed)
-        // {
-        // $leadclosed->delete();
-        // }
-        // $so = So::where('quotation_id', $quotation->id)->first();
-
         DB::beginTransaction();
-
         try {
-
             $so = SO::find($id);
-            if ($so->quotation_id  && $so->quotation_id  != 0) {
-                $quotation = Quotation::where('id', $so->quotation_id)->first();
-                if ($quotation) {
-                    $calls = Calls::find($quotation->calls_id);
-                    $calls->status = 'Quoted';
-                    $calls->save();
-                    $leadclosed = Closed::where('call_id', $quotation->calls_id)->first();
-                    if ($leadclosed) {
-                        $leadclosed->delete();
-                    }
-                }
-            }
-            $soitems = Soitems::where('so_id', $so->id)->get();
-            foreach ($soitems as $soitem) {
-                $vehicle = Vehicles::find($soitem->vehicles_id);
-                if ($vehicle) {
-                    $vehicle->so_id = null;
-                    $vehicle->reservation_start_date = null;
-                    $vehicle->reservation_end_date = null;
-                    $vehicle->booking_person_id = null;
-                    $vehicle->save();
-                    \Log::info('Unassign SO id - Case 4-' . $so->id);
-                }
-            }
-            foreach ($soitems as $soitem) {
-                $soitem->deleted_by = Auth::id();
-                $soitem->save();
-                \Log::info('SO items deleted - Case 4-' . $so->id);
-
-                $soitem->delete();
+            if (!$so) {
+                DB::rollBack();
+                return redirect()->back()->with('error', 'Sales Order not found.');
             }
 
-            $bookingrequest = BookingRequest::where('calls_id', $id)->first();
-            if ($bookingrequest) {
-                $bookingrequest->status = 'Rejected';
-                $bookingrequest->save();
+            // Get related quotation and call and change status of quotation to show the relevent quottaion to list in quotaions
+            $quotation = Quotation::where('id', $so->quotation_id)->first();
+            if($quotation){
+                $call = Calls::find($quotation->calls_id);
+                $call->status = 'Quoted';
+                $call->save();
             }
-            $solog = new Solog();
-            $solog->time = now()->format('H:i:s');
-            $solog->date = now()->format('Y-m-d');
-            $solog->status = 'SO Cancel';
-            $solog->created_by = Auth::id();
-            $solog->so_id = $so->id;
-            $solog->role = Auth::user()->selectedRole;
-            $solog->save();
-            $so->delete();
+            $calls = $quotation ? Calls::find($quotation->calls_id) : null;
+
+            // 1. Unassign vehicles
+            Vehicles::where('so_id', $so->id)->update([
+                'so_id' => null,
+                'reservation_start_date' => null,
+                'reservation_end_date' => null,
+                'booking_person_id' => null,
+            ]);
+
+            // 2. Delete SalesOrderHistoryDetail and SalesOrderHistory
+            // $historyIds = SalesOrderHistory::where('so_id', $so->id)->pluck('id');
+            // SalesOrderHistoryDetail::whereIn('sales_order_history_id', $historyIds)->delete();
+            // SalesOrderHistory::where('so_id', $so->id)->delete();
+
+            //3.  Delete SoVariant
+            $soVariantIds = SoVariant::where('so_id', $so->id)->pluck('id');
+            // SoVariant::where('so_id', $so->id)->delete();
+
+            // 4. Delete Soitems
+            Soitems::whereIn('so_variant_id', $soVariantIds)->delete();
+
+            // 5. Delete the closed leads
+            Closed::where('so_id', $so->id)->delete();
+
+            // 6. Set BookingRequest status to 'Rejected'
+            if ($calls) {
+                BookingRequest::where('calls_id', $calls->id)->update(['status' => 'Rejected']);
+            }
+
+            // 7. update so status (unable to make soft deletes due to so_id is linked to softdeleted data)
+            $so->status = "Cancelled";
+            $so->save();
 
             DB::commit();
             return redirect()->back()->with('success', 'Sales Order and related items canceled successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-
             Log::error('Sales Order Cancellation failed', ['error' => $e->getMessage()]);
             return redirect()->back()->with('error', 'Sales Order Cancellation failed.');
         }
@@ -1866,6 +1886,9 @@ class SalesOrderController extends Controller
         $exists = SO::where('so_number', $request->so_number)
             ->when($request->filled('so_id'), function ($query) use ($request) {
                 return $query->where('id', '!=', $request->so_id);
+            })
+           ->where(function ($query) {
+                $query->where('status', '!=', 'Cancelled')->orWhereNull('status');
             })
             ->whereDoesntHave('so_logs', function ($query) {
                 $query->where('status', 'SO Cancel');

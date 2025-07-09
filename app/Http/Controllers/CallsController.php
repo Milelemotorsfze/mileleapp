@@ -35,6 +35,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Validator; 
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 class CallsController extends Controller
 {
@@ -933,9 +934,9 @@ public function uploadingbulk(Request $request)
         $brand = $row[7];
         $model_line_name = $row[8];
         $custom_brand_model = $row[9];
-        $remarks = $row[10];
-        $strategies = $row[11];
-        $priority = strtolower(trim($row[12]));
+        // $remarks = $row[10];
+        $strategies = $row[10];
+        $priority = strtolower(trim($row[11]));
 
         $cleanPhone = preg_replace('/[\s\-]/', '', $rawPhone); 
         
@@ -1034,7 +1035,7 @@ public function uploadingbulk(Request $request)
         $sheet = $spreadsheet->getActiveSheet();
         $headers = [
             'Name', 'Phone', 'Email', 'Location', 'Sales Person', 'Source Name', 'Language',
-             'Brand', 'Model Line Name', 'Custom Brand Model', 'Remarks', 'Strategies', 'Priority','Error Description'
+             'Brand', 'Model Line Name', 'Custom Brand Model', 'Strategies', 'Priority', 'Error Description'
         ];
         $sheet->fromArray($headers, null, 'A1');
 
@@ -1070,9 +1071,41 @@ public function uploadingbulk(Request $request)
             $brand =  $row[7];
             $model_line_name = $row[8];
             $custom_brand_model = $row[9];
-            $remarks = $row[10];
-            $strategies = $row[11];
-            $priority = strtolower(trim($row[12]));
+            $strategies = $row[10];
+            $priority = strtolower(trim($row[11]));
+            $carInterested = trim($row[12]);
+            $purchasePurpose = trim($row[13]);
+            $endUser = trim($row[14]);
+            $destinationCountry = trim($row[15]);
+            $plannedUnits = trim($row[16]);
+            $experience = trim($row[17]);
+            $shipping = trim($row[18]);
+            $paymentMethod = trim($row[19]);
+            $prevPurchase = trim($row[20]);
+            $timeline = trim($row[21]);
+            $additionalNotes = trim($row[22]);
+
+            $remarksArray = [];
+
+            if ($carInterested || $purchasePurpose || $endUser || $destinationCountry || $plannedUnits || $experience || $shipping || $paymentMethod || $prevPurchase || $timeline) {
+                $remarksArray[] = 'Lead Summary - Qualification Notes:';
+                if ($carInterested) $remarksArray[] = "1. Car Interested In: $carInterested";
+                if ($purchasePurpose) $remarksArray[] = "2. Purpose of Purchase: $purchasePurpose";
+                if ($endUser) $remarksArray[] = "3. End User: $endUser";
+                if ($destinationCountry) $remarksArray[] = "4. Destination Country: $destinationCountry";
+                if ($plannedUnits) $remarksArray[] = "5. Planned Units: $plannedUnits";
+                if ($experience) $remarksArray[] = "6. Experience with UAE Sourcing: $experience";
+                if ($shipping) $remarksArray[] = "7. Shipping Assistance Required: $shipping";
+                if ($paymentMethod) $remarksArray[] = "8. Payment Method: $paymentMethod";
+                if ($prevPurchase) $remarksArray[] = "9. Previous Purchase History: $prevPurchase";
+                if ($timeline) $remarksArray[] = "10. Purchase Timeline: $timeline";
+            }
+            if ($additionalNotes) {
+                $remarksArray[] = "General Remark / Additional Notes: $additionalNotes";
+            }
+
+            $remarksData = implode('###SEP###', $remarksArray);
+
             $errorDescription = '';
             if ($sales_person == null) {
                 $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
@@ -1328,7 +1361,7 @@ public function uploadingbulk(Request $request)
                 $call->email = !empty(trim($row[2])) ? trim($row[2]) : null;
                 $call->assign_time = Carbon::now();
                 $call->custom_brand_model = $row[9];
-                $call->remarks = $row[10];
+                $call->remarks = $remarksData;
                 $call->source = $lead_source_id;
                 $call->strategies_id = $strategies_id;
                 $call->priority = $priority;
@@ -1462,7 +1495,7 @@ public function simplefile()
         $useractivities->activity = "Export Simple File for Bulk Leads";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-    $filePath = storage_path('app/calls.xlsx'); // Path to the Excel file
+        $filePath = storage_path('app/calls.xlsx'); // Path to the Excel file
 
     if (file_exists($filePath)) {
         // Generate a response with appropriate headers
@@ -1474,6 +1507,23 @@ public function simplefile()
         return redirect()->back()->with('error', 'The requested file does not exist.');
     }
 }
+public function bulkLeadsDataUplaodExcel()
+    {
+        $useractivities =  New UserActivities();
+            $useractivities->activity = "Export Simple File for Bulk Leads";
+            $useractivities->users_id = Auth::id();
+            $useractivities->save();
+            $filePath = public_path('storage/calls.xlsx');
+            Log::info("File path is : ". $filePath);
+
+        if (file_exists($filePath)) {
+            return Response::download($filePath, 'calls.xlsx', [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]);
+        } else {
+            return redirect()->back()->with('error', 'The requested file does not exist.');
+        }
+    }
 public function varinatinfo()
 {
     $useractivities =  New UserActivities();
@@ -1823,83 +1873,128 @@ foreach ($modelLineIds as $modelLineId) {
         return view('calls.leadsexport', compact('countries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'strategies'));
     }
     public function exportsleadsform(Request $request)
-{
-    $useractivities = new UserActivities();
-    $useractivities->activity = "Export the Leads Data";
-    $useractivities->users_id = Auth::id();
-    $useractivities->save();
-    $fromDate = $request->input('fromDate');
-    $source = $request->input('source');
-    $strategy = $request->input('strategy');
-    $salesperson = $request->input('salesperson');
-    $modelline = $request->input('modelline');
-    $priority = $request->input('priority');
-    $location = $request->input('location');
-    $language = $request->input('language');
-    $toDate = date('Y-m-d', strtotime($request->input('toDate') . ' +1 day'));
-    $headings = [
-        'Name',
-        'Phone',
-        'Email',
-        'Remarks',
-        'Location',
-        'Language',
-        'Created At',
-        'Type',
-        'Priority',
-        'Custom Brand Model',
-        'Sales Person Name',
-        'Lead Source Name',
-        'Strategies',
-        'Model Line',
-        'Status',
-    ];
-    $data = \DB::table('calls as c')
-        ->join('users as u', 'c.sales_person', '=', 'u.id')
-        ->join('lead_source as ls', 'c.source', '=', 'ls.id')
-        ->leftJoin('strategies as st', 'c.strategies_id', '=', 'st.id')
-        ->leftJoin('calls_requirement as cr', 'c.id', '=', 'cr.lead_id')
-        ->leftJoin('master_model_lines as mml', 'cr.model_line_id', '=', 'mml.id')
-        ->whereBetween('c.created_at', [$fromDate, $toDate]);
-    if ($source !== null) {
-        $data->where('c.source', $source);
+    {
+        $useractivities = new UserActivities();
+        $useractivities->activity = "Export the Leads Data";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        $fromDate = $request->input('fromDate');
+        $source = $request->input('source');
+        $strategy = $request->input('strategy');
+        $salesperson = $request->input('salesperson');
+        $modelline = $request->input('modelline');
+        $priority = $request->input('priority');
+        $location = $request->input('location');
+        $language = $request->input('language');
+        $toDate = date('Y-m-d', strtotime($request->input('toDate') . ' +1 day'));
+        $headings = [
+            'Name',
+            'Phone',
+            'Email',
+            'Location',
+            'Language',
+            'Created At',
+            'Type',
+            'Priority',
+            'Custom Brand Model',
+            'Sales Person Name',
+            'Lead Source Name',
+            'Strategies',
+            'Model Line',
+            'Status',
+            'Car Interested In',
+            'Purpose of Purchase',
+            'End User',
+            'Destination Country',
+            'Planned Units',
+            'Experience with UAE Sourcing',
+            'Shipping Assistance Required',
+            'Payment Method',
+            'Previous Purchase History',
+            'Purchase Timeline',
+            'General Remark / Additional Notes'
+        ];
+        
+        $data = \DB::table('calls as c')
+            ->join('users as u', 'c.sales_person', '=', 'u.id')
+            ->join('lead_source as ls', 'c.source', '=', 'ls.id')
+            ->leftJoin('strategies as st', 'c.strategies_id', '=', 'st.id')
+            ->leftJoin('calls_requirement as cr', 'c.id', '=', 'cr.lead_id')
+            ->leftJoin('master_model_lines as mml', 'cr.model_line_id', '=', 'mml.id')
+            ->whereBetween('c.created_at', [$fromDate, $toDate]);
+        if ($source !== null) {
+            $data->where('c.source', $source);
+        }
+        if ($strategy !== null) {
+            $data->where('c.strategies_id', $strategy);
+        }
+        if ($salesperson !== null) {
+            $data->where('c.sales_person', $salesperson);
+        }
+        if ($modelline !== null) {
+            $data->where('cr.model_line_id', $modelline);
+        }
+        if ($priority !== null) {
+            $data->where('c.priority', $priority);
+        }
+        if ($location !== null) {
+            $data->where('c.location', $location);
+        }
+        if ($language !== null) {
+            $data->where('c.language', $language);
+        }
+        $data->select(
+            'c.name',
+            \DB::raw('CAST(c.phone AS UNSIGNED) as phone'),
+            'c.email',
+            'c.remarks',
+            'c.location',
+            'c.language',
+            'c.created_at',
+            'c.type',
+            'c.priority',
+            'c.custom_brand_model',
+            'u.name as sales_person_name',
+            'ls.source_name as lead_source_name',
+            \DB::raw('IFNULL(st.name, "No Strategy") as strategies'),
+            'mml.model_line as model_line',
+            'c.status'
+        );
+        $results = $data->get()->toArray();
+
+        $parsedResults = [];
+        foreach ($results as $row) {
+            $parsed = [
+                'Car Interested In' => '',
+                'Purpose of Purchase' => '',
+                'End User' => '',
+                'Destination Country' => '',
+                'Planned Units' => '',
+                'Experience with UAE Sourcing' => '',
+                'Shipping Assistance Required' => '',
+                'Payment Method' => '',
+                'Previous Purchase History' => '',
+                'Purchase Timeline' => '',
+                'General Remark / Additional Notes' => '',
+            ];
+
+            if (!empty($row->remarks)) {
+                $lines = explode('###SEP###', $row->remarks);
+                foreach ($lines as $line) {
+                    foreach ($parsed as $key => $val) {
+                        if (stripos($line, $key) !== false) {
+                            $parts = explode(':', $line, 2);
+                            if (isset($parts[1])) {
+                                $parsed[$key] = trim($parts[1]);
+                            }
+                        }  
+                    }
+                }
+            }
+
+            unset($row->remarks); // Remove original remarks
+            $parsedResults[] = array_merge((array) $row, $parsed);
+        }
+        return Excel::download(new LeadsExport($parsedResults, $headings), 'leads_export.xlsx');
     }
-    if ($strategy !== null) {
-        $data->where('c.strategies_id', $strategy);
-    }
-    if ($salesperson !== null) {
-        $data->where('c.sales_person', $salesperson);
-    }
-    if ($modelline !== null) {
-        $data->where('cr.model_line_id', $modelline);
-    }
-    if ($priority !== null) {
-        $data->where('c.priority', $priority);
-    }
-    if ($location !== null) {
-        $data->where('c.location', $location);
-    }
-    if ($language !== null) {
-        $data->where('c.language', $language);
-    }
-    $data->select(
-        'c.name',
-        \DB::raw('CAST(c.phone AS UNSIGNED) as phone'),
-        'c.email',
-        'c.remarks',
-        'c.location',
-        'c.language',
-        'c.created_at',
-        'c.type',
-        'c.priority',
-        'c.custom_brand_model',
-        'u.name as sales_person_name',
-        'ls.source_name as lead_source_name',
-        \DB::raw('IFNULL(st.name, "No Strategy") as strategies'),
-        'mml.model_line as model_line',
-        'c.status'
-    );
-    $results = $data->get()->toArray();
-    return Excel::download(new LeadsExport($results, $headings), 'leads_export.xlsx');
-}
 }

@@ -100,6 +100,10 @@ class DailyleadsController extends Controller
                 ->leftJoin('quotations', 'so.quotation_id', '=', 'quotations.id')
                 ->leftJoin('users', 'quotations.created_by', '=', 'users.id')
                 ->leftJoin('calls', 'quotations.calls_id', '=', 'calls.id')
+                ->where(function ($query) {
+                        $query->where('so.status', '!=', 'Cancelled')
+                            ->orWhereNull('so.status');
+                    })
                 ->groupby('so.id')
                 ->get();
                 return DataTables::of($so)->toJson();  
@@ -899,7 +903,11 @@ public function closed(Request $request)
         $useractivities->users_id = Auth::id();
         $useractivities->save();
     $sonumber = $request->sonumber;
-    $so = So::where('so_number', $sonumber)->first();
+    $so = So::where('so_number', $sonumber)
+        ->where(function ($query) {
+            $query->where('status', '!=', 'Cancelled')
+                  ->orWhereNull('status');
+        })->first();
     if (!$so) {
         $so = new So();
         $so->so_number = $sonumber;

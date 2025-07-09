@@ -751,21 +751,53 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                             <div class="col-md-6 col-sm-12 mb-3">
                                 <div class="card">
                                     <div class="card-body">
-                                        <h5 class="text-center">Remarks</h5>
-                                        </br>
-                                        @php
-                                            $text = $lead->remarks;
-                                            $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
-                                        @endphp
+    <h5 class="text-center">Remarks</h5>
+    <br>
 
-                                        <div class="rich-text-content">
-                                            @if (!empty(trim(strip_tags($remarks))))
-                                                {!! $remarks !!}
-                                            @else
-                                                <p class="text-muted">No remarks.</p>
-                                            @endif
-                                        </div>
-                                    </div>
+    @php
+    $text = $lead->remarks ?? '';
+    $cleanText = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
+    $hasContent = trim(strip_tags($cleanText)) ? true : false;
+@endphp
+
+<div class="rich-text-content">
+    @if ($hasContent)
+        @php
+            $formatted = str_replace('###SEP###', '<br>', $cleanText);
+            $formatted = preg_replace(
+                '/^Lead Summary - Qualification Notes:/i',
+                '<strong>Lead Summary - Qualification Notes:</strong><br>',
+                $formatted
+            );
+            $formatted = preg_replace('/^(?=\d+\.\s)/m', '<br>', $formatted, 1);
+
+            $formatted = preg_replace(
+                '/(\d+\.\s*[^:\n]+:.*)(?=<br>General Remark|<br>General Remark|General Remark)/is',
+                '$1<br>',
+                $formatted
+            );
+
+            $formatted = preg_replace(
+                '/(\d+\.\s*[^:\n]+):/',
+                '<strong>$1:</strong>',
+                $formatted
+            );
+
+            $formatted = preg_replace(
+                '/(General Remark\s*\/\s*Additional Notes:)/i',
+                '<strong>$1</strong>',
+                $formatted
+            );
+        @endphp
+
+        {!! nl2br($formatted) !!}
+    @else
+        <p class="text-muted">No remarks.</p>
+    @endif
+</div>
+
+</div>
+
                                 </div>
                             </div>
                     </div>
@@ -1143,13 +1175,14 @@ $(document).ready(function() {
 
     if (td.find('select').length === 0 && td.find('input').length === 0) {
         if (field === 'priority') {
+            var normalizedValue = currentValue?.toLowerCase().trim();
             var dropdown = `
                 <select class="form-control">
-                    <option value="Hot" ${currentValue === 'Hot' ? 'selected' : ''}>Hot</option>
-                    <option value="Normal" ${currentValue === 'Normal' ? 'selected' : ''}>Normal</option>
-                    <option value="Low" ${currentValue === 'Low' ? 'selected' : ''}>Low</option>
-                    <option value="Regular" ${currentValue === 'Regular' ? 'selected' : ''}>Regular</option>
-                    <option value="High" ${currentValue === 'High' ? 'selected' : ''}>High</option>
+                    <option value="Hot" ${normalizedValue === 'hot' ? 'selected' : ''}>Hot</option>
+                    <option value="Normal" ${normalizedValue === 'normal' ? 'selected' : ''}>Normal</option>
+                    <option value="Low" ${normalizedValue === 'low' ? 'selected' : ''}>Low</option>
+                    <option value="Regular" ${normalizedValue === 'regular' ? 'selected' : ''}>Regular</option>
+                    <option value="High" ${normalizedValue === 'high' ? 'selected' : ''}>High</option>
                 </select>`;
             td.html(dropdown);
             editButton.html('<i class="fas fa-save"></i>');
