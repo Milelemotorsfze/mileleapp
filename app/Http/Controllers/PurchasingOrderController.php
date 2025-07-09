@@ -1288,7 +1288,16 @@ class PurchasingOrderController extends Controller
         $purchasingOrder = PurchasingOrder::with(['polPort', 'podPort', 'fdCountry'])->findOrFail($id);
         $paymentterms = PaymentTerms::findorfail($purchasingOrder->payment_term_id);
         $payments = PaymentTerms::get();
-        $vehicles = Vehicles::with(['dn:id,dn_number'])->where('purchasing_order_id', $id)->get();
+        $vehicles = Vehicles::with([
+            'dn:id,dn_number',
+            'variant' => function($q) {
+                $q->select('id', 'name', 'detail', 'brands_id', 'master_model_lines_id', 'upholestry')
+                  ->with([
+                      'brand:id,brand_name',
+                      'master_model_lines:id,model_line,brand_id'
+                  ]);
+            }
+        ])->where('purchasing_order_id', $id)->get();
         $vehiclesdel = Vehicles::onlyTrashed()->where('purchasing_order_id', $id)->get();
         $vendorsname = Supplier::where('id', $purchasingOrder->vendors_id)->value('supplier');
         $vehicleslog = Vehicleslog::whereNull('category')->whereIn('vehicles_id', $vehicles->pluck('id'))->get();
@@ -1537,6 +1546,7 @@ class PurchasingOrderController extends Controller
             return [
                 'variant' => $row['Variant'] ?? $row['variant'] ?? '',
                 'vin' => $row['VIN Number'] ?? $row['vin'] ?? '',
+                'old_vin' => $row['old_vin'] ?? $row['Old VIN'] ?? '',
                 'engine' => $row['Engine Number'] ?? $row['engine'] ?? '',
                 'prod_month' => $prod_month,
                 'ex_colour' => $ex_colour,

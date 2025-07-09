@@ -158,7 +158,7 @@
     .row-space {
         margin-bottom: 10px;
     }
-    #dtBasicExample1 th {
+    #vehicleSectionTable th {
             min-width: 150px !important;
         }
 </style>
@@ -1798,7 +1798,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                 </div>
                 <div class="card-body">
                     <div class="table-responsive" >
-                        <table id="dtBasicExample1" class="table table-striped table-editable table-edits table table-bordered">
+                        <table id="vehicleSectionTable" class="table table-striped table-editable table-edits table table-bordered">
                             <thead class="bg-soft-secondary">
                             <tr>
                                 <th id="serno" style="vertical-align: middle;">Ref No:</th>
@@ -1821,6 +1821,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                                 <th>VIN Number</th>
                                 <th>DN Number</th>
                                 <th>Engine Number</th>
+                                <th>Upholstery</th>
                                 <th>Territory</th>
                                 <th style="vertical-align: middle;" id="estimated">Estimated Arrival</th>
                                 <th>Production Date</th>
@@ -1908,6 +1909,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                             <td class="editable-field vin" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
                             <td class="editable-field dn" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->dn->dn_number ?? '' }}</td>
                             <td class="editable-field engine" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
+                            <td class="" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->variant->upholestry }}</td>
                             <td class="editable-field territory" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td class="editable-field estimation_date" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
                             <td class="editable-field ppmmyyy" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
@@ -1939,6 +1941,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
                             <td class="editable-field dn" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->dn->dn_number ?? '' }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->variant->upholestry }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
@@ -1971,6 +1974,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
                             <td class="editable-field dn" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->dn->dn_number ?? '' }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->variant->upholestry }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
@@ -2006,6 +2010,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                                 </td>
                                 <td>{{ $vehicles->vin }}</td>
                                 <td>{{ $vehicles->engine }}</td>
+                                <td>{{ $vehicles->variant->upholestry }}</td>
                                 <td>{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                                 <td>{{ $vehicles->estimation_date }}</td>
                                 <td>{{ $vehicles->ppmmyyy }}</td>
@@ -2023,179 +2028,6 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                             {{ ucfirst(strtolower( $vehicles->status)) }}
                             @endif
                             </td>
-                            <!-- @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'po-approval', 'edit-po-colour-details']);
-                            @endphp
-                            @if ($hasPermission)
-                            <td>
-    @if($vehicles->purchased_paid_percentage != 100 && $vehicles->purchased_paid_percentage != "")
-        {{ 'Partial Payment' }}
-    @elseif($vehicles->purchased_paid_percentage == 100)
-        @if(!$vehicles->remaining_payment_status)
-            {{ ucfirst(strtolower($vehicles->payment_status)) }}
-        @else
-            {{ 'Partial Payment' }}
-        @endif
-    @else
-        {{ ucfirst(strtolower($vehicles->payment_status)) }}
-    @endif
-    
-    @if($vehicles->purchased_paid_percentage)
-        ({{ $vehicles->purchased_paid_percentage }}%)
-    @endif
-</td>
-
-                                @endif -->
-                                   <!-- @php
-                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-release-approval');
-                        @endphp
-                        @if ($hasPermission)
-                        @if ($vehicles->payment_status === 'Payment Initiated')
-                        <div style="display: flex; gap: 10px;">
-                        <a title="Payment Release Approved" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentreleasesconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
-                        Approved
-                        </a>
-                        <button data-placement="top" class="btn btn-sm btn-danger" onclick="return openModal('{{ $vehicles->id }}');" style="margin-right: 10px;">Reject</button>
-                        </div>
-                        @endif
-                        @endif -->
-											<!-- @php
-											$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
-											@endphp
-											@if ($hasPermission)
-											@if ($purchasingOrder->status === 'Approved')
-											@if ($vehicles->payment_status === 'Vendor Confirmed')
-											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmincoming', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-											Incoming Confirmed
-											</a>
-                                            @endif
-											@endif
-											@endif -->
-											<!-- @php
-											$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
-											@endphp
-											@if ($hasPermission)
-											@if ($purchasingOrder->status === 'Approved')
-											@if ($vehicles->payment_status === 'Payment Completed')
-											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmvendors', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-											Incoming Confirmed
-											</a>
-											@endif
-											@endif
-											@endif -->
-                                        <!-- @php
-										$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
-										@endphp
-										@if ($hasPermission)
-										@if ($purchasingOrder->status === 'Approved')
-										@if ($vehicles->payment_status != '' && $vehicles->purchased_paid_percentage != 100 && $vehicles->remaining_payment_status != 'Request for Payment')
-										<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentremanings', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-											Initiate Remainings
-										</a>
-										@endif
-										@endif
-										@endif -->
-                            <!-- @if ($vehicles->payment_status === 'Payment Initiated Request')
-                        @php
-                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-initiated');
-                        @endphp
-                        @if ($hasPermission)
-                        <div style="display: flex; gap: 10px;">
-                       <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-                        Approved
-                        </a>
-                        @endif
-                        @endif -->
-                                            <!-- @php
-											$hasPermission = Auth::user()->hasPermissionForSelectedRole('re-payment-request');
-											@endphp
-											@if ($hasPermission)
-											@if ($purchasingOrder->status === 'Approved')
-											@if ($vehicles->payment_status === 'Payment Release Rejected')
-											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.repaymentintiation', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-											Re-Payment Request
-											</a>
-											@endif
-											@endif
-											@endif -->
-								<!-- @php
-								$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
-								@endphp
-								@if ($hasPermission)
-								@if ($purchasingOrder->status === 'Approved')
-								@if ($vehicles->payment_status === 'Payment Initiate Request Approved')
-								<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-								Payment Initiated
-								</a>
-								@endif
-								@endif
-								@endif -->
-									<!-- @php
-									$hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-initiated');
-									@endphp
-									@if ($hasPermission)
-									@if ($purchasingOrder->status === 'Approved')
-									@if ($vehicles->payment_status === 'Payment Release Approved')
-                                    <div class="modal fade" id="fileUploadModalsingle" tabindex="-1" role="dialog" aria-labelledby="fileUploadModalsingleLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <form id="paymentForm" action="{{ route('vehicles.paymentrelconfirmdebited', 0) }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        <div class="modal-header">
-          <h5 class="modal-title" id="fileUploadModalsingleLabel">Swift Copy</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="paymentFile">Upload File</label>
-            <input type="file" class="form-control" id="paymentFile" name="paymentFile" required>
-          </div>
-          <input type="hidden" id="vehicleId" name="vehicleId" value="">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Submit</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div> -->
-                                        <!-- File Upload Modal -->
-                                        <!-- <div class="modal fade" id="fileUploadModalsingle" tabindex="-1" role="dialog" aria-labelledby="fileUploadModalsingleLabel" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
-                                            <div class="modal-content">
-                                            <form id="paymentForm" action="{{ route('vehicles.paymentrelconfirmdebited', 0) }}" method="POST" enctype="multipart/form-data">
-                                                @csrf
-                                                <div class="modal-header">
-                                                <h5 class="modal-title" id="fileUploadModalsingleLabel">Upload Payment Confirmation</h5>
-                                                <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                <div class="form-group">
-                                                    <label for="paymentFile">Upload File</label>
-                                                    <input type="file" class="form-control" id="paymentFile" name="paymentFile" required>
-                                                </div>
-                                                <input type="hidden" id="vehicleId" name="vehicleId" value="">
-                                                </div>
-                                                <div class="modal-footer">
-                                                <button type="submit" class="btn btn-primary">Submit</button>
-                                                </div>
-                                            </form>
-                                            </div>
-                                        </div>
-                                        </div> -->
-                                    <!-- <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="#" onclick="allpaymentintreqfinpaycompsingle({{ $vehicles->id }});" style="margin-right: 10px; white-space: nowrap;">
-    Payment Completed
-</a> -->
-									<!-- <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmdebited', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-									Payment Completed
-									</a> -->
-									<!-- @endif
-									@endif
-									@endif
-									</div> -->
                             @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['po-approval', 'edit-po-colour-details']);
                             @endphp
@@ -2942,7 +2774,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                 });
 
                 // Table #dtBasicExample2
-                var dataTable2 = $('#dtBasicExample1').DataTable({
+                var dataTable2 = $('#vehicleSectionTable').DataTable({
                     "order": [[4, "desc"]],
                     pageLength: 10,
                     initComplete: function() {
@@ -5467,6 +5299,7 @@ $(document).ready(function () {
         } else {
             // If "Individual Vehicles" is selected, get DN numbers for each vehicle
             var vehicleData = [];
+            var dnNumbers = [];
             $('#vehicleTableBodydn tr').each(function () {
                 var vehicleId = $(this).find('.dn-number-input').data('vehicle-id');
                 var dnNumber = $(this).find('.dn-number-input').val();
@@ -5475,8 +5308,16 @@ $(document).ready(function () {
                         vehicleId: vehicleId,
                         dnNumber: dnNumber
                     });
+                    dnNumbers.push(dnNumber);
                 }
             });
+            // Check if all DN numbers are the same
+            var allSame = dnNumbers.every(function(val, i, arr) { return val === arr[0]; });
+            if (!allSame && dnNumbers.length > 1) {
+                if (!confirm('Warning: Different DN numbers are being added. Do you want to continue?')) {
+                    return;
+                }
+            }
             // Prepare data for "Individual Vehicles" and send AJAX request
             $.ajax({
                 url: '/save-dn-numbers',
@@ -5597,7 +5438,7 @@ $(document).ready(function() {
                 $('#importModal').modal('hide');
                 if (response.vehiclesData && Array.isArray(response.vehiclesData)) {
                     // check number of vehicles in csv with available vehicles
-                    var availableVehicles = $('#dtBasicExample1 tbody .vin').length;
+                    var availableVehicles = $('#vehicleSectionTable tbody .vin').length;
                     if (response.vehiclesData.length > availableVehicles) {
                         alert('Waring: Quantity of variants is more than available vehicles in PO. Please check your CSV file.');
                         location.reload();
@@ -5638,62 +5479,123 @@ $(document).ready(function() {
                     var usedVins = {};
                     response.vehiclesData.forEach(function(vehicle) {
                         var updated = false;
-                        // 1. If a row with the same VIN exists, update it
-                        $('#dtBasicExample1 tbody tr').each(function() {
-                            var $row = $(this);
-                            var vinCell = $row.find('.vin');
-                            if (
-                                vinCell.length > 0 &&
-                                vinCell.text().trim().toLowerCase() === (vehicle.vin || '').trim().toLowerCase() &&
-                                vehicle.vin
-                            ) {
-                                $row.find('.dn').text(vehicle.dn);
-                                $row.find('.engine').text(vehicle.engine);
-                                // Update Exterior Color (if select)
-                                if (vehicle.ex_colour) {
-                                    var $exSelect = $row.find('.ex_colour select');
-                                    var exVal = '';
-                                    var csvColor = vehicle.ex_colour.trim().toLowerCase().replace(/\s+/g, '');
-                                    $exSelect.find('option').each(function() {
-                                        var optionText = $(this).text().trim().toLowerCase().replace(/\s+/g, '');
-                                        if (optionText === csvColor) {
-                                            exVal = $(this).val();
+                        // If old_vin is present, try to update the VIN in the row where VIN matches old_vin and variant too
+                        if (vehicle.old_vin && vehicle.variant) {
+                            $('#vehicleSectionTable tbody tr').each(function() {
+                                var $row = $(this);
+                                var vinCell = $row.find('.vin');
+                                var variantCell = $row.find('td').filter(function() {
+                                    return $(this).text().trim().toLowerCase() === (vehicle.variant || '').trim().toLowerCase();
+                                });
+                                if (
+                                    vinCell.length > 0 &&
+                                    variantCell.length > 0 &&
+                                    vinCell.text().trim().toLowerCase() === vehicle.old_vin.trim().toLowerCase()
+                                ) {
+                                    vinCell.text(vehicle.vin);
+                                    $row.find('.dn').text(vehicle.dn);
+                                    $row.find('.engine').text(vehicle.engine);
+                                    // Update Exterior Color (if select)
+                                    if (vehicle.ex_colour) {
+                                        var $exSelect = $row.find('.ex_colour select');
+                                        var exVal = '';
+                                        var csvColor = vehicle.ex_colour.trim().toLowerCase().replace(/\s+/g, '');
+                                        $exSelect.find('option').each(function() {
+                                            var optionText = $(this).text().trim().toLowerCase().replace(/\s+/g, '');
+                                            if (optionText === csvColor) {
+                                                exVal = $(this).val();
+                                            }
+                                        });
+                                        if (exVal) {
+                                            $exSelect.val(exVal).trigger('change');
+                                        } else {
+                                            console.log('No match for exterior color:', vehicle.ex_colour, 'in', $exSelect.html());
                                         }
-                                    });
-                                    if (exVal) {
-                                        $exSelect.val(exVal).trigger('change');
+                                    }
+                                    // Update Interior Color (if select)
+                                    if (vehicle.int_colour) {
+                                        var $intSelect = $row.find('.int_colour select');
+                                        var intVal = '';
+                                        $intSelect.find('option').each(function() {
+                                            if ($(this).text().trim().toLowerCase() === vehicle.int_colour.trim().toLowerCase()) {
+                                                intVal = $(this).val();
+                                            }
+                                        });
+                                        if (intVal) {
+                                            $intSelect.val(intVal).trigger('change');
+                                        }
+                                    }
+                                    // Update Production Month
+                                    var $prodInput = $row.find('.ppmmyyy input[type="date"]');
+                                    if ($prodInput.length > 0) {
+                                        $prodInput.val(vehicle.prod_month);
                                     } else {
-                                        console.log('No match for exterior color:', vehicle.ex_colour, 'in', $exSelect.html());
+                                        $row.find('.ppmmyyy').text(vehicle.prod_month);
                                     }
+                                    usedVins[vehicle.vin] = true;
+                                    updated = true;
+                                    return false;
                                 }
-                                // Update Interior Color (if select)
-                                if (vehicle.int_colour) {
-                                    var $intSelect = $row.find('.int_colour select');
-                                    var intVal = '';
-                                    $intSelect.find('option').each(function() {
-                                        if ($(this).text().trim().toLowerCase() === vehicle.int_colour.trim().toLowerCase()) {
-                                            intVal = $(this).val();
+                            });
+                        }
+                        // 1. If a row with the same VIN exists, update it
+                        if (!updated) {
+                            $('#vehicleSectionTable tbody tr').each(function() {
+                                var $row = $(this);
+                                var vinCell = $row.find('.vin');
+                                if (
+                                    vinCell.length > 0 &&
+                                    vinCell.text().trim().toLowerCase() === (vehicle.vin || '').trim().toLowerCase() &&
+                                    vehicle.vin
+                                ) {
+                                    $row.find('.dn').text(vehicle.dn);
+                                    $row.find('.engine').text(vehicle.engine);
+                                    // Update Exterior Color (if select)
+                                    if (vehicle.ex_colour) {
+                                        var $exSelect = $row.find('.ex_colour select');
+                                        var exVal = '';
+                                        var csvColor = vehicle.ex_colour.trim().toLowerCase().replace(/\s+/g, '');
+                                        $exSelect.find('option').each(function() {
+                                            var optionText = $(this).text().trim().toLowerCase().replace(/\s+/g, '');
+                                            if (optionText === csvColor) {
+                                                exVal = $(this).val();
+                                            }
+                                        });
+                                        if (exVal) {
+                                            $exSelect.val(exVal).trigger('change');
+                                        } else {
+                                            console.log('No match for exterior color:', vehicle.ex_colour, 'in', $exSelect.html());
                                         }
-                                    });
-                                    if (intVal) {
-                                        $intSelect.val(intVal).trigger('change');
                                     }
+                                    // Update Interior Color (if select)
+                                    if (vehicle.int_colour) {
+                                        var $intSelect = $row.find('.int_colour select');
+                                        var intVal = '';
+                                        $intSelect.find('option').each(function() {
+                                            if ($(this).text().trim().toLowerCase() === vehicle.int_colour.trim().toLowerCase()) {
+                                                intVal = $(this).val();
+                                            }
+                                        });
+                                        if (intVal) {
+                                            $intSelect.val(intVal).trigger('change');
+                                        }
+                                    }
+                                    // Update Production Month
+                                    var $prodInput = $row.find('.ppmmyyy input[type="date"]');
+                                    if ($prodInput.length > 0) {
+                                        $prodInput.val(vehicle.prod_month);
+                                    } else {
+                                        $row.find('.ppmmyyy').text(vehicle.prod_month);
+                                    }
+                                    usedVins[vehicle.vin] = true;
+                                    updated = true;
+                                    return false;
                                 }
-                                // Update Production Month
-                                var $prodInput = $row.find('.ppmmyyy input[type="date"]');
-                                if ($prodInput.length > 0) {
-                                    $prodInput.val(vehicle.prod_month);
-                                } else {
-                                    $row.find('.ppmmyyy').text(vehicle.prod_month);
-                                }
-                                usedVins[vehicle.vin] = true;
-                                updated = true;
-                                return false; // break .each for this vehicle
-                            }
-                        });
+                            });
+                        }
                         // 2. Otherwise, find first row with same variant and empty VIN, and fill it
                         if (!updated && vehicle.vin && !usedVins[vehicle.vin]) {
-                            $('#dtBasicExample1 tbody tr').each(function() {
+                            $('#vehicleSectionTable tbody tr').each(function() {
                                 var $row = $(this);
                                 var vinCell = $row.find('.vin');
                                 var variantCell = $row.find('td').filter(function() {
