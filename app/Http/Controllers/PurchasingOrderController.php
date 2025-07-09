@@ -1524,9 +1524,8 @@ class PurchasingOrderController extends Controller
             return response()->json(['message' => 'Unable to open uploaded file.'], 500);
         }
 
-        // Map CSV columns to a structure for frontend
+        // Map CSV columns for exterior & interior colors
         $vehiclesData = collect($filtered)->map(function($row) {
-            // --- COLOR LOGIC START ---
             $ex_colour = '';
             $int_colour = '';
             $ex_colour_id = null;
@@ -1535,7 +1534,7 @@ class PurchasingOrderController extends Controller
             $int_colour_name = '';
             $colorCodeRaw = $row['COLOR CODE'] ?? $row['Color Code'] ?? $row['color_code'] ?? $row['colorcode'] ?? '';
             $colorRaw = $row['COLOR'] ?? $row['Color'] ?? $row['color'] ?? '';
-            // 1. Try COLOR CODE first
+            // Try COLOR CODE first
             if ($colorCodeRaw) {
                 $code = preg_replace('/\D/', '', $colorCodeRaw);
                 if (strlen($code) === 4) {
@@ -1562,7 +1561,7 @@ class PurchasingOrderController extends Controller
                     }
                 }
             }
-            // 2. Fallback to COLOR column for any missing color
+            // 2. Try COLOR column for any missing color
             if ((!$ex_colour || !$int_colour) && $colorRaw) {
                 $parts = explode('/', $colorRaw);
                 if (!$ex_colour && isset($parts[0])) {
