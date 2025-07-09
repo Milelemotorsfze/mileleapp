@@ -152,6 +152,10 @@ class WorkOrderController extends Controller
         })->get();
         $airlines = MasterAirlines::orderBy('name','ASC')->get();
         $vins = Vehicles::orderBy('vin','ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand','interior','exterior','warehouseLocation','document')->get()->unique('vin')
+            ->map(function ($vehicle) {
+                $vehicle->vin = trim(preg_replace('/\s+/', ' ', $vehicle->vin));
+                return $vehicle;
+            })
             ->values(); // Reset the keys to ensure it's a proper array 
         $salesPersons = [];
         $hasAllSalesAccess = Auth::user()->hasPermissionForSelectedRole([
