@@ -385,6 +385,7 @@ class ApprovalsController extends Controller
     }
     public function savevariantsd(Request $request) 
     {
+        info("variant update");
         $useractivities =  New UserActivities();
         $useractivities->activity = "Create New Variant";
         $useractivities->users_id = Auth::id();
@@ -623,7 +624,6 @@ class ApprovalsController extends Controller
     }
     public function approveInspection(Request $request) {
 
-        
         $currentDate = Carbon::now();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -653,6 +653,8 @@ class ApprovalsController extends Controller
             return redirect()->route('approvalsinspection.index')->with('success', 'Inspection Re-Inspection successfully Forwarded');
         }
         else{
+        
+
             $useractivities =  New UserActivities();
             $useractivities->activity = "Approved The Inspection";
             $useractivities->users_id = Auth::id();
@@ -727,28 +729,28 @@ class ApprovalsController extends Controller
             {
         $existingVariantop = Varaint::where('brands_id', $request->input('brands_id'))
         ->where('master_model_lines_id', $request->input('master_model_lines_id'))
-    ->where('fuel_type', $request->input('fuel_type'))
-    ->where('engine', $request->input('engine'))
-    ->where('coo', $request->input('coo'))
-    ->where('my', $request->input('my'))
-    ->where('drive_train', $request->input('drive_train'))
-    ->where('gearbox', $request->input('gearbox'))
-    ->where('steering', $request->input('steering'))
-    ->where('upholestry', $request->input('upholestry'))
-    ->whereExists(function ($query) use ($selectedSpecifications) {
-        $query->select(DB::raw(1))
-            ->from('variant_items')
-            ->whereColumn('variant_items.varaint_id', 'varaints.id')
-            ->where(function ($query) use ($selectedSpecifications) {
-                foreach ($selectedSpecifications as $specificationData) {
-                    $query->orWhere(function ($q) use ($specificationData) {
-                        $q->where('variant_items.model_specification_id', $specificationData['specification_id'])
-                          ->where('variant_items.model_specification_options_id', $specificationData['value']);
-                    });
-                }
-            });
-    })
-    ->first();
+        ->where('fuel_type', $request->input('fuel_type'))
+        ->where('engine', $request->input('engine'))
+        ->where('coo', $request->input('coo'))
+        ->where('my', $request->input('my'))
+        ->where('drive_train', $request->input('drive_train'))
+        ->where('gearbox', $request->input('gearbox'))
+        ->where('steering', $request->input('steering'))
+        ->where('upholestry', $request->input('upholestry'))
+        ->whereExists(function ($query) use ($selectedSpecifications) {
+            $query->select(DB::raw(1))
+                ->from('variant_items')
+                ->whereColumn('variant_items.varaint_id', 'varaints.id')
+                ->where(function ($query) use ($selectedSpecifications) {
+                    foreach ($selectedSpecifications as $specificationData) {
+                        $query->orWhere(function ($q) use ($specificationData) {
+                            $q->where('variant_items.model_specification_id', $specificationData['specification_id'])
+                            ->where('variant_items.model_specification_options_id', $specificationData['value']);
+                        });
+                    }
+                });
+        })
+        ->first();
         if ($existingVariantop) {
             $existingVariantId = $existingVariantop->id;
             $vehiclese = Vehicles::where('varaints_id', $existingVariantId)->where('id', $inspection->vehicle_id)->first();
@@ -799,32 +801,32 @@ class ApprovalsController extends Controller
                 $modelLine = $variant->master_model_lines->model_line;
                 if($purchasingOrder->is_demand_planning_po == 1)
                 {
-                $recipients = ['team.dp@milele.com'];
-                Mail::to($recipients)->send(new QCUpdateNotification(
-    $purchasingOrder->po_number,
-    $purchasingOrder->pl_number,
-    $vehiclesVIN,
-    $brandName,
-    $modelLine,
-    $oldVariantName,
-    $newVariantName,
-    $orderUrl
-));
+                    $recipients = ['team.dp@milele.com'];
+                    Mail::to($recipients)->send(new QCUpdateNotification(
+                    $purchasingOrder->po_number,
+                    $purchasingOrder->pl_number,
+                    $vehiclesVIN,
+                    $brandName,
+                    $modelLine,
+                    $oldVariantName,
+                    $newVariantName,
+                    $orderUrl
+                    ));
 
                 }
                 else
                 {
-                $recipients = ['abdul@milele.com'];
-                Mail::to($recipients)->send(new QCUpdateNotification(
-    $purchasingOrder->po_number,
-    $purchasingOrder->pl_number,
-    $vehiclesVIN,
-    $brandName,
-    $modelLine,
-    $oldVariantName,
-    $newVariantName,
-    $orderUrl
-));
+                    $recipients = ['abdul@milele.com'];
+                    Mail::to($recipients)->send(new QCUpdateNotification(
+                    $purchasingOrder->po_number,
+                    $purchasingOrder->pl_number,
+                    $vehiclesVIN,
+                    $brandName,
+                    $modelLine,
+                    $oldVariantName,
+                    $newVariantName,
+                    $orderUrl
+                    ));
 
                 }
                 $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
@@ -860,6 +862,7 @@ class ApprovalsController extends Controller
             ->where('master_model_lines_id', $request->input('master_model_lines_id'))
             ->where('coo', $request->input('coo'))
             ->where('my', $request->input('my'))
+            ->where('engine', $request->input('engine'))
             ->where('drive_train', $request->input('drive_train'))
             ->where('gearbox', $request->input('gearbox'))
             ->where('upholestry', $request->input('upholestry'))
@@ -918,7 +921,7 @@ class ApprovalsController extends Controller
             
                 if (is_numeric($lastNumber)) {
                     $namepart = $steeringn . $model_line . $engine . $f;
-                    $newNumber = (int)$lastNumber;
+                    $newNumber = (int)$lastNumber + 1;
                     $name = $namepart . '_' . $newNumber;  // Use $namepart directly
                 } else {
                     $NewexistingName = substr($existingName, 0, -1);
@@ -929,7 +932,7 @@ class ApprovalsController extends Controller
             
                         if (is_numeric($lastNumber)) {
                             $namepart =  $steeringn . $model_line . $engine . $f;
-                            $newNumber = (int)$lastNumber;
+                            $newNumber = (int)$lastNumber + 1;
                             $name = $namepart . '_' . $newNumber;  // Use $namepart directly
                         } 
                     }
@@ -1081,6 +1084,11 @@ class ApprovalsController extends Controller
             }
             $variant_details = $my . ',' . $steering . ',' . $model_line . ',' . $engine . ',' . $gearbox . ',' . $fuel_type . ',' . $gearbox . ',' . $coo . ',' . $drive_train . ',' . $upholestry;
         }
+
+         $isVariantNameExist = Varaint::where('name', $name)->first();
+        if($isVariantNameExist) {
+            return redirect()->back()->with('error', 'Variant with the same Name( '. $name.' )already exists');
+        }
         $variant = new Varaint();
         $variant->brands_id = $request->input('brands_id');
         $variant->master_model_lines_id = $request->input('master_model_lines_id');
@@ -1156,63 +1164,65 @@ class ApprovalsController extends Controller
                 $modelLine = $variant->master_model_lines->model_line;
                 if($purchasingOrder->is_demand_planning_po == 1)
                 {
-                $recipients = ['team.dp@milele.com'];
-                Mail::to($recipients)->send(new QCUpdateNotification(
-    $purchasingOrder->po_number,
-    $purchasingOrder->pl_number,
-    $vehiclesVIN,
-    $brandName,
-    $modelLine,
-    $oldVariantName,
-    $newVariantName,
-    $orderUrl
-));
+                    $recipients = ['team.dp@milele.com'];
+                    Mail::to($recipients)->send(new QCUpdateNotification(
+                            $purchasingOrder->po_number,
+                            $purchasingOrder->pl_number,
+                            $vehiclesVIN,
+                            $brandName,
+                            $modelLine,
+                            $oldVariantName,
+                            $newVariantName,
+                            $orderUrl
+                        ));
 
                 }
                 else
                 {
-                $recipients = ['abdul@milele.com'];
-                Mail::to($recipients)->send(new QCUpdateNotification(
-    $purchasingOrder->po_number,
-    $purchasingOrder->pl_number,
-    $vehiclesVIN,
-    $brandName,
-    $modelLine,
-    $oldVariantName,
-    $newVariantName,
-    $orderUrl
-));
+                    $recipients = ['abdul@milele.com'];
+                    Mail::to($recipients)->send(new QCUpdateNotification(
+                    $purchasingOrder->po_number,
+                    $purchasingOrder->pl_number,
+                    $vehiclesVIN,
+                    $brandName,
+                    $modelLine,
+                    $oldVariantName,
+                    $newVariantName,
+                    $orderUrl
+                ));
 
-                }
-    $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
-          "PFI Number: " . $purchasingOrder->pl_number . "\n" .
-          "Stage: " . "QC Inspection Done\n" .
-          "Old Variant: " . $oldVariantName . " Vehicles\n" .
-          "New Variant: " . $newVariantName . " Vehicles\n" .
-          "Order URL: " . $orderUrl;
-        $notification = New DepartmentNotifications();
-        $notification->module = 'QC / Inspection';
-        $notification->type = 'Information';
-        $notification->detail = $detailText;
-        $notification->save();
-        if($purchasingOrder->is_demand_planning_po == 1)
-                {
-                    $dnaccess = New Dnaccess();
-                    $dnaccess->master_departments_id = 4; 
-                    $dnaccess->department_notifications_id = $notification->id;
-                    $dnaccess->save();
-                } 
-                else
-                {
-                    $dnaccess = New Dnaccess();
-                    $dnaccess->master_departments_id = 15; 
-                    $dnaccess->department_notifications_id = $notification->id;
-                    $dnaccess->save();
-                }
-        }
-    }  
-            return redirect()->route('approvalsinspection.index')->with('success', 'Inspection Approval successfully Done.');
+            }
+            $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+            "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+            "Stage: " . "QC Inspection Done\n" .
+            "Old Variant: " . $oldVariantName . " Vehicles\n" .
+            "New Variant: " . $newVariantName . " Vehicles\n" .
+            "Order URL: " . $orderUrl;
+            $notification = New DepartmentNotifications();
+            $notification->module = 'QC / Inspection';
+            $notification->type = 'Information';
+            $notification->detail = $detailText;
+            $notification->save();
+            if($purchasingOrder->is_demand_planning_po == 1)
+                    {
+                        $dnaccess = New Dnaccess();
+                        $dnaccess->master_departments_id = 4; 
+                        $dnaccess->department_notifications_id = $notification->id;
+                        $dnaccess->save();
+                    } 
+                    else
+                    {
+                        $dnaccess = New Dnaccess();
+                        $dnaccess->master_departments_id = 15; 
+                        $dnaccess->department_notifications_id = $notification->id;
+                        $dnaccess->save();
+                    }
+            }
+        }  
+        return redirect()->route('approvalsinspection.index')->with('success', 'Inspection Approval successfully Done.');
+
     }
+    
     }
     public function getRoutineInspectionData($vehicleId)
     {
