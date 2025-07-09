@@ -812,10 +812,18 @@ public function savespecification(Request $request)
             {
                 $nextVariantName = "A";
             }
+
             $variantfull = Varaint::findOrFail($variant);
-            $newvariant = New Varaint();
             $oldname = $variantfull->name;
-            $newvariant->name = $oldname . $nextVariantName;
+
+            $name = $oldname . $nextVariantName;
+            $isSameNameExist = Varaint::where('name', $name)->first();
+            if($isSameNameExist) {
+                return redirect()->back()->with('error', 'Variant Name ( '. $name .' ) is already existing.');
+            }
+           
+            $newvariant = New Varaint();
+            $newvariant->name = $name;
             $newvariant->engine = $request->input('engine');
             $newvariant->fuel_type = $request->input('fuel_type');
             $newvariant->netsuite_name = $request->input('netsuite_name');
@@ -839,7 +847,6 @@ public function savespecification(Request $request)
                 if($count >= 1)
                 {
                     for ($i = 0; $i < $count; $i++) {
-                        info($accessories[$i]);
                     $newModifiedVariant = new ModifiedVariants();
                     $newModifiedVariant->name = $nextVariantName;
                     $newModifiedVariant->modified_variant_items = $attributes[$i];
