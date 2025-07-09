@@ -112,7 +112,7 @@ class VariantController extends Controller
 public function store(Request $request)
 {
     DB::beginTransaction(); // Start transaction
-
+    
     try {
     $selectedSpecifications = json_decode(request('selected_specifications'), true);
     ksort($selectedSpecifications);
@@ -155,6 +155,7 @@ public function store(Request $request)
         ->where('master_model_lines_id', $request->input('master_model_lines_id'))
         ->where('coo', $request->input('coo'))
         ->where('my', $request->input('my'))
+        ->where('engine', $request->input('engine'))
         ->where('drive_train', $request->input('drive_train'))
         ->where('gearbox', $request->input('gearbox'))
         ->where('upholestry', $request->input('upholestry'))
@@ -220,7 +221,7 @@ public function store(Request $request)
             
                 if (is_numeric($lastNumber)) {
                     $namepart = $steeringn . $model_line . $engine . $f;
-                    $newNumber = (int)$lastNumber;
+                    $newNumber = (int)$lastNumber + 1;
                     $name = $namepart . '_' . $newNumber;  // Use $namepart directly
                 } else {
                     $NewexistingName = substr($existingName, 0, -1);
@@ -231,7 +232,7 @@ public function store(Request $request)
             
                         if (is_numeric($lastNumber)) {
                             $namepart =  $steeringn . $model_line . $engine . $f;
-                            $newNumber = (int)$lastNumber;
+                            $newNumber = (int)$lastNumber + 1;
                             $name = $namepart . '_' . $newNumber;  // Use $namepart directly
                         } 
                     }
@@ -323,7 +324,7 @@ public function store(Request $request)
         ->where('steering', $request->input('steering'))
         ->orderByRaw("CAST(SUBSTRING_INDEX(name, '_', -1) AS UNSIGNED) DESC")
         ->first();
-       
+   
         $master_model_lines_id = $request->input('master_model_lines_id');
         $steering = $request->input('steering');
         if($steering == "LHD"){
@@ -471,6 +472,11 @@ public function store(Request $request)
             $variant_details = $my . ',' . $steering . ',' . $model_line . ',' . $engine . ',' . $gearbox . ',' . $fuel_type . ',' . $gearbox . ',' . $coo . ',' . $drive_train . ',' . $upholestry;
         }
     $name = str_replace(' ', '', $name);
+    // valiadtaion chcek for variant name 
+    $isVariantNameExist = Varaint::where('name', $name)->first();
+    if($isVariantNameExist) {
+          return redirect()->back()->with('error', 'Variant with the same Name( '. $name.' )already exists');
+    }
     $variant = new Varaint();
     $variant->brands_id = $request->input('brands_id');
     $variant->netsuite_name = $request->input('netsuite_name');
