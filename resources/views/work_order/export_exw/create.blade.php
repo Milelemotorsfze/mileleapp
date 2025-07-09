@@ -1178,7 +1178,7 @@
 		
 		let commentIdCounter = 1;
 		var customers = {!! json_encode($customers) !!};
-		var vins = {!! json_encode($vinsData) !!}; 
+		var vins = JSON.parse('{!! addslashes($vinsJson) !!}');
 		var customerCount =  $("#customerCount").val();
 		var type = $("#type").val();
 		var addedVins = [];
