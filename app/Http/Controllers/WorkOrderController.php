@@ -133,10 +133,13 @@ class WorkOrderController extends Controller
 
         // Clean up customer names in PHP
         $combinedResults = $combinedResults->map(function ($item) {
-            // Replace multiple spaces with a single space
             $item->customer_name = preg_replace('/\s+/', ' ', trim($item->customer_name));
+            $item->customer_email = $item->customer_email ? htmlspecialchars($item->customer_email, ENT_QUOTES, 'UTF-8') : null;
+            $item->customer_company_number = $item->customer_company_number ? htmlspecialchars($item->customer_company_number, ENT_QUOTES, 'UTF-8') : null;
+            $item->customer_address = $item->customer_address ? htmlspecialchars($item->customer_address, ENT_QUOTES, 'UTF-8') : null;
             return $item;
         });
+        
 
         // Process combined results to remove duplicates based on unique_id
         $customers = $combinedResults->groupBy('unique_id')->map(function($items) {

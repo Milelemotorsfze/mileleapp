@@ -1174,14 +1174,6 @@
 			</div>
 		</div>
 	@endif
-	<script>
-try {
-    var customers = {!! json_encode($customers) !!};
-    console.log("Customers:", customers);
-} catch (e) {
-    console.error("Customers block crashed:", e.message);
-}
-</script>
 	<script type="text/javascript">
 		
 		let commentIdCounter = 1;
