@@ -70,6 +70,7 @@ use setasign\Fpdi\Tcpdf\Fpdi;
 use Illuminate\Support\Str;
 use File;
 use Exception;
+use App\Rules\ValidVin;
 
 
 class PurchasingOrderController extends Controller
@@ -1610,6 +1611,20 @@ class PurchasingOrderController extends Controller
                 'dn' => $row['dn'] ?? $row['DN'] ?? '',
             ];
         })->toArray();
+
+        // VIN validation
+        $invalidVins = [];
+        foreach ($vehiclesData as $row) {
+            $vin = $row['vin'] ?? '';
+            if ($vin && !(new ValidVin)->passes('vin', $vin)) {
+                $invalidVins[] = $vin;
+            }
+        }
+        if (!empty($invalidVins)) {
+            return response()->json([
+                'message' => 'Invalid VIN(s) found: ' . implode(', ', $invalidVins) . '. VINs must be alphanumeric with no spaces or special characters.'
+            ], 422);
+        }
 
         return response()->json([
             'vehiclesData' => $vehiclesData

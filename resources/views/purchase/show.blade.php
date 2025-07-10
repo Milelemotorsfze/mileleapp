@@ -2958,6 +2958,19 @@ return [$color->id => $formattedName];
                 });
             });
             updateBtn.addEventListener('click', () => {
+                // VIN validation before update
+                const vinFields = document.querySelectorAll('.editable-field.vin');
+                const invalidVins = [];
+                vinFields.forEach(field => {
+                    const vin = field.innerText.trim();
+                    if (vin && !isValidVin(vin)) {
+                        invalidVins.push(vin);
+                    }
+                });
+                if (invalidVins.length > 0) {
+                    alert('Invalid VIN(s) found: ' + invalidVins.join(', ') + '. VINs must be alphanumeric with no spaces or special characters.');
+                    return;
+                }
                 checkDuplicateVIN(function(vinCheckResult) {
                     console.log(vinCheckResult);
                     if (vinCheckResult === false) {
@@ -5800,6 +5813,56 @@ return [$color->id => $formattedName];
                     }
                 });
             });
+        });
+    </script>
+    <script>
+        // VIN validation function
+        function isValidVin(vin) {
+            return /^[A-Za-z0-9]+$/.test(vin);
+        }
+        // CSV VIN validation before ajax submit
+        $('#importForm').on('submit', function(e) {
+            var fileInput = $('input[name="import_file"]')[0];
+            var file = fileInput.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(ev) {
+                    var text = ev.target.result;
+                    var lines = text.split('\n');
+                    var vinColIndex = -1;
+                    var invalidVins = [];
+                    lines.forEach(function(line, idx) {
+                        var cols = line.split(',');
+                        if (idx === 0) {
+                            vinColIndex = cols.findIndex(col => col.trim().toLowerCase() === 'vin' || col.trim().toLowerCase() === 'vin number');
+                        } else if (vinColIndex >= 0 && cols[vinColIndex]) {
+                            var vin = cols[vinColIndex].trim();
+                            if (vin && !isValidVin(vin)) {
+                                invalidVins.push(vin);
+                            }
+                        }
+                    });
+                    if (invalidVins.length > 0) {
+                        alert('Invalid VIN(s) found: ' + invalidVins.join(', ') + '. VINs must be alphanumeric with no spaces or special characters.');
+                        e.preventDefault();
+                        return false;
+                    } else {
+                        $('#importForm')[0].submit();
+                    }
+                };
+                reader.readAsText(file);
+                e.preventDefault();
+                return false;
+            }
+        });
+        // VIN validation if value entered fromm input field
+        $(document).on('blur', 'input[name="vin[]"]', function() {
+            var vin = $(this).val();
+            if (vin && !isValidVin(vin)) {
+                alert('Invalid VIN: ' + vin + '. VINs must be alphanumeric with no spaces or special characters.');
+                $(this).val('');
+                $(this).focus();
+            }
         });
     </script>
     @endsection
