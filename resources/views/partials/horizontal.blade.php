@@ -2069,6 +2069,17 @@
                                         </div>
                                         @endif
 
+                                        <!-- @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('colour-edit');
+                                        @endphp
+                                        @if ($hasPermission) -->
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('countries.index')}}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Countries </span>
+                                            </a>
+                                        </div>
+                                        <!-- @endif -->
+
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-edit');
                                         @endphp

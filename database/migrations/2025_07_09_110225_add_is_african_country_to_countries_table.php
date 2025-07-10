@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::table('countries', function (Blueprint $table) {
             $table->boolean('is_african_country')->default(false)->after('iso_3166_code');
+            $table->unsignedBigInteger('created_by')->nullable()->after('updated_at');
+            $table->unsignedBigInteger('updated_by')->nullable()->after('created_by');
+            $table->softDeletes();
         });
     }
 
@@ -22,7 +25,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('countries', function (Blueprint $table) {
-            $table->dropColumn('is_african_country');
+            $table->dropColumn(['is_african_country', 'created_by', 'updated_by']);
         });
     }
 };
