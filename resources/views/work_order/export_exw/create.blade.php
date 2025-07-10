@@ -1178,7 +1178,8 @@
 		
 		let commentIdCounter = 1;
 		var customers = {!! json_encode($customers) !!};
-		var vins = {!! json_encode($vins) !!};
+		var vins = {!! json_encode($vins->slice(0, 1)) !!}; // just one VIN
+		console.log(vins);
 		var customerCount =  $("#customerCount").val();
 		var type = $("#type").val();
 		var addedVins = [];
