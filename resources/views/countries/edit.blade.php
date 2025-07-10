@@ -70,7 +70,8 @@
             const hasDoubleHyphen = /--/.test(value);
             const hasDoubleSpace = /\s{2,}/.test(value);
             const hasDoubleBrackets = /\(\)|\)\)|\(\(/.test(value);
-            const invalidChars = /[^A-Za-z0-9\s\-()]/.test(value);
+            const hasDoubleDot = /\.\./.test(value);
+            const invalidChars = /[^A-Za-z0-9\s\-().]/.test(value);
             const hyphenCount = (value.match(/-/g) || []).length;
 
             if (value !== trimmed) return "No leading or trailing spaces allowed.";
@@ -78,7 +79,8 @@
             if (hasDoubleHyphen) return "Only one hyphen allowed.";
             if (hyphenCount > 1) return "Only one hyphen allowed.";
             if (hasDoubleBrackets) return "Avoid empty or double brackets.";
-            if (invalidChars) return "Only letters, numbers, space, one hyphen and brackets allowed.";
+            if (hasDoubleDot) return "Avoid consecutive dots.";
+            if (invalidChars) return "Only letters, numbers, space, dot (.), one hyphen (-), and brackets allowed.";
 
             return "";
         }

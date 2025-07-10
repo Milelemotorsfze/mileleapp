@@ -20,9 +20,10 @@ class CountryController extends Controller
         $request->validate([
             'name' => [
                 'required',
-                'regex:/^(?!.*\s{2,})(?!.*--)(?!.*\(\))(?!.*\)\))(?!(.*-){2,})[A-Za-z0-9\s\-\(\)]+$/',
-                Rule::unique('countries')->ignore($country->id ?? null)->where(function ($query) use ($request) {
-                    return $query->whereRaw('LOWER(name) = ?', [strtolower($request->name)])
+                'regex:/^(?!.*\s{2,})(?!.*--)(?!.*\.\.)(?!.*\(\))(?!.*\)\))(?!(.*-){2,})(?!(.*\.){2,})[A-Za-z0-9\s\-\(\)\.]+$/',
+                Rule::unique('countries')->where(function ($query) use ($request) {
+                    return $query
+                        ->whereRaw('LOWER(name) = ?', [strtolower($request->name)])
                         ->whereNull('deleted_at');
                 }),
             ],
@@ -31,7 +32,7 @@ class CountryController extends Controller
             'is_african_country' => 'required|boolean',
         ], [
             'name.required' => 'Country name is required.',
-            'name.regex' => 'Invalid country name format. Avoid double spaces, consecutive symbols, and only allow letters, numbers, single hyphen or brackets.',
+            'name.regex' => 'Invalid country name format. Avoid double spaces, consecutive symbols, and only allow letters, numbers, dot, one hyphen, and brackets.',
             'name.unique' => 'This country name already exists.',
         ]);
 
@@ -60,7 +61,7 @@ class CountryController extends Controller
         $request->validate([
             'name' => [
                 'required',
-                'regex:/^(?!.*\s{2,})(?!.*--)(?!.*\(\))(?!.*\)\))(?!(.*-){2,})[A-Za-z0-9\s\-\(\)]+$/',
+                'regex:/^(?!.*\s{2,})(?!.*--)(?!.*\.\.)(?!.*\(\))(?!.*\)\))(?!(.*-){2,})(?!(.*\.){2,})[A-Za-z0-9\s\-\(\)\.]+$/',
                 Rule::unique('countries')->ignore($country->id)->where(function ($query) use ($request) {
                     return $query
                         ->whereRaw('LOWER(name) = ?', [strtolower($request->name)])
@@ -72,7 +73,7 @@ class CountryController extends Controller
             'is_african_country' => 'required|boolean',
         ], [
             'name.required' => 'Country name is required.',
-            'name.regex' => 'Invalid country name format. Avoid double spaces, consecutive symbols, and only allow letters, numbers, single hyphen or brackets.',
+            'name.regex' => 'Invalid country name format. Avoid double spaces, consecutive symbols, and only allow letters, numbers, dot, one hyphen, and brackets.',
             'name.unique' => 'This country name already exists.',
         ]);
 
@@ -83,6 +84,7 @@ class CountryController extends Controller
 
         return redirect()->route('countries.index')->with('success', 'Country updated successfully.');
     }
+
     public function destroy(Country $country)
     {
         $country->delete();
