@@ -2473,7 +2473,9 @@ try {
 										<label class="col-form-label text-md-end">Addon :</label>
 										<select name="addons[]" id="addons_${index}" class="form-control widthinput addondynamicselect2" data-index="${index}" multiple="true">
 											@foreach($addons as $addon)
-											<option value="{{$addon->addon_code}} - {{$addon->addon_name}}">{{$addon->addon_code}} - {{$addon->addon_name}}</option>
+												<option value="{{ e($addon->addon_code . ' - ' . $addon->addon_name) }}">
+													{{ e($addon->addon_code . ' - ' . $addon->addon_name) }}
+												</option>											
 											@endforeach
 											@foreach($charges as $charge)
 											<option value="{{$charge->addon_code}} - {{$charge->addon_name}}">{{$charge->addon_code}} - {{$charge->addon_name}}</option>
