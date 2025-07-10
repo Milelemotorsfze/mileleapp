@@ -1176,14 +1176,10 @@
 	@endif
 	<script>
 try {
-    console.log("Script start");
-
-    // var customers = {!! json_encode($customers) !!}; // comment temporarily
-    var vins = {!! json_encode($vins->slice(0, 1)) !!};
-    
-    console.log("VIN data:", vins);
+    var customers = {!! json_encode($customers) !!};
+    console.log("Customers:", customers);
 } catch (e) {
-    console.error("Script crashed:", e.message);
+    console.error("Customers block crashed:", e.message);
 }
 </script>
 	<script type="text/javascript">
