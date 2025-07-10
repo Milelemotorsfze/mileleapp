@@ -1174,31 +1174,32 @@
 			</div>
 		</div>
 	@endif
+	{{-- Customers --}}
 <script id="customers-json" type="application/json">
 {!! json_encode($customers, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) !!}
 </script>
 
+{{-- VINs --}}
 <script id="vins-json" type="application/json">
 {!! json_encode($vins, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) !!}
 </script>
 
-<script id="salespersons-json" type="application/json">
-{!! json_encode($salesPersons ?? [], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) !!}
+{{-- JS block to parse safely --}}
+<script>
+let customers = [];
+let vins = [];
+
+try {
+    customers = JSON.parse(document.getElementById('customers-json').textContent);
+    vins = JSON.parse(document.getElementById('vins-json').textContent);
+    console.log("Customers & VINs loaded successfully");
+} catch (e) {
+    console.error("JSON parse failed:", e);
+}
 </script>
 	<script type="text/javascript">
 		
 		let commentIdCounter = 1;
-		let customers = [];
-let vins = [];
-let salesPersons = [];
-		try {
-    customers = JSON.parse(document.getElementById('customers-json').textContent);
-    vins = JSON.parse(document.getElementById('vins-json').textContent);
-    salesPersons = JSON.parse(document.getElementById('salespersons-json').textContent);
-    console.log("Parsed JSON:", { customers, vins, salesPersons });
-} catch (e) {
-    console.error("JSON parsing failed:", e);
-}
 		var customerCount =  $("#customerCount").val();
 		var type = $("#type").val();
 		var addedVins = [];

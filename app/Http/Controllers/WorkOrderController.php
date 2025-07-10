@@ -3289,11 +3289,10 @@ class WorkOrderController extends Controller
         return $number ? " " . $number : '';
     }
     private function cleanField($value)
-    {
-        if (is_null($value)) return null;
-    
-        $value = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
-        $value = preg_replace('/[\x00-\x1F\x7F]/u', '', $value);
-        return preg_replace('/\s+/', ' ', trim($value));
-    }
+{
+    if (is_null($value)) return null;
+    $value = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+    $value = preg_replace('/[\x00-\x1F\x7F]/u', '', $value); // remove control chars
+    return preg_replace('/\s+/', ' ', trim($value));
+}
 }
