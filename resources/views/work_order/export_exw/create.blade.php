@@ -1174,15 +1174,18 @@
 			</div>
 		</div>
 	@endif
+	<script id="customers-json" type="application/json">
+    {!! json_encode($customers, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) !!}
+</script>
 	<script type="text/javascript">
 		
 		let commentIdCounter = 1;
 		try {
-			var customers = {!! json_encode($customers, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!};
-			console.log("Customers loaded:", customers);
-		} catch (e) {
-			console.error("Customer JSON crashed:", e);
-		}
+        customers = JSON.parse(document.getElementById('customers-json').textContent);
+        console.log("Customers loaded safely:", customers);
+    } catch (e) {
+        console.error("Customer JSON parse failed:", e);
+    }
 		var vins = {!! json_encode($vins) !!};
 		var customerCount =  $("#customerCount").val();
 		var type = $("#type").val();
