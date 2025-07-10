@@ -353,10 +353,15 @@
 								<input hidden id="customer_reference_id" name="customer_reference_id" value="">
 								<input hidden id="customer_reference_type" name="customer_reference_type" value="">
 								<select id="customer_name" name="existing_customer_name" class="form-control widthinput" multiple="true">
-									@foreach($customers as $customer)
-									<option value="{{$customer->customer_name ?? ''}}" data-id="{{$customer->unique_id ?? ''}}"
-									>{{$customer->customer_name ?? ''}}</option>
-									@endforeach
+								@foreach($customers as $customer)
+									<option 
+										value="{{ e($customer->customer_name ?? '') }}"
+										data-id="{{ e(($customer->email ?? '') . '_' . ($customer->phone ?? '')) }}"
+									>
+										{{ e($customer->customer_name ?? '') }}
+									</option>
+								@endforeach
+
 								</select> 
 								<input type="text" id="textInput" placeholder="Enter Customer Name" name="new_customer_name"
 									class="form-control widthinput @error('customer_name') is-invalid @enderror" onkeyup="sanitizeInput(this)">
@@ -1215,7 +1220,7 @@ try {
 		var vinWithoutBoe = [];
 		var authUserPermission = @json($allfieldPermission ? 'true' : 'false');
 		@if(isset($workOrder))
-			var workOrder = {!! json_encode($workOrder) !!};
+			var workOrder = @json($workOrder);
 		@else
 			var workOrder = null;
 			document.addEventListener("DOMContentLoaded", function() {
