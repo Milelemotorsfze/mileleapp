@@ -276,7 +276,7 @@
 				<div class="card">
 					<div class="card-header">
 						<h4 class="card-title">
-							<center>General Informations</center>
+							<center>General Information</center>
 						</h4>
 					</div>
 					<div class="card-body">
