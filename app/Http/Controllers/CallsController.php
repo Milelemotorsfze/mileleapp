@@ -1587,6 +1587,7 @@ public function createnewvarinats()
     return view('variants.add_new_variants', compact('interiorColors', 'exteriorColors'));
 }
 public function storenewvarinats(Request $request) {
+    // seems to be this function not using anywhere
     $useractivities =  New UserActivities();
         $useractivities->activity = "Show New Variants";
         $useractivities->users_id = Auth::id();

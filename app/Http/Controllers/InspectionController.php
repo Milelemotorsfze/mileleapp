@@ -1457,6 +1457,10 @@ class InspectionController extends Controller
         }
         $variant_details = $my . ',' . $steering . ',' . $model_line . ',' . $engine . ',' . $gearbox . ',' . $fuel_type . ',' . $gearbox . ',' . $coo . ',' . $drive_train . ',' . $upholestry;
     }
+            $isVariantNameExist = Varaint::where('name', $name)->first();
+            if($isVariantNameExist) {
+                return redirect()->back()->with('error', 'Variant with the same Name( '. $name.' )already exists');
+            }
                     $variant = new Varaint();
                     $variant->brands_id = $variantsdf->brands_id;
                     $variant->master_model_lines_id = $variantsdf->master_model_lines_id;
