@@ -1174,10 +1174,22 @@
 			</div>
 		</div>
 	@endif
+	<script>
+try {
+    console.log("Script start");
+
+    // var customers = {!! json_encode($customers) !!}; // comment temporarily
+    var vins = {!! json_encode($vins->slice(0, 1)) !!};
+    
+    console.log("VIN data:", vins);
+} catch (e) {
+    console.error("Script crashed:", e.message);
+}
+</script>
 	<script type="text/javascript">
 		
 		let commentIdCounter = 1;
-		// var customers = {!! json_encode($customers) !!};
+		var customers = {!! json_encode($customers) !!};
 		var vins = {!! json_encode($vins) !!};
 		var customerCount =  $("#customerCount").val();
 		var type = $("#type").val();
