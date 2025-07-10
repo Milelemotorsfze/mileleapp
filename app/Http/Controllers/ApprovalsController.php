@@ -405,6 +405,11 @@ class ApprovalsController extends Controller
         $remark = $request->input('remark');
         $variant = $request->input('variant');
         $newvariantid = $request->input('newvariantid');
+        $isVariantNameExist = Varaint::where('name', $variantname)->first();
+        if ($isVariantNameExist) {
+            return response()->json(['error' => 'Variant with the same Name (' . $variantname . ') already exists'], 422);
+
+        }
        if($variantType == "new")
        {
         if($newvariantid)
@@ -443,6 +448,7 @@ class ApprovalsController extends Controller
         $variantRequest->status = "Approval";
         $variantRequest->save();
      }
+       
         $variant = new Varaint();
         $variant->name = $variantname;
         $variant->model_detail = $modeldetail;
@@ -1369,6 +1375,7 @@ class ApprovalsController extends Controller
     }
     public function inspectionedit($id)
     {
+        
         $useractivities =  New UserActivities();
         $useractivities->activity = "Open the Approval Page For Approval";
         $useractivities->users_id = Auth::id();
