@@ -1177,7 +1177,12 @@
 	<script type="text/javascript">
 		
 		let commentIdCounter = 1;
-		var customers = {!! json_encode($customers) !!};
+		try {
+			var customers = {!! json_encode($customers, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!};
+			console.log("Customers:", customers);
+		} catch (e) {
+			console.error("Customer JSON parse error:", e);
+		}
 		var vins = {!! json_encode($vins) !!};
 		var customerCount =  $("#customerCount").val();
 		var type = $("#type").val();
