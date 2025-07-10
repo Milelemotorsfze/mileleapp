@@ -276,7 +276,7 @@
 				<div class="card">
 					<div class="card-header">
 						<h4 class="card-title">
-							<center>General Information</center>
+							<center>General Informations</center>
 						</h4>
 					</div>
 					<div class="card-body">
@@ -1177,9 +1177,8 @@
 	<script type="text/javascript">
 		
 		let commentIdCounter = 1;
-		var customers = {!! json_encode($customers) !!};
-		var vins = {!! json_encode($vins->slice(0, 1)) !!}; // just one VIN
-		console.log(vins);
+		// var customers = {!! json_encode($customers) !!};
+		var vins = {!! json_encode($vins) !!};
 		var customerCount =  $("#customerCount").val();
 		var type = $("#type").val();
 		var addedVins = [];
