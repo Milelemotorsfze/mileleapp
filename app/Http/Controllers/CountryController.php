@@ -20,15 +20,19 @@ class CountryController extends Controller
         $request->validate([
             'name' => [
                 'required',
-                Rule::unique('countries')->where(function ($query) use ($request) {
-                    return $query
-                        ->whereRaw('LOWER(name) = ?', [strtolower($request->name)])
+                'regex:/^(?!.*\s{2,})(?!.*--)(?!.*\(\))(?!.*\)\))(?!(.*-){2,})[A-Za-z0-9\s\-\(\)]+$/',
+                Rule::unique('countries')->ignore($country->id ?? null)->where(function ($query) use ($request) {
+                    return $query->whereRaw('LOWER(name) = ?', [strtolower($request->name)])
                         ->whereNull('deleted_at');
                 }),
             ],
             'nationality' => 'nullable|string|max:255',
             'iso_3166_code' => 'nullable|string|max:255',
             'is_african_country' => 'required|boolean',
+        ], [
+            'name.required' => 'Country name is required.',
+            'name.regex' => 'Invalid country name format. Avoid double spaces, consecutive symbols, and only allow letters, numbers, single hyphen or brackets.',
+            'name.unique' => 'This country name already exists.',
         ]);
 
         $country = new Country($request->all());
@@ -56,6 +60,7 @@ class CountryController extends Controller
         $request->validate([
             'name' => [
                 'required',
+                'regex:/^(?!.*\s{2,})(?!.*--)(?!.*\(\))(?!.*\)\))(?!(.*-){2,})[A-Za-z0-9\s\-\(\)]+$/',
                 Rule::unique('countries')->ignore($country->id)->where(function ($query) use ($request) {
                     return $query
                         ->whereRaw('LOWER(name) = ?', [strtolower($request->name)])
@@ -65,6 +70,10 @@ class CountryController extends Controller
             'nationality' => 'nullable|string|max:255',
             'iso_3166_code' => 'nullable|string|max:255',
             'is_african_country' => 'required|boolean',
+        ], [
+            'name.required' => 'Country name is required.',
+            'name.regex' => 'Invalid country name format. Avoid double spaces, consecutive symbols, and only allow letters, numbers, single hyphen or brackets.',
+            'name.unique' => 'This country name already exists.',
         ]);
 
         $country->fill($request->all());

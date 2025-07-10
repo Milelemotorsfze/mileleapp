@@ -59,3 +59,63 @@
     </form>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const nameInput = document.getElementById('name');
+        const form = nameInput.closest('form');
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const errorDiv = document.createElement('div');
+        errorDiv.classList.add('text-danger', 'mt-1');
+        nameInput.parentNode.appendChild(errorDiv);
+
+        let dirty = false;
+
+        function validateName(value) {
+            const trimmed = value.trim();
+            const hasDoubleHyphen = /--/.test(value);
+            const hasDoubleSpace = /\s{2,}/.test(value);
+            const hasDoubleBrackets = /\(\)|\)\)|\(\(/.test(value);
+            const invalidChars = /[^A-Za-z0-9\s\-()]/.test(value);
+            const hyphenCount = (value.match(/-/g) || []).length;
+
+            if (value !== trimmed) return "No leading or trailing spaces allowed.";
+            if (hasDoubleSpace) return "Avoid double spaces.";
+            if (hasDoubleHyphen) return "Only one hyphen allowed.";
+            if (hyphenCount > 1) return "Only one hyphen allowed.";
+            if (hasDoubleBrackets) return "Avoid empty or double brackets.";
+            if (invalidChars) return "Only letters, numbers, space, one hyphen and brackets allowed.";
+
+            return "";
+        }
+
+        function updateValidation() {
+            const value = nameInput.value;
+            const error = validateName(value);
+            if (dirty && error) {
+                errorDiv.textContent = error;
+                submitBtn.disabled = true;
+            } else {
+                errorDiv.textContent = "";
+                submitBtn.disabled = false;
+            }
+        }
+
+        nameInput.addEventListener('input', function() {
+            dirty = true;
+            updateValidation();
+        });
+
+        form.addEventListener('submit', function(e) {
+            updateValidation();
+            if (submitBtn.disabled) {
+                e.preventDefault();
+                nameInput.focus();
+            }
+        });
+
+        submitBtn.disabled = false;
+    });
+</script>
+@endpush
