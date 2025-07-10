@@ -1178,10 +1178,10 @@
 		
 		let commentIdCounter = 1;
 		try {
-			var customers = {!! json_encode($customers, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!};
-			console.log("Customers:", customers);
+			var customers = {!! json_encode($customers, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!};
+			console.log("Customers loaded:", customers);
 		} catch (e) {
-			console.error("Customer JSON parse error:", e);
+			console.error("Customer JSON crashed:", e);
 		}
 		var vins = {!! json_encode($vins) !!};
 		var customerCount =  $("#customerCount").val();

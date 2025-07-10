@@ -133,10 +133,10 @@ class WorkOrderController extends Controller
 
         // Clean up customer names in PHP
         $combinedResults = $combinedResults->map(function ($item) {
-            $item->customer_name = preg_replace('/\s+/', ' ', trim($item->customer_name));
-            $item->customer_email = $item->customer_email ? htmlspecialchars($item->customer_email, ENT_QUOTES, 'UTF-8') : null;
-            $item->customer_company_number = $item->customer_company_number ? htmlspecialchars($item->customer_company_number, ENT_QUOTES, 'UTF-8') : null;
-            $item->customer_address = $item->customer_address ? htmlspecialchars($item->customer_address, ENT_QUOTES, 'UTF-8') : null;
+            $item->customer_name = cleanField($item->customer_name);
+            $item->customer_email = cleanField($item->customer_email);
+            $item->customer_company_number = cleanField($item->customer_company_number);
+            $item->customer_address = cleanField($item->customer_address);
             return $item;
         });
         
@@ -3282,5 +3282,19 @@ class WorkOrderController extends Controller
     function formatPhoneForExcel($number)
     {
         return $number ? " " . $number : '';
+    }
+    function cleanField($value) {
+        if (is_null($value)) return null;
+    
+        // Convert to UTF-8 (if not already), strip invalid chars
+        $value = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+    
+        // Remove control characters (except line breaks)
+        $value = preg_replace('/[\x00-\x1F\x7F]/u', '', $value);
+    
+        // Normalize spaces
+        $value = preg_replace('/\s+/', ' ', trim($value));
+    
+        return $value;
     }
 }
