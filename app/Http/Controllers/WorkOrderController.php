@@ -132,7 +132,7 @@ class WorkOrderController extends Controller
             ->get();
 
         // Clean up customer names in PHP
-        $combinedResults = $combinedResults->map(function ($item) {
+        $customers = $customers->map(function ($item) {
             $item->customer_name = $this->cleanField($item->customer_name);
             $item->customer_email = $this->cleanField($item->customer_email);
             $item->customer_company_number = $this->cleanField($item->customer_company_number);
@@ -170,6 +170,14 @@ class WorkOrderController extends Controller
             $salesPersons = User::orderBy('name','ASC')->where('status','active')->where('is_sales_rep','Yes')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
                 $q = $q->where('type','employee');
             })->get();
+        }
+        foreach ($customers as $index => $cust) {
+            try {
+                json_encode($cust, JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                Log::error("Customer JSON error at index {$index}: " . $e->getMessage(), ['customer' => $cust]);
+                abort(500, "Bad customer record at index {$index}");
+            }
         }
         return view('work_order.export_exw.create', compact('type', 'customers', 'customerCount', 'airlines', 'vins', 'users', 'addons', 'charges','salesPersons'))->with([
             'vinsJson' => $vins->toJson(), // Single encoding here
@@ -3290,16 +3298,16 @@ class WorkOrderController extends Controller
         return $number ? " " . $number : '';
     }
     private function cleanField($value)
-{
-    if (is_null($value)) return null;
-
-    // Force to UTF-8 and remove broken characters
-    $value = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
-
-    // Remove control characters
-    $value = preg_replace('/[\x00-\x1F\x7F]/u', '', $value);
-
-    // Normalize whitespace
-    return preg_replace('/\s+/', ' ', trim($value));
-}
+    {
+        if (is_null($value)) return null;
+    
+        // Fix encoding
+        $value = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+    
+        // Remove control characters
+        $value = preg_replace('/[\x00-\x1F\x7F]/u', '', $value);
+    
+        // Escape for JSON safety
+        return preg_replace('/\s+/', ' ', trim($value));
+    }
 }
