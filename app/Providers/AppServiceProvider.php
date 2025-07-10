@@ -22,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
     }
     public function boot(): void
     {
+        // Enforce UTF-8 output encoding
+        ini_set('default_charset', 'UTF-8');
+
         Vehicles::observe(VehicleObserver::class);
 
         View::composer('partials.horizontal', function ($view) {
