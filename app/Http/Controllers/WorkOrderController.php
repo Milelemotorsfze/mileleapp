@@ -146,7 +146,13 @@ class WorkOrderController extends Controller
             // Sort items by score in descending order and then take the first item
             return $items->sortByDesc('score')->first();
         })->values()->sortBy('customer_name');
-
+        foreach ($customers as $i => $cust) {
+            try {
+                json_encode($cust, JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                dd("Broken customer at index {$i}", $cust, $e->getMessage());
+            }
+        }
         // Get the count of customers
         $customerCount = $customers->count();
 
