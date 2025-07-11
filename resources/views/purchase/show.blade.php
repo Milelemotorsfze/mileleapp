@@ -5666,15 +5666,14 @@ return [$color->id => $formattedName];
                                         }
                                     });
                                 }
-                                // 1. If a row with the same VIN exists, update it
-                                if (!updated) {
+                                // --- MATCH BY VIN IF VIN IS PRESENT ---
+                                if (!updated && vehicle.vin) {
                                     $('#vehicleSectionTable tbody tr').each(function() {
                                         var $row = $(this);
                                         var vinCell = $row.find('.vin');
                                         if (
                                             vinCell.length > 0 &&
-                                            vinCell.text().trim().toLowerCase() === (vehicle.vin || '').trim().toLowerCase() &&
-                                            vehicle.vin
+                                            vinCell.text().trim().toLowerCase() === vehicle.vin.trim().toLowerCase()
                                         ) {
                                             $row.find('.dn').text(vehicle.dn);
                                             $row.find('.engine').text(vehicle.engine);
@@ -5696,11 +5695,7 @@ return [$color->id => $formattedName];
                                                 $exSelect.prop('disabled', false);
                                                 $exSelect.val(exVal).trigger('change');
                                                 $exSelect.prop('disabled', true);
-                                                console.log('Set exterior color select to', exVal, 'for VIN', vehicle.vin);
-                                            } else {
-                                                console.log('No match for exterior color:', vehicle.ex_colour, 'in', $exSelect.html());
                                             }
-
                                             // Update Interior Color (if select)
                                             var $intSelect = $row.find('.int_colour select');
                                             var intVal = '';
@@ -5717,7 +5712,6 @@ return [$color->id => $formattedName];
                                                 $intSelect.prop('disabled', false);
                                                 $intSelect.val(intVal).trigger('change');
                                                 $intSelect.prop('disabled', true);
-                                                console.log('Set interior color select to', intVal, 'for VIN', vehicle.vin);
                                             }
                                             // Update Production Month
                                             var $prodInput = $row.find('.ppmmyyy input[type="date"]');
@@ -5732,20 +5726,20 @@ return [$color->id => $formattedName];
                                         }
                                     });
                                 }
-                                // 2. Otherwise, find first row with same variant and empty VIN, and fill it
-                                if (!updated && vehicle.vin && !usedVins[vehicle.vin]) {
+                                // --- ONLY MATCH BY VARIANT IF VIN IS NOT PRESENT ---
+                                if (!updated && !vehicle.vin && vehicle.variant) {
                                     $('#vehicleSectionTable tbody tr').each(function() {
                                         var $row = $(this);
                                         var vinCell = $row.find('.vin');
                                         var variantCell = $row.find('td').filter(function() {
-                                            return $(this).text().trim().toLowerCase() === (vehicle.variant || '').trim().toLowerCase();
+                                            return $(this).text().trim().toLowerCase() === vehicle.variant.trim().toLowerCase();
                                         });
                                         if (
                                             variantCell.length > 0 &&
                                             vinCell.length > 0 &&
                                             (!vinCell.text().trim() || vinCell.text().trim() === '-')
                                         ) {
-                                            vinCell.text(vehicle.vin);
+                                            // Do NOT fill VIN cell if no VIN is provided
                                             $row.find('.dn').text(vehicle.dn);
                                             $row.find('.engine').text(vehicle.engine);
                                             // Update Exterior Color (if select)
@@ -5766,11 +5760,7 @@ return [$color->id => $formattedName];
                                                 $exSelect.prop('disabled', false);
                                                 $exSelect.val(exVal).trigger('change');
                                                 $exSelect.prop('disabled', true);
-                                                console.log('Set exterior color select to', exVal, 'for VIN', vehicle.vin);
-                                            } else {
-                                                console.log('No match for exterior color:', vehicle.ex_colour, 'in', $exSelect.html());
                                             }
-
                                             // Update Interior Color (if select)
                                             var $intSelect = $row.find('.int_colour select');
                                             var intVal = '';
@@ -5787,7 +5777,69 @@ return [$color->id => $formattedName];
                                                 $intSelect.prop('disabled', false);
                                                 $intSelect.val(intVal).trigger('change');
                                                 $intSelect.prop('disabled', true);
-                                                console.log('Set interior color select to', intVal, 'for VIN', vehicle.vin);
+                                            }
+                                            // Update Production Month
+                                            var $prodInput = $row.find('.ppmmyyy input[type="date"]');
+                                            if ($prodInput.length > 0) {
+                                                $prodInput.val(vehicle.prod_month);
+                                            } else {
+                                                $row.find('.ppmmyyy').text(vehicle.prod_month);
+                                            }
+                                            updated = true;
+                                            return false;
+                                        }
+                                    });
+                                }
+                                // --- MATCH BY VIN AND VARIANT IF BOTH ARE PRESENT ---
+                                if (!updated && vehicle.vin && vehicle.variant) {
+                                    $('#vehicleSectionTable tbody tr').each(function() {
+                                        var $row = $(this);
+                                        var vinCell = $row.find('.vin');
+                                        var variantCell = $row.find('td').filter(function() {
+                                            return $(this).text().trim().toLowerCase() === vehicle.variant.trim().toLowerCase();
+                                        });
+                                        if (
+                                            vinCell.length > 0 &&
+                                            variantCell.length > 0 &&
+                                            vinCell.text().trim().toLowerCase() === vehicle.vin.trim().toLowerCase()
+                                        ) {
+                                            $row.find('.dn').text(vehicle.dn);
+                                            $row.find('.engine').text(vehicle.engine);
+                                            // Update Exterior Color (if select)
+                                            var $exSelect = $row.find('.ex_colour select');
+                                            var exVal = '';
+                                            if (vehicle.ex_colour_id) {
+                                                exVal = vehicle.ex_colour_id;
+                                            } else if (vehicle.ex_colour) {
+                                                var csvColor = vehicle.ex_colour.trim().toLowerCase().replace(/\s+/g, '');
+                                                $exSelect.find('option').each(function() {
+                                                    var optionText = $(this).text().trim().toLowerCase().replace(/\s+/g, '');
+                                                    if (optionText === csvColor) {
+                                                        exVal = $(this).val();
+                                                    }
+                                                });
+                                            }
+                                            if (exVal) {
+                                                $exSelect.prop('disabled', false);
+                                                $exSelect.val(exVal).trigger('change');
+                                                $exSelect.prop('disabled', true);
+                                            }
+                                            // Update Interior Color (if select)
+                                            var $intSelect = $row.find('.int_colour select');
+                                            var intVal = '';
+                                            if (vehicle.int_colour_id) {
+                                                intVal = vehicle.int_colour_id;
+                                            } else if (vehicle.int_colour) {
+                                                $intSelect.find('option').each(function() {
+                                                    if ($(this).text().trim().toLowerCase() === vehicle.int_colour.trim().toLowerCase()) {
+                                                        intVal = $(this).val();
+                                                    }
+                                                });
+                                            }
+                                            if (intVal) {
+                                                $intSelect.prop('disabled', false);
+                                                $intSelect.val(intVal).trigger('change');
+                                                $intSelect.prop('disabled', true);
                                             }
                                             // Update Production Month
                                             var $prodInput = $row.find('.ppmmyyy input[type="date"]');
@@ -5797,6 +5849,7 @@ return [$color->id => $formattedName];
                                                 $row.find('.ppmmyyy').text(vehicle.prod_month);
                                             }
                                             usedVins[vehicle.vin] = true;
+                                            updated = true;
                                             return false;
                                         }
                                     });

@@ -1626,6 +1626,60 @@ class PurchasingOrderController extends Controller
             ], 422);
         }
 
+        // Validate required columns and values
+        $requiredColumns = ['model_sfx', 'variant', 'my', 'old_vin', 'vin', 'engine', 'color_code', 'color', 'prod_month', 'order_type', 'destination', 'end_user', 'status', 'pfi', 'po', 'dn'];
+        $requiredValueColumns = ['po', 'variant'];
+        $missingColumns = [];
+        if ($header) {
+            foreach ($requiredColumns as $col) {
+                // Case-insensitive check for column presence
+                $found = false;
+                foreach ($header as $h) {
+                    if (strtolower(trim($h)) === strtolower($col)) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if (!$found) {
+                    $missingColumns[] = $col;
+                }
+            }
+        }
+        if (!empty($missingColumns)) {
+            return response()->json(['message' => 'Missing required column(s): ' . implode(', ', $missingColumns)], 422);
+        }
+
+        // Check for missing values in required columns ('variant' and 'po')
+        $missingValueRows = [];
+        if ($header && !empty($filtered)) {
+            // validate 'variant' and 'po' columns
+            $variantIdx = null;
+            $poIdx = null;
+            foreach ($header as $idx => $h) {
+                if (strtolower(trim($h)) === 'variant') {
+                    $variantIdx = $idx;
+                }
+            }
+            foreach ($filtered as $rowNum => $row) {
+                $variantVal = ($variantIdx !== null && isset($row[$header[$variantIdx]])) ? trim($row[$header[$variantIdx]]) : '';
+                if ($variantVal === '') {
+                    $missingValueRows[] = $rowNum + 2;
+                }
+            }
+        }
+        if (!empty($missingValueRows)) {
+            return response()->json([
+                'message' => 'Missing required value(s) for column(s) "variant" or "po" in row(s): ' . implode(', ', $missingValueRows)
+            ], 422);
+        }
+
+        $headerMap = [];
+        if ($header) {
+            foreach ($header as $idx => $h) {
+                $headerMap[strtolower(trim($h))] = $idx;
+            }
+        }
+
         return response()->json([
             'vehiclesData' => $vehiclesData
         ]);
