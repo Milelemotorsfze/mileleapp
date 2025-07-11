@@ -78,7 +78,7 @@
 @section('content')
     <div class="card-header">
         <h4 class="card-title">
-            Variants Info ss
+            Variants Info
         </h4>
         @php
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
@@ -216,7 +216,7 @@
                                 </td>
                                 @else
                                 <td class="nowrap-td">
-                                  Id- {{ $variant->id }}
+                                
                                 </td>
                                 @endif
                             @endif
