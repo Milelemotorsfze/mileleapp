@@ -353,10 +353,15 @@
 								<input hidden id="customer_reference_id" name="customer_reference_id" value="">
 								<input hidden id="customer_reference_type" name="customer_reference_type" value="">
 								<select id="customer_name" name="existing_customer_name" class="form-control widthinput" multiple="true">
-									@foreach($customers as $customer)
-									<option value="{{$customer->customer_name ?? ''}}" data-id="{{$customer->unique_id ?? ''}}"
-									>{{$customer->customer_name ?? ''}}</option>
-									@endforeach
+								@foreach($customers as $customer)
+									<option 
+										value="{{ e($customer->customer_name ?? '') }}"
+										data-id="{{ e(($customer->email ?? '') . '_' . ($customer->phone ?? '')) }}"
+									>
+										{{ e($customer->customer_name ?? '') }}
+									</option>
+								@endforeach
+
 								</select> 
 								<input type="text" id="textInput" placeholder="Enter Customer Name" name="new_customer_name"
 									class="form-control widthinput @error('customer_name') is-invalid @enderror" onkeyup="sanitizeInput(this)">
@@ -1174,11 +1179,32 @@
 			</div>
 		</div>
 	@endif
+	{{-- Customers --}}
+<script id="customers-json" type="application/json">
+{!! json_encode($customers, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) !!}
+</script>
+
+{{-- VINs --}}
+<script id="vins-json" type="application/json">
+{!! json_encode($vins, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) !!}
+</script>
+
+{{-- JS block to parse safely --}}
+<script>
+let customers = [];
+let vins = [];
+
+try {
+    customers = JSON.parse(document.getElementById('customers-json').textContent);
+    vins = JSON.parse(document.getElementById('vins-json').textContent);
+    console.log("Customers & VINs loaded successfully");
+} catch (e) {
+    console.error("JSON parse failed:", e);
+}
+</script>
 	<script type="text/javascript">
 		
 		let commentIdCounter = 1;
-		var customers = {!! json_encode($customers) !!};
-		var vins = JSON.parse('{!! addslashes($vinsJson) !!}');
 		var customerCount =  $("#customerCount").val();
 		var type = $("#type").val();
 		var addedVins = [];
@@ -1194,7 +1220,7 @@
 		var vinWithoutBoe = [];
 		var authUserPermission = @json($allfieldPermission ? 'true' : 'false');
 		@if(isset($workOrder))
-			var workOrder = {!! json_encode($workOrder) !!};
+			var workOrder = @json($workOrder);
 		@else
 			var workOrder = null;
 			document.addEventListener("DOMContentLoaded", function() {
@@ -2447,7 +2473,9 @@
 										<label class="col-form-label text-md-end">Addon :</label>
 										<select name="addons[]" id="addons_${index}" class="form-control widthinput addondynamicselect2" data-index="${index}" multiple="true">
 											@foreach($addons as $addon)
-											<option value="{{$addon->addon_code}} - {{$addon->addon_name}}">{{$addon->addon_code}} - {{$addon->addon_name}}</option>
+												<option value="{{ e($addon->addon_code . ' - ' . $addon->addon_name) }}">
+													{{ e($addon->addon_code . ' - ' . $addon->addon_name) }}
+												</option>											
 											@endforeach
 											@foreach($charges as $charge)
 											<option value="{{$charge->addon_code}} - {{$charge->addon_name}}">{{$charge->addon_code}} - {{$charge->addon_name}}</option>

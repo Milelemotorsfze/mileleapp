@@ -169,7 +169,7 @@ Route::get('/d', function () {
 
 
     Auth::routes();
-    Route::controller(AuthOtpController::class)->group(function(){
+    Route::middleware(['web'])->controller(AuthOtpController::class)->group(function(){
         Route::get('/otp/login', 'login')->name('otp.login');
         Route::post('/otp/generate', 'generate')->name('otp.generate');
         Route::post('/login/otp/generate', 'loginOtpGenerate')->name('otp.loginOtpGenerate');

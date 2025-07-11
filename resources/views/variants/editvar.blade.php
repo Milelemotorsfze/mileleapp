@@ -6,7 +6,7 @@
         @endphp
         @if ($hasPermission)
             <div class="card-header">
-                <h4 class="card-title">Edit Variant - {{$variant->name}}</h4>
+                <h4 class="card-title">Edit Variant - {{$variant->name}} </h4>
                 @can('variants-list')
                     @php
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-list');

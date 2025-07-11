@@ -17,9 +17,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Quotation Details</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <!-- Content will be dynamically loaded here -->
@@ -145,7 +143,7 @@
     <hr>
     <!-- Sales Orders Section -->
     <div class="mb-4">
-        <h5>Qoutations</h5>
+        <h5>Quotations</h5>
         <div class="table-responsive" >
                     <table id="dtBasicExample2" class="table table-striped table-editable table-edits table table-bordered">
                 <thead class="bg-soft-secondary">
@@ -228,6 +226,7 @@
 @endsection
 @push('scripts')
 <script>
+    const BASE_URL = "{{ url('/') }}/storage/";
     $(document).ready(function() {
         $('#dtBasicExample1').DataTable({
             processing: true,
@@ -282,13 +281,17 @@
         { data: 'currency', name: 'quotations.currency' },
         { data: 'deal_value', name: 'quotations.deal_value' },
         { data: 'place_of_supply', name: 'quotation_details.place_of_supply' },
-        { 
-            data: 'file_path', // Assuming 'file_path' is the column containing the file path
-            render: function(data, type, row) {
-                // Add a button with a data attribute containing the file path
-                return '<button class="btn btn-info view-file" data-file-path="'+data+'" data-toggle="modal" data-target="#fileModal"><i class="fas fa-eye"></i></button>';
+        {
+            data: 'file_path',
+            render: function (data) {
+                const fullUrl = BASE_URL + data;
+                return `
+                    <button class="btn btn-info view-file" data-file-path="${fullUrl}" data-toggle="modal" data-target="#fileModal">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                `;
             }
-        },
+        }
     ]
 });
     });

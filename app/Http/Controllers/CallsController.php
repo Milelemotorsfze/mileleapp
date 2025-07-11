@@ -1646,114 +1646,114 @@ class CallsController extends Controller
             return redirect()->back()->with('error', 'The requested file does not exist.');
         }
     }
-    public function varinatinfo()
-    {
-        $useractivities =  New UserActivities();
-            $useractivities->activity = "Open Variants Info Page";
-            $useractivities->users_id = Auth::id();
-            $useractivities->save();
-        $Variants = AvailableColour::get();   
-        return view('variants.vairantinfo', compact('Variants'));
-    }
-    public function createnewvarinats()
-    {
-        $useractivities =  New UserActivities();
-            $useractivities->activity = "Create New Variants";
-            $useractivities->users_id = Auth::id();
-            $useractivities->save();
-        $interiorColors = [
-            'Black', 'Dark Gray', 'Light Gray', 'Beige', 'Tan', 'Cream',
-            'Brown', 'Ivory', 'White', 'Red', 'Blue', 'Green',
-            'Burgundy', 'Charcoal', 'Navy', 'Silver', 'Champagne', 'Pewter',
-            'Almond', 'Ebony', 'Caramel', 'Slate', 'Graphite', 'Sand',
-            'Oyster', 'Mocha', 'Parchment', 'Mahogany', 'Cocoa', 'Espresso',
-            'Platinum', 'Jet Black', 'Stone Gray', 'Cashmere', 'Granite', 'Saddle',
-            'Opal Gray', 'Pebble', 'Shadow', 'Walnut', 'Fawn', 'Pearl',
-            'Chestnut', 'Sandalwood', 'Brick', 'Tawny', 'Hickory', 'Tuscan',
-            'Driftwood', 'Olive', 'Cloud', 'Raven', 'Twilight', 'Chestnut Brown',
-            'Mink', 'Mushroom', 'Clay', 'Slate Gray', 'Flint', 'Arctic',
-            'Sandstone', 'Ebony Black', 'Cognac', 'Russet', 'Stone', 'Linen',
-            'Carbon', 'Charcoal Gray', 'Bamboo', 'Nutmeg', 'Canyon', 'Terra Cotta',
-            'Canyon Brown', 'Steel', 'Gunmetal', 'Bamboo Beige', 'Oatmeal', 'Mink Brown',
-            'Warm Gray', 'Truffle', 'Light Stone', 'Tuxedo Black', 'Chalk', 'Agate',
-            'Mojave', 'Blond', 'Ochre', 'Natural', 'Cobblestone', 'Stone Beige',
-            'Light Beige', 'Granite Gray', 'Eclipse', 'Shale', 'Pumice', 'Ice',
-            'Ash', 'Tarmac', 'Dove Gray', 'Desert Sand', 'Sable', 'Cappuccino',
-            'Sandy Beige', 'Mist', 'Storm', 'Shetland', 'Onyx', 'Chestnut Brown',
-            'Iron', 'Cashew', 'Pebble Beige', 'Storm Gray', 'Shadow Gray', 'Piano Black',
-            // Add more color names here...
-        ];
-        $exteriorColors = [
-            'Black', 'White', 'Silver', 'Gray', 'Red', 'Blue',
-            'Green', 'Brown', 'Beige', 'Yellow', 'Orange', 'Purple',
-            'Gold', 'Bronze', 'Copper', 'Charcoal', 'Navy', 'Burgundy',
-            'Pearl', 'Metallic', 'Graphite', 'Platinum', 'Champagne', 'Midnight',
-            'Ebony', 'Crimson', 'Ruby', 'Emerald', 'Sapphire', 'Amethyst',
-            'Topaz', 'Garnet', 'Opal', 'Mocha', 'Cocoa', 'Ivory',
-            'Cream', 'Tungsten', 'Quartz', 'Titanium', 'Lunar', 'Majestic',
-            'Mystic', 'Radiant', 'Moonlight', 'Ingot', 'Cobalt', 'Azure',
-            'Indigo', 'Slate', 'Shadow', 'Steel', 'Lime', 'Sunset',
-            'Tangerine', 'Lemon', 'Olive', 'Forest', 'Teal', 'Mint',
-            'Plum', 'Lavender', 'Violet', 'Coral', 'Copper', 'Bronze',
-            'Sienna', 'Mahogany', 'Terra Cotta', 'Sandstone', 'Sandy', 'Desert',
-            'Pebble', 'Stone', 'Granite', 'Graphite', 'Metallic', 'Midnight Blue',
-            'Ruby Red', 'Emerald Green', 'Sapphire Blue', 'Amethyst Purple', 'Onyx Black', 'Lunar Silver',
-            'Opulent Blue', 'Magnetic Gray', 'Pure White', 'Pearl White', 'Iridium Silver', 'Classic Red',
-            'Race Blue', 'Frozen White', 'Bright Yellow', 'Sunset Orange', 'Velvet Red', 'Deep Blue',
-            'Midnight Black', 'Galaxy Blue', 'Fire Red', 'Solar Yellow', 'Cosmic Black', 'Crystal White',
-            'Phantom Black', 'Diamond Silver', 'Ruby Red', 'Storm Gray', 'Platinum White', 'Bronze Metallic',
-            'Liquid Blue', 'Silk Silver', 'Majestic Blue', 'Metallic Black', 'Candy Red', 'Crystal Blue',
-            'Quartz Gray', 'Slate Gray', 'Shimmering Silver', 'Eclipse Black', 'Hyper Red', 'Glacier White',
-            // Add more color names here...
-        ];
-        return view('variants.add_new_variants', compact('interiorColors', 'exteriorColors'));
-    }
-    public function storenewvarinats(Request $request) 
-    {
-        $useractivities =  New UserActivities();
-            $useractivities->activity = "Show New Variants";
-            $useractivities->users_id = Auth::id();
-            $useractivities->save();
-        $variantName = $request->input('name');
-        $existingVariant = Varaint::where('name', $variantName)->first();
-        if ($existingVariant) {
-            $variantId = $existingVariant->id;
-            $existingColor = AvailableColour::where('varaint_id', $variantId)
-                ->where('int_colour', $request->input('int_colour'))
-                ->where('ext_colour', $request->input('ext_colour'))
-                ->first();
-            if ($existingColor) {
-                return redirect()->back()->with('error', 'Color combination already exists for this variant');
-            }
-        } else {
-            $variant = new Varaint();
-            $variant->name = $variantName;
-            $variant->save();
-            $variantId = $variant->id;
+public function varinatinfo()
+{
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Open Variants Info Page";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+    $Variants = AvailableColour::get();   
+    return view('variants.vairantinfo', compact('Variants'));
+}
+public function createnewvarinats()
+{
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Create New Variants";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+    $interiorColors = [
+        'Black', 'Dark Gray', 'Light Gray', 'Beige', 'Tan', 'Cream',
+        'Brown', 'Ivory', 'White', 'Red', 'Blue', 'Green',
+        'Burgundy', 'Charcoal', 'Navy', 'Silver', 'Champagne', 'Pewter',
+        'Almond', 'Ebony', 'Caramel', 'Slate', 'Graphite', 'Sand',
+        'Oyster', 'Mocha', 'Parchment', 'Mahogany', 'Cocoa', 'Espresso',
+        'Platinum', 'Jet Black', 'Stone Gray', 'Cashmere', 'Granite', 'Saddle',
+        'Opal Gray', 'Pebble', 'Shadow', 'Walnut', 'Fawn', 'Pearl',
+        'Chestnut', 'Sandalwood', 'Brick', 'Tawny', 'Hickory', 'Tuscan',
+        'Driftwood', 'Olive', 'Cloud', 'Raven', 'Twilight', 'Chestnut Brown',
+        'Mink', 'Mushroom', 'Clay', 'Slate Gray', 'Flint', 'Arctic',
+        'Sandstone', 'Ebony Black', 'Cognac', 'Russet', 'Stone', 'Linen',
+        'Carbon', 'Charcoal Gray', 'Bamboo', 'Nutmeg', 'Canyon', 'Terra Cotta',
+        'Canyon Brown', 'Steel', 'Gunmetal', 'Bamboo Beige', 'Oatmeal', 'Mink Brown',
+        'Warm Gray', 'Truffle', 'Light Stone', 'Tuxedo Black', 'Chalk', 'Agate',
+        'Mojave', 'Blond', 'Ochre', 'Natural', 'Cobblestone', 'Stone Beige',
+        'Light Beige', 'Granite Gray', 'Eclipse', 'Shale', 'Pumice', 'Ice',
+        'Ash', 'Tarmac', 'Dove Gray', 'Desert Sand', 'Sable', 'Cappuccino',
+        'Sandy Beige', 'Mist', 'Storm', 'Shetland', 'Onyx', 'Chestnut Brown',
+        'Iron', 'Cashew', 'Pebble Beige', 'Storm Gray', 'Shadow Gray', 'Piano Black',
+        // Add more color names here...
+    ];
+    $exteriorColors = [
+        'Black', 'White', 'Silver', 'Gray', 'Red', 'Blue',
+        'Green', 'Brown', 'Beige', 'Yellow', 'Orange', 'Purple',
+        'Gold', 'Bronze', 'Copper', 'Charcoal', 'Navy', 'Burgundy',
+        'Pearl', 'Metallic', 'Graphite', 'Platinum', 'Champagne', 'Midnight',
+        'Ebony', 'Crimson', 'Ruby', 'Emerald', 'Sapphire', 'Amethyst',
+        'Topaz', 'Garnet', 'Opal', 'Mocha', 'Cocoa', 'Ivory',
+        'Cream', 'Tungsten', 'Quartz', 'Titanium', 'Lunar', 'Majestic',
+        'Mystic', 'Radiant', 'Moonlight', 'Ingot', 'Cobalt', 'Azure',
+        'Indigo', 'Slate', 'Shadow', 'Steel', 'Lime', 'Sunset',
+        'Tangerine', 'Lemon', 'Olive', 'Forest', 'Teal', 'Mint',
+        'Plum', 'Lavender', 'Violet', 'Coral', 'Copper', 'Bronze',
+        'Sienna', 'Mahogany', 'Terra Cotta', 'Sandstone', 'Sandy', 'Desert',
+        'Pebble', 'Stone', 'Granite', 'Graphite', 'Metallic', 'Midnight Blue',
+        'Ruby Red', 'Emerald Green', 'Sapphire Blue', 'Amethyst Purple', 'Onyx Black', 'Lunar Silver',
+        'Opulent Blue', 'Magnetic Gray', 'Pure White', 'Pearl White', 'Iridium Silver', 'Classic Red',
+        'Race Blue', 'Frozen White', 'Bright Yellow', 'Sunset Orange', 'Velvet Red', 'Deep Blue',
+        'Midnight Black', 'Galaxy Blue', 'Fire Red', 'Solar Yellow', 'Cosmic Black', 'Crystal White',
+        'Phantom Black', 'Diamond Silver', 'Ruby Red', 'Storm Gray', 'Platinum White', 'Bronze Metallic',
+        'Liquid Blue', 'Silk Silver', 'Majestic Blue', 'Metallic Black', 'Candy Red', 'Crystal Blue',
+        'Quartz Gray', 'Slate Gray', 'Shimmering Silver', 'Eclipse Black', 'Hyper Red', 'Glacier White',
+        // Add more color names here...
+    ];
+    return view('variants.add_new_variants', compact('interiorColors', 'exteriorColors'));
+}
+public function storenewvarinats(Request $request) {
+    // seems to be this function not using anywhere
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Show New Variants";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+    $variantName = $request->input('name');
+    $existingVariant = Varaint::where('name', $variantName)->first();
+    if ($existingVariant) {
+        $variantId = $existingVariant->id;
+        $existingColor = AvailableColour::where('varaint_id', $variantId)
+            ->where('int_colour', $request->input('int_colour'))
+            ->where('ext_colour', $request->input('ext_colour'))
+            ->first();
+        if ($existingColor) {
+            return redirect()->back()->with('error', 'Color combination already exists for this variant');
         }
-        $data = [
-            'varaint_id' => $variantId,
-            'int_colour' => $request->input('int_colour'),
-            'ext_colour' => $request->input('ext_colour')
-        ];
-        $availableColour = new AvailableColour($data);
-        $availableColour->save();
-        return redirect()->back()->with('success', 'Variant and color details stored successfully');
+    } else {
+        $variant = new Varaint();
+        $variant->name = $variantName;
+        $variant->save();
+        $variantId = $variant->id;
     }
-    public function downloadRejected($filename)
-    {
-        $useractivities =  New UserActivities();
-            $useractivities->activity = "Download Rejected Lead List CSV";
-            $useractivities->users_id = Auth::id();
-            $useractivities->save();
-        $filePath = storage_path('app/public/' . $filename);
-        if (file_exists($filePath)) {
-            return response()->download($filePath);
-        } else {
-            return redirect()->route('calls.createbulk')->with('error', 'File not found.');
-        }
+    $data = [
+        'varaint_id' => $variantId,
+        'int_colour' => $request->input('int_colour'),
+        'ext_colour' => $request->input('ext_colour')
+    ];
+    $availableColour = new AvailableColour($data);
+    $availableColour->save();
+    return redirect()->back()->with('success', 'Variant and color details stored successfully');
+}
+public function downloadRejected($filename)
+{
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Download Rejected Lead List CSV";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+    $filePath = storage_path('app/public/' . $filename);
+    if (file_exists($filePath)) {
+        return response()->download($filePath);
+    } else {
+        return redirect()->route('calls.createbulk')->with('error', 'File not found.');
     }
-    public function addnewleads()
+}
+public function addnewleads()
     {
         $useractivities =  New UserActivities();
         $useractivities->activity = "Add New Lead Page Open";

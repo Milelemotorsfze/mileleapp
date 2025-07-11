@@ -131,19 +131,26 @@ class WorkOrderController extends Controller
             ->union($clients)
             ->get();
 
-        // Clean up customer names in PHP
-        $combinedResults = $combinedResults->map(function ($item) {
-            // Replace multiple spaces with a single space
-            $item->customer_name = preg_replace('/\s+/', ' ', trim($item->customer_name));
-            return $item;
-        });
-
-        // Process combined results to remove duplicates based on unique_id
-        $customers = $combinedResults->groupBy('unique_id')->map(function($items) {
-            // Sort items by score in descending order and then take the first item
-            return $items->sortByDesc('score')->first();
-        })->values()->sortBy('customer_name');
-
+            $combinedResults = $combinedResults->map(function ($item) {
+                $item->customer_name = $this->cleanField($item->customer_name);
+                $item->customer_email = $this->cleanField($item->customer_email);
+                $item->customer_company_number = $this->cleanField($item->customer_company_number);
+                $item->customer_address = $this->cleanField($item->customer_address);
+                return $item;
+            });
+            
+            // Process into $customers after sanitization
+            $customers = $combinedResults->groupBy('unique_id')->map(function($items) {
+                return $items->sortByDesc('score')->first();
+            })->values()->sortBy('customer_name');
+            foreach ($customers as $index => $cust) {
+                try {
+                    json_encode($cust, JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    Log::error("Customer JSON error at index {$index}: " . $e->getMessage(), ['customer' => $cust]);
+                    abort(500, "Bad customer record at index {$index}");
+                }
+            }
         // Get the count of customers
         $customerCount = $customers->count();
 
@@ -162,6 +169,7 @@ class WorkOrderController extends Controller
                 $q = $q->where('type','employee');
             })->get();
         }
+      
         return view('work_order.export_exw.create', compact('type', 'customers', 'customerCount', 'airlines', 'vins', 'users', 'addons', 'charges','salesPersons'))->with([
             'vinsJson' => $vins->toJson(), // Single encoding here
         ]);
@@ -3280,4 +3288,11 @@ class WorkOrderController extends Controller
     {
         return $number ? " " . $number : '';
     }
+    private function cleanField($value)
+{
+    if (is_null($value)) return null;
+    $value = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+    $value = preg_replace('/[\x00-\x1F\x7F]/u', '', $value); // remove control chars
+    return preg_replace('/\s+/', ' ', trim($value));
+}
 }

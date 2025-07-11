@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         @include('partials/head-css')
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta name="csrf-token" content="{{ csrf_token() }}" charset="UTF-8">
         <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> -->
         <script src="{{ asset('js/custom/intlTelInput.min.js') }}"></script>
         <!-- CHANGE CDN TO LOCAL PATH --><!-- add new js/custom/ckeditor.js -->
