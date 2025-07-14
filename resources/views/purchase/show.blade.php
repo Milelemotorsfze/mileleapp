@@ -5917,5 +5917,22 @@ return [$color->id => $formattedName];
                 $(this).focus();
             }
         });
-    </script>
+
+    // prevent multiple clicks on submit button ...
+    $(document).ready(function() {
+        var submitting = false;
+        $('#purchasing-order').on('submit', function(e) {
+            var $btn = $('#submit-button');
+            if (submitting) {
+                e.preventDefault();
+                return false;
+            }
+            submitting = true;
+            $btn.prop('disabled', true);
+            $btn.val('Submitting...');
+        });
+    });
+</script>
     @endsection
+```
+</script>
