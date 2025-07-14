@@ -1896,7 +1896,7 @@ return [$color->id => $formattedName];
                                     <a href="javascript:void(0);" class="read-more" data-full-detail="{{ ucfirst(strtolower($vehicles->variant->detail)) }}">Read more</a>
                                     @endif
                                 </td>
-                                <td>{{ number_format($vehicles->VehiclePurchasingCost->unit_price, 0, '.', ',') }}</td>
+                                <td>{{ $vehicles->VehiclePurchasingCost?->unit_price ? number_format($vehicles->VehiclePurchasingCost->unit_price, 0, '.', ',') : '' }}</td>
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                                 @endphp
