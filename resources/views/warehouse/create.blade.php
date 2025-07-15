@@ -288,6 +288,7 @@ input[type=number]::-webkit-outer-spin-button {
             <input type="hidden" name="totalcost" id="totalUnitPriceInputHidden" value="0">
     <div class="col-lg-12 col-md-12">
         <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" id="submit-button"/>
+        <input type="submit" id="hidden-submit-trigger" style="display: none;">
     </div>
 {!! Form::close() !!}
 		</br>
@@ -350,7 +351,7 @@ $(document).ready(function() {
         alert('Invalid variant selected');
         return;
     }
-    var qty = $('#QTY').val();
+
     var unitPriceRaw = $('#unit_price').val();
     if (!unitPriceRaw || unitPriceRaw.trim() === '') {
         alert('Unit price cannot be null or blank');
@@ -358,6 +359,18 @@ $(document).ready(function() {
     }
     var unitPrice = parseFloat(unitPriceRaw);
     unitPrice = Math.round(unitPrice * 100) / 100;
+
+    var qtyRaw = $('#QTY').val();
+    if (!qtyRaw || qtyRaw.trim() === '') {
+        alert('Quantity is required.');
+        return;
+    }
+    var qty = parseInt(qtyRaw);
+    if (isNaN(qty) || qty <= 0) {
+        alert('Quantity must be a number greater than 0.');
+        return;
+    }
+
     var detail = variantOption.data('detail');
     console.log(detail);
     var brand = variantOption.data('brands_id');
@@ -491,67 +504,88 @@ intColourDropdown.select2({
   });
 </script>
 <script>
-  $(document).ready(function() {
-    $('#submit-button').click(function(e) {
-      var variantIds = $('input[name="variant_id[]"]').map(function() {
-        return $(this).val();
-      }).get();
-      if (variantIds.length === 0) {
-        e.preventDefault();
-        alert('Please select at least one variant');
-      }
-    });
-  });
-</script>
-<script>
-  $(document).ready(function() {
-    function checkDuplicateVIN() {
-      var vinValues = $('input[name="vin[]"]').map(function() {
-        return $(this).val();
-      }).get();
 
-      var duplicates = vinValues.filter(function(value, index, self) {
-        return self.indexOf(value) !== index && value.trim() !== '';
-      });
+    function disableSubmitButton() {
+  $('#submit-button').prop('disabled', true).text('Processing...');
+}
 
-      if (duplicates.length > 0) {
-        alert('Duplicate VIN values found. Please ensure all VIN values are unique.');
-        return false;
-      }
+function enableSubmitButton() {
+  $('#submit-button').prop('disabled', false).text('Submit');
+}
 
-      var allBlank = vinValues.every(function(value) {
-        return value.trim() === '';
-      });
-      if (allBlank) {
-        $('#purchasing-order').unbind('submit').submit();
-      } else {
-        var formData = $('#purchasing-order').serialize();
-        $.ajax({
-          url: '{{ route('vehicles.check-create-vins') }}',
-          method: 'POST',
-          data: formData,
-          success: function(response) {
-            if (response === 'duplicate') {
-              alert('Duplicate VIN values found in the database. Please ensure all VIN values are unique.');
-              return false;
-            } else {
-              $('#purchasing-order').unbind('submit').submit();
-            }
-          },
-          error: function() {
-            alert('An error occurred while checking for VIN duplication. Please try again.');
-            return false;
-          }
-        });
-      }
-      return false;
+        $('#submit-button').on('click', function (e) {
+  e.preventDefault();
+  disableSubmitButton();
+
+  const form = document.getElementById('purchasing-order');
+
+  // ✅ Check form validity before proceeding
+  if (!form.checkValidity()) {
+    form.reportValidity();         // Shows browser validation
+    enableSubmitButton();         // Re-enable the button in all cases
+    return;
+  }
+
+  try {
+    // ✅ Step 1: Validate variants
+    const variantIds = $('input[name="variant_id[]"]').map(function () {
+      return $(this).val();
+    }).get();
+
+    if (variantIds.length === 0) {
+      alert('Please select at least one variant.');
+      throw new Error('No variants');
     }
-    $('#purchasing-order').submit(function(event) {
-      event.preventDefault();
-      checkDuplicateVIN();
+
+    // ✅ Step 2: Check for duplicate VINs
+    const vinValues = $('input[name="vin[]"]').map(function () {
+      return $(this).val();
+    }).get();
+
+    const duplicates = vinValues.filter((value, index, self) =>
+      self.indexOf(value) !== index && value.trim() !== ''
+    );
+
+    if (duplicates.length > 0) {
+      alert('Duplicate VIN values found. Please ensure all VIN values are unique.');
+      throw new Error('Duplicate VINs');
+    }
+
+    const allBlank = vinValues.every((value) => value.trim() === '');
+
+    if (allBlank) {
+      $('#hidden-submit-trigger').click();
+      return;
+    }
+
+    // ✅ Step 3: Check VINs via server
+    $.ajax({
+      url: '{{ route('vehicles.check-create-vins') }}',
+      method: 'POST',
+      data: $('#purchasing-order').serialize(),
+      success: function (response) {
+        if (response === 'duplicate') {
+          alert('Duplicate VIN values found in the database.');
+          enableSubmitButton();
+        } else {
+          $('#hidden-submit-trigger').click();
+        }
+      },
+      error: function () {
+        alert('Server error while checking VINs. Please try again.');
+        enableSubmitButton();
+      }
     });
-  });
+
+  } catch (validationError) {
+    enableSubmitButton(); // Don't forget this in catch block too
+  }
+});
+
+
 </script>
+
+
 <script>
     $(document).ready(function() {
         $('#fd').select2();
