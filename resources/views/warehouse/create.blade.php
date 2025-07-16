@@ -450,25 +450,22 @@ return [$color->id => $formattedName];
         });
     });
     $(document).ready(function() {
-        $('#po_number').on('blur', function() {
-            var poNumber = $(this).val();
-            $.ajax({
-                url: "{{ route('purchasing-order.checkPONumber') }}",
-                type: 'POST',
-                data: {
-                    '_token': '{{ csrf_token() }}',
-                    'poNumber': poNumber
-                },
-                success: function(response) {
-                    $('#poNumberError').hide().text('');
-                },
-                error: function(xhr) {
-                    if (xhr.status === 422) {
-                        alert("PO Number Already Existing");
-                    }
+        // Add PO number 6-digit validation
+        var poInput = document.getElementById('po_number');
+        var poError = document.getElementById('po_error_message');
+        var form = document.getElementById('purchasing-order');
+        if(poInput && form) {
+            poInput.addEventListener('input', function() {
+                var regex = /^\d{6}$/;
+                if (!regex.test(poInput.value)) {
+                    poError.textContent = 'PO Number must be exactly 6 digits.';
+                    poInput.setCustomValidity('Invalid');
+                } else {
+                    poError.textContent = '';
+                    poInput.setCustomValidity('');
                 }
             });
-        });
+        }
     });
 
     var input = document.getElementById('variants_id');
@@ -505,7 +502,7 @@ return [$color->id => $formattedName];
     });
 
     $(document).ready(function() {
-        function checkDuplicateVIN() {
+        function checkDuplicateVIN(submitCallback) {
             var vinValues = $('input[name="vin[]"]').map(function() {
                 return $(this).val();
             }).get();
@@ -523,7 +520,7 @@ return [$color->id => $formattedName];
                 return value.trim() === '';
             });
             if (allBlank) {
-                $('#purchasing-order').unbind('submit').submit();
+                if (typeof submitCallback === 'function') submitCallback();
             } else {
                 var formData = $('#purchasing-order').serialize();
                 $.ajax({
@@ -535,7 +532,7 @@ return [$color->id => $formattedName];
                             alert('Duplicate VIN values found in the database. Please ensure all VIN values are unique.');
                             return false;
                         } else {
-                            $('#purchasing-order').unbind('submit').submit();
+                            if (typeof submitCallback === 'function') submitCallback();
                         }
                     },
                     error: function() {
@@ -546,9 +543,38 @@ return [$color->id => $formattedName];
             }
             return false;
         }
+        
+        function checkPOUniqueness(callback) {
+            var rawPoNumber = $('#po_number').val().trim();
+            var poNumber = 'PO-' + rawPoNumber;
+            $.ajax({
+                url: "{{ route('purchasing-order.checkPONumber') }}",
+                type: 'POST',
+                data: {
+                    '_token': '{{ csrf_token() }}',
+                    'poNumber': poNumber
+                },
+                success: function(response) {
+                    $('#poNumberError').hide().text('');
+                    if (typeof callback === 'function') callback();
+                },
+                error: function(xhr) {
+                    if (xhr.status === 422) {
+                        alert("PO Number Already Exists");
+                    }
+                }
+            });
+        }
+
         $('#purchasing-order').submit(function(event) {
             event.preventDefault();
-            checkDuplicateVIN();
+            checkPOUniqueness(function() {
+                checkDuplicateVIN(function() {
+                    // Unbind the submit handler to avoid infinite loop, then submit
+                    $('#purchasing-order').off('submit');
+                    $('#purchasing-order').submit();
+                });
+            });
         });
     });
 
@@ -556,22 +582,6 @@ return [$color->id => $formattedName];
         $('#fd').select2();
         $('#pol').select2();
         $('#pod').select2();
-    });
-
-    const poInput = document.getElementById('po_number');
-    const poErrorMessage = document.getElementById('po_error_message');
-
-    poInput.addEventListener('input', function() {
-        const regex = /^\d{6,}$/; // Pattern: At least 6 digits
-        const value = poInput.value;
-
-        if (!regex.test(value)) {
-            poErrorMessage.textContent = "Please enter at least 6 digits after 'PO-' (e.g., 123456 or more).";
-            poInput.setCustomValidity("Invalid");
-        } else {
-            poErrorMessage.textContent = "";
-            poInput.setCustomValidity("");
-        }
     });
 </script>
 @endpush

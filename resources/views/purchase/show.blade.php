@@ -3847,6 +3847,23 @@ return [$color->id => $formattedName];
                     }
                 });
             });
+
+            // Add PO number 6-digit validation
+            var poInput = document.getElementById('po_number');
+            var poError = document.getElementById('po_error_message');
+            var form = document.getElementById('purchasing-order');
+            if(poInput && form) {
+                poInput.addEventListener('input', function() {
+                    var regex = /^\d{6}$/;
+                    if (!regex.test(poInput.value)) {
+                        poError.textContent = 'PO Number must be exactly 6 digits.';
+                        poInput.setCustomValidity('Invalid');
+                    } else {
+                        poError.textContent = '';
+                        poInput.setCustomValidity('');
+                    }
+                });
+            }
         });
     </script>
     <script>
