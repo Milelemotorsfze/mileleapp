@@ -643,8 +643,7 @@ class CallsController extends Controller
             Log::info("Starting auto-assignment for lead creation.");
 
             $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
-            // Always exclude Nabia Kamran (204), Abdul Azeem Liaqat (42), Hanif Azad (20)
-            $excluded_user_ids = array_unique(array_merge($excluded_user_ids, [204, 42, 20]));
+            $excluded_user_ids = array_unique(array_merge($excluded_user_ids, [204, 42, 20])); // Always exclude Nabia Kamran (204), Abdul Azeem Liaqat (42), Hanif Azad (20)
             $email = $request->input('email');
             $phone = $request->input('phone');
             $language = $request->input('language');
@@ -675,72 +674,36 @@ class CallsController extends Controller
                 Log::info("Matched by Phone (ANY rep) - Assigning to Sales Person ID: $sales_person_id");
             }
 
-            if ($matchByEmail) {
-                $sales_person_id = $matchByEmail->sales_person;
-                Log::info("Matched by Email - Assigning to Sales Person ID: $sales_person_id");
-            } elseif ($matchByPhone) {
-                $sales_person_id = $matchByPhone->sales_person;
-                Log::info("Matched by Phone - Assigning to Sales Person ID: $sales_person_id");
-            }
-
-            if (!$sales_person_id && !empty($language)) {
-                Log::info("No Email/Phone match. Trying LANGUAGE match | Language: " . implode(', ', (array)$language));
-
-                $langMatched = SalesPersonLaugauges::whereIn('sales_person', $excluded_user_ids)
-                    ->where('language', $language)
-                    ->pluck('sales_person')
-                    ->toArray();
-
-                if (count($langMatched) === 1) {
-                    $sales_person_id = $langMatched[0];
-                    Log::info("Exact language match found - Sales Person ID: $sales_person_id");
-                } elseif (count($langMatched) > 1) {
-                    $lowestLeadLang = ModelHasRoles::select('model_id')
-                        ->where('role_id', 7)
-                        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-                        ->where('users.status', 'active')
-                        ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
-                        ->join('sales_person_laugauges', 'model_has_roles.model_id', '=', 'sales_person_laugauges.sales_person')
-                        ->whereIn('model_has_roles.model_id', $langMatched)
-                        ->where('sales_person_laugauges.language', $language)
-                        ->where('calls.status', 'New')
-                        ->groupBy('calls.sales_person')
-                        ->orderByRaw('COUNT(calls.id) ASC')
-                        ->first();
-
-                    if ($lowestLeadLang) {
-                        $sales_person_id = $lowestLeadLang->model_id;
-                        Log::info("Multiple language matches - Assigning lowest load: $sales_person_id");
-                    }
-                }
-            }
-
-            // Fallback to round-robin
+            // If not matched by email/phone, always prefer user with least pending/Neww leads
             if (!$sales_person_id) {
-                Log::info("No language match. Falling back to round-robin.");
-
-                $roundRobinQuery = ModelHasRoles::select('model_id')
+                $eligibleUserQuery = ModelHasRoles::select('model_id')
                     ->where('role_id', 7)
                     ->join('users', 'model_has_roles.model_id', '=', 'users.id')
                     ->where('users.status', 'active')
+                    ->whereNotIn('model_has_roles.model_id', $excluded_user_ids);
+
+                if (!empty($language)) {
+                    $eligibleUserQuery->join('sales_person_laugauges', 'model_has_roles.model_id', '=', 'sales_person_laugauges.sales_person')
+                        ->where('sales_person_laugauges.language', $language);
+                }
+                if ($isAfrican) {
+                    $eligibleUserQuery->where('users.is_dubai_sales_rep', 'Yes');
+                }
+
+                $userWithLeastLeads = $eligibleUserQuery
                     ->leftJoin('calls', function ($join) {
                         $join->on('model_has_roles.model_id', '=', 'calls.sales_person')
                             ->where('calls.status', 'New');
                     })
-                    ->whereIn('model_has_roles.model_id', $excluded_user_ids);
-
-                if ($isAfrican) {
-                    $roundRobinQuery->where('users.is_dubai_sales_rep', 'Yes');
-                }
-
-                $fallbackPerson = $roundRobinQuery
                     ->groupBy('model_has_roles.model_id')
                     ->orderByRaw('COALESCE(COUNT(calls.id), 0) ASC')
                     ->first();
 
-                if ($fallbackPerson) {
-                    $sales_person_id = $fallbackPerson->model_id;
-                    Log::info("Round-robin fallback selected ID: $sales_person_id");
+                if ($userWithLeastLeads) {
+                    $sales_person_id = $userWithLeastLeads->model_id;
+                    Log::info("Assigned to user with least pending/new leads: $sales_person_id");
+                } else {
+                    Log::warning("No eligible user found for assignment.");
                 }
             }
 
@@ -1790,8 +1753,7 @@ public function addnewleads()
             Log::info("Starting auto-assignment for lead creation.");
 
             $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
-            // Always exclude Nabia Kamran (204), Abdul Azeem Liaqat (42), Hanif Azad (20)
-            $excluded_user_ids = array_unique(array_merge($excluded_user_ids, [204, 42, 20]));
+            $excluded_user_ids = array_unique(array_merge($excluded_user_ids, [204, 42, 20])); // Always exclude Nabia Kamran (204), Abdul Azeem Liaqat (42), Hanif Azad (20)
             $email = $request->input('email');
             $phone = $request->input('phone');
             $language = $request->input('language');
