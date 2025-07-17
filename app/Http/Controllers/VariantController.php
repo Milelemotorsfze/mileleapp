@@ -112,10 +112,26 @@ class VariantController extends Controller
 public function store(Request $request)
 {
     DB::beginTransaction(); // Start transaction
-    
+
     try {
     $selectedSpecifications = json_decode(request('selected_specifications'), true);
     ksort($selectedSpecifications);
+
+    $gradeValue = null;
+    foreach ($selectedSpecifications as $specificationData) {
+        $specId = $specificationData['specification_id'];
+        $optionId = $specificationData['value'];
+
+        $spec = ModelSpecification::find($specId);
+        if ($spec && strtolower($spec->name) === 'grade') {
+            $option = ModelSpecificationOption::find($optionId);
+            if ($option) {
+                preg_match('/\d+/', $option->name, $matches);
+                $gradeValue = $matches[0] ?? null;
+            }
+        }
+    }
+
     $totalSpecifications = count($selectedSpecifications);
     $existingVariantop = Varaint::where('brands_id', $request->input('brands_id'))
         ->where('master_model_lines_id', $request->input('master_model_lines_id'))
@@ -220,7 +236,15 @@ public function store(Request $request)
                 $lastNumber = end($parts);
             
                 if (is_numeric($lastNumber)) {
-                    $namepart = $steeringn . $model_line . $engine . $f;
+                    // $namepart = $steeringn . $model_line . $engine . $f;
+                    $namepart = $steeringn . $model_line;
+
+                    if ($gradeValue) {
+                        $namepart .= $gradeValue;
+                    }
+
+                    $namepart .= $engine . $f;
+
                     $newNumber = (int)$lastNumber + 1;
                     $name = $namepart . '_' . $newNumber;  // Use $namepart directly
                 } else {
@@ -231,7 +255,14 @@ public function store(Request $request)
                         $lastNumber = end($parts);
             
                         if (is_numeric($lastNumber)) {
-                            $namepart =  $steeringn . $model_line . $engine . $f;
+                            // $namepart =  $steeringn . $model_line . $engine . $f;
+                            $namepart = $steeringn . $model_line;
+
+                            if ($gradeValue) {
+                                $namepart .= $gradeValue;
+                            }
+
+                            $namepart .= $engine . $f;
                             $newNumber = (int)$lastNumber + 1;
                             $name = $namepart . '_' . $newNumber;  // Use $namepart directly
                         } 
@@ -312,8 +343,15 @@ public function store(Request $request)
                 }
             } 
         else {
-                $name = $steeringn . $model_line . $engine . $f . '_1';
-        }
+                // $name = $steeringn . $model_line . $engine . $f . '_1';
+                $name = $steeringn . $model_line;
+
+                if ($gradeValue) {
+                    $name .= $gradeValue;
+                }
+
+                $name .= $engine . $f . '_1';
+            }
         }
     }
     else{
@@ -386,7 +424,14 @@ public function store(Request $request)
         }
         } 
         else {
-                $name = $steeringn . $model_line . $engine . $f . '_1';
+            // $name = $steeringn . $model_line . $engine . $f . '_1';
+            $name = $steeringn . $model_line;
+
+            if ($gradeValue) {
+                $name .= $gradeValue;
+            }
+
+            $name .= $engine . $f . '_1';
         }
     }
     (new UserActivityController)->createActivity('Creating New Variant');
@@ -430,7 +475,15 @@ public function store(Request $request)
             {
                 $gearbox = "MT";
             }
-            $model_details = $steering . ' ' . $model_line . ' ' . $engine . ' ' . $f . ' ' . $gearbox;
+            // $model_details = $steering . ' ' . $model_line . ' ' . $engine . ' ' . $f . ' ' . $gearbox;
+            $model_details = $steering . ' ' . $model_line;
+
+            if ($gradeValue) {
+                $model_details .= ' ' . $gradeValue;
+            }
+
+            $model_details .= ' ' . $engine . $f . ' ' . $gearbox;
+
             }
         $variant_details= $request->input('variant');
         if($variant_details == null)

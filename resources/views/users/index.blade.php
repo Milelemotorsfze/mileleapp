@@ -87,6 +87,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      <th>Role</th>
                      <th>Status</th>
                      <th>Is Sales Rep.</th>
+                     <th>Is Dubai Sales Rep.</th>
                      <th>Can Send WO Email</th>
                      <th>Manual Lead Assign</th>
                      <th>PFI/Quotation</th>
@@ -114,6 +115,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      </td>
                      <td>
                         {{ $user->is_sales_rep ?? '' }}
+                     </td>
+                     <td>
+                        {{ $user->is_dubai_sales_rep ?? '' }}
                      </td>
                      <td>
                         {{ $user->can_send_wo_email ?? '' }}
@@ -213,6 +217,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      <th>Role</th>
                      <th>Status</th>
                      <th>Is Sales Rep.</th>
+                     <th>Is Dubai Sales Rep.</th>
                      <th>Can Send WO Email</th>
                      <th>Manual Lead Assign</th>
                      <th>PFI/Quotation</th>
@@ -240,6 +245,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      </td>
                      <td>
                         {{ $user->is_sales_rep ?? '' }}
+                     </td>
+                     <td>
+                        {{ $user->is_dubai_sales_rep ?? '' }}
                      </td>
                      <td>
                         {{ $user->can_send_wo_email ?? '' }}
@@ -354,6 +362,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      <th>Role</th>
                      <th>Status</th>
                      <th>Is Sales Rep.</th>
+                     <th>Is Dubai Sales Rep.</th>
                      <th>Can Send WO Email</th>
                      <th>Manual Lead Assign</th>
                      <th>PFI/Quotation</th>
@@ -377,6 +386,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      <td><label class="badge badge-soft-danger">{{ $user->status }}</label></td>
                      <td>
                         {{ $user->is_sales_rep ?? '' }}
+                     </td>
+                     <td>
+                        {{ $user->is_dubai_sales_rep ?? '' }}
                      </td>
                      <td>
                         {{ $user->can_send_wo_email ?? '' }}
@@ -481,6 +493,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                         <th>Role</th>
                         <th>Status</th>
                         <th>Is Sales Rep.</th>
+                        <th>Is Dubai Sales Rep.</th>
                         <th>Can Send WO Email</th>
                         <th>Manual Lead Assign</th>
                         <th>PFI/Quotation</th>
@@ -503,6 +516,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                         </td>
                         <td><label class="badge badge-soft-danger">deleted</label></td>
                         <td>{{ $user->is_sales_rep ?? '' }}</td>
+                        <td>
+                           {{ $user->is_dubai_sales_rep ?? '' }}
+                        </td>
+                        <td>
+                           {{ $user->is_dubai_sales_rep ?? '' }}
+                        </td>
                         <td>
                         {{ $user->can_send_wo_email ?? '' }}
                      </td>

@@ -115,10 +115,6 @@ redirect()->route('home')->send();
         $('#source').select2();
         $('#type').select2();
 
-        setTimeout(function() {
-            $('#error-message').fadeOut('slow');
-        }, 10000);
-
         $("form").submit(function(event) {
             var fileInput = $("input[name='file']");
             if (!fileInput[0].files.length) {

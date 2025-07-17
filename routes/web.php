@@ -137,6 +137,7 @@ use App\Exports\BelgiumVehicleStockExport;
 use App\Http\Controllers\ModeldescriptionController;
 use App\Http\Controllers\MasterGradeController;
 use App\Http\Controllers\CompanyDomainController;
+use App\Http\Controllers\CountryController;
 use App\Http\Controllers\MasterChargesController;
 use App\Http\Controllers\SoFinalizationController;
 use App\Models\Gdn;
@@ -788,6 +789,7 @@ Route::get('/d', function () {
     Route::post('/update-purchasing-data', [PurchasingOrderController::class, 'updatepurchasingData'])->name('purchasing.updateData');
     Route::post('/update-purchasing-status', [PurchasingOrderController::class, 'purchasingupdateStatus'])->name('purchasing.updateStatus');
     Route::resource('warehouse', WarehouseController::class);
+    Route::resource('countries', CountryController::class);
     Route::post('/update-warehouse-remarks', [WarehouseController::class, 'updatewarehouseremarks'])->name('warehouse.updatewarehouseremarks');
     Route::get('vehicles/payment-confirm/{id}', [PurchasingOrderController::class, 'confirmPayment'])->name('vehicles.paymentconfirm');
     Route::get('vehicles/payment-paymentremanings/{id}', [PurchasingOrderController::class, 'paymentremanings'])->name('vehicles.paymentremanings');

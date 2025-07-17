@@ -81,6 +81,12 @@
         </div>
         <div class="col-md-2">
             <div class="form-check mt-4">
+                <input class="form-check-input" type="checkbox" id="is_dubai_sales_rep" name="is_dubai_sales_rep" {{ old('is_dubai_sales_rep') ? 'checked' : '' }}>
+                <label class="form-check-label" for="is_dubai_sales_rep">Dubai Sales Rep</label>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-check mt-4">
                 <input class="form-check-input" type="checkbox" id="can_send_wo_email" name="can_send_wo_email" value="yes" {{ old('can_send_wo_email') == 'yes' ? 'checked' : '' }}>
                 <label class="form-check-label" for="can_send_wo_email">Can Send Work Order Email ?</label>
             </div>
@@ -97,6 +103,7 @@
                 <label class="form-check-label" for="pfi_access">Can Use As Sales Person In PFI/Quotation ?</label>
             </div>
         </div>
+        <p></p>
         <div class="col-md-4">
             <label for="user_image" class="form-label">User Image</label>
             <input type="file" name="user_image" id="user_image" class="form-control" accept=".jpg, .jpeg, .png">
