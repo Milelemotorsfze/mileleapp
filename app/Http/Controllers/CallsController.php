@@ -577,7 +577,7 @@ class CallsController extends Controller
         //     }
         //         else
         //         {
-        //             Log::info("No Email/Phone match. Trying LANGUAGE match | Language: $language");
+        //             Log::info("No Email/Phone match. Trying LANGUAGE match | Language: " . implode(', ', (array)$language));
 
         //         $sales_person_languages = SalesPersonLaugauges::whereIn('sales_person', $sales_persons->pluck('model_id'))
         //         ->where('language', $language)
@@ -643,6 +643,8 @@ class CallsController extends Controller
             Log::info("Starting auto-assignment for lead creation.");
 
             $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
+            // Always exclude Nabia Kamran (204), Abdul Azeem Liaqat (42), Hanif Azad (20)
+            $excluded_user_ids = array_unique(array_merge($excluded_user_ids, [204, 42, 20]));
             $email = $request->input('email');
             $phone = $request->input('phone');
             $language = $request->input('language');
@@ -682,7 +684,7 @@ class CallsController extends Controller
             }
 
             if (!$sales_person_id && !empty($language)) {
-                Log::info("No Email/Phone match. Trying LANGUAGE match | Language: $language");
+                Log::info("No Email/Phone match. Trying LANGUAGE match | Language: " . implode(', ', (array)$language));
 
                 $langMatched = SalesPersonLaugauges::whereIn('sales_person', $excluded_user_ids)
                     ->where('language', $language)
@@ -781,7 +783,7 @@ class CallsController extends Controller
                 'strategies_id' => $strategies_id->id,
                 'priority' => $request->input('priority'),
                 'custom_brand_model' => $request->input('custom_brand_model'),
-                'language' => $request->input('language'),
+                'language' => is_array($request->input('language')) ? implode(', ', $request->input('language')) : $request->input('language'),
                 'created_at' => $formattedDate,
                 'assign_time' => $formattedDate,
                 'created_by' => Auth::id(),
@@ -996,7 +998,7 @@ class CallsController extends Controller
 		$model->phone = $phone;
 		// $model->secondary_phone_number = $request->input('secondary_phone_number');
 		$model->custom_brand_model = $request->input('custom_brand_model');
-		$model->language = $request->input('language');
+		$model->language = is_array($request->input('language')) ? implode(', ', $request->input('language')) : $request->input('language');
         $model->strategies_id = $strategies_id;
         $model->priority = $request->input('priority');
 		$model->status = "New";
@@ -1486,7 +1488,7 @@ class CallsController extends Controller
                     $call->source = $lead_source_id;
                     $call->strategies_id = $strategies_id;
                     $call->priority = $priority;
-                    $call->language = $row[6];
+                    $call->language = is_array($row[6]) ? implode(', ', $row[6]) : $row[6];
                     $call->sales_person = $sales_person_id;
                     $call->created_at = $formattedDate;
                     $call->assign_time = $formattedDate;
@@ -1785,7 +1787,11 @@ public function addnewleads()
         ]);      
         
         if ($request->input('sales-option') == "auto-assign") {
+            Log::info("Starting auto-assignment for lead creation.");
+
             $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
+            // Always exclude Nabia Kamran (204), Abdul Azeem Liaqat (42), Hanif Azad (20)
+            $excluded_user_ids = array_unique(array_merge($excluded_user_ids, [204, 42, 20]));
             $email = $request->input('email');
             $phone = $request->input('phone');
             $language = $request->input('language');
@@ -1879,7 +1885,7 @@ public function addnewleads()
             'location' => $request->input('location'),
             'phone' => $request->input('phone'),
             'custom_brand_model' => $request->input('custom_brand_model'),
-            'language' => $request->input('language'),
+            'language' => is_array($request->input('language')) ? implode(', ', $request->input('language')) : $request->input('language'),
             'created_at' => $formattedDate,
             'created_by' => Auth::id(),
             'status' => "New",
