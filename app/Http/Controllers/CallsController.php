@@ -33,7 +33,7 @@ use League\Csv\Writer;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Illuminate\Support\Facades\Validator; 
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
@@ -45,18 +45,18 @@ class CallsController extends Controller
     public function index()
     {
         $datahot = Calls::where('calls.status', 'New')
-        ->where('calls.priority', 'Hot')
-        ->join('lead_source', 'calls.source', '=', 'lead_source.id')
-        ->orderBy('calls.created_at', 'desc')
-        ->select('calls.*', 'lead_source.priority as lead_source_priority')
-        ->get();
+            ->where('calls.priority', 'Hot')
+            ->join('lead_source', 'calls.source', '=', 'lead_source.id')
+            ->orderBy('calls.created_at', 'desc')
+            ->select('calls.*', 'lead_source.priority as lead_source_priority')
+            ->get();
         $countdatahot = $datahot->count();
         $datanormal = Calls::where('calls.status', 'New')
-        ->where('calls.priority', 'Normal')
-        ->join('lead_source', 'calls.source', '=', 'lead_source.id')
-        ->orderBy('calls.created_at', 'desc')
-        ->select('calls.*', 'lead_source.priority as lead_source_priority')
-        ->get();
+            ->where('calls.priority', 'Normal')
+            ->join('lead_source', 'calls.source', '=', 'lead_source.id')
+            ->orderBy('calls.created_at', 'desc')
+            ->select('calls.*', 'lead_source.priority as lead_source_priority')
+            ->get();
         $countdatanormal = $datanormal->count();
         $datalow = Calls::where('calls.status', 'New')
         ->where('calls.priority', 'Low')
@@ -65,11 +65,11 @@ class CallsController extends Controller
         ->select('calls.*', 'lead_source.priority as lead_source_priority')
         ->get();
         $countdatalow = $datalow->count();
-        $useractivities =  New UserActivities();
+        $useractivities =  new UserActivities();
         $useractivities->activity = "Open Call & Lead Pending Info";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-        return view('calls.index',compact('datahot', 'datanormal', 'datalow', 'countdatalow', 'countdatanormal', 'countdatahot'));
+        return view('calls.index', compact('datahot', 'datanormal', 'datalow', 'countdatalow', 'countdatanormal', 'countdatahot'));
     }
     public function inprocess()
     {
@@ -80,37 +80,37 @@ class CallsController extends Controller
                 ->orWhere('status', 'Negotiation')
                 ->where('created_at', '>=', Carbon::now()->subMonths(2))
                 ->get();
-    
+
             return DataTables::of($data)
                 ->addIndexColumn()
-                ->addColumn('sales_person', function($row) {
+                ->addColumn('sales_person', function ($row) {
                     $sales_persons = DB::table('users')->where('id', $row->sales_person)->first();
                     return $sales_persons ? $sales_persons->name : '';
                 })
-                ->addColumn('brands_models', function($row) {
+                ->addColumn('brands_models', function ($row) {
                     $leads_models_brands = DB::table('calls_requirement')
                         ->select('calls_requirement.model_line_id', 'master_model_lines.brand_id', 'brands.brand_name', 'master_model_lines.model_line')
                         ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
                         ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
                         ->where('calls_requirement.lead_id', $row->id)
                         ->get();
-    
+
                     $models_brands_string = '';
                     foreach ($leads_models_brands as $lead_model_brand) {
                         $models_brands_string .= $lead_model_brand->brand_name . ' - ' . $lead_model_brand->model_line . ', ';
                     }
                     return rtrim($models_brands_string, ', ');
                 })
-                ->addColumn('lead_source', function($row) {
+                ->addColumn('lead_source', function ($row) {
                     $leadsource = DB::table('lead_source')->where('id', $row->source)->first();
                     return $leadsource ? $leadsource->source_name : '';
                 })
-                ->addColumn('remarks_messages', function($row) {
+                ->addColumn('remarks_messages', function ($row) {
                     $text = $row->remarks;
                     $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
                     return str_replace(['<p>', '</p>'], '', strip_tags($remarks));
                 })
-                ->addColumn('sales_person_remarks', function($row) {
+                ->addColumn('sales_person_remarks', function ($row) {
                     $sales_notes = "";
                     if ($row->status == "Prospecting") {
                         $result = DB::table('prospectings')->where('calls_id', $row->id)->first();
@@ -138,35 +138,39 @@ class CallsController extends Controller
                 ->rawColumns(['sales_person', 'brands_models', 'lead_source', 'remarks_messages', 'sales_person_remarks'])
                 ->make(true);
         }
-    
+
         $useractivities =  new UserActivities();
         $useractivities->activity = "Open Call & Lead Inprocess Info";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-    
+
         return view('calls.inprocess');
     }
     public function converted()
     {
-        $data = Calls::where('status','Closed')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->where('created_at', '>=', Carbon::now()->subMonths(2))->get();    
-        $useractivities =  New UserActivities();
+        $data = Calls::where('status', 'Closed')->where(function ($query) {
+            $query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');
+        })->where('created_at', '>=', Carbon::now()->subMonths(2))->get();
+        $useractivities =  new UserActivities();
         $useractivities->activity = "Open Call & Lead Info";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-        return view('calls.converted',compact('data'));
+        return view('calls.converted', compact('data'));
     }
     public function rejected()
     {
-        $data = Calls::where('status','Rejected')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->where('created_at', '>=', Carbon::now()->subMonths(2))->get(); 
-        $useractivities =  New UserActivities();
+        $data = Calls::where('status', 'Rejected')->where(function ($query) {
+            $query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');
+        })->where('created_at', '>=', Carbon::now()->subMonths(2))->get();
+        $useractivities =  new UserActivities();
         $useractivities->activity = "Open Call & Lead Info";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-        return view('calls.rejected',compact('data'));
+        return view('calls.rejected', compact('data'));
     }
     public function datacenter(Request $request)
     {
-        $useractivities =  New UserActivities();
+        $useractivities =  new UserActivities();
         $useractivities->activity = "Open The Leads Database";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
@@ -177,85 +181,77 @@ class CallsController extends Controller
                 $columnIndex = $order['column'];
                 $columnName = $request->input('columns')[$columnIndex]['name'];
                 $direction = $order['dir'];
-    
+
                 $callsQuery->orderBy($columnName, $direction);
             }
             foreach ($request->input('columns') as $column) {
                 $searchValue = $column['search']['value'];
                 $columnName = $column['name'];
                 if (!empty($searchValue)) {
-                if ($columnName === 'date' && $searchValue !== null) {
-                    $callsQuery->orWhere('created_at', 'like', '%' . $searchValue . '%');
-                } elseif ($columnName === 'status' && $searchValue !== null) {
-                    $callsQuery->orWhere('status', 'like', '%' . $searchValue . '%');
-                } elseif ($columnName === 'type' && $searchValue !== null) {
-                    $callsQuery->orWhere('type', 'like', '%' . $searchValue . '%');
-                } elseif ($columnName === 'priority' && $searchValue !== null) {
-                    $callsQuery->orWhere('priority', 'like', '%' . $searchValue . '%');
-                } elseif ($columnName === 'name' && $searchValue !== null) {
-                    $callsQuery->orWhere('name', 'like', '%' . $searchValue . '%');
-                } elseif ($columnName === 'email' && $searchValue !== null) {
-                    $callsQuery->orWhere('email', 'like', '%' . $searchValue . '%');
-                } elseif ($columnName === 'phone' && $searchValue !== null) {
-                    $callsQuery->orWhere('phone', 'like', '%' . $searchValue . '%');
+                    if ($columnName === 'date' && $searchValue !== null) {
+                        $callsQuery->orWhere('created_at', 'like', '%' . $searchValue . '%');
+                    } elseif ($columnName === 'status' && $searchValue !== null) {
+                        $callsQuery->orWhere('status', 'like', '%' . $searchValue . '%');
+                    } elseif ($columnName === 'type' && $searchValue !== null) {
+                        $callsQuery->orWhere('type', 'like', '%' . $searchValue . '%');
+                    } elseif ($columnName === 'priority' && $searchValue !== null) {
+                        $callsQuery->orWhere('priority', 'like', '%' . $searchValue . '%');
+                    } elseif ($columnName === 'name' && $searchValue !== null) {
+                        $callsQuery->orWhere('name', 'like', '%' . $searchValue . '%');
+                    } elseif ($columnName === 'email' && $searchValue !== null) {
+                        $callsQuery->orWhere('email', 'like', '%' . $searchValue . '%');
+                    } elseif ($columnName === 'phone' && $searchValue !== null) {
+                        $callsQuery->orWhere('phone', 'like', '%' . $searchValue . '%');
+                    } elseif ($columnName === 'location' && $searchValue !== null) {
+                        $callsQuery->orWhere('location', 'like', '%' . $searchValue . '%');
+                    } elseif ($columnName === 'custom_brand_model' && $searchValue !== null) {
+                        $callsQuery->orWhere('custom_brand_model', 'like', '%' . $searchValue . '%');
+                    } elseif ($columnName === 'remarks' && $searchValue !== null) {
+                        $callsQuery->orWhere('remarks', 'like', '%' . $searchValue . '%');
+                    } elseif ($columnName === 'remarks' && $searchValue !== null) {
+                        $callsQuery->orWhere('remarks', 'like', '%' . $searchValue . '%');
+                    } elseif ($columnName === 'salesperson' && $searchValue !== null) {
+                        $callsQuery->orWhereHas('salesperson', function ($query) use ($searchValue) {
+                            $query->where('name', 'like', '%' . $searchValue . '%');
+                        });
+                    } else if ($columnName === 'brand_model' && $searchValue !== null) {
+                        $callsQuery->orWhereHas('requirements.masterModelLine.brand', function ($query) use ($searchValue) {
+                            $query->where('brand_name', 'like', '%' . $searchValue . '%');
+                        });
+
+                        $callsQuery->orWhereHas('requirements.masterModelLine', function ($query) use ($searchValue) {
+                            $query->where('model_line', 'like', '%' . $searchValue . '%');
+                        });
+                    } else if ($columnName === 'sales_remarks_coming' && $searchValue !== null) {
+                        $callsQuery->orWhereHas('closed', function ($query) use ($searchValue) {
+                            $query->where('sales_notes', 'like', '%' . $searchValue . '%');
+                        });
+
+                        $callsQuery->orWhereHas('rejectionleads', function ($query) use ($searchValue) {
+                            $query->where('sales_notes', 'like', '%' . $searchValue . '%');
+                        });
+
+                        $callsQuery->orWhereHas('salesdemandleads', function ($query) use ($searchValue) {
+                            $query->where('salesnotes', 'like', '%' . $searchValue . '%');
+                        });
+
+                        $callsQuery->orWhereHas('negotiationleads', function ($query) use ($searchValue) {
+                            $query->where('sales_notes', 'like', '%' . $searchValue . '%');
+                        });
+
+                        $callsQuery->orWhereHas('quotationleads', function ($query) use ($searchValue) {
+                            $query->where('sales_notes', 'like', '%' . $searchValue . '%');
+                        });
+
+                        $callsQuery->orWhereHas('prospectingleads', function ($query) use ($searchValue) {
+                            $query->where('salesnotes', 'like', '%' . $searchValue . '%');
+                        });
+                    } else if ($columnName === 'strategies' && $searchValue !== null) {
+                        $callsQuery->orWhereHas('strategies', function ($query) use ($searchValue) {
+                            $query->where('name', 'like', '%' . $searchValue . '%');
+                        });
+                    }
                 }
-                elseif ($columnName === 'location' && $searchValue !== null) {
-                    $callsQuery->orWhere('location', 'like', '%' . $searchValue . '%');
-                }
-                elseif ($columnName === 'custom_brand_model' && $searchValue !== null) {
-                    $callsQuery->orWhere('custom_brand_model', 'like', '%' . $searchValue . '%');
-                }
-                elseif ($columnName === 'remarks' && $searchValue !== null) {
-                    $callsQuery->orWhere('remarks', 'like', '%' . $searchValue . '%');
-                }
-                elseif ($columnName === 'remarks' && $searchValue !== null) {
-                    $callsQuery->orWhere('remarks', 'like', '%' . $searchValue . '%');
-                }
-                elseif ($columnName === 'salesperson' && $searchValue !== null) {
-                    $callsQuery->orWhereHas('salesperson', function ($query) use ($searchValue) {
-                        $query->where('name', 'like', '%' . $searchValue . '%');
-                    });
-                }
-                else if ($columnName === 'brand_model' && $searchValue !== null) {
-                    $callsQuery->orWhereHas('requirements.masterModelLine.brand', function ($query) use ($searchValue) {
-                        $query->where('brand_name', 'like', '%' . $searchValue . '%');
-                    });
-                
-                    $callsQuery->orWhereHas('requirements.masterModelLine', function ($query) use ($searchValue) {
-                        $query->where('model_line', 'like', '%' . $searchValue . '%');
-                    });
-                }
-                else if ($columnName === 'sales_remarks_coming' && $searchValue !== null) {
-                    $callsQuery->orWhereHas('closed', function ($query) use ($searchValue) {
-                        $query->where('sales_notes', 'like', '%' . $searchValue . '%');
-                    });
-                
-                    $callsQuery->orWhereHas('rejectionleads', function ($query) use ($searchValue) {
-                        $query->where('sales_notes', 'like', '%' . $searchValue . '%');
-                    });
-                
-                    $callsQuery->orWhereHas('salesdemandleads', function ($query) use ($searchValue) {
-                        $query->where('salesnotes', 'like', '%' . $searchValue . '%');
-                    });
-                
-                    $callsQuery->orWhereHas('negotiationleads', function ($query) use ($searchValue) {
-                        $query->where('sales_notes', 'like', '%' . $searchValue . '%');
-                    });
-                
-                    $callsQuery->orWhereHas('quotationleads', function ($query) use ($searchValue) {
-                        $query->where('sales_notes', 'like', '%' . $searchValue . '%');
-                    });
-                
-                    $callsQuery->orWhereHas('prospectingleads', function ($query) use ($searchValue) {
-                        $query->where('salesnotes', 'like', '%' . $searchValue . '%');
-                    });
-                }
-                else if ($columnName === 'strategies' && $searchValue !== null) {
-                    $callsQuery->orWhereHas('strategies', function ($query) use ($searchValue) {
-                        $query->where('name', 'like', '%' . $searchValue . '%');
-                    });
-                }                
-            }
             }
             return DataTables::of($callsQuery)
                 ->addColumn('created_at', function ($call) {
@@ -290,10 +286,10 @@ class CallsController extends Controller
                 })
                 ->addColumn('leadsource', function ($call) {
                     return $call->leadssouces ? $call->leadssouces->source_name : '';
-                }) 
+                })
                 ->addColumn('strategies', function ($call) {
                     return $call->strategies ? $call->strategies->name : '';
-                })               
+                })
                 ->addColumn('brand_model', function ($call) {
                     $requirements = $call->requirements;
                     if ($requirements) {
@@ -316,9 +312,9 @@ class CallsController extends Controller
                         return $closed->sales_notes;
                     } elseif ($rejection) {
                         return $rejection->sales_notes;
-                    }elseif ($demandleads) {
+                    } elseif ($demandleads) {
                         return $demandleads->salesnotes;
-                    }elseif ($negotiation) {
+                    } elseif ($negotiation) {
                         return $negotiation->sales_notes;
                     } elseif ($quotation) {
                         return $quotation->sales_notes;
@@ -327,7 +323,7 @@ class CallsController extends Controller
                     } else {
                         return '';
                     }
-                })                
+                })
                 ->toJson();
         }
         return view('calls.leadsdatabase');
@@ -340,9 +336,9 @@ class CallsController extends Controller
         $countries = CountryListFacade::getList('en');
         $africanCountries = Country::where('is_african_country', 1)->pluck('name')->toArray();
         $Language = Language::get();
-        $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
+        $LeadSource = LeadSource::select('id', 'source_name')->orderBy('source_name', 'ASC')->where('status', 'active')->get();
         $strategy = Strategy::get();
-        $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
+        $modelLineMasters = MasterModelLines::select('id', 'brand_id', 'model_line')->orderBy('model_line', 'ASC')->get();
         $sales_persons = User::where('manual_lead_assign', 1)
         ->select('id', 'name', 'is_dubai_sales_rep') 
         ->orderBy('name', 'asc')
@@ -357,65 +353,68 @@ class CallsController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    { 
+    {
         $validCountryCodes = CountryCodes::list();
 
-        $validator = Validator::make($request->all(), [
-            'phone' => ['nullable', 'required_without:email', function ($attribute, $value, $fail) use ($validCountryCodes) {
-            if (!empty($value)) {
-                $value = preg_replace('/[^\d+]/', '', $value);
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'phone' => ['nullable', 'required_without:email', function ($attribute, $value, $fail) use ($validCountryCodes) {
+                    if (!empty($value)) {
+                        $value = preg_replace('/[^\d+]/', '', $value);
 
-                if ($value[0] !== '+') {
-                    $value = '+' . $value;
-                }
+                        if ($value[0] !== '+') {
+                            $value = '+' . $value;
+                        }
 
-                $matchedCode = null;
-                foreach ($validCountryCodes as $code) {
-                    if (strpos($value, $code) === 0) {
-                        $matchedCode = $code;
-                        break;
+                        $matchedCode = null;
+                        foreach ($validCountryCodes as $code) {
+                            if (strpos($value, $code) === 0) {
+                                $matchedCode = $code;
+                                break;
+                            }
+                        }
+
+                        if (!$matchedCode) {
+                            return $fail('Invalid country code in phone number.');
+                        }
+
+                        $localPart = substr($value, strlen($matchedCode));
+
+                        if (!ctype_digit($localPart)) {
+                            return $fail('Phone number can only contain digits after country code.');
+                        }
+
+                        $length = strlen($localPart);
+                        if ($length < 5 || $length > 20) {
+                            return $fail('Phone number must be between 5 to 20 digits (excluding country code).');
+                        }
                     }
-                }
+                }],
+                'email' => 'nullable|required_without:phone|email',
+                'location' => 'required',
+                'milelemotors' => 'required',
+                'language' => 'required',
+                'strategy' => 'required',
+                'priority' => 'required',
+                'model_line_ids' => 'array',
+                'model_line_ids.*' => 'distinct',
+                'type' => 'required',
+                'sales_person_id' => ($request->input('sales-option') == "manual-assign") ? 'required' : '',
+            ],
+            [
+                'milelemotors.required' => 'The Source field is required.',
+                'location.required' => 'The Destination field is required.',
+                'strategy.required' => 'The Strategy field is required.',
+                'priority.required' => 'The Priority field is required.',
+                'phone.regex' => 'Invalid Phone Number.',
+            ]
+        );
 
-                if (!$matchedCode) {
-                    return $fail('Invalid country code in phone number.');
-                }
-
-                $localPart = substr($value, strlen($matchedCode));
-
-                if (!ctype_digit($localPart)) {
-                    return $fail('Phone number can only contain digits after country code.');
-                }
-
-                $length = strlen($localPart);
-                if ($length < 5 || $length > 20) {
-                    return $fail('Phone number must be between 5 to 20 digits (excluding country code).');
-                }
-            }
-            }],
-            'email' => 'nullable|required_without:phone|email',
-            'location' => 'required',
-            'milelemotors' => 'required',
-            'language' => 'required',
-            'strategy' => 'required', 
-            'priority' => 'required', 
-            'model_line_ids' => 'array',
-            'model_line_ids.*' => 'distinct',
-            'type' => 'required',
-            'sales_person_id' => ($request->input('sales-option') == "manual-assign") ? 'required' : '',
-        ],
-        [
-            'milelemotors.required' => 'The Source field is required.',
-            'location.required' => 'The Destination field is required.',
-            'strategy.required' => 'The Strategy field is required.',  
-            'priority.required' => 'The Priority field is required.',  
-            'phone.regex' => 'Invalid Phone Number.',
-        ]);
-        
         if ($validator->fails()) {
             return redirect()->back()
                 ->withErrors($validator)
-                ->withInput(); 
+                ->withInput();
         }
         
         // if ($request->input('sales-option') == "auto-assign") {
@@ -768,7 +767,7 @@ class CallsController extends Controller
             $modelLineIds = $request->input('model_line_ids');
 
         if (!empty($modelLineIds) && is_array($modelLineIds) && $modelLineIds[0] !== null) {
-                foreach ($modelLineIds as $modelLineId) {
+            foreach ($modelLineIds as $modelLineId) {
                 $datacalls = [
                     'lead_id' => $table_id,
                     'model_line_id' => $modelLineId,
@@ -779,20 +778,20 @@ class CallsController extends Controller
                 $model->save();
             }
         }
-            $logdata = [
-                'table_name' => "calls",
-                'table_id' => $table_id,
-                'user_id' => Auth::id(),
-                'action' => "Create",
-            ];
-            $model = new Logs($logdata);
-            $model->save();
-            $useractivities =  New UserActivities();
-            $useractivities->activity = "Store New Lead";
-            $useractivities->users_id = Auth::id();
-            $useractivities->save();
-            return redirect()->route('calls.index')
-            ->with('success','Call Record created successfully');
+        $logdata = [
+            'table_name' => "calls",
+            'table_id' => $table_id,
+            'user_id' => Auth::id(),
+            'action' => "Create",
+        ];
+        $model = new Logs($logdata);
+        $model->save();
+        $useractivities =  new UserActivities();
+        $useractivities->activity = "Store New Lead";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        return redirect()->route('calls.index')
+            ->with('success', 'Call Record created successfully');
     }
 
     public function upload(Request $request)
@@ -816,7 +815,7 @@ class CallsController extends Controller
     }        
         
     public function showcalls(Request $request, $call, $brand_id, $model_line_id, $location, $days, $custom_brand_model = null)
-    {   
+    {
         $brandId = $request->route('brand_id');
         $location = $request->route('location');
         $modelLineId = $request->route('model_line_id');
@@ -827,17 +826,21 @@ class CallsController extends Controller
             ->join('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
             ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
             ->where('master_model_lines.brand_id', $brandId)
-            ->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})
+            ->where(function ($query) {
+                $query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');
+            })
             ->where('master_model_lines.id', $modelLineId)
             ->where('calls.location', $location)
             ->whereBetween('calls.created_at', [$startDate, $endDate])
-            ->pluck('calls.id');   
+            ->pluck('calls.id');
         $data = Calls::orderBy('status', 'DESC')
-        ->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})
-        ->whereIn('id', $callIds)
-        ->whereIn('status', ['new', 'active'])
-        ->get();
-        $useractivities =  New UserActivities();
+            ->where(function ($query) {
+                $query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');
+            })
+            ->whereIn('id', $callIds)
+            ->whereIn('status', ['new', 'active'])
+            ->get();
+        $useractivities =  new UserActivities();
         $useractivities->activity = "View The Most Lead Brand And Models";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
@@ -861,7 +864,7 @@ class CallsController extends Controller
             ->where('status', 'active')
             ->orderBy('name')
             ->get();
-        $useractivities =  New UserActivities();
+        $useractivities =  new UserActivities();
         $useractivities->activity = "Open Edit Page of Leads";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
@@ -879,11 +882,11 @@ class CallsController extends Controller
             'phone' => ['nullable', 'required_without:email', function ($attribute, $value, $fail) use ($validCountryCodes) {
                 if (!empty($value)) {
                     $value = preg_replace('/[^\d+]/', '', $value);
-    
+
                     if ($value[0] !== '+') {
                         $value = '+' . $value;
                     }
-    
+
                     $matchedCode = null;
                     foreach ($validCountryCodes as $code) {
                         if (strpos($value, $code) === 0) {
@@ -891,17 +894,17 @@ class CallsController extends Controller
                             break;
                         }
                     }
-    
+
                     if (!$matchedCode) {
                         return $fail('Invalid country code in phone number.');
                     }
-    
+
                     $localPart = substr($value, strlen($matchedCode));
-    
+
                     if (!ctype_digit($localPart)) {
                         return $fail('Phone number can only contain digits after country code.');
                     }
-    
+
                     $length = strlen($localPart);
                     if ($length < 5 || $length > 20) {
                         return $fail('Phone number must be between 5 to 20 digits (excluding country code).');
@@ -922,18 +925,16 @@ class CallsController extends Controller
             'strategy.required' => 'The Strategy field is required.',
             'priority.required' => 'The Priority field is required.',
         ]);
-    
+
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        if ($request->input('sales-option') == "manual-assign") 
-		{
-        $sales_person_id = $request->input('sales_person_id');
-		}
-		else{
-		$sales_person_id = $request->input('old_sales_person_id');	
-		}
+        if ($request->input('sales-option') == "manual-assign") {
+            $sales_person_id = $request->input('sales_person_id');
+        } else {
+            $sales_person_id = $request->input('old_sales_person_id');
+        }
 
         $strategyRecord = Strategy::where('name', $request->input('strategy'))->first();
         $strategies_id = $strategyRecord ? $strategyRecord->id : null;
@@ -971,18 +972,18 @@ class CallsController extends Controller
 
         CallsRequirement::where('lead_id', $call_id)->delete();
 
-            foreach ($modelLineIds as $modelLineId) {
-                if ($modelLineId !== null) {
-                    $datacalls = [
-                        'lead_id' => $call_id,
-                        'model_line_id' => $modelLineId,
-                        'created_at' => $formattedDate
-                    ];
-                    $model = new CallsRequirement($datacalls);
-                    $model->save();
-                }
-            }       
-       $table_id = $call_id;
+        foreach ($modelLineIds as $modelLineId) {
+            if ($modelLineId !== null) {
+                $datacalls = [
+                    'lead_id' => $call_id,
+                    'model_line_id' => $modelLineId,
+                    'created_at' => $formattedDate
+                ];
+                $model = new CallsRequirement($datacalls);
+                $model->save();
+            }
+        }
+        $table_id = $call_id;
         $logdata = [
             'table_name' => "calls",
             'table_id' => $table_id,
@@ -991,12 +992,12 @@ class CallsController extends Controller
         ];
         $model = new Logs($logdata);
         $model->save();
-        $useractivities =  New UserActivities();
+        $useractivities =  new UserActivities();
         $useractivities->activity = "Edit the Lead";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         return redirect()->route('calls.index')
-        ->with('success','Call Record created successfully');
+            ->with('success', 'Call Record created successfully');
     }
 
     /**
@@ -1020,7 +1021,7 @@ class CallsController extends Controller
     }
     public function getmodelline(Request $request)
     {
-        $brandId = $request->input('brand'); 
+        $brandId = $request->input('brand');
         $data = MasterModelLines::where('brand_id', $brandId)
             ->pluck('model_line', 'id');
         return response()->json($data);
@@ -1028,12 +1029,12 @@ class CallsController extends Controller
     public function createbulk()
     {
         $countries = CountryListFacade::getList('en');
-        $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
-        $useractivities =  New UserActivities();
+        $LeadSource = LeadSource::select('id', 'source_name')->orderBy('source_name', 'ASC')->where('status', 'active')->get();
+        $useractivities =  new UserActivities();
         $useractivities->activity = "Open Create Bulk Leads";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-        return view('calls.createbulk', compact('countries','LeadSource'));
+        return view('calls.createbulk', compact('countries', 'LeadSource'));
     }
 
     public function uploadingbulk(Request $request)
@@ -1596,12 +1597,12 @@ class CallsController extends Controller
     }
     public function bulkLeadsDataUplaodExcel()
     {
-        $useractivities =  New UserActivities();
-            $useractivities->activity = "Export Simple File for Bulk Leads";
-            $useractivities->users_id = Auth::id();
-            $useractivities->save();
-            $filePath = public_path('storage/calls.xlsx');
-            Log::info("File path is : ". $filePath);
+        $useractivities =  new UserActivities();
+        $useractivities->activity = "Export Simple File for Bulk Leads";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        $filePath = public_path('storage/calls.xlsx');
+        Log::info("File path is : " . $filePath);
 
         if (file_exists($filePath)) {
             return Response::download($filePath, 'calls.xlsx', [
@@ -1611,123 +1612,319 @@ class CallsController extends Controller
             return redirect()->back()->with('error', 'The requested file does not exist.');
         }
     }
-public function varinatinfo()
-{
-    $useractivities =  New UserActivities();
+    public function varinatinfo()
+    {
+        $useractivities =  new UserActivities();
         $useractivities->activity = "Open Variants Info Page";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-    $Variants = AvailableColour::get();   
-    return view('variants.vairantinfo', compact('Variants'));
-}
-public function createnewvarinats()
-{
-    $useractivities =  New UserActivities();
+        $Variants = AvailableColour::get();
+        return view('variants.vairantinfo', compact('Variants'));
+    }
+    public function createnewvarinats()
+    {
+        $useractivities =  new UserActivities();
         $useractivities->activity = "Create New Variants";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-    $interiorColors = [
-        'Black', 'Dark Gray', 'Light Gray', 'Beige', 'Tan', 'Cream',
-        'Brown', 'Ivory', 'White', 'Red', 'Blue', 'Green',
-        'Burgundy', 'Charcoal', 'Navy', 'Silver', 'Champagne', 'Pewter',
-        'Almond', 'Ebony', 'Caramel', 'Slate', 'Graphite', 'Sand',
-        'Oyster', 'Mocha', 'Parchment', 'Mahogany', 'Cocoa', 'Espresso',
-        'Platinum', 'Jet Black', 'Stone Gray', 'Cashmere', 'Granite', 'Saddle',
-        'Opal Gray', 'Pebble', 'Shadow', 'Walnut', 'Fawn', 'Pearl',
-        'Chestnut', 'Sandalwood', 'Brick', 'Tawny', 'Hickory', 'Tuscan',
-        'Driftwood', 'Olive', 'Cloud', 'Raven', 'Twilight', 'Chestnut Brown',
-        'Mink', 'Mushroom', 'Clay', 'Slate Gray', 'Flint', 'Arctic',
-        'Sandstone', 'Ebony Black', 'Cognac', 'Russet', 'Stone', 'Linen',
-        'Carbon', 'Charcoal Gray', 'Bamboo', 'Nutmeg', 'Canyon', 'Terra Cotta',
-        'Canyon Brown', 'Steel', 'Gunmetal', 'Bamboo Beige', 'Oatmeal', 'Mink Brown',
-        'Warm Gray', 'Truffle', 'Light Stone', 'Tuxedo Black', 'Chalk', 'Agate',
-        'Mojave', 'Blond', 'Ochre', 'Natural', 'Cobblestone', 'Stone Beige',
-        'Light Beige', 'Granite Gray', 'Eclipse', 'Shale', 'Pumice', 'Ice',
-        'Ash', 'Tarmac', 'Dove Gray', 'Desert Sand', 'Sable', 'Cappuccino',
-        'Sandy Beige', 'Mist', 'Storm', 'Shetland', 'Onyx', 'Chestnut Brown',
-        'Iron', 'Cashew', 'Pebble Beige', 'Storm Gray', 'Shadow Gray', 'Piano Black',
-        // Add more color names here...
-    ];
-    $exteriorColors = [
-        'Black', 'White', 'Silver', 'Gray', 'Red', 'Blue',
-        'Green', 'Brown', 'Beige', 'Yellow', 'Orange', 'Purple',
-        'Gold', 'Bronze', 'Copper', 'Charcoal', 'Navy', 'Burgundy',
-        'Pearl', 'Metallic', 'Graphite', 'Platinum', 'Champagne', 'Midnight',
-        'Ebony', 'Crimson', 'Ruby', 'Emerald', 'Sapphire', 'Amethyst',
-        'Topaz', 'Garnet', 'Opal', 'Mocha', 'Cocoa', 'Ivory',
-        'Cream', 'Tungsten', 'Quartz', 'Titanium', 'Lunar', 'Majestic',
-        'Mystic', 'Radiant', 'Moonlight', 'Ingot', 'Cobalt', 'Azure',
-        'Indigo', 'Slate', 'Shadow', 'Steel', 'Lime', 'Sunset',
-        'Tangerine', 'Lemon', 'Olive', 'Forest', 'Teal', 'Mint',
-        'Plum', 'Lavender', 'Violet', 'Coral', 'Copper', 'Bronze',
-        'Sienna', 'Mahogany', 'Terra Cotta', 'Sandstone', 'Sandy', 'Desert',
-        'Pebble', 'Stone', 'Granite', 'Graphite', 'Metallic', 'Midnight Blue',
-        'Ruby Red', 'Emerald Green', 'Sapphire Blue', 'Amethyst Purple', 'Onyx Black', 'Lunar Silver',
-        'Opulent Blue', 'Magnetic Gray', 'Pure White', 'Pearl White', 'Iridium Silver', 'Classic Red',
-        'Race Blue', 'Frozen White', 'Bright Yellow', 'Sunset Orange', 'Velvet Red', 'Deep Blue',
-        'Midnight Black', 'Galaxy Blue', 'Fire Red', 'Solar Yellow', 'Cosmic Black', 'Crystal White',
-        'Phantom Black', 'Diamond Silver', 'Ruby Red', 'Storm Gray', 'Platinum White', 'Bronze Metallic',
-        'Liquid Blue', 'Silk Silver', 'Majestic Blue', 'Metallic Black', 'Candy Red', 'Crystal Blue',
-        'Quartz Gray', 'Slate Gray', 'Shimmering Silver', 'Eclipse Black', 'Hyper Red', 'Glacier White',
-        // Add more color names here...
-    ];
-    return view('variants.add_new_variants', compact('interiorColors', 'exteriorColors'));
-}
-public function storenewvarinats(Request $request) {
-    // seems to be this function not using anywhere
-    $useractivities =  New UserActivities();
+        $interiorColors = [
+            'Black',
+            'Dark Gray',
+            'Light Gray',
+            'Beige',
+            'Tan',
+            'Cream',
+            'Brown',
+            'Ivory',
+            'White',
+            'Red',
+            'Blue',
+            'Green',
+            'Burgundy',
+            'Charcoal',
+            'Navy',
+            'Silver',
+            'Champagne',
+            'Pewter',
+            'Almond',
+            'Ebony',
+            'Caramel',
+            'Slate',
+            'Graphite',
+            'Sand',
+            'Oyster',
+            'Mocha',
+            'Parchment',
+            'Mahogany',
+            'Cocoa',
+            'Espresso',
+            'Platinum',
+            'Jet Black',
+            'Stone Gray',
+            'Cashmere',
+            'Granite',
+            'Saddle',
+            'Opal Gray',
+            'Pebble',
+            'Shadow',
+            'Walnut',
+            'Fawn',
+            'Pearl',
+            'Chestnut',
+            'Sandalwood',
+            'Brick',
+            'Tawny',
+            'Hickory',
+            'Tuscan',
+            'Driftwood',
+            'Olive',
+            'Cloud',
+            'Raven',
+            'Twilight',
+            'Chestnut Brown',
+            'Mink',
+            'Mushroom',
+            'Clay',
+            'Slate Gray',
+            'Flint',
+            'Arctic',
+            'Sandstone',
+            'Ebony Black',
+            'Cognac',
+            'Russet',
+            'Stone',
+            'Linen',
+            'Carbon',
+            'Charcoal Gray',
+            'Bamboo',
+            'Nutmeg',
+            'Canyon',
+            'Terra Cotta',
+            'Canyon Brown',
+            'Steel',
+            'Gunmetal',
+            'Bamboo Beige',
+            'Oatmeal',
+            'Mink Brown',
+            'Warm Gray',
+            'Truffle',
+            'Light Stone',
+            'Tuxedo Black',
+            'Chalk',
+            'Agate',
+            'Mojave',
+            'Blond',
+            'Ochre',
+            'Natural',
+            'Cobblestone',
+            'Stone Beige',
+            'Light Beige',
+            'Granite Gray',
+            'Eclipse',
+            'Shale',
+            'Pumice',
+            'Ice',
+            'Ash',
+            'Tarmac',
+            'Dove Gray',
+            'Desert Sand',
+            'Sable',
+            'Cappuccino',
+            'Sandy Beige',
+            'Mist',
+            'Storm',
+            'Shetland',
+            'Onyx',
+            'Chestnut Brown',
+            'Iron',
+            'Cashew',
+            'Pebble Beige',
+            'Storm Gray',
+            'Shadow Gray',
+            'Piano Black',
+            // Add more color names here...
+        ];
+        $exteriorColors = [
+            'Black',
+            'White',
+            'Silver',
+            'Gray',
+            'Red',
+            'Blue',
+            'Green',
+            'Brown',
+            'Beige',
+            'Yellow',
+            'Orange',
+            'Purple',
+            'Gold',
+            'Bronze',
+            'Copper',
+            'Charcoal',
+            'Navy',
+            'Burgundy',
+            'Pearl',
+            'Metallic',
+            'Graphite',
+            'Platinum',
+            'Champagne',
+            'Midnight',
+            'Ebony',
+            'Crimson',
+            'Ruby',
+            'Emerald',
+            'Sapphire',
+            'Amethyst',
+            'Topaz',
+            'Garnet',
+            'Opal',
+            'Mocha',
+            'Cocoa',
+            'Ivory',
+            'Cream',
+            'Tungsten',
+            'Quartz',
+            'Titanium',
+            'Lunar',
+            'Majestic',
+            'Mystic',
+            'Radiant',
+            'Moonlight',
+            'Ingot',
+            'Cobalt',
+            'Azure',
+            'Indigo',
+            'Slate',
+            'Shadow',
+            'Steel',
+            'Lime',
+            'Sunset',
+            'Tangerine',
+            'Lemon',
+            'Olive',
+            'Forest',
+            'Teal',
+            'Mint',
+            'Plum',
+            'Lavender',
+            'Violet',
+            'Coral',
+            'Copper',
+            'Bronze',
+            'Sienna',
+            'Mahogany',
+            'Terra Cotta',
+            'Sandstone',
+            'Sandy',
+            'Desert',
+            'Pebble',
+            'Stone',
+            'Granite',
+            'Graphite',
+            'Metallic',
+            'Midnight Blue',
+            'Ruby Red',
+            'Emerald Green',
+            'Sapphire Blue',
+            'Amethyst Purple',
+            'Onyx Black',
+            'Lunar Silver',
+            'Opulent Blue',
+            'Magnetic Gray',
+            'Pure White',
+            'Pearl White',
+            'Iridium Silver',
+            'Classic Red',
+            'Race Blue',
+            'Frozen White',
+            'Bright Yellow',
+            'Sunset Orange',
+            'Velvet Red',
+            'Deep Blue',
+            'Midnight Black',
+            'Galaxy Blue',
+            'Fire Red',
+            'Solar Yellow',
+            'Cosmic Black',
+            'Crystal White',
+            'Phantom Black',
+            'Diamond Silver',
+            'Ruby Red',
+            'Storm Gray',
+            'Platinum White',
+            'Bronze Metallic',
+            'Liquid Blue',
+            'Silk Silver',
+            'Majestic Blue',
+            'Metallic Black',
+            'Candy Red',
+            'Crystal Blue',
+            'Quartz Gray',
+            'Slate Gray',
+            'Shimmering Silver',
+            'Eclipse Black',
+            'Hyper Red',
+            'Glacier White',
+            // Add more color names here...
+        ];
+        return view('variants.add_new_variants', compact('interiorColors', 'exteriorColors'));
+    }
+    public function storenewvarinats(Request $request)
+    {
+        // seems to be this function not using anywhere
+        $useractivities =  new UserActivities();
         $useractivities->activity = "Show New Variants";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-    $variantName = $request->input('name');
-    $existingVariant = Varaint::where('name', $variantName)->first();
-    if ($existingVariant) {
-        $variantId = $existingVariant->id;
-        $existingColor = AvailableColour::where('varaint_id', $variantId)
-            ->where('int_colour', $request->input('int_colour'))
-            ->where('ext_colour', $request->input('ext_colour'))
-            ->first();
-        if ($existingColor) {
-            return redirect()->back()->with('error', 'Color combination already exists for this variant');
+        $variantName = $request->input('name');
+        $existingVariant = Varaint::where('name', $variantName)->first();
+        if ($existingVariant) {
+            $variantId = $existingVariant->id;
+            $existingColor = AvailableColour::where('varaint_id', $variantId)
+                ->where('int_colour', $request->input('int_colour'))
+                ->where('ext_colour', $request->input('ext_colour'))
+                ->first();
+            if ($existingColor) {
+                return redirect()->back()->with('error', 'Color combination already exists for this variant');
+            }
+        } else {
+            $variant = new Varaint();
+            $variant->name = $variantName;
+            $variant->save();
+            $variantId = $variant->id;
         }
-    } else {
-        $variant = new Varaint();
-        $variant->name = $variantName;
-        $variant->save();
-        $variantId = $variant->id;
+        $data = [
+            'varaint_id' => $variantId,
+            'int_colour' => $request->input('int_colour'),
+            'ext_colour' => $request->input('ext_colour')
+        ];
+        $availableColour = new AvailableColour($data);
+        $availableColour->save();
+        return redirect()->back()->with('success', 'Variant and color details stored successfully');
     }
-    $data = [
-        'varaint_id' => $variantId,
-        'int_colour' => $request->input('int_colour'),
-        'ext_colour' => $request->input('ext_colour')
-    ];
-    $availableColour = new AvailableColour($data);
-    $availableColour->save();
-    return redirect()->back()->with('success', 'Variant and color details stored successfully');
-}
-public function downloadRejected($filename)
-{
-    $useractivities =  New UserActivities();
+    public function downloadRejected($filename)
+    {
+        $useractivities =  new UserActivities();
         $useractivities->activity = "Download Rejected Lead List CSV";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-    $filePath = storage_path('app/public/' . $filename);
-    if (file_exists($filePath)) {
-        return response()->download($filePath);
-    } else {
-        return redirect()->route('calls.createbulk')->with('error', 'File not found.');
+        $filePath = storage_path('app/public/' . $filename);
+        if (file_exists($filePath)) {
+            return response()->download($filePath);
+        } else {
+            return redirect()->route('calls.createbulk')->with('error', 'File not found.');
+        }
     }
-}
-public function addnewleads()
+    public function addnewleads()
     {
-        $useractivities =  New UserActivities();
+        $useractivities =  new UserActivities();
         $useractivities->activity = "Add New Lead Page Open";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $countries = CountryListFacade::getList('en');
         $Language = Language::get();
-        $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
-        $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
+        $LeadSource = LeadSource::select('id', 'source_name')->orderBy('source_name', 'ASC')->where('status', 'active')->get();
+        $modelLineMasters = MasterModelLines::select('id', 'brand_id', 'model_line')->orderBy('model_line', 'ASC')->get();
         $sales_persons = ModelHasRoles::where('role_id', 7)->get();
         return view('calls.sscreate', compact('countries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'Language'));
     }
@@ -1738,8 +1935,8 @@ public function addnewleads()
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $this->validate($request, [
-            'phone' => 'nullable|required_without:email',          
-            'email' => 'nullable|required_without:phone|email',           
+            'phone' => 'nullable|required_without:email',
+            'email' => 'nullable|required_without:phone|email',
             'location' => 'required',
             'milelemotors' => 'required',
             'language' => 'required',
@@ -1832,7 +2029,6 @@ public function addnewleads()
         } else {
             $sales_person_id = $request->input('sales_person_id');
         }
-
         $date = Carbon::now();
         $date->setTimezone('Asia/Dubai');
         $formattedDate = $date->format('Y-m-d H:i:s');
@@ -1855,23 +2051,23 @@ public function addnewleads()
         $model = new Calls($data);
         $model->save();
         $lastRecord = Calls::where('created_by', $data['created_by'])
-                   ->orderBy('id', 'desc')
-                   ->first();
+            ->orderBy('id', 'desc')
+            ->first();
         $table_id = $lastRecord->id;
         $modelLineIds = $request->input('model_line_ids');
 
-if ($modelLineIds[0] !== null) {
-foreach ($modelLineIds as $modelLineId) {
-    $datacalls = [
-        'lead_id' => $table_id,
-        'model_line_id' => $modelLineId,
-        'created_at' => $formattedDate
-    ];
+        if ($modelLineIds[0] !== null) {
+            foreach ($modelLineIds as $modelLineId) {
+                $datacalls = [
+                    'lead_id' => $table_id,
+                    'model_line_id' => $modelLineId,
+                    'created_at' => $formattedDate
+                ];
 
-    $model = new CallsRequirement($datacalls);
-    $model->save();
-}
-}
+                $model = new CallsRequirement($datacalls);
+                $model->save();
+            }
+        }
         $logdata = [
             'table_name' => "calls",
             'table_id' => $table_id,
@@ -1884,14 +2080,14 @@ foreach ($modelLineIds as $modelLineId) {
     }
     public function leadsexport(Request $request)
     {
-        $useractivities =  New UserActivities();
+        $useractivities =  new UserActivities();
         $useractivities->activity = "Open Leads Export Page";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $countries = CountryListFacade::getList('en');
         $strategies = Strategy::get();
-        $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
-        $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
+        $LeadSource = LeadSource::select('id', 'source_name')->orderBy('source_name', 'ASC')->where('status', 'active')->get();
+        $modelLineMasters = MasterModelLines::select('id', 'brand_id', 'model_line')->orderBy('model_line', 'ASC')->get();
         $sales_persons = ModelHasRoles::where('role_id', 7)->get();
         return view('calls.leadsexport', compact('countries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'strategies'));
     }
@@ -1937,7 +2133,7 @@ foreach ($modelLineIds as $modelLineId) {
             'Purchase Timeline',
             'General Remark / Additional Notes'
         ];
-        
+
         $data = \DB::table('calls as c')
             ->join('users as u', 'c.sales_person', '=', 'u.id')
             ->join('lead_source as ls', 'c.source', '=', 'ls.id')
@@ -2010,7 +2206,7 @@ foreach ($modelLineIds as $modelLineId) {
                             if (isset($parts[1])) {
                                 $parsed[$key] = trim($parts[1]);
                             }
-                        }  
+                        }
                     }
                 }
             }
