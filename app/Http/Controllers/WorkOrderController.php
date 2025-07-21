@@ -42,62 +42,71 @@ use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Mail;
 use App\Models\WOBOE;
-use App\Mail\WOBOEStatusMail; 
+use App\Mail\WOBOEStatusMail;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Rap2hpoutre\FastExcel\FastExcel;
 
 class WorkOrderController extends Controller
 {
-    public function workOrderCreate($type) {
+    public function workOrderCreate($type)
+    {
         $authId = Auth::id();
-        (new UserActivityController)->createActivity('Open '.$type.' work order create page');
+        (new UserActivityController)->createActivity('Open ' . $type . ' work order create page');
 
-        $kit = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+        $kit = AddonDetails::select('addon_details.id', 'addon_details.addon_code', DB::raw("CONCAT(addons.name, 
                 IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
-                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+                "), DB::raw("'App\\Models\\AddonDetails' as reference_type"))
             ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
             ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
             ->where('addon_details.addon_type_name', 'K')
             ->orderBy('addon_details.id', 'asc')
             ->get();
-        $accessories = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+        $accessories = AddonDetails::select('addon_details.id', 'addon_details.addon_code', DB::raw("CONCAT(addons.name, 
                 IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
-                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+                "), DB::raw("'App\\Models\\AddonDetails' as reference_type"))
             ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
             ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
             ->where('addon_details.addon_type_name', 'P')
             ->orderBy('addon_details.id', 'asc')
             ->get();
-        $spareParts = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+        $spareParts = AddonDetails::select('addon_details.id', 'addon_details.addon_code', DB::raw("CONCAT(addons.name, 
                 IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
-                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+                "), DB::raw("'App\\Models\\AddonDetails' as reference_type"))
             ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
             ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
             ->where('addon_details.addon_type_name', 'SP')
             ->orderBy('addon_details.id', 'asc')
             ->get();
-        $charges = MasterCharges::select('master_charges.id','master_charges.addon_code',DB::raw("CONCAT(
+        $charges = MasterCharges::select(
+            'master_charges.id',
+            'master_charges.addon_code',
+            DB::raw("CONCAT(
                 IF(master_charges.name IS NOT NULL, master_charges.name, ''), 
                 IF(master_charges.name IS NOT NULL AND master_charges.description IS NOT NULL, ' - ', ''), 
                 IF(master_charges.description IS NOT NULL, master_charges.description, '')) as addon_name"),
-                DB::raw("'App\\Models\\Masters\\MasterCharges' as reference_type"))
+            DB::raw("'App\\Models\\Masters\\MasterCharges' as reference_type")
+        )
             ->orderBy('master_charges.id', 'asc')
             ->get();
         // Merge collections
         $addons = $accessories->merge($spareParts)->merge($kit);
         // Store permission checks
         $hasFullAccess = Auth::user()->hasPermissionForSelectedRole([
-            'list-export-exw-wo', 'list-export-cnf-wo', 'list-export-local-sale-wo'
+            'list-export-exw-wo',
+            'list-export-cnf-wo',
+            'list-export-local-sale-wo'
         ]);
 
         $hasLimitedAccess = Auth::user()->hasPermissionForSelectedRole([
-            'view-current-user-export-exw-wo-list', 'view-current-user-export-cnf-wo-list', 'view-current-user-local-sale-wo-list'
+            'view-current-user-export-exw-wo-list',
+            'view-current-user-export-cnf-wo-list',
+            'view-current-user-local-sale-wo-list'
         ]);
         // Select data from the WorkOrder table
         $workOrders = WorkOrder::select(
-            DB::raw('TRIM(customer_name) as customer_name'), 
-            'customer_email', 
-            'customer_company_number', 
+            DB::raw('TRIM(customer_name) as customer_name'),
+            'customer_email',
+            'customer_company_number',
             'customer_address',
             DB::raw('(IF(customer_email IS NOT NULL, 1, 0) + IF(customer_company_number IS NOT NULL, 1, 0) + IF(customer_address IS NOT NULL, 1, 0)) as score'),
             DB::raw("'App\\Models\\WorkOrder' as reference_type"),
@@ -108,9 +117,9 @@ class WorkOrderController extends Controller
 
         // Select and transform data from the Clients table
         $clients = Clients::select(
-            DB::raw('TRIM(name) as customer_name'), 
-            DB::raw('email as customer_email'), 
-            DB::raw('phone as customer_company_number'), 
+            DB::raw('TRIM(name) as customer_name'),
+            DB::raw('email as customer_email'),
+            DB::raw('phone as customer_company_number'),
             DB::raw('NULL as customer_address'),
             DB::raw('(IF(email IS NOT NULL, 1, 0) + IF(phone IS NOT NULL, 1, 0)) as score'),
             DB::raw("'App\\Models\\Clients' as reference_type"),
@@ -131,46 +140,46 @@ class WorkOrderController extends Controller
             ->union($clients)
             ->get();
 
-            $combinedResults = $combinedResults->map(function ($item) {
-                $item->customer_name = $this->cleanField($item->customer_name);
-                $item->customer_email = $this->cleanField($item->customer_email);
-                $item->customer_company_number = $this->cleanField($item->customer_company_number);
-                $item->customer_address = $this->cleanField($item->customer_address);
-                return $item;
-            });
-            
-            // Process into $customers after sanitization
-            $customers = $combinedResults->groupBy('unique_id')->map(function($items) {
-                return $items->sortByDesc('score')->first();
-            })->values()->sortBy('customer_name');
-            foreach ($customers as $index => $cust) {
-                try {
-                    json_encode($cust, JSON_THROW_ON_ERROR);
-                } catch (\JsonException $e) {
-                    Log::error("Customer JSON error at index {$index}: " . $e->getMessage(), ['customer' => $cust]);
-                    abort(500, "Bad customer record at index {$index}");
-                }
+        $combinedResults = $combinedResults->map(function ($item) {
+            $item->customer_name = $this->cleanField($item->customer_name);
+            $item->customer_email = $this->cleanField($item->customer_email);
+            $item->customer_company_number = $this->cleanField($item->customer_company_number);
+            $item->customer_address = $this->cleanField($item->customer_address);
+            return $item;
+        });
+
+        // Process into $customers after sanitization
+        $customers = $combinedResults->groupBy('unique_id')->map(function ($items) {
+            return $items->sortByDesc('score')->first();
+        })->values()->sortBy('customer_name');
+        foreach ($customers as $index => $cust) {
+            try {
+                json_encode($cust, JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                Log::error("Customer JSON error at index {$index}: " . $e->getMessage(), ['customer' => $cust]);
+                abort(500, "Bad customer record at index {$index}");
             }
+        }
         // Get the count of customers
         $customerCount = $customers->count();
 
-        $users = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
-            $q = $q->where('type','employee');
+        $users = User::orderBy('name', 'ASC')->where('status', 'active')->whereNotIn('id', [1, 16])->whereHas('empProfile', function ($q) {
+            $q = $q->where('type', 'employee');
         })->get();
-        $airlines = MasterAirlines::orderBy('name','ASC')->get();
-        $vins = Vehicles::orderBy('vin','ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand','interior','exterior','warehouseLocation','document')->get()->unique('vin')
+        $airlines = MasterAirlines::orderBy('name', 'ASC')->get();
+        $vins = Vehicles::orderBy('vin', 'ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand', 'interior', 'exterior', 'warehouseLocation', 'document')->get()->unique('vin')
             ->values(); // Reset the keys to ensure it's a proper array 
         $salesPersons = [];
         $hasAllSalesAccess = Auth::user()->hasPermissionForSelectedRole([
             'create-wo-for-all-sales-person'
         ]);
         if ($hasAllSalesAccess) {
-            $salesPersons = User::orderBy('name','ASC')->where('status','active')->where('is_sales_rep','Yes')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
-                $q = $q->where('type','employee');
+            $salesPersons = User::orderBy('name', 'ASC')->where('status', 'active')->where('is_sales_rep', 'Yes')->whereNotIn('id', [1, 16])->whereHas('empProfile', function ($q) {
+                $q = $q->where('type', 'employee');
             })->get();
         }
-      
-        return view('work_order.export_exw.create', compact('type', 'customers', 'customerCount', 'airlines', 'vins', 'users', 'addons', 'charges','salesPersons'))->with([
+
+        return view('work_order.export_exw.create', compact('type', 'customers', 'customerCount', 'airlines', 'vins', 'users', 'addons', 'charges', 'salesPersons'))->with([
             'vinsJson' => $vins->toJson(), // Single encoding here
         ]);
     }
@@ -182,22 +191,24 @@ class WorkOrderController extends Controller
         $search = $request->query('search'); // Get the 'search' query parameter
         $authId = Auth::id();
         $hasLimitedAccess = Auth::user()->hasPermissionForSelectedRole([
-            'view-current-user-export-exw-wo-list', 'view-current-user-export-cnf-wo-list', 'view-current-user-local-sale-wo-list'
+            'view-current-user-export-exw-wo-list',
+            'view-current-user-export-cnf-wo-list',
+            'view-current-user-local-sale-wo-list'
         ]);
-    
+
         // Fetch saved filters for the current user and decode JSON into an array
         $savedFilters = WOUserFilterInputs::where('user_id', $authId)->first();
-        $filters = $savedFilters ? json_decode($savedFilters->filters, true) : []; 
+        $filters = $savedFilters ? json_decode($savedFilters->filters, true) : [];
         $statuses = WoStatus::distinct()->orderBy('status', 'asc')->pluck('status');
         $workOrders = WorkOrder::all();
         $salesSupportDataConfirmations = $workOrders->pluck('sales_support_data_confirmation')->unique()->sort()->values();
-        $financeApprovalStatuses = $workOrders->pluck('finance_approval_status')->filter(function($value) {
-                return $value !== ''; // Exclude empty strings
-            })->unique()->sort()->values();
+        $financeApprovalStatuses = $workOrders->pluck('finance_approval_status')->filter(function ($value) {
+            return $value !== ''; // Exclude empty strings
+        })->unique()->sort()->values();
         $financeApprovalStatuses = $financeApprovalStatuses->push('Blank')->sort()->values();
-        $cooApprovalStatuses = $workOrders->pluck('coo_approval_status')->filter(function($value) {
-                return $value !== ''; // Exclude empty strings
-            })->unique()->sort()->values();
+        $cooApprovalStatuses = $workOrders->pluck('coo_approval_status')->filter(function ($value) {
+            return $value !== ''; // Exclude empty strings
+        })->unique()->sort()->values();
         $cooApprovalStatuses = $cooApprovalStatuses->push('Blank')->sort()->values();
         $docsStatuses = $workOrders->pluck('docs_status')->unique()->sort()->values();
         // $docsStatuses = $docsStatuses->push('Blank')->sort()->values();
@@ -205,52 +216,272 @@ class WorkOrderController extends Controller
         $pdiSummary = WOVehicles::all()->pluck('pdi_status')->unique()->sort()->values();
         $deliverySummary = WOVehicles::all()->pluck('delivery_status')->unique()->sort()->values();
         $columns = [
-            'all' => ['id', 'type', 'date', 'so_number', 'temporary_exit', 'delivery_advise', 'showroom_transfer', 'cross_trade', 'is_batch', 'batch', 'wo_number', 
-                'customer_name', 'customer_email', 'customer_company_number', 'customer_address', 'customer_representative_name', 'customer_representative_email', 
-                'customer_representative_contact', 'freight_agent_name', 'freight_agent_email', 'freight_agent_contact_number', 'port_of_loading', 
-                'port_of_discharge', 'final_destination', 'transport_type', 'brn_file', 'brn', 'container_number', 'airline', 'airway_bill', 'shipping_line', 
-                'forward_import_code', 'trailer_number_plate', 'transportation_company', 'transporting_driver_contact_number', 'airway_details', 
-                'transportation_company_details', 'currency', 'so_total_amount', 'so_vehicle_quantity', 'amount_received', 'balance_amount', 'delivery_location', 
-                'delivery_contact_person', 'delivery_contact_person_number', 'delivery_date', 'preferred_shipping_line_of_customer', 'bill_of_loading_details', 
-                'shipper', 'consignee', 'notify_party', 'special_or_transit_clause_or_request', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
-                'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by'
-                ,'sales_person_id','created_by','created_at','updated_at','lto','has_claim'
+            'all' => [
+                'id',
+                'type',
+                'date',
+                'so_number',
+                'temporary_exit',
+                'delivery_advise',
+                'showroom_transfer',
+                'cross_trade',
+                'is_batch',
+                'batch',
+                'wo_number',
+                'customer_name',
+                'customer_email',
+                'customer_company_number',
+                'customer_address',
+                'customer_representative_name',
+                'customer_representative_email',
+                'customer_representative_contact',
+                'freight_agent_name',
+                'freight_agent_email',
+                'freight_agent_contact_number',
+                'port_of_loading',
+                'port_of_discharge',
+                'final_destination',
+                'transport_type',
+                'brn_file',
+                'brn',
+                'container_number',
+                'airline',
+                'airway_bill',
+                'shipping_line',
+                'forward_import_code',
+                'trailer_number_plate',
+                'transportation_company',
+                'transporting_driver_contact_number',
+                'airway_details',
+                'transportation_company_details',
+                'currency',
+                'so_total_amount',
+                'so_vehicle_quantity',
+                'amount_received',
+                'balance_amount',
+                'delivery_location',
+                'delivery_contact_person',
+                'delivery_contact_person_number',
+                'delivery_date',
+                'preferred_shipping_line_of_customer',
+                'bill_of_loading_details',
+                'shipper',
+                'consignee',
+                'notify_party',
+                'special_or_transit_clause_or_request',
+                'signed_pfi',
+                'signed_contract',
+                'payment_receipts',
+                'noc',
+                'enduser_trade_license',
+                'enduser_passport',
+                'enduser_contract',
+                'vehicle_handover_person_id',
+                'sales_support_data_confirmation_at',
+                'updated_by',
+                'sales_person_id',
+                'created_by',
+                'created_at',
+                'updated_at',
+                'lto',
+                'has_claim'
             ],
-            'status_report' => ['id', 'date', 'so_number', 'is_batch', 'batch', 'wo_number', 'airway_details', 'sales_support_data_confirmation_at', 'updated_by',
-                'sales_person_id','created_by','created_at','updated_at'
+            'status_report' => [
+                'id',
+                'date',
+                'so_number',
+                'is_batch',
+                'batch',
+                'wo_number',
+                'airway_details',
+                'sales_support_data_confirmation_at',
+                'updated_by',
+                'sales_person_id',
+                'created_by',
+                'created_at',
+                'updated_at'
             ],
-            'export_exw' => ['id', 'type', 'date', 'so_number', 'temporary_exit', 'delivery_advise', 'showroom_transfer', 'is_batch', 'batch', 'wo_number', 
-                'customer_name', 'customer_email', 'customer_company_number', 'customer_address', 'customer_representative_name', 'customer_representative_email', 
-                'customer_representative_contact', 'freight_agent_name', 'freight_agent_email', 'freight_agent_contact_number', 'port_of_loading', 
-                'port_of_discharge', 'final_destination', 'transport_type', 'brn_file', 'brn', 'container_number', 'airline', 'airway_bill', 'shipping_line', 
-                'forward_import_code', 'trailer_number_plate', 'transportation_company', 'transporting_driver_contact_number', 'airway_details', 
-                'transportation_company_details', 'currency', 'so_total_amount', 'so_vehicle_quantity', 'amount_received', 'balance_amount', 'delivery_location', 
-                'delivery_contact_person', 'delivery_contact_person_number', 'delivery_date', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
-                'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by',
-                'sales_person_id','created_by','created_at','updated_at','has_claim'
+            'export_exw' => [
+                'id',
+                'type',
+                'date',
+                'so_number',
+                'temporary_exit',
+                'delivery_advise',
+                'showroom_transfer',
+                'is_batch',
+                'batch',
+                'wo_number',
+                'customer_name',
+                'customer_email',
+                'customer_company_number',
+                'customer_address',
+                'customer_representative_name',
+                'customer_representative_email',
+                'customer_representative_contact',
+                'freight_agent_name',
+                'freight_agent_email',
+                'freight_agent_contact_number',
+                'port_of_loading',
+                'port_of_discharge',
+                'final_destination',
+                'transport_type',
+                'brn_file',
+                'brn',
+                'container_number',
+                'airline',
+                'airway_bill',
+                'shipping_line',
+                'forward_import_code',
+                'trailer_number_plate',
+                'transportation_company',
+                'transporting_driver_contact_number',
+                'airway_details',
+                'transportation_company_details',
+                'currency',
+                'so_total_amount',
+                'so_vehicle_quantity',
+                'amount_received',
+                'balance_amount',
+                'delivery_location',
+                'delivery_contact_person',
+                'delivery_contact_person_number',
+                'delivery_date',
+                'signed_pfi',
+                'signed_contract',
+                'payment_receipts',
+                'noc',
+                'enduser_trade_license',
+                'enduser_passport',
+                'enduser_contract',
+                'vehicle_handover_person_id',
+                'sales_support_data_confirmation_at',
+                'updated_by',
+                'sales_person_id',
+                'created_by',
+                'created_at',
+                'updated_at',
+                'has_claim'
             ],
-            'export_cnf' => ['id', 'type', 'date', 'so_number', 'temporary_exit', 'cross_trade', 'is_batch', 'batch', 'wo_number', 'customer_name', 'customer_email', 
-                'customer_company_number', 'customer_address', 'customer_representative_name', 'customer_representative_email', 'customer_representative_contact', 
-                'port_of_loading', 'port_of_discharge', 'final_destination', 'transport_type', 'brn_file', 'brn', 'container_number', 'airline', 'airway_bill', 
-                'shipping_line', 'forward_import_code', 'trailer_number_plate', 'transportation_company', 'transporting_driver_contact_number', 'airway_details', 
-                'transportation_company_details', 'currency', 'so_total_amount', 'so_vehicle_quantity', 'amount_received', 'balance_amount', 'delivery_location', 
-                'delivery_contact_person', 'delivery_contact_person_number', 'delivery_date', 'preferred_shipping_line_of_customer', 'bill_of_loading_details', 
-                'shipper', 'consignee', 'notify_party', 'special_or_transit_clause_or_request', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
-                'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by',
-                'sales_person_id','created_by','created_at','updated_at','has_claim'
+            'export_cnf' => [
+                'id',
+                'type',
+                'date',
+                'so_number',
+                'temporary_exit',
+                'cross_trade',
+                'is_batch',
+                'batch',
+                'wo_number',
+                'customer_name',
+                'customer_email',
+                'customer_company_number',
+                'customer_address',
+                'customer_representative_name',
+                'customer_representative_email',
+                'customer_representative_contact',
+                'port_of_loading',
+                'port_of_discharge',
+                'final_destination',
+                'transport_type',
+                'brn_file',
+                'brn',
+                'container_number',
+                'airline',
+                'airway_bill',
+                'shipping_line',
+                'forward_import_code',
+                'trailer_number_plate',
+                'transportation_company',
+                'transporting_driver_contact_number',
+                'airway_details',
+                'transportation_company_details',
+                'currency',
+                'so_total_amount',
+                'so_vehicle_quantity',
+                'amount_received',
+                'balance_amount',
+                'delivery_location',
+                'delivery_contact_person',
+                'delivery_contact_person_number',
+                'delivery_date',
+                'preferred_shipping_line_of_customer',
+                'bill_of_loading_details',
+                'shipper',
+                'consignee',
+                'notify_party',
+                'special_or_transit_clause_or_request',
+                'signed_pfi',
+                'signed_contract',
+                'payment_receipts',
+                'noc',
+                'enduser_trade_license',
+                'enduser_passport',
+                'enduser_contract',
+                'vehicle_handover_person_id',
+                'sales_support_data_confirmation_at',
+                'updated_by',
+                'sales_person_id',
+                'created_by',
+                'created_at',
+                'updated_at',
+                'has_claim'
             ],
-            'local_sale' => ['id', 'date', 'so_number', 'wo_number', 'customer_name', 'customer_email', 'customer_company_number', 'customer_address',
-                'customer_representative_name', 'customer_representative_email', 'customer_representative_contact', 'transporting_driver_contact_number', 
-                'airway_details', 'currency', 'so_total_amount', 'so_vehicle_quantity', 'amount_received', 'balance_amount', 'delivery_location', 
-                'delivery_contact_person', 'delivery_contact_person_number', 'delivery_date', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
-                'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by',
-                'sales_person_id','created_by','created_at','updated_at','lto','has_claim'
+            'local_sale' => [
+                'id',
+                'date',
+                'so_number',
+                'wo_number',
+                'customer_name',
+                'customer_email',
+                'customer_company_number',
+                'customer_address',
+                'customer_representative_name',
+                'customer_representative_email',
+                'customer_representative_contact',
+                'transporting_driver_contact_number',
+                'airway_details',
+                'currency',
+                'so_total_amount',
+                'so_vehicle_quantity',
+                'amount_received',
+                'balance_amount',
+                'delivery_location',
+                'delivery_contact_person',
+                'delivery_contact_person_number',
+                'delivery_date',
+                'signed_pfi',
+                'signed_contract',
+                'payment_receipts',
+                'noc',
+                'enduser_trade_license',
+                'enduser_passport',
+                'enduser_contract',
+                'vehicle_handover_person_id',
+                'sales_support_data_confirmation_at',
+                'updated_by',
+                'sales_person_id',
+                'created_by',
+                'created_at',
+                'updated_at',
+                'lto',
+                'has_claim'
             ],
         ];
         $nonSearchableFields = [
-            'id', 'brn_file', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc',
-            'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'updated_by',
-            'sales_person_id', 'created_by', 'vehicle_handover_person_id'
+            'id',
+            'brn_file',
+            'signed_pfi',
+            'signed_contract',
+            'payment_receipts',
+            'noc',
+            'enduser_trade_license',
+            'enduser_passport',
+            'enduser_contract',
+            'updated_by',
+            'sales_person_id',
+            'created_by',
+            'vehicle_handover_person_id'
         ];
         // Helper function to apply select and search
         $applySelectAndSearch = function ($query, $search, $columns) use ($nonSearchableFields) {
@@ -260,7 +491,7 @@ class WorkOrderController extends Controller
                 $searchableColumns = array_filter($columns, function ($column) use ($nonSearchableFields) {
                     return !in_array($column, $nonSearchableFields);
                 });
-                $searchTerms = preg_split('/\s+/', $search); 
+                $searchTerms = preg_split('/\s+/', $search);
                 $query->where(function ($query) use ($searchTerms, $searchableColumns) {
                     foreach ($searchTerms as $term) {
                         $singleBatchTerms = ['single', 'singl', 'sing', 'sin', 'si', 's'];
@@ -295,7 +526,7 @@ class WorkOrderController extends Controller
             ->when($hasLimitedAccess, function ($queryLimited) use ($authId) {
                 return $queryLimited->where(function ($subQuery) use ($authId) {
                     $subQuery->where('created_by', $authId)
-                             ->orWhere('sales_person_id', $authId);
+                        ->orWhere('sales_person_id', $authId);
                 });
             })
             ->when($filters, function ($queryStatus) use ($filters) {
@@ -326,20 +557,20 @@ class WorkOrderController extends Controller
 
         $filteredDatas = $datas;
         if (isset($filters['finance_approval_filter']) && !empty($filters['finance_approval_filter'])) {
-            $normalizedFinanceApprovalFilter = array_map('strtolower', $filters['finance_approval_filter']);      
-            $includeBlank = in_array('blank', $normalizedFinanceApprovalFilter);     
+            $normalizedFinanceApprovalFilter = array_map('strtolower', $filters['finance_approval_filter']);
+            $includeBlank = in_array('blank', $normalizedFinanceApprovalFilter);
             $filteredDatas = $filteredDatas->filter(function ($data) use ($normalizedFinanceApprovalFilter, $includeBlank) {
                 if ($includeBlank && (!$data->latestFinance || $data->can_show_fin_approval == 'no')) {
                     return true;
-                }     
+                }
                 return $data->latestFinance && in_array(strtolower($data->latestFinance->status), $normalizedFinanceApprovalFilter) && $data->can_show_fin_approval == 'yes';
             });
-        }      
+        }
         if (isset($filters['coo_approval_filter']) && !empty($filters['coo_approval_filter'])) {
-            $normalizedCOOApprovalFilter = array_map('strtolower', $filters['coo_approval_filter']);          
-            $includeBlankCOO = in_array('blank', $normalizedCOOApprovalFilter);      
+            $normalizedCOOApprovalFilter = array_map('strtolower', $filters['coo_approval_filter']);
+            $includeBlankCOO = in_array('blank', $normalizedCOOApprovalFilter);
             $filteredDatas = $filteredDatas->filter(function ($data) use ($normalizedCOOApprovalFilter, $includeBlankCOO) {
-                if ($includeBlankCOO && (!$data->latestCOO || $data->can_show_coo_approval == 'no') ) {
+                if ($includeBlankCOO && (!$data->latestCOO || $data->can_show_coo_approval == 'no')) {
                     return true;
                 }
                 return $data->latestCOO && in_array(strtolower($data->latestCOO->status), $normalizedCOOApprovalFilter) && $data->can_show_coo_approval == 'yes';
@@ -348,92 +579,92 @@ class WorkOrderController extends Controller
         if (isset($filters['docs_status_filter']) && !empty($filters['docs_status_filter'])) {
             $docsStatusFilter = $filters['docs_status_filter'];
             $includeBlankDocs = in_array('Blank', $docsStatusFilter);
-        
+
             $filteredDatas = $datas->filter(function ($data) use ($docsStatusFilter, $includeBlankDocs) {
                 // Check if docs_status is in filter list and other conditions are met
-                $matchesFilter = in_array($data->docs_status, $docsStatusFilter) 
-                    && $data->sales_support_data_confirmation_at !== null 
-                    && $data->finance_approval_status === 'Approved' 
+                $matchesFilter = in_array($data->docs_status, $docsStatusFilter)
+                    && $data->sales_support_data_confirmation_at !== null
+                    && $data->finance_approval_status === 'Approved'
                     && $data->coo_approval_status === 'Approved';
-        
+
                 // Handle cases where docs_status is "Blank" and other conditions aren't fully met
-                $matchesBlank = $includeBlankDocs 
-                    && ($data->docs_status == 'Blank') 
-                    && ($data->sales_support_data_confirmation_at === null 
-                        || $data->finance_approval_status !== 'Approved' 
+                $matchesBlank = $includeBlankDocs
+                    && ($data->docs_status == 'Blank')
+                    && ($data->sales_support_data_confirmation_at === null
+                        || $data->finance_approval_status !== 'Approved'
                         || $data->coo_approval_status !== 'Approved');
-        
+
                 return $matchesFilter || $matchesBlank;
             });
         }
-        if($request->export == 'EXCEL') {
+        if ($request->export == 'EXCEL') {
             (new UserActivityController)->createActivity('Export Work Order List');
 
             return (new FastExcel($filteredDatas))->download('work-orders.csv', function ($data) {
-               
-                    return [
-                        'Type' => $data->type,
-                        'status' => $data->latestStatus->status ?? '',
-                        'Sales Support Confirmation' => $data->sales_support_data_confirmation ?? '',
-                        'Finance Approval Status' => $data->finance_approval_status ?? '',
-                        'COO Office Approval Status' => $data->coo_approval_status ?? '',
-                        'Documentation Status' => $data->docs_status ?? '',
-                        'Vehicle Modification status' => $data->vehicles_modification_summary ?? '',
-                        'PDI Status' => $data->pdi_summary ?? '',
-                        'Delivery Status' => $data->delivery_summary ?? '',
-                        'Sales Person Name' => $data->salesPerson->name ?? '',
-                        'SO Number' => $data->so_number,
-                        'WO Number' => $data->wo_number,
-                        'Date' => $data->date,
-                        'Batch' => $data->is_batch == 0 ? 'Single' : $data->batch ?? '',
-                        'Customer Name' => $data->customer_name ?? '',
-                        'Customer Email' => $data->customer_email ?? '', 
-                        'Customer Contact Number' => "\t".$data->customer_company_number ?? '',
-                        'Customer Representative Name' => $data->customer_representative_name ?? '',
-                        'Customer Representative Email' => $data->customer_representative_email ?? '',
-                        'Customer Representative Number' =>  "\t".$data->customer_representative_contact ?? '',
-                        'Freight Agent Name' => $data->freight_agent_name ?? '',
-                        'Freight Agent Email' => $data->freight_agent_email ?? '',
-                        'Freight Agent Contact Number' => "\t".$data->freight_agent_contact_number ?? '',
-                        'Delivery Advise' => $data->delivery_advise ?? '',
-                        'Transfer Of Ownership' => $data->showroom_transfer ?? '',
-                        'Cross Trade' => $data->cross_trade ?? '',
-                        'LTO' => $data->lto ?? '',
-                        'Temporary Exit' => $data->temporary_exit ?? '',
-                        'Port Of Loading' => $data->port_of_loading ?? '',
-                        'Port Of Discharge' => $data->port_of_discharge ?? '',
-                        'Final Destination' => $data->final_destination ?? '',
-                        'Transport Type' => $data->transport_type ?? '',
-                        'Airline/Shipping Line/Trailer No.' => $data->transport_type ? $data->getTransportField('name') ?? '' : '',
-                        'AWB/Container No./Transportation Company' => $data->transport_type ? $data->getTransportField('id') ?? '': '',
-                        'Airway Info/Fwd Import Code/Driver Contact No.' => $data->transport_type ? $data->getTransportField('details') ?? '' : '',
-                        'BRN/Transportation Com. Info' => $data->transport_type === 'sea' || $data->transport_type === 'road' ? $data->getTransportField('additional') ?? '': '',
-                        'SO Vehicle Quantity' => $data->so_vehicle_quantity ?? '',
-                        'SO Currency' => $data->currency ?? '',
-                        'SO Amount' => $data->so_total_amount != 0.00 ? $data->so_total_amount : '',
-                        'Deposit' => $data->amount_received != 0.00 ? $data->amount_received : '',
-                        'Balance' => $data->balance_amount != 0.00 ? $data->balance_amount : '',
-                        'Delivery Location' => $data->delivery_location ?? '',
-                        'Delivery Contact Person' => $data->delivery_contact_person ?? '',
-                        'Delivery Contact Number' => "\t".$data->delivery_contact_person_number ?? '',
-                        'Delivery Date' => $data->delivery_date ? Carbon::parse($data->delivery_date)->format('d M Y') : '',
-                        'Preferred Shipping Line' => $data->preferred_shipping_line_of_customer ?? '',
-                        'Bill of Lading' => $data->bill_of_loading_details ?? '',
-                        'Shipper' => $data->shipper ?? '',
-                        'Consignee' => $data->consignee ?? '',
-                        'Notify Party' => $data->notify_party ?? '',
-                        'Special Requests' => $data->special_or_transit_clause_or_request ?? '',
-                        'Created By' => $data->CreatedBy->name ?? '',
-                        'Created At' => $data->created_at ?? '',
-                        'Last Updated By' => $data->UpdatedBy->name ?? '',
-                        'Last Updated At' => $data->updated_at ?? '',
-                        'Sales Support Confirmation By' => $data->salesSupportDataConfirmationBy->name ?? '',
-                        'Sales Support Confirmation At' => $data->sales_support_data_confirmation_at ?? '',
-                        'Total BOE' => $data->total_number_of_boe ?? '',
-                        'Has Claim' => $data->has_claim ?? '',
-                        'Vehicle Count' => $data->vehicles->count() ?? 0,
-                    ];
-                });
+
+                return [
+                    'Type' => $data->type,
+                    'status' => $data->latestStatus->status ?? '',
+                    'Sales Support Confirmation' => $data->sales_support_data_confirmation ?? '',
+                    'Finance Approval Status' => $data->finance_approval_status ?? '',
+                    'COO Office Approval Status' => $data->coo_approval_status ?? '',
+                    'Documentation Status' => $data->docs_status ?? '',
+                    'Vehicle Modification status' => $data->vehicles_modification_summary ?? '',
+                    'PDI Status' => $data->pdi_summary ?? '',
+                    'Delivery Status' => $data->delivery_summary ?? '',
+                    'Sales Person Name' => $data->salesPerson->name ?? '',
+                    'SO Number' => $data->so_number,
+                    'WO Number' => $data->wo_number,
+                    'Date' => $data->date,
+                    'Batch' => $data->is_batch == 0 ? 'Single' : $data->batch ?? '',
+                    'Customer Name' => $data->customer_name ?? '',
+                    'Customer Email' => $data->customer_email ?? '',
+                    'Customer Contact Number' => "\t" . $data->customer_company_number ?? '',
+                    'Customer Representative Name' => $data->customer_representative_name ?? '',
+                    'Customer Representative Email' => $data->customer_representative_email ?? '',
+                    'Customer Representative Number' =>  "\t" . $data->customer_representative_contact ?? '',
+                    'Freight Agent Name' => $data->freight_agent_name ?? '',
+                    'Freight Agent Email' => $data->freight_agent_email ?? '',
+                    'Freight Agent Contact Number' => "\t" . $data->freight_agent_contact_number ?? '',
+                    'Delivery Advise' => $data->delivery_advise ?? '',
+                    'Transfer Of Ownership' => $data->showroom_transfer ?? '',
+                    'Cross Trade' => $data->cross_trade ?? '',
+                    'LTO' => $data->lto ?? '',
+                    'Temporary Exit' => $data->temporary_exit ?? '',
+                    'Port Of Loading' => $data->port_of_loading ?? '',
+                    'Port Of Discharge' => $data->port_of_discharge ?? '',
+                    'Final Destination' => $data->final_destination ?? '',
+                    'Transport Type' => $data->transport_type ?? '',
+                    'Airline/Shipping Line/Trailer No.' => $data->transport_type ? $data->getTransportField('name') ?? '' : '',
+                    'AWB/Container No./Transportation Company' => $data->transport_type ? $data->getTransportField('id') ?? '' : '',
+                    'Airway Info/Fwd Import Code/Driver Contact No.' => $data->transport_type ? $data->getTransportField('details') ?? '' : '',
+                    'BRN/Transportation Com. Info' => $data->transport_type === 'sea' || $data->transport_type === 'road' ? $data->getTransportField('additional') ?? '' : '',
+                    'SO Vehicle Quantity' => $data->so_vehicle_quantity ?? '',
+                    'SO Currency' => $data->currency ?? '',
+                    'SO Amount' => $data->so_total_amount != 0.00 ? $data->so_total_amount : '',
+                    'Deposit' => $data->amount_received != 0.00 ? $data->amount_received : '',
+                    'Balance' => $data->balance_amount != 0.00 ? $data->balance_amount : '',
+                    'Delivery Location' => $data->delivery_location ?? '',
+                    'Delivery Contact Person' => $data->delivery_contact_person ?? '',
+                    'Delivery Contact Number' => "\t" . $data->delivery_contact_person_number ?? '',
+                    'Delivery Date' => $data->delivery_date ? Carbon::parse($data->delivery_date)->format('d M Y') : '',
+                    'Preferred Shipping Line' => $data->preferred_shipping_line_of_customer ?? '',
+                    'Bill of Lading' => $data->bill_of_loading_details ?? '',
+                    'Shipper' => $data->shipper ?? '',
+                    'Consignee' => $data->consignee ?? '',
+                    'Notify Party' => $data->notify_party ?? '',
+                    'Special Requests' => $data->special_or_transit_clause_or_request ?? '',
+                    'Created By' => $data->CreatedBy->name ?? '',
+                    'Created At' => $data->created_at ?? '',
+                    'Last Updated By' => $data->UpdatedBy->name ?? '',
+                    'Last Updated At' => $data->updated_at ?? '',
+                    'Sales Support Confirmation By' => $data->salesSupportDataConfirmationBy->name ?? '',
+                    'Sales Support Confirmation At' => $data->sales_support_data_confirmation_at ?? '',
+                    'Total BOE' => $data->total_number_of_boe ?? '',
+                    'Has Claim' => $data->has_claim ?? '',
+                    'Vehicle Count' => $data->vehicles->count() ?? 0,
+                ];
+            });
         }
 
         // Pagination parameters
@@ -452,9 +683,21 @@ class WorkOrderController extends Controller
             ['path' => request()->url(), 'query' => request()->query()]
         );
         $datas = $paginatedFilteredDatas;
-    
-        return view('work_order.export_exw.index', compact('type', 'datas', 'filters', 'statuses', 'salesSupportDataConfirmations','search',
-            'financeApprovalStatuses','cooApprovalStatuses','docsStatuses','vehiclesModificationSummary','pdiSummary','deliverySummary'));
+
+        return view('work_order.export_exw.index', compact(
+            'type',
+            'datas',
+            'filters',
+            'statuses',
+            'salesSupportDataConfirmations',
+            'search',
+            'financeApprovalStatuses',
+            'cooApprovalStatuses',
+            'docsStatuses',
+            'vehiclesModificationSummary',
+            'pdiSummary',
+            'deliverySummary'
+        ));
     }
 
     /**
@@ -497,7 +740,7 @@ class WorkOrderController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(StoreWorkOrderRequest $request)
-    { 
+    {
         DB::beginTransaction();
 
         try {
@@ -525,23 +768,40 @@ class WorkOrderController extends Controller
 
             $fields = [
                 'air' => [
-                    'brn', 'container_number', 'shipping_line', 'forward_import_code',
-                    'trailer_number_plate', 'transportation_company',
-                    'transporting_driver_contact_number', 'transportation_company_details'
+                    'brn',
+                    'container_number',
+                    'shipping_line',
+                    'forward_import_code',
+                    'trailer_number_plate',
+                    'transportation_company',
+                    'transporting_driver_contact_number',
+                    'transportation_company_details'
                 ],
                 'sea' => [
-                    'airline_reference_id', 'airline', 'airway_bill', 'trailer_number_plate',
-                    'transportation_company', 'transporting_driver_contact_number',
-                    'airway_details', 'transportation_company_details'
+                    'airline_reference_id',
+                    'airline',
+                    'airway_bill',
+                    'trailer_number_plate',
+                    'transportation_company',
+                    'transporting_driver_contact_number',
+                    'airway_details',
+                    'transportation_company_details'
                 ],
                 'road' => [
-                    'brn_file', 'brn', 'container_number', 'airline_reference_id', 'airline',
-                    'airway_bill', 'shipping_line', 'airway_details', 'forward_import_code'
+                    'brn_file',
+                    'brn',
+                    'container_number',
+                    'airline_reference_id',
+                    'airline',
+                    'airway_bill',
+                    'shipping_line',
+                    'airway_details',
+                    'forward_import_code'
                 ]
             ];
-            
+
             $transportType = $request->transport_type;
-            
+
             if (isset($fields[$transportType])) {
                 foreach ($fields[$transportType] as $field) {
                     $input[$field] = NULL;
@@ -558,7 +818,7 @@ class WorkOrderController extends Controller
                 'enduser_passport' => 'wo/enduser_passport',
                 'enduser_contract' => 'wo/enduser_contract',
                 'vehicle_handover_person_id' => 'wo/vehicle_handover_person_id'
-            ]; 
+            ];
             // Loop through each file field
             foreach ($fileFields as $fileField => $path) {
                 if ($request->hasFile($fileField)) {
@@ -579,11 +839,10 @@ class WorkOrderController extends Controller
                     }
                 }
             }
-            if(!isset($request->is_batch)) {
+            if (!isset($request->is_batch)) {
                 $input['batch'] = NULL;
                 $input['is_batch'] = 0;
-            }
-            else {
+            } else {
                 $input['is_batch'] = 1;
             }
             if (isset($request->lto)) {
@@ -600,7 +859,7 @@ class WorkOrderController extends Controller
             $createwostatus['comment'] = 'The system generated the status when this work order was created.';
             $createwostatus['status_changed_at'] = Carbon::now();
             $WoStatusCreate = WoStatus::create($createwostatus);
-            if(isset($request->is_batch)) {
+            if (isset($request->is_batch)) {
                 WORecordHistory::create([
                     'work_order_id' => $workOrder->id,
                     'user_id' => $authId,
@@ -618,7 +877,7 @@ class WorkOrderController extends Controller
                     'new_value' => 1,
                     'type' => 'Set',
                     'changed_at' => Carbon::now()
-                ]);               
+                ]);
             }
             // Handle customer name changes based on customer type
             if ($request->customer_type == 'new' && !is_null($request->new_customer_name)) {
@@ -642,12 +901,27 @@ class WorkOrderController extends Controller
                     'changed_at' => Carbon::now()
                 ]);
             }
-           // Define the fields to exclude
+            // Define the fields to exclude
             $excludeFields = [
-                '_token', 'customerCount', 'type', 'customer_type', 'comments', 'currency', 
-                'wo_id', 'new_customer_name', 'brn_file', 'signed_pfi', 'signed_contract', 
-                'payment_receipts', 'noc', 'enduser_trade_license', 'enduser_passport', 
-                'enduser_contract', 'vehicle_handover_person_id','batch','is_batch'
+                '_token',
+                'customerCount',
+                'type',
+                'customer_type',
+                'comments',
+                'currency',
+                'wo_id',
+                'new_customer_name',
+                'brn_file',
+                'signed_pfi',
+                'signed_contract',
+                'payment_receipts',
+                'noc',
+                'enduser_trade_license',
+                'enduser_passport',
+                'enduser_contract',
+                'vehicle_handover_person_id',
+                'batch',
+                'is_batch'
             ];
 
             // Filter out non-null, non-array values, and exclude specified fields
@@ -665,7 +939,7 @@ class WorkOrderController extends Controller
             ];
             $canCreateFinanceApproval = false;
             // Store each non-null, non-array field in the data history
-            foreach ($nonNullData as $field => $value) { 
+            foreach ($nonNullData as $field => $value) {
                 WORecordHistory::create([
                     'work_order_id' => $workOrder->id,
                     'field_name' => $field,
@@ -677,7 +951,7 @@ class WorkOrderController extends Controller
                 ]);
 
                 // Store currency value conditionally based on the 'so_total_amount' field
-                if($field == 'so_total_amount') {
+                if ($field == 'so_total_amount') {
                     WORecordHistory::create([
                         'work_order_id' => $workOrder->id,
                         'field_name' => 'currency',
@@ -688,7 +962,7 @@ class WorkOrderController extends Controller
                         'changed_at' => Carbon::now(),
                     ]);
                 }
-            
+
                 // Check for specified fields and create an entry in the WOApprovals model
                 if (in_array($field, ['so_total_amount', 'so_vehicle_quantity', 'amount_received', 'balance_amount'])) {
                     // , 'currency'
@@ -752,7 +1026,7 @@ class WorkOrderController extends Controller
                         $createWOVehicles['special_request_or_remarks'] = $vehicleData['special_request_or_remarks'] ?? null;
                         $createWOVehicles['shipment'] = $vehicleData['shipment'] ?? null;
                         $createWOVehicles['created_by'] = $authId;
-            
+
                         $woVehicles = WOVehicles::create($createWOVehicles);
                         $canCreateCOOApproval = true;
                         // Define the fields to exclude
@@ -766,7 +1040,7 @@ class WorkOrderController extends Controller
                         }, ARRAY_FILTER_USE_BOTH);
 
                         // Store each non-null, non-array field in the data history
-                        foreach ($nonNullVehicleData as $field => $value) { 
+                        foreach ($nonNullVehicleData as $field => $value) {
                             WOVehicleRecordHistory::create([
                                 'w_o_vehicle_id' => $woVehicles->id,
                                 'field_name' => $field,
@@ -785,16 +1059,16 @@ class WorkOrderController extends Controller
                                     }
                                 }
                             }
-                        }       
+                        }
                     }
                 }
-            }  
+            }
             // BOE
             if (isset($request->boe) && count($request->boe) > 0) {
                 foreach ($request->boe as $boeNumber => $boe) {
                     if (isset($boe['vin']) && count($boe['vin']) > 0) {
                         foreach ($boe['vin'] as $vin) {
-                            $vinUpdate = WOVehicles::where('vin', $vin)->where('work_order_id',$workOrder->id)->first();
+                            $vinUpdate = WOVehicles::where('vin', $vin)->where('work_order_id', $workOrder->id)->first();
                             if ($vinUpdate) {
                                 $vinUpdate->boe_number = $boeNumber;
                                 $vinUpdate->save();
@@ -817,7 +1091,7 @@ class WorkOrderController extends Controller
             if (isset($request->deposit_received_as) && $request->deposit_received_as === 'custom_deposit') {
                 if (isset($request->deposit_aganist_vehicle) && is_array($request->deposit_aganist_vehicle) && count($request->deposit_aganist_vehicle) > 0) {
                     foreach ($request->deposit_aganist_vehicle as $vin) {
-                        $vinUpdate = WOVehicles::where('vin', $vin)->where('work_order_id',$workOrder->id)->first();
+                        $vinUpdate = WOVehicles::where('vin', $vin)->where('work_order_id', $workOrder->id)->first();
                         if ($vinUpdate) {
                             $vinUpdate->deposit_received = 'yes';
                             $vinUpdate->save();
@@ -840,7 +1114,7 @@ class WorkOrderController extends Controller
             $comments = json_decode($request->input('comments'), true);
             $commentIdMap = [];
 
-            if (isset($comments) && $comments != null) { 
+            if (isset($comments) && $comments != null) {
                 // First pass: Create all comments and map their IDs
                 foreach ($comments as $comment) {
                     $newComment = WOComments::create([
@@ -858,13 +1132,13 @@ class WorkOrderController extends Controller
                 foreach ($comments as $comment) {
                     $newCommentId = $commentIdMap[$comment['commentId']];
 
-                    if (!empty($comment['parentId'])) { 
+                    if (!empty($comment['parentId'])) {
                         $newParentId = $commentIdMap[$comment['parentId']];
                         WOComments::where('id', $newCommentId)->update(['parent_id' => $newParentId]);
                     }
 
                     // Save files associated with the comment
-                    if (isset($comment['files']) && is_array($comment['files'])) { 
+                    if (isset($comment['files']) && is_array($comment['files'])) {
                         foreach ($comment['files'] as $file) {
                             // Check if the filename exceeds 50 characters
                             $originalFileName = $file['name'];
@@ -916,10 +1190,10 @@ class WorkOrderController extends Controller
                                 $subject = "You were mentioned in a comment - " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
                                 $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
                                 $accessLinkWithComment = $accessLink . '#comment-' . $newCommentId;
-                            
+
                                 // Retrieve the comment object from the database
                                 $comment = WOComments::find($newCommentId);
-                            
+
                                 Mail::send('work_order.emails.mentioned_in_comment', [
                                     'workOrder' => $workOrder,
                                     'accessLink' => $accessLink,
@@ -928,38 +1202,37 @@ class WorkOrderController extends Controller
                                     'user' => $user // Pass the user object to the view
                                 ], function ($message) use ($subject, $template, $user) {
                                     $message->from($template['from'], $template['from_name'])
-                                            ->to($user->email)
-                                            ->subject($subject);
+                                        ->to($user->email)
+                                        ->subject($subject);
                                 });
                             })->onQueue('emails');
-                            
                         }
                     }
                 }
             }
 
-            if(isset($request->deposit_received_as) && $request->deposit_received_as != '') {
+            if (isset($request->deposit_received_as) && $request->deposit_received_as != '') {
                 $canCreateFinanceApproval = true;
             }
-            if($canCreateFinanceApproval == true) {
+            if ($canCreateFinanceApproval == true) {
                 WOApprovals::create([
                     'work_order_id' => $workOrder->id,
-                    'type' => 'finance', 
-                    'status' => 'pending', 
-                    'action_at' =>NULL,
+                    'type' => 'finance',
+                    'status' => 'pending',
+                    'action_at' => NULL,
                 ]);
             }
-            if($canCreateCOOApproval == true) {
+            if ($canCreateCOOApproval == true) {
                 WOApprovals::create([
                     'work_order_id' => $workOrder->id,
-                    'type' => 'coo', 
-                    'status' => 'pending', 
-                    'action_at' =>NULL,
+                    'type' => 'coo',
+                    'status' => 'pending',
+                    'action_at' => NULL,
                 ]);
                 // Call the private function to send the email
                 // $this->sendVehicleUpdateEmail($workOrder);
             }
-            (new UserActivityController)->createActivity('Create '.$request->type.' work order');
+            (new UserActivityController)->createActivity('Create ' . $request->type . ' work order');
             // Prepare the from details
             $template['from'] = 'no-reply@milele.com';
             $template['from_name'] = 'Milele Matrix';
@@ -977,7 +1250,7 @@ class WorkOrderController extends Controller
             $financeEmail = filter_var(env('FINANCE_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
             $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
             // Get all users with 'can_send_wo_email' set to 'yes' from the database
-            $managementEmails = \App\Models\User::where('can_send_wo_email', 'yes')->pluck('email')->filter(function($email) {
+            $managementEmails = \App\Models\User::where('can_send_wo_email', 'yes')->pluck('email')->filter(function ($email) {
                 return filter_var($email, FILTER_VALIDATE_EMAIL);
             })->toArray();
             // Log email addresses to help with debugging
@@ -1000,20 +1273,20 @@ class WorkOrderController extends Controller
                 'accessLink' => $accessLink,
             ], function ($message) use ($subject, $recipients, $template) {
                 $message->from($template['from'], $template['from_name'])
-                        ->to($recipients)
-                        ->subject($subject);
+                    ->to($recipients)
+                    ->subject($subject);
             });
             $checkRecords = $workOrder->dataHistories()
                 ->whereIn('field_name', ['amount_received', 'balance_amount', 'currency', 'deposit_received_as', 'so_total_amount', 'so_vehicle_quantity'])
                 ->exists();
             if ($checkRecords) {
-                $this->sendSOAmountUpdateEmail($workOrder,null);
+                $this->sendSOAmountUpdateEmail($workOrder, null);
             }
             // Commit the transaction
-            DB::commit(); 
-            
+            DB::commit();
+
             return response()->json(['success' => true, 'message' => 'Work order created successfully.']);
-        } catch (\Exception $e) {  
+        } catch (\Exception $e) {
             // Rollback the transaction
             DB::rollBack();
 
@@ -1022,34 +1295,35 @@ class WorkOrderController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
-    private function sendSOAmountUpdateEmail($workOrder, $comment) {
+    private function sendSOAmountUpdateEmail($workOrder, $comment)
+    {
         // Check if the user has permission to edit confirmed work orders
-        $hasEditConfirmedPermission = Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order']);     
+        $hasEditConfirmedPermission = Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order']);
         // Prepare the from details
         $template['from'] = 'no-reply@milele.com';
-        $template['from_name'] = 'Milele Matrix';   
+        $template['from_name'] = 'Milele Matrix';
         // Handle cases where customer_name is null
         $customerName = $workOrder->customer_name ?? 'Unknown Customer';
         // Construct the email subject based on permission
         if ($hasEditConfirmedPermission) {
             // Include system administrator details in the subject
-            $subject = "WO Deposit Update WO-" . $workOrder->order_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type 
+            $subject = "WO Deposit Update WO-" . $workOrder->order_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type
                 . " By system administrator (" . Auth::user()->name . " - " . Auth::user()->email . ")";
         } else {
             // Standard subject line without admin details
             $subject = "WO Deposit Update WO-" . $workOrder->order_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type;
         }
         // Define a quick access link (adjust the route as needed)
-        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;   
+        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
         // Retrieve and validate email addresses from .env
         $financeEmail = filter_var(env('FINANCE_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
         $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
         // Get all users with 'can_send_wo_email' set to 'yes' from the database
-        $managementEmails = \App\Models\User::where('can_send_wo_email', 'yes')->pluck('email')->filter(function($email) {
+        $managementEmails = \App\Models\User::where('can_send_wo_email', 'yes')->pluck('email')->filter(function ($email) {
             return filter_var($email, FILTER_VALIDATE_EMAIL);
-        })->toArray();  
+        })->toArray();
         // Retrieve the CreatedBy user's email and validate it
-        $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL); 
+        $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
         // Log email addresses to help with debugging
         \Log::info('Email Recipients:', [
             'financeEmail' => $financeEmail,
@@ -1058,12 +1332,12 @@ class WorkOrderController extends Controller
             'createdByEmail' => $createdByEmail ?? 'null',
         ]);
         // Combine all recipient emails into a single array
-        $recipients = array_filter(array_merge([$financeEmail, $operationsEmail, $createdByEmail], $managementEmails)); 
+        $recipients = array_filter(array_merge([$financeEmail, $operationsEmail, $createdByEmail], $managementEmails));
         // If no valid recipients, log the issue and skip sending the email
         if (empty($recipients)) {
             \Log::info('No valid recipients found. Skipping email sending for WO-' . $workOrder->order_number);
             return;
-        } 
+        }
         // Retrieve the authenticated user's name
         $authUserName = auth()->user()->name;
         $authUserEmail = auth()->user()->email;  // Also include the email
@@ -1080,10 +1354,10 @@ class WorkOrderController extends Controller
             'hasEditConfirmedPermission' => $hasEditConfirmedPermission, // Pass the permission flag
         ], function ($message) use ($subject, $recipients, $template) {
             $message->from($template['from'], $template['from_name'])
-                    ->to($recipients)
-                    ->subject($subject);
+                ->to($recipients)
+                ->subject($subject);
         });
-    } 
+    }
     private function sendDataUpdateEmail($workOrder, $comment)
     {
         // Check if the user has permission to edit confirmed work orders
@@ -1098,7 +1372,7 @@ class WorkOrderController extends Controller
         if ($hasEditConfirmedPermission) {
             // Include system administrator details in the subject
             $subject = "WO Deposit Update WO-" . $workOrder->order_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type
-            . " By system administrator (" . Auth::user()->name . " - " . Auth::user()->email . ")";
+                . " By system administrator (" . Auth::user()->name . " - " . Auth::user()->email . ")";
         } else {
             // Standard subject line without admin details
             $subject = "WO Deposit Update WO-" . $workOrder->order_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type;
@@ -1108,7 +1382,7 @@ class WorkOrderController extends Controller
         // Retrieve all users who can receive WO emails
         $users = \DB::table('users')->where('can_send_wo_email', true)->pluck('email');
         // Filter valid email addresses
-        $emailList = $users->filter(function($email) {
+        $emailList = $users->filter(function ($email) {
             return filter_var($email, FILTER_VALIDATE_EMAIL);
         });
         // If no valid email addresses are found, log a message and exit the function
@@ -1132,30 +1406,31 @@ class WorkOrderController extends Controller
             'hasEditConfirmedPermission' => $hasEditConfirmedPermission, // Pass the permission flag
         ], function ($message) use ($subject, $emailList, $template) {
             $message->from($template['from'], $template['from_name'])
-                    ->to($emailList->toArray()) // Convert the collection to an array
-                    ->subject($subject);
+                ->to($emailList->toArray()) // Convert the collection to an array
+                ->subject($subject);
         });
     }
-    private function sendVehicleUpdateEmail($workOrder, $newComment) {
+    private function sendVehicleUpdateEmail($workOrder, $newComment)
+    {
         // Check if the user has permission to edit confirmed work orders
         $hasEditConfirmedPermission = Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order']);
         // Prepare the from details
         $template['from'] = 'no-reply@milele.com';
         $template['from_name'] = 'Milele Matrix';
         // Handle cases where customer_name is null
-        $customerName = $workOrder->customer_name ?? 'Unknown Customer';  
+        $customerName = $workOrder->customer_name ?? 'Unknown Customer';
         if ($hasEditConfirmedPermission) {
             // Include system administrator details in the subject
             $subject = "WO Vehicle Update " . $workOrder->order_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type
-            . " By system administrator (" . Auth::user()->name . " - " . Auth::user()->email . ")";
+                . " By system administrator (" . Auth::user()->name . " - " . Auth::user()->email . ")";
         } else {
             // Standard subject line without admin details
             $subject = "WO Vehicle Update " . $workOrder->order_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type;
         }
         // Define a quick access link (adjust the route as needed)
-        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id; 
+        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
         // Retrieve email addresses from the users table where can_send_wo_email is true
-        $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function($email) {
+        $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function ($email) {
             return filter_var($email, FILTER_VALIDATE_EMAIL);
         })->toArray();
         // Log and skip sending if there are no valid email addresses
@@ -1179,35 +1454,37 @@ class WorkOrderController extends Controller
             'hasEditConfirmedPermission' => $hasEditConfirmedPermission, // Pass the permission flag
         ], function ($message) use ($subject, $managementEmails, $template) {
             $message->from($template['from'], $template['from_name'])
-                    ->to($managementEmails)
-                    ->subject($subject);
+                ->to($managementEmails)
+                ->subject($subject);
         });
-    }   
-    public function processNewAddons($woVehicles,$addonData,$authId) { 
+    }
+    public function processNewAddons($woVehicles, $addonData, $authId)
+    {
         $createWOVehiclesAddons = [];
-        $createWOVehiclesAddons['w_o_vehicle_id'] = $woVehicles->id;                          
+        $createWOVehiclesAddons['w_o_vehicle_id'] = $woVehicles->id;
         // $createWOVehiclesAddons['addon_reference_id'] = $addonData['vin'] ?? null;
         // $createWOVehiclesAddons['addon_reference_type'] = $addonData['brand'] ?? null;
         $createWOVehiclesAddons['addon_code'] = $addonData['addon_code'] ?? null;
         // $createWOVehiclesAddons['addon_name'] = $addonData['addon_name'] ?? null;
         // $createWOVehiclesAddons['addon_name_description'] = $addonData['addon_name_description'] ?? null;
         $createWOVehiclesAddons['addon_quantity'] = $addonData['addon_quantity'] ?? null;
-        $createWOVehiclesAddons['addon_description'] = $addonData['addon_description'] ?? null;                                  
+        $createWOVehiclesAddons['addon_description'] = $addonData['addon_description'] ?? null;
         $createWOVehiclesAddons['created_by'] = $authId;
-    
-        $WOVehicleAddons = WOVehicleAddons::create($createWOVehiclesAddons); 
+
+        $WOVehicleAddons = WOVehicleAddons::create($createWOVehiclesAddons);
         $canCreateFinanceApproval = true;
         // Filter out non-null, non-array values, and exclude specified fields
         $excludeVehicleAddonFields = [
-            'id','w_o_vehicle_id',
+            'id',
+            'w_o_vehicle_id',
         ];
         $nonNullVehicleAddonData = array_filter($addonData, function ($value, $key) use ($excludeVehicleAddonFields) {
             return !is_null($value) && !in_array($key, $excludeVehicleAddonFields);
         }, ARRAY_FILTER_USE_BOTH);
-       
-    
+
+
         // Store each non-null, non-array field in the data history
-        foreach ($nonNullVehicleAddonData as $field => $value) {  
+        foreach ($nonNullVehicleAddonData as $field => $value) {
             WOVehicleAddonRecordHistory::create([
                 'w_o_vehicle_addon_id' => $WOVehicleAddons->id,
                 'field_name' => $field,
@@ -1220,7 +1497,7 @@ class WorkOrderController extends Controller
         }
         return $canCreateFinanceApproval;
     }
-   
+
     /**
      * Handle file upload.
      *
@@ -1241,16 +1518,20 @@ class WorkOrderController extends Controller
     {
         $authId = Auth::id();
         $type = $workOrder->type;
-    
+
         // Store permission checks to avoid redundant calls
         $hasFullAccess = Auth::user()->hasPermissionForSelectedRole([
-            'export-exw-wo-details', 'export-cnf-wo-details', 'local-sale-wo-details'
+            'export-exw-wo-details',
+            'export-cnf-wo-details',
+            'local-sale-wo-details'
         ]);
-    
+
         $hasLimitedAccess = Auth::user()->hasPermissionForSelectedRole([
-            'current-user-export-exw-wo-details', 'current-user-export-cnf-wo-details', 'current-user-local-sale-wo-details'
+            'current-user-export-exw-wo-details',
+            'current-user-export-cnf-wo-details',
+            'current-user-local-sale-wo-details'
         ]);
-    
+
         // Build the base query with necessary relationships
         $query = WorkOrder::where('id', $workOrder->id)
             ->with([
@@ -1260,15 +1541,15 @@ class WorkOrderController extends Controller
                 'latestDocsStatus',
                 'boe',
             ]);
-    
+
         // Adjust the query based on user permissions
         if ($hasLimitedAccess) {
             $query->where(function ($subQuery) use ($authId) {
                 $subQuery->where('created_by', $authId)
-                         ->orWhere('sales_person_id', $authId);
+                    ->orWhere('sales_person_id', $authId);
             });
         }
-    
+
         try {
             // Fetch the current work order
             $workOrder = $query->firstOrFail();
@@ -1276,34 +1557,34 @@ class WorkOrderController extends Controller
             $errorMsg = "Sorry! You don't have permission to access this page.";
             return view('hrm.notaccess', compact('errorMsg'));
         }
-        
+
         // Retrieve previous and next work order IDs
         $previous = WorkOrder::where('type', $type)
             ->where('id', '<', $workOrder->id)
-            ->when($hasLimitedAccess, function($query) use ($authId) {
+            ->when($hasLimitedAccess, function ($query) use ($authId) {
                 return $query->where('created_by', $authId);
             })
             ->max('id');
-    
+
         $next = WorkOrder::where('type', $type)
             ->where('id', '>', $workOrder->id)
-            ->when($hasLimitedAccess, function($query) use ($authId) {
+            ->when($hasLimitedAccess, function ($query) use ($authId) {
                 return $query->where('created_by', $authId);
             })
             ->min('id');
-    
+
         // Get active users excluding specific IDs
         $users = User::where('status', 'active')
             ->whereNotIn('id', [1, 16])
-            ->whereHas('empProfile', function($q) {
+            ->whereHas('empProfile', function ($q) {
                 $q->where('type', 'employee');
             })
             ->orderBy('name', 'ASC')
             ->get();
-        $locations = MasterOfficeLocation::select('id','name')->get();
-        return view('work_order.export_exw.show', compact('type', 'users', 'workOrder', 'previous', 'next','locations'));
+        $locations = MasterOfficeLocation::select('id', 'name')->get();
+        return view('work_order.export_exw.show', compact('type', 'users', 'workOrder', 'previous', 'next', 'locations'));
     }
-    
+
 
     /**
      * Show the form for editing the specified resource.
@@ -1314,49 +1595,53 @@ class WorkOrderController extends Controller
         $authId = Auth::id();
         // Store permission checks
         $hasFullAccess = Auth::user()->hasPermissionForSelectedRole([
-            'edit-all-export-exw-work-order', 'edit-all-export-cnf-work-order', 'edit-all-local-sale-work-order'
+            'edit-all-export-exw-work-order',
+            'edit-all-export-cnf-work-order',
+            'edit-all-local-sale-work-order'
         ]);
 
         $hasLimitedAccess = Auth::user()->hasPermissionForSelectedRole([
-            'edit-current-user-export-exw-work-order', 'edit-current-user-export-cnf-work-order', 'edit-current-user-local-sale-work-order'
+            'edit-current-user-export-exw-work-order',
+            'edit-current-user-export-cnf-work-order',
+            'edit-current-user-local-sale-work-order'
         ]);
         $type = $workOrder->type;
         // Build the query to retrieve the work order
         $workOrderQuery = WorkOrder::where('id', $workOrder->id)
-        ->with('vehicles.addons', 'comments', 'financePendingApproval', 'cooPendingApproval');
+            ->with('vehicles.addons', 'comments', 'financePendingApproval', 'cooPendingApproval');
 
         // Apply the created_by condition if the user has limited access
         if ($hasLimitedAccess) {
-        $workOrderQuery->where('created_by', $authId);
+            $workOrderQuery->where('created_by', $authId);
         }
 
-         try {
-             // Execute the query to get the work order
+        try {
+            // Execute the query to get the work order
             $workOrder = $workOrderQuery->firstOrFail();
         } catch (ModelNotFoundException $e) {
             $errorMsg = "Sorry! You don't have permission to access this page.";
             return view('hrm.notaccess', compact('errorMsg'));
         }
-          // Retrieve previous and next work order IDs
-          $previous = WorkOrder::where('type', $type)
-          ->where('id', '<', $workOrder->id)
-          ->when($hasLimitedAccess, function($query) use ($authId) {
-              return $query->where('created_by', $authId);
-          })
-          ->max('id');
-  
-      $next = WorkOrder::where('type', $type)
-          ->where('id', '>', $workOrder->id)
-          ->when($hasLimitedAccess, function($query) use ($authId) {
-              return $query->where('created_by', $authId);
-          })
-          ->min('id');
+        // Retrieve previous and next work order IDs
+        $previous = WorkOrder::where('type', $type)
+            ->where('id', '<', $workOrder->id)
+            ->when($hasLimitedAccess, function ($query) use ($authId) {
+                return $query->where('created_by', $authId);
+            })
+            ->max('id');
+
+        $next = WorkOrder::where('type', $type)
+            ->where('id', '>', $workOrder->id)
+            ->when($hasLimitedAccess, function ($query) use ($authId) {
+                return $query->where('created_by', $authId);
+            })
+            ->min('id');
 
         // Select data from the WorkOrder table
         $workOrders = WorkOrder::select(
-            DB::raw('TRIM(customer_name) as customer_name'), 
-            'customer_email', 
-            'customer_company_number', 
+            DB::raw('TRIM(customer_name) as customer_name'),
+            'customer_email',
+            'customer_company_number',
             'customer_address',
             DB::raw('(IF(customer_email IS NOT NULL, 1, 0) + IF(customer_company_number IS NOT NULL, 1, 0) + IF(customer_address IS NOT NULL, 1, 0)) as score'),
             DB::raw("'App\\Models\\WorkOrder' as reference_type"),
@@ -1367,9 +1652,9 @@ class WorkOrderController extends Controller
 
         // Select and transform data from the Clients table
         $clients = Clients::select(
-            DB::raw('TRIM(name) as customer_name'), 
-            DB::raw('email as customer_email'), 
-            DB::raw('phone as customer_company_number'), 
+            DB::raw('TRIM(name) as customer_name'),
+            DB::raw('email as customer_email'),
+            DB::raw('phone as customer_company_number'),
             DB::raw('NULL as customer_address'),
             DB::raw('(IF(email IS NOT NULL, 1, 0) + IF(phone IS NOT NULL, 1, 0)) as score'),
             DB::raw("'App\\Models\\Clients' as reference_type"),
@@ -1396,7 +1681,7 @@ class WorkOrderController extends Controller
         });
 
         // Process combined results to remove duplicates based on unique_id
-        $customers = $combinedResults->groupBy('unique_id')->map(function($items) {
+        $customers = $combinedResults->groupBy('unique_id')->map(function ($items) {
             // Sort items by score in descending order and then take the first item
             return $items->sortByDesc('score')->first();
         })->values()->sortBy('customer_name');
@@ -1404,43 +1689,47 @@ class WorkOrderController extends Controller
 
         // Get the count of customers
         $customerCount = $customers->count();
-        $users = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
-            $q = $q->where('type','employee');
+        $users = User::orderBy('name', 'ASC')->where('status', 'active')->whereNotIn('id', [1, 16])->whereHas('empProfile', function ($q) {
+            $q = $q->where('type', 'employee');
         })->get();
         // $accSpaKits = AddonDetails::select('addon_code')->distinct();
-        
-        $airlines = MasterAirlines::orderBy('name','ASC')->get();
-        $vins = Vehicles::orderBy('vin','ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand','interior','exterior','warehouseLocation','document')->get()->unique('vin')
-        ->values();
-        $kit = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+
+        $airlines = MasterAirlines::orderBy('name', 'ASC')->get();
+        $vins = Vehicles::orderBy('vin', 'ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand', 'interior', 'exterior', 'warehouseLocation', 'document')->get()->unique('vin')
+            ->values();
+        $kit = AddonDetails::select('addon_details.id', 'addon_details.addon_code', DB::raw("CONCAT(addons.name, 
                 IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
-                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+                "), DB::raw("'App\\Models\\AddonDetails' as reference_type"))
             ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
             ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
             ->where('addon_details.addon_type_name', 'K')
             ->orderBy('addon_details.id', 'asc')
             ->get();
-        $accessories = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+        $accessories = AddonDetails::select('addon_details.id', 'addon_details.addon_code', DB::raw("CONCAT(addons.name, 
                 IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
-                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+                "), DB::raw("'App\\Models\\AddonDetails' as reference_type"))
             ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
             ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
             ->where('addon_details.addon_type_name', 'P')
             ->orderBy('addon_details.id', 'asc')
             ->get();
-        $spareParts = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+        $spareParts = AddonDetails::select('addon_details.id', 'addon_details.addon_code', DB::raw("CONCAT(addons.name, 
                 IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
-                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+                "), DB::raw("'App\\Models\\AddonDetails' as reference_type"))
             ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
             ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
             ->where('addon_details.addon_type_name', 'SP')
             ->orderBy('addon_details.id', 'asc')
             ->get();
-        $charges = MasterCharges::select('master_charges.id','master_charges.addon_code',DB::raw("CONCAT(
+        $charges = MasterCharges::select(
+            'master_charges.id',
+            'master_charges.addon_code',
+            DB::raw("CONCAT(
                 IF(master_charges.name IS NOT NULL, master_charges.name, ''), 
                 IF(master_charges.name IS NOT NULL AND master_charges.description IS NOT NULL, ' - ', ''), 
                 IF(master_charges.description IS NOT NULL, master_charges.description, '')) as addon_name"),
-                DB::raw("'App\\Models\\Masters\\MasterCharges' as reference_type"))
+            DB::raw("'App\\Models\\Masters\\MasterCharges' as reference_type")
+        )
             ->orderBy('master_charges.id', 'asc')
             ->get();
         // Merge collections
@@ -1454,29 +1743,29 @@ class WorkOrderController extends Controller
                 // Main condition for active sales reps
                 $query->where(function ($q) {
                     $q->where('status', 'active')
-                      ->where('is_sales_rep', 'Yes')
-                      ->whereNotIn('id', [1, 16])
-                      ->whereHas('empProfile', function($sub) {
-                          $sub->where('type', 'employee');
-                      });
+                        ->where('is_sales_rep', 'Yes')
+                        ->whereNotIn('id', [1, 16])
+                        ->whereHas('empProfile', function ($sub) {
+                            $sub->where('type', 'employee');
+                        });
                 });
-        
+
                 // Additional condition to include the specific sales_person_id
                 if ($workOrder && $workOrder->sales_person_id) {
                     $query->orWhere('id', $workOrder->sales_person_id);
                 }
             })
-            ->orderBy('name', 'ASC')
-            ->get()
-            ->unique('id')
-            ->values();
+                ->orderBy('name', 'ASC')
+                ->get()
+                ->unique('id')
+                ->values();
         }
         $canDisableBatch = false;
-        $otherWo = WorkOrder::whereNot('id',$workOrder->id)->where('so_number',$workOrder->so_number)->get();
-        if(count($otherWo) > 0){
+        $otherWo = WorkOrder::whereNot('id', $workOrder->id)->where('so_number', $workOrder->so_number)->get();
+        if (count($otherWo) > 0) {
             $canDisableBatch = true;
         }
-        return view('work_order.export_exw.create',compact('canDisableBatch','previous','next','workOrder','customerCount','type','customers','airlines','vins','users','addons','charges','salesPersons'))->with([
+        return view('work_order.export_exw.create', compact('canDisableBatch', 'previous', 'next', 'workOrder', 'customerCount', 'type', 'customers', 'airlines', 'vins', 'users', 'addons', 'charges', 'salesPersons'))->with([
             'vinsJson' => $vins->toJson(), // Single encoding here
         ]);
     }
@@ -1485,7 +1774,7 @@ class WorkOrderController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, WorkOrder $workOrder)
-    { 
+    {
         // Check if the user has permission to edit confirmed work orders
         $hasEditConfirmedPermission = Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order']);
         // Check if the sales support data has been confirmed
@@ -1493,13 +1782,13 @@ class WorkOrderController extends Controller
             return response()->json(['success' => false, 'message' => "Can't edit the work order because the sales support confirmed the data."], 400);
         }
         DB::beginTransaction();
-        try { 
+        try {
             $canCreateFinanceApproval = false;
             $canCreateCOOApproval = false;
-            if(isset($request->deposit_received_as) && $request->deposit_received_as != '' && ($request->deposit_received_as != $workOrder->deposit_received_as)) {
+            if (isset($request->deposit_received_as) && $request->deposit_received_as != '' && ($request->deposit_received_as != $workOrder->deposit_received_as)) {
                 $canCreateFinanceApproval = true;
             }
-            $authId = Auth::id();            
+            $authId = Auth::id();
             $newComment = WOComments::create([
                 'work_order_id' => $workOrder->id,
                 'text' => "The work order data was changed as follows by " . auth()->user()->name . ($hasEditConfirmedPermission ? " (System Administrator)" : ""), // Conditionally append "System Administrator"
@@ -1511,36 +1800,31 @@ class WorkOrderController extends Controller
             // Initialize newData array
             $newData = [];
             $newData = $request->all();
-            if(isset($request->is_batch)) {
+            if (isset($request->is_batch)) {
                 $newData['is_batch'] = 1;
                 $newData['batch'] = $request->batch;
-            }
-            else {
+            } else {
                 $newData['is_batch'] = 0;
                 $newData['batch'] = NULL;
             }
-            if(isset($request->delivery_advise)) {
+            if (isset($request->delivery_advise)) {
                 $newData['delivery_advise'] = 'yes';
-            }
-            else {
+            } else {
                 $newData['delivery_advise'] = 'no';
             }
-            if(isset($request->temporary_exit)) {
+            if (isset($request->temporary_exit)) {
                 $newData['temporary_exit'] = 'yes';
-            }
-            else {
+            } else {
                 $newData['temporary_exit'] = 'no';
             }
-            if(isset($request->showroom_transfer)) {
+            if (isset($request->showroom_transfer)) {
                 $newData['showroom_transfer'] = 'yes';
-            }
-            else {
+            } else {
                 $newData['showroom_transfer'] = 'no';
             }
-            if(isset($request->cross_trade)) {
+            if (isset($request->cross_trade)) {
                 $newData['cross_trade'] = 'yes';
-            }
-            else {
+            } else {
                 $newData['cross_trade'] = 'no';
             }
             if (isset($request->lto)) {
@@ -1558,30 +1842,30 @@ class WorkOrderController extends Controller
                 'freight_agent_contact_number',
                 'transporting_driver_contact_number'
             ];
-            
+
             foreach ($nestedFields as $field) {
                 $newData[$field] = $request->$field['full'] ?? null;
             }
-    
+
             // Additional data processing
             $newData['updated_by'] = $authId;
             $newData['so_total_amount'] = $request->so_total_amount ?? 0.00;
             $newData['amount_received'] = $request->amount_received ?? 0.00;
             $newData['balance_amount'] = $request->balance_amount ?? 0.00;
-    
+
             if ($request->customer_type == 'new') {
                 $newData['customer_name'] = $request->new_customer_name;
             } else if ($request->customer_type == 'existing') {
                 $newData['customer_name'] = $request->existing_customer_name;
             }
-    
+
             // Reset fields based on transport type
             $fields = [
                 'air' => ['brn', 'container_number', 'shipping_line', 'forward_import_code', 'trailer_number_plate', 'transportation_company', 'transporting_driver_contact_number', 'transportation_company_details'],
                 'sea' => ['airline_reference_id', 'airline', 'airway_bill', 'trailer_number_plate', 'transportation_company', 'transporting_driver_contact_number', 'airway_details', 'transportation_company_details'],
                 'road' => ['brn_file', 'brn', 'container_number', 'airline_reference_id', 'airline', 'airway_bill', 'shipping_line', 'airway_details', 'forward_import_code']
             ];
-            
+
             $transportType = $request->transport_type;
             if (isset($fields[$transportType])) {
                 foreach ($fields[$transportType] as $field) {
@@ -1590,7 +1874,8 @@ class WorkOrderController extends Controller
             }
 
             // Helper function to handle file upload and history recording
-            function handleFileUpload($request, $fileKey, $path, &$newData, $workOrder, $oldData, $deleteFlag = null, $CommentId) {
+            function handleFileUpload($request, $fileKey, $path, &$newData, $workOrder, $oldData, $deleteFlag = null, $CommentId)
+            {
                 $fileName = null;
                 if ($request->hasFile($fileKey)) {
                     $fileName = auth()->id() . '_' . time() . '.' . $request->file($fileKey)->extension();
@@ -1652,17 +1937,44 @@ class WorkOrderController extends Controller
             ];
 
             foreach ($filesToHandle as $fileKey => $path) {
-                handleFileUpload($request, $fileKey, $path, $newData, $workOrder, $oldData, 'is_' . $fileKey . '_delete',$CommentId);
+                handleFileUpload($request, $fileKey, $path, $newData, $workOrder, $oldData, 'is_' . $fileKey . '_delete', $CommentId);
             }
-    
+
             // List of fields to exclude
             $excludeFields = [
-                '_method', '_token', 'customerCount', 'type', 'customer_type', 'comments', 'currency', 'wo_id', 'updated_by',
-                'brn_file', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 'enduser_trade_license',
-                'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'new_customer_name', 'existing_customer_name','customer_name','customer_reference_id',
-                'is_brn_file_delete','is_signed_pfi_delete','is_signed_contract_delete','is_payment_receipts_delete','is_noc_delete',
-                'is_enduser_trade_license_delete','is_enduser_passport_delete','is_enduser_contract_delete','is_vehicle_handover_person_id_delete',
-                'vin_multiple','has_claim'
+                '_method',
+                '_token',
+                'customerCount',
+                'type',
+                'customer_type',
+                'comments',
+                'currency',
+                'wo_id',
+                'updated_by',
+                'brn_file',
+                'signed_pfi',
+                'signed_contract',
+                'payment_receipts',
+                'noc',
+                'enduser_trade_license',
+                'enduser_passport',
+                'enduser_contract',
+                'vehicle_handover_person_id',
+                'new_customer_name',
+                'existing_customer_name',
+                'customer_name',
+                'customer_reference_id',
+                'is_brn_file_delete',
+                'is_signed_pfi_delete',
+                'is_signed_contract_delete',
+                'is_payment_receipts_delete',
+                'is_noc_delete',
+                'is_enduser_trade_license_delete',
+                'is_enduser_passport_delete',
+                'is_enduser_contract_delete',
+                'is_vehicle_handover_person_id_delete',
+                'vin_multiple',
+                'has_claim'
             ];
 
             // Filter $newData to exclude array values and fields in the exclude list
@@ -1711,7 +2023,7 @@ class WorkOrderController extends Controller
                     ];
                     $canDeleteComment = false;
                     // Check for specified fields and create an entry in the WOApprovals model
-                    if (in_array($field, ['so_total_amount','so_vehicle_quantity', 'amount_received', 'balance_amount'])) {
+                    if (in_array($field, ['so_total_amount', 'so_vehicle_quantity', 'amount_received', 'balance_amount'])) {
                         $canCreateFinanceApproval = true;
                     }
                 }
@@ -1733,7 +2045,7 @@ class WorkOrderController extends Controller
                     'new_value' => $request->new_customer_name,
                     'type' => $changeType,
                     'changed_at' => Carbon::now(),
-                    'comment_id' =>$CommentId,
+                    'comment_id' => $CommentId,
                 ];
                 $canDeleteComment = false;
             } else if ($request->customer_type == 'existing' && $oldData['customer_name'] != $request->existing_customer_name) {
@@ -1756,12 +2068,11 @@ class WorkOrderController extends Controller
                 $canDeleteComment = false;
             }
             // Handle currency changes based on SO Amount, Amount Received and Balance Amount
-            if($oldData['currency'] != $request->currency) {
+            if ($oldData['currency'] != $request->currency) {
                 $changeType = 'Change';
-                if(is_null($oldData['currency']) && !is_null($request->currency)) {
+                if (is_null($oldData['currency']) && !is_null($request->currency)) {
                     $changeType = 'Set';
-                }
-                else if(!is_null($oldData['currency']) && is_null($request->currency)) {
+                } else if (!is_null($oldData['currency']) && is_null($request->currency)) {
                     $changeType = 'Unset';
                 }
                 $changes[] = [
@@ -1772,13 +2083,13 @@ class WorkOrderController extends Controller
                     'new_value' => $request->currency,
                     'type' => $changeType,
                     'changed_at' => Carbon::now(),
-                    'comment_id' =>$CommentId,
+                    'comment_id' => $CommentId,
                 ];
                 $canDeleteComment = false;
                 $canCreateFinanceApproval = true;
             }
             // If there are changes, insert them into the WORecordHistory
-            if (!empty($changes)) { 
+            if (!empty($changes)) {
                 WORecordHistory::insert($changes);
             }
             $workOrder['updated_by'] = $authId;
@@ -1808,13 +2119,18 @@ class WorkOrderController extends Controller
                 $id = $vehicleData['id'];
                 // Define the fields to exclude
                 $excludeVehicleFields = [
-                    'id','work_order_id','vehicle_id','updated_by','created_by','comment_id'
+                    'id',
+                    'work_order_id',
+                    'vehicle_id',
+                    'updated_by',
+                    'created_by',
+                    'comment_id'
                 ];
-               
+
                 // Update if exists, otherwise create
-                if (isset($existingVehicles[$id])) {                    
+                if (isset($existingVehicles[$id])) {
                     // Mark this VIN as processed
-                    $processedIds[] = $id; 
+                    $processedIds[] = $id;
                     $vehicle = $existingVehicles[$id];
 
                     $createVehComMap = [];
@@ -1854,7 +2170,7 @@ class WorkOrderController extends Controller
                                 'comment_vehicle_id' => $CreatedVehComMap->id,
                             ]);
                             $canDeleteCreatedVehComMap = false;
-                            $canCreateCOOApproval =true;
+                            $canCreateCOOApproval = true;
                         }
                     }
                     $vehicle->updated_by = $authId;
@@ -1880,10 +2196,16 @@ class WorkOrderController extends Controller
                         $addonId = $addonData['id'] ?? null;
                         // Define the fields to exclude
                         $excludeVehicleAddonFields = [
-                            'id','work_order_id','w_o_vehicle_id', 'w_o_vehicle_addon_id','vehicle_id','updated_by','created_by',
+                            'id',
+                            'work_order_id',
+                            'w_o_vehicle_id',
+                            'w_o_vehicle_addon_id',
+                            'vehicle_id',
+                            'updated_by',
+                            'created_by',
                         ];
                         // Update if exists, otherwise create
-                        if (isset($existingAddons[$addonId])) { 
+                        if (isset($existingAddons[$addonId])) {
                             $processedAddonIds[] = $addonId; // Append ID to array
                             $addon = $existingAddons[$addonId];
 
@@ -1900,7 +2222,7 @@ class WorkOrderController extends Controller
                             // Check and store only changed fields
                             foreach ($filterredVehicleAddonData as $field => $newValue) {
                                 $oldValue = $addon->$field;
-                                
+
                                 // Trim string values
                                 if (is_string($oldValue)) {
                                     $oldValue = trim($oldValue);
@@ -1908,22 +2230,22 @@ class WorkOrderController extends Controller
                                 if (is_string($newValue)) {
                                     $newValue = trim($newValue);
                                 }
-                                
+
                                 // Convert numeric strings to numbers
                                 if (is_numeric($oldValue) && is_numeric($newValue)) {
                                     $oldValue = (float)$oldValue;
                                     $newValue = (float)$newValue;
                                 }
-                            
+
                                 if ($oldValue !== $newValue) {
-                                    
+
                                     $changeType = 'Change';
                                     if (is_null($oldValue) && !is_null($newValue)) {
                                         $changeType = 'Set';
                                     } elseif (!is_null($oldValue) && is_null($newValue)) {
                                         $changeType = 'Unset';
                                     }
-                            
+
                                     // Change the vehicle data
                                     $addon->$field = $newValue;
                                     // Store the change in history
@@ -1941,15 +2263,13 @@ class WorkOrderController extends Controller
                                     $canDeleteCreateVehComAddMap = false;
                                 }
                             }
-                            if($canDeleteCreateVehComAddMap == true) {
-                                $deleteCreateVehComAddMap = CommentVehicleAddonMapping::where('id',$createdCommVehAddonMapp->id)->first();
-                                if($deleteCreateVehComAddMap) {
+                            if ($canDeleteCreateVehComAddMap == true) {
+                                $deleteCreateVehComAddMap = CommentVehicleAddonMapping::where('id', $createdCommVehAddonMapp->id)->first();
+                                if ($deleteCreateVehComAddMap) {
                                     $deleteCreateVehComAddMap->delete();
                                 }
-                            }
-                            else {
+                            } else {
                                 $canDeleteCreatedVehComMap = false;
-
                             }
                             // Save the vehicle with updated data
                             $addon->save();
@@ -1971,7 +2291,7 @@ class WorkOrderController extends Controller
                             }, ARRAY_FILTER_USE_BOTH);
 
                             // Store each non-null, non-array field in the data history
-                            foreach ($nonNullVehicleData as $field => $value) { 
+                            foreach ($nonNullVehicleData as $field => $value) {
                                 WOVehicleAddonRecordHistory::create([
                                     'w_o_vehicle_addon_id' => $woVehicleAddon->id,
                                     'field_name' => $field,
@@ -1984,20 +2304,19 @@ class WorkOrderController extends Controller
                                 ]);
                                 $canDeleteCreateVehComAddMap = false;
                             }
-                            if($canDeleteCreateVehComAddMap == true) {
-                                $deleteCreateVehComAddMap = CommentVehicleAddonMapping::where('id',$createdCommVehAddonMapp->id)->first();
-                                if($deleteCreateVehComAddMap) {
+                            if ($canDeleteCreateVehComAddMap == true) {
+                                $deleteCreateVehComAddMap = CommentVehicleAddonMapping::where('id', $createdCommVehAddonMapp->id)->first();
+                                if ($deleteCreateVehComAddMap) {
                                     $deleteCreateVehComAddMap->delete();
                                 }
-                            }
-                            else {
+                            } else {
                                 $canDeleteCreatedVehComMap = false;
                             }
                         }
                     }
 
                     // Ensure $processedIds only contains valid IDs
-                    $processedAddonIds = array_filter($processedAddonIds, function($id) {
+                    $processedAddonIds = array_filter($processedAddonIds, function ($id) {
                         return !is_null($id);
                     });
                     // Retrieve addons that were not in the incoming request and update deleted_by field
@@ -2015,13 +2334,12 @@ class WorkOrderController extends Controller
 
                     // Now delete the addons
                     WOVehicleAddons::whereNotIn('id', $processedAddonIds)->where('w_o_vehicle_id', $vehicle->id)->delete();
-                    if($canDeleteCreatedVehComMap == true) {
-                        $deleteCommVehMap = CommentVehicleMapping::where('id',$CreatedVehComMap->id)->first();
-                        if($deleteCommVehMap) {
+                    if ($canDeleteCreatedVehComMap == true) {
+                        $deleteCommVehMap = CommentVehicleMapping::where('id', $CreatedVehComMap->id)->first();
+                        if ($deleteCommVehMap) {
                             $deleteCommVehMap->delete();
                         }
-                    }
-                    else {
+                    } else {
                         $canDeleteComment = false;
                     }
                     // ADDON END..............................
@@ -2047,7 +2365,7 @@ class WorkOrderController extends Controller
                     }, ARRAY_FILTER_USE_BOTH);
 
                     // Store each non-null, non-array field in the data history
-                    foreach ($nonNullVehicleData as $field => $value) { 
+                    foreach ($nonNullVehicleData as $field => $value) {
                         WOVehicleRecordHistory::create([
                             'w_o_vehicle_id' => $woVehicles->id,
                             'field_name' => $field,
@@ -2056,7 +2374,7 @@ class WorkOrderController extends Controller
                             'type' => 'Set',
                             'user_id' => Auth::id(),
                             'changed_at' => Carbon::now(),
-                            'comment_vehicle_id' =>$CreatedVehComMap->id,
+                            'comment_vehicle_id' => $CreatedVehComMap->id,
                         ]);
                         $canDeleteCreatedVehComMap = false;
                     }
@@ -2069,16 +2387,16 @@ class WorkOrderController extends Controller
                                 if (isset($addonData['addon_code']) && $addonData['addon_code'] != null) {
                                     // $this->processNewAddons($woVehicles,$addonData,$authId);
                                     $createWOVehiclesAddons = [];
-                                    $createWOVehiclesAddons['w_o_vehicle_id'] = $woVehicles->id;                          
+                                    $createWOVehiclesAddons['w_o_vehicle_id'] = $woVehicles->id;
                                     // $createWOVehiclesAddons['addon_reference_id'] = $addonData['vin'] ?? null;
                                     // $createWOVehiclesAddons['addon_reference_type'] = $addonData['brand'] ?? null;
                                     $createWOVehiclesAddons['addon_code'] = $addonData['addon_code'] ?? null;
                                     // $createWOVehiclesAddons['addon_name'] = $addonData['addon_name'] ?? null;
                                     // $createWOVehiclesAddons['addon_name_description'] = $addonData['addon_name_description'] ?? null;
                                     $createWOVehiclesAddons['addon_quantity'] = $addonData['addon_quantity'] ?? null;
-                                    $createWOVehiclesAddons['addon_description'] = $addonData['addon_description'] ?? null;                                  
+                                    $createWOVehiclesAddons['addon_description'] = $addonData['addon_description'] ?? null;
                                     $createWOVehiclesAddons['created_by'] = $authId;
-                                    $WOVehicleAddons = WOVehicleAddons::create($createWOVehiclesAddons); 
+                                    $WOVehicleAddons = WOVehicleAddons::create($createWOVehiclesAddons);
                                     $canCreateFinanceApproval = true;
                                     $createCommVehAddon['type'] = 'store';
                                     $createCommVehAddon['comment_vehicle_mapping_id'] = $CreatedVehComMap->id;
@@ -2087,15 +2405,16 @@ class WorkOrderController extends Controller
                                     $canDeleteCreateVehComAddMap = true;
                                     // Filter out non-null, non-array values, and exclude specified fields
                                     $excludeVehicleAddonFields = [
-                                        'id','w_o_vehicle_id',
+                                        'id',
+                                        'w_o_vehicle_id',
                                     ];
                                     $nonNullVehicleAddonData = array_filter($addonData, function ($value, $key) use ($excludeVehicleAddonFields) {
                                         return !is_null($value) && !in_array($key, $excludeVehicleAddonFields);
                                     }, ARRAY_FILTER_USE_BOTH);
-                                   
-                                
+
+
                                     // Store each non-null, non-array field in the data history
-                                    foreach ($nonNullVehicleAddonData as $field => $value) {  
+                                    foreach ($nonNullVehicleAddonData as $field => $value) {
                                         WOVehicleAddonRecordHistory::create([
                                             'w_o_vehicle_addon_id' => $WOVehicleAddons->id,
                                             'field_name' => $field,
@@ -2104,38 +2423,37 @@ class WorkOrderController extends Controller
                                             'type' => 'Set',
                                             'user_id' => Auth::id(),
                                             'changed_at' => Carbon::now(),
-                                            'cvm_id' =>$createdCommVehAddonMapp->id,
+                                            'cvm_id' => $createdCommVehAddonMapp->id,
                                         ]);
                                         $canDeleteCreateVehComAddMap = false;
                                     }
                                     // Mark this addon as processed
-                                    if($canDeleteCreateVehComAddMap == true) {
-                                        $deleteCreateVehComAddMap = CommentVehicleAddonMapping::where('id',$createdCommVehAddonMapp->id)->first();
-                                        if($deleteCreateVehComAddMap) {
+                                    if ($canDeleteCreateVehComAddMap == true) {
+                                        $deleteCreateVehComAddMap = CommentVehicleAddonMapping::where('id', $createdCommVehAddonMapp->id)->first();
+                                        if ($deleteCreateVehComAddMap) {
                                             $deleteCreateVehComAddMap->delete();
                                         }
-                                    }else {
-                                        $canDeleteCreatedVehComMap = false; 
+                                    } else {
+                                        $canDeleteCreatedVehComMap = false;
                                     }
                                 }
                             }
                         }
-                    }  
+                    }
                     // ADDON END ..................  
                     $processedIds[] = $woVehicles->id;
-                    if($canDeleteCreatedVehComMap == true) {
-                        $deleteCommVehMap = CommentVehicleMapping::where('id',$CreatedVehComMap->id)->first();
-                        if($deleteCommVehMap) {
+                    if ($canDeleteCreatedVehComMap == true) {
+                        $deleteCommVehMap = CommentVehicleMapping::where('id', $CreatedVehComMap->id)->first();
+                        if ($deleteCommVehMap) {
                             $deleteCommVehMap->delete();
                         }
-                    }
-                    else {
+                    } else {
                         $canDeleteComment = false;
                     }
                 }
             }
-           // Ensure $processedIds only contains valid IDs
-            $processedIds = array_filter($processedIds, function($id) {
+            // Ensure $processedIds only contains valid IDs
+            $processedIds = array_filter($processedIds, function ($id) {
                 return !is_null($id);
             });
 
@@ -2149,7 +2467,7 @@ class WorkOrderController extends Controller
             }
 
             // Now delete the vehicles
-            WOVehicles::whereNotIn('id', $processedIds)->where('work_order_id',$workOrder->id)->delete();
+            WOVehicles::whereNotIn('id', $processedIds)->where('work_order_id', $workOrder->id)->delete();
 
             // VEHICLES END ........................................
             // BOE
@@ -2157,10 +2475,10 @@ class WorkOrderController extends Controller
                 // $createVehComMap['comment_id'] = $CommentId;
                 // $createVehComMap['vehicle_id'] = $vehicle->id;
                 // $CreatedVehComMap = CommentVehicleMapping::where('comment_id',$CommentId)
-                DB::transaction(function() use ($request, $workOrder,$CommentId,$NewVehicleIdArr) {
+                DB::transaction(function () use ($request, $workOrder, $CommentId, $NewVehicleIdArr) {
                     // Step 1: Fetch all WOVehicles associated with the work order
                     $woVehiclesForBOE = WOVehicles::where('work_order_id', $workOrder->id)->get();
-            
+
                     // Step 2: Create a list of all VINs provided in the request
                     $requestVins = [];
                     foreach ($request->boe as $boeNumber => $boe) {
@@ -2170,7 +2488,7 @@ class WorkOrderController extends Controller
                             }
                         }
                     }
-            
+
                     // Step 3: Iterate through each WOVehicle and check if its VIN exists in the provided list
                     foreach ($woVehiclesForBOE as $woVehicle) {
                         if (!in_array($woVehicle->vin, $requestVins)) {
@@ -2219,7 +2537,7 @@ class WorkOrderController extends Controller
                             }
                         }
                     }
-            
+
                     // Existing logic to update the boe_number for the provided VINs
                     foreach ($request->boe as $boeNumber => $boe) {
                         if (isset($boe['vin']) && count($boe['vin']) > 0) {
@@ -2229,7 +2547,7 @@ class WorkOrderController extends Controller
                                     $oldBoeNumber = $vinUpdate->boe_number;
                                     $vinUpdate->boe_number = $boeNumber;
                                     $vinUpdate->save();
-            
+
                                     // Determine the change type
                                     $changeType = 'Change';
                                     if (is_null($oldBoeNumber) && !is_null($boeNumber)) {
@@ -2250,8 +2568,7 @@ class WorkOrderController extends Controller
                                             // 'comment_vehicle_id' =>$CreatedVehComMap->id,
                                         ]);
                                         $canDeleteCreatedVehComMap = false;
-                                    }
-                                    else {
+                                    } else {
                                         WOVehicleRecordHistory::create([
                                             'w_o_vehicle_id' => $vinUpdate->id,
                                             'field_name' => 'boe_number',
@@ -2270,17 +2587,17 @@ class WorkOrderController extends Controller
                     }
                 });
             }
-                     
+
 
             // Deposit against vehicles
             if (isset($request->deposit_received_as) && $request->deposit_received_as === 'custom_deposit') {
-                DB::transaction(function() use ($request, $workOrder,$CommentId,$NewVehicleIdArr) {
+                DB::transaction(function () use ($request, $workOrder, $CommentId, $NewVehicleIdArr) {
                     // Fetch all WOVehicles associated with the work order
                     $woVehicles = WOVehicles::where('work_order_id', $workOrder->id)->get();
-            
+
                     // Create a list of all VINs provided in the request
                     $requestVins = isset($request->deposit_aganist_vehicle) && is_array($request->deposit_aganist_vehicle) ? $request->deposit_aganist_vehicle : [];
-            
+
                     // Iterate through each WOVehicle
                     foreach ($woVehicles as $woVehicle) {
                         if (!in_array($woVehicle->vin, $requestVins)) {
@@ -2303,8 +2620,7 @@ class WorkOrderController extends Controller
                                     ]);
                                     $canDeleteCreatedVehComMap = false;
                                     $canCreateFinanceApproval = true;
-                                }
-                                else {
+                                } else {
                                     // Create history record
                                     WOVehicleRecordHistory::create([
                                         'w_o_vehicle_id' => $woVehicle->id,
@@ -2337,12 +2653,11 @@ class WorkOrderController extends Controller
                                         'type' => 'Change',
                                         'user_id' => Auth::id(),
                                         'changed_at' => Carbon::now(),
-                                    //    'comment_vehicle_id' =>$CreatedVehComMap->id,
+                                        //    'comment_vehicle_id' =>$CreatedVehComMap->id,
                                     ]);
                                     $canDeleteCreatedVehComMap = false;
                                     $canCreateFinanceApproval = true;
-                                }
-                                else {
+                                } else {
                                     // Create history record
                                     WOVehicleRecordHistory::create([
                                         'w_o_vehicle_id' => $vinUpdate->id,
@@ -2361,12 +2676,12 @@ class WorkOrderController extends Controller
                         }
                     }
                 });
-            }
-            else if ((isset($request->deposit_received_as) && $request->deposit_received_as === 'custom_deposit') OR 
-            (isset($request->deposit_received_as) && $request->deposit_received_as === null) OR !isset($request->deposit_received_as)) {
+            } else if ((isset($request->deposit_received_as) && $request->deposit_received_as === 'custom_deposit') or
+                (isset($request->deposit_received_as) && $request->deposit_received_as === null) or !isset($request->deposit_received_as)
+            ) {
                 $woVehicles = WOVehicles::where('work_order_id', $workOrder->id)->get();
                 foreach ($woVehicles as $woVehicle) {
-                    if($woVehicle->deposit_received == 'yes') {
+                    if ($woVehicle->deposit_received == 'yes') {
                         if (in_array($woVehicle->id, $NewVehicleIdArr)) {
                             // Create history record
                             WOVehicleRecordHistory::create([
@@ -2381,8 +2696,7 @@ class WorkOrderController extends Controller
                             ]);
                             $canDeleteCreatedVehComMap = false;
                             $canCreateFinanceApproval = true;
-                        }
-                        else {
+                        } else {
                             // Create history record
                             WOVehicleRecordHistory::create([
                                 'w_o_vehicle_id' => $woVehicle->id,
@@ -2401,75 +2715,117 @@ class WorkOrderController extends Controller
                     $woVehicle->deposit_received = 'no';
                     $woVehicle->save();
                 }
-            }    
+            }
 
-            if($canDeleteComment == true) {
+            if ($canDeleteComment == true) {
                 $deleteComment = WOComments::where('id', $CommentId)->first();
-                if($deleteComment) {
+                if ($deleteComment) {
                     $deleteComment->delete();
                 }
-            }
-            else {
+            } else {
                 $checkRecords = $newComment->wo_histories()
                     ->whereIn('field_name', ['amount_received', 'balance_amount', 'currency', 'deposit_received_as', 'so_total_amount', 'so_vehicle_quantity'])
                     ->exists();
                 if ($checkRecords) {
-                    $this->sendSOAmountUpdateEmail($workOrder,$newComment);
+                    $this->sendSOAmountUpdateEmail($workOrder, $newComment);
                 }
                 $checkmainRecords = $newComment->wo_histories()
-                    ->whereIn('field_name', ['airline','airway_bill','airway_details','batch','brn','brn_file','container_number',
-                        'customer_address','customer_company_number','customer_company_number.full','customer_email','customer_name',
-                        'customer_representative_contact','customer_representative_contact.full','customer_representative_email',
-                        'customer_representative_name','delivery_contact_person','delivery_contact_person_number','delivery_date',
-                        'delivery_location','enduser_contract','enduser_passport','enduser_trade_license','existing_customer_name',
-                        'final_destination','forward_import_code','freight_agent_contact_number','freight_agent_contact_number.full',
-                        'freight_agent_email','freight_agent_name','is_batch','noc','payment_receipts','port_of_discharge','port_of_loading',
-                        'shipment','shipping_line','signed_contract','signed_pfi','so_number','trailer_number_plate','transport_type',
-                        'transportation_company','transportation_company_details','transporting_driver_contact_number','transporting_driver_contact_number.full',
-                        'vehicle_handover_person_id','wo_number','preferred_shipping_line_of_customer','bill_of_loading_details',
-                        'shipper','consignee','notify_party','special_or_transit_clause_or_request',])->exists();
+                    ->whereIn('field_name', [
+                        'airline',
+                        'airway_bill',
+                        'airway_details',
+                        'batch',
+                        'brn',
+                        'brn_file',
+                        'container_number',
+                        'customer_address',
+                        'customer_company_number',
+                        'customer_company_number.full',
+                        'customer_email',
+                        'customer_name',
+                        'customer_representative_contact',
+                        'customer_representative_contact.full',
+                        'customer_representative_email',
+                        'customer_representative_name',
+                        'delivery_contact_person',
+                        'delivery_contact_person_number',
+                        'delivery_date',
+                        'delivery_location',
+                        'enduser_contract',
+                        'enduser_passport',
+                        'enduser_trade_license',
+                        'existing_customer_name',
+                        'final_destination',
+                        'forward_import_code',
+                        'freight_agent_contact_number',
+                        'freight_agent_contact_number.full',
+                        'freight_agent_email',
+                        'freight_agent_name',
+                        'is_batch',
+                        'noc',
+                        'payment_receipts',
+                        'port_of_discharge',
+                        'port_of_loading',
+                        'shipment',
+                        'shipping_line',
+                        'signed_contract',
+                        'signed_pfi',
+                        'so_number',
+                        'trailer_number_plate',
+                        'transport_type',
+                        'transportation_company',
+                        'transportation_company_details',
+                        'transporting_driver_contact_number',
+                        'transporting_driver_contact_number.full',
+                        'vehicle_handover_person_id',
+                        'wo_number',
+                        'preferred_shipping_line_of_customer',
+                        'bill_of_loading_details',
+                        'shipper',
+                        'consignee',
+                        'notify_party',
+                        'special_or_transit_clause_or_request',
+                    ])->exists();
                 if ($checkmainRecords) {
-                    $this->sendDataUpdateEmail($workOrder,$newComment);
+                    $this->sendDataUpdateEmail($workOrder, $newComment);
                 }
             }
-            if($canCreateFinanceApproval == true) {
-                if(!$hasEditConfirmedPermission) {
-                    $financePendingApproval = WOApprovals::where('work_order_id',$workOrder->id)->where('type','finance')->where('status','pending')->first();
-                    if($financePendingApproval == null) { 
+            if ($canCreateFinanceApproval == true) {
+                if (!$hasEditConfirmedPermission) {
+                    $financePendingApproval = WOApprovals::where('work_order_id', $workOrder->id)->where('type', 'finance')->where('status', 'pending')->first();
+                    if ($financePendingApproval == null) {
                         WOApprovals::create([
                             'work_order_id' => $workOrder->id,
-                            'type' => 'finance', 
-                            'status' => 'pending', 
-                            'action_at' =>NULL,
+                            'type' => 'finance',
+                            'status' => 'pending',
+                            'action_at' => NULL,
                         ]);
-                    }
-                    else {
+                    } else {
                         $financePendingApproval->updated_at = Carbon::now();
                         $financePendingApproval->update();
                     }
                 }
             }
-            if($canCreateCOOApproval == true) {
-                if(!$hasEditConfirmedPermission) {
-                    $cooPendingApprovals = WOApprovals::where('work_order_id',$workOrder->id)->where('type','coo')->where('status','pending')->first();
-                    if($cooPendingApprovals == null) { 
+            if ($canCreateCOOApproval == true) {
+                if (!$hasEditConfirmedPermission) {
+                    $cooPendingApprovals = WOApprovals::where('work_order_id', $workOrder->id)->where('type', 'coo')->where('status', 'pending')->first();
+                    if ($cooPendingApprovals == null) {
                         WOApprovals::create([
                             'work_order_id' => $workOrder->id,
-                            'type' => 'coo', 
-                            'status' => 'pending', 
-                            'action_at' =>NULL,
+                            'type' => 'coo',
+                            'status' => 'pending',
+                            'action_at' => NULL,
                         ]);
-                    }
-                    else {
+                    } else {
                         $cooPendingApprovals->updated_at = Carbon::now();
                         $cooPendingApprovals->update();
-                    }      
-                }                
+                    }
+                }
                 // Call the private function to send the email
-                $this->sendVehicleUpdateEmail($workOrder,$newComment);
+                $this->sendVehicleUpdateEmail($workOrder, $newComment);
             }
             (new UserActivityController)->createActivity('Update ' . $request->type . ' work order');
-            
+
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Work order updated successfully.']);
         } catch (\Exception $e) {
@@ -2478,7 +2834,7 @@ class WorkOrderController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
-    
+
     /**
      * Remove the specified resource from storage.
      */
@@ -2521,7 +2877,6 @@ class WorkOrderController extends Controller
                 'status' => 'success',
                 'message' => 'Work order and related vehicles deleted successfully.'
             ]);
-
         } catch (\Exception $e) {
             // Roll back the transaction on error
             DB::rollBack();
@@ -2540,45 +2895,49 @@ class WorkOrderController extends Controller
             ], 500);
         }
     }
-    
+
     public function fetchAddons(Request $request)
     {
         // $vins = $request->input('vins');
         // if (isset($vins) && count($vins) > 0) {
-        $kit = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+        $kit = AddonDetails::select('addon_details.id', 'addon_details.addon_code', DB::raw("CONCAT(addons.name, 
                 IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
-                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+                "), DB::raw("'App\\Models\\AddonDetails' as reference_type"))
             ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
             ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
             ->where('addon_details.addon_type_name', 'K')
             ->orderBy('addon_details.id', 'asc')
             ->get();
-        $accessories = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+        $accessories = AddonDetails::select('addon_details.id', 'addon_details.addon_code', DB::raw("CONCAT(addons.name, 
                 IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
-                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+                "), DB::raw("'App\\Models\\AddonDetails' as reference_type"))
             ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
             ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
             ->where('addon_details.addon_type_name', 'P')
             ->orderBy('addon_details.id', 'asc')
             ->get();
-        $spareParts = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+        $spareParts = AddonDetails::select('addon_details.id', 'addon_details.addon_code', DB::raw("CONCAT(addons.name, 
                 IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
-                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+                "), DB::raw("'App\\Models\\AddonDetails' as reference_type"))
             ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
             ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
             ->where('addon_details.addon_type_name', 'SP')
             ->orderBy('addon_details.id', 'asc')
             ->get();
-        $data['charges'] = MasterCharges::select('master_charges.id','master_charges.addon_code',DB::raw("CONCAT(
+        $data['charges'] = MasterCharges::select(
+            'master_charges.id',
+            'master_charges.addon_code',
+            DB::raw("CONCAT(
                 IF(master_charges.name IS NOT NULL, master_charges.name, ''), 
                 IF(master_charges.name IS NOT NULL AND master_charges.description IS NOT NULL, ' - ', ''), 
                 IF(master_charges.description IS NOT NULL, master_charges.description, '')) as addon_name"),
-                DB::raw("'App\\Models\\Masters\\MasterCharges' as reference_type"))
+            DB::raw("'App\\Models\\Masters\\MasterCharges' as reference_type")
+        )
             ->orderBy('master_charges.id', 'asc')
             ->get();
         // Merge collections
         $data['addons'] = $accessories->merge($spareParts)->merge($kit);
-                    return response()->json($data);
+        return response()->json($data);
         // }
 
         // return response()->json([]);
@@ -2594,12 +2953,12 @@ class WorkOrderController extends Controller
             'mentioned_users.*' => 'exists:users,id',
             'files.*' => 'file|mimes:jpg,png,pdf|max:2048', // File validation
         ]);
-    
+
         // Check if text is null and there are no files
         if (is_null($request->input('text')) && !$request->hasFile('files')) {
             return response()->json(['error' => 'Text or files are required.'], 422);
         }
-    
+
         // Store empty space if text is null
         $text = $request->input('text') ?? '';
         // Create the comment with nullable text
@@ -2631,7 +2990,7 @@ class WorkOrderController extends Controller
 
         if (!empty($mentionedUserNames)) {
             $mentionedUsers = User::whereIn('name', $mentionedUserNames)->get();
-        
+
             foreach ($mentionedUsers as $user) {
                 // Queue email notifications for efficiency
                 dispatch(function () use ($workOrder, $comment, $user) {
@@ -2649,8 +3008,8 @@ class WorkOrderController extends Controller
                         'user' => $user // Pass the user variable to the view
                     ], function ($message) use ($subject, $template, $user) {
                         $message->from($template['from'], $template['from_name'])
-                                ->to($user->email)
-                                ->subject($subject);
+                            ->to($user->email)
+                            ->subject($subject);
                     });
                 })->onQueue('emails');
             }
@@ -2664,92 +3023,102 @@ class WorkOrderController extends Controller
     //     $comments = WOComments::where('work_order_id', $workOrderId)->get();
     //     return response()->json(['comments' => $comments]);
     // }
-    
+
     public function getComments($workOrderId)
     {
         $comments = WOComments::where('work_order_id', $workOrderId)
-            ->with('files', 'user', 'wo_histories', 'removed_vehicles','new_vehicles.vehicle.addonsWithTrashed',
-            'updated_vehicles.vehicle.addonsWithTrashed','new_vehicles.recordHistories','updated_vehicles.recordHistories',
-            'new_vehicles.storeMappingAddons.recordHistories','updated_vehicles.updateMappingAddons.recordHistories',
-            'new_vehicles.storeMappingAddons.addon','updated_vehicles.updateMappingAddons.addon',
-            'updated_vehicles.storeMappingAddons.recordHistories','updated_vehicles.storeMappingAddons.addon','updated_vehicles.deleteMappingAddons.addon',
-            'updated_vehicles.updateMappingAddons.recordHistories','updated_vehicles.updateMappingAddons.addon'
+            ->with(
+                'files',
+                'user',
+                'wo_histories',
+                'removed_vehicles',
+                'new_vehicles.vehicle.addonsWithTrashed',
+                'updated_vehicles.vehicle.addonsWithTrashed',
+                'new_vehicles.recordHistories',
+                'updated_vehicles.recordHistories',
+                'new_vehicles.storeMappingAddons.recordHistories',
+                'updated_vehicles.updateMappingAddons.recordHistories',
+                'new_vehicles.storeMappingAddons.addon',
+                'updated_vehicles.updateMappingAddons.addon',
+                'updated_vehicles.storeMappingAddons.recordHistories',
+                'updated_vehicles.storeMappingAddons.addon',
+                'updated_vehicles.deleteMappingAddons.addon',
+                'updated_vehicles.updateMappingAddons.recordHistories',
+                'updated_vehicles.updateMappingAddons.addon'
             )
             // 'updated_vehicles.deleteMappingAddons'
             ->get();
         return response()->json(['comments' => $comments]);
     }
-    public function uniqueWO(Request $request) { 
+    public function uniqueWO(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'wo_number' => 'required',
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
-        }
-        else {
+        } else {
             try {
                 $wo = WorkOrder::where('wo_number', $request->wo_number);
-                if($request->id != NULL || $request->id != '') { 
-                    $wo = $wo->where('id','!=',$request->id);
+                if ($request->id != NULL || $request->id != '') {
+                    $wo = $wo->where('id', '!=', $request->id);
                 }
-                $wo = $wo->get()->filter(function($item) {
+                $wo = $wo->get()->filter(function ($item) {
                     return $item->status != 'Cancelled';  // Filter out records where status is 'Cancelled'
                 });
-                if($wo->count() > 0) {
+                if ($wo->count() > 0) {
                     return false;
-                }
-                else {
+                } else {
                     return true;
                 }
-           } 
-           catch (\Exception $e) {
-               info($e);
-           }
+            } catch (\Exception $e) {
+                info($e);
+            }
         }
     }
-    public function uniqueSO(Request $request) { 
+    public function uniqueSO(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'so_number' => 'required',
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
-        }
-        else {
+        } else {
             try {
-                $wo = WorkOrder::where('so_number',$request->so_number);
-                if($request->id != NULL || $request->id != '') { 
-                    $wo = $wo->whereNot('id',$request->id);
+                $wo = WorkOrder::where('so_number', $request->so_number);
+                if ($request->id != NULL || $request->id != '') {
+                    $wo = $wo->whereNot('id', $request->id);
                 }
-                $wo =$wo->get();
-                if(count($wo) > 0) {
+                $wo = $wo->get();
+                if (count($wo) > 0) {
                     return false;
-                }
-                else {
+                } else {
                     return true;
                 }
-           } 
-           catch (\Exception $e) {
-               info($e);
-           }
+            } catch (\Exception $e) {
+                info($e);
+            }
         }
     }
-    public function vehicleDataHistory($id) {
+    public function vehicleDataHistory($id)
+    {
         $woVehicle = WOVehicles::withTrashed()->where('id', $id)->first();
-        $datas = WOVehicleRecordHistory::where('w_o_vehicle_id',$id)->get();
-        return view('work_order.export_exw.show_vehicle_history',compact('datas','woVehicle'));
+        $datas = WOVehicleRecordHistory::where('w_o_vehicle_id', $id)->get();
+        return view('work_order.export_exw.show_vehicle_history', compact('datas', 'woVehicle'));
     }
-    public function vehicleAddonDataHistory($id) {
-        $woVehicleAddon = WOVehicleAddons::where('id',$id)->first();
-        $datas = WOVehicleAddonRecordHistory::where('w_o_vehicle_addon_id',$id)->get();
-        return view('work_order.export_exw.show_vehicle_addon_history',compact('datas','woVehicleAddon'));
+    public function vehicleAddonDataHistory($id)
+    {
+        $woVehicleAddon = WOVehicleAddons::where('id', $id)->first();
+        $datas = WOVehicleAddonRecordHistory::where('w_o_vehicle_addon_id', $id)->get();
+        return view('work_order.export_exw.show_vehicle_addon_history', compact('datas', 'woVehicleAddon'));
     }
     public function financeApproval(Request $request)
-    { 
+    {
         $validator = Validator::make($request->all(), [
             'id' => 'required',
             'status' => 'required',
         ]);
-    
+
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
         } else {
@@ -2757,62 +3126,62 @@ class WorkOrderController extends Controller
             try {
                 $authId = Auth::id();
                 $woApprovals = WOApprovals::where('id', $request->id)->first();
-                $workOrder = WorkOrder::where('id',$woApprovals->work_order_id)->first();             
-    
+                $workOrder = WorkOrder::where('id', $woApprovals->work_order_id)->first();
+
                 if ($woApprovals && $woApprovals->action_at == '' && $woApprovals->status == 'pending') {
                     $woApprovals->action_at = Carbon::now();
                     $woApprovals->user_id = $authId;
                     $woApprovals->comments = $request->comments;
-    
+
                     $woApprovals->status = ($request->status == 'approve') ? 'approved' : 'rejected';
                     $woApprovals->update();
-    
-                    $fields = ['so_total_amount', 'currency', 'so_vehicle_quantity', 'amount_received', 'balance_amount','deposit_received_as'];
-    
+
+                    $fields = ['so_total_amount', 'currency', 'so_vehicle_quantity', 'amount_received', 'balance_amount', 'deposit_received_as'];
+
                     $woHistory = WORecordHistory::where('work_order_id', $woApprovals->work_order_id)
                         ->whereIn('field_name', $fields)
                         ->orderBy('changed_at', 'desc')
                         ->get()
                         ->unique('field_name');
-    
+
                     foreach ($woHistory as $record) {
                         WOApprovalDataHistory::create([
                             'w_o_approvals_id' => $woApprovals->id,
                             'wo_history_id' => $record->id
                         ]);
                     }
-                    if($workOrder->deposit_received_as == 'custom_deposit') {
-                        $depAgnVeh = WOVehicles::where('work_order_id', $woApprovals->work_order_id)->where('deposit_received','yes')->select('id')->get();
-                        foreach($depAgnVeh as $depAgnVehId) {                      
+                    if ($workOrder->deposit_received_as == 'custom_deposit') {
+                        $depAgnVeh = WOVehicles::where('work_order_id', $woApprovals->work_order_id)->where('deposit_received', 'yes')->select('id')->get();
+                        foreach ($depAgnVeh as $depAgnVehId) {
                             WOApprovalDepositAganistVehicle::create([
                                 'w_o_approvals_id' => $woApprovals->id,
                                 'w_o_vehicle_id' => $depAgnVehId->id
                             ]);
                         }
                     }
-    
+
                     $woVehicleIds = WOVehicles::where('work_order_id', $woApprovals->work_order_id)->pluck('id');
                     $woAddonIds = WOVehicleAddons::whereIn('w_o_vehicle_id', $woVehicleIds)->pluck('id');
-    
+
                     $woAddonHistory = WOVehicleAddonRecordHistory::whereIn('w_o_vehicle_addon_id', $woAddonIds)
                         ->orderBy('changed_at', 'desc')
                         ->get()
                         ->unique(function ($item) {
                             return $item['field_name'] . $item['w_o_vehicle_addon_id'];
                         });
-    
+
                     foreach ($woAddonHistory as $record) {
                         WOApprovalAddonDataHistory::create([
                             'w_o_approvals_id' => $woApprovals->id,
                             'wo_addon_history_id' => $record->id
                         ]);
                     }
-                    if(isset($woApprovals) && $woApprovals->status == 'approved') {
+                    if (isset($woApprovals) && $woApprovals->status == 'approved') {
                         $cooPending = WOApprovals::where('work_order_id', $workOrder->id)
-                        ->where('type', 'coo')
-                        ->where('status', 'pending')
-                        ->orderBy('id', 'ASC')
-                        ->first(); 
+                            ->where('type', 'coo')
+                            ->where('status', 'pending')
+                            ->orderBy('id', 'ASC')
+                            ->first();
                         if ($cooPending) {
                             // Prepare the from details
                             $template['from'] = 'no-reply@milele.com';
@@ -2829,21 +3198,21 @@ class WorkOrderController extends Controller
 
                             $rolesWithPermission = Role::whereHas('permissions', function ($query) {
                                 $query->where('name', 'do-coo-office-approval');
-                            })->pluck('id')->toArray();                   
+                            })->pluck('id')->toArray();
                             // Get users with the required roles and valid email addresses
                             $recipients = \App\Models\User::role($rolesWithPermission)
                                 ->whereIn('status', ['new', 'active'])
                                 ->where('password', '!=', '')
                                 ->whereHas('roles')
                                 ->pluck('email')
-                                ->filter(function($email) {
+                                ->filter(function ($email) {
                                     return filter_var($email, FILTER_VALIDATE_EMAIL);
-                                })->toArray(); 
+                                })->toArray();
                             // Get the emails to exclude from the environment variable
                             $excludedEmails = explode(',', env('DONT_SEND_EMAIL', ''));
-                        
+
                             // Filter out the excluded emails
-                            $filteredRecipients = array_diff($recipients, $excludedEmails);                      
+                            $filteredRecipients = array_diff($recipients, $excludedEmails);
                             // Log email addresses to help with debugging
                             \Log::info('Email Recipients:', [
                                 'recipients' => implode(', ', $filteredRecipients) ?: 'none found',
@@ -2860,14 +3229,14 @@ class WorkOrderController extends Controller
                                 'approvalHistoryLink' => $approvalHistoryLink,
                             ], function ($message) use ($subject, $filteredRecipients, $template) {
                                 $message->from($template['from'], $template['from_name'])
-                                        ->to($filteredRecipients)
-                                        ->subject($subject);
-                            });                            
-                        } 
-                    }     
+                                    ->to($filteredRecipients)
+                                    ->subject($subject);
+                            });
+                        }
+                    }
                     DB::commit();
                     // Send email notification
-                    $this->sendFinanceApprovalEmail($workOrder, $woApprovals->status, $woApprovals->comments,$woApprovals->user->name);
+                    $this->sendFinanceApprovalEmail($workOrder, $woApprovals->status, $woApprovals->comments, $woApprovals->user->name);
                     return response()->json('success');
                 } else if ($woApprovals && $woApprovals->action_at != '') {
                     DB::commit();
@@ -2898,7 +3267,7 @@ class WorkOrderController extends Controller
         $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
         $approvalHistoryLink = env('BASE_URL') . '/finance-approval-history/' . $workOrder->id;
         // Retrieve email addresses from the users table where can_send_wo_email is true
-        $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function($email) {
+        $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function ($email) {
             return filter_var($email, FILTER_VALIDATE_EMAIL);
         })->toArray();
         // Retrieve and validate email addresses from .env for finance and operations teams
@@ -2933,29 +3302,29 @@ class WorkOrderController extends Controller
             'status' => $status
         ], function ($message) use ($subject, $recipients, $template) {
             $message->from($template['from'], $template['from_name'])
-                    ->to($recipients)
-                    ->subject($subject);
+                ->to($recipients)
+                ->subject($subject);
         });
     }
-    public function coeOfficeApproval(Request $request) {
+    public function coeOfficeApproval(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'id' => 'required',
             'status' => 'required',
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
-        }
-        else {
+        } else {
             DB::beginTransaction();
             try {
                 $authId = Auth::id();
                 $woApprovals = WOApprovals::where('id', $request->id)->first();
-                $workOrder = WorkOrder::where('id',$woApprovals->work_order_id)->first(); 
+                $workOrder = WorkOrder::where('id', $woApprovals->work_order_id)->first();
                 if ($woApprovals && $woApprovals->action_at == '' && $woApprovals->status == 'pending') {
                     $woApprovals->action_at = Carbon::now();
                     $woApprovals->user_id = $authId;
                     $woApprovals->comments = $request->comments;
-    
+
                     $woApprovals->status = ($request->status == 'approve') ? 'approved' : 'rejected';
                     $woApprovals->update();
                     $woVehicleIds = WOVehicles::where('work_order_id', $woApprovals->work_order_id)->pluck('id');
@@ -2972,21 +3341,20 @@ class WorkOrderController extends Controller
                             'wo_vehicle_history_id' => $record->id
                         ]);
                     }
-    
+
                     DB::commit();
                     // Send email notification
-                    $this->sendCOOApprovalEmail($workOrder, $woApprovals->status, $woApprovals->comments,$woApprovals->user->name);                   
+                    $this->sendCOOApprovalEmail($workOrder, $woApprovals->status, $woApprovals->comments, $woApprovals->user->name);
                     return response()->json('success');
                 } else if ($woApprovals && $woApprovals->action_at != '') {
                     DB::commit();
                     return response()->json('error');
                 }
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 DB::rollback();
                 info($e);
-                $errorMsg ="Something went wrong! Contact your admin";
-                return view('hrm.notaccess',compact('errorMsg'));
+                $errorMsg = "Something went wrong! Contact your admin";
+                return view('hrm.notaccess', compact('errorMsg'));
             }
         }
     }
@@ -3007,7 +3375,7 @@ class WorkOrderController extends Controller
         $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
         $approvalHistoryLink = env('BASE_URL') . '/coo-approval-history/' . $workOrder->id;
         // Retrieve email addresses from the users table where can_send_wo_email is true
-        $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function($email) {
+        $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function ($email) {
             return filter_var($email, FILTER_VALIDATE_EMAIL);
         })->toArray();
         // Retrieve and validate email addresses from .env for finance and operations teams
@@ -3042,23 +3410,23 @@ class WorkOrderController extends Controller
             'status' => $status
         ], function ($message) use ($subject, $recipients, $template) {
             $message->from($template['from'], $template['from_name'])
-                    ->to($recipients)
-                    ->subject($subject);
+                ->to($recipients)
+                ->subject($subject);
         });
     }
-    public function salesApproval(Request $request) {
+    public function salesApproval(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'id' => 'required',
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
-        }
-        else {
+        } else {
             DB::beginTransaction();
             try {
                 $authId = Auth::id();
-                $wo = WorkOrder::where('id',$request->id)->first();
-                if($wo && $wo->sales_support_data_confirmation_at == '' && $wo->sales_support_data_confirmation_by == '') {
+                $wo = WorkOrder::where('id', $request->id)->first();
+                if ($wo && $wo->sales_support_data_confirmation_at == '' && $wo->sales_support_data_confirmation_by == '') {
                     $wo->sales_support_data_confirmation_at = Carbon::now();
                     $wo->sales_support_data_confirmation_by = $authId;
                     $wo->update();
@@ -3081,10 +3449,10 @@ class WorkOrderController extends Controller
                         'changed_at' => Carbon::now()
                     ]);
                     $financePending = WOApprovals::where('work_order_id', $wo->id)
-                    ->where('type', 'finance')
-                    ->where('status', 'pending')
-                    ->orderBy('id', 'ASC')
-                    ->first(); 
+                        ->where('type', 'finance')
+                        ->where('status', 'pending')
+                        ->orderBy('id', 'ASC')
+                        ->first();
                     if ($financePending) {
                         // Prepare the from details
                         $template['from'] = 'no-reply@milele.com';
@@ -3102,11 +3470,11 @@ class WorkOrderController extends Controller
 
                         $rolesWithPermission = Role::whereHas('permissions', function ($query) {
                             $query->where('name', 'do-finance-approval');
-                        })->pluck('id')->toArray();                   
-                        $recipients = \App\Models\User::role($rolesWithPermission)->whereIn('status',['new','active'])->where('password','!=','')->whereHas('roles')
-                        ->pluck('email')->filter(function($email) {
-                            return filter_var($email, FILTER_VALIDATE_EMAIL);
-                        })->toArray(); 
+                        })->pluck('id')->toArray();
+                        $recipients = \App\Models\User::role($rolesWithPermission)->whereIn('status', ['new', 'active'])->where('password', '!=', '')->whereHas('roles')
+                            ->pluck('email')->filter(function ($email) {
+                                return filter_var($email, FILTER_VALIDATE_EMAIL);
+                            })->toArray();
                         // Log email addresses to help with debugging
                         \Log::info('Email Recipients:', [
                             'recipients' => implode(', ', $recipients) ?: 'none found',
@@ -3123,39 +3491,37 @@ class WorkOrderController extends Controller
                             'approvalHistoryLink' => $approvalHistoryLink,
                         ], function ($message) use ($subject, $recipients, $template) {
                             $message->from($template['from'], $template['from_name'])
-                                    ->to($recipients)
-                                    ->subject($subject);
-                        });  
-                    }                 
+                                ->to($recipients)
+                                ->subject($subject);
+                        });
+                    }
                     DB::commit();
                     return response()->json('success');
-                }
-                else if($wo && $wo->sales_support_data_confirmation_at != '') {
+                } else if ($wo && $wo->sales_support_data_confirmation_at != '') {
                     DB::commit();
                     return response()->json('error');
                 }
-            } 
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 DB::rollback();
                 info($e);
-                $errorMsg ="Something went wrong! Contact your admin";
-                return view('hrm.notaccess',compact('errorMsg'));
+                $errorMsg = "Something went wrong! Contact your admin";
+                return view('hrm.notaccess', compact('errorMsg'));
             }
         }
     }
-    public function revertSalesApproval(Request $request) {
+    public function revertSalesApproval(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'id' => 'required',
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
-        }
-        else {
+        } else {
             DB::beginTransaction();
             try {
                 $authId = Auth::id();
-                $wo = WorkOrder::where('id',$request->id)->first();
-                if($wo && $wo->sales_support_data_confirmation_at != '' && $wo->sales_support_data_confirmation_by != '') {
+                $wo = WorkOrder::where('id', $request->id)->first();
+                if ($wo && $wo->sales_support_data_confirmation_at != '' && $wo->sales_support_data_confirmation_by != '') {
                     $wo->sales_support_data_confirmation_at = NULL;
                     $wo->sales_support_data_confirmation_by = NULL;
                     $wo->update();
@@ -3179,25 +3545,23 @@ class WorkOrderController extends Controller
                     ]);
                     DB::commit();
                     return response()->json('success');
-                }
-                else if($wo && $wo->sales_support_data_confirmation_at == '') {
+                } else if ($wo && $wo->sales_support_data_confirmation_at == '') {
                     DB::commit();
                     return response()->json('error');
                 }
-            } 
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 DB::rollback();
                 info($e);
-                $errorMsg ="Something went wrong! Contact your admin";
-                return view('hrm.notaccess',compact('errorMsg'));
+                $errorMsg = "Something went wrong! Contact your admin";
+                return view('hrm.notaccess', compact('errorMsg'));
             }
         }
     }
     public function saveFilters(Request $request)
-    { 
+    {
         // Get the authenticated user's ID
         $userId = auth()->user()->id;
-    
+
         // Serialize the filters to store as a JSON string
         $filters = json_encode([
             'status_filter' => $request->status_filter,
@@ -3206,10 +3570,10 @@ class WorkOrderController extends Controller
             'coo_approval_filter' => $request->coo_approval_filter,
             'docs_status_filter' => $request->docs_status_filter,
         ]);
-    
+
         // Check if the filter record exists for the current user
         $userFilter = WOUserFilterInputs::where('user_id', $userId)->first();
-    
+
         if ($userFilter) {
             // If record exists, update the filters
             $userFilter->filters = $filters;
@@ -3221,22 +3585,22 @@ class WorkOrderController extends Controller
                 'filters' => $filters
             ]);
         }
-    
+
         // Redirect back to the index route with the type parameter
         return redirect()->route('work-order.index', ['type' => $request->input('type')]);
-    }    
+    }
     public function checkSONumber(Request $request)
     {
-        $soNumber = $request->input('so_number');  
+        $soNumber = $request->input('so_number');
         $workOrderId = $request->input('work_order_id'); // In case of edit 
-    
+
         // Helper closure to extract the numeric batch
         $extractNumericBatch = function ($batch) {
             return (int) filter_var($batch, FILTER_SANITIZE_NUMBER_INT);
-        };    
+        };
         if ($workOrderId) {
-            $workOrders = WorkOrder::where('id',$workOrderId)->first(); 
-            if($workOrders->so_number == $soNumber) {
+            $workOrders = WorkOrder::where('id', $workOrderId)->first();
+            if ($workOrders->so_number == $soNumber) {
                 $largestBatch = $extractNumericBatch($workOrders->batch);
                 $isBatch = $workOrders->is_batch;
                 return response()->json([
@@ -3251,7 +3615,7 @@ class WorkOrderController extends Controller
                 }
                 $numericBatches = $workOrders->where('is_batch', 1)
                     ->pluck('batch')
-                    ->map($extractNumericBatch);               
+                    ->map($extractNumericBatch);
                 $largestBatch = $numericBatches->max() ?? 0;
                 $isBatch = $workOrders->first()->is_batch;
                 return response()->json([
@@ -3276,23 +3640,23 @@ class WorkOrderController extends Controller
                 'is_batch' => $isBatch,
             ]);
         }
-    }    
+    }
     public function isExistInSalesOrder(Request $request)
     {
         $soNumber = $request->input('so_number');
         // Check if the so_number exists in the So model
         $exists = So::where('so_number', $soNumber)->exists();
         return response()->json(['valid' => $exists]);
-    }  
+    }
     function formatPhoneForExcel($number)
     {
         return $number ? " " . $number : '';
     }
     private function cleanField($value)
-{
-    if (is_null($value)) return null;
-    $value = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
-    $value = preg_replace('/[\x00-\x1F\x7F]/u', '', $value); // remove control chars
-    return preg_replace('/\s+/', ' ', trim($value));
-}
+    {
+        if (is_null($value)) return null;
+        $value = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+        $value = preg_replace('/[\x00-\x1F\x7F]/u', '', $value); // remove control chars
+        return preg_replace('/\s+/', ' ', trim($value));
+    }
 }
