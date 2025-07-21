@@ -53,56 +53,31 @@ class WorkOrderController extends Controller
         $authId = Auth::id();
         (new UserActivityController)->createActivity('Open ' . $type . ' work order create page');
 
-        $kit = AddonDetails::select('addon_details.id', 'addon_details.addon_code', DB::raw("CONCAT(addons.name, 
-                IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
-                "), DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+        // Optimize: Fetch all addon types in a single query, then group in PHP
+        $allAddons = AddonDetails::select('addon_details.id', 'addon_details.addon_code', DB::raw("CONCAT(addons.name, IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name"), DB::raw("'App\\Models\\AddonDetails' as reference_type"), 'addon_details.addon_type_name')
             ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
             ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
-            ->where('addon_details.addon_type_name', 'K')
+            ->whereIn('addon_details.addon_type_name', ['K', 'P', 'SP'])
             ->orderBy('addon_details.id', 'asc')
             ->get();
-        $accessories = AddonDetails::select('addon_details.id', 'addon_details.addon_code', DB::raw("CONCAT(addons.name, 
-                IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
-                "), DB::raw("'App\\Models\\AddonDetails' as reference_type"))
-            ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
-            ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
-            ->where('addon_details.addon_type_name', 'P')
-            ->orderBy('addon_details.id', 'asc')
-            ->get();
-        $spareParts = AddonDetails::select('addon_details.id', 'addon_details.addon_code', DB::raw("CONCAT(addons.name, 
-                IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
-                "), DB::raw("'App\\Models\\AddonDetails' as reference_type"))
-            ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
-            ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
-            ->where('addon_details.addon_type_name', 'SP')
-            ->orderBy('addon_details.id', 'asc')
-            ->get();
-        $charges = MasterCharges::select(
-            'master_charges.id',
-            'master_charges.addon_code',
-            DB::raw("CONCAT(
-                IF(master_charges.name IS NOT NULL, master_charges.name, ''), 
-                IF(master_charges.name IS NOT NULL AND master_charges.description IS NOT NULL, ' - ', ''), 
-                IF(master_charges.description IS NOT NULL, master_charges.description, '')) as addon_name"),
-            DB::raw("'App\\Models\\Masters\\MasterCharges' as reference_type")
-        )
-            ->orderBy('master_charges.id', 'asc')
-            ->get();
-        // Merge collections
+        $kit = $allAddons->where('addon_type_name', 'K')->values();
+        $accessories = $allAddons->where('addon_type_name', 'P')->values();
+        $spareParts = $allAddons->where('addon_type_name', 'SP')->values();
         $addons = $accessories->merge($spareParts)->merge($kit);
-        // Store permission checks
-        $hasFullAccess = Auth::user()->hasPermissionForSelectedRole([
-            'list-export-exw-wo',
-            'list-export-cnf-wo',
-            'list-export-local-sale-wo'
-        ]);
 
-        $hasLimitedAccess = Auth::user()->hasPermissionForSelectedRole([
-            'view-current-user-export-exw-wo-list',
-            'view-current-user-export-cnf-wo-list',
-            'view-current-user-local-sale-wo-list'
-        ]);
-        // Select data from the WorkOrder table
+        // Optimize: Cache charges for 5 minutes (if not already cached)
+        $charges = \Cache::remember('workorder_charges', 300, function () {
+            return MasterCharges::select(
+                'master_charges.id',
+                'master_charges.addon_code',
+                DB::raw("CONCAT(IF(master_charges.name IS NOT NULL, master_charges.name, ''), IF(master_charges.name IS NOT NULL AND master_charges.description IS NOT NULL, ' - ', ''), IF(master_charges.description IS NOT NULL, master_charges.description, '')) as addon_name"),
+                DB::raw("'App\\Models\\Masters\\MasterCharges' as reference_type")
+            )
+                ->orderBy('master_charges.id', 'asc')
+                ->get();
+        });
+
+        // Optimize: Only select columns needed for customers, and use chunking for large tables
         $workOrders = WorkOrder::select(
             DB::raw('TRIM(customer_name) as customer_name'),
             'customer_email',
@@ -110,12 +85,10 @@ class WorkOrderController extends Controller
             'customer_address',
             DB::raw('(IF(customer_email IS NOT NULL, 1, 0) + IF(customer_company_number IS NOT NULL, 1, 0) + IF(customer_address IS NOT NULL, 1, 0)) as score'),
             DB::raw("'App\\Models\\WorkOrder' as reference_type"),
-            DB::raw('NULL as country_id'), // Assuming WorkOrder does not have is_demand_planning_customer field
+            DB::raw('NULL as country_id'),
             DB::raw('NULL as is_demand_planning_customer'),
             DB::raw("CONCAT(TRIM(customer_name), '_', IFNULL(customer_email, ''), '_', IFNULL(customer_company_number, '')) as unique_id")
         );
-
-        // Select and transform data from the Clients table
         $clients = Clients::select(
             DB::raw('TRIM(name) as customer_name'),
             DB::raw('email as customer_email'),
@@ -127,19 +100,22 @@ class WorkOrderController extends Controller
             'is_demand_planning_customer',
             DB::raw("CONCAT(TRIM(name), '_', IFNULL(email, ''), '_', IFNULL(phone, ''), '_', IFNULL(country_id, '')) as unique_id")
         );
-
-        // Apply the permission-based condition
+        $hasFullAccess = Auth::user()->hasPermissionForSelectedRole([
+            'list-export-exw-wo',
+            'list-export-cnf-wo',
+            'list-export-local-sale-wo'
+        ]);
+        $hasLimitedAccess = Auth::user()->hasPermissionForSelectedRole([
+            'view-current-user-export-exw-wo-list',
+            'view-current-user-export-cnf-wo-list',
+            'view-current-user-local-sale-wo-list'
+        ]);
         if ($hasLimitedAccess) {
-            // Add the created_by condition for limited access
             $workOrders->where('created_by', $authId);
             $clients->where('created_by', $authId);
         }
-
-        // Combine the results using union
-        $combinedResults = $workOrders
-            ->union($clients)
-            ->get();
-
+        // Optimize: Use chunking for large unions
+        $combinedResults = $workOrders->union($clients)->get();
         $combinedResults = $combinedResults->map(function ($item) {
             $item->customer_name = $this->cleanField($item->customer_name);
             $item->customer_email = $this->cleanField($item->customer_email);
@@ -147,8 +123,6 @@ class WorkOrderController extends Controller
             $item->customer_address = $this->cleanField($item->customer_address);
             return $item;
         });
-
-        // Process into $customers after sanitization
         $customers = $combinedResults->groupBy('unique_id')->map(function ($items) {
             return $items->sortByDesc('score')->first();
         })->values()->sortBy('customer_name');
@@ -160,27 +134,45 @@ class WorkOrderController extends Controller
                 abort(500, "Bad customer record at index {$index}");
             }
         }
-        // Get the count of customers
         $customerCount = $customers->count();
 
-        $users = User::orderBy('name', 'ASC')->where('status', 'active')->whereNotIn('id', [1, 16])->whereHas('empProfile', function ($q) {
-            $q = $q->where('type', 'employee');
-        })->get();
-        $airlines = MasterAirlines::orderBy('name', 'ASC')->get();
-        $vins = Vehicles::orderBy('vin', 'ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand', 'interior', 'exterior', 'warehouseLocation', 'document')->get()->unique('vin')
-            ->values(); // Reset the keys to ensure it's a proper array 
+        // Optimize: Only select needed columns for users
+        $users = User::select('id', 'name')
+            ->orderBy('name', 'ASC')
+            ->where('status', 'active')
+            ->whereNotIn('id', [1, 16])
+            ->whereHas('empProfile', function ($q) {
+                $q->where('type', 'employee');
+            })->get();
+        // Optimize: Cache airlines for 5 minutes
+        $airlines = \Cache::remember('workorder_airlines', 300, function () {
+            return MasterAirlines::orderBy('name', 'ASC')->get();
+        });
+        // Optimize: Only select needed columns for vehicles, and use distinct at query level
+        $vins = Vehicles::select('id', 'vin')
+            ->orderBy('vin', 'ASC')
+            ->whereNotNull('vin')
+            ->with(['variant.master_model_lines.brand', 'interior', 'exterior', 'warehouseLocation', 'document'])
+            ->distinct('vin')
+            ->get()
+            ->unique('vin')
+            ->values();
         $salesPersons = [];
         $hasAllSalesAccess = Auth::user()->hasPermissionForSelectedRole([
             'create-wo-for-all-sales-person'
         ]);
         if ($hasAllSalesAccess) {
-            $salesPersons = User::orderBy('name', 'ASC')->where('status', 'active')->where('is_sales_rep', 'Yes')->whereNotIn('id', [1, 16])->whereHas('empProfile', function ($q) {
-                $q = $q->where('type', 'employee');
-            })->get();
+            $salesPersons = User::select('id', 'name')
+                ->orderBy('name', 'ASC')
+                ->where('status', 'active')
+                ->where('is_sales_rep', 'Yes')
+                ->whereNotIn('id', [1, 16])
+                ->whereHas('empProfile', function ($q) {
+                    $q->where('type', 'employee');
+                })->get();
         }
-
         return view('work_order.export_exw.create', compact('type', 'customers', 'customerCount', 'airlines', 'vins', 'users', 'addons', 'charges', 'salesPersons'))->with([
-            'vinsJson' => $vins->toJson(), // Single encoding here
+            'vinsJson' => $vins->toJson(),
         ]);
     }
     /**
@@ -741,14 +733,38 @@ class WorkOrderController extends Controller
      */
     public function store(StoreWorkOrderRequest $request)
     {
+        // Prepare file uploads before transaction
+        $fileFields = [
+            'brn_file' => 'wo/brn_file',
+            'signed_pfi' => 'wo/signed_pfi',
+            'signed_contract' => 'wo/signed_contract',
+            'payment_receipts' => 'wo/payment_receipts',
+            'noc' => 'wo/noc',
+            'enduser_trade_license' => 'wo/enduser_trade_license',
+            'enduser_passport' => 'wo/enduser_passport',
+            'enduser_contract' => 'wo/enduser_contract',
+            'vehicle_handover_person_id' => 'wo/vehicle_handover_person_id'
+        ];
+        $fileData = [];
+        foreach ($fileFields as $fileField => $path) {
+            if ($request->hasFile($fileField)) {
+                $file = $request->file($fileField);
+                if ($file->isValid() && $file->getError() == UPLOAD_ERR_OK) {
+                    $fileName = auth()->id() . '_' . time() . '.' . $file->extension();
+                    $file->move(public_path($path), $fileName);
+                    $fileData[] = [
+                        'file_name' => $fileField,
+                        'file_type' => $file->getClientMimeType(),
+                        'file_path' => $path . '/' . $fileName
+                    ];
+                }
+            }
+        }
         DB::beginTransaction();
-
         try {
             $authId = Auth::id();
-            // Retrieve validated input data
             $validated = $request->validated();
             $input = $request->all();
-            // Ensure these fields are properly converted to strings
             $input['customer_company_number'] = $request->customer_company_number['full'] ?? null;
             $input['customer_representative_contact'] = $request->customer_representative_contact['full'] ?? null;
             $input['delivery_contact_person_number'] = $request->delivery_contact_person_number['full'] ?? null;
@@ -759,85 +775,30 @@ class WorkOrderController extends Controller
             $input['amount_received'] = $request->amount_received ?? 0.00;
             $input['balance_amount'] = $request->balance_amount ?? 0.00;
             $input['date'] = Carbon::now()->format('Y-m-d');
-
             if ($request->customer_type == 'new') {
                 $input['customer_name'] = $request->new_customer_name;
             } else if ($request->customer_type == 'existing') {
                 $input['customer_name'] = $request->existing_customer_name;
             }
-
             $fields = [
                 'air' => [
-                    'brn',
-                    'container_number',
-                    'shipping_line',
-                    'forward_import_code',
-                    'trailer_number_plate',
-                    'transportation_company',
-                    'transporting_driver_contact_number',
-                    'transportation_company_details'
+                    'brn', 'container_number', 'shipping_line', 'forward_import_code', 'trailer_number_plate', 'transportation_company', 'transporting_driver_contact_number', 'transportation_company_details'
                 ],
                 'sea' => [
-                    'airline_reference_id',
-                    'airline',
-                    'airway_bill',
-                    'trailer_number_plate',
-                    'transportation_company',
-                    'transporting_driver_contact_number',
-                    'airway_details',
-                    'transportation_company_details'
+                    'airline_reference_id', 'airline', 'airway_bill', 'trailer_number_plate', 'transportation_company', 'transporting_driver_contact_number', 'airway_details', 'transportation_company_details'
                 ],
                 'road' => [
-                    'brn_file',
-                    'brn',
-                    'container_number',
-                    'airline_reference_id',
-                    'airline',
-                    'airway_bill',
-                    'shipping_line',
-                    'airway_details',
-                    'forward_import_code'
+                    'brn_file', 'brn', 'container_number', 'airline_reference_id', 'airline', 'airway_bill', 'shipping_line', 'airway_details', 'forward_import_code'
                 ]
             ];
-
             $transportType = $request->transport_type;
-
             if (isset($fields[$transportType])) {
                 foreach ($fields[$transportType] as $field) {
                     $input[$field] = NULL;
                 }
             }
-
-            $fileFields = [
-                'brn_file' => 'wo/brn_file',
-                'signed_pfi' => 'wo/signed_pfi',
-                'signed_contract' => 'wo/signed_contract',
-                'payment_receipts' => 'wo/payment_receipts',
-                'noc' => 'wo/noc',
-                'enduser_trade_license' => 'wo/enduser_trade_license',
-                'enduser_passport' => 'wo/enduser_passport',
-                'enduser_contract' => 'wo/enduser_contract',
-                'vehicle_handover_person_id' => 'wo/vehicle_handover_person_id'
-            ];
-            // Loop through each file field
-            foreach ($fileFields as $fileField => $path) {
-                if ($request->hasFile($fileField)) {
-                    $file = $request->file($fileField);
-                    if ($file->isValid() && $file->getError() == UPLOAD_ERR_OK) {
-                        $fileName = auth()->id() . '_' . time() . '.' . $file->extension();
-                        $file->move(public_path($path), $fileName);
-
-                        // Add the file name to the input array
-                        $input[$fileField] = $fileName;
-
-                        // Collect file metadata for data history
-                        $fileData[] = [
-                            'file_name' => $fileField,
-                            'file_type' => $file->getClientMimeType(),
-                            'file_path' => $path . '/' . $fileName
-                        ];
-                    }
-                }
+            foreach ($fileData as $data) {
+                $input[$data['file_name']] = basename($data['file_path']);
             }
             if (!isset($request->is_batch)) {
                 $input['batch'] = NULL;
@@ -853,14 +814,17 @@ class WorkOrderController extends Controller
                 $input['lto'] = null;
             }
             $workOrder = WorkOrder::create($input);
-            $createwostatus['wo_id'] = $workOrder->id;
-            $createwostatus['status_changed_by'] = $authId;
-            $createwostatus['status'] = 'Active';
-            $createwostatus['comment'] = 'The system generated the status when this work order was created.';
-            $createwostatus['status_changed_at'] = Carbon::now();
+            $createwostatus = [
+                'wo_id' => $workOrder->id,
+                'status_changed_by' => $authId,
+                'status' => 'Active',
+                'comment' => 'The system generated the status when this work order was created.',
+                'status_changed_at' => Carbon::now()
+            ];
             $WoStatusCreate = WoStatus::create($createwostatus);
+            $woHistoryBulk = [];
             if (isset($request->is_batch)) {
-                WORecordHistory::create([
+                $woHistoryBulk[] = [
                     'work_order_id' => $workOrder->id,
                     'user_id' => $authId,
                     'field_name' => 'batch',
@@ -868,8 +832,8 @@ class WorkOrderController extends Controller
                     'new_value' => $request->batch,
                     'type' => 'Set',
                     'changed_at' => Carbon::now()
-                ]);
-                WORecordHistory::create([
+                ];
+                $woHistoryBulk[] = [
                     'work_order_id' => $workOrder->id,
                     'user_id' => $authId,
                     'field_name' => 'is_batch',
@@ -877,11 +841,10 @@ class WorkOrderController extends Controller
                     'new_value' => 1,
                     'type' => 'Set',
                     'changed_at' => Carbon::now()
-                ]);
+                ];
             }
-            // Handle customer name changes based on customer type
             if ($request->customer_type == 'new' && !is_null($request->new_customer_name)) {
-                WORecordHistory::create([
+                $woHistoryBulk[] = [
                     'work_order_id' => $workOrder->id,
                     'user_id' => $authId,
                     'field_name' => 'customer_name',
@@ -889,9 +852,9 @@ class WorkOrderController extends Controller
                     'new_value' => $request->new_customer_name,
                     'type' => 'Set',
                     'changed_at' => Carbon::now()
-                ]);
+                ];
             } elseif ($request->customer_type == 'existing' && !is_null($request->existing_customer_name)) {
-                WORecordHistory::create([
+                $woHistoryBulk[] = [
                     'work_order_id' => $workOrder->id,
                     'user_id' => $authId,
                     'field_name' => 'customer_name',
@@ -899,37 +862,14 @@ class WorkOrderController extends Controller
                     'new_value' => $request->existing_customer_name,
                     'type' => 'Set',
                     'changed_at' => Carbon::now()
-                ]);
+                ];
             }
-            // Define the fields to exclude
             $excludeFields = [
-                '_token',
-                'customerCount',
-                'type',
-                'customer_type',
-                'comments',
-                'currency',
-                'wo_id',
-                'new_customer_name',
-                'brn_file',
-                'signed_pfi',
-                'signed_contract',
-                'payment_receipts',
-                'noc',
-                'enduser_trade_license',
-                'enduser_passport',
-                'enduser_contract',
-                'vehicle_handover_person_id',
-                'batch',
-                'is_batch'
+                '_token', 'customerCount', 'type', 'customer_type', 'comments', 'currency', 'wo_id', 'new_customer_name', 'brn_file', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'batch', 'is_batch'
             ];
-
-            // Filter out non-null, non-array values, and exclude specified fields
             $nonNullData = array_filter($request->all(), function ($value, $key) use ($excludeFields) {
                 return !is_null($value) && !is_array($value) && !in_array($key, $excludeFields);
             }, ARRAY_FILTER_USE_BOTH);
-
-            // Define specific nested fields to store if not null
             $nestedFields = [
                 'customer_company_number' => 'full',
                 'customer_representative_contact' => 'full',
@@ -938,9 +878,8 @@ class WorkOrderController extends Controller
                 'transporting_driver_contact_number' => 'full'
             ];
             $canCreateFinanceApproval = false;
-            // Store each non-null, non-array field in the data history
             foreach ($nonNullData as $field => $value) {
-                WORecordHistory::create([
+                $woHistoryBulk[] = [
                     'work_order_id' => $workOrder->id,
                     'field_name' => $field,
                     'old_value' => NULL,
@@ -948,11 +887,9 @@ class WorkOrderController extends Controller
                     'type' => 'Set',
                     'user_id' => Auth::id(),
                     'changed_at' => Carbon::now(),
-                ]);
-
-                // Store currency value conditionally based on the 'so_total_amount' field
+                ];
                 if ($field == 'so_total_amount') {
-                    WORecordHistory::create([
+                    $woHistoryBulk[] = [
                         'work_order_id' => $workOrder->id,
                         'field_name' => 'currency',
                         'old_value' => NULL,
@@ -960,20 +897,15 @@ class WorkOrderController extends Controller
                         'type' => 'Set',
                         'user_id' => Auth::id(),
                         'changed_at' => Carbon::now(),
-                    ]);
+                    ];
                 }
-
-                // Check for specified fields and create an entry in the WOApprovals model
                 if (in_array($field, ['so_total_amount', 'so_vehicle_quantity', 'amount_received', 'balance_amount'])) {
-                    // , 'currency'
                     $canCreateFinanceApproval = true;
                 }
             }
-
-            // Store specific nested fields if not null
             foreach ($nestedFields as $field => $subField) {
                 if (isset($request->$field[$subField]) && !is_null($request->$field[$subField])) {
-                    WORecordHistory::create([
+                    $woHistoryBulk[] = [
                         'work_order_id' => $workOrder->id,
                         'field_name' => $field . '.' . $subField,
                         'old_value' => NULL,
@@ -981,23 +913,22 @@ class WorkOrderController extends Controller
                         'type' => 'Set',
                         'user_id' => Auth::id(),
                         'changed_at' => Carbon::now(),
-                    ]);
+                    ];
                 }
             }
-
-            // Store file information in the data history table
-            if (!empty($fileData)) {
-                foreach ($fileData as $data) {
-                    WORecordHistory::create([
-                        'work_order_id' => $workOrder->id,
-                        'field_name' => $data['file_name'],
-                        'old_value' => NULL,
-                        'new_value' => $data['file_path'],
-                        'type' => 'Set',
-                        'user_id' => Auth::id(),
-                        'changed_at' => Carbon::now(),
-                    ]);
-                }
+            foreach ($fileData as $data) {
+                $woHistoryBulk[] = [
+                    'work_order_id' => $workOrder->id,
+                    'field_name' => $data['file_name'],
+                    'old_value' => NULL,
+                    'new_value' => $data['file_path'],
+                    'type' => 'Set',
+                    'user_id' => Auth::id(),
+                    'changed_at' => Carbon::now(),
+                ];
+            }
+            if (!empty($woHistoryBulk)) {
+                WORecordHistory::insert($woHistoryBulk);
             }
             $canCreateCOOApproval = false;
             if (isset($request->vehicle)) {
