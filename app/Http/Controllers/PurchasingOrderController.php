@@ -5285,22 +5285,22 @@ public function submitPaymentDetails(Request $request)
 
             $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
             $currency = $supplierAccountTransaction->account_currency;
-            if($purchasingOrder->is_demand_planning_po == 1)
-            {
-                $recipients = [
-                    config('mail.custom_recipients.dp'),
-                    config('mail.custom_recipients.finance'),
-                ];
-            Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
-            }
-            else 
-            {
-                $recipients = [
-                    config('mail.custom_recipients.cso'),
-                    config('mail.custom_recipients.finance'),
-                ];
-            Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
-            }
+            // if($purchasingOrder->is_demand_planning_po == 1)
+            // {
+            //     $recipients = [
+            //         config('mail.custom_recipients.dp'),
+            //         config('mail.custom_recipients.finance'),
+            //     ];
+            // Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+            // }
+            // else 
+            // {
+            //     $recipients = [
+            //         config('mail.custom_recipients.cso'),
+            //         config('mail.custom_recipients.finance'),
+            //     ];
+            // Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+            // }
             $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
             "PFI Number: " . $purchasingOrder->pl_number . "\n" .
             "Payment Amount: " . $supplierAccountTransaction->transaction_amount . "\n" .
