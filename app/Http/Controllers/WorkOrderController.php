@@ -149,8 +149,7 @@ class WorkOrderController extends Controller
             return MasterAirlines::orderBy('name', 'ASC')->get();
         });
         // Optimize: Only select needed columns for vehicles, and use distinct at query level
-        $vins = Vehicles::select('id', 'vin')
-            ->orderBy('vin', 'ASC')
+        $vins = Vehicles::orderBy('vin', 'ASC')
             ->whereNotNull('vin')
             ->with(['variant.master_model_lines.brand', 'interior', 'exterior', 'warehouseLocation', 'document'])
             ->distinct('vin')
@@ -782,13 +781,35 @@ class WorkOrderController extends Controller
             }
             $fields = [
                 'air' => [
-                    'brn', 'container_number', 'shipping_line', 'forward_import_code', 'trailer_number_plate', 'transportation_company', 'transporting_driver_contact_number', 'transportation_company_details'
+                    'brn',
+                    'container_number',
+                    'shipping_line',
+                    'forward_import_code',
+                    'trailer_number_plate',
+                    'transportation_company',
+                    'transporting_driver_contact_number',
+                    'transportation_company_details'
                 ],
                 'sea' => [
-                    'airline_reference_id', 'airline', 'airway_bill', 'trailer_number_plate', 'transportation_company', 'transporting_driver_contact_number', 'airway_details', 'transportation_company_details'
+                    'airline_reference_id',
+                    'airline',
+                    'airway_bill',
+                    'trailer_number_plate',
+                    'transportation_company',
+                    'transporting_driver_contact_number',
+                    'airway_details',
+                    'transportation_company_details'
                 ],
                 'road' => [
-                    'brn_file', 'brn', 'container_number', 'airline_reference_id', 'airline', 'airway_bill', 'shipping_line', 'airway_details', 'forward_import_code'
+                    'brn_file',
+                    'brn',
+                    'container_number',
+                    'airline_reference_id',
+                    'airline',
+                    'airway_bill',
+                    'shipping_line',
+                    'airway_details',
+                    'forward_import_code'
                 ]
             ];
             $transportType = $request->transport_type;
@@ -865,7 +886,25 @@ class WorkOrderController extends Controller
                 ];
             }
             $excludeFields = [
-                '_token', 'customerCount', 'type', 'customer_type', 'comments', 'currency', 'wo_id', 'new_customer_name', 'brn_file', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'batch', 'is_batch'
+                '_token',
+                'customerCount',
+                'type',
+                'customer_type',
+                'comments',
+                'currency',
+                'wo_id',
+                'new_customer_name',
+                'brn_file',
+                'signed_pfi',
+                'signed_contract',
+                'payment_receipts',
+                'noc',
+                'enduser_trade_license',
+                'enduser_passport',
+                'enduser_contract',
+                'vehicle_handover_person_id',
+                'batch',
+                'is_batch'
             ];
             $nonNullData = array_filter($request->all(), function ($value, $key) use ($excludeFields) {
                 return !is_null($value) && !is_array($value) && !in_array($key, $excludeFields);
