@@ -64,6 +64,7 @@ class AuthOtpController extends Controller
 
                 }
 
+                /*
                 # Generate An OTP
                 $verificationCode = $this->generateOtp($request->email);
                 $message = "Your OTP To Login is Send Successfully ";
@@ -83,10 +84,14 @@ class AuthOtpController extends Controller
                                 ->subject($subject);
                         }
                     );
-                    $user_id = Crypt::encryptString($verificationCode->user_id);
-                    $email = Crypt::encryptString($request->email);
-                    $password = Crypt::encryptString($request->password);
+                $user_id = Crypt::encryptString($verificationCode->user_id);
+                $email = Crypt::encryptString($request->email);
+                $password = Crypt::encryptString($request->password);
                 return redirect()->route('otp.verification', ['user_id' => $user_id, 'email'=>$email,'password'=>$password])->with('success',  $message);
+                */
+                // Directly log in the user without OTP and mail
+                $request['user_id'] = $user->id;
+                return (app('App\Http\Controllers\Auth\LoginController')->login($request));
             }
             else
             {
@@ -106,30 +111,34 @@ class AuthOtpController extends Controller
         $user = User::where('email',$request->email)->first();
         if($user)
         {
-                 # Validate Data
-                $request->validate([
-                    'email' => 'required|exists:users,email',
-                ]);
-                # Generate An OTP
-                $verificationCode = $this->generateOtp($request->email);
-                $message = "Your OTP To Login is Send Successfully ";
-                # Return With OTP
-                $data['email'] = $request->email;
-                $data['name'] = 'Hello,';
-                $data['otp'] = $verificationCode->otp;
-                $template['from'] = 'no-reply@milele.com';
-                $template['from_name'] = 'Milele Matrix';
-                $subject = 'Milele Matrix Login OTP Code';
-                Mail::send(
-                        "auth.otpemail",
-                        ["data"=>$data] ,
-                        function($msg) use ($data,$template,$subject) {
-                            $msg->to($data['email'], $data['name'])
-                                ->from($template['from'],$template['from_name'])
-                                ->subject($subject);
-                        }
-                    );
-                return redirect()->route('otp.verification', ['user_id' => $verificationCode->user_id])->with('success',  $message);
+            # Validate Data
+            $request->validate([
+                'email' => 'required|exists:users,email',
+            ]);
+            /*
+            # Generate An OTP
+            $verificationCode = $this->generateOtp($request->email);
+            $message = "Your OTP To Login is Send Successfully ";
+            # Return With OTP
+            $data['email'] = $request->email;
+            $data['name'] = 'Hello,';
+            $data['otp'] = $verificationCode->otp;
+            $template['from'] = 'no-reply@milele.com';
+            $template['from_name'] = 'Milele Matrix';
+            $subject = 'Milele Matrix Login OTP Code';
+            Mail::send(
+                    "auth.otpemail",
+                    ["data"=>$data] ,
+                    function($msg) use ($data,$template,$subject) {
+                        $msg->to($data['email'], $data['name'])
+                            ->from($template['from'],$template['from_name'])
+                            ->subject($subject);
+                    }
+                );
+            return redirect()->route('otp.verification', ['user_id' => $verificationCode->user_id])->with('success',  $message);
+            */
+            // Directly redirect to login page with success (simulate OTP success)
+            return redirect()->route('login')->with('success',  'OTP step bypassed, please login.');
         }
         else
         {
@@ -138,6 +147,7 @@ class AuthOtpController extends Controller
         }
     }
 
+    /*
     public function generateOtp($email)
     {
         $user = User::where('email', $email)->first();
@@ -158,7 +168,10 @@ class AuthOtpController extends Controller
             'expire_at' => Carbon::now()->addMinutes(10)
         ]);
     }
+    */
 
+    // Optionally, you may want to comment out or adjust the verification method if not needed
+    /*
     public function verification($user_id, $email, $password)
     {
         $user_id= Crypt::decryptString($user_id);
@@ -170,6 +183,7 @@ class AuthOtpController extends Controller
             'password' => $password,
         ]);
     }
+    */
 
 
 }
