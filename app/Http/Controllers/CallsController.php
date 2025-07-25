@@ -417,6 +417,44 @@ class CallsController extends Controller
                 ->withInput();
         }
 
+        // Additional required field validation
+        $customErrors = [];
+        $rawPhone = $request->input('phone');
+        $email = $request->input('email');
+        $location = $request->input('location');
+        $source_name = $request->input('milelemotors');
+        $language = $request->input('language');
+        $strategies = $request->input('strategy');
+        $priority = strtolower(trim($request->input('priority')));
+        // 1. Contact No. or Email
+        if (empty($rawPhone) && empty($email)) {
+            $customErrors['contact'] = 'Contact No or Email is required.';
+        }
+        // 2. Country
+        if (empty($location) || !\App\Models\Country::where('name', $location)->exists()) {
+            $customErrors['location'] = 'Country is required.';
+        }
+        // 3. Source
+        if (empty($source_name) || !\App\Models\LeadSource::where('source_name', $source_name)->exists()) {
+            $customErrors['source'] = 'Source is required.';
+        }
+        // 4. Preferred Language
+        if (empty($language) || !\App\Models\Language::where('name', $language)->exists()) {
+            $customErrors['language'] = 'Preferred Language is required.';
+        }
+        // 5. Strategies
+        if (empty($strategies) || !\App\Models\Strategy::where('name', $strategies)->exists()) {
+            $customErrors['strategies'] = 'Strategies is required.';
+        }
+        // 6. Priority
+        $validPriorities = ['hot', 'low', 'normal'];
+        if (empty($priority) || !in_array($priority, $validPriorities)) {
+            $customErrors['priority'] = 'Priority is required.';
+        }
+        if (!empty($customErrors)) {
+            return redirect()->back()->withErrors($customErrors)->withInput();
+        }
+
         if ($request->input('sales-option') == "auto-assign") {
             Log::info("Starting auto-assignment for lead creation.");
             $sales_person_id = $this->autoAssignSalesPerson(
