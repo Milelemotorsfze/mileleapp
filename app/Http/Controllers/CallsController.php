@@ -1015,16 +1015,24 @@ class CallsController extends Controller
 
                 $errorDescription = '';
 
-                if ($sales_person == null) {
+                // Assignment logic
+                if (!empty($sales_person)) {
+                    // If sales person is specified, assign directly (bypass auto-assignment rules)
+                    $salesPerson = User::where('name', $sales_person)->first();
+                    if ($salesPerson) {
+                        $sales_person_id = $salesPerson->id;
+                    } else {
+                        $errorMessages[] = 'Specified Sales Person not found.';
+                        $sales_person_id = null;
+                    }
+                } else {
+                    // Auto-assignment logic
                     $sales_person_id = $this->autoAssignSalesPerson(
                         $email,
                         $rawPhone,
                         $language,
                         $location
                     );
-                } else {
-                    $salesPerson = User::where('name', $sales_person)->first();
-                    $sales_person_id = $salesPerson ? $salesPerson->id : null;
                 }
 
                 if ($source_name !== null) {
