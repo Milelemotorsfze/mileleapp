@@ -859,8 +859,9 @@ class CallsController extends Controller
                 }
             }
 
-            if (!$isPhoneValid && !$isEmailValid) {
-                $errorMessages[] = 'Either a valid Email or Phone Number is required';
+            // If both phone and email are missing, reject with clear error
+            if (empty($rawPhone) && empty($email)) {
+                $errorMessages[] = 'Missing Email and Phone Number';
             }
 
             if (!$isPhoneValid && !$isEmailValid) {
@@ -1878,7 +1879,7 @@ class CallsController extends Controller
             'Ayoub Ididir',
             // 'Elie Zouein',
         ];
-        $sales_person_id = null;
+
         $isAfrican = false;
         if ($location && in_array($location, Country::where('is_african_country', 1)->pluck('name')->toArray())) {
             $isAfrican = true;
@@ -1886,48 +1887,91 @@ class CallsController extends Controller
         $cleanedPhone = $phone ? ltrim(preg_replace('/[^\d+]/', '', $phone), '+') : '';
         $matchByEmail = !empty($email) ? Calls::where('email', $email)->whereNotNull('email')->orderBy('created_at', 'desc')->first() : null;
         $matchByPhone = !empty($cleanedPhone) ? Calls::where('phone', 'LIKE', '%' . $cleanedPhone)->whereNotNull('phone')->orderBy('created_at', 'desc')->first() : null;
+
+        // 1. Check for Previous Assignment
+        $previousSalesPerson = null;
         if ($matchByEmail && !in_array($matchByEmail->sales_person, $excluded_user_ids)) {
             $matchedUser = User::find($matchByEmail->sales_person);
             if ($matchedUser && in_array($matchedUser->name, $allowed_users)) {
-                $sales_person_id = $matchByEmail->sales_person;
+                $previousSalesPerson = $matchByEmail->sales_person;
             }
         } elseif ($matchByPhone && !in_array($matchByPhone->sales_person, $excluded_user_ids)) {
             $matchedUser = User::find($matchByPhone->sales_person);
             if ($matchedUser && in_array($matchedUser->name, $allowed_users)) {
-                $sales_person_id = $matchByPhone->sales_person;
+                $previousSalesPerson = $matchByPhone->sales_person;
             }
         }
-        if (!$sales_person_id && !empty($language)) {
-            $langMatched = SalesPersonLaugauges::whereIn('sales_person', $excluded_user_ids)
+        if ($previousSalesPerson) {
+            return $previousSalesPerson;
+        }
+
+        // 2. Proceed with New Assignment
+        // 3. Language Check
+        $userQuery = ModelHasRoles::select('model_id')
+            ->where('role_id', 7)
+            ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+            ->where('users.status', 'active')
+            ->whereIn('users.name', $allowed_users)
+            ->whereNotIn('model_has_roles.model_id', $excluded_user_ids);
+        if ($isAfrican) {
+            $userQuery->where('users.is_dubai_sales_rep', 'Yes');
+        }
+        $eligibleUserIds = $userQuery->pluck('model_id')->toArray();
+
+        // If language is English
+        if (strtolower($language) === 'english') {
+            // Assign to the salesperson with the least number of pending leads (round robin among all eligible)
+            $leastLeadsUser = Calls::whereIn('sales_person', $eligibleUserIds)
+                ->where('status', 'New')
+                ->selectRaw('sales_person, COUNT(*) as lead_count')
+                ->groupBy('sales_person')
+                ->orderBy('lead_count', 'asc')
+                ->first();
+            if ($leastLeadsUser) {
+                return $leastLeadsUser->sales_person;
+            } else {
+                // If no leads, just pick the first eligible user
+                return !empty($eligibleUserIds) ? $eligibleUserIds[0] : null;
+            }
+        } else {
+            // Non-English language
+            $langMatched = SalesPersonLaugauges::whereIn('sales_person', $eligibleUserIds)
                 ->where('language', $language)
                 ->pluck('sales_person')
                 ->toArray();
             if (count($langMatched) === 1) {
-                $user = User::find($langMatched[0]);
-                if ($user && in_array($user->name, $allowed_users)) {
-                    $sales_person_id = $langMatched[0];
-                }
+                return $langMatched[0];
             } elseif (count($langMatched) > 1) {
-                $lowestLeadLang = ModelHasRoles::select('model_id')
-                    ->where('role_id', 7)
-                    ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-                    ->where('users.status', 'active')
-                    ->whereIn('users.name', $allowed_users)
-                    ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
-                    ->join('sales_person_laugauges', 'model_has_roles.model_id', '=', 'sales_person_laugauges.sales_person')
-                    ->whereIn('model_has_roles.model_id', $langMatched)
-                    ->where('sales_person_laugauges.language', $language)
-                    ->where('calls.status', 'New')
-                    ->groupBy('calls.sales_person')
-                    ->orderByRaw('COUNT(calls.id) ASC')
+                // Round robin among those who speak the language
+                $leastLeadsUser = Calls::whereIn('sales_person', $langMatched)
+                    ->where('status', 'New')
+                    ->selectRaw('sales_person, COUNT(*) as lead_count')
+                    ->groupBy('sales_person')
+                    ->orderBy('lead_count', 'asc')
                     ->first();
-                if ($lowestLeadLang) {
-                    $sales_person_id = $lowestLeadLang->model_id;
+                if ($leastLeadsUser) {
+                    return $leastLeadsUser->sales_person;
+                } else {
+                    return $langMatched[0];
+                }
+            } else {
+                // No salesperson speaks the language, assign to any available salesperson
+                $leastLeadsUser = Calls::whereIn('sales_person', $eligibleUserIds)
+                    ->where('status', 'New')
+                    ->selectRaw('sales_person, COUNT(*) as lead_count')
+                    ->groupBy('sales_person')
+                    ->orderBy('lead_count', 'asc')
+                    ->first();
+                if ($leastLeadsUser) {
+                    return $leastLeadsUser->sales_person;
+                } else {
+                    return !empty($eligibleUserIds) ? $eligibleUserIds[0] : null;
                 }
             }
         }
+        // FINAL FALLBACK: If no eligible user found, assign to any available active salesperson (not excluded, and in allowed_users)
         if (!$sales_person_id) {
-            $roundRobinQuery = ModelHasRoles::select('model_id')
+            $anyUser = ModelHasRoles::select('model_id')
                 ->where('role_id', 7)
                 ->join('users', 'model_has_roles.model_id', '=', 'users.id')
                 ->where('users.status', 'active')
@@ -1936,16 +1980,12 @@ class CallsController extends Controller
                 ->leftJoin('calls', function ($join) {
                     $join->on('model_has_roles.model_id', '=', 'calls.sales_person')
                         ->where('calls.status', 'New');
-                });
-            if ($isAfrican) {
-                $roundRobinQuery->where('users.is_dubai_sales_rep', 'Yes');
-            }
-            $fallbackPerson = $roundRobinQuery
+                })
                 ->groupBy('model_has_roles.model_id')
                 ->orderByRaw('COALESCE(COUNT(calls.id), 0) ASC')
                 ->first();
-            if ($fallbackPerson) {
-                $sales_person_id = $fallbackPerson->model_id;
+            if ($anyUser) {
+                $sales_person_id = $anyUser->model_id;
             }
         }
         return $sales_person_id;
