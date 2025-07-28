@@ -821,7 +821,7 @@ class CallsController extends Controller
         }
         // Define required columns (excluding CONTACT_NO and EMAIL for now)
         $requiredColumns = [
-            'COUNTRY', 'SOURCE', 'PREFERRED LANGUAGE', 'STRATEGIES', 'PRIORITY'
+            'COUNTRY', 'SOURCE', 'PREFERRED_LANGUAGE', 'STRATEGIES', 'PRIORITY'
         ];
         // Check for missing required columns
         $missingColumns = array_diff($requiredColumns, array_keys($headerMap));
@@ -848,26 +848,26 @@ class CallsController extends Controller
             $name = isset($headerMap['CUSTOMER']) ? ($row[$headerMap['CUSTOMER']] ?? '') : '';
             $rawPhone  = isset($headerMap['CONTACT_NO']) ? trim($row[$headerMap['CONTACT_NO']] ?? '') : '';
             $email = isset($headerMap['EMAIL']) ? trim($row[$headerMap['EMAIL']] ?? '') : '';
-            $sales_person = isset($headerMap['SALES PERSON']) ? ($row[$headerMap['SALES PERSON']] ?? '') : '';
+            $sales_person = isset($headerMap['SALES_PERSON']) ? ($row[$headerMap['SALES_PERSON']] ?? '') : '';
             $source_name = isset($headerMap['SOURCE']) ? ($row[$headerMap['SOURCE']] ?? '') : '';
-            $language = isset($headerMap['PREFERRED LANGUAGE']) ? ($row[$headerMap['PREFERRED LANGUAGE']] ?? '') : '';
+            $language = isset($headerMap['PREFERRED_LANGUAGE']) ? ($row[$headerMap['PREFERRED_LANGUAGE']] ?? '') : '';
             $location = isset($headerMap['COUNTRY']) ? ($row[$headerMap['COUNTRY']] ?? '') : '';
             $brand = isset($headerMap['BRAND']) ? ($row[$headerMap['BRAND']] ?? '') : '';
-            $model_line_name = isset($headerMap['MODEL LINE']) ? ($row[$headerMap['MODEL LINE']] ?? '') : '';
-            $custom_brand_model = isset($headerMap['CUSTOM MODEL']) ? ($row[$headerMap['CUSTOM MODEL']] ?? '') : '';
+            $model_line_name = isset($headerMap['MODEL_LINE']) ? ($row[$headerMap['MODEL_LINE']] ?? '') : '';
+            $custom_brand_model = isset($headerMap['CUSTOM_MODEL']) ? ($row[$headerMap['CUSTOM_MODEL']] ?? '') : '';
             $strategies = isset($headerMap['STRATEGIES']) ? ($row[$headerMap['STRATEGIES']] ?? '') : '';
             $priority = isset($headerMap['PRIORITY']) ? strtolower(trim($row[$headerMap['PRIORITY']] ?? '')) : '';
-            $carInterested = isset($headerMap['CAR INTERESTED']) ? trim($row[$headerMap['CAR INTERESTED']] ?? '') : '';
+            $carInterested = isset($headerMap['CAR_INTERESTED']) ? trim($row[$headerMap['CAR_INTERESTED']] ?? '') : '';
             $purchasePurpose = isset($headerMap['PURPOSE OF PURCHASE']) ? trim($row[$headerMap['PURPOSE OF PURCHASE']] ?? '') : '';
-            $endUser = isset($headerMap['END USER']) ? trim($row[$headerMap['END USER']] ?? '') : '';
-            $destinationCountry = isset($headerMap['DESTINATION COUNTRY']) ? trim($row[$headerMap['DESTINATION COUNTRY']] ?? '') : '';
-            $plannedUnits = isset($headerMap['PLANNED UNITS']) ? trim($row[$headerMap['PLANNED UNITS']] ?? '') : '';
-            $experience = isset($headerMap['EXPERIENCE WITH UAE SOURCING']) ? trim($row[$headerMap['EXPERIENCE WITH UAE SOURCING']] ?? '') : '';
-            $shipping = isset($headerMap['SHIPPING ASSISTANCE REQUIRED']) ? trim($row[$headerMap['SHIPPING ASSISTANCE REQUIRED']] ?? '') : '';
-            $paymentMethod = isset($headerMap['PAYMENT METHOD']) ? trim($row[$headerMap['PAYMENT METHOD']] ?? '') : '';
-            $prevPurchase = isset($headerMap['PREVIOUS PURCHASE HISTORY']) ? trim($row[$headerMap['PREVIOUS PURCHASE HISTORY']] ?? '') : '';
-            $timeline = isset($headerMap['PURCHASE TIMELINE']) ? trim($row[$headerMap['PURCHASE TIMELINE']] ?? '') : '';
-            $additionalNotes = isset($headerMap['ADDITIONAL NOTES']) ? trim($row[$headerMap['ADDITIONAL NOTES']] ?? '') : '';
+            $endUser = isset($headerMap['END_USER']) ? trim($row[$headerMap['END_USER']] ?? '') : '';
+            $destinationCountry = isset($headerMap['DESTINATION_COUNTRY']) ? trim($row[$headerMap['DESTINATION_COUNTRY']] ?? '') : '';
+            $plannedUnits = isset($headerMap['PLANNED_UNITS']) ? trim($row[$headerMap['PLANNED_UNITS']] ?? '') : '';
+            $experience = isset($headerMap['EXPERIENCE_WITH_UAE_SOURCING']) ? trim($row[$headerMap['EXPERIENCE_WITH_UAE_SOURCING']] ?? '') : '';
+            $shipping = isset($headerMap['SHIPPING_ASSISTANCE_REQUIRED']) ? trim($row[$headerMap['SHIPPING_ASSISTANCE_REQUIRED']] ?? '') : '';
+            $paymentMethod = isset($headerMap['PAYMENT_METHOD']) ? trim($row[$headerMap['PAYMENT_METHOD']] ?? '') : '';
+            $prevPurchase = isset($headerMap['PREVIOUS_PURCHASE_HISTORY']) ? trim($row[$headerMap['PREVIOUS_PURCHASE_HISTORY']] ?? '') : '';
+            $timeline = isset($headerMap['PURCHASE_TIMELINE']) ? trim($row[$headerMap['PURCHASE_TIMELINE']] ?? '') : '';
+            $additionalNotes = isset($headerMap['ADDITIONAL_NOTES']) ? trim($row[$headerMap['ADDITIONAL_NOTES']] ?? '') : '';
 
             $cleanPhone = preg_replace('/[\s\-]/', '', $rawPhone); 
             
@@ -966,7 +966,7 @@ class CallsController extends Controller
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
             $headers = [
-                'Name', 'Phone', 'Email', 'Location', 'Sales Person', 'Source Name', 'Language',
+                'Name', 'Phone', 'Email', 'Location', 'Sales_Person', 'Source Name', 'Language',
                 'Brand', 'Model Line Name', 'Custom Brand Model', 'Strategies', 'Priority', 'Error Description'
             ];
             $sheet->fromArray($headers, null, 'A1');
