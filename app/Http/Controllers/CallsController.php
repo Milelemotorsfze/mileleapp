@@ -967,6 +967,24 @@ class CallsController extends Controller
         }
 
         else {
+            // At the top of the else block, before the foreach ($rows as $row):
+            $allowed_users = [
+                'Lincoln Mukwada',
+                'Nwanneka Nwani',
+                'Raymond Chikoki',
+                'Ali Arous',
+                'Mohamad Azizi',
+                'Yacine Guella',
+                'Sarah Ferhane',
+                'Ayoub Ididir',
+            ];
+            $allowed_user_ids = User::whereIn('name', $allowed_users)->pluck('id')->toArray();
+            $userLeadCounts = [];
+            foreach ($allowed_user_ids as $uid) {
+                $userLeadCounts[$uid] = Calls::where('sales_person', $uid)->where('status', 'New')->count();
+            }
+            // ...
+            // Then, inside the foreach ($rows as $row), use only the round-robin/least-leads logic for assignment, without re-initializing these arrays.
             foreach ($rows as $row) {
                 $call = new Calls();
                 $name = $row[0];
@@ -1026,6 +1044,26 @@ class CallsController extends Controller
                         $sales_person_id = null;
                     }
                 } else {
+                    // Fair round-robin/least-leads logic for bulk upload
+                    // Filter eligible users by language/location if needed
+                    $allowed_users = [
+                        'Lincoln Mukwada',
+                        'Nwanneka Nwani',
+                        'Raymond Chikoki',
+                        'Ali Arous',
+                        'Mohamad Azizi',
+                        'Yacine Guella',
+                        'Sarah Ferhane',
+                        'Ayoub Ididir',
+                    ];
+                    $allowed_user_ids = User::whereIn('name', $allowed_users)->pluck('id')->toArray();
+
+                    // Build initial lead counts for each allowed user
+                    $userLeadCounts = [];
+                    foreach ($allowed_user_ids as $uid) {
+                        $userLeadCounts[$uid] = Calls::where('sales_person', $uid)->where('status', 'New')->count();
+                    }
+
                     // Auto-assignment logic for empty sales person field
                     $rawPhoneForAutoAssign = trim($row[1]);
                     if (!empty($rawPhoneForAutoAssign) && $rawPhoneForAutoAssign[0] !== '+') {
