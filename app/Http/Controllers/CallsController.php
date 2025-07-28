@@ -1934,10 +1934,13 @@ class CallsController extends Controller
             'Mohamad Azizi',
             'Yacine Guella',
             'Sarah Ferhane',
-            // 'Manal Khamalli',
             'Ayoub Ididir',
-            // 'Elie Zouein',
         ];
+        // 'Elie Zouein',
+        // 'Manal Khamalli',
+
+        // Get user IDs for allowed users only
+        $allowed_user_ids = User::whereIn('name', $allowed_users)->pluck('id')->toArray();
 
         $isAfrican = false;
         if ($location && in_array($location, Country::where('is_african_country', 1)->pluck('name')->toArray())) {
@@ -1949,12 +1952,12 @@ class CallsController extends Controller
 
         // 1. Check for Previous Assignment
         $previousSalesPerson = null;
-        if ($matchByEmail && !in_array($matchByEmail->sales_person, $excluded_user_ids)) {
+        if ($matchByEmail && in_array($matchByEmail->sales_person, $allowed_user_ids)) {
             $matchedUser = User::find($matchByEmail->sales_person);
             if ($matchedUser && in_array($matchedUser->name, $allowed_users)) {
                 $previousSalesPerson = $matchByEmail->sales_person;
             }
-        } elseif ($matchByPhone && !in_array($matchByPhone->sales_person, $excluded_user_ids)) {
+        } elseif ($matchByPhone && in_array($matchByPhone->sales_person, $allowed_user_ids)) {
             $matchedUser = User::find($matchByPhone->sales_person);
             if ($matchedUser && in_array($matchedUser->name, $allowed_users)) {
                 $previousSalesPerson = $matchByPhone->sales_person;
@@ -1970,8 +1973,7 @@ class CallsController extends Controller
             ->where('role_id', 7)
             ->join('users', 'model_has_roles.model_id', '=', 'users.id')
             ->where('users.status', 'active')
-            ->whereIn('users.name', $allowed_users)
-            ->whereNotIn('model_has_roles.model_id', $excluded_user_ids);
+            ->whereIn('model_has_roles.model_id', $allowed_user_ids);
         if ($isAfrican) {
             $userQuery->where('users.is_dubai_sales_rep', 'Yes');
         }
@@ -2029,13 +2031,12 @@ class CallsController extends Controller
             }
         }
         
-        // FINAL FALLBACK: If no eligible user found, assign to any available active salesperson (not excluded, and in allowed_users)
+        // FINAL FALLBACK: If no eligible user found, assign to any available active salesperson from allowed list
         $anyUser = ModelHasRoles::select('model_id')
             ->where('role_id', 7)
             ->join('users', 'model_has_roles.model_id', '=', 'users.id')
             ->where('users.status', 'active')
-            ->whereIn('users.name', $allowed_users)
-            ->whereNotIn('model_has_roles.model_id', $excluded_user_ids)
+            ->whereIn('model_has_roles.model_id', $allowed_user_ids)
             ->leftJoin('calls', function ($join) {
                 $join->on('model_has_roles.model_id', '=', 'calls.sales_person')
                     ->where('calls.status', 'New');
