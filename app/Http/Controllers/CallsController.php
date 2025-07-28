@@ -1022,17 +1022,32 @@ class CallsController extends Controller
                     if ($salesPerson) {
                         $sales_person_id = $salesPerson->id;
                     } else {
-                        $errorMessages[] = 'Specified Sales Person not found.';
+                        $errorDescription .= 'Specified Sales Person not found. ';
                         $sales_person_id = null;
                     }
                 } else {
-                    // Auto-assignment logic
+                    // Auto-assignment logic for empty sales person field
+                    $rawPhoneForAutoAssign = trim($row[1]);
+                    if (!empty($rawPhoneForAutoAssign) && $rawPhoneForAutoAssign[0] !== '+') {
+                        $rawPhoneForAutoAssign = '+' . $rawPhoneForAutoAssign;
+                    }
+                    
+                    Log::info("Auto-assigning lead for: Email=$email, Phone=$rawPhoneForAutoAssign, Language=$language, Location=$location");
+                    
                     $sales_person_id = $this->autoAssignSalesPerson(
                         $email,
-                        $rawPhone,
+                        $rawPhoneForAutoAssign,
                         $language,
                         $location
                     );
+                    
+                    if ($sales_person_id) {
+                        $assignedPerson = User::find($sales_person_id);
+                        Log::info("Auto-assigned to: " . ($assignedPerson ? $assignedPerson->name : 'Unknown') . " (ID: $sales_person_id)");
+                    } else {
+                        Log::warning("No suitable sales person found for auto-assignment");
+                        $errorDescription .= 'No suitable sales person found for auto-assignment. ';
+                    }
                 }
 
                 if ($source_name !== null) {
@@ -1097,9 +1112,8 @@ class CallsController extends Controller
                 
                 if($lead_source_id === 1 || $sales_person_id === null || $language === 'Not Supported' || $location === 'Not Supported' || $strategies_id === 1)
                 {
-                    $filteredRows[] = $row;
                     if ($sales_person_id === null) {
-                        $errorDescription .= 'Invalid sales person.';
+                        $errorDescription .= 'Invalid sales person. ';
                     }
                     if ($lead_source_id === 1) {
                         $errorDescription .= 'Invalid Source ';
@@ -1111,14 +1125,13 @@ class CallsController extends Controller
                         $errorDescription .= 'Invalid Language ';
                     }
                     if ($location === 'Not Supported') {
-                        $errorDescription .= 'Invalid Location';
+                        $errorDescription .= 'Invalid Location ';
                     }
-                    if (!empty($errorDescription)) {
-                        $row[] = $errorDescription;
-                        $rejectedRows[] = $row;
-                        $rejectedCount++;
-                        continue;
-                    }                
+                    
+                    $row[] = $errorDescription;
+                    $rejectedRows[] = $row;
+                    $rejectedCount++;
+                    continue;
                 }
                 else{
                     $date = Carbon::now();
@@ -1921,7 +1934,7 @@ class CallsController extends Controller
             'Mohamad Azizi',
             'Yacine Guella',
             'Sarah Ferhane',
-            'Manal Khamalli',
+            // 'Manal Khamalli',
             'Ayoub Ididir',
             // 'Elie Zouein',
         ];
@@ -2015,25 +2028,22 @@ class CallsController extends Controller
                 }
             }
         }
+        
         // FINAL FALLBACK: If no eligible user found, assign to any available active salesperson (not excluded, and in allowed_users)
-        if (!$sales_person_id) {
-            $anyUser = ModelHasRoles::select('model_id')
-                ->where('role_id', 7)
-                ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-                ->where('users.status', 'active')
-                ->whereIn('users.name', $allowed_users)
-                ->whereNotIn('model_has_roles.model_id', $excluded_user_ids)
-                ->leftJoin('calls', function ($join) {
-                    $join->on('model_has_roles.model_id', '=', 'calls.sales_person')
-                        ->where('calls.status', 'New');
-                })
-                ->groupBy('model_has_roles.model_id')
-                ->orderByRaw('COALESCE(COUNT(calls.id), 0) ASC')
-                ->first();
-            if ($anyUser) {
-                $sales_person_id = $anyUser->model_id;
-            }
-        }
-        return $sales_person_id;
+        $anyUser = ModelHasRoles::select('model_id')
+            ->where('role_id', 7)
+            ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+            ->where('users.status', 'active')
+            ->whereIn('users.name', $allowed_users)
+            ->whereNotIn('model_has_roles.model_id', $excluded_user_ids)
+            ->leftJoin('calls', function ($join) {
+                $join->on('model_has_roles.model_id', '=', 'calls.sales_person')
+                    ->where('calls.status', 'New');
+            })
+            ->groupBy('model_has_roles.model_id')
+            ->orderByRaw('COALESCE(COUNT(calls.id), 0) ASC')
+            ->first();
+        
+        return $anyUser ? $anyUser->model_id : null;
     }
 }
