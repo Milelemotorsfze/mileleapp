@@ -819,15 +819,15 @@ class CallsController extends Controller
         foreach ($headers as $idx => $header) {
             $headerMap[strtoupper(trim($header))] = $idx;
         }
-        // Define required columns (excluding CONTACT and EMAIL for now)
+        // Define required columns (excluding CONTACT_NO and EMAIL for now)
         $requiredColumns = [
             'COUNTRY', 'SOURCE', 'PREFERRED LANGUAGE', 'STRATEGIES', 'PRIORITY'
         ];
         // Check for missing required columns
         $missingColumns = array_diff($requiredColumns, array_keys($headerMap));
-        // Special check: at least one of CONTACT or EMAIL must be present
-        if (!isset($headerMap['CONTACT']) && !isset($headerMap['EMAIL'])) {
-            $missingColumns[] = 'CONTACT or EMAIL (at least one required)';
+        // Special check: at least one of CONTACT_NO or EMAIL must be present
+        if (!isset($headerMap['CONTACT_NO']) && !isset($headerMap['EMAIL'])) {
+            $missingColumns[] = 'CONTACT_NO or EMAIL (at least one required)';
         }
         if (!empty($missingColumns)) {
             return back()->with('error', 'Missing required columns in Excel: ' . implode(', ', $missingColumns));
@@ -846,7 +846,7 @@ class CallsController extends Controller
             $isEmailValid = false;
             // Extract data using header map
             $name = isset($headerMap['CUSTOMER']) ? ($row[$headerMap['CUSTOMER']] ?? '') : '';
-            $rawPhone  = isset($headerMap['CONTACT']) ? trim($row[$headerMap['CONTACT']] ?? '') : '';
+            $rawPhone  = isset($headerMap['CONTACT_NO']) ? trim($row[$headerMap['CONTACT_NO']] ?? '') : '';
             $email = isset($headerMap['EMAIL']) ? trim($row[$headerMap['EMAIL']] ?? '') : '';
             $sales_person = isset($headerMap['SALES PERSON']) ? ($row[$headerMap['SALES PERSON']] ?? '') : '';
             $source_name = isset($headerMap['SOURCE']) ? ($row[$headerMap['SOURCE']] ?? '') : '';
