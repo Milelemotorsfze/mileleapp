@@ -106,23 +106,26 @@ class WOVehicleDeliveryStatusController extends Controller
         $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
         $statusLogLink = env('BASE_URL') . '/vehicle-delivery-status-log/' . $woVehicle->id;
 
-        // Send email using Blade template
-        Mail::send('work_order.emails.delivery_status_update', [
-            'workOrder' => $workOrder,
-            'woVehicle' => $woVehicle,
-            'accessLink' => $accessLink,
-            'statusLogLink' => $statusLogLink,
-            'comments' => $validatedData['comment'],
-            'userName' => $authUserName,
-            'status' => $statusName,
-            'datetime' => Carbon::now(),
-            'statusTracking' => $statusTracking,
-            'isCustomerEmail' => $validatedData['status'] === 'Ready', // To control the view for customer email
-        ], function ($message) use ($subject, $recipients) {
-            $message->from('no-reply@milele.com', 'Milele Matrix')
-                    ->to($recipients)
-                    ->subject($subject);
-        });
+        try {
+            Mail::send('work_order.emails.delivery_status_update', [
+                'workOrder' => $workOrder,
+                'woVehicle' => $woVehicle,
+                'accessLink' => $accessLink,
+                'statusLogLink' => $statusLogLink,
+                'comments' => $validatedData['comment'],
+                'userName' => $authUserName,
+                'status' => $statusName,
+                'datetime' => Carbon::now(),
+                'statusTracking' => $statusTracking,
+                'isCustomerEmail' => $validatedData['status'] === 'Ready', // To control the view for customer email
+            ], function ($message) use ($subject, $recipients) {
+                $message->from('no-reply@milele.com', 'Milele Matrix')
+                        ->to($recipients)
+                        ->subject($subject);
+            });
+        } catch (\Exception $e) {
+            \Log::error($e);
+        }
 
         // Return a JSON response indicating success
         return response()->json(['message' => 'Status updated successfully', 'data' => $statusTracking]);

@@ -65,7 +65,11 @@ class SendWOBOEStatusEmail extends Command
                 }
             }
             // Send email to the determined recipient list
-            Mail::to($recipients)->send(new WOBOEStatusMail($boe, $salesperson));
+            try {
+                Mail::to($recipients)->send(new WOBOEStatusMail($boe, $salesperson));
+            } catch (\Exception $e) {
+                \Log::error($e);
+            }
         }
 
         $this->info('WOBOE status emails have been sent successfully.');

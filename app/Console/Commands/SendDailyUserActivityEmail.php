@@ -22,6 +22,10 @@ class SendDailyUserActivityEmail extends Command
         $activities = UserActivities::with('user')
             ->whereDate('created_at', now()->toDateString())
             ->get();
-        Mail::to('abdul@milele.com')->send(new UserActivityEmail($activities));
+        try {
+            Mail::to('abdul@milele.com')->send(new UserActivityEmail($activities));
+        } catch (\Exception $e) {
+            \Log::error($e);
+        }
     }
 }

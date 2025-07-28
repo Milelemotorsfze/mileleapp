@@ -538,15 +538,19 @@ class JoiningReportController extends Controller
                     $template['from'] = 'no-reply@milele.com'; 
                     $template['from_name'] = 'Milele Matrix';
                     $subject = 'Milele - Employee Joining Report Verification';
-                    Mail::send(
-                        "hrm.onBoarding.joiningReport.email",
-                        ["data"=>$data] ,
-                        function($msg) use ($data,$template,$subject) {
-                            $msg->to($data['email'], $data['name'])
-                                ->from($template['from'],$template['from_name'])
-                                ->subject($subject);
-                        }
-                    );
+                    try {
+                        Mail::send(
+                            "hrm.onBoarding.joiningReport.email",
+                            ["data"=>$data] ,
+                            function($msg) use ($data,$template,$subject) {
+                                $msg->to($data['email'], $data['name'])
+                                    ->from($template['from'],$template['from_name'])
+                                    ->subject($subject);
+                            }
+                        );
+                    } catch (\Exception $e) {
+                        \Log::error($e);
+                    }
                 }
             }
             else if($request->current_approve_position == 'Employee') {

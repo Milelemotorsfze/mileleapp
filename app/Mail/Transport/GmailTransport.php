@@ -26,7 +26,11 @@ class GmailTransport implements TransportInterface
         $gmailMessage = new Google_Service_Gmail_Message();
         $gmailMessage->setRaw($rawMessage);
 
-        $this->gmail->users_messages->send('me', $gmailMessage);
+        try {
+            $this->gmail->users_messages->send('me', $gmailMessage);
+        } catch (\Exception $e) {
+            \Log::error($e);
+        }
 
         return new SentMessage($message, $envelope);
     }

@@ -49,7 +49,11 @@ class LeadChatController extends Controller
             // Notify user via email, e.g., using Laravel's Mail facade
             $user = User::where('email', $email)->first();
             if ($user) {
-                Mail::to($user->email)->send(new TaggedInChatNotification($user, $message));
+                try {
+                    Mail::to($user->email)->send(new TaggedInChatNotification($user, $message));
+                } catch (\Exception $e) {
+                    \Log::error($e);
+                }
             }
         }
     }

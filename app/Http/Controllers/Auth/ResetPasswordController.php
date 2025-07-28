@@ -108,6 +108,7 @@ class ResetPasswordController extends Controller
                     }
                 );
             }catch(Exception $e){
+                \Log::error($e);
                 return response($e->getMessage(), 422);
             }
 

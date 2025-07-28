@@ -20,7 +20,11 @@ class EmailController extends Controller
             ->subject($subject)
             ->html($body);
 
-        Mail::mailer('gmail')->send($email);
+        try {
+            Mail::mailer('gmail')->send($email);
+        } catch (\Exception $e) {
+            \Log::error($e);
+        }
 
         return response()->json(['message' => 'Email sent successfully']);
     }

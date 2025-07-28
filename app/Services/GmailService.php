@@ -35,7 +35,11 @@ class GmailService
         $message->setBody($body, 'text/html');
 
         $data = $this->buildMessage($message);
-        $this->sendMessage('me', $data);
+        try {
+            $this->sendMessage('me', $data);
+        } catch (\Exception $e) {
+            \Log::error($e);
+        }
     }
 
     private function buildMessage($swiftMessage)

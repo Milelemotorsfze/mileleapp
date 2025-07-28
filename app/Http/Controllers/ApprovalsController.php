@@ -808,31 +808,39 @@ class ApprovalsController extends Controller
                 if($purchasingOrder->is_demand_planning_po == 1)
                 {
                     $recipients = ['team.dp@milele.com'];
-                    Mail::to($recipients)->send(new QCUpdateNotification(
-                    $purchasingOrder->po_number,
-                    $purchasingOrder->pl_number,
-                    $vehiclesVIN,
-                    $brandName,
-                    $modelLine,
-                    $oldVariantName,
-                    $newVariantName,
-                    $orderUrl
-                    ));
+                    try {
+                        Mail::to($recipients)->send(new QCUpdateNotification(
+                        $purchasingOrder->po_number,
+                        $purchasingOrder->pl_number,
+                        $vehiclesVIN,
+                        $brandName,
+                        $modelLine,
+                        $oldVariantName,
+                        $newVariantName,
+                        $orderUrl
+                        ));
+                    } catch (\Exception $e) {
+                        \Log::error($e);
+                    }
 
                 }
                 else
                 {
                     $recipients = ['abdul@milele.com'];
-                    Mail::to($recipients)->send(new QCUpdateNotification(
-                    $purchasingOrder->po_number,
-                    $purchasingOrder->pl_number,
-                    $vehiclesVIN,
-                    $brandName,
-                    $modelLine,
-                    $oldVariantName,
-                    $newVariantName,
-                    $orderUrl
-                    ));
+                    try {
+                        Mail::to($recipients)->send(new QCUpdateNotification(
+                        $purchasingOrder->po_number,
+                        $purchasingOrder->pl_number,
+                        $vehiclesVIN,
+                        $brandName,
+                        $modelLine,
+                        $oldVariantName,
+                        $newVariantName,
+                        $orderUrl
+                        ));
+                    } catch (\Exception $e) {
+                        \Log::error($e);
+                    }
 
                 }
                 $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
@@ -1171,7 +1179,8 @@ class ApprovalsController extends Controller
                 if($purchasingOrder->is_demand_planning_po == 1)
                 {
                     $recipients = ['team.dp@milele.com'];
-                    Mail::to($recipients)->send(new QCUpdateNotification(
+                    try {
+                        Mail::to($recipients)->send(new QCUpdateNotification(
                             $purchasingOrder->po_number,
                             $purchasingOrder->pl_number,
                             $vehiclesVIN,
@@ -1181,23 +1190,30 @@ class ApprovalsController extends Controller
                             $newVariantName,
                             $orderUrl
                         ));
+                    } catch (\Exception $e) {
+                        \Log::error($e);
+                    }
 
                 }
                 else
                 {
                     $recipients = ['abdul@milele.com'];
-                    Mail::to($recipients)->send(new QCUpdateNotification(
-                    $purchasingOrder->po_number,
-                    $purchasingOrder->pl_number,
-                    $vehiclesVIN,
-                    $brandName,
-                    $modelLine,
-                    $oldVariantName,
-                    $newVariantName,
-                    $orderUrl
-                ));
+                    try {
+                        Mail::to($recipients)->send(new QCUpdateNotification(
+                        $purchasingOrder->po_number,
+                        $purchasingOrder->pl_number,
+                        $vehiclesVIN,
+                        $brandName,
+                        $modelLine,
+                        $oldVariantName,
+                        $newVariantName,
+                        $orderUrl
+                    ));
+                    } catch (\Exception $e) {
+                        \Log::error($e);
+                    }
 
-            }
+                }
             $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
             "PFI Number: " . $purchasingOrder->pl_number . "\n" .
             "Stage: " . "QC Inspection Done\n" .
