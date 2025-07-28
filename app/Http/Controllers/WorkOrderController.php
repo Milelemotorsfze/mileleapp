@@ -1314,19 +1314,23 @@ class WorkOrderController extends Controller
         // Get the current date and time in d M Y, h:i:s A format
         $currentDateTime = now()->format('d M Y, h:i:s A');
         // Send email using a Blade template
-        Mail::send('work_order.emails.amount_update', [
-            'workOrder' => $workOrder,
-            'accessLink' => $accessLink,
-            'authUserName' => $authUserName, // Pass the authenticated user's name
-            'authUserEmail' => $authUserEmail, // Pass the authenticated user's email
-            'currentDateTime' => $currentDateTime, // Pass the current date and time
-            'comment' => $comment,
-            'hasEditConfirmedPermission' => $hasEditConfirmedPermission, // Pass the permission flag
-        ], function ($message) use ($subject, $recipients, $template) {
-            $message->from($template['from'], $template['from_name'])
-                ->to($recipients)
-                ->subject($subject);
-        });
+        try {
+            Mail::send('work_order.emails.amount_update', [
+                'workOrder' => $workOrder,
+                'accessLink' => $accessLink,
+                'authUserName' => $authUserName, // Pass the authenticated user's name
+                'authUserEmail' => $authUserEmail, // Pass the authenticated user's email
+                'currentDateTime' => $currentDateTime, // Pass the current date and time
+                'comment' => $comment,
+                'hasEditConfirmedPermission' => $hasEditConfirmedPermission, // Pass the permission flag
+            ], function ($message) use ($subject, $recipients, $template) {
+                $message->from($template['from'], $template['from_name'])
+                    ->to($recipients)
+                    ->subject($subject);
+            });
+        } catch (\Exception $e) {
+            \Log::error($e);
+        }
     }
     private function sendDataUpdateEmail($workOrder, $comment)
     {
@@ -1366,19 +1370,23 @@ class WorkOrderController extends Controller
         // Get the current date and time in d M Y, h:i:s A format
         $currentDateTime = now()->format('d M Y, h:i:s A');
         // Send email using a Blade template
-        Mail::send('work_order.emails.data_update', [
-            'workOrder' => $workOrder,
-            'accessLink' => $accessLink,
-            'authUserName' => $authUserName, // Pass the authenticated user's name
-            'authUserEmail' => $authUserEmail,
-            'currentDateTime' => $currentDateTime, // Pass the current date and time
-            'comment' => $comment,
-            'hasEditConfirmedPermission' => $hasEditConfirmedPermission, // Pass the permission flag
-        ], function ($message) use ($subject, $emailList, $template) {
-            $message->from($template['from'], $template['from_name'])
-                ->to($emailList->toArray()) // Convert the collection to an array
-                ->subject($subject);
-        });
+        try {
+            Mail::send('work_order.emails.data_update', [
+                'workOrder' => $workOrder,
+                'accessLink' => $accessLink,
+                'authUserName' => $authUserName, // Pass the authenticated user's name
+                'authUserEmail' => $authUserEmail,
+                'currentDateTime' => $currentDateTime, // Pass the current date and time
+                'comment' => $comment,
+                'hasEditConfirmedPermission' => $hasEditConfirmedPermission, // Pass the permission flag
+            ], function ($message) use ($subject, $emailList, $template) {
+                $message->from($template['from'], $template['from_name'])
+                    ->to($emailList->toArray()) // Convert the collection to an array
+                    ->subject($subject);
+            });
+        } catch (\Exception $e) {
+            \Log::error($e);
+        }
     }
     private function sendVehicleUpdateEmail($workOrder, $newComment)
     {
@@ -1414,19 +1422,23 @@ class WorkOrderController extends Controller
         // Get the current date and time in d M Y, h:i:s A format
         $currentDateTime = now()->format('d M Y, h:i:s A');
         // Send email using a Blade template
-        Mail::send('work_order.emails.vehicle_update', [
-            'workOrder' => $workOrder,
-            'accessLink' => $accessLink,
-            'newComment' => $newComment,
-            'authUserName' => $authUserName, // Pass the authenticated user's name
-            'authUserEmail' => $authUserEmail,
-            'currentDateTime' => $currentDateTime, // Pass the current date and time
-            'hasEditConfirmedPermission' => $hasEditConfirmedPermission, // Pass the permission flag
-        ], function ($message) use ($subject, $managementEmails, $template) {
-            $message->from($template['from'], $template['from_name'])
-                ->to($managementEmails)
-                ->subject($subject);
-        });
+        try {
+            Mail::send('work_order.emails.vehicle_update', [
+                'workOrder' => $workOrder,
+                'accessLink' => $accessLink,
+                'newComment' => $newComment,
+                'authUserName' => $authUserName, // Pass the authenticated user's name
+                'authUserEmail' => $authUserEmail,
+                'currentDateTime' => $currentDateTime, // Pass the current date and time
+                'hasEditConfirmedPermission' => $hasEditConfirmedPermission, // Pass the permission flag
+            ], function ($message) use ($subject, $managementEmails, $template) {
+                $message->from($template['from'], $template['from_name'])
+                    ->to($managementEmails)
+                    ->subject($subject);
+            });
+        } catch (\Exception $e) {
+            \Log::error($e);
+        }
     }
     public function processNewAddons($woVehicles, $addonData, $authId)
     {
@@ -3263,18 +3275,22 @@ class WorkOrderController extends Controller
         }
 
         // Send email using a Blade template
-        Mail::send('work_order.emails.fin_approval', [
-            'workOrder' => $workOrder,
-            'accessLink' => $accessLink,
-            'approvalHistoryLink' => $approvalHistoryLink,
-            'comments' => $comments,
-            'userName' => $userName,
-            'status' => $status
-        ], function ($message) use ($subject, $recipients, $template) {
-            $message->from($template['from'], $template['from_name'])
-                ->to($recipients)
-                ->subject($subject);
-        });
+        try {
+            Mail::send('work_order.emails.fin_approval', [
+                'workOrder' => $workOrder,
+                'accessLink' => $accessLink,
+                'approvalHistoryLink' => $approvalHistoryLink,
+                'comments' => $comments,
+                'userName' => $userName,
+                'status' => $status
+            ], function ($message) use ($subject, $recipients, $template) {
+                $message->from($template['from'], $template['from_name'])
+                    ->to($recipients)
+                    ->subject($subject);
+            });
+        } catch (\Exception $e) {
+            \Log::error($e);
+        }
     }
     public function coeOfficeApproval(Request $request)
     {
@@ -3371,18 +3387,22 @@ class WorkOrderController extends Controller
         }
 
         // Send email using a Blade template
-        Mail::send('work_order.emails.coo_approval', [
-            'workOrder' => $workOrder,
-            'accessLink' => $accessLink,
-            'approvalHistoryLink' => $approvalHistoryLink,
-            'comments' => $comments,
-            'userName' => $userName,
-            'status' => $status
-        ], function ($message) use ($subject, $recipients, $template) {
-            $message->from($template['from'], $template['from_name'])
-                ->to($recipients)
-                ->subject($subject);
-        });
+        try {
+            Mail::send('work_order.emails.coo_approval', [
+                'workOrder' => $workOrder,
+                'accessLink' => $accessLink,
+                'approvalHistoryLink' => $approvalHistoryLink,
+                'comments' => $comments,
+                'userName' => $userName,
+                'status' => $status
+            ], function ($message) use ($subject, $recipients, $template) {
+                $message->from($template['from'], $template['from_name'])
+                    ->to($recipients)
+                    ->subject($subject);
+            });
+        } catch (\Exception $e) {
+            \Log::error($e);
+        }
     }
     public function salesApproval(Request $request)
     {

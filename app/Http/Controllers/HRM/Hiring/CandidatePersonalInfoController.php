@@ -76,7 +76,8 @@ class CandidatePersonalInfoController extends Controller
                 $template['from'] = 'no-reply@milele.com';
                 $template['from_name'] = 'Milele Matrix';
                 $subject = 'Milele - Candidate Documents Request Form';
-                Mail::send(
+                try {
+                    Mail::send(
                         "hrm.hiring.documents.email",
                         ["data"=>$data] ,
                         function($msg) use ($data,$template,$subject) {
@@ -85,6 +86,9 @@ class CandidatePersonalInfoController extends Controller
                                 ->subject($subject);
                         }
                     );
+                } catch (\Exception $e) {
+                    \Log::error($e);
+                }
                     $status = 'success';
                     $message = 'Documents Request Form Successfully Send To Candidate';
                 }
@@ -267,7 +271,8 @@ class CandidatePersonalInfoController extends Controller
                     $template['from'] = 'no-reply@milele.com';
                     $template['from_name'] = 'Milele Matrix';
                     $subject = 'Milele - Candidate Personal Information Form';
-                    Mail::send(
+                    try {
+                        Mail::send(
                             "hrm.hiring.personal_info.email",
                             ["data"=>$data] ,
                             function($msg) use ($data,$template,$subject) {
@@ -276,6 +281,9 @@ class CandidatePersonalInfoController extends Controller
                                     ->subject($subject);
                             }
                         );
+                    } catch (\Exception $e) {
+                        \Log::error($e);
+                    }
                         $status ='success';
                 $msg ='Offer Letter and Personal Information Form Successfully Send To Candidate';   
                 }
@@ -723,7 +731,8 @@ class CandidatePersonalInfoController extends Controller
                         $emp->update();
                     }
                     $attachPath = $directory . '/' . $filename;
-                    Mail::send(
+                    try {
+                        Mail::send(
                             "hrm.hiring.offer_letter.sendOfferLetterDocsEmail",
                             ["data"=>$data] ,
                             function($msg) use ($data,$template,$subject,$attachPath) {
@@ -732,7 +741,10 @@ class CandidatePersonalInfoController extends Controller
                                     ->subject($subject)
                                     ->attach($attachPath);
                             }
-                        );         
+                        );
+                    } catch (\Exception $e) {
+                        \Log::error($e);
+                    }
                     DB::commit();
                     return response()->json('success');
                 }
@@ -879,7 +891,8 @@ class CandidatePersonalInfoController extends Controller
                     $template['from'] = 'no-reply@milele.com';
                     $template['from_name'] = 'Milele Matrix';
                     $subject = 'Milele - Candidate Personal Information Form';
-                    Mail::send(
+                    try {
+                        Mail::send(
                             "hrm.hiring.personal_info.email",
                             ["data"=>$data] ,
                             function($msg) use ($data,$template,$subject) {
@@ -888,6 +901,9 @@ class CandidatePersonalInfoController extends Controller
                                     ->subject($subject);
                             }
                         );
+                    } catch (\Exception $e) {
+                        \Log::error($e);
+                    }
                     DB::commit();
                     return redirect()->route('interview-summary-report.index')->with('success','Offer Letter and Personal Information Form successfully sent to candidate');     
                 }

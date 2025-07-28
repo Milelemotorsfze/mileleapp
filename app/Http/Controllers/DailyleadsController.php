@@ -1383,7 +1383,11 @@ public function storeLog(Request $request)
         $log->save();
         $leadLink = route('calls.leaddetailpage', ['id' => $request->lead_id]);
         if ($assigner && $assigner->email) {
-            Mail::to($assigner->email)->send(new TaskAssigned($assigner, $request->task_message, $leadLink));
+            try {
+                Mail::to($assigner->email)->send(new TaskAssigned($assigner, $request->task_message, $leadLink));
+            } catch (\Exception $e) {
+                \Log::error($e);
+            }
         }
         return response()->json([
             'success' => true,

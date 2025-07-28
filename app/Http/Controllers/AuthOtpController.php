@@ -75,15 +75,19 @@ class AuthOtpController extends Controller
                 $template['from'] = 'no-reply@milele.com';
                 $template['from_name'] = 'Milele Matrix';
                 $subject = 'Milele Matrix Login OTP Code';
-                Mail::send(
-                        "auth.otpemail",
-                        ["data"=>$data] ,
-                        function($msg) use ($data,$template,$subject) {
-                            $msg->to($data['email'], $data['name'])
-                                ->from($template['from'],$template['from_name'])
-                                ->subject($subject);
-                        }
-                    );
+                try {
+                    Mail::send(
+                            "auth.otpemail",
+                            ["data"=>$data] ,
+                            function($msg) use ($data,$template,$subject) {
+                                $msg->to($data['email'], $data['name'])
+                                    ->from($template['from'],$template['from_name'])
+                                    ->subject($subject);
+                            }
+                        );
+                } catch (\Exception $e) {
+                    \Log::error($e);
+                }
                 $user_id = Crypt::encryptString($verificationCode->user_id);
                 $email = Crypt::encryptString($request->email);
                 $password = Crypt::encryptString($request->password);
@@ -126,15 +130,19 @@ class AuthOtpController extends Controller
             $template['from'] = 'no-reply@milele.com';
             $template['from_name'] = 'Milele Matrix';
             $subject = 'Milele Matrix Login OTP Code';
-            Mail::send(
-                    "auth.otpemail",
-                    ["data"=>$data] ,
-                    function($msg) use ($data,$template,$subject) {
-                        $msg->to($data['email'], $data['name'])
-                            ->from($template['from'],$template['from_name'])
-                            ->subject($subject);
-                    }
-                );
+            try {
+                Mail::send(
+                        "auth.otpemail",
+                        ["data"=>$data] ,
+                        function($msg) use ($data,$template,$subject) {
+                            $msg->to($data['email'], $data['name'])
+                                ->from($template['from'],$template['from_name'])
+                                ->subject($subject);
+                        }
+                    );
+            } catch (\Exception $e) {
+                \Log::error($e);
+            }
             return redirect()->route('otp.verification', ['user_id' => $verificationCode->user_id])->with('success',  $message);
             */
             // Directly redirect to login page with success (simulate OTP success)
