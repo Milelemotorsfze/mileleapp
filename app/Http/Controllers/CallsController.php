@@ -814,13 +814,29 @@ class CallsController extends Controller
         $rejectedCount = 0;
 
         $headers = array_shift($rows);
+        // Build header map: column name (upper, trimmed) => index
+        $headerMap = [];
+        foreach ($headers as $idx => $header) {
+            $headerMap[strtoupper(trim($header))] = $idx;
+        }
+        // Define required columns (excluding CONTACT and EMAIL for now)
+        $requiredColumns = [
+            'COUNTRY', 'SOURCE', 'PREFERRED LANGUAGE', 'STRATEGIES', 'PRIORITY'
+        ];
+        // Check for missing required columns
+        $missingColumns = array_diff($requiredColumns, array_keys($headerMap));
+        // Special check: at least one of CONTACT or EMAIL must be present
+        if (!isset($headerMap['CONTACT']) && !isset($headerMap['EMAIL'])) {
+            $missingColumns[] = 'CONTACT or EMAIL (at least one required)';
+        }
+        if (!empty($missingColumns)) {
+            return back()->with('error', 'Missing required columns in Excel: ' . implode(', ', $missingColumns));
+        }
 
         foreach ($rows as $row) {
-
             $nonEmptyValues = array_filter($row, function ($value) {
                 return !is_null($value) && trim($value) !== '';
             });
-        
             if (empty($nonEmptyValues)) {
                 continue;
             }
@@ -828,21 +844,30 @@ class CallsController extends Controller
             $errorMessages = [];
             $isPhoneValid = false;
             $isEmailValid = false;
-
-            // Extract data
-            $name = $row[0];
-            $rawPhone  = trim($row[1]);
-            $email = trim($row[2]);
-            $sales_person = $row[4];
-            $source_name = $row[5];
-            $language = $row[6];
-            $location = $row[3];
-            $brand = $row[7];
-            $model_line_name = $row[8];
-            $custom_brand_model = $row[9];
-            // $remarks = $row[10];
-            $strategies = $row[10];
-            $priority = strtolower(trim($row[11]));
+            // Extract data using header map
+            $name = $row[$headerMap['CUSTOMER']] ?? '';
+            $rawPhone  = trim($row[$headerMap['CONTACT']] ?? '');
+            $email = trim($row[$headerMap['EMAIL']] ?? '');
+            $sales_person = $row[$headerMap['SALES PERSON']] ?? '';
+            $source_name = $row[$headerMap['SOURCE']] ?? '';
+            $language = $row[$headerMap['PREFERRED LANGUAGE']] ?? '';
+            $location = $row[$headerMap['COUNTRY']] ?? '';
+            $brand = $row[$headerMap['BRAND']] ?? '';
+            $model_line_name = $row[$headerMap['MODEL LINE']] ?? '';
+            $custom_brand_model = $row[$headerMap['CUSTOM MODEL']] ?? '';
+            $strategies = $row[$headerMap['STRATEGIES']] ?? '';
+            $priority = strtolower(trim($row[$headerMap['PRIORITY']] ?? ''));
+            $carInterested = isset($headerMap['CAR INTERESTED']) ? trim($row[$headerMap['CAR INTERESTED']]) : '';
+            $purchasePurpose = isset($headerMap['PURPOSE OF PURCHASE']) ? trim($row[$headerMap['PURPOSE OF PURCHASE']]) : '';
+            $endUser = isset($headerMap['END USER']) ? trim($row[$headerMap['END USER']]) : '';
+            $destinationCountry = isset($headerMap['DESTINATION COUNTRY']) ? trim($row[$headerMap['DESTINATION COUNTRY']]) : '';
+            $plannedUnits = isset($headerMap['PLANNED UNITS']) ? trim($row[$headerMap['PLANNED UNITS']]) : '';
+            $experience = isset($headerMap['EXPERIENCE WITH UAE SOURCING']) ? trim($row[$headerMap['EXPERIENCE WITH UAE SOURCING']]) : '';
+            $shipping = isset($headerMap['SHIPPING ASSISTANCE REQUIRED']) ? trim($row[$headerMap['SHIPPING ASSISTANCE REQUIRED']]) : '';
+            $paymentMethod = isset($headerMap['PAYMENT METHOD']) ? trim($row[$headerMap['PAYMENT METHOD']]) : '';
+            $prevPurchase = isset($headerMap['PREVIOUS PURCHASE HISTORY']) ? trim($row[$headerMap['PREVIOUS PURCHASE HISTORY']]) : '';
+            $timeline = isset($headerMap['PURCHASE TIMELINE']) ? trim($row[$headerMap['PURCHASE TIMELINE']]) : '';
+            $additionalNotes = isset($headerMap['ADDITIONAL NOTES']) ? trim($row[$headerMap['ADDITIONAL NOTES']]) : '';
 
             $cleanPhone = preg_replace('/[\s\-]/', '', $rawPhone); 
             
