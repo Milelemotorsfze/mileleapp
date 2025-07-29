@@ -1203,55 +1203,55 @@ class WorkOrderController extends Controller
                 // $this->sendVehicleUpdateEmail($workOrder);
             }
             (new UserActivityController)->createActivity('Create ' . $request->type . ' work order');
-            // // Prepare the from details
-            // $template['from'] = 'no-reply@milele.com';
-            // $template['from_name'] = 'Milele Matrix';
+            // Prepare the from details
+            $template['from'] = 'no-reply@milele.com';
+            $template['from_name'] = 'Milele Matrix';
 
-            // // Handle cases where customer_name is null
-            // $customerName = $workOrder->customer_name ?? 'Unknown Customer';
+            // Handle cases where customer_name is null
+            $customerName = $workOrder->customer_name ?? 'Unknown Customer';
 
-            // // Prepare email data
-            // $subject = "New Work Order " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
+            // Prepare email data
+            $subject = "New Work Order " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
 
-            // // Define a quick access link (adjust the route as needed)
-            // $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+            // Define a quick access link (adjust the route as needed)
+            $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
 
-            // // Retrieve and validate email addresses from .env
-            // $financeEmail = filter_var(env('FINANCE_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
-            // $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
-            // // Get all users with 'can_send_wo_email' set to 'yes' from the database
-            // $managementEmails = \App\Models\User::where('can_send_wo_email', 'yes')->pluck('email')->filter(function ($email) {
-            //     return filter_var($email, FILTER_VALIDATE_EMAIL);
-            // })->toArray();
-            // // Log email addresses to help with debugging
-            // \Log::info('Email Recipients:', [
-            //     'financeEmail' => $financeEmail,
-            //     'operationsEmail' => $operationsEmail,
-            //     'managementEmails' => implode(', ', $managementEmails) ?: 'none found',
-            // ]);
-            // // Combine all recipient emails into a single array
-            // $recipients = array_filter(array_merge([$financeEmail, $operationsEmail], $managementEmails));
-            // // Log and handle invalid email addresses (but do not throw an exception, just log)
-            // if (empty($recipients)) {
-            //     \Log::info('No valid recipients found. Skipping email sending for Work Order: ' . $workOrder->wo_number);
-            //     return;
-            // }
+            // Retrieve and validate email addresses from .env
+            $financeEmail = filter_var(env('FINANCE_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+            $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+            // Get all users with 'can_send_wo_email' set to 'yes' from the database
+            $managementEmails = \App\Models\User::where('can_send_wo_email', 'yes')->pluck('email')->filter(function ($email) {
+                return filter_var($email, FILTER_VALIDATE_EMAIL);
+            })->toArray();
+            // Log email addresses to help with debugging
+            \Log::info('Email Recipients:', [
+                'financeEmail' => $financeEmail,
+                'operationsEmail' => $operationsEmail,
+                'managementEmails' => implode(', ', $managementEmails) ?: 'none found',
+            ]);
+            // Combine all recipient emails into a single array
+            $recipients = array_filter(array_merge([$financeEmail, $operationsEmail], $managementEmails));
+            // Log and handle invalid email addresses (but do not throw an exception, just log)
+            if (empty($recipients)) {
+                \Log::info('No valid recipients found. Skipping email sending for Work Order: ' . $workOrder->wo_number);
+                return;
+            }
 
-            // // Send email using a Blade template
-            // Mail::send('work_order.emails.new_wo', [
-            //     'workOrder' => $workOrder,
-            //     'accessLink' => $accessLink,
-            // ], function ($message) use ($subject, $recipients, $template) {
-            //     $message->from($template['from'], $template['from_name'])
-            //         ->to($recipients)
-            //         ->subject($subject);
-            // });
-            // $checkRecords = $workOrder->dataHistories()
-            //     ->whereIn('field_name', ['amount_received', 'balance_amount', 'currency', 'deposit_received_as', 'so_total_amount', 'so_vehicle_quantity'])
-            //     ->exists();
-            // if ($checkRecords) {
-            //     $this->sendSOAmountUpdateEmail($workOrder, null);
-            // }
+            // Send email using a Blade template
+            Mail::send('work_order.emails.new_wo', [
+                'workOrder' => $workOrder,
+                'accessLink' => $accessLink,
+            ], function ($message) use ($subject, $recipients, $template) {
+                $message->from($template['from'], $template['from_name'])
+                    ->to($recipients)
+                    ->subject($subject);
+            });
+            $checkRecords = $workOrder->dataHistories()
+                ->whereIn('field_name', ['amount_received', 'balance_amount', 'currency', 'deposit_received_as', 'so_total_amount', 'so_vehicle_quantity'])
+                ->exists();
+            if ($checkRecords) {
+                $this->sendSOAmountUpdateEmail($workOrder, null);
+            }
             // Commit the transaction
             DB::commit();
 

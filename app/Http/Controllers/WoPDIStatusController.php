@@ -123,22 +123,22 @@ class WoPDIStatusController extends Controller
                 return;
             }
 
-            // // Send email using a Blade template
-            // Mail::send('work_order.emails.pdi_status_update', [
-            //     'workOrder' => $workOrder,
-            //     'woVehicle' => $woVehicle,
-            //     'accessLink' => $accessLink,
-            //     'statusLogLink' => $statusLogLink,
-            //     'comments' => $validatedData['comment'],
-            //     'userName' => $authUserName,
-            //     'status' => $statusName,
-            //     'datetime' => Carbon::now(),
-            //     'statusTracking' => $statusTracking,
-            // ], function ($message) use ($subject, $recipients, $template) {
-            //     $message->from($template['from'], $template['from_name'])
-            //             ->to($recipients)
-            //             ->subject($subject);
-            // });
+            // Send email using a Blade template
+            Mail::send('work_order.emails.pdi_status_update', [
+                'workOrder' => $workOrder,
+                'woVehicle' => $woVehicle,
+                'accessLink' => $accessLink,
+                'statusLogLink' => $statusLogLink,
+                'comments' => $validatedData['comment'],
+                'userName' => $authUserName,
+                'status' => $statusName,
+                'datetime' => Carbon::now(),
+                'statusTracking' => $statusTracking,
+            ], function ($message) use ($subject, $recipients, $template) {
+                $message->from($template['from'], $template['from_name'])
+                        ->to($recipients)
+                        ->subject($subject);
+            });
         }
 
         // Return a JSON response indicating success
