@@ -24,11 +24,9 @@ class AuthOtpController extends Controller
 
     public function loginOtpGenerate(Request $request)
     {
-        $user = User::where('email',$request->email)->first();
-        if($user && Hash::check($request->password, $user->password))
-        {
-            if('active' == $user->status)
-            {
+        $user = User::where('email', $request->email)->first();
+        if ($user && Hash::check($request->password, $user->password)) {
+            if ('active' == $user->status) {
                 # Validate Data
                 $request->validate([
                     'email' => 'required|exists:users,email',
@@ -37,10 +35,10 @@ class AuthOtpController extends Controller
 
                 $userCurrentBrowser = Agent::browser();
                 $userLastOtpVerified = VerificationCode::where('user_id', $user->id)
-                    ->orderBy('id','DESC')->first();
-                if($userLastOtpVerified) {
-                    $latestLoginActivity = LogActivity::where('user_id', $user->id)->orderBy('id','DESC')->first();
-                    if($latestLoginActivity) {
+                    ->orderBy('id', 'DESC')->first();
+                if ($userLastOtpVerified) {
+                    $latestLoginActivity = LogActivity::where('user_id', $user->id)->orderBy('id', 'DESC')->first();
+                    if ($latestLoginActivity) {
                         if (Agent::isPhone() == 'phone') {
                             $userDevice = 'phone';
                         } elseif (Agent::isTablet() == 'tablet') {
@@ -61,7 +59,6 @@ class AuthOtpController extends Controller
                             }
                         }
                     }
-
                 }
 
                 # Generate An OTP
@@ -76,43 +73,38 @@ class AuthOtpController extends Controller
                 $subject = 'Milele Matrix Login OTP Code';
                 try {
                     Mail::send(
-                            "auth.otpemail",
-                            ["data"=>$data] ,
-                            function($msg) use ($data,$template,$subject) {
-                                $msg->to($data['email'], $data['name'])
-                                    ->from($template['from'],$template['from_name'])
-                                    ->subject($subject);
-                            }
-                        );
+                        "auth.otpemail",
+                        ["data" => $data],
+                        function ($msg) use ($data, $template, $subject) {
+                            $msg->to($data['email'], $data['name'])
+                                ->from($template['from'], $template['from_name'])
+                                ->subject($subject);
+                        }
+                    );
                 } catch (\Exception $e) {
                     \Log::error($e);
                 }
                 $user_id = Crypt::encryptString($verificationCode->user_id);
                 $email = Crypt::encryptString($request->email);
                 $password = Crypt::encryptString($request->password);
-                return redirect()->route('otp.verification', ['user_id' => $user_id, 'email'=>$email,'password'=>$password])->with('success',  $message);
+                return redirect()->route('otp.verification', ['user_id' => $user_id, 'email' => $email, 'password' => $password])->with('success',  $message);
                 // Directly log in the user without OTP and mail
                 $request['user_id'] = $user->id;
                 return (app('App\Http\Controllers\Auth\LoginController')->login($request));
-            }
-            else
-            {
-                Session::flash('error','You are not Active by Admin.');
+            } else {
+                Session::flash('error', 'You are not Active by Admin.');
                 return view('auth.login');
             }
-        }
-        else
-        {
-            Session::flash('error','These credentials do not match our records.');
+        } else {
+            Session::flash('error', 'These credentials do not match our records.');
             return view('auth.login');
         }
     }
     // Generate OTP
     public function generate(Request $request)
     {
-        $user = User::where('email',$request->email)->first();
-        if($user)
-        {
+        $user = User::where('email', $request->email)->first();
+        if ($user) {
             # Validate Data
             $request->validate([
                 'email' => 'required|exists:users,email',
@@ -129,24 +121,22 @@ class AuthOtpController extends Controller
             $subject = 'Milele Matrix Login OTP Code';
             try {
                 Mail::send(
-                        "auth.otpemail",
-                        ["data"=>$data] ,
-                        function($msg) use ($data,$template,$subject) {
-                            $msg->to($data['email'], $data['name'])
-                                ->from($template['from'],$template['from_name'])
-                                ->subject($subject);
-                        }
-                    );
+                    "auth.otpemail",
+                    ["data" => $data],
+                    function ($msg) use ($data, $template, $subject) {
+                        $msg->to($data['email'], $data['name'])
+                            ->from($template['from'], $template['from_name'])
+                            ->subject($subject);
+                    }
+                );
             } catch (\Exception $e) {
                 \Log::error($e);
             }
             return redirect()->route('otp.verification', ['user_id' => $verificationCode->user_id])->with('success',  $message);
             // Directly redirect to login page with success (simulate OTP success)
             return redirect()->route('login')->with('success',  'OTP step bypassed, please login.');
-        }
-        else
-        {
-            Session::flash('error','This email do not match our records.');
+        } else {
+            Session::flash('error', 'This email do not match our records.');
             return view('otp.login');
         }
     }
@@ -160,7 +150,7 @@ class AuthOtpController extends Controller
 
         $now = Carbon::now();
 
-        if($verificationCode && $now->isBefore($verificationCode->expire_at)){
+        if ($verificationCode && $now->isBefore($verificationCode->expire_at)) {
             return $verificationCode;
         }
 
@@ -175,9 +165,9 @@ class AuthOtpController extends Controller
     // Optionally, you may want to comment out or adjust the verification method if not needed
     public function verification($user_id, $email, $password)
     {
-        $user_id= Crypt::decryptString($user_id);
-        $email= Crypt::decryptString($email);
-        $password= Crypt::decryptString($password);
+        $user_id = Crypt::decryptString($user_id);
+        $email = Crypt::decryptString($email);
+        $password = Crypt::decryptString($password);
         return view('auth.otp-verification')->with([
             'user_id' => $user_id,
             'email' => $email,
