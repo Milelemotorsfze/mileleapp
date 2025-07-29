@@ -106,22 +106,22 @@ class WoVehicleController extends Controller
                 \Log::info('No valid recipients found. Skipping email sending for WO-' . $workOrder->wo_number);
                 return; // Exit the function without throwing an exception
             }
-            // // Send email using a Blade template
-            // Mail::send('work_order.emails.modification_status_update', [
-            //     'workOrder' => $workOrder,
-            //     'woVehicle' => $woVehicle,
-            //     'accessLink' => $accessLink,
-            //     'statusLogLink' => $statusLogLink,
-            //     'comments' => $validatedData['comment'],
-            //     'statusTracking' => $statusTracking,
-            //     'userName' => $authUserName,
-            //     'status' => $statusName,
-            //     'datetime' => Carbon::now(),
-            // ], function ($message) use ($subject, $recipients, $template) {
-            //     $message->from($template['from'], $template['from_name'])
-            //             ->to($recipients)
-            //             ->subject($subject);
-            // });
+            // Send email using a Blade template
+            Mail::send('work_order.emails.modification_status_update', [
+                'workOrder' => $workOrder,
+                'woVehicle' => $woVehicle,
+                'accessLink' => $accessLink,
+                'statusLogLink' => $statusLogLink,
+                'comments' => $validatedData['comment'],
+                'statusTracking' => $statusTracking,
+                'userName' => $authUserName,
+                'status' => $statusName,
+                'datetime' => Carbon::now(),
+            ], function ($message) use ($subject, $recipients, $template) {
+                $message->from($template['from'], $template['from_name'])
+                        ->to($recipients)
+                        ->subject($subject);
+            });
             // Log successful email sending
             \Log::info('Email sent to recipients:', $recipients);
         }
