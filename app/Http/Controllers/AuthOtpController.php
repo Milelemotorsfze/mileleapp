@@ -64,7 +64,6 @@ class AuthOtpController extends Controller
 
                 }
 
-                /*
                 # Generate An OTP
                 $verificationCode = $this->generateOtp($request->email);
                 $message = "Your OTP To Login is Send Successfully ";
@@ -92,7 +91,6 @@ class AuthOtpController extends Controller
                 $email = Crypt::encryptString($request->email);
                 $password = Crypt::encryptString($request->password);
                 return redirect()->route('otp.verification', ['user_id' => $user_id, 'email'=>$email,'password'=>$password])->with('success',  $message);
-                */
                 // Directly log in the user without OTP and mail
                 $request['user_id'] = $user->id;
                 return (app('App\Http\Controllers\Auth\LoginController')->login($request));
@@ -119,7 +117,6 @@ class AuthOtpController extends Controller
             $request->validate([
                 'email' => 'required|exists:users,email',
             ]);
-            /*
             # Generate An OTP
             $verificationCode = $this->generateOtp($request->email);
             $message = "Your OTP To Login is Send Successfully ";
@@ -144,7 +141,6 @@ class AuthOtpController extends Controller
                 \Log::error($e);
             }
             return redirect()->route('otp.verification', ['user_id' => $verificationCode->user_id])->with('success',  $message);
-            */
             // Directly redirect to login page with success (simulate OTP success)
             return redirect()->route('login')->with('success',  'OTP step bypassed, please login.');
         }
@@ -155,7 +151,6 @@ class AuthOtpController extends Controller
         }
     }
 
-    /*
     public function generateOtp($email)
     {
         $user = User::where('email', $email)->first();
@@ -176,10 +171,8 @@ class AuthOtpController extends Controller
             'expire_at' => Carbon::now()->addMinutes(10)
         ]);
     }
-    */
 
     // Optionally, you may want to comment out or adjust the verification method if not needed
-    /*
     public function verification($user_id, $email, $password)
     {
         $user_id= Crypt::decryptString($user_id);
@@ -191,7 +184,4 @@ class AuthOtpController extends Controller
             'password' => $password,
         ]);
     }
-    */
-
-
 }
