@@ -144,6 +144,8 @@
                     <option value="3.3" @if($variant_request->engine == '3.3') selected @endif>3.3</option>
                     <option value="3.4" @if($variant_request->engine == '3.4') selected @endif>3.4</option>
                     <option value="3.5" @if($variant_request->engine == '3.5') selected @endif>3.5</option>
+                    <option value="3.6" @if($variant_request->engine == '3.6') selected @endif>3.6</option>
+                    <option value="3.8" @if($variant_request->engine == '3.8') selected @endif>3.8</option>
                     <option value="4" @if($variant_request->engine == '4') selected @endif>4</option>
                     <option value="4.2" @if($variant_request->engine == '4.2') selected @endif>4.2</option>
                     <option value="4.4" @if($variant_request->engine == '4.4') selected @endif>4.4</option>

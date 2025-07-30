@@ -169,7 +169,6 @@ class ApprovalsController extends Controller
      */
     public function show($id)
     {
-      
     $useractivities =  New UserActivities();
     $useractivities->activity = "Open the Approval Page For Approval";
     $useractivities->users_id = Auth::id();
