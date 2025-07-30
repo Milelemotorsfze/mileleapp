@@ -386,7 +386,7 @@ class MovementController extends Controller
                             'ext_colour' => $vehicle->exterior->name ?? '',
                         ];
                     });
-                    Mail::to($recipients)->send(new GRNEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $orderUrl, $vehicleCount, $grnDate, $vehicleDetails));
+                    // Mail::to($recipients)->send(new GRNEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $orderUrl, $vehicleCount, $grnDate, $vehicleDetails));
                     $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
                     "PFI Number: " . $purchasingOrder->pl_number . "\n" .
                     "Stage: " . "Goods Received Note\n" .
