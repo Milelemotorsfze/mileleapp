@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\ColorCode;
 use Illuminate\Support\Facades\Log;
 use App\Events\DataUpdatedEvent;
@@ -56,13 +57,13 @@ class VehiclesController extends Controller
             $data = Vehicles::where('status', $statuss);
             $data = $data->where(function ($query) {
                 $query->whereNull('gdn_id')
-                      ->orWhere(function ($subQuery) {
-                          $subQuery->whereNotNull('gdn_id')
-                                   ->whereHas('gdn', function ($gdnQuery) {
-                                       $sixMonthsAgo = now()->subMonths(1);
-                                       $gdnQuery->where('date', '>', $sixMonthsAgo);
-                                   });
-                      });
+                    ->orWhere(function ($subQuery) {
+                        $subQuery->whereNotNull('gdn_id')
+                            ->whereHas('gdn', function ($gdnQuery) {
+                                $sixMonthsAgo = now()->subMonths(1);
+                                $gdnQuery->where('date', '>', $sixMonthsAgo);
+                            });
+                    });
             });
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             if ($hasEditSOPermission) {
@@ -89,694 +90,610 @@ class VehiclesController extends Controller
                             $vinNumbers = explode(',', $searchQuery);
                             $data = $data->where(function ($query) use ($vinNumbers) {
                                 foreach ($vinNumbers as $vin) {
-                                    if($vin == "null")
-                                    {
-                                    $query->orWhere('vin', null);
-                                    }
-                                    else{
-                                    $query->orWhere('vin', 'LIKE', '%' . trim($vin) . '%');
+                                    if ($vin == "null") {
+                                        $query->orWhere('vin', null);
+                                    } else {
+                                        $query->orWhere('vin', 'LIKE', '%' . trim($vin) . '%');
                                     }
                                 }
                             });
                             break;
-                            case 'vehicle_id':
-                                $vehicle_id = explode(',', $searchQuery);
-                                $data = $data->where(function ($query) use ($vehicle_id) {
-                                    foreach ($vehicle_id as $id) {
-                                        if($id == "null")
-                                    {
+                        case 'vehicle_id':
+                            $vehicle_id = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($vehicle_id) {
+                                foreach ($vehicle_id as $id) {
+                                    if ($id == "null") {
                                         $query->orWhere('id', null);
-                                    }
-                                    else{
+                                    } else {
                                         $query->orWhere('id', 'LIKE', '%' . trim($id) . '%');
                                     }
-                                    }
-                                });
-                                break;
-                                case 'estimation_date':
-                                    $estimation_date = explode(',', $searchQuery);
-                                    $data = $data->where(function ($query) use ($estimation_date) {
-                                        foreach ($estimation_date as $estimation_date) {
-                                    if($estimation_date == "null")
-                                    {
+                                }
+                            });
+                            break;
+                        case 'estimation_date':
+                            $estimation_date = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($estimation_date) {
+                                foreach ($estimation_date as $estimation_date) {
+                                    if ($estimation_date == "null") {
                                         $query->orWhere('estimation_date', null);
+                                    } else {
+                                        $query->orWhere('estimation_date', 'LIKE', '%' . trim($estimation_date) . '%');
                                     }
-                                    else{
-                                            $query->orWhere('estimation_date', 'LIKE', '%' . trim($estimation_date) . '%');
+                                }
+                            });
+                            break;
+                        case 'grn_remark':
+                            $grn_remark = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($grn_remark) {
+                                foreach ($grn_remark as $grn_remark) {
+                                    if ($grn_remark == "null") {
+                                        $query->orWhere('grn_remark', null);
+                                    } else {
+                                        $query->orWhere('grn_remark', 'LIKE', '%' . trim($grn_remark) . '%');
                                     }
+                                }
+                            });
+                            break;
+                        case 'qc_remarks':
+                            $qc_remarks = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($qc_remarks) {
+                                foreach ($qc_remarks as $qc_remarks) {
+                                    if ($qc_remarks == "null") {
+                                        $query->orWhere('qc_remarks', null);
+                                    } else {
+                                        $query->orWhere('qc_remarks', 'LIKE', '%' . trim($qc_remarks) . '%');
+                                    }
+                                }
+                            });
+                            break;
+                        case 'pdi_date':
+                            $pdi_date = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($pdi_date) {
+                                foreach ($pdi_date as $pdi_date) {
+                                    if ($pdi_date == "null") {
+                                        $query->orWhere('pdi_date', null);
+                                    } else {
+                                        $query->orWhere('pdi_date', 'LIKE', '%' . trim($pdi_date) . '%');
+                                    }
+                                }
+                            });
+                            break;
+                        case 'pdi_remarks':
+                            $pdi_remarks = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($pdi_remarks) {
+                                foreach ($pdi_remarks as $pdi_remarks) {
+                                    if ($pdi_remarks == "null") {
+                                        $query->orWhere('pdi_remarks', null);
+                                    } else {
+                                        $query->orWhere('pdi_remarks', 'LIKE', '%' . trim($pdi_remarks) . '%');
+                                    }
+                                }
+                            });
+                            break;
+                        case 'extra_features':
+                            $extra_features = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($extra_features) {
+                                foreach ($extra_features as $extra_features) {
+                                    if ($extra_features == "null") {
+                                        $query->orWhere('extra_features', null);
+                                    } else {
+                                        $query->orWhere('extra_features', 'LIKE', '%' . trim($extra_features) . '%');
+                                    }
+                                }
+                            });
+                            break;
+                        case 'inspection_date':
+                            $inspection_date = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($inspection_date) {
+                                foreach ($inspection_date as $inspection_date) {
+                                    if ($inspection_date == "null") {
+                                        $query->orWhere('inspection_date', null);
+                                    } else {
+                                        $query->orWhere('inspection_date', 'LIKE', '%' . trim($inspection_date) . '%');
+                                    }
+                                }
+                            });
+                            break;
+                        case 'reservation_start_date':
+                            $reservation_start_date = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($reservation_start_date) {
+                                foreach ($reservation_start_date as $reservation_start_date) {
+                                    if ($reservation_start_date == "null") {
+                                        $query->orWhere('reservation_start_date', null);
+                                    } else {
+                                        $query->orWhere('reservation_start_date', 'LIKE', '%' . trim($reservation_start_date) . '%');
+                                    }
+                                }
+                            });
+                            break;
+                        case 'reservation_end_date':
+                            $reservation_end_date = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($reservation_end_date) {
+                                foreach ($reservation_end_date as $reservation_end_date) {
+                                    if ($reservation_end_date == "null") {
+                                        $query->orWhere('reservation_end_date', null);
+                                    } else {
+                                        $query->orWhere('reservation_end_date', 'LIKE', '%' . trim($reservation_end_date) . '%');
+                                    }
+                                }
+                            });
+                            break;
+                        case 'engine':
+                            $engine = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($engine) {
+                                foreach ($engine as $engine) {
+                                    if ($engine == "null") {
+                                        $query->orWhere('engine', null);
+                                    } else {
+                                        $query->orWhere('engine', 'LIKE', '%' . trim($engine) . '%');
+                                    }
+                                }
+                            });
+                            break;
+                        case 'ppmmyyy':
+                            $ppmmyyy = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($ppmmyyy) {
+                                foreach ($ppmmyyy as $ppmmyyy) {
+                                    if ($ppmmyyy == "null") {
+                                        $query->orWhere('ppmmyyy', null);
+                                    } else {
+                                        $query->orWhere('ppmmyyy', 'LIKE', '%' . trim($ppmmyyy) . '%');
+                                    }
+                                }
+                            });
+                            break;
+                        case 'price':
+                            $price = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($price) {
+                                foreach ($price as $price) {
+                                    if ($price == "null") {
+                                        $query->orWhere('price', null);
+                                    } else {
+                                        $query->orWhere('price', 'LIKE', '%' . trim($price) . '%');
+                                    }
+                                }
+                            });
+                            break;
+                        case 'po_number':
+                            $poNumbers = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($poNumbers) {
+                                foreach ($poNumbers as $poNumber) {
+                                    if ($poNumber == "null") {
+                                        $query->orWhere('purchasing_order_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $purchasingOrder = PurchasingOrder::where('po_number', 'LIKE', '%' . trim($poNumber) . '%')->first();
+                                        if ($purchasingOrder) {
+                                            $query->orWhere('purchasing_order_id', $purchasingOrder->id);
                                         }
-                                    });
-                                    break;
-                                    case 'grn_remark':
-                                        $grn_remark = explode(',', $searchQuery);
-                                        $data = $data->where(function ($query) use ($grn_remark) {
-                                            foreach ($grn_remark as $grn_remark) {
-                                                if($grn_remark == "null")
-                                                {
-                                                    $query->orWhere('grn_remark', null);
-                                                }
-                                                else{
-                                                $query->orWhere('grn_remark', 'LIKE', '%' . trim($grn_remark) . '%');
-                                                }
-                                            }
-                                        });
-                                        break;
-                                        case 'qc_remarks':
-                                            $qc_remarks = explode(',', $searchQuery);
-                                            $data = $data->where(function ($query) use ($qc_remarks) {
-                                                foreach ($qc_remarks as $qc_remarks) {
-                                                    if($qc_remarks == "null")
-                                                    {
-                                                        $query->orWhere('qc_remarks', null);
-                                                    }
-                                                    else{
-                                                    $query->orWhere('qc_remarks', 'LIKE', '%' . trim($qc_remarks) . '%');
-                                                    }
-                                                }
-                                            });
-                                            break;
-                                            case 'pdi_date':
-                                                $pdi_date = explode(',', $searchQuery);
-                                                $data = $data->where(function ($query) use ($pdi_date) {
-                                                    foreach ($pdi_date as $pdi_date) {
-                                                        if($pdi_date == "null")
-                                                        {
-                                                            $query->orWhere('pdi_date', null);
-                                                        }
-                                                        else{
-                                                        $query->orWhere('pdi_date', 'LIKE', '%' . trim($pdi_date) . '%');
-                                                        }
-                                                    }
-                                                });
-                                                break;
-                                                case 'pdi_remarks':
-                                                    $pdi_remarks = explode(',', $searchQuery);
-                                                    $data = $data->where(function ($query) use ($pdi_remarks) {
-                                                        foreach ($pdi_remarks as $pdi_remarks) {
-                                                            if($pdi_remarks == "null")
-                                                            {
-                                                                $query->orWhere('pdi_remarks', null);
-                                                            }
-                                                            else{
-                                                            $query->orWhere('pdi_remarks', 'LIKE', '%' . trim($pdi_remarks) . '%');
-                                                            }
-                                                        }
-                                                    });
-                                                    break;
-                                                    case 'extra_features':
-                                                        $extra_features = explode(',', $searchQuery);
-                                                        $data = $data->where(function ($query) use ($extra_features) {
-                                                            foreach ($extra_features as $extra_features) {
-                                                                if($extra_features == "null")
-                                                                {
-                                                                    $query->orWhere('extra_features', null);
-                                                                }
-                                                                else{
-                                                                $query->orWhere('extra_features', 'LIKE', '%' . trim($extra_features) . '%');
-                                                                }
-                                                            }
-                                                        });
-                                                        break;
-                                        case 'inspection_date':
-                                            $inspection_date = explode(',', $searchQuery);
-                                            $data = $data->where(function ($query) use ($inspection_date) {
-                                                foreach ($inspection_date as $inspection_date) {
-                                                    if($inspection_date == "null")
-                                                    {
-                                                        $query->orWhere('inspection_date', null);
-                                                    }
-                                                    else{
-                                                    $query->orWhere('inspection_date', 'LIKE', '%' . trim($inspection_date) . '%');
-                                                    }
-                                                }
-                                            });
-                                            break;
-                                        case 'reservation_start_date':
-                                            $reservation_start_date = explode(',', $searchQuery);
-                                            $data = $data->where(function ($query) use ($reservation_start_date) {
-                                                foreach ($reservation_start_date as $reservation_start_date) {
-                                                    if($reservation_start_date == "null")
-                                                    {
-                                                        $query->orWhere('reservation_start_date', null);
-                                                    }
-                                                    else{
-                                                    $query->orWhere('reservation_start_date', 'LIKE', '%' . trim($reservation_start_date) . '%');
-                                                    }
-                                                }
-                                            });
-                                            break;
-                                            case 'reservation_end_date':
-                                                $reservation_end_date = explode(',', $searchQuery);
-                                                $data = $data->where(function ($query) use ($reservation_end_date) {
-                                                    foreach ($reservation_end_date as $reservation_end_date) {
-                                                        if($reservation_end_date == "null")
-                                                    {
-                                                        $query->orWhere('reservation_end_date', null);
-                                                    }
-                                                    else{
-                                                        $query->orWhere('reservation_end_date', 'LIKE', '%' . trim($reservation_end_date) . '%');
-                                                    }
-                                                    }
-                                                });
-                                                break;
-                                                case 'engine':
-                                                    $engine = explode(',', $searchQuery);
-                                                    $data = $data->where(function ($query) use ($engine) {
-                                                        foreach ($engine as $engine) {
-                                                            if($engine == "null")
-                                                            {
-                                                                $query->orWhere('engine', null);
-                                                            }
-                                                            else{
-                                                            $query->orWhere('engine', 'LIKE', '%' . trim($engine) . '%');
-                                                            }
-                                                        }
-                                                    });
-                                                    break;
-                                                    case 'ppmmyyy':
-                                                        $ppmmyyy = explode(',', $searchQuery);
-                                                        $data = $data->where(function ($query) use ($ppmmyyy) {
-                                                            foreach ($ppmmyyy as $ppmmyyy) {
-                                                                if($ppmmyyy == "null")
-                                                            {
-                                                                $query->orWhere('ppmmyyy', null);
-                                                            }
-                                                            else{
-                                                                $query->orWhere('ppmmyyy', 'LIKE', '%' . trim($ppmmyyy) . '%');
-                                                            }
-                                                            }
-                                                        });
-                                                        break;
-                                                        case 'price':
-                                                            $price = explode(',', $searchQuery);
-                                                            $data = $data->where(function ($query) use ($price) {
-                                                                foreach ($price as $price) {
-                                                                    if($price == "null")
-                                                            {
-                                                                $query->orWhere('price', null);
-                                                            }
-                                                            else{
-                                                                    $query->orWhere('price', 'LIKE', '%' . trim($price) . '%');
-                                                            }
-                                                                }
-                                                            });
-                                                            break;
-                                case 'po_number':
-                                    $poNumbers = explode(',', $searchQuery);
-                                    $data = $data->where(function ($query) use ($poNumbers) {
-                                        foreach ($poNumbers as $poNumber) {
-                                            if($poNumber == "null")
-                                            {
-                                                $query->orWhere('purchasing_order_id', null);
-                                            }
-                                            else{
-                                            // Find the purchasing_order_id based on the po_number
-                                            $purchasingOrder = PurchasingOrder::where('po_number', 'LIKE', '%' . trim($poNumber) . '%')->first();
-                                            if ($purchasingOrder) {
-                                                $query->orWhere('purchasing_order_id', $purchasingOrder->id);
-                                            }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'po_date':
+                            $po_date = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($po_date) {
+                                foreach ($po_date as $po_date) {
+                                    if ($po_date == "null") {
+                                        $query->orWhere('purchasing_order_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $purchasingOrder = PurchasingOrder::where('po_date', 'LIKE', '%' . trim($po_date) . '%')->first();
+                                        if ($purchasingOrder) {
+                                            $query->orWhere('purchasing_order_id', $purchasingOrder->id);
                                         }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'grn_number':
+                            $grn_number = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($grn_number) {
+                                foreach ($grn_number as $grn_number) {
+                                    if ($grn_number == "null") {
+                                        $query->orWhere('movement_grn_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $grn = MovementGrn::where('grn_number', 'LIKE', '%' . trim($grn_number) . '%')->first();
+                                        if ($grn) {
+                                            $query->orWhere('movement_grn_id', $grn->id);
                                         }
-                                    });
-                                    break;
-                                    case 'po_date':
-                                        $po_date = explode(',', $searchQuery);
-                                        $data = $data->where(function ($query) use ($po_date) {
-                                            foreach ($po_date as $po_date) {
-                                                if($po_date == "null")
-                                            {
-                                                $query->orWhere('purchasing_order_id', null);
-                                            }
-                                            else{
-                                                // Find the purchasing_order_id based on the po_number
-                                                $purchasingOrder = PurchasingOrder::where('po_date', 'LIKE', '%' . trim($po_date) . '%')->first();
-                                                if ($purchasingOrder) {
-                                                    $query->orWhere('purchasing_order_id', $purchasingOrder->id);
-                                                }
-                                            }
-                                            }
-                                        });
-                                        break;
-                                        case 'grn_number':
-                                            $grn_number = explode(',', $searchQuery);
-                                            $data = $data->where(function ($query) use ($grn_number) {
-                                                foreach ($grn_number as $grn_number) {
-                                                    if($grn_number == "null")
-                                            {
-                                                $query->orWhere('movement_grn_id', null);
-                                            }
-                                            else{
-                                                    // Find the purchasing_order_id based on the po_number
-                                                    $grn = MovementGrn::where('grn_number', 'LIKE', '%' . trim($grn_number) . '%')->first();
-                                                    if ($grn) {
-                                                        $query->orWhere('movement_grn_id', $grn->id);
-                                                    }
-                                                }
-                                                }
-                                            });
-                                            break;
-                                            case 'grn_date':
-                                                $grn_date = explode(',', $searchQuery);
-                                                $data = $data->where(function ($query) use ($grn_date) {
-                                                    foreach ($grn_date as $grn_date) {
-                                                        if($grn_date == "null")
-                                            {
-                                                $query->orWhere('movement_grn_id', null);
-                                            }
-                                            else{
-                                                        // Find the purchasing_order_id based on the po_number
-                                                        $grn = MovementsReference::where('date', 'LIKE', '%' . trim($grn_date) . '%')->first();
-                                                        if ($grn) {
-                                                            $query->orWhere('movement_grn_id', $grn->id);
-                                                        }
-                                                    }
-                                                    }
-                                                });
-                                                break;
-                                                case 'so_number':
-                                                    $so_number = explode(',', $searchQuery);
-                                                    $data = $data->where(function ($query) use ($so_number) {
-                                                        foreach ($so_number as $so_number) {
-                                                            if($so_number == "null")
-                                                            {
-                                                                $query->orWhere('so_id', null);
-                                                            }
-                                                            else{
-                                                            // Find the purchasing_order_id based on the po_number
-                                                            $so = So::where('so_number', 'LIKE', '%' . trim($so_number) . '%')->first();
-                                                            if ($so) {
-                                                                $query->orWhere('so_id', $so->id);
-                                                            }
-                                                        }
-                                                        }
-                                                    });
-                                                    break;
-                                                    case 'so_date':
-                                                        $so_date = explode(',', $searchQuery);
-                                                        $data = $data->where(function ($query) use ($so_date) {
-                                                            foreach ($so_date as $so_date) {
-                                                                if($so_date == "null")
-                                                                {
-                                                                    $query->orWhere('so_id', null);
-                                                                }
-                                                                else{
-                                                                // Find the purchasing_order_id based on the po_number
-                                                                $sodte = So::where('so_date', 'LIKE', '%' . trim($so_date) . '%')->first();
-                                                                if ($sodte) {
-                                                                    $query->orWhere('so_id', $sodte->id);
-                                                                }
-                                                            }
-                                                            }
-                                                        });
-                                                        break;
-                                                        case 'sales_person_id':
-                                                            $sales_person_id = explode(',', $searchQuery);
-                                                            $data = $data->where(function ($query) use ($sales_person_id) {
-                                                                foreach ($sales_person_id as $sales_person_id) {
-                                                                    if($sales_person_id == "null")
-                                                                    {
-                                                                        $query->orWhere('so_id', null);
-                                                                    }
-                                                                    else{
-                                                                    // Find the purchasing_order_id based on the po_number
-                                                                    $sosales = So::where('sales_person_id', 'LIKE', '%' . trim($sales_person_id) . '%')->first();
-                                                                    if ($sosales) {
-                                                                        $query->orWhere('so_id', $sosales->id);
-                                                                    }
-                                                                }
-                                                                }
-                                                            });
-                                                            break;
-                                                            case 'gdn_number':
-                                                                $gdn_number = explode(',', $searchQuery);
-                                                                $data = $data->where(function ($query) use ($gdn_number) {
-                                                                    foreach ($gdn_number as $gdn_number) {
-                                                                        if($gdn_number == "null")
-                                                                    {
-                                                                        $query->orWhere('gdn_id', null);
-                                                                    }
-                                                                    else{
-                                                                        // Find the purchasing_order_id based on the po_number
-                                                                        $gdnumber = Gdn::where('gdn_number', 'LIKE', '%' . trim($gdn_number) . '%')->first();
-                                                                        if ($gdnumber) {
-                                                                            $query->orWhere('gdn_id', $gdnumber->id);
-                                                                        }
-                                                                    }
-                                                                    }
-                                                                });
-                                                                break;
-                                                                case 'gdn_date':
-                                                                    $gdn_date = explode(',', $searchQuery);
-                                                                    $data = $data->where(function ($query) use ($gdn_date) {
-                                                                        foreach ($gdn_date as $gdn_date) {
-                                                                            if($gdn_date == "null")
-                                                                            {
-                                                                                $query->orWhere('gdn_id', null);
-                                                                            }
-                                                                            else{
-                                                                            // Find the purchasing_order_id based on the po_number
-                                                                            $gdndate = Gdn::where('date', 'LIKE', '%' . trim($gdn_date) . '%')->first();
-                                                                            if ($gdndate) {
-                                                                                $query->orWhere('gdn_id', $gdndate->id);
-                                                                            }
-                                                                        }
-                                                                        }
-                                                                    });
-                                                                    break;
-                                                                    case 'variant':
-                                                                        $variant = explode(',', $searchQuery);
-                                                                        $data = $data->where(function ($query) use ($variant) {
-                                                                            foreach ($variant as $variant) {
-                                                                                if($variant == "null")
-                                                                                {
-                                                                                    $query->orWhere('varaints_id', null);
-                                                                                }
-                                                                                else{
-                                                                                // Find the purchasing_order_id based on the po_number
-                                                                                $variant = Varaint::where('name', 'LIKE', '%' . trim($variant) . '%')->first();
-                                                                                if ($variant) {
-                                                                                    $query->orWhere('varaints_id', $variant->id);
-                                                                                }
-                                                                            }
-                                                                            }
-                                                                        });
-                                                                        break;
-                                                                        case 'variant_details':
-                                                                            $variant_details = explode(',', $searchQuery);
-                                                                            $data = $data->where(function ($query) use ($variant_details) {
-                                                                                foreach ($variant_details as $variant_details) {
-                                                                                    if($variant_details == "null")
-                                                                                {
-                                                                                    $query->orWhere('varaints_id', null);
-                                                                                }
-                                                                                else{
-                                                                                    // Find the purchasing_order_id based on the po_number
-                                                                                    $variant_details = Varaint::where('detail', 'LIKE', '%' . trim($variant_details) . '%')->first();
-                                                                                    if ($variant_details) {
-                                                                                        $query->orWhere('varaints_id', $variant_details->id);
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                            });
-                                                                            break;
-                                                                                case 'model_description':
-                                                                                    $model_description = explode(',', $searchQuery);
-                                                                                    $data = $data->where(function ($query) use ($model_description) {
-                                                                                        foreach ($model_description as $model_description) {
-                                                                                            if($model_description == "null")
-                                                                                {
-                                                                                    $query->orWhere('varaints_id', null);
-                                                                                }
-                                                                                else{
-                                                                                            // Find the purchasing_order_id based on the po_number
-                                                                                            $model_description = Varaint::where('model_detail', 'LIKE', '%' . trim($model_description) . '%')->first();
-                                                                                            if ($model_description) {
-                                                                                                $query->orWhere('varaints_id', $model_description->id);
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                    });
-                                                                                    break;
-                                                                                        case 'model_year':
-                                                                                            $model_year = explode(',', $searchQuery);
-                                                                                            $data = $data->where(function ($query) use ($model_year) {
-                                                                                                foreach ($model_year as $model_year) {
-                                                                                                    if($model_year == "null")
-                                                                                                    {
-                                                                                                        $query->orWhere('varaints_id', null);
-                                                                                                    }
-                                                                                                    else{
-                                                                                                    // Find the purchasing_order_id based on the po_number
-                                                                                                    $model_year = Varaint::where('my', 'LIKE', '%' . trim($model_year) . '%')->first();
-                                                                                                    if ($model_year) {
-                                                                                                        $query->orWhere('varaints_id', $model_year->id);
-                                                                                                    }
-                                                                                                }
-                                                                                            }
-                                                                                            });
-                                                                                            break;
-                                                                                            case 'steering':
-                                                                                                $steering = explode(',', $searchQuery);
-                                                                                                $data = $data->where(function ($query) use ($steering) {
-                                                                                                    foreach ($steering as $steering) {
-                                                                                                        if($steering == "null")
-                                                                                                    {
-                                                                                                        $query->orWhere('varaints_id', null);
-                                                                                                    }
-                                                                                                    else{
-                                                                                                        // Find the purchasing_order_id based on the po_number
-                                                                                                        $steering = Varaint::where('steering', 'LIKE', '%' . trim($steering) . '%')->first();
-                                                                                                        if ($steering) {
-                                                                                                            $query->orWhere('varaints_id', $steering->id);
-                                                                                                        }
-                                                                                                    }
-                                                                                                }
-                                                                                                });
-                                                                                                break;
-                                                                                                case 'seats':
-                                                                                                    $seats = explode(',', $searchQuery);
-                                                                                                    $data = $data->where(function ($query) use ($seats) {
-                                                                                                        foreach ($seats as $seats) {
-                                                                                                            if($seats == "null")
-                                                                                                            {
-                                                                                                                $query->orWhere('varaints_id', null);
-                                                                                                            }
-                                                                                                            else{
-                                                                                                            // Find the purchasing_order_id based on the po_number
-                                                                                                            $seats = Varaint::where('seat', 'LIKE', '%' . trim($seats) . '%')->first();
-                                                                                                            if ($seats) {
-                                                                                                                $query->orWhere('varaints_id', $seats->id);
-                                                                                                            }
-                                                                                                        }
-                                                                                                    }
-                                                                                                    });
-                                                                                                    break;
-                                                                                                    case 'upholestry':
-                                                                                                        $upholestry = explode(',', $searchQuery);
-                                                                                                        $data = $data->where(function ($query) use ($upholestry) {
-                                                                                                            foreach ($upholestry as $upholestry) {
-                                                                                                                if($upholestry == "null")
-                                                                                                            {
-                                                                                                                $query->orWhere('varaints_id', null);
-                                                                                                            }
-                                                                                                            else{
-                                                                                                                // Find the purchasing_order_id based on the po_number
-                                                                                                                $upholestry = Varaint::where('upholestry', 'LIKE', '%' . trim($upholestry) . '%')->first();
-                                                                                                                if ($upholestry) {
-                                                                                                                    $query->orWhere('varaints_id', $upholestry->id);
-                                                                                                                }
-                                                                                                            }
-                                                                                                        }
-                                                                                                        });
-                                                                                                        break;
-                                                                                                    case 'fuel_type':
-                                                                                                        $fuel_type = explode(',', $searchQuery);
-                                                                                                        $data = $data->where(function ($query) use ($fuel_type) {
-                                                                                                            foreach ($fuel_type as $fuel_type) {
-                                                                                                                if($fuel_type == "null")
-                                                                                                            {
-                                                                                                                $query->orWhere('varaints_id', null);
-                                                                                                            }
-                                                                                                            else{
-                                                                                                                // Find the purchasing_order_id based on the po_number
-                                                                                                                $fuel_type = Varaint::where('fuel_type', 'LIKE', '%' . trim($fuel_type) . '%')->first();
-                                                                                                                if ($fuel_type) {
-                                                                                                                    $query->orWhere('varaints_id', $fuel_type->id);
-                                                                                                                }
-                                                                                                            }
-                                                                                                        }
-                                                                                                        });
-                                                                                                        break;
-                                                                                                        case 'brand':
-                                                                                                            $brandNames = explode(',', $searchQuery);
-                                                                                                            $data = $data->where(function ($query) use ($brandNames) {
-                                                                                                                foreach ($brandNames as $brandName) {
-                                                                                                                    if($brandName == "null")
-                                                                                                                    {
-                                                                                                                        $query->orWhereIn('varaints_id', null);
-                                                                                                                    }
-                                                                                                                    else{
-                                                                                                                    // Find the brand_id based on the brand name from the brands table
-                                                                                                                    $brand = Brand::where('brand_name', 'LIKE', '%' . trim($brandName) . '%')->first();
-                                                                                                                    if ($brand) {
-                                                                                                                        // Find the varaints_id based on the brand_id from the variants table
-                                                                                                                        $variantsWithBrand = Varaint::where('brands_id', $brand->id)->pluck('id');
-                                                                                                                        $query->orWhereIn('varaints_id', $variantsWithBrand);
-                                                                                                                    }
-                                                                                                                }
-                                                                                                                }
-                                                                                                            });
-                                                                                                            break;
-                                                                                                            case 'model_line':
-                                                                                                                $modelline = explode(',', $searchQuery);
-                                                                                                                $data = $data->where(function ($query) use ($modelline) {
-                                                                                                                    foreach ($modelline as $modellines) {
-                                                                                                                        // Find the brand_id based on the brand name from the brands table
-                                                                                                                        if($modellines == "null")
-                                                                                                                    {
-                                                                                                                        $query->orWhereIn('varaints_id', null);
-                                                                                                                    }
-                                                                                                                    else{
-                                                                                                                        $modelline = MasterModelLines::where('model_line', 'LIKE', '%' . trim($modellines) . '%')->first();
-                                                                                                                        if ($modelline) {
-                                                                                                                            // Find the varaints_id based on the brand_id from the variants table
-                                                                                                                            $variantsWithBrand = Varaint::where('master_model_lines_id', $modelline->id)->pluck('id');
-                                                                                                                            $query->orWhereIn('varaints_id', $variantsWithBrand);
-                                                                                                                        }
-                                                                                                                    }
-                                                                                                                }
-                                                                                                                });
-                                                                                                                break;
-                                                                                                        case 'ex_colour':
-                                                                                                            $ex_colour = explode(',', $searchQuery);
-                                                                                                            $data = $data->where(function ($query) use ($ex_colour) {
-                                                                                                                foreach ($ex_colour as $ex_colour) {
-                                                                                                                    if($ex_colour == "null")
-                                                                                                                    {
-                                                                                                                        $query->orWhere('ex_colour', null);
-                                                                                                                    }
-                                                                                                                    else{
-                                                                                                                    $ex_colour = ColorCode::where('name', 'LIKE', '%' . trim($ex_colour) . '%')->where('belong_to', 'ex')->first();
-                                                                                                                    if ($ex_colour) {
-                                                                                                                        $query->orWhere('ex_colour', $ex_colour->id);
-                                                                                                                    }
-                                                                                                                }
-                                                                                                                }
-                                                                                                            });
-                                                                                                            break;
-                                                                                                            case 'int_colour':
-                                                                                                                $int_colour = explode(',', $searchQuery);
-                                                                                                                $data = $data->where(function ($query) use ($int_colour) {
-                                                                                                                    foreach ($int_colour as $int_colour) {
-                                                                                                                        if($int_colour == "null")
-                                                                                                                    {
-                                                                                                                        $query->orWhere('int_colour', null);
-                                                                                                                    }
-                                                                                                                    else{
-                                                                                                                        // Find the purchasing_order_id based on the po_number
-                                                                                                                        $int_colour = ColorCode::where('name', 'LIKE', '%' . trim($int_colour) . '%')->where('belong_to', 'int')->first();
-                                                                                                                        if ($int_colour) {
-                                                                                                                            $query->orWhere('int_colour', $int_colour->id);
-                                                                                                                        }
-                                                                                                                    }
-                                                                                                                }
-                                                                                                                });
-                                                                                                                break;
-                                                                                                            case 'importdoc':
-                                                                                                                $import_type = explode(',', $searchQuery);
-                                                                                                                $data = $data->where(function ($query) use ($import_type) {
-                                                                                                                    foreach ($import_type as $import_type) {
-                                                                                                                        if($import_type == "null")
-                                                                                                                    {
-                                                                                                                        $query->orWhere('documents_id', null);
-                                                                                                                    }
-                                                                                                                    else{
-                                                                                                                        // Find the purchasing_order_id based on the po_number
-                                                                                                                        $import_type = Document::where('import_type', 'LIKE', '%' . trim($import_type) . '%')->first();
-                                                                                                                        if ($import_type) {
-                                                                                                                            $query->orWhere('documents_id', $import_type->id);
-                                                                                                                        }
-                                                                                                                    }
-                                                                                                                }
-                                                                                                                });
-                                                                                                                break;
-                                                                                                                case 'ownership':
-                                                                                                                    $owership = explode(',', $searchQuery);
-                                                                                                                    $data = $data->where(function ($query) use ($owership) {
-                                                                                                                        foreach ($owership as $owership) {
-                                                                                                                            if($owership == "null")
-                                                                                                                    {
-                                                                                                                        $query->orWhere('documents_id', null);;
-                                                                                                                    }
-                                                                                                                    else{
-                                                                                                                            // Find the purchasing_order_id based on the po_number
-                                                                                                                            $owership = Document::where('owership', 'LIKE', '%' . trim($owership) . '%')->first();
-                                                                                                                            if ($owership) {
-                                                                                                                                $query->orWhere('documents_id', $owership->id);
-                                                                                                                            }
-                                                                                                                        }
-                                                                                                                    }
-                                                                                                                    });
-                                                                                                                    break;
-                                                                                                                    case 'documentwith':
-                                                                                                                        $documentwith = explode(',', $searchQuery);
-                                                                                                                        $data = $data->where(function ($query) use ($documentwith) {
-                                                                                                                            foreach ($documentwith as $documentwith) {
-                                                                                                                                if($documentwith == "null")
-                                                                                                                                {
-                                                                                                                                    $query->orWhere('documents_id', null);
-                                                                                                                                }
-                                                                                                                                else{
-                                                                                                                                // Find the purchasing_order_id based on the po_number
-                                                                                                                                $documentwith = Document::where('documentwith', 'LIKE', '%' . trim($documentwith) . '%')->first();
-                                                                                                                                if ($documentwith) {
-                                                                                                                                    $query->orWhere('documents_id', $documentwith->id);
-                                                                                                                                }
-                                                                                                                            }
-                                                                                                                            }
-                                                                                                                        });
-                                                                                                                        break;
-                                                                                                                        case 'bl_number':
-                                                                                                                            $bl_number = explode(',', $searchQuery);
-                                                                                                                            $data = $data->where(function ($query) use ($bl_number) {
-                                                                                                                                foreach ($bl_number as $bl_number) {
-                                                                                                                                    if($bl_number == "null")
-                                                                                                                                {
-                                                                                                                                    $query->orWhere('documents_id', null);
-                                                                                                                                }
-                                                                                                                                else{
-                                                                                                                                    // Find the purchasing_order_id based on the po_number
-                                                                                                                                    $bl_number = Document::where('bl_number', 'LIKE', '%' . trim($bl_number) . '%')->first();
-                                                                                                                                    if ($bl_number) {
-                                                                                                                                        $query->orWhere('documents_id', $bl_number->id);
-                                                                                                                                    }
-                                                                                                                                }
-                                                                                                                            }
-                                                                                                                            });
-                                                                                                                            break;
-                                                                                                                            case 'bl_dms_uploading':
-                                                                                                                                $bl_dms_uploading = explode(',', $searchQuery);
-                                                                                                                                $data = $data->where(function ($query) use ($bl_dms_uploading) {
-                                                                                                                                    foreach ($bl_dms_uploading as $bl_dms_uploading) {
-                                                                                                                                        if($bl_dms_uploading == "null")
-                                                                                                                                    {
-                                                                                                                                        $query->orWhere('documents_id', null);
-                                                                                                                                    }
-                                                                                                                                    else{
-                                                                                                                                        // Find the purchasing_order_id based on the po_number
-                                                                                                                                        $bl_dms_uploading = Document::where('bl_dms_uploading', 'LIKE', '%' . trim($bl_dms_uploading) . '%')->first();
-                                                                                                                                        if ($bl_dms_uploading) {
-                                                                                                                                            $query->orWhere('documents_id', $bl_dms_uploading->id);
-                                                                                                                                        }
-                                                                                                                                    }
-                                                                                                                                }
-                                                                                                                                });
-                                                                                                                                break;
-                                                                                                                            case 'latest_location':
-                                                                                                                                $latest_location = explode(',', $searchQuery);
-                                                                                                                                $data = $data->where(function ($query) use ($latest_location) {
-                                                                                                                                    foreach ($latest_location as $latest_location) {
-                                                                                                                                        if($latest_location == "null")
-                                                                                                                                        {
-                                                                                                                                            $query->orWhere('latest_location', null);
-                                                                                                                                        }
-                                                                                                                                        else{
-                                                                                                                                        // Find the purchasing_order_id based on the po_number
-                                                                                                                                        $latest_location = Warehouse::where('latest_location', 'LIKE', '%' . trim($latest_location) . '%')->first();
-                                                                                                                                        if ($latest_location) {
-                                                                                                                                            $query->orWhere('latest_location', $latest_location->id);
-                                                                                                                                        }
-                                                                                                                                    }
-                                                                                                                                    }
-                                                                                                                                });
-                                                                                                                                break;
+                                    }
+                                }
+                            });
+                            break;
+                        case 'grn_date':
+                            $grn_date = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($grn_date) {
+                                foreach ($grn_date as $grn_date) {
+                                    if ($grn_date == "null") {
+                                        $query->orWhere('movement_grn_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $grn = MovementsReference::where('date', 'LIKE', '%' . trim($grn_date) . '%')->first();
+                                        if ($grn) {
+                                            $query->orWhere('movement_grn_id', $grn->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'so_number':
+                            $so_number = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($so_number) {
+                                foreach ($so_number as $so_number) {
+                                    if ($so_number == "null") {
+                                        $query->orWhere('so_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $so = So::where('so_number', 'LIKE', '%' . trim($so_number) . '%')->first();
+                                        if ($so) {
+                                            $query->orWhere('so_id', $so->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'so_date':
+                            $so_date = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($so_date) {
+                                foreach ($so_date as $so_date) {
+                                    if ($so_date == "null") {
+                                        $query->orWhere('so_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $sodte = So::where('so_date', 'LIKE', '%' . trim($so_date) . '%')->first();
+                                        if ($sodte) {
+                                            $query->orWhere('so_id', $sodte->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'sales_person_id':
+                            $sales_person_id = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($sales_person_id) {
+                                foreach ($sales_person_id as $sales_person_id) {
+                                    if ($sales_person_id == "null") {
+                                        $query->orWhere('so_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $sosales = So::where('sales_person_id', 'LIKE', '%' . trim($sales_person_id) . '%')->first();
+                                        if ($sosales) {
+                                            $query->orWhere('so_id', $sosales->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'gdn_number':
+                            $gdn_number = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($gdn_number) {
+                                foreach ($gdn_number as $gdn_number) {
+                                    if ($gdn_number == "null") {
+                                        $query->orWhere('gdn_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $gdnumber = Gdn::where('gdn_number', 'LIKE', '%' . trim($gdn_number) . '%')->first();
+                                        if ($gdnumber) {
+                                            $query->orWhere('gdn_id', $gdnumber->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'gdn_date':
+                            $gdn_date = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($gdn_date) {
+                                foreach ($gdn_date as $gdn_date) {
+                                    if ($gdn_date == "null") {
+                                        $query->orWhere('gdn_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $gdndate = Gdn::where('date', 'LIKE', '%' . trim($gdn_date) . '%')->first();
+                                        if ($gdndate) {
+                                            $query->orWhere('gdn_id', $gdndate->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'variant':
+                            $variant = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($variant) {
+                                foreach ($variant as $variant) {
+                                    if ($variant == "null") {
+                                        $query->orWhere('varaints_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $variant = Varaint::where('name', 'LIKE', '%' . trim($variant) . '%')->first();
+                                        if ($variant) {
+                                            $query->orWhere('varaints_id', $variant->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'variant_details':
+                            $variant_details = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($variant_details) {
+                                foreach ($variant_details as $variant_details) {
+                                    if ($variant_details == "null") {
+                                        $query->orWhere('varaints_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $variant_details = Varaint::where('detail', 'LIKE', '%' . trim($variant_details) . '%')->first();
+                                        if ($variant_details) {
+                                            $query->orWhere('varaints_id', $variant_details->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'model_description':
+                            $model_description = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($model_description) {
+                                foreach ($model_description as $model_description) {
+                                    if ($model_description == "null") {
+                                        $query->orWhere('varaints_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $model_description = Varaint::where('model_detail', 'LIKE', '%' . trim($model_description) . '%')->first();
+                                        if ($model_description) {
+                                            $query->orWhere('varaints_id', $model_description->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'model_year':
+                            $model_year = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($model_year) {
+                                foreach ($model_year as $model_year) {
+                                    if ($model_year == "null") {
+                                        $query->orWhere('varaints_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $model_year = Varaint::where('my', 'LIKE', '%' . trim($model_year) . '%')->first();
+                                        if ($model_year) {
+                                            $query->orWhere('varaints_id', $model_year->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'steering':
+                            $steering = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($steering) {
+                                foreach ($steering as $steering) {
+                                    if ($steering == "null") {
+                                        $query->orWhere('varaints_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $steering = Varaint::where('steering', 'LIKE', '%' . trim($steering) . '%')->first();
+                                        if ($steering) {
+                                            $query->orWhere('varaints_id', $steering->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'seats':
+                            $seats = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($seats) {
+                                foreach ($seats as $seats) {
+                                    if ($seats == "null") {
+                                        $query->orWhere('varaints_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $seats = Varaint::where('seat', 'LIKE', '%' . trim($seats) . '%')->first();
+                                        if ($seats) {
+                                            $query->orWhere('varaints_id', $seats->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'upholestry':
+                            $upholestry = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($upholestry) {
+                                foreach ($upholestry as $upholestry) {
+                                    if ($upholestry == "null") {
+                                        $query->orWhere('varaints_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $upholestry = Varaint::where('upholestry', 'LIKE', '%' . trim($upholestry) . '%')->first();
+                                        if ($upholestry) {
+                                            $query->orWhere('varaints_id', $upholestry->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'fuel_type':
+                            $fuel_type = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($fuel_type) {
+                                foreach ($fuel_type as $fuel_type) {
+                                    if ($fuel_type == "null") {
+                                        $query->orWhere('varaints_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $fuel_type = Varaint::where('fuel_type', 'LIKE', '%' . trim($fuel_type) . '%')->first();
+                                        if ($fuel_type) {
+                                            $query->orWhere('varaints_id', $fuel_type->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'brand':
+                            $brandNames = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($brandNames) {
+                                foreach ($brandNames as $brandName) {
+                                    if ($brandName == "null") {
+                                        $query->orWhereIn('varaints_id', null);
+                                    } else {
+                                        // Find the brand_id based on the brand name from the brands table
+                                        $brand = Brand::where('brand_name', 'LIKE', '%' . trim($brandName) . '%')->first();
+                                        if ($brand) {
+                                            // Find the varaints_id based on the brand_id from the variants table
+                                            $variantsWithBrand = Varaint::where('brands_id', $brand->id)->pluck('id');
+                                            $query->orWhereIn('varaints_id', $variantsWithBrand);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'model_line':
+                            $modelline = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($modelline) {
+                                foreach ($modelline as $modellines) {
+                                    // Find the brand_id based on the brand name from the brands table
+                                    if ($modellines == "null") {
+                                        $query->orWhereIn('varaints_id', null);
+                                    } else {
+                                        $modelline = MasterModelLines::where('model_line', 'LIKE', '%' . trim($modellines) . '%')->first();
+                                        if ($modelline) {
+                                            // Find the varaints_id based on the brand_id from the variants table
+                                            $variantsWithBrand = Varaint::where('master_model_lines_id', $modelline->id)->pluck('id');
+                                            $query->orWhereIn('varaints_id', $variantsWithBrand);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'ex_colour':
+                            $ex_colour = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($ex_colour) {
+                                foreach ($ex_colour as $ex_colour) {
+                                    if ($ex_colour == "null") {
+                                        $query->orWhere('ex_colour', null);
+                                    } else {
+                                        $ex_colour = ColorCode::where('name', 'LIKE', '%' . trim($ex_colour) . '%')->where('belong_to', 'ex')->first();
+                                        if ($ex_colour) {
+                                            $query->orWhere('ex_colour', $ex_colour->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'int_colour':
+                            $int_colour = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($int_colour) {
+                                foreach ($int_colour as $int_colour) {
+                                    if ($int_colour == "null") {
+                                        $query->orWhere('int_colour', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $int_colour = ColorCode::where('name', 'LIKE', '%' . trim($int_colour) . '%')->where('belong_to', 'int')->first();
+                                        if ($int_colour) {
+                                            $query->orWhere('int_colour', $int_colour->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'importdoc':
+                            $import_type = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($import_type) {
+                                foreach ($import_type as $import_type) {
+                                    if ($import_type == "null") {
+                                        $query->orWhere('documents_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $import_type = Document::where('import_type', 'LIKE', '%' . trim($import_type) . '%')->first();
+                                        if ($import_type) {
+                                            $query->orWhere('documents_id', $import_type->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'ownership':
+                            $owership = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($owership) {
+                                foreach ($owership as $owership) {
+                                    if ($owership == "null") {
+                                        $query->orWhere('documents_id', null);;
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $owership = Document::where('owership', 'LIKE', '%' . trim($owership) . '%')->first();
+                                        if ($owership) {
+                                            $query->orWhere('documents_id', $owership->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'documentwith':
+                            $documentwith = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($documentwith) {
+                                foreach ($documentwith as $documentwith) {
+                                    if ($documentwith == "null") {
+                                        $query->orWhere('documents_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $documentwith = Document::where('documentwith', 'LIKE', '%' . trim($documentwith) . '%')->first();
+                                        if ($documentwith) {
+                                            $query->orWhere('documents_id', $documentwith->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'bl_number':
+                            $bl_number = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($bl_number) {
+                                foreach ($bl_number as $bl_number) {
+                                    if ($bl_number == "null") {
+                                        $query->orWhere('documents_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $bl_number = Document::where('bl_number', 'LIKE', '%' . trim($bl_number) . '%')->first();
+                                        if ($bl_number) {
+                                            $query->orWhere('documents_id', $bl_number->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'bl_dms_uploading':
+                            $bl_dms_uploading = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($bl_dms_uploading) {
+                                foreach ($bl_dms_uploading as $bl_dms_uploading) {
+                                    if ($bl_dms_uploading == "null") {
+                                        $query->orWhere('documents_id', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $bl_dms_uploading = Document::where('bl_dms_uploading', 'LIKE', '%' . trim($bl_dms_uploading) . '%')->first();
+                                        if ($bl_dms_uploading) {
+                                            $query->orWhere('documents_id', $bl_dms_uploading->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
+                        case 'latest_location':
+                            $latest_location = explode(',', $searchQuery);
+                            $data = $data->where(function ($query) use ($latest_location) {
+                                foreach ($latest_location as $latest_location) {
+                                    if ($latest_location == "null") {
+                                        $query->orWhere('latest_location', null);
+                                    } else {
+                                        // Find the purchasing_order_id based on the po_number
+                                        $latest_location = Warehouse::where('latest_location', 'LIKE', '%' . trim($latest_location) . '%')->first();
+                                        if ($latest_location) {
+                                            $query->orWhere('latest_location', $latest_location->id);
+                                        }
+                                    }
+                                }
+                            });
+                            break;
                         case 'territory':
-                            if($searchQuery == "null")
-                            {
-                            $data->where('territory', null);
-                            }
-                            else{
-                            $data->where('territory', 'LIKE', '%' . $searchQuery . '%');
+                            if ($searchQuery == "null") {
+                                $data->where('territory', null);
+                            } else {
+                                $data->where('territory', 'LIKE', '%' . $searchQuery . '%');
                             }
                             break;
                         default:
@@ -785,89 +702,110 @@ class VehiclesController extends Controller
                 }
             }
             $data = $data->paginate(100);
-        $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')->groupBy('vehicle_id')->get();
-        $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
-        $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
-        $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
-        $sales_persons = ModelHasRoles::get();
-        $sales_ids = $sales_persons->pluck('model_id');
-        $sales = User::whereIn('id', $sales_ids)->get();
-        $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
-        $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $countwarehouse = $warehouses->count();
-        $previousYearSold = $this->previousYearSold()->count();
-        $previousYearBooked = $this->previousYearBooked()->count();
-        $previousMonthSold = $this->previousMonthSold()->count();
-        $previousMonthBooked = $this->previousMonthBooked()->count();
-        $yesterdaySold = $this->yesterdaySold()->count();
-        $yesterdayBooked  = $this->yesterdayBooked()->count();
-        $previousYearAvailable  = $this->previousYearAvailable()->count();
-        $previousMonthAvailable  = $this->previousMonthAvailable()->count();
-        $yesterdayAvailable  = $this->yesterdayAvailable()->count();
-        $previousYearPurchased = $this->previousYearPurchased()->count();
-        $previousMonthPurchased = $this->previousMonthPurchased()->count();
-        $yesterdayPurchased = $this->yesterdayPurchased()->count();
+            $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status', 'Pending')->groupBy('vehicle_id')->get();
+            $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
+            $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
+            $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
+            $sales_persons = ModelHasRoles::get();
+            $sales_ids = $sales_persons->pluck('model_id');
+            $sales = User::whereIn('id', $sales_ids)->get();
+            $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
+            $interiorColours = ColorCode::where('belong_to', 'int')->get();
+            $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $countwarehouse = $warehouses->count();
+            $previousYearSold = $this->previousYearSold()->count();
+            $previousYearBooked = $this->previousYearBooked()->count();
+            $previousMonthSold = $this->previousMonthSold()->count();
+            $previousMonthBooked = $this->previousMonthBooked()->count();
+            $yesterdaySold = $this->yesterdaySold()->count();
+            $yesterdayBooked  = $this->yesterdayBooked()->count();
+            $previousYearAvailable  = $this->previousYearAvailable()->count();
+            $previousMonthAvailable  = $this->previousMonthAvailable()->count();
+            $yesterdayAvailable  = $this->yesterdayAvailable()->count();
+            $previousYearPurchased = $this->previousYearPurchased()->count();
+            $previousMonthPurchased = $this->previousMonthPurchased()->count();
+            $yesterdayPurchased = $this->yesterdayPurchased()->count();
 
-        return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending',
-            'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse',
-            'warehousesveh','warehousesvehss', 'warehousesveher','previousYearSold','previousMonthSold','previousYearBooked',
-            'previousMonthBooked','yesterdaySold','yesterdayBooked','previousYearAvailable','previousMonthAvailable',
-            'yesterdayAvailable', 'yesterdayPurchased','previousMonthPurchased','previousYearPurchased', 'warehousessold'));
-        }
-        else{
+            return view('vehicles.index', compact(
+                'data',
+                'varaint',
+                'sales',
+                'datapending',
+                'exteriorColours',
+                'interiorColours',
+                'pendingVehicleDetailForApprovalCount',
+                'warehouses',
+                'countwarehouse',
+                'warehousesveh',
+                'warehousesvehss',
+                'warehousesveher',
+                'previousYearSold',
+                'previousMonthSold',
+                'previousYearBooked',
+                'previousMonthBooked',
+                'yesterdaySold',
+                'yesterdayBooked',
+                'previousYearAvailable',
+                'previousMonthAvailable',
+                'yesterdayAvailable',
+                'yesterdayPurchased',
+                'previousMonthPurchased',
+                'previousYearPurchased',
+                'warehousessold'
+            ));
+        } else {
             return redirect()->route('home');
         }
     }
-    public function stockCountFilter(Request $request) {
+    public function stockCountFilter(Request $request)
+    {
 
-        if($request->key) {
+        if ($request->key) {
             $searchKey = $request->key;
             $vehicleIds = Vehicles::pluck('id');
 
-            if($searchKey == Vehicles::FILTER_PREVIOUS_YEAR_SOLD) {
+            if ($searchKey == Vehicles::FILTER_PREVIOUS_YEAR_SOLD) {
                 $vehicleIds = $this->previousYearSold()->pluck('id');
             }
-            if($searchKey == Vehicles::FILTER_PREVIOUS_MONTH_SOLD) {
+            if ($searchKey == Vehicles::FILTER_PREVIOUS_MONTH_SOLD) {
                 $vehicleIds = $this->previousMonthSold()->pluck('id');
             }
-            if($searchKey == Vehicles::FILTER_YESTERDAY_SOLD) {
+            if ($searchKey == Vehicles::FILTER_YESTERDAY_SOLD) {
                 $vehicleIds = $this->yesterdaySold()->pluck('id');
             }
-            if($searchKey == Vehicles::FILTER_PREVIOUS_YEAR_BOOKED) {
+            if ($searchKey == Vehicles::FILTER_PREVIOUS_YEAR_BOOKED) {
                 $vehicleIds = $this->previousYearBooked()->pluck('id');
             }
-            if($searchKey == Vehicles::FILTER_PREVIOUS_MONTH_BOOKED) {
+            if ($searchKey == Vehicles::FILTER_PREVIOUS_MONTH_BOOKED) {
                 $vehicleIds = $this->previousMonthBooked()->pluck('id');
             }
-            if($searchKey == Vehicles::FILTER_YESTERDAY_BOOKED) {
+            if ($searchKey == Vehicles::FILTER_YESTERDAY_BOOKED) {
                 $vehicleIds = $this->yesterdayBooked()->pluck('id');
             }
-            if($searchKey == Vehicles::FILTER_PREVIOUS_YEAR_AVAILABLE) {
+            if ($searchKey == Vehicles::FILTER_PREVIOUS_YEAR_AVAILABLE) {
                 $vehicleIds = $this->previousYearAvailable()->pluck('id');
             }
-            if($searchKey == Vehicles::FILTER_PREVIOUS_MONTH_AVAILABLE) {
+            if ($searchKey == Vehicles::FILTER_PREVIOUS_MONTH_AVAILABLE) {
                 $vehicleIds = $this->previousMonthAvailable()->pluck('id');
             }
-            if($searchKey == Vehicles::FILTER_YESTERDAY_AVAILABLE) {
+            if ($searchKey == Vehicles::FILTER_YESTERDAY_AVAILABLE) {
                 $vehicleIds = $this->yesterdayAvailable()->pluck('id');
             }
-            if($searchKey == Vehicles::FILTER_PREVIOUS_YEAR_PURCHASED) {
+            if ($searchKey == Vehicles::FILTER_PREVIOUS_YEAR_PURCHASED) {
                 $vehicleIds = $this->previousYearPurchased()->pluck('id');
             }
-            if($searchKey == Vehicles::FILTER_PREVIOUS_MONTH_PURCHASED) {
+            if ($searchKey == Vehicles::FILTER_PREVIOUS_MONTH_PURCHASED) {
                 $vehicleIds = $this->previousMonthPurchased()->pluck('id');
             }
-            if($searchKey == Vehicles::FILTER_YESTERDAY_PURCHASED) {
+            if ($searchKey == Vehicles::FILTER_YESTERDAY_PURCHASED) {
                 $vehicleIds = $this->yesterdayPurchased()->pluck('id');
             }
-            $data = Vehicles::whereIn('id',$vehicleIds)->paginate(100);
-
-        }else{
+            $data = Vehicles::whereIn('id', $vehicleIds)->paginate(100);
+        } else {
             $statuss = "Approved";
             $data = Vehicles::where('status', $statuss);
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
@@ -883,7 +821,7 @@ class VehiclesController extends Controller
             }
             $data = $data->paginate(100);
         }
-        $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
+        $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status', 'Pending')
             ->groupBy('vehicle_id')->get();
         $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
         $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
@@ -913,13 +851,35 @@ class VehiclesController extends Controller
         $previousMonthPurchased = $this->previousMonthPurchased()->count();
         $yesterdayPurchased = $this->yesterdayPurchased()->count();
 
-        return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
-            ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse',
-            'warehousesveh','warehousesvehss', 'warehousesveher','previousYearSold','previousMonthSold','previousYearBooked',
-            'previousMonthBooked','yesterdaySold','yesterdayBooked','previousYearAvailable','previousMonthAvailable','yesterdayAvailable',
-            'yesterdayPurchased','previousMonthPurchased','previousYearPurchased'));
+        return view('vehicles.index', compact(
+            'data',
+            'varaint',
+            'sales',
+            'datapending',
+            'exteriorColours',
+            'interiorColours',
+            'pendingVehicleDetailForApprovalCount',
+            'warehouses',
+            'countwarehouse',
+            'warehousesveh',
+            'warehousesvehss',
+            'warehousesveher',
+            'previousYearSold',
+            'previousMonthSold',
+            'previousYearBooked',
+            'previousMonthBooked',
+            'yesterdaySold',
+            'yesterdayBooked',
+            'previousYearAvailable',
+            'previousMonthAvailable',
+            'yesterdayAvailable',
+            'yesterdayPurchased',
+            'previousMonthPurchased',
+            'previousYearPurchased'
+        ));
     }
-    public function previousYearPurchased() {
+    public function previousYearPurchased()
+    {
 
         $currentYear = \Carbon\Carbon::now()->year;
         $previousYear = $currentYear - 1;
@@ -929,16 +889,17 @@ class VehiclesController extends Controller
             ->whereExists(function ($query) use ($startDate, $endDate) {
                 $query->select(DB::raw(1))
                     ->from('movement_grns')
-                    ->join('movements_reference', 'movements_reference.id', '=', 'movement_grns.movement_reference_id') 
+                    ->join('movements_reference', 'movements_reference.id', '=', 'movement_grns.movement_reference_id')
                     ->whereColumn('movement_grns.id', '=', 'vehicles.movement_grn_id')
                     ->whereBetween('movements_reference.date', [$startDateLastMonth, $endDateLastMonth]);
-                    // ->whereBetween('grn.date', [$startDate, $endDate]);
+                // ->whereBetween('grn.date', [$startDate, $endDate]);
             })
             ->paginate(100);
 
         return $data;
     }
-    public function previousMonthPurchased() {
+    public function previousMonthPurchased()
+    {
 
         $startDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->startOfMonth();
         $endDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->endOfMonth();
@@ -947,7 +908,7 @@ class VehiclesController extends Controller
             ->whereExists(function ($query) use ($startDateLastMonth, $endDateLastMonth) {
                 $query->select(DB::raw(1))
                     ->from('movement_grns')
-                    ->join('movements_reference', 'movements_reference.id', '=', 'movement_grns.movement_reference_id') 
+                    ->join('movements_reference', 'movements_reference.id', '=', 'movement_grns.movement_reference_id')
                     ->whereColumn('movement_grns.id', '=', 'vehicles.movement_grn_id')
                     ->whereBetween('movements_reference.date', [$startDateLastMonth, $endDateLastMonth]);
             })
@@ -955,7 +916,8 @@ class VehiclesController extends Controller
 
         return $data;
     }
-    public function yesterdayPurchased() {
+    public function yesterdayPurchased()
+    {
 
         $yesterday = Carbon::now()->subDay(1)->format('Y-m-d');
         $data = \Illuminate\Support\Facades\DB::table('vehicles')
@@ -964,7 +926,7 @@ class VehiclesController extends Controller
                     // ->from('grn')
                     // ->whereColumn('grn.id', '=', 'vehicles.grn_id')
                     ->from('movement_grns')
-                    ->join('movements_reference', 'movements_reference.id', '=', 'movement_grns.movement_reference_id') 
+                    ->join('movements_reference', 'movements_reference.id', '=', 'movement_grns.movement_reference_id')
                     ->whereColumn('movement_grns.id', '=', 'vehicles.movement_grn_id')
                     ->whereDate('movements_reference.date', $yesterday);
             })
@@ -972,7 +934,8 @@ class VehiclesController extends Controller
 
         return $data;
     }
-    public function previousYearSold() {
+    public function previousYearSold()
+    {
         // logic => if gdn id is there then that vehicle is completed.
         $currentYear = \Carbon\Carbon::now()->year;
         $previousYear = $currentYear - 1;
@@ -989,7 +952,8 @@ class VehiclesController extends Controller
 
         return $countPreviouseYearSold;
     }
-    public function previousYearBooked() {
+    public function previousYearBooked()
+    {
         $currentYear = \Carbon\Carbon::now()->year;
         $previousYear = $currentYear - 1;
         $startDate = \Carbon\Carbon::createFromDate($previousYear, 1, 1);
@@ -1005,7 +969,8 @@ class VehiclesController extends Controller
 
         return $countPreviouseYearBooked;
     }
-    public function previousYearAvailable() {
+    public function previousYearAvailable()
+    {
 
         $currentYear = \Carbon\Carbon::now()->year;
         $previousYear = $currentYear - 1;
@@ -1018,7 +983,8 @@ class VehiclesController extends Controller
 
         return $countPreviouseYearAvailable;
     }
-    public function previousMonthSold() {
+    public function previousMonthSold()
+    {
         $startDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->startOfMonth();
         $endDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->endOfMonth();
 
@@ -1033,7 +999,8 @@ class VehiclesController extends Controller
 
         return $countLastMonth;
     }
-    public function previousMonthBooked() {
+    public function previousMonthBooked()
+    {
         // logic => if gdn id is there then that vehicle is completed.
         $startDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->startOfMonth();
         $endDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->endOfMonth();
@@ -1049,7 +1016,8 @@ class VehiclesController extends Controller
 
         return $countLastMonth;
     }
-    public function previousMonthAvailable() {
+    public function previousMonthAvailable()
+    {
 
         $startDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->startOfMonth();
         $endDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->endOfMonth();
@@ -1058,13 +1026,14 @@ class VehiclesController extends Controller
             ->join('gdn', 'gdn.id', '=', 'vehicles.gdn_id')
             ->join('so', 'so.id', '=', 'vehicles.so_id')
             ->whereBetween('gdn.date', [$startDateLastMonth, $endDateLastMonth])
-            ->whereDate('so.so_date', '>=' , $endDateLastMonth)
+            ->whereDate('so.so_date', '>=', $endDateLastMonth)
             ->paginate(100);
 
         return $countPreviousYearAvailable;
     }
 
-    public function yesterdaySold() {
+    public function yesterdaySold()
+    {
         $yesterday = Carbon::now()->subDay(1)->format('Y-m-d');
         $countYesterdaySold = \Illuminate\Support\Facades\DB::table('vehicles')
             ->whereExists(function ($query) use ($yesterday) {
@@ -1077,8 +1046,9 @@ class VehiclesController extends Controller
 
         return $countYesterdaySold;
     }
-    public function yesterdayBooked() {
-          $yesterday = Carbon::now()->subDay(1)->format('Y-m-d');
+    public function yesterdayBooked()
+    {
+        $yesterday = Carbon::now()->subDay(1)->format('Y-m-d');
 
         $countYesterdayBooked = \Illuminate\Support\Facades\DB::table('vehicles')
             ->whereExists(function ($query) use ($yesterday) {
@@ -1091,7 +1061,8 @@ class VehiclesController extends Controller
 
         return $countYesterdayBooked;
     }
-    public function yesterdayAvailable() {
+    public function yesterdayAvailable()
+    {
 
         $yesterday = Carbon::now()->subDay(1)->format('Y-m-d');
 
@@ -1099,7 +1070,7 @@ class VehiclesController extends Controller
             ->join('gdn', 'gdn.id', '=', 'vehicles.gdn_id')
             ->join('so', 'so.id', '=', 'vehicles.so_id')
             ->whereDate('gdn.date', $yesterday)
-            ->whereDate('so.so_date', '>=' , $yesterday)
+            ->whereDate('so.so_date', '>=', $yesterday)
             ->paginate(100);
 
         return $countYesterdayAvailable;
@@ -1112,7 +1083,7 @@ class VehiclesController extends Controller
         if ($hasPermission) {
             $fieldValues = ['ex_colour', 'int_colour', 'variants_id', 'ppmmyyy', 'inspection_date', 'engine'];
             $statuss = "Approved";
-        $data = Vehicles::where('status', $statuss)
+            $data = Vehicles::where('status', $statuss)
                 ->where('latest_location', $warehouseId)
                 ->join('vehicle_detail_approval_requests', 'vehicles.id', '=', 'vehicle_detail_approval_requests.vehicle_id')
                 ->where('vehicle_detail_approval_requests.status', '=', 'Pending')
@@ -1120,38 +1091,50 @@ class VehiclesController extends Controller
                 ->where(function ($query) use ($fieldValues) {
                     $query->whereIn('field', $fieldValues);
                 });
-                $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
-                if ($hasEditSOPermission) {
-                    $data = $data->where(function ($query) {
-                        // Include vehicles with 'so_id' is null
-                        $query->whereNull('so_id')
-                            // OR vehicles associated with sales orders where sales_person_id matches the user's role ID
-                            ->orWhereHas('So', function ($query) {
-                                $query->where('sales_person_id', Auth::user()->role_id);
-                            });
-                    });
-                }
-                $data = $data->paginate(100);
-        $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
-        ->groupBy('vehicle_id')->get();
-        $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
-        $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
-        $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
-        $sales_persons = ModelHasRoles::get();
-        $sales_ids = $sales_persons->pluck('model_id');
-        $sales = User::whereIn('id', $sales_ids)->get();
-        $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
-        $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $countwarehouse = $warehouses->count() ?? 0;
-        return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
-        ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh','warehousesvehss', 'warehousesveher', 'warehousessold'));
-        }
-        else{
+            $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
+            if ($hasEditSOPermission) {
+                $data = $data->where(function ($query) {
+                    // Include vehicles with 'so_id' is null
+                    $query->whereNull('so_id')
+                        // OR vehicles associated with sales orders where sales_person_id matches the user's role ID
+                        ->orWhereHas('So', function ($query) {
+                            $query->where('sales_person_id', Auth::user()->role_id);
+                        });
+                });
+            }
+            $data = $data->paginate(100);
+            $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status', 'Pending')
+                ->groupBy('vehicle_id')->get();
+            $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
+            $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
+            $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
+            $sales_persons = ModelHasRoles::get();
+            $sales_ids = $sales_persons->pluck('model_id');
+            $sales = User::whereIn('id', $sales_ids)->get();
+            $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
+            $interiorColours = ColorCode::where('belong_to', 'int')->get();
+            $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $countwarehouse = $warehouses->count() ?? 0;
+            return view('vehicles.index', compact(
+                'data',
+                'varaint',
+                'sales',
+                'datapending',
+                'exteriorColours',
+                'interiorColours',
+                'pendingVehicleDetailForApprovalCount',
+                'warehouses',
+                'countwarehouse',
+                'warehousesveh',
+                'warehousesvehss',
+                'warehousesveher',
+                'warehousessold'
+            ));
+        } else {
             return redirect()->route('home');
         }
     }
@@ -1162,9 +1145,9 @@ class VehiclesController extends Controller
         if ($hasPermission) {
             $statuss = "Approved";
             $data = Vehicles::where('status', $statuss)
-            ->where('latest_location', $warehouseId)
-            ->whereNotNull('movement_grn_id')
-            ->whereNull('inspection_date');
+                ->where('latest_location', $warehouseId)
+                ->whereNotNull('movement_grn_id')
+                ->whereNull('inspection_date');
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             if ($hasEditSOPermission) {
                 $data = $data->where(function ($query) {
@@ -1177,26 +1160,38 @@ class VehiclesController extends Controller
                 });
             }
             $data = $data->paginate(100);
-        $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
-        ->groupBy('vehicle_id')->get();
-        $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
-        $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
-        $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
-        $sales_persons = ModelHasRoles::get();
-        $sales_ids = $sales_persons->pluck('model_id');
-        $sales = User::whereIn('id', $sales_ids)->get();
-        $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
-        $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $countwarehouse = $warehouses->count() ?? 0;
-        return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
-        ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh','warehousesvehss', 'warehousesveher', 'warehousessold'));
-        }
-        else{
+            $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status', 'Pending')
+                ->groupBy('vehicle_id')->get();
+            $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
+            $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
+            $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
+            $sales_persons = ModelHasRoles::get();
+            $sales_ids = $sales_persons->pluck('model_id');
+            $sales = User::whereIn('id', $sales_ids)->get();
+            $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
+            $interiorColours = ColorCode::where('belong_to', 'int')->get();
+            $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $countwarehouse = $warehouses->count() ?? 0;
+            return view('vehicles.index', compact(
+                'data',
+                'varaint',
+                'sales',
+                'datapending',
+                'exteriorColours',
+                'interiorColours',
+                'pendingVehicleDetailForApprovalCount',
+                'warehouses',
+                'countwarehouse',
+                'warehousesveh',
+                'warehousesvehss',
+                'warehousesveher',
+                'warehousessold'
+            ));
+        } else {
             return redirect()->route('home');
         }
     }
@@ -1206,8 +1201,8 @@ class VehiclesController extends Controller
         if ($hasPermission) {
             $statuss = "Approved";
             $data = Vehicles::where('status', $statuss)
-            ->whereNull('movement_grn_id')
-            ->whereNull('gdn_id');
+                ->whereNull('movement_grn_id')
+                ->whereNull('gdn_id');
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             if ($hasEditSOPermission) {
                 $data = $data->where(function ($query) {
@@ -1220,26 +1215,38 @@ class VehiclesController extends Controller
                 });
             }
             $data = $data->paginate(100);
-        $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
-        ->groupBy('vehicle_id')->get();
-        $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
-        $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
-        $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
-        $sales_persons = ModelHasRoles::get();
-        $sales_ids = $sales_persons->pluck('model_id');
-        $sales = User::whereIn('id', $sales_ids)->get();
-        $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
-        $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $countwarehouse = $warehouses->count();
-        return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
-        ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh','warehousesvehss', 'warehousesveher', 'warehousessold'));
-        }
-        else{
+            $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status', 'Pending')
+                ->groupBy('vehicle_id')->get();
+            $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
+            $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
+            $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
+            $sales_persons = ModelHasRoles::get();
+            $sales_ids = $sales_persons->pluck('model_id');
+            $sales = User::whereIn('id', $sales_ids)->get();
+            $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
+            $interiorColours = ColorCode::where('belong_to', 'int')->get();
+            $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $countwarehouse = $warehouses->count();
+            return view('vehicles.index', compact(
+                'data',
+                'varaint',
+                'sales',
+                'datapending',
+                'exteriorColours',
+                'interiorColours',
+                'pendingVehicleDetailForApprovalCount',
+                'warehouses',
+                'countwarehouse',
+                'warehousesveh',
+                'warehousesvehss',
+                'warehousesveher',
+                'warehousessold'
+            ));
+        } else {
             return redirect()->route('home');
         }
     }
@@ -1282,7 +1289,8 @@ class VehiclesController extends Controller
     {
         //
     }
-    public function getVehicleDetails(Request $request) {
+    public function getVehicleDetails(Request $request)
+    {
         $variant = Varaint::find($request->variant_id);
         $brand = $variant->brand->brand_name ?? '';
         $data['brand'] = $brand;
@@ -1303,73 +1311,63 @@ class VehiclesController extends Controller
         $vehiclesId = $request->input('vehicles_id');
         $column = $request->input('column');
         $value = $request->input('value');
-        if($column === "vin")
-        {
-        $vehicle = Vehicles::find($vehiclesId);
-        $vehicle->vin = $value;
-        $vehicle->save();
+        if ($column === "vin") {
+            $vehicle = Vehicles::find($vehiclesId);
+            $vehicle->vin = $value;
+            $vehicle->save();
         }
-        if($column === "int_colour")
-        {
-        $vehicle = Vehicles::find($vehiclesId);
-        $vehicle->int_colour = $value;
-        $vehicle->save();
+        if ($column === "int_colour") {
+            $vehicle = Vehicles::find($vehiclesId);
+            $vehicle->int_colour = $value;
+            $vehicle->save();
         }
-        if($column === "ex_colour")
-        {
-        $vehicle = Vehicles::find($vehiclesId);
-        $vehicle->ex_colour = $value;
-        $vehicle->save();
+        if ($column === "ex_colour") {
+            $vehicle = Vehicles::find($vehiclesId);
+            $vehicle->ex_colour = $value;
+            $vehicle->save();
         }
-        if($column === "engine")
-        {
-        $vehicle = Vehicles::find($vehiclesId);
-        $vehicle->engine = $value;
-        $vehicle->save();
+        if ($column === "engine") {
+            $vehicle = Vehicles::find($vehiclesId);
+            $vehicle->engine = $value;
+            $vehicle->save();
         }
-        if($column === "remarks")
-        {
-        $vehicle = Vehicles::find($vehiclesId);
-        $vehicle->remarks = $value;
-        $vehicle->save();
+        if ($column === "remarks") {
+            $vehicle = Vehicles::find($vehiclesId);
+            $vehicle->remarks = $value;
+            $vehicle->save();
         }
-        if($column === "territory")
-        {
-        $vehicle = Vehicles::find($vehiclesId);
-        $vehicle->territory = $value;
-        $vehicle->save();
+        if ($column === "territory") {
+            $vehicle = Vehicles::find($vehiclesId);
+            $vehicle->territory = $value;
+            $vehicle->save();
         }
-        if($column === "documzinout")
-        {
-        $vehicle = Vehicles::find($vehiclesId);
-        $vehicle->documzinout = $value;
-        $vehicle->save();
+        if ($column === "documzinout") {
+            $vehicle = Vehicles::find($vehiclesId);
+            $vehicle->documzinout = $value;
+            $vehicle->save();
         }
-        if($column === "ppmmyyy")
-        {
-        $vehicle = Vehicles::find($vehiclesId);
-        $vehicle->ppmmyyy = $value;
-        $vehicle->save();
+        if ($column === "ppmmyyy") {
+            $vehicle = Vehicles::find($vehiclesId);
+            $vehicle->ppmmyyy = $value;
+            $vehicle->save();
         }
-        if($column === "variants_name")
-        {
+        if ($column === "variants_name") {
             $variant = Varaint::where('name', $value)->first();
             if ($variant) {
                 Vehicles::where('id', $vehiclesId)
-                ->update(['varaints_id' => $variant->id]);
+                    ->update(['varaints_id' => $variant->id]);
                 Log::info('Variant Change Detected 12. Variant Changed in (updatevehiclesdata)', [
-                'vehicle_id' => $vehiclesId,
-                'new_variant_id' => $variant->id,
-                'variant_name' => $variant->name,
-                'user_id' => auth()->id(),
-                'user_name' => auth()->user()->name ?? 'N/A',
-                'source' => 'updatevehiclesinvehiclesConroller',
-                'timestamp' => now()->toDateTimeString()
-            ]);
+                    'vehicle_id' => $vehiclesId,
+                    'new_variant_id' => $variant->id,
+                    'variant_name' => $variant->name,
+                    'user_id' => auth()->id(),
+                    'user_name' => auth()->user()->name ?? 'N/A',
+                    'source' => 'updatevehiclesinvehiclesConroller',
+                    'timestamp' => now()->toDateTimeString()
+                ]);
             }
         }
-        if($column === "import_type")
-        {
+        if ($column === "import_type") {
             $vehicle = Vehicles::find($vehiclesId);
             if ($vehicle) {
                 $documents_id = $vehicle->documents_id;
@@ -1388,8 +1386,7 @@ class VehiclesController extends Controller
                 }
             }
         }
-        if($column === "owership")
-        {
+        if ($column === "owership") {
             $vehicle = Vehicles::find($vehiclesId);
             if ($vehicle) {
                 $documents_id = $vehicle->documents_id;
@@ -1408,8 +1405,7 @@ class VehiclesController extends Controller
                 }
             }
         }
-        if($column === "document_with")
-        {
+        if ($column === "document_with") {
             $vehicle = Vehicles::find($vehiclesId);
             if ($vehicle) {
                 $documents_id = $vehicle->documents_id;
@@ -1427,32 +1423,31 @@ class VehiclesController extends Controller
                     $vehicle->save();
                 }
             }
-
         }
         return response()->json(['message' => 'Vehicle data updated successfully']);
     }
     public function fatchvariantdetails(Request $request)
-  {
-    $variantName = $request->input('value');
-    $result = DB::table('varaints')
-    ->join('brands', 'varaints.brands_id', '=', 'brands.id')
-    ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
-    ->where('varaints.name', $variantName)
-    ->select('varaints.name', 'varaints.my', 'varaints.detail', 'varaints.upholestry', 'varaints.steering', 'varaints.fuel_type', 'varaints.seat','varaints.gearbox', 'brands.brand_name AS brand_name', 'master_model_lines.model_line')
-    ->first();
-    $responseData = [
-        'varaints_detail' => $result->detail ?? null,
-        'brand_name' => $result->brand_name ?? null,
-        'model_line' => $result->model_line ?? null,
-        'my' => $result->my ?? null,
-        'upholestry' => $result->upholestry ?? null,
-        'steering' => $result->steering ?? null,
-        'fuel' => $result->fuel_type ?? null,
-        'seat' => $result->seat ?? null,
-        'gearbox' => $result->gearbox ?? null,
-        'vehicles_id' => $request->input('vehicles_id'),
-    ];
-    return response()->json($responseData);
+    {
+        $variantName = $request->input('value');
+        $result = DB::table('varaints')
+            ->join('brands', 'varaints.brands_id', '=', 'brands.id')
+            ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+            ->where('varaints.name', $variantName)
+            ->select('varaints.name', 'varaints.my', 'varaints.detail', 'varaints.upholestry', 'varaints.steering', 'varaints.fuel_type', 'varaints.seat', 'varaints.gearbox', 'brands.brand_name AS brand_name', 'master_model_lines.model_line')
+            ->first();
+        $responseData = [
+            'varaints_detail' => $result->detail ?? null,
+            'brand_name' => $result->brand_name ?? null,
+            'model_line' => $result->model_line ?? null,
+            'my' => $result->my ?? null,
+            'upholestry' => $result->upholestry ?? null,
+            'steering' => $result->steering ?? null,
+            'fuel' => $result->fuel_type ?? null,
+            'seat' => $result->seat ?? null,
+            'gearbox' => $result->gearbox ?? null,
+            'vehicles_id' => $request->input('vehicles_id'),
+        ];
+        return response()->json($responseData);
     }
     public function updatedata(Request $request)
     {
@@ -1497,14 +1492,12 @@ class VehiclesController extends Controller
                             $approvalLog->save();
                         }
                     }
-                }
-                elseif (in_array($fieldName, ['import_type', 'document_with', 'bl_number', 'owership', 'bl_dms_uploading'])) {
+                } elseif (in_array($fieldName, ['import_type', 'document_with', 'bl_number', 'owership', 'bl_dms_uploading'])) {
                     $documents_id = $vehicle->documents_id;
                     $document = $documents_id ? Document::find($documents_id) : new Document();
                     $oldValue = $document->$fieldName ?? null;
                     $newValue = $fieldValue;
-                    if($documents_id === null && $newValue !== null)
-                    {
+                    if ($documents_id === null && $newValue !== null) {
                         $documentupdate = new Document();
                         $documentupdate->$fieldName = $newValue;
                         $documentupdate->save();
@@ -1525,24 +1518,23 @@ class VehiclesController extends Controller
                         $documentLog->created_by = auth()->user()->id;
                         $documentLog->role = Auth::user()->selectedRole;
                         $documentLog->save();
-                    }
-                    else{
-                    if ($oldValue !== $newValue) {
-                                $documentLog = new DocumentLog();
-                                $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-                                $currentDateTime = Carbon::now($dubaiTimeZone);
-                                $documentLog->time = $currentDateTime->toTimeString();
-                                $documentLog->date = $currentDateTime->toDateString();
-                                $documentLog->status = 'Update Document';
-                                $documentLog->documents_id = $documents_id;
-                                $documentLog->field = $fieldName;
-                                $documentLog->old_value = $oldValue;
-                                $documentLog->new_value = $newValue;
-                                $documentLog->created_by = auth()->user()->id;
-                                $documentLog->role = Auth::user()->selectedRole;
-                                $documentLog->save();
-                                $document->$fieldName = $newValue;
-                                $document->save();
+                    } else {
+                        if ($oldValue !== $newValue) {
+                            $documentLog = new DocumentLog();
+                            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                            $currentDateTime = Carbon::now($dubaiTimeZone);
+                            $documentLog->time = $currentDateTime->toTimeString();
+                            $documentLog->date = $currentDateTime->toDateString();
+                            $documentLog->status = 'Update Document';
+                            $documentLog->documents_id = $documents_id;
+                            $documentLog->field = $fieldName;
+                            $documentLog->old_value = $oldValue;
+                            $documentLog->new_value = $newValue;
+                            $documentLog->created_by = auth()->user()->id;
+                            $documentLog->role = Auth::user()->selectedRole;
+                            $documentLog->save();
+                            $document->$fieldName = $newValue;
+                            $document->save();
                             //     if ($newValue !== null) {
                             //     $approvalLog = new VehicleApprovalRequests();
                             //     $approvalLog->vehicle_id = $vehicleId;
@@ -1553,20 +1545,19 @@ class VehiclesController extends Controller
                             //     $approvalLog->updated_by = auth()->user()->id;
                             //     $approvalLog->save();
                             // }
-                            }
                         }
                     }
-                    elseif (in_array($fieldName, ['warehouse-remarks', 'sales-remarks'])) {
-                        $department = ($fieldName === 'sales-remarks') ? 'sales' : 'warehouse';
-                        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-                        $currentDateTime = Carbon::now($dubaiTimeZone);
-                        if ($fieldValue !== null) {
-                            $fieldValue = rtrim($fieldValue, 'View All');
-                            $existingRemark = Remarks::where('vehicles_id', $vehicleId)
+                } elseif (in_array($fieldName, ['warehouse-remarks', 'sales-remarks'])) {
+                    $department = ($fieldName === 'sales-remarks') ? 'sales' : 'warehouse';
+                    $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                    $currentDateTime = Carbon::now($dubaiTimeZone);
+                    if ($fieldValue !== null) {
+                        $fieldValue = rtrim($fieldValue, 'View All');
+                        $existingRemark = Remarks::where('vehicles_id', $vehicleId)
                             ->where('department', $department)
                             ->where('remarks', $fieldValue)
                             ->first();
-                            if (!$existingRemark) {
+                        if (!$existingRemark) {
                             $remarks = new Remarks();
                             $remarks->vehicles_id = $vehicleId;
                             $remarks->department = $department;
@@ -1588,107 +1579,101 @@ class VehiclesController extends Controller
                             $vehicleslog->save();
                         }
                     }
-                    }
-                    elseif (in_array($fieldName, ['conversion', 'netsuit_grn_number', 'netsuit_grn_date', 'qc_remarks'])) {
-                        $oldValues = $vehicle->getAttributes();
-                        $changes = [];
-                        foreach ($oldValues as $field => $oldValue) {
-                            if ($field !== 'created_at' && $field !== 'updated_at') {
-                                $newValue = $field === $fieldName ? $fieldValue : $vehicle->$field;
-                                if ($oldValue != $newValue) {
-                                    $changes[$field] = [
-                                        'old_value' => $oldValue,
-                                        'new_value' => $newValue,
-                                    ];
-                                }
+                } elseif (in_array($fieldName, ['conversion', 'netsuit_grn_number', 'netsuit_grn_date', 'qc_remarks'])) {
+                    $oldValues = $vehicle->getAttributes();
+                    $changes = [];
+                    foreach ($oldValues as $field => $oldValue) {
+                        if ($field !== 'created_at' && $field !== 'updated_at') {
+                            $newValue = $field === $fieldName ? $fieldValue : $vehicle->$field;
+                            if ($oldValue != $newValue) {
+                                $changes[$field] = [
+                                    'old_value' => $oldValue,
+                                    'new_value' => $newValue,
+                                ];
                             }
                         }
-                        if (!empty($changes)) {
-                            $vehicle->$fieldName = $fieldValue;
-                            $vehicle->save();
-                            event(new DataUpdatedEvent(['id' => $vehicleId, 'message' => "Data Update"]));
-                            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-                            $currentDateTime = Carbon::now($dubaiTimeZone);
-                            $vehicleslog = new Vehicleslog();
-                            $vehicleslog->time = $currentDateTime->toTimeString();
-                            $vehicleslog->date = $currentDateTime->toDateString();
-                            $vehicleslog->status = 'Update QC Values';
-                            $vehicleslog->vehicles_id = $vehicleId;
-                            $vehicleslog->field = $fieldName;
-                            $vehicleslog->old_value = $oldValues[$fieldName];
-                            $vehicleslog->new_value = $fieldValue;
-                            $vehicleslog->created_by = auth()->user()->id;
-                            $vehicleslog->save();
-                        }
                     }
-            else {
-                $oldValues = $vehicle->getAttributes();
-                $changes = [];
-                foreach ($oldValues as $field => $oldValue) {
-                    if ($field !== 'created_at' && $field !== 'updated_at') {
-                        $newValue = $field === $fieldName ? $fieldValue : $vehicle->$field;
-                        if ($oldValue != $newValue) {
-                            $changes[$field] = [
-                                'old_value' => $oldValue,
-                                'new_value' => $newValue,
-                            ];
-                        }
-                    }
-                }
-                if (!empty($changes)) {
-                    // Save approval log if the old value is null and the new value is not null
-                    if ($fieldValue !== null) {
-                        // Update the field in the 'Vehicles' table with the new value
+                    if (!empty($changes)) {
                         $vehicle->$fieldName = $fieldValue;
-                        // $vehicle->save();
-                        // // Save vehicle log for the specific field
-                        // $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-                        // $currentDateTime = Carbon::now($dubaiTimeZone);
-                        // $vehicleslog = new Vehicleslog();
-                        // $vehicleslog->time = $currentDateTime->toTimeString();
-                        // $vehicleslog->date = $currentDateTime->toDateString();
-                        // $vehicleslog->status = 'Update QC Values';
-                        // $vehicleslog->vehicles_id = $vehicleId;
-                        // $vehicleslog->field = $fieldName;
-                        // $vehicleslog->old_value = $oldValues[$fieldName];
-                        // $vehicleslog->new_value = $fieldValue;
-                        // $vehicleslog->created_by = auth()->user()->id;
-                        // $vehicleslog->save();
-                        $approvalLog = new VehicleApprovalRequests();
-                        $approvalLog->vehicle_id = $vehicleId;
-                        $approvalLog->status = 'Pending';
-                        $approvalLog->field = $fieldName;
-                        $approvalLog->old_value = $oldValues[$fieldName];
-                        $approvalLog->new_value = $fieldValue;
-                        $approvalLog->updated_by = auth()->user()->id;
-                        $approvalLog->save();
+                        $vehicle->save();
+                        event(new DataUpdatedEvent(['id' => $vehicleId, 'message' => "Data Update"]));
+                        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                        $currentDateTime = Carbon::now($dubaiTimeZone);
+                        $vehicleslog = new Vehicleslog();
+                        $vehicleslog->time = $currentDateTime->toTimeString();
+                        $vehicleslog->date = $currentDateTime->toDateString();
+                        $vehicleslog->status = 'Update QC Values';
+                        $vehicleslog->vehicles_id = $vehicleId;
+                        $vehicleslog->field = $fieldName;
+                        $vehicleslog->old_value = $oldValues[$fieldName];
+                        $vehicleslog->new_value = $fieldValue;
+                        $vehicleslog->created_by = auth()->user()->id;
+                        $vehicleslog->save();
+                    }
+                } else {
+                    $oldValues = $vehicle->getAttributes();
+                    $changes = [];
+                    foreach ($oldValues as $field => $oldValue) {
+                        if ($field !== 'created_at' && $field !== 'updated_at') {
+                            $newValue = $field === $fieldName ? $fieldValue : $vehicle->$field;
+                            if ($oldValue != $newValue) {
+                                $changes[$field] = [
+                                    'old_value' => $oldValue,
+                                    'new_value' => $newValue,
+                                ];
+                            }
+                        }
+                    }
+                    if (!empty($changes)) {
+                        // Save approval log if the old value is null and the new value is not null
+                        if ($fieldValue !== null) {
+                            // Update the field in the 'Vehicles' table with the new value
+                            $vehicle->$fieldName = $fieldValue;
+                            // $vehicle->save();
+                            // // Save vehicle log for the specific field
+                            // $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                            // $currentDateTime = Carbon::now($dubaiTimeZone);
+                            // $vehicleslog = new Vehicleslog();
+                            // $vehicleslog->time = $currentDateTime->toTimeString();
+                            // $vehicleslog->date = $currentDateTime->toDateString();
+                            // $vehicleslog->status = 'Update QC Values';
+                            // $vehicleslog->vehicles_id = $vehicleId;
+                            // $vehicleslog->field = $fieldName;
+                            // $vehicleslog->old_value = $oldValues[$fieldName];
+                            // $vehicleslog->new_value = $fieldValue;
+                            // $vehicleslog->created_by = auth()->user()->id;
+                            // $vehicleslog->save();
+                            $approvalLog = new VehicleApprovalRequests();
+                            $approvalLog->vehicle_id = $vehicleId;
+                            $approvalLog->status = 'Pending';
+                            $approvalLog->field = $fieldName;
+                            $approvalLog->old_value = $oldValues[$fieldName];
+                            $approvalLog->new_value = $fieldValue;
+                            $approvalLog->updated_by = auth()->user()->id;
+                            $approvalLog->save();
+                        }
                     }
                 }
-
             }
         }
-    }
 
-    $responseData = ['status' => 'success', 'message' => 'Data updated successfully'];
-    return response()->json($responseData);
-}
+        $responseData = ['status' => 'success', 'message' => 'Data updated successfully'];
+        return response()->json($responseData);
+    }
     public function updateso(Request $request)
     {
-//        return $request->all();
+        //        return $request->all();
         $vehicles = $request->vehicle_ids;
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
 
-        foreach ($vehicles as $key => $vehicleId)
-        {
+        foreach ($vehicles as $key => $vehicleId) {
             $vehicle = Vehicles::find($vehicleId);
             $soId = $vehicle->so_id;
-            if ($soId)
-            {
+            if ($soId) {
                 $so = So::find($soId);
-                if(!empty($so->so_number)) {
-                    if($so->so_number != $request->so_numbers[$key])
-                    {
+                if (!empty($so->so_number)) {
+                    if ($so->so_number != $request->so_numbers[$key]) {
                         $vehicleDetailApproval = new VehicleApprovalRequests();
                         $vehicleDetailApproval->vehicle_id = $vehicle->id;
                         $vehicleDetailApproval->field = 'so_number';
@@ -1698,10 +1683,8 @@ class VehiclesController extends Controller
                         $vehicleDetailApproval->status = 'Pending';
                         $vehicleDetailApproval->save();
                     }
-
-                }else {
-                    if($so->so_number != $request->so_numbers[$key])
-                    {
+                } else {
+                    if ($so->so_number != $request->so_numbers[$key]) {
                         $solog = new Solog();
 
                         $solog->time = $currentDateTime->toTimeString();
@@ -1721,8 +1704,8 @@ class VehiclesController extends Controller
 
                 $oldSoDate = Carbon::parse($so->so_date)->format('d M Y');
                 $newSoDate = Carbon::parse($request->so_dates[$key])->format('d M Y');
-                if(!empty($so->so_date)) {
-                    if($oldSoDate != $newSoDate) {
+                if (!empty($so->so_date)) {
+                    if ($oldSoDate != $newSoDate) {
                         $vehicleDetailApproval = new VehicleApprovalRequests();
                         $vehicleDetailApproval->vehicle_id = $vehicle->id;
                         $vehicleDetailApproval->field = 'so_date';
@@ -1732,13 +1715,11 @@ class VehiclesController extends Controller
                         $vehicleDetailApproval->status = 'Pending';
                         $vehicleDetailApproval->save();
                     }
-
-                }else{
-                    if($oldSoDate != $newSoDate)
-                    {
+                } else {
+                    if ($oldSoDate != $newSoDate) {
                         $solog = new Solog();
-//                    $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-//                    $currentDateTime = Carbon::now($dubaiTimeZone);
+                        //                    $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                        //                    $currentDateTime = Carbon::now($dubaiTimeZone);
                         $solog->time = $currentDateTime->toTimeString();
                         $solog->date = $currentDateTime->toDateString();
                         $solog->status = 'Update Sales Values';
@@ -1753,40 +1734,37 @@ class VehiclesController extends Controller
                         $so->save();
                     }
                 }
-            }
-            else
-            {
+            } else {
                 // so should be unique then so number is updtaing existing so number.
                 $existingSo = So::where('so_number', $request->so_numbers[$key])->first();
-//                if ($existingSo) {
-//                    // Update existing So
-//                    if($existingSo->so_number != $request->so_numbers[$key])
-//                    {
-                        $vehicleDetailApproval = new VehicleApprovalRequests();
-                        $vehicleDetailApproval->vehicle_id = $vehicle->id;
-                        $vehicleDetailApproval->field = 'so_number';
-                        $vehicleDetailApproval->old_value = $so->so_number;
-                        $vehicleDetailApproval->new_value = $request->so_numbers[$key];
-                        $vehicleDetailApproval->updated_by = auth()->user()->id;
-                        $vehicleDetailApproval->status = 'Pending';
-                        $vehicleDetailApproval->save();
-//                    }
-                    $oldSoDate = Carbon::parse($so->so_date)->format('d M Y');
-                    $newSoDate = Carbon::parse($request->so_dates[$key])->format('d M Y');
-                    if($oldSoDate != $newSoDate)
-                    {
-                        $vehicleDetailApproval = new VehicleApprovalRequests();
-                        $vehicleDetailApproval->vehicle_id = $vehicle->id;
-                        $vehicleDetailApproval->field = 'so_date';
-                        $vehicleDetailApproval->old_value = $so->so_date;
-                        $vehicleDetailApproval->new_value = $request->so_dates[$key];
-                        $vehicleDetailApproval->updated_by = auth()->user()->id;
-                        $vehicleDetailApproval->status = 'Pending';
-                        $vehicleDetailApproval->save();
-                    }
-//                    $existingSo->save();
+                //                if ($existingSo) {
+                //                    // Update existing So
+                //                    if($existingSo->so_number != $request->so_numbers[$key])
+                //                    {
+                $vehicleDetailApproval = new VehicleApprovalRequests();
+                $vehicleDetailApproval->vehicle_id = $vehicle->id;
+                $vehicleDetailApproval->field = 'so_number';
+                $vehicleDetailApproval->old_value = $so->so_number;
+                $vehicleDetailApproval->new_value = $request->so_numbers[$key];
+                $vehicleDetailApproval->updated_by = auth()->user()->id;
+                $vehicleDetailApproval->status = 'Pending';
+                $vehicleDetailApproval->save();
+                //                    }
+                $oldSoDate = Carbon::parse($so->so_date)->format('d M Y');
+                $newSoDate = Carbon::parse($request->so_dates[$key])->format('d M Y');
+                if ($oldSoDate != $newSoDate) {
+                    $vehicleDetailApproval = new VehicleApprovalRequests();
+                    $vehicleDetailApproval->vehicle_id = $vehicle->id;
+                    $vehicleDetailApproval->field = 'so_date';
+                    $vehicleDetailApproval->old_value = $so->so_date;
+                    $vehicleDetailApproval->new_value = $request->so_dates[$key];
+                    $vehicleDetailApproval->updated_by = auth()->user()->id;
+                    $vehicleDetailApproval->status = 'Pending';
+                    $vehicleDetailApproval->save();
+                }
+                //                    $existingSo->save();
 
-//                }
+                //                }
             }
 
             if ($request->reservation_start_dates[$key]) {
@@ -1804,7 +1782,7 @@ class VehiclesController extends Controller
                         $vehicleDetailApproval->status = 'Pending';
                         $vehicleDetailApproval->save();
                     }
-                }else{
+                } else {
                     if ($vehicle->reservation_start_date != $newReservationStartDate) {
                         $vehicle->reservation_start_date = $newReservationStartDate;
 
@@ -1824,9 +1802,8 @@ class VehiclesController extends Controller
             if ($request->reservation_end_dates[$key]) {
                 $newReservationEndDate = $request->reservation_end_dates[$key];
                 $isEndDateChanged = $vehicle->reservation_end_date != $newReservationEndDate;
-                if (!empty($vehicle->reservation_end_date))
-                {
-                    if($vehicle->reservation_end_date != $newReservationEndDate) {
+                if (!empty($vehicle->reservation_end_date)) {
+                    if ($vehicle->reservation_end_date != $newReservationEndDate) {
                         $vehicleDetailApproval = new VehicleApprovalRequests();
 
                         $vehicleDetailApproval->vehicle_id = $vehicle->id;
@@ -1837,9 +1814,8 @@ class VehiclesController extends Controller
                         $vehicleDetailApproval->status = 'Pending';
                         $vehicleDetailApproval->save();
                     }
-
-                }else {
-                    if($vehicle->reservation_end_date != $newReservationEndDate) {
+                } else {
+                    if ($vehicle->reservation_end_date != $newReservationEndDate) {
                         $vehicle->reservation_end_date = $newReservationEndDate;
 
                         $reservationEndDateLog = new Vehicleslog();
@@ -1856,7 +1832,7 @@ class VehiclesController extends Controller
                 }
             }
 
-            if($request->remarks[$key]){
+            if ($request->remarks[$key]) {
 
                 $remarksdata = new Remarks();
 
@@ -1869,57 +1845,56 @@ class VehiclesController extends Controller
                 $remarksdata->created_at = $currentDateTime;
                 $remarksdata->save();
                 event(new DataUpdatedEvent(['id' => $vehicleId, 'message' => "Data Update"]));
-//                if($soID) {
-//                    $remarklog = new Solog();
-//                    $remarklog->time = $currentDateTime->toTimeString();
-//                    $remarklog->date = $currentDateTime->toDateString();
-//                    $remarklog->status = 'New Created';
-//                    $remarklog->so_id = $soID;
-//                    $remarklog->field = 'remarks';
-//                    $remarklog->new_value = $request->remarks[$key];
-//                    $remarklog->created_by = auth()->user()->id;
-//                    $remarklog->save();
-//                }
+                //                if($soID) {
+                //                    $remarklog = new Solog();
+                //                    $remarklog->time = $currentDateTime->toTimeString();
+                //                    $remarklog->date = $currentDateTime->toDateString();
+                //                    $remarklog->status = 'New Created';
+                //                    $remarklog->so_id = $soID;
+                //                    $remarklog->field = 'remarks';
+                //                    $remarklog->new_value = $request->remarks[$key];
+                //                    $remarklog->created_by = auth()->user()->id;
+                //                    $remarklog->save();
+                //                }
 
             }
             // Save changes in the vehicles table
             $vehicle->save();
-
         }
         ///  Currenty not updating /////////////
         // Update payment_percentage if changed
-//        if ($request->has('payment_percentage')) {
-//            $newPaymentPercentage = $request->input('payment_percentage');
-//            if ($vehicle->payment_percentage != $newPaymentPercentage) {
-//                $vehicle->payment_percentage = $newPaymentPercentage;
-//                $paymentPercentageLog = new Vehicleslog();
-//                $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-//                $currentDateTime = Carbon::now($dubaiTimeZone);
-//                $paymentPercentageLog->time = $currentDateTime->toTimeString();
-//                $paymentPercentageLog->date = $currentDateTime->toDateString();
-//                $paymentPercentageLog->status = 'Update Vehicle Values';
-//                $paymentPercentageLog->vehicles_id = $vehicle;
-//                $paymentPercentageLog->field = 'payment_percentage';
-//                $paymentPercentageLog->old_value = $vehicle->getOriginal('payment_percentage');
-//                $paymentPercentageLog->new_value = $newPaymentPercentage;
-//                $paymentPercentageLog->created_by = auth()->user()->id;
-//                $paymentPercentageLog->save();
-//            }
-//        }
-            // Update reservation_end_date if changed
+        //        if ($request->has('payment_percentage')) {
+        //            $newPaymentPercentage = $request->input('payment_percentage');
+        //            if ($vehicle->payment_percentage != $newPaymentPercentage) {
+        //                $vehicle->payment_percentage = $newPaymentPercentage;
+        //                $paymentPercentageLog = new Vehicleslog();
+        //                $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+        //                $currentDateTime = Carbon::now($dubaiTimeZone);
+        //                $paymentPercentageLog->time = $currentDateTime->toTimeString();
+        //                $paymentPercentageLog->date = $currentDateTime->toDateString();
+        //                $paymentPercentageLog->status = 'Update Vehicle Values';
+        //                $paymentPercentageLog->vehicles_id = $vehicle;
+        //                $paymentPercentageLog->field = 'payment_percentage';
+        //                $paymentPercentageLog->old_value = $vehicle->getOriginal('payment_percentage');
+        //                $paymentPercentageLog->new_value = $newPaymentPercentage;
+        //                $paymentPercentageLog->created_by = auth()->user()->id;
+        //                $paymentPercentageLog->save();
+        //            }
+        //        }
+        // Update reservation_end_date if changed
 
         return redirect()->back()->with('success', 'Sales details sent for approval successfully.');
     }
     public function deletes($id)
     {
-    $vehicle = Vehicles::find($id);
-    if ($vehicle->movement_grn_id === null) {
-        $vehicle->status = 'cancel';
-        $vehicle->save();
-        return redirect()->back()->with('success', 'Vehicle status updated to "cancel" successfully.');
-    } else {
-        return redirect()->back()->with('error', 'Vehicle has already been delivered and cannot be canceled.');
-    }
+        $vehicle = Vehicles::find($id);
+        if ($vehicle->movement_grn_id === null) {
+            $vehicle->status = 'cancel';
+            $vehicle->save();
+            return redirect()->back()->with('success', 'Vehicle status updated to "cancel" successfully.');
+        } else {
+            return redirect()->back()->with('error', 'Vehicle has already been delivered and cannot be canceled.');
+        }
     }
     public function viewLogDetails($id)
     {
@@ -1929,29 +1904,29 @@ class VehiclesController extends Controller
         $remarks = Remarks::where('vehicles_id', $id)->where('department', 'warehouse')->get();
         $vehiclesLog = Vehicleslog::with('roleName')->where('vehicles_id', $vehicle->id);
         $mergedLogs = $documentsLog->union($soLog)->union($vehiclesLog)->orderBy('updated_at')->get();
-        $pendingVehicleDetailApprovalRequests = VehicleApprovalRequests::where('vehicle_id', $id)->orderBy('id','DESC')->get();
+        $pendingVehicleDetailApprovalRequests = VehicleApprovalRequests::where('vehicle_id', $id)->orderBy('id', 'DESC')->get();
         $previousId = Vehicles::where('id', '<', $id)->max('id');
         $nextId = Vehicles::where('id', '>', $id)->min('id');
         return view('vehicles.vehicleslog', [
-               'currentId' => $id,
-               'previousId' => $previousId,
-               'nextId' => $nextId
-           ], compact('mergedLogs', 'vehicle','pendingVehicleDetailApprovalRequests', 'remarks'));
+            'currentId' => $id,
+            'previousId' => $previousId,
+            'nextId' => $nextId
+        ], compact('mergedLogs', 'vehicle', 'pendingVehicleDetailApprovalRequests', 'remarks'));
     }
-    public function  viewremarks(Request $request,$id)
+    public function  viewremarks(Request $request, $id)
     {
         $remarks = Remarks::where('vehicles_id', $id)->where('department', 'Sales')->get();
-        if($request->type == 'WareHouse') {
+        if ($request->type == 'WareHouse') {
             $remarks = Remarks::where('vehicles_id', $id)->where('department', 'WareHouse')->get();
         }
         // sales
         $previousId = Vehicles::where('id', '<', $id)->max('id');
         $nextId = Vehicles::where('id', '>', $id)->min('id');
         return view('vehicles.viewremarks', [
-               'currentId' => $id,
-               'previousId' => $previousId,
-               'nextId' => $nextId
-           ], compact('remarks'));
+            'currentId' => $id,
+            'previousId' => $previousId,
+            'nextId' => $nextId
+        ], compact('remarks'));
     }
     public function updatelogistics(Request $request)
     {
@@ -1965,8 +1940,7 @@ class VehiclesController extends Controller
             if ($documents_id) {
                 $documents = Document::find($documents_id);
 
-                if($documents->import_type != $request->import_types[$key])
-                {
+                if ($documents->import_type != $request->import_types[$key]) {
                     $documentlog = new Documentlog();
                     $documentlog->time = $currentDateTime->toTimeString();
                     $documentlog->date = $currentDateTime->toDateString();
@@ -1980,8 +1954,7 @@ class VehiclesController extends Controller
 
                     $documents->import_type = $request->import_types[$key];
                 }
-                if($documents->owership != $request->owerships[$key])
-                {
+                if ($documents->owership != $request->owerships[$key]) {
                     $documentlog = new Documentlog();
                     $documentlog->time = $currentDateTime->toTimeString();
                     $documentlog->date = $currentDateTime->toDateString();
@@ -1995,8 +1968,7 @@ class VehiclesController extends Controller
 
                     $documents->owership = $request->owerships[$key];
                 }
-                if($documents->document_with != $request->documents_with[$key])
-                {
+                if ($documents->document_with != $request->documents_with[$key]) {
                     $documentlog = new Documentlog();
                     $documentlog->time = $currentDateTime->toTimeString();
                     $documentlog->date = $currentDateTime->toDateString();
@@ -2010,8 +1982,7 @@ class VehiclesController extends Controller
 
                     $documents->document_with = $request->documents_with[$key];
                 }
-                if($documents->bl_number != $request->bl_numbers[$key])
-                {
+                if ($documents->bl_number != $request->bl_numbers[$key]) {
                     $documentlog = new Documentlog();
                     $documentlog->time = $currentDateTime->toTimeString();
                     $documentlog->date = $currentDateTime->toDateString();
@@ -2026,12 +1997,11 @@ class VehiclesController extends Controller
                     $documents->bl_number = $request->bl_numbers[$key];
                 }
                 $documents->save();
-
-            }
-            else {
-                if(!empty($request->import_types[$key]) || !empty($request->owerships[$key]) ||
-                    !empty($request->documents_with[$key]) || !empty($request->bl_numbers[$key]))
-                {
+            } else {
+                if (
+                    !empty($request->import_types[$key]) || !empty($request->owerships[$key]) ||
+                    !empty($request->documents_with[$key]) || !empty($request->bl_numbers[$key])
+                ) {
                     $documents = new Document();
                     $documents->import_type = $request->import_types[$key];
                     $documents->owership = $request->owerships[$key];
@@ -2051,17 +2021,16 @@ class VehiclesController extends Controller
                     $vehicle->documents_id = $documents_id;
                     $vehicle->save();
                 }
-
             }
         }
-//         $vehicleId = $request->input('vehicle_id');
+        //         $vehicleId = $request->input('vehicle_id');
 
         return redirect()->back()->with('success', 'Vehicle details updated successfully.');
     }
     public function viewpictures($id)
     {
-    $vehiclePictures = VehiclePicture::where('vehicle_id', $id)->get();
-    return view('vehicle_pictures.show', compact('vehiclePictures'));
+        $vehiclePictures = VehiclePicture::where('vehicle_id', $id)->get();
+        return view('vehicle_pictures.show', compact('vehiclePictures'));
     }
     public function updatewarehouse(Request $request)
     {
@@ -2071,9 +2040,9 @@ class VehiclesController extends Controller
 
         foreach ($vehicles as $key => $vehicleId) {
             $vehicle = Vehicles::find($vehicleId);
-//            $vehicle->conversion = $request->conversions[$key];
+            //            $vehicle->conversion = $request->conversions[$key];
 
-            if($vehicle->remarks != $request->warehouse_remarks[$key]) {
+            if ($vehicle->remarks != $request->warehouse_remarks[$key]) {
                 $vehicleslog = new Vehicleslog();
                 $vehicleslog->time = $currentDateTime->toTimeString();
                 $vehicleslog->date = $currentDateTime->toDateString();
@@ -2097,9 +2066,8 @@ class VehiclesController extends Controller
                 $remarksdata->save();
                 event(new DataUpdatedEvent(['id' => $vehicleId, 'message' => "Data Update"]));
                 $vehicle->remarks = $request->warehouse_remarks[$key];
-
             }
-            if($vehicle->conversion != $request->conversions[$key]) {
+            if ($vehicle->conversion != $request->conversions[$key]) {
                 $vehicleslog = new Vehicleslog();
                 $vehicleslog->time = $currentDateTime->toTimeString();
                 $vehicleslog->date = $currentDateTime->toDateString();
@@ -2111,7 +2079,6 @@ class VehiclesController extends Controller
                 $vehicleslog->created_by = auth()->user()->id;
                 $vehicleslog->save();
                 $vehicle->conversion = $request->conversions[$key];
-
             }
             $vehicle->save();
         }
@@ -2131,9 +2098,9 @@ class VehiclesController extends Controller
         if ($hasPermission) {
             $statuss = "Approved";
             $data = Vehicles::where('status', $statuss)
-            ->where('latest_location', $warehouseId)
-            ->whereNotNull('so_id')
-            ->whereNull('pdi_date');
+                ->where('latest_location', $warehouseId)
+                ->whereNotNull('so_id')
+                ->whereNull('pdi_date');
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             if ($hasEditSOPermission) {
                 $data = $data->where(function ($query) {
@@ -2146,43 +2113,54 @@ class VehiclesController extends Controller
                 });
             }
             $data = $data->paginate(100);
-        $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
-        ->groupBy('vehicle_id')->get();
-        $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
-        $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
-        $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
-        $sales_persons = ModelHasRoles::get();
-        $sales_ids = $sales_persons->pluck('model_id');
-        $sales = User::whereIn('id', $sales_ids)->get();
-        $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
-        $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $countwarehouse = $warehouses->count() ?? 0;
-        return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
-        ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh', 'warehousesveher', 'warehousesvehss'));
-        }
-        else{
+            $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status', 'Pending')
+                ->groupBy('vehicle_id')->get();
+            $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
+            $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
+            $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
+            $sales_persons = ModelHasRoles::get();
+            $sales_ids = $sales_persons->pluck('model_id');
+            $sales = User::whereIn('id', $sales_ids)->get();
+            $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
+            $interiorColours = ColorCode::where('belong_to', 'int')->get();
+            $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $countwarehouse = $warehouses->count() ?? 0;
+            return view('vehicles.index', compact(
+                'data',
+                'varaint',
+                'sales',
+                'datapending',
+                'exteriorColours',
+                'interiorColours',
+                'pendingVehicleDetailForApprovalCount',
+                'warehouses',
+                'countwarehouse',
+                'warehousesveh',
+                'warehousesveher',
+                'warehousesvehss'
+            ));
+        } else {
             return redirect()->route('home');
         }
     }
     public function checkEntry(Request $request)
     {
         $vin = $request->input('vin');
-    $vehicle = Vehicles::where('vin', $vin)->first();
-    if ($vehicle) {
-        $vehiclePicture = VehiclePicture::where('vehicle_id', $vehicle->id)->get();
-        if ($vehiclePicture) {
-            return response()->json(['entryExists' => true, 'category' => $vehiclePicture->category]);
+        $vehicle = Vehicles::where('vin', $vin)->first();
+        if ($vehicle) {
+            $vehiclePicture = VehiclePicture::where('vehicle_id', $vehicle->id)->get();
+            if ($vehiclePicture) {
+                return response()->json(['entryExists' => true, 'category' => $vehiclePicture->category]);
+            } else {
+                return response()->json(['entryExists' => false]);
+            }
         } else {
             return response()->json(['entryExists' => false]);
         }
-    } else {
-        return response()->json(['entryExists' => false]);
-    }
     }
 
     public function soldvehss(Request $request)
@@ -2192,8 +2170,8 @@ class VehiclesController extends Controller
         if ($hasPermission) {
             $statuss = "Approved";
             $data = Vehicles::where('status', $statuss)
-            ->where('latest_location', $warehouseId)
-            ->whereNotNull('so_id');
+                ->where('latest_location', $warehouseId)
+                ->whereNotNull('so_id');
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             if ($hasEditSOPermission) {
                 $data = $data->where(function ($query) {
@@ -2206,26 +2184,38 @@ class VehiclesController extends Controller
                 });
             }
             $data = $data->paginate(100);
-        $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
-        ->groupBy('vehicle_id')->get();
-        $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
-        $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
-        $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
-        $sales_persons = ModelHasRoles::get();
-        $sales_ids = $sales_persons->pluck('model_id');
-        $sales = User::whereIn('id', $sales_ids)->get();
-        $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
-        $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $countwarehouse = $warehouses->count() ?? 0;
-        return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
-        ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh', 'warehousesveher', 'warehousesvehss', 'warehousessold'));
-        }
-        else{
+            $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status', 'Pending')
+                ->groupBy('vehicle_id')->get();
+            $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
+            $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
+            $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
+            $sales_persons = ModelHasRoles::get();
+            $sales_ids = $sales_persons->pluck('model_id');
+            $sales = User::whereIn('id', $sales_ids)->get();
+            $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
+            $interiorColours = ColorCode::where('belong_to', 'int')->get();
+            $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $countwarehouse = $warehouses->count() ?? 0;
+            return view('vehicles.index', compact(
+                'data',
+                'varaint',
+                'sales',
+                'datapending',
+                'exteriorColours',
+                'interiorColours',
+                'pendingVehicleDetailForApprovalCount',
+                'warehouses',
+                'countwarehouse',
+                'warehousesveh',
+                'warehousesveher',
+                'warehousesvehss',
+                'warehousessold'
+            ));
+        } else {
             return redirect()->route('home');
         }
     }
@@ -2236,9 +2226,9 @@ class VehiclesController extends Controller
         if ($hasPermission) {
             $statuss = "Approved";
             $data = Vehicles::where('status', $statuss)
-            ->where('latest_location', $warehouseId)
-            ->whereNotNull('inspection_date')
-            ->whereNull('so_id');
+                ->where('latest_location', $warehouseId)
+                ->whereNotNull('inspection_date')
+                ->whereNull('so_id');
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             if ($hasEditSOPermission) {
                 $data = $data->where(function ($query) {
@@ -2251,26 +2241,38 @@ class VehiclesController extends Controller
                 });
             }
             $data = $data->paginate(100);
-        $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
-        ->groupBy('vehicle_id')->get();
-        $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
-        $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
-        $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
-        $sales_persons = ModelHasRoles::get();
-        $sales_ids = $sales_persons->pluck('model_id');
-        $sales = User::whereIn('id', $sales_ids)->get();
-        $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
-        $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $countwarehouse = $warehouses->count() ?? 0;
-        return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
-        ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh', 'warehousesveher', 'warehousesvehss', 'warehousessold'));
-        }
-        else{
+            $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status', 'Pending')
+                ->groupBy('vehicle_id')->get();
+            $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
+            $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
+            $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
+            $sales_persons = ModelHasRoles::get();
+            $sales_ids = $sales_persons->pluck('model_id');
+            $sales = User::whereIn('id', $sales_ids)->get();
+            $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
+            $interiorColours = ColorCode::where('belong_to', 'int')->get();
+            $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $countwarehouse = $warehouses->count() ?? 0;
+            return view('vehicles.index', compact(
+                'data',
+                'varaint',
+                'sales',
+                'datapending',
+                'exteriorColours',
+                'interiorColours',
+                'pendingVehicleDetailForApprovalCount',
+                'warehouses',
+                'countwarehouse',
+                'warehousesveh',
+                'warehousesveher',
+                'warehousesvehss',
+                'warehousessold'
+            ));
+        } else {
             return redirect()->route('home');
         }
     }
@@ -2281,9 +2283,9 @@ class VehiclesController extends Controller
         if ($hasPermission) {
             $statuss = "Approved";
             $data = Vehicles::where('status', $statuss)
-            ->where('latest_location', $warehouseId)
-            ->whereNotNull('movement_grn_id')
-		    ->whereNull('netsuit_grn_number');
+                ->where('latest_location', $warehouseId)
+                ->whereNotNull('movement_grn_id')
+                ->whereNull('netsuit_grn_number');
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             if ($hasEditSOPermission) {
                 $data = $data->where(function ($query) {
@@ -2294,26 +2296,38 @@ class VehiclesController extends Controller
                 });
             }
             $data = $data->paginate(100);
-        $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
-        ->groupBy('vehicle_id')->get();
-        $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
-        $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
-        $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
-        $sales_persons = ModelHasRoles::get();
-        $sales_ids = $sales_persons->pluck('model_id');
-        $sales = User::whereIn('id', $sales_ids)->get();
-        $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
-        $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $countwarehouse = $warehouses->count() ?? 0;
-        return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
-        ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh', 'warehousesveher', 'warehousesvehss', 'warehousessold'));
-        }
-        else{
+            $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status', 'Pending')
+                ->groupBy('vehicle_id')->get();
+            $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
+            $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
+            $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
+            $sales_persons = ModelHasRoles::get();
+            $sales_ids = $sales_persons->pluck('model_id');
+            $sales = User::whereIn('id', $sales_ids)->get();
+            $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
+            $interiorColours = ColorCode::where('belong_to', 'int')->get();
+            $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $countwarehouse = $warehouses->count() ?? 0;
+            return view('vehicles.index', compact(
+                'data',
+                'varaint',
+                'sales',
+                'datapending',
+                'exteriorColours',
+                'interiorColours',
+                'pendingVehicleDetailForApprovalCount',
+                'warehouses',
+                'countwarehouse',
+                'warehousesveh',
+                'warehousesveher',
+                'warehousesvehss',
+                'warehousessold'
+            ));
+        } else {
             return redirect()->route('home');
         }
     }
@@ -2324,7 +2338,7 @@ class VehiclesController extends Controller
         if ($hasPermission) {
             $fieldValues = ['so_number', 'so_date', 'sales_person_id', 'reservation_start_date', 'reservation_end_date'];
             $statuss = "Approved";
-        $data = Vehicles::where('status', $statuss)
+            $data = Vehicles::where('status', $statuss)
                 ->where('latest_location', $warehouseId)
                 ->join('vehicle_detail_approval_requests', 'vehicles.id', '=', 'vehicle_detail_approval_requests.vehicle_id')
                 ->where('vehicle_detail_approval_requests.status', '=', 'Pending')
@@ -2332,38 +2346,50 @@ class VehiclesController extends Controller
                 ->where(function ($query) use ($fieldValues) {
                     $query->whereIn('field', $fieldValues);
                 });
-                $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
-                if ($hasEditSOPermission) {
-                    $data = $data->where(function ($query) {
-                        // Include vehicles with 'so_id' is null
-                        $query->whereNull('so_id')
-                            // OR vehicles associated with sales orders where sales_person_id matches the user's role ID
-                            ->orWhereHas('So', function ($query) {
-                                $query->where('sales_person_id', Auth::user()->role_id);
-                            });
-                    });
-                }
-                $data = $data->paginate(100);
-        $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
-        ->groupBy('vehicle_id')->get();
-        $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
-        $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
-        $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
-        $sales_persons = ModelHasRoles::get();
-        $sales_ids = $sales_persons->pluck('model_id');
-        $sales = User::whereIn('id', $sales_ids)->get();
-        $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
-        $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $countwarehouse = $warehouses->count() ?? 0;
-        return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
-        ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh','warehousesvehss', 'warehousesveher', 'warehousessold'));
-        }
-        else{
+            $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
+            if ($hasEditSOPermission) {
+                $data = $data->where(function ($query) {
+                    // Include vehicles with 'so_id' is null
+                    $query->whereNull('so_id')
+                        // OR vehicles associated with sales orders where sales_person_id matches the user's role ID
+                        ->orWhereHas('So', function ($query) {
+                            $query->where('sales_person_id', Auth::user()->role_id);
+                        });
+                });
+            }
+            $data = $data->paginate(100);
+            $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status', 'Pending')
+                ->groupBy('vehicle_id')->get();
+            $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
+            $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
+            $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
+            $sales_persons = ModelHasRoles::get();
+            $sales_ids = $sales_persons->pluck('model_id');
+            $sales = User::whereIn('id', $sales_ids)->get();
+            $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
+            $interiorColours = ColorCode::where('belong_to', 'int')->get();
+            $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $countwarehouse = $warehouses->count() ?? 0;
+            return view('vehicles.index', compact(
+                'data',
+                'varaint',
+                'sales',
+                'datapending',
+                'exteriorColours',
+                'interiorColours',
+                'pendingVehicleDetailForApprovalCount',
+                'warehouses',
+                'countwarehouse',
+                'warehousesveh',
+                'warehousesvehss',
+                'warehousesveher',
+                'warehousessold'
+            ));
+        } else {
             return redirect()->route('home');
         }
     }
@@ -2375,11 +2401,11 @@ class VehiclesController extends Controller
         if ($hasPermission) {
             $statuss = "Approved";
             $data = Vehicles::where('status', $statuss)
-            ->where('latest_location', $warehouseId)
-            ->whereNotNull('reservation_end_date')
-            ->where('reservation_end_date', '<=', $today)
-            ->whereNotNull('so_id')
-            ->whereNull('gdn_id');
+                ->where('latest_location', $warehouseId)
+                ->whereNotNull('reservation_end_date')
+                ->where('reservation_end_date', '<=', $today)
+                ->whereNotNull('so_id')
+                ->whereNull('gdn_id');
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             if ($hasEditSOPermission) {
                 $data = $data->where(function ($query) {
@@ -2392,46 +2418,58 @@ class VehiclesController extends Controller
                 });
             }
             $data = $data->paginate(100);
-        $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
-        ->groupBy('vehicle_id')->get();
-        $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
-        $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
-        $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
-        $sales_persons = ModelHasRoles::get();
-        $sales_ids = $sales_persons->pluck('model_id');
-        $sales = User::whereIn('id', $sales_ids)->get();
-        $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
-        $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
-        $countwarehouse = $warehouses->count() ?? 0;
-        return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
-        ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh', 'warehousesveher', 'warehousesvehss', 'warehousessold'));
-        }
-        else{
+            $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status', 'Pending')
+                ->groupBy('vehicle_id')->get();
+            $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
+            $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
+            $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
+            $sales_persons = ModelHasRoles::get();
+            $sales_ids = $sales_persons->pluck('model_id');
+            $sales = User::whereIn('id', $sales_ids)->get();
+            $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
+            $interiorColours = ColorCode::where('belong_to', 'int')->get();
+            $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+            $countwarehouse = $warehouses->count() ?? 0;
+            return view('vehicles.index', compact(
+                'data',
+                'varaint',
+                'sales',
+                'datapending',
+                'exteriorColours',
+                'interiorColours',
+                'pendingVehicleDetailForApprovalCount',
+                'warehouses',
+                'countwarehouse',
+                'warehousesveh',
+                'warehousesveher',
+                'warehousesvehss',
+                'warehousessold'
+            ));
+        } else {
             return redirect()->route('home');
         }
     }
     public function viewall(Request $request)
-{
-    return view('vehicles.indext');
-}
-public function viewalls(Request $request)
+    {
+        return view('vehicles.indext');
+    }
+    public function viewalls(Request $request)
     {
         // testing needed
         info("testing grn");
         $offset = $request->input('offset', 0);
         $length = $request->input('length', 40);
         $searchParams = $request->input('columns', []);
-        $query = Vehicles::with(['So', 'PurchasingOrder', 'Grn','movementGrn', 'Gdn', 'variant', 'document', 'warehouse', 'interior', 'exterior', 'variant.brand', 'variant.master_model_lines', 'So.salesperson', 'latestRemarkSales', 'latestRemarkWarehouse'])->where(function ($subQuery) {
+        $query = Vehicles::with(['So', 'PurchasingOrder', 'Grn', 'movementGrn', 'Gdn', 'variant', 'document', 'warehouse', 'interior', 'exterior', 'variant.brand', 'variant.master_model_lines', 'So.salesperson', 'latestRemarkSales', 'latestRemarkWarehouse'])->where(function ($subQuery) {
             $subQuery->where('status', 'Approved')
-                     ->whereNull('gdn_id');
+                ->whereNull('gdn_id');
             $subQuery->orWhereHas('Gdn', function ($gdnSubQuery) {
                 $gdnSubQuery->whereNotNull('gdn_id')
-                             ->where('date', '>=', now()->subMonths(3)->toDateString());
+                    ->where('date', '>=', now()->subMonths(3)->toDateString());
             });
         });
         foreach ($searchParams as $column => $searchValue) {
@@ -2626,8 +2664,8 @@ public function viewalls(Request $request)
                 }
             }
         }
-        $vehicles = $query->select('id', 'status', 'vin', 'latest_location', 'ex_colour', 'int_colour','varaints_id', 'so_id', 'purchasing_order_id', 'grn_id','movement_grn_id', 'gdn_id', 'documents_id', 'estimation_date', 'inspection_date', 'grn_remark', 'qc_remarks', 'reservation_start_date', 'reservation_start_date', 'pdi_date', 'pdi_remarks', 'conversion', 'engine', 'extra_features', 'ppmmyyy', 'territory', 'price' )->skip($offset)->take($length)->get();
-            $modifiedVehicles = $vehicles->map(function ($vehicle) {
+        $vehicles = $query->select('id', 'status', 'vin', 'latest_location', 'ex_colour', 'int_colour', 'varaints_id', 'so_id', 'purchasing_order_id', 'grn_id', 'movement_grn_id', 'gdn_id', 'documents_id', 'estimation_date', 'inspection_date', 'grn_remark', 'qc_remarks', 'reservation_start_date', 'reservation_start_date', 'pdi_date', 'pdi_remarks', 'conversion', 'engine', 'extra_features', 'ppmmyyy', 'territory', 'price')->skip($offset)->take($length)->get();
+        $modifiedVehicles = $vehicles->map(function ($vehicle) {
             $vehicle->so_number = $vehicle->so ? $vehicle->so->so_number : '';
             $vehicle->so_date = $vehicle->so ? $vehicle->so->so_date : '';
             $vehicle->po_number = $vehicle->purchasingOrder ? $vehicle->purchasingOrder->po_number : '';
@@ -2667,8 +2705,8 @@ public function viewalls(Request $request)
     }
     public function getUpdatedVehicle($id)
     {
-        $query = Vehicles::with(['So', 'PurchasingOrder', 'Grn', 'Gdn','MovementGrn', 'variant', 'document', 'warehouse', 'interior', 'exterior', 'variant.brand', 'variant.master_model_lines', 'So.salesperson', 'latestRemarkSales', 'latestRemarkWarehouse'])
-            ->select('id', 'status', 'vin', 'latest_location', 'ex_colour', 'int_colour', 'varaints_id', 'so_id', 'purchasing_order_id', 'grn_id','movement_grn_id', 'gdn_id', 'documents_id', 'estimation_date', 'netsuit_grn_number', 'netsuit_grn_date', 'inspection_date', 'grn_remark', 'qc_remarks', 'reservation_start_date', 'reservation_start_date', 'pdi_date', 'pdi_remarks', 'conversion', 'engine', 'extra_features', 'ppmmyyy', 'territory', 'price')
+        $query = Vehicles::with(['So', 'PurchasingOrder', 'Grn', 'Gdn', 'MovementGrn', 'variant', 'document', 'warehouse', 'interior', 'exterior', 'variant.brand', 'variant.master_model_lines', 'So.salesperson', 'latestRemarkSales', 'latestRemarkWarehouse'])
+            ->select('id', 'status', 'vin', 'latest_location', 'ex_colour', 'int_colour', 'varaints_id', 'so_id', 'purchasing_order_id', 'grn_id', 'movement_grn_id', 'gdn_id', 'documents_id', 'estimation_date', 'netsuit_grn_number', 'netsuit_grn_date', 'inspection_date', 'grn_remark', 'qc_remarks', 'reservation_start_date', 'reservation_start_date', 'pdi_date', 'pdi_remarks', 'conversion', 'engine', 'extra_features', 'ppmmyyy', 'territory', 'price')
             ->where('id', $id);
 
         $vehicle = $query->first();
@@ -2720,138 +2758,136 @@ public function viewalls(Request $request)
         $useractivities->save();
         // Variant detail computation
         $sales_persons = ModelHasRoles::join('users', 'model_has_roles.model_id', '=', 'users.id')
-        ->where('users.status', 'active')
-        ->where(function ($query) {
-            $query->where('model_has_roles.role_id', 7)
-                  ->orWhere('model_has_roles.model_id', 17);
-        })
-        ->orwhere('users.id', 40)
-        ->orderBy('users.name', 'asc')
-        ->get();
-$variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
-->orderBy('id', 'DESC')
-->whereNot('category', 'Modified')
-->get();
-$sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
-$normalizationMap = [
-'COO' => 'COO',
-'SFX' => 'SFX',
-'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
-'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
-'HeadLamp Type' => 'HeadLamp Type',
-'infotainment type' => 'infotainment type',
-'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
-'Speakers' => 'Speakers',
-'sunroof' => 'sunroof'
-];
-foreach ($variants as $variant) {
-    if($variant->category != 'Modified')
-    {
-    $details = [];
-    $otherDetails = [];
-    foreach ($variant->variantItems as $item) {
-        $modelSpecification = $item->model_specification;
-        $modelSpecificationOption = $item->model_specification_option;
-        if ($modelSpecification && $modelSpecificationOption) {
-            $name = $modelSpecification->name;
-            $optionName = $modelSpecificationOption->name;
-            $normalized = null;
-            foreach ($normalizationMap as $key => $values) {
-                if (is_array($values)) {
-                    if (in_array($name, $values)) {
-                        $normalized = $key;
-                        break;
+            ->where('users.status', 'active')
+            ->where(function ($query) {
+                $query->where('model_has_roles.role_id', 7)
+                    ->orWhere('model_has_roles.model_id', 17);
+            })
+            ->orwhere('users.id', 40)
+            ->orderBy('users.name', 'asc')
+            ->get();
+        $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
+            ->orderBy('id', 'DESC')
+            ->whereNot('category', 'Modified')
+            ->get();
+        $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
+        $normalizationMap = [
+            'COO' => 'COO',
+            'SFX' => 'SFX',
+            'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
+            'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
+            'HeadLamp Type' => 'HeadLamp Type',
+            'infotainment type' => 'infotainment type',
+            'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
+            'Speakers' => 'Speakers',
+            'sunroof' => 'sunroof'
+        ];
+        foreach ($variants as $variant) {
+            if ($variant->category != 'Modified') {
+                $details = [];
+                $otherDetails = [];
+                foreach ($variant->variantItems as $item) {
+                    $modelSpecification = $item->model_specification;
+                    $modelSpecificationOption = $item->model_specification_option;
+                    if ($modelSpecification && $modelSpecificationOption) {
+                        $name = $modelSpecification->name;
+                        $optionName = $modelSpecificationOption->name;
+                        $normalized = null;
+                        foreach ($normalizationMap as $key => $values) {
+                            if (is_array($values)) {
+                                if (in_array($name, $values)) {
+                                    $normalized = $key;
+                                    break;
+                                }
+                            } elseif ($name === $values) {
+                                $normalized = $key;
+                                break;
+                            }
+                        }
+
+                        if ($normalized) {
+                            $name = $normalized;
+                        }
+                        if (in_array(strtolower($optionName), ['yes', 'no'])) {
+                            if (strtolower($optionName) === 'yes') {
+                                $optionName = $name;
+                            } else {
+                                continue;
+                            }
+                        }
+                        if (in_array($name, $sequence)) {
+                            $index = array_search($name, $sequence);
+                            $details[$index] = $optionName;
+                        } else {
+                            $otherDetails[] = $optionName;
+                        }
                     }
-                } elseif ($name === $values) {
-                    $normalized = $key;
-                    break;
                 }
-            }
-    
-            if ($normalized) {
-                $name = $normalized;
-            }
-            if (in_array(strtolower($optionName), ['yes', 'no'])) {
-                if (strtolower($optionName) === 'yes') {
-                    $optionName = $name;
-                } else {
-                    continue;
-                }
-            }
-            if (in_array($name, $sequence)) {
-                $index = array_search($name, $sequence);
-                $details[$index] = $optionName;
-            } else {
-                $otherDetails[] = $optionName;
+                ksort($details);
+                $variant->detail = implode(', ', array_merge($details, $otherDetails));
+                $variant->save();
             }
         }
-    }
-    ksort($details);
-    $variant->detail = implode(', ', array_merge($details, $otherDetails));
-    $variant->save();
-}
-    }
         if ($request->ajax()) {
             $status = $request->input('status');
             $filters = $request->input('filters', []);
-            if($status === "allstock")
-                {
-                    $data = Vehicles::select( [
-                        'vehicles.id',
-                        'vehicles.movement_grn_id',
-                        'vehicles.gdn_id',
-                        'vehicles.gp',
-                        'vehicles.sales_remarks',
-                        'vehicles.estimation_date',
-                        'vehicles.territory',
-                        'vehicles.inspection_status',
-                        'vehicles.ownership_type',
-                        'vehicles.inspection_date',
-                        'vehicles.custom_inspection_number',
-                        'vehicles.custom_inspection_status',
-                        'vehicles.so_id',
-                        'vehicles.minimum_commission',
-                        'vehicles.reservation_end_date',
-                        'vehicles.vehicle_document_status',
-                        'warehouse.name as location',
-                        'purchasing_order.po_date',
-                        'vehicles.ppmmyyy',
-                        'vehicles.vin as vin',
-                        'inspection_grn.id as grn_inspectionid',
-                        'inspection_pdi.id as pdi_inspectionid',
-                        'vehicles.engine',
-                        'vehicles.price',
-                        'countries.name as fd',
-                        'brands.brand_name',
-                        'varaints.name as variant',
-                        'varaints.id as variant_id',
-                        'varaints.model_detail',
-                        'varaints.detail',
-                        'varaints.seat',
-                        'varaints.detail as variant_detail',
-                        'varaints.upholestry',
-                        'varaints.steering',
-                        'varaints.my',
-                        'varaints.fuel_type',
-                        'varaints.gearbox',
-                        'so.so_number',
-                        'master_model_lines.model_line',
-                        'int_color.name as interior_color',
-                        'ex_color.name as exterior_color',
-                        'purchasing_order.po_number',
-                        'documents.import_type',
-                        'documents.owership',
-                        'documents.document_with',
-                        'movement_grns.grn_number',
-                        'gdn.gdn_number',
-                        'bp.name as bpn',
-                        'sp.name as spn',
-                        DB::raw("DATE_FORMAT(work_orders.date, '%Y-%m-%d') as work_order_date"),
-                        DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
-                        'so.so_date',
-                        'movements_reference.date',
-                        'gdn.date as gdndate',
-                        DB::raw("
+            if ($status === "allstock") {
+                $data = Vehicles::select([
+                    'vehicles.id',
+                    'vehicles.movement_grn_id',
+                    'vehicles.gdn_id',
+                    'vehicles.gp',
+                    'vehicles.sales_remarks',
+                    'vehicles.estimation_date',
+                    'vehicles.territory',
+                    'vehicles.inspection_status',
+                    'vehicles.ownership_type',
+                    'vehicles.inspection_date',
+                    'vehicles.custom_inspection_number',
+                    'vehicles.custom_inspection_status',
+                    'vehicles.so_id',
+                    'vehicles.minimum_commission',
+                    'vehicles.reservation_end_date',
+                    'vehicles.vehicle_document_status',
+                    'warehouse.name as location',
+                    'purchasing_order.po_date',
+                    'vehicles.ppmmyyy',
+                    'vehicles.vin as vin',
+                    'inspection_grn.id as grn_inspectionid',
+                    'inspection_pdi.id as pdi_inspectionid',
+                    'vehicles.engine',
+                    'vehicles.price',
+                    'countries.name as fd',
+                    'brands.brand_name',
+                    'varaints.name as variant',
+                    'varaints.id as variant_id',
+                    'varaints.model_detail',
+                    'varaints.detail',
+                    'varaints.seat',
+                    'varaints.detail as variant_detail',
+                    'varaints.upholestry',
+                    'varaints.steering',
+                    'varaints.my',
+                    'varaints.fuel_type',
+                    'varaints.gearbox',
+                    'so.so_number',
+                    'master_model_lines.model_line',
+                    'int_color.name as interior_color',
+                    'ex_color.name as exterior_color',
+                    'purchasing_order.po_number',
+                    'documents.import_type',
+                    'documents.owership',
+                    'documents.document_with',
+                    'movement_grns.grn_number',
+                    'gdn.gdn_number',
+                    'bp.name as bpn',
+                    'sp.name as spn',
+                    DB::raw("DATE_FORMAT(work_orders.date, '%Y-%m-%d') as work_order_date"),
+                    DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
+                    'so.so_date',
+                    'movements_reference.date',
+                    'gdn.date as gdndate',
+                    DB::raw("
                         COALESCE(
                             (SELECT FORMAT(CAST(cost AS UNSIGNED), 0) FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
                             (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
@@ -2860,7 +2896,7 @@ foreach ($variants as $variant) {
                         (SELECT netsuite_link FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1) as netsuite_link
                     ")
 
-                    ])
+                ])
                     ->leftJoin('w_o_vehicles', 'vehicles.id', '=', 'w_o_vehicles.vehicle_id')
                     ->leftJoin('work_orders', 'w_o_vehicles.work_order_id', '=', 'work_orders.id')
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
@@ -2878,394 +2914,401 @@ foreach ($variants as $variant) {
                     ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                     ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                     ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                    ->leftJoin('inspection as inspection_grn', function($join) {
+                    ->leftJoin('inspection as inspection_grn', function ($join) {
                         $join->on('vehicles.id', '=', 'inspection_grn.vehicle_id')
-                             ->where('inspection_grn.stage', '=', 'GRN');
+                            ->where('inspection_grn.stage', '=', 'GRN');
                     })
                     ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
-                    ->leftJoin('inspection as inspection_pdi', function($join) {
+                    ->leftJoin('inspection as inspection_pdi', function ($join) {
                         $join->on('vehicles.id', '=', 'inspection_pdi.vehicle_id')
-                             ->where('inspection_pdi.stage', '=', 'PDI');
+                            ->where('inspection_pdi.stage', '=', 'PDI');
                     })
                     ->where('vehicles.status', 'Approved');
-                    foreach ($filters as $columnName => $values) {
-                        if (in_array('__NULL__', $values)) {
-                            $data->whereNull($columnName); // Filter for NULL values
-                        } elseif (in_array('__Not EMPTY__', $values)) {
-                            $data->whereNotNull($columnName); // Filter for non-empty values
-                        } else {
-                            $data->whereIn($columnName, $values); // Regular filtering for selected values
-                        }
-                    } 
-                    $data = $data->groupBy('vehicles.id');  
+                foreach ($filters as $columnName => $values) {
+                    if (in_array('__NULL__', $values)) {
+                        $data->whereNull($columnName); // Filter for NULL values
+                    } elseif (in_array('__Not EMPTY__', $values)) {
+                        $data->whereNotNull($columnName); // Filter for non-empty values
+                    } else {
+                        $data->whereIn($columnName, $values); // Regular filtering for selected values
+                    }
                 }
-        if ($data) {
-            return DataTables::of($data)->toJson();
-        }
+                $data = $data->groupBy('vehicles.id');
+            }
+            if ($data) {
+                return DataTables::of($data)->toJson();
+            }
         }
         return view('vehicles.stock', ['salesperson' => $sales_persons]);
     }
     public function generategrnPDF(Request $request)
     {
-    $vehicleId = $request->vehicle_id;
-    $vehicle = Vehicles::with(['interior', 'exterior'])->where('id', $vehicleId)->first();
-    $grn = MovementGrn::where('id', $vehicle->movement_grn_id)->first();
-    $variant = Varaint::with(['master_model_lines', 'brand'])->where('id', $vehicle->varaints_id)->first();
-    // get the data from variant request
-    $variantitems = VariantItems::with(['model_specification', 'model_specification_option'])->where('varaint_id', $variant->id)->get();
-    $vehicleitems = VehicleExtraItems::where('vehicle_id', $vehicleId)->get();
-    $inspection = Inspection::where('vehicle_id', $vehicleId)->where('stage', 'GRN')->first();
-    $incident = Incident::where('vehicle_id', $vehicleId)->where('inspection_id', $inspection->id)->first();
-    $createdby = User::where('id', $inspection->created_by)->pluck('name')->first();
-    if (!$vehicle) {
-        abort(404);
-    }
-    $data = [
-        'vehicle' => $vehicle,
-        'grn_date' => $grn->Movementrefernce->date ?? '',
-        'variant' => $variant,
-        'inspection' => $inspection,
-        'variantitems' => $variantitems,
-        'vehicleItems' => $vehicleitems,
-        'created_by' => $createdby,
-        'incident' => $incident,
-    ];
-    $pdf = PDF::loadView('Reports.Grn', $data);
-    return $pdf->stream('vehicle-details.pdf');
+        $vehicleId = $request->vehicle_id;
+        $vehicle = Vehicles::with(['interior', 'exterior'])->where('id', $vehicleId)->first();
+        $grn = MovementGrn::where('id', $vehicle->movement_grn_id)->first();
+        $variant = Varaint::with(['master_model_lines', 'brand'])->where('id', $vehicle->varaints_id)->first();
+        // get the data from variant request
+        $variantitems = VariantItems::with(['model_specification', 'model_specification_option'])->where('varaint_id', $variant->id)->get();
+        $vehicleitems = VehicleExtraItems::where('vehicle_id', $vehicleId)->get();
+        $inspection = Inspection::where('vehicle_id', $vehicleId)->where('stage', 'GRN')->first();
+        $incident = Incident::where('vehicle_id', $vehicleId)->where('inspection_id', $inspection->id)->first();
+        $createdby = User::where('id', $inspection->created_by)->pluck('name')->first();
+        if (!$vehicle) {
+            abort(404);
+        }
+        $data = [
+            'vehicle' => $vehicle,
+            'grn_date' => $grn->Movementrefernce->date ?? '',
+            'variant' => $variant,
+            'inspection' => $inspection,
+            'variantitems' => $variantitems,
+            'vehicleItems' => $vehicleitems,
+            'created_by' => $createdby,
+            'incident' => $incident,
+        ];
+        $pdf = PDF::loadView('Reports.Grn', $data);
+        return $pdf->stream('vehicle-details.pdf');
     }
     public function fetchData(Request $request)
-{
-    $vehicleId = $request->input('vehicle_id');
-    $vehicle = Vehicles::with('variant', 'exterior')->findOrFail($vehicleId);
-    $variant = str_replace(' ', '', $vehicle->variant->name);
-    $post = $this->fetchPost($variant, $vehicle->exterior ? $vehicle->exterior->name : null);
-
-    if (!$post) {
-        // Remove the first letter of the variant name and try again
-        $variant = substr($variant, 1);
+    {
+        $vehicleId = $request->input('vehicle_id');
+        $vehicle = Vehicles::with('variant', 'exterior')->findOrFail($vehicleId);
+        $variant = str_replace(' ', '', $vehicle->variant->name);
         $post = $this->fetchPost($variant, $vehicle->exterior ? $vehicle->exterior->name : null);
+
+        if (!$post) {
+            // Remove the first letter of the variant name and try again
+            $variant = substr($variant, 1);
+            $post = $this->fetchPost($variant, $vehicle->exterior ? $vehicle->exterior->name : null);
+        }
+
+        if ($post) {
+            $galleryMeta = DB::connection('wordpress')->table('mm_postmeta')
+                ->where('post_id', $post->ID)
+                ->where('meta_key', 'gallery')
+                ->first();
+
+            $galleryIds = unserialize($galleryMeta->meta_value);
+
+            $imageUrls = [];
+            foreach ($galleryIds as $id) {
+                $imagePost = DB::connection('wordpress')->table('mm_posts')
+                    ->where('ID', $id)
+                    ->first();
+
+                if ($imagePost) {
+                    $imageUrls[] = $imagePost->guid;
+                }
+            }
+
+            return response()->json([
+                'gallery' => $imageUrls
+            ]);
+        } else {
+            return response()->json(['message' => 'No post found'], 404);
+        }
     }
 
-    if ($post) {
-        $galleryMeta = DB::connection('wordpress')->table('mm_postmeta')
-            ->where('post_id', $post->ID)
-            ->where('meta_key', 'gallery')
+    private function fetchPost($variant, $exteriorColor)
+    {
+        $query = DB::connection('wordpress')->table('mm_posts')
+            ->join('mm_postmeta as variant_meta', 'mm_posts.ID', '=', 'variant_meta.post_id')
+            ->join('mm_postmeta as color_meta', 'mm_posts.ID', '=', 'color_meta.post_id')
+            ->where('variant_meta.meta_key', 'Car ID')
+            ->where('variant_meta.meta_value', $variant)
+            ->where('mm_posts.post_status', 'publish');
+
+        if ($exteriorColor) {
+            $query->where('color_meta.meta_key', 'color')
+                ->where('color_meta.meta_value', $exteriorColor);
+        }
+
+        return $query->select('mm_posts.ID', 'mm_posts.post_title', 'mm_posts.post_name')
+            ->first();
+    }
+    public function currentstatus()
+    {
+        return view('vehicles.currentstatus');
+    }
+    public function statussreach(Request $request)
+    {
+        $searchQuery = $request->input('search');
+        $vehicles = Vehicles::where('vin', 'LIKE', "%{$searchQuery}%")->get();
+        $data = [];
+        foreach ($vehicles as $vehicle) {
+            $status = $vehicle->status;
+            $previous_status = '';
+            $current_status = '';
+            $next_stage = '';
+            switch ($status) {
+                case 'Approved':
+                    $previous_status = 'Pending Approval From Vehicle Procurement Manager';
+                    $current_status = 'Vehicle is Approved For Initiated Payment';
+                    $next_stage = 'Initiated Payment By Vehicle Procurement Executive';
+                    break;
+                case 'Not Approved':
+                    $previous_status = 'Created PO By Vehicle Procurement Executive';
+                    $current_status = 'Vehicle is Not Approved By the Vehicle Procurement Manager';
+                    $next_stage = 'Approved Vehicle By Procurement Manager';
+                    break;
+                case 'Request for Payment':
+                    $previous_status = 'Approved Vehicle By Procurement Manager';
+                    $current_status = 'Initiated Payment By Vehicle Procurement Executive';
+                    $next_stage = 'Procurement Manager Forward Request for Payment To Finance Department';
+                    break;
+                case 'Payment Requested':
+                    $previous_status = 'Procurement Manager Forward Request for Payment To Finance Department';
+                    $current_status = 'Finance Department Forward Request to CEO Office For Payment Release';
+                    $next_stage = 'CEO Office Payment Released';
+                    break;
+                case 'Payment Completed':
+                    $previous_status = 'CEO Office Payment Released';
+                    $current_status = 'Finance Department Complete the Payments';
+                    $next_stage = 'Vehicle Procurement Executive Will Confirm Vendor Received Payment and Vehicle is Incoming';
+                    break;
+                case 'Payment Rejected':
+                    $previous_status = 'Request to CEO Office for Payment Release';
+                    $current_status = 'Payment Rejected By CEO Office';
+                    $next_stage = 'Procurement Manager Forward Again Request for Payment To Finance Department';
+                    break;
+                default:
+                    break;
+            }
+            if ($vehicle->status == 'Payment Requested' && $vehicle->payment_status == 'Payment Initiated') {
+                $previous_status = 'Finance Department Forward Request to CEO Office For Payment Release';
+                $current_status = 'Request to CEO Office for Payment Release';
+                $next_stage = 'CEO Office Payment Released';
+            }
+            if ($vehicle->status == 'Approved' && $vehicle->movement_grn_id == NULL) {
+                $previous_status = 'Vehicle Procurement Executive Will Confirm Vendor Received Payment and Vehicle is Incoming';
+                $current_status = 'Incoming Vehicles / Pending GRN';
+                $next_stage = 'GRN Done';
+            }
+            if ($vehicle->movement_grn_id != NULL && $vehicle->inspection_date == null) {
+                $previous_status = 'GRN Done';
+                $current_status = 'Pending Inspection';
+                $next_stage = 'Available Stock';
+            }
+            if ($vehicle->inspection_date != NULL) {
+                $previous_status = 'Inspection Done';
+                $current_status = 'Available Stock';
+                $next_stage = 'Create SO, Pending PDI, Pending GDN';
+            }
+            if ($vehicle->pdi_date == NULL && $vehicle->gdn == NULL && $vehicle->so_id != NULL) {
+                $previous_status = 'Available Stock';
+                $current_status = 'Pending PDI Inspection';
+                $next_stage = 'GDN';
+            }
+            if ($vehicle->gdn_id != NULL) {
+                $previous_status = 'PDI Inspection';
+                $current_status = 'GDN Done';
+                $next_stage = '';
+            }
+            $data[] = [
+                'previous_status' => $previous_status,
+                'current_status' => $current_status,
+                'next_stage' => $next_stage
+            ];
+        }
+        return response()->json(['data' => $data]);
+    }
+    public function generatepfiPDF(Request $request)
+    {
+        $useractivities = new UserActivities();
+        $useractivities->activity = "Open The PDI Inspection";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+
+        $vehicleId = $request->vehicle_id;
+        $inspection = Inspection::where('vehicle_id', $vehicleId)->where('stage', 'PDI')->first();
+        if (!$inspection) {
+            return response()->json(['message' => 'Inspection not found'], 404);
+        }
+
+        $PdiInspectionData = Pdi::select('checking_item', 'reciving', 'status')
+            ->where('inspection_id', $inspection->id)
+            ->get();
+
+        $additionalInfo = Vehicles::select(
+            'master_model_lines.model_line',
+            'vehicles.vin',
+            'int_color.name as int_colour',
+            'ext_color.name as ext_colour',
+            'warehouse.name as location'
+        )
+            ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+            ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+            ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+            ->leftJoin('color_codes as ext_color', 'vehicles.ex_colour', '=', 'ext_color.id')
+            ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
+            ->where('vehicles.id', $inspection->vehicle_id)
             ->first();
 
-        $galleryIds = unserialize($galleryMeta->meta_value);
+        $incident = Incident::where('inspection_id', $inspection->id)->first();
+        $vehicle = Vehicles::find($inspection->vehicle_id);
 
-        $imageUrls = [];
-        foreach ($galleryIds as $id) {
-            $imagePost = DB::connection('wordpress')->table('mm_posts')
-                ->where('ID', $id)
-                ->first();
-            
-            if ($imagePost) {
-                $imageUrls[] = $imagePost->guid;
-            }
+        $grnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GRN')->pluck('vehicle_picture_link')->first();
+        $secgrnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GRN-2')->pluck('vehicle_picture_link')->first();
+        $PDIpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'PDI')->pluck('vehicle_picture_link')->first();
+        $modificationpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'Modification')->pluck('vehicle_picture_link')->first();
+        $Incidentpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'Incident')->pluck('vehicle_picture_link')->first();
+        $createdby = User::where('id', $inspection->created_by)->pluck('name')->first();
+        $variantitems = [];
+        if ($vehicle) {
+            $variantitems = VariantItems::with(['model_specification', 'model_specification_option'])
+                ->where('varaint_id', $vehicle->varaints_id)->get();
         }
+        $data = [
+            'inspection' => $inspection,
+            'PdiInspectionData' => $PdiInspectionData,
+            'additionalInfo' => $additionalInfo,
+            'grnpicturelink' => $grnpicturelink,
+            'secgrnpicturelink' => $secgrnpicturelink,
+            'PDIpicturelink' => $PDIpicturelink,
+            'modificationpicturelink' => $modificationpicturelink,
+            'Incidentpicturelink' => $Incidentpicturelink,
+            'incident' => $incident,
+            'remarks' => $inspection->remarks,
+            'created_by' => $createdby,
+            'variantitems' => $variantitems
+        ];
 
-        return response()->json([
-            'gallery' => $imageUrls
-        ]);
-    } else {
-        return response()->json(['message' => 'No post found'], 404);
+        $pdf = PDF::loadView('Reports.pdi', $data);
+        return $pdf->stream('vehicle-details-pdi.pdf');
     }
-}
-
-private function fetchPost($variant, $exteriorColor)
-{
-    $query = DB::connection('wordpress')->table('mm_posts')
-        ->join('mm_postmeta as variant_meta', 'mm_posts.ID', '=', 'variant_meta.post_id')
-        ->join('mm_postmeta as color_meta', 'mm_posts.ID', '=', 'color_meta.post_id')
-        ->where('variant_meta.meta_key', 'Car ID')
-        ->where('variant_meta.meta_value', $variant)
-        ->where('mm_posts.post_status', 'publish');
-
-    if ($exteriorColor) {
-        $query->where('color_meta.meta_key', 'color')
-            ->where('color_meta.meta_value', $exteriorColor);
-    }
-
-    return $query->select('mm_posts.ID', 'mm_posts.post_title', 'mm_posts.post_name')
-        ->first();
-    }
-        public function currentstatus ()
-        {
-            return view('vehicles.currentstatus');
-        }
-        public function statussreach(Request $request)
-        {
-            $searchQuery = $request->input('search');
-            $vehicles = Vehicles::where('vin', 'LIKE', "%{$searchQuery}%")->get();
-            $data = [];
-            foreach ($vehicles as $vehicle) {
-                $status = $vehicle->status;
-                $previous_status = '';
-                $current_status = '';
-                $next_stage = '';
-                switch ($status) {
-                    case 'Approved':
-                        $previous_status = 'Pending Approval From Vehicle Procurement Manager';
-                        $current_status = 'Vehicle is Approved For Initiated Payment';
-                        $next_stage = 'Initiated Payment By Vehicle Procurement Executive';
-                        break;
-                    case 'Not Approved':
-                        $previous_status = 'Created PO By Vehicle Procurement Executive';
-                        $current_status = 'Vehicle is Not Approved By the Vehicle Procurement Manager';
-                        $next_stage = 'Approved Vehicle By Procurement Manager';
-                        break;
-                    case 'Request for Payment':
-                        $previous_status = 'Approved Vehicle By Procurement Manager';
-                        $current_status = 'Initiated Payment By Vehicle Procurement Executive';
-                        $next_stage = 'Procurement Manager Forward Request for Payment To Finance Department';
-                        break;
-                    case 'Payment Requested':
-                        $previous_status = 'Procurement Manager Forward Request for Payment To Finance Department';
-                        $current_status = 'Finance Department Forward Request to CEO Office For Payment Release';
-                        $next_stage = 'CEO Office Payment Released';
-                        break;
-                    case 'Payment Completed':
-                        $previous_status = 'CEO Office Payment Released';
-                        $current_status = 'Finance Department Complete the Payments';
-                        $next_stage = 'Vehicle Procurement Executive Will Confirm Vendor Received Payment and Vehicle is Incoming';
-                        break;
-                    case 'Payment Rejected':
-                        $previous_status = 'Request to CEO Office for Payment Release';
-                        $current_status = 'Payment Rejected By CEO Office';
-                        $next_stage = 'Procurement Manager Forward Again Request for Payment To Finance Department';
-                        break;
-                    default:
-                        break;
-                }
-                if ($vehicle->status == 'Payment Requested' && $vehicle->payment_status == 'Payment Initiated') {
-                    $previous_status = 'Finance Department Forward Request to CEO Office For Payment Release';
-                    $current_status = 'Request to CEO Office for Payment Release';
-                    $next_stage = 'CEO Office Payment Released';
-                }
-                if ($vehicle->status == 'Approved' && $vehicle->movement_grn_id == NULL) {
-                    $previous_status = 'Vehicle Procurement Executive Will Confirm Vendor Received Payment and Vehicle is Incoming';
-                    $current_status = 'Incoming Vehicles / Pending GRN';
-                    $next_stage = 'GRN Done';
-                }
-                if ($vehicle->movement_grn_id != NULL && $vehicle->inspection_date == null) {
-                    $previous_status = 'GRN Done';
-                    $current_status = 'Pending Inspection';
-                    $next_stage = 'Available Stock';
-                }
-                if ($vehicle->inspection_date != NULL) {
-                    $previous_status = 'Inspection Done';
-                    $current_status = 'Available Stock';
-                    $next_stage = 'Create SO, Pending PDI, Pending GDN';
-                }
-                if ($vehicle->pdi_date == NULL && $vehicle->gdn == NULL && $vehicle->so_id != NULL) {
-                    $previous_status = 'Available Stock';
-                    $current_status = 'Pending PDI Inspection';
-                    $next_stage = 'GDN';
-                }
-                if ($vehicle->gdn_id != NULL) {
-                    $previous_status = 'PDI Inspection';
-                    $current_status = 'GDN Done';
-                    $next_stage = '';
-                }
-                $data[] = [
-                    'previous_status' => $previous_status,
-                    'current_status' => $current_status,
-                    'next_stage' => $next_stage
-                ];
-            }
-            return response()->json(['data' => $data]);
-        }
-        public function generatepfiPDF(Request $request)
-{
-    $useractivities = new UserActivities();
-    $useractivities->activity = "Open The PDI Inspection";
-    $useractivities->users_id = Auth::id();
-    $useractivities->save();
-
-    $vehicleId = $request->vehicle_id;
-    $inspection = Inspection::where('vehicle_id', $vehicleId)->where('stage', 'PDI')->first();
-    if (!$inspection) {
-        return response()->json(['message' => 'Inspection not found'], 404);
-    }
-
-    $PdiInspectionData = Pdi::select('checking_item', 'reciving', 'status')
-                            ->where('inspection_id', $inspection->id)
-                            ->get();
-
-    $additionalInfo = Vehicles::select('master_model_lines.model_line', 'vehicles.vin', 
-                            'int_color.name as int_colour', 'ext_color.name as ext_colour', 'warehouse.name as location')
-        ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
-        ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
-        ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
-        ->leftJoin('color_codes as ext_color', 'vehicles.ex_colour', '=', 'ext_color.id')
-        ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-        ->where('vehicles.id', $inspection->vehicle_id)
-        ->first();
-
-    $incident = Incident::where('inspection_id', $inspection->id)->first();
-    $vehicle = Vehicles::find($inspection->vehicle_id);
-
-    $grnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GRN')->pluck('vehicle_picture_link')->first();
-    $secgrnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GRN-2')->pluck('vehicle_picture_link')->first();
-    $PDIpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'PDI')->pluck('vehicle_picture_link')->first();
-    $modificationpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'Modification')->pluck('vehicle_picture_link')->first();
-    $Incidentpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'Incident')->pluck('vehicle_picture_link')->first();
-    $createdby = User::where('id', $inspection->created_by)->pluck('name')->first();
-    $variantitems = [];
-    if($vehicle) {
-        $variantitems = VariantItems::with(['model_specification', 'model_specification_option'])
-        ->where('varaint_id', $vehicle->varaints_id)->get();
-
-    }
-    $data = [
-        'inspection' => $inspection,
-        'PdiInspectionData' => $PdiInspectionData,
-        'additionalInfo' => $additionalInfo,
-        'grnpicturelink' => $grnpicturelink,
-        'secgrnpicturelink' => $secgrnpicturelink,
-        'PDIpicturelink' => $PDIpicturelink,
-        'modificationpicturelink' => $modificationpicturelink,
-        'Incidentpicturelink' => $Incidentpicturelink,
-        'incident' => $incident,
-        'remarks' => $inspection->remarks,
-        'created_by' => $createdby,
-        'variantitems' => $variantitems
-    ];
-
-    $pdf = PDF::loadView('Reports.pdi', $data);
-    return $pdf->stream('vehicle-details-pdi.pdf');
-}
-public function hold(Request $request, $id)
-{
-    $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-    $currentDateTime = Carbon::now($dubaiTimeZone);
-    $vehicle = Vehicles::find($id);
-    $vehicleslog = new Vehicleslog();
-    $vehicleslog->time = $currentDateTime->toTimeString();
-    $vehicleslog->date = $currentDateTime->toDateString();
-    $vehicleslog->status = 'Hold Vehicle';
-    $vehicleslog->vehicles_id = $id;
-    $vehicleslog->field = "Vehicle Status";
-    $vehicleslog->old_value =  $vehicle->status;
-    $vehicleslog->new_value = $request->status;
-    $vehicleslog->created_by = auth()->user()->id;
-    $vehicleslog->save();
-    $purchasingOrder = PurchasingOrder::where('id', $vehicle->purchasing_order_id)->first();
-    $purchasingOrder->status = "Pending Approval";
-    $purchasingOrder->save();
-    if ($request->status === 'hold') {
-        $vehicle->status = 'Hold';
-    } else {
-        $vehicle->status = 'Not Approved';
-    }
-    $vehicle->save();
-    return response()->json(['success' => true]);
-}
-public function allvariantprice(Request $request)
+    public function hold(Request $request, $id)
     {
-    $useractivities =  New UserActivities();
+        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+        $currentDateTime = Carbon::now($dubaiTimeZone);
+        $vehicle = Vehicles::find($id);
+        $vehicleslog = new Vehicleslog();
+        $vehicleslog->time = $currentDateTime->toTimeString();
+        $vehicleslog->date = $currentDateTime->toDateString();
+        $vehicleslog->status = 'Hold Vehicle';
+        $vehicleslog->vehicles_id = $id;
+        $vehicleslog->field = "Vehicle Status";
+        $vehicleslog->old_value =  $vehicle->status;
+        $vehicleslog->new_value = $request->status;
+        $vehicleslog->created_by = auth()->user()->id;
+        $vehicleslog->save();
+        $purchasingOrder = PurchasingOrder::where('id', $vehicle->purchasing_order_id)->first();
+        $purchasingOrder->status = "Pending Approval";
+        $purchasingOrder->save();
+        if ($request->status === 'hold') {
+            $vehicle->status = 'Hold';
+        } else {
+            $vehicle->status = 'Not Approved';
+        }
+        $vehicle->save();
+        return response()->json(['success' => true]);
+    }
+    public function allvariantprice(Request $request)
+    {
+        $useractivities =  new UserActivities();
         $useractivities->activity = "Open All Variant Price";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         if ($request->ajax()) {
-            $data = Vehicles::select( [
-                    'brands.brand_name',
-                    'vehicles.gp',
-                    'vehicles.minimum_commission',
-                    'vehicles.varaints_id',
-                    'vehicles.int_colour',
-                    'vehicles.ex_colour',
-                    'vehicles.price',
-                    'varaints.name',
-                    'master_model_lines.model_line',
-                    'int_color.name as interior_color',
-                    'ex_color.name as exterior_color',
-                ])
+            $data = Vehicles::select([
+                'brands.brand_name',
+                'vehicles.gp',
+                'vehicles.minimum_commission',
+                'vehicles.varaints_id',
+                'vehicles.int_colour',
+                'vehicles.ex_colour',
+                'vehicles.price',
+                'varaints.name',
+                'master_model_lines.model_line',
+                'int_color.name as interior_color',
+                'ex_color.name as exterior_color',
+            ])
                 ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
                 ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
                 ->groupBy('varaints.id', 'int_color.id', 'ex_color.id');
-          
-                return DataTables::of($data)
-        ->editColumn('price', function($data) {
-            return number_format($data->price, 0, '.', ',');
-        })
-        ->editColumn('minimum_commission', function($data) {
-            return number_format($data->minimum_commission, 0, '.', ',');
-        })
-        ->toJson();
-            }
+
+            return DataTables::of($data)
+                ->editColumn('price', function ($data) {
+                    return number_format($data->price, 0, '.', ',');
+                })
+                ->editColumn('minimum_commission', function ($data) {
+                    return number_format($data->minimum_commission, 0, '.', ',');
+                })
+                ->toJson();
+        }
         return view('variant-prices.allindex');
     }
-public function allvariantpriceupdate(Request $request)
-{
-    // Validate the incoming request
-    $validator = Validator::make($request->all(), [
-            'varaints_id' => 'required|integer|exists:varaints,id',
-            'field' => 'required|string|in:price,gp,minimum_commission',
-            'value' => 'required|string'
+    public function allvariantpriceupdate(Request $request)
+    {
+        // Validate the incoming request
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'varaints_id' => 'required|integer|exists:varaints,id',
+                'field' => 'required|string|in:price,gp,minimum_commission',
+                'value' => 'required|string'
             ],
-            ['value.required' => 'Valid amount value is required']);
+            ['value.required' => 'Valid amount value is required']
+        );
 
-    if ($validator->fails()) {
-        return response()->json([
-            'success' => false,
-            'errors' => $validator->errors(),
-        ], 422);
-    }
-    // Find the vehicle by varaints_id, and optionally by int_colour and ex_colour
-    $query = Vehicles::where('varaints_id', $request->varaints_id);
-
-            
-    if (!empty($request->int_colour)) {
-        $query->where('int_colour', $request->int_colour);
-    }else{
-        $query->whereNull('int_colour');
-    }
-
-    if (!empty($request->ex_colour)) {
-        $query->where('ex_colour', $request->ex_colour);
-    }else{
-        $query->whereNull('ex_colour');
-    }
-    
-    $vehicles = $query->get();
-
-    if ($vehicles->count() <= 0) {
-        return response()->json(['error' => 'Vehicle not found'], 404);
-    }
-
-    foreach($vehicles as $vehicle) {
-        $oldValue = $vehicle->{$request->field};
-        $field = $request->field;
-        $value = $request->value;
-        if ($field == 'price') {
-            $value = str_replace(',', '', $value);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
         }
-        if ($field == 'minimum_commission') {
-            $value = str_replace(',', '', $value);
+        // Find the vehicle by varaints_id, and optionally by int_colour and ex_colour
+        $query = Vehicles::where('varaints_id', $request->varaints_id);
+
+
+        if (!empty($request->int_colour)) {
+            $query->where('int_colour', $request->int_colour);
+        } else {
+            $query->whereNull('int_colour');
         }
-        $vehicle->$field = $value ?? 0;
-        $vehicle->save();
-        $currentDateTime = Carbon::now();
-        $vehicleslog = new Vehicleslog();
-        $vehicleslog->time = $currentDateTime->toTimeString();
-        $vehicleslog->date = $currentDateTime->toDateString();
-        $vehicleslog->status = 'Update Vehicles Selling Price / GP';
-        $vehicleslog->vehicles_id = $vehicle->id;
-        $vehicleslog->field = $field;
-        $vehicleslog->old_value = $oldValue;
-        $vehicleslog->new_value = $value;
-        $vehicleslog->category = "Sales";
-        $vehicleslog->created_by = auth()->user()->id;
-        $vehicleslog->role = Auth::user()->selectedRole;
-        $vehicleslog->save();
-    }
-    
-    return response()->json(['success' => 'Vehicle updated successfully']);
+
+        if (!empty($request->ex_colour)) {
+            $query->where('ex_colour', $request->ex_colour);
+        } else {
+            $query->whereNull('ex_colour');
+        }
+
+        $vehicles = $query->get();
+
+        if ($vehicles->count() <= 0) {
+            return response()->json(['error' => 'Vehicle not found'], 404);
+        }
+
+        foreach ($vehicles as $vehicle) {
+            $oldValue = $vehicle->{$request->field};
+            $field = $request->field;
+            $value = $request->value;
+            if ($field == 'price') {
+                $value = str_replace(',', '', $value);
+            }
+            if ($field == 'minimum_commission') {
+                $value = str_replace(',', '', $value);
+            }
+            $vehicle->$field = $value ?? 0;
+            $vehicle->save();
+            $currentDateTime = Carbon::now();
+            $vehicleslog = new Vehicleslog();
+            $vehicleslog->time = $currentDateTime->toTimeString();
+            $vehicleslog->date = $currentDateTime->toDateString();
+            $vehicleslog->status = 'Update Vehicles Selling Price / GP';
+            $vehicleslog->vehicles_id = $vehicle->id;
+            $vehicleslog->field = $field;
+            $vehicleslog->old_value = $oldValue;
+            $vehicleslog->new_value = $value;
+            $vehicleslog->category = "Sales";
+            $vehicleslog->created_by = auth()->user()->id;
+            $vehicleslog->role = Auth::user()->selectedRole;
+            $vehicleslog->save();
+        }
+
+        return response()->json(['success' => 'Vehicle updated successfully']);
     }
     public function custominspectionupdate(Request $request)
     {
@@ -3281,14 +3324,14 @@ public function allvariantpriceupdate(Request $request)
         return redirect()->route('vehicles.statuswise', ['status' => 'allstock']);
     }
     public function getReservation(Request $request)
-{
-    $vehicle_id = $request->input('vehicle_id');
-    $reservation = DB::table('vehicles')
-        ->where('id', $vehicle_id)
-        ->whereDate('reservation_end_date', '>=', Carbon::today())
-        ->first();
-    return response()->json($reservation);
-}
+    {
+        $vehicle_id = $request->input('vehicle_id');
+        $reservation = DB::table('vehicles')
+            ->where('id', $vehicle_id)
+            ->whereDate('reservation_end_date', '>=', Carbon::today())
+            ->first();
+        return response()->json($reservation);
+    }
     public function saveenhancement(Request $request)
     {
         $vehicleId = $request->input('vehicle_id');
@@ -3328,23 +3371,23 @@ public function allvariantpriceupdate(Request $request)
     }
     public function getVariants(Request $request)
     {
-    $vehicleId = $request->input('vehicle_id');
-    $vehicle = Vehicles::find($vehicleId);
-    if ($vehicle) {
-        $variantId = $vehicle->varaints_id;
-        $varaiant = Varaint::find($variantId);
-        $masterModelLinesId = $varaiant->master_model_lines_id;
-        $variants = Varaint::where('master_model_lines_id', $masterModelLinesId)
-                            ->get();
-                            return response()->json([
-                                'success' => true,
-                                'data' => [
-                                    'variants' => $variants,
-                                    'vin' => $vehicle->vin,  // Assuming the VIN is stored in the vehicle model
-                                ]
-                            ]);
-    }
-    return response()->json(['success' => false, 'message' => 'Vehicle not found']);
+        $vehicleId = $request->input('vehicle_id');
+        $vehicle = Vehicles::find($vehicleId);
+        if ($vehicle) {
+            $variantId = $vehicle->varaints_id;
+            $varaiant = Varaint::find($variantId);
+            $masterModelLinesId = $varaiant->master_model_lines_id;
+            $variants = Varaint::where('master_model_lines_id', $masterModelLinesId)
+                ->get();
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'variants' => $variants,
+                    'vin' => $vehicle->vin,  // Assuming the VIN is stored in the vehicle model
+                ]
+            ]);
+        }
+        return response()->json(['success' => false, 'message' => 'Vehicle not found']);
     }
     public function getcolours(Request $request)
     {
@@ -3356,19 +3399,19 @@ public function allvariantpriceupdate(Request $request)
         $intColorSelect = '<option value="">Select Interior Color</option>';
         foreach ($intColorOptions as $color) {
             $selected = $vehicle->int_colour == $color->id ? 'selected' : '';
-            $intColorSelect .= '<option value="'.$color->id.'" '.$selected.'>'.$color->name.'</option>';
+            $intColorSelect .= '<option value="' . $color->id . '" ' . $selected . '>' . $color->name . '</option>';
         }
         $extColorSelect = '<option value="">Select Exterior Color</option>';
         foreach ($extColorOptions as $color) {
             $selected = $vehicle->ex_colour == $color->id ? 'selected' : '';
-            $extColorSelect .= '<option value="'.$color->id.'" '.$selected.'>'.$color->name.'</option>';
+            $extColorSelect .= '<option value="' . $color->id . '" ' . $selected . '>' . $color->name . '</option>';
         }
         return response()->json([
             'intColorOptions' => $intColorSelect,
             'extColorOptions' => $extColorSelect,
             'vin' => $vin,
         ]);
-    } 
+    }
     public function saveenhancementcolor(Request $request)
     {
         $vehicleId = $request->input('vehicle_id');
@@ -3382,57 +3425,55 @@ public function allvariantpriceupdate(Request $request)
             $vehicle->ex_colour = $ext_color;
             $vehicle->save();
         }
-        if($oldValueint != $int_color)
-        {
-        $currentDateTime = Carbon::now();
-        $vehicleslog = new Vehicleslog();
-        $vehicleslog->time = $currentDateTime->toTimeString();
-        $vehicleslog->date = $currentDateTime->toDateString();
-        $vehicleslog->status = 'Update Vehicle Interior Colours';
-        $vehicleslog->vehicles_id = $vehicle->id;
-        $vehicleslog->field = "Interior Colour";
-        $vehicleslog->old_value = $oldValueint;
-        $vehicleslog->new_value = $int_color;
-        $vehicleslog->category = "Enhancement";
-        $vehicleslog->created_by = auth()->user()->id;
-        $vehicleslog->role = Auth::user()->selectedRole;
-        $vehicleslog->save();
+        if ($oldValueint != $int_color) {
+            $currentDateTime = Carbon::now();
+            $vehicleslog = new Vehicleslog();
+            $vehicleslog->time = $currentDateTime->toTimeString();
+            $vehicleslog->date = $currentDateTime->toDateString();
+            $vehicleslog->status = 'Update Vehicle Interior Colours';
+            $vehicleslog->vehicles_id = $vehicle->id;
+            $vehicleslog->field = "Interior Colour";
+            $vehicleslog->old_value = $oldValueint;
+            $vehicleslog->new_value = $int_color;
+            $vehicleslog->category = "Enhancement";
+            $vehicleslog->created_by = auth()->user()->id;
+            $vehicleslog->role = Auth::user()->selectedRole;
+            $vehicleslog->save();
         }
-        if($oldValueex != $ext_color)
-        {
-        $currentDateTime = Carbon::now();
-        $vehicleslog = new Vehicleslog();
-        $vehicleslog->time = $currentDateTime->toTimeString();
-        $vehicleslog->date = $currentDateTime->toDateString();
-        $vehicleslog->status = 'Update Vehicle Exterior Colours';
-        $vehicleslog->vehicles_id = $vehicle->id;
-        $vehicleslog->field = "Exterior Colour";
-        $vehicleslog->old_value = $oldValueex;
-        $vehicleslog->new_value = $ext_color;
-        $vehicleslog->category = "Enhancement";
-        $vehicleslog->created_by = auth()->user()->id;
-        $vehicleslog->role = Auth::user()->selectedRole;
-        $vehicleslog->save();
+        if ($oldValueex != $ext_color) {
+            $currentDateTime = Carbon::now();
+            $vehicleslog = new Vehicleslog();
+            $vehicleslog->time = $currentDateTime->toTimeString();
+            $vehicleslog->date = $currentDateTime->toDateString();
+            $vehicleslog->status = 'Update Vehicle Exterior Colours';
+            $vehicleslog->vehicles_id = $vehicle->id;
+            $vehicleslog->field = "Exterior Colour";
+            $vehicleslog->old_value = $oldValueex;
+            $vehicleslog->new_value = $ext_color;
+            $vehicleslog->category = "Enhancement";
+            $vehicleslog->created_by = auth()->user()->id;
+            $vehicleslog->role = Auth::user()->selectedRole;
+            $vehicleslog->save();
         }
         return redirect()->route('vehicles.statuswise', ['status' => 'allstock']);
-    }  
-    public function getCustomInspectionData(Request $request)
-{
-    // Find the vehicle by ID and fetch its custom inspection details
-    $vehicleId = $request->input('vehicle_id');
-    $vehicle = Vehicles::find($vehicleId); // Assume you have a Vehicle model
-
-    if ($vehicle) {
-        // Return the custom inspection number and status
-        return response()->json([
-            'custom_inspection_number' => $vehicle->custom_inspection_number, // Replace with the actual column
-            'custom_inspection_status' => $vehicle->custom_inspection_status  // Replace with the actual column
-        ]);
-    } else {
-        return response()->json(['error' => 'Vehicle not found'], 404);
     }
-}
-public function availablevehicles(Request $request)
+    public function getCustomInspectionData(Request $request)
+    {
+        // Find the vehicle by ID and fetch its custom inspection details
+        $vehicleId = $request->input('vehicle_id');
+        $vehicle = Vehicles::find($vehicleId); // Assume you have a Vehicle model
+
+        if ($vehicle) {
+            // Return the custom inspection number and status
+            return response()->json([
+                'custom_inspection_number' => $vehicle->custom_inspection_number, // Replace with the actual column
+                'custom_inspection_status' => $vehicle->custom_inspection_status  // Replace with the actual column
+            ]);
+        } else {
+            return response()->json(['error' => 'Vehicle not found'], 404);
+        }
+    }
+    public function availablevehicles(Request $request)
     {
         $useractivities = new UserActivities();
         $useractivities->activity = "View the Stock Status Wise";
@@ -3440,134 +3481,132 @@ public function availablevehicles(Request $request)
         $useractivities->save();
         // Variant detail computation
         $sales_persons = ModelHasRoles::join('users', 'model_has_roles.model_id', '=', 'users.id')
-        ->where('users.status', 'active')
-        ->where(function ($query) {
-            $query->where('model_has_roles.role_id', 7)
-                  ->orWhere('model_has_roles.model_id', 17);
-        })
-        ->orderBy('users.name', 'asc')
-        ->get();
+            ->where('users.status', 'active')
+            ->where(function ($query) {
+                $query->where('model_has_roles.role_id', 7)
+                    ->orWhere('model_has_roles.model_id', 17);
+            })
+            ->orderBy('users.name', 'asc')
+            ->get();
 
         $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
-        ->orderBy('id', 'DESC')
-        ->whereNot('category', 'Modified')
-        ->get();
+            ->orderBy('id', 'DESC')
+            ->whereNot('category', 'Modified')
+            ->get();
         $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
         $normalizationMap = [
-        'COO' => 'COO',
-        'SFX' => 'SFX',
-        'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
-        'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
-        'HeadLamp Type' => 'HeadLamp Type',
-        'infotainment type' => 'infotainment type',
-        'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
-        'Speakers' => 'Speakers',
-        'sunroof' => 'sunroof'
+            'COO' => 'COO',
+            'SFX' => 'SFX',
+            'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
+            'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
+            'HeadLamp Type' => 'HeadLamp Type',
+            'infotainment type' => 'infotainment type',
+            'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
+            'Speakers' => 'Speakers',
+            'sunroof' => 'sunroof'
         ];
-    foreach ($variants as $variant) {
-        if($variant->category != 'Modified')
-        {
-    $details = [];
-    $otherDetails = [];
-    foreach ($variant->variantItems as $item) {
-        $modelSpecification = $item->model_specification;
-        $modelSpecificationOption = $item->model_specification_option;
-        if ($modelSpecification && $modelSpecificationOption) {
-            $name = $modelSpecification->name;
-            $optionName = $modelSpecificationOption->name;
-            $normalized = null;
-            foreach ($normalizationMap as $key => $values) {
-                if (is_array($values)) {
-                    if (in_array($name, $values)) {
-                        $normalized = $key;
-                        break;
+        foreach ($variants as $variant) {
+            if ($variant->category != 'Modified') {
+                $details = [];
+                $otherDetails = [];
+                foreach ($variant->variantItems as $item) {
+                    $modelSpecification = $item->model_specification;
+                    $modelSpecificationOption = $item->model_specification_option;
+                    if ($modelSpecification && $modelSpecificationOption) {
+                        $name = $modelSpecification->name;
+                        $optionName = $modelSpecificationOption->name;
+                        $normalized = null;
+                        foreach ($normalizationMap as $key => $values) {
+                            if (is_array($values)) {
+                                if (in_array($name, $values)) {
+                                    $normalized = $key;
+                                    break;
+                                }
+                            } elseif ($name === $values) {
+                                $normalized = $key;
+                                break;
+                            }
+                        }
+
+                        if ($normalized) {
+                            $name = $normalized;
+                        }
+                        if (in_array(strtolower($optionName), ['yes', 'no'])) {
+                            if (strtolower($optionName) === 'yes') {
+                                $optionName = $name;
+                            } else {
+                                continue;
+                            }
+                        }
+                        if (in_array($name, $sequence)) {
+                            $index = array_search($name, $sequence);
+                            $details[$index] = $optionName;
+                        } else {
+                            $otherDetails[] = $optionName;
+                        }
                     }
-                } elseif ($name === $values) {
-                    $normalized = $key;
-                    break;
                 }
-            }
-    
-            if ($normalized) {
-                $name = $normalized;
-            }
-            if (in_array(strtolower($optionName), ['yes', 'no'])) {
-                if (strtolower($optionName) === 'yes') {
-                    $optionName = $name;
-                } else {
-                    continue;
-                }
-            }
-            if (in_array($name, $sequence)) {
-                $index = array_search($name, $sequence);
-                $details[$index] = $optionName;
-            } else {
-                $otherDetails[] = $optionName;
+                ksort($details);
+                $variant->detail = implode(', ', array_merge($details, $otherDetails));
+                $variant->save();
             }
         }
-    }
-    ksort($details);
-    $variant->detail = implode(', ', array_merge($details, $otherDetails));
-    $variant->save();
-    }
-}
         if ($request->ajax()) {
             $status = $request->input('status');
             $filters = $request->input('filters', []);
             \Log::info("Received Filters: ", $filters);
-                if($status === "Available Stock")
-                {
-                    $data = Vehicles::select( [
-                        'vehicles.id as id',
-                        'warehouse.name as location',
-                         'purchasing_order.po_date',
-                         'vehicles.estimation_date',
-                         'vehicles.sales_remarks',
-                         'vehicles.ppmmyyy',
-                         DB::raw("DATE_FORMAT(vehicles.reservation_start_date, '%d-%b-%Y') as reservation_start_date"),
-                        'vehicles.reservation_end_date',
-                        'vehicles.vin',
-                        'vehicles.ownership_type',
-                        'vehicles.inspection_date',
-                        'vehicles.inspection_status',
-                        'vehicles.engine',
-                        'vehicles.minimum_commission',
-                        'vehicles.custom_inspection_number',
-                        'vehicles.custom_inspection_status',
-                        'vehicles.gp',
-                        'inspection_grn.id as grn_inspectionid',
-                        'vehicles.territory',
-                        'vehicles.price as price',
-                        'inspection_pdi.id as pdi_inspectionid',
-                        'vehicles.grn_remark',
-                        'brands.brand_name',
-                        'varaints.name as variant',
-                        'varaints.model_detail',
-                        'varaints.id as variant_id',
-                        'varaints.detail as variant_detail',
-                       'countries.name as fd',
-                        'varaints.seat',
-                        'varaints.upholestry',
-                        'varaints.steering',
-                        'varaints.my',
-                        'varaints.fuel_type',
-                        'varaints.gearbox',
-                        'master_model_lines.model_line',
-                        'int_color.name as interior_color',
-                        'ex_color.name as exterior_color',
-                        'so.so_number',
-                        'purchasing_order.po_number',
-                        'movement_grns.grn_number',
-                        'sp.name as spn',
-                        'documents.import_type',
-                        'documents.owership',
-                        'documents.document_with',
-                        'bp.name as bpn',
-                        'so.so_date',
-                        'movements_reference.date',
-                        DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
-                        DB::raw("DATE_FORMAT(work_orders.date, '%Y-%m-%d') as work_order_date"),
-                        DB::raw("
+            if ($status === "Available Stock") {
+                $data = Vehicles::select([
+                    'vehicles.id as id',
+                    'warehouse.name as location',
+                    'purchasing_order.po_date',
+                    'vehicles.estimation_date',
+                    'vehicles.sales_remarks',
+                    'vehicles.ppmmyyy',
+                    DB::raw("DATE_FORMAT(vehicles.reservation_start_date, '%d-%b-%Y') as reservation_start_date"),
+                    'vehicles.reservation_end_date',
+                    'vehicles.vin',
+                    'vehicles.ownership_type',
+                    'vehicles.inspection_date',
+                    'vehicles.inspection_status',
+                    'vehicles.engine',
+                    'vehicles.minimum_commission',
+                    'vehicles.custom_inspection_number',
+                    'vehicles.custom_inspection_status',
+                    'vehicles.gp',
+                    'inspection_grn.id as grn_inspectionid',
+                    'vehicles.territory',
+                    'vehicles.price as price',
+                    'inspection_pdi.id as pdi_inspectionid',
+                    'vehicles.grn_remark',
+                    'brands.brand_name',
+                    'varaints.name as variant',
+                    'varaints.model_detail',
+                    'varaints.id as variant_id',
+                    'varaints.detail as variant_detail',
+                    'countries.name as fd',
+                    'varaints.seat',
+                    'varaints.upholestry',
+                    'varaints.steering',
+                    'varaints.my',
+                    'varaints.fuel_type',
+                    'varaints.gearbox',
+                    'master_model_lines.model_line',
+                    'int_color.name as interior_color',
+                    'ex_color.name as exterior_color',
+                    'so.so_number',
+                    'purchasing_order.po_number',
+                    'movement_grns.grn_number',
+                    'sp.name as spn',
+                    'documents.import_type',
+                    'documents.owership',
+                    'documents.document_with',
+                    'bp.name as bpn',
+                    'so.so_date',
+                    'movements_reference.date',
+                    DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
+                    DB::raw("DATE_FORMAT(work_orders.date, '%Y-%m-%d') as work_order_date"),
+                    DB::raw("
                         COALESCE(
                             (SELECT FORMAT(CAST(cost AS UNSIGNED), 0) FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
                             (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
@@ -3576,7 +3615,7 @@ public function availablevehicles(Request $request)
                         (SELECT netsuite_link FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1) as netsuite_link
                     ")
 
-                    ])
+                ])
                     ->leftJoin('w_o_vehicles', 'vehicles.id', '=', 'w_o_vehicles.vehicle_id')
                     ->leftJoin('work_orders', 'w_o_vehicles.work_order_id', '=', 'work_orders.id')
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
@@ -3594,31 +3633,31 @@ public function availablevehicles(Request $request)
                     ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                     ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                     ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                    ->leftJoin('inspection as inspection_grn', function($join) {
+                    ->leftJoin('inspection as inspection_grn', function ($join) {
                         $join->on('vehicles.id', '=', 'inspection_grn.vehicle_id')
-                             ->where('inspection_grn.stage', '=', 'GRN');
+                            ->where('inspection_grn.stage', '=', 'GRN');
                     })
                     ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
-                    ->leftJoin('inspection as inspection_pdi', function($join) {
+                    ->leftJoin('inspection as inspection_pdi', function ($join) {
                         $join->on('vehicles.id', '=', 'inspection_pdi.vehicle_id')
-                             ->where('inspection_pdi.stage', '=', 'PDI');
+                            ->where('inspection_pdi.stage', '=', 'PDI');
                     })
                     ->whereNull('vehicles.gdn_id')
                     ->where('vehicles.status', 'Approved');
-                    foreach ($filters as $columnName => $values) {
-                        if (in_array('__NULL__', $values)) {
-                            $data->whereNull($columnName); // Filter for NULL values
-                        } elseif (in_array('__Not EMPTY__', $values)) {
-                            $data->whereNotNull($columnName); // Filter for non-empty values
-                        } else {
-                            $data->whereIn($columnName, $values); // Regular filtering for selected values
-                        }
-                    }                               
-                    $data = $data->groupBy('vehicles.id');  
+                foreach ($filters as $columnName => $values) {
+                    if (in_array('__NULL__', $values)) {
+                        $data->whereNull($columnName); // Filter for NULL values
+                    } elseif (in_array('__Not EMPTY__', $values)) {
+                        $data->whereNotNull($columnName); // Filter for non-empty values
+                    } else {
+                        $data->whereIn($columnName, $values); // Regular filtering for selected values
+                    }
                 }
-        if ($data) {
-            return DataTables::of($data)->toJson();
-        }
+                $data = $data->groupBy('vehicles.id');
+            }
+            if ($data) {
+                return DataTables::of($data)->toJson();
+            }
         }
         return view('vehicles.available', ['salesperson' => $sales_persons]);
     }
@@ -3630,84 +3669,82 @@ public function availablevehicles(Request $request)
         $useractivities->save();
         // Variant detail computation
         $sales_persons = ModelHasRoles::join('users', 'model_has_roles.model_id', '=', 'users.id')
-        ->where('users.status', 'active')
-        ->where(function ($query) {
-            $query->where('model_has_roles.role_id', 7)
-                  ->orWhere('model_has_roles.model_id', 17);
-        })
-        ->orderBy('users.name', 'asc')
-        ->get();
-    
+            ->where('users.status', 'active')
+            ->where(function ($query) {
+                $query->where('model_has_roles.role_id', 7)
+                    ->orWhere('model_has_roles.model_id', 17);
+            })
+            ->orderBy('users.name', 'asc')
+            ->get();
+
 
         $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
-        ->orderBy('id', 'DESC')
-        ->whereNot('category', 'Modified')
-        ->get();
+            ->orderBy('id', 'DESC')
+            ->whereNot('category', 'Modified')
+            ->get();
         $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
         $normalizationMap = [
-        'COO' => 'COO',
-        'SFX' => 'SFX',
-        'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
-        'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
-        'HeadLamp Type' => 'HeadLamp Type',
-        'infotainment type' => 'infotainment type',
-        'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
-        'Speakers' => 'Speakers',
-        'sunroof' => 'sunroof'
+            'COO' => 'COO',
+            'SFX' => 'SFX',
+            'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
+            'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
+            'HeadLamp Type' => 'HeadLamp Type',
+            'infotainment type' => 'infotainment type',
+            'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
+            'Speakers' => 'Speakers',
+            'sunroof' => 'sunroof'
         ];
-    foreach ($variants as $variant) {
-        if($variant->category != 'Modified')
-        {
-    $details = [];
-    $otherDetails = [];
-    foreach ($variant->variantItems as $item) {
-        $modelSpecification = $item->model_specification;
-        $modelSpecificationOption = $item->model_specification_option;
-        if ($modelSpecification && $modelSpecificationOption) {
-            $name = $modelSpecification->name;
-            $optionName = $modelSpecificationOption->name;
-            $normalized = null;
-            foreach ($normalizationMap as $key => $values) {
-                if (is_array($values)) {
-                    if (in_array($name, $values)) {
-                        $normalized = $key;
-                        break;
+        foreach ($variants as $variant) {
+            if ($variant->category != 'Modified') {
+                $details = [];
+                $otherDetails = [];
+                foreach ($variant->variantItems as $item) {
+                    $modelSpecification = $item->model_specification;
+                    $modelSpecificationOption = $item->model_specification_option;
+                    if ($modelSpecification && $modelSpecificationOption) {
+                        $name = $modelSpecification->name;
+                        $optionName = $modelSpecificationOption->name;
+                        $normalized = null;
+                        foreach ($normalizationMap as $key => $values) {
+                            if (is_array($values)) {
+                                if (in_array($name, $values)) {
+                                    $normalized = $key;
+                                    break;
+                                }
+                            } elseif ($name === $values) {
+                                $normalized = $key;
+                                break;
+                            }
+                        }
+
+                        if ($normalized) {
+                            $name = $normalized;
+                        }
+                        if (in_array(strtolower($optionName), ['yes', 'no'])) {
+                            if (strtolower($optionName) === 'yes') {
+                                $optionName = $name;
+                            } else {
+                                continue;
+                            }
+                        }
+                        if (in_array($name, $sequence)) {
+                            $index = array_search($name, $sequence);
+                            $details[$index] = $optionName;
+                        } else {
+                            $otherDetails[] = $optionName;
+                        }
                     }
-                } elseif ($name === $values) {
-                    $normalized = $key;
-                    break;
                 }
-            }
-    
-            if ($normalized) {
-                $name = $normalized;
-            }
-            if (in_array(strtolower($optionName), ['yes', 'no'])) {
-                if (strtolower($optionName) === 'yes') {
-                    $optionName = $name;
-                } else {
-                    continue;
-                }
-            }
-            if (in_array($name, $sequence)) {
-                $index = array_search($name, $sequence);
-                $details[$index] = $optionName;
-            } else {
-                $otherDetails[] = $optionName;
+                ksort($details);
+                $variant->detail = implode(', ', array_merge($details, $otherDetails));
+                $variant->save();
             }
         }
-    }
-    ksort($details);
-    $variant->detail = implode(', ', array_merge($details, $otherDetails));
-    $variant->save();
-    }
-}
         if ($request->ajax()) {
             $status = $request->input('status');
             $filters = $request->input('filters', []);
-            if($status === "Delivered")
-            {
-                $data = Vehicles::select( [
+            if ($status === "Delivered") {
+                $data = Vehicles::select([
                     'vehicles.id',
                     'warehouse.name as location',
                     'purchasing_order.po_date',
@@ -3765,35 +3802,35 @@ public function availablevehicles(Request $request)
                     ")
 
                 ])
-                ->leftJoin('w_o_vehicles', 'vehicles.id', '=', 'w_o_vehicles.vehicle_id')
-                ->leftJoin('work_orders', 'w_o_vehicles.work_order_id', '=', 'work_orders.id')
-                ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
-                ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
-                ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                // ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
-                ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
-                ->leftJoin('movements_reference', 'movement_grns.movement_reference_id', '=', 'movements_reference.id')
-                ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
-                ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
-                ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
-                ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
-                ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
-                ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
-                ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
-                ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                ->leftJoin('inspection as inspection_grn', function($join) {
-                    $join->on('vehicles.id', '=', 'inspection_grn.vehicle_id')
-                         ->where('inspection_grn.stage', '=', 'GRN');
-                })
-                ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
-                ->leftJoin('inspection as inspection_pdi', function($join) {
-                    $join->on('vehicles.id', '=', 'inspection_pdi.vehicle_id')
-                         ->where('inspection_pdi.stage', '=', 'PDI');
-                })
-                ->whereNotNull('vehicles.inspection_date')
-                ->whereNotNull('vehicles.gdn_id')
-                ->whereNotNull('vehicles.movement_grn_id')
-                ->where('vehicles.status', 'Approved');
+                    ->leftJoin('w_o_vehicles', 'vehicles.id', '=', 'w_o_vehicles.vehicle_id')
+                    ->leftJoin('work_orders', 'w_o_vehicles.work_order_id', '=', 'work_orders.id')
+                    ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                    ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
+                    ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
+                    // ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                    ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
+                    ->leftJoin('movements_reference', 'movement_grns.movement_reference_id', '=', 'movements_reference.id')
+                    ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
+                    ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
+                    ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
+                    ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+                    ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+                    ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+                    ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+                    ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
+                    ->leftJoin('inspection as inspection_grn', function ($join) {
+                        $join->on('vehicles.id', '=', 'inspection_grn.vehicle_id')
+                            ->where('inspection_grn.stage', '=', 'GRN');
+                    })
+                    ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
+                    ->leftJoin('inspection as inspection_pdi', function ($join) {
+                        $join->on('vehicles.id', '=', 'inspection_pdi.vehicle_id')
+                            ->where('inspection_pdi.stage', '=', 'PDI');
+                    })
+                    ->whereNotNull('vehicles.inspection_date')
+                    ->whereNotNull('vehicles.gdn_id')
+                    ->whereNotNull('vehicles.movement_grn_id')
+                    ->where('vehicles.status', 'Approved');
                 foreach ($filters as $columnName => $values) {
                     if (in_array('__NULL__', $values)) {
                         // info($columnName);
@@ -3803,13 +3840,13 @@ public function availablevehicles(Request $request)
                     } else {
                         $data->whereIn($columnName, $values); // Regular filtering for selected values
                     }
-                } 
-                $data = $data->groupBy('vehicles.id');  
+                }
+                $data = $data->groupBy('vehicles.id');
             }
             if ($data) {
                 return DataTables::of($data)->toJson();
             }
-            }
+        }
         return view('vehicles.delivered', ['salesperson' => $sales_persons]);
     }
     public function dpvehicles(Request $request)
@@ -3820,82 +3857,80 @@ public function availablevehicles(Request $request)
         $useractivities->save();
         // Variant detail computation
         $sales_persons = ModelHasRoles::join('users', 'model_has_roles.model_id', '=', 'users.id')
-        ->where('users.status', 'active')
-        ->where(function ($query) {
-            $query->where('model_has_roles.role_id', 7)
-                  ->orWhere('model_has_roles.model_id', 17);
-        })
-        ->orderBy('users.name', 'asc')
-        ->get();
+            ->where('users.status', 'active')
+            ->where(function ($query) {
+                $query->where('model_has_roles.role_id', 7)
+                    ->orWhere('model_has_roles.model_id', 17);
+            })
+            ->orderBy('users.name', 'asc')
+            ->get();
         $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
-        ->orderBy('id', 'DESC')
-        ->whereNot('category', 'Modified')
-        ->get();
+            ->orderBy('id', 'DESC')
+            ->whereNot('category', 'Modified')
+            ->get();
         $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
         $normalizationMap = [
-        'COO' => 'COO',
-        'SFX' => 'SFX',
-        'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
-        'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
-        'HeadLamp Type' => 'HeadLamp Type',
-        'infotainment type' => 'infotainment type',
-        'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
-        'Speakers' => 'Speakers',
-        'sunroof' => 'sunroof'
+            'COO' => 'COO',
+            'SFX' => 'SFX',
+            'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
+            'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
+            'HeadLamp Type' => 'HeadLamp Type',
+            'infotainment type' => 'infotainment type',
+            'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
+            'Speakers' => 'Speakers',
+            'sunroof' => 'sunroof'
         ];
-    foreach ($variants as $variant) {
-        if($variant->category != 'Modified')
-        {
-    $details = [];
-    $otherDetails = [];
-    foreach ($variant->variantItems as $item) {
-        $modelSpecification = $item->model_specification;
-        $modelSpecificationOption = $item->model_specification_option;
-        if ($modelSpecification && $modelSpecificationOption) {
-            $name = $modelSpecification->name;
-            $optionName = $modelSpecificationOption->name;
-            $normalized = null;
-            foreach ($normalizationMap as $key => $values) {
-                if (is_array($values)) {
-                    if (in_array($name, $values)) {
-                        $normalized = $key;
-                        break;
+        foreach ($variants as $variant) {
+            if ($variant->category != 'Modified') {
+                $details = [];
+                $otherDetails = [];
+                foreach ($variant->variantItems as $item) {
+                    $modelSpecification = $item->model_specification;
+                    $modelSpecificationOption = $item->model_specification_option;
+                    if ($modelSpecification && $modelSpecificationOption) {
+                        $name = $modelSpecification->name;
+                        $optionName = $modelSpecificationOption->name;
+                        $normalized = null;
+                        foreach ($normalizationMap as $key => $values) {
+                            if (is_array($values)) {
+                                if (in_array($name, $values)) {
+                                    $normalized = $key;
+                                    break;
+                                }
+                            } elseif ($name === $values) {
+                                $normalized = $key;
+                                break;
+                            }
+                        }
+
+                        if ($normalized) {
+                            $name = $normalized;
+                        }
+                        if (in_array(strtolower($optionName), ['yes', 'no'])) {
+                            if (strtolower($optionName) === 'yes') {
+                                $optionName = $name;
+                            } else {
+                                continue;
+                            }
+                        }
+                        if (in_array($name, $sequence)) {
+                            $index = array_search($name, $sequence);
+                            $details[$index] = $optionName;
+                        } else {
+                            $otherDetails[] = $optionName;
+                        }
                     }
-                } elseif ($name === $values) {
-                    $normalized = $key;
-                    break;
                 }
-            }
-    
-            if ($normalized) {
-                $name = $normalized;
-            }
-            if (in_array(strtolower($optionName), ['yes', 'no'])) {
-                if (strtolower($optionName) === 'yes') {
-                    $optionName = $name;
-                } else {
-                    continue;
-                }
-            }
-            if (in_array($name, $sequence)) {
-                $index = array_search($name, $sequence);
-                $details[$index] = $optionName;
-            } else {
-                $otherDetails[] = $optionName;
+                ksort($details);
+                $variant->detail = implode(', ', array_merge($details, $otherDetails));
+                $variant->save();
             }
         }
-    }
-    ksort($details);
-    $variant->detail = implode(', ', array_merge($details, $otherDetails));
-    $variant->save();
-    }
-}
         if ($request->ajax()) {
             $status = $request->input('status');
             $filters = $request->input('filters', []);
-            if($status === "dpvehicles")
-            {
-                $data = Vehicles::select( [
+            if ($status === "dpvehicles") {
+                $data = Vehicles::select([
                     'vehicles.id',
                     'vehicles.movement_grn_id',
                     'vehicles.gdn_id',
@@ -3956,33 +3991,33 @@ public function availablevehicles(Request $request)
                     ")
 
                 ])
-                ->leftJoin('w_o_vehicles', 'vehicles.id', '=', 'w_o_vehicles.vehicle_id')
-                ->leftJoin('work_orders', 'w_o_vehicles.work_order_id', '=', 'work_orders.id')
-                ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
-                ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
-                ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                // ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
-                ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
-                ->leftJoin('movements_reference', 'movement_grns.movement_reference_id', '=', 'movements_reference.id')
-                ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
-                ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
-                ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
-                ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
-                ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
-                ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
-                ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
-                ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                ->leftJoin('inspection as inspection_grn', function($join) {
-                    $join->on('vehicles.id', '=', 'inspection_grn.vehicle_id')
-                         ->where('inspection_grn.stage', '=', 'GRN');
-                })
-                ->leftJoin('inspection as inspection_pdi', function($join) {
-                    $join->on('vehicles.id', '=', 'inspection_pdi.vehicle_id')
-                         ->where('inspection_pdi.stage', '=', 'PDI');
-                })
-                ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
-                ->where('vehicles.status', 'Approved')
-                ->where('purchasing_order.is_demand_planning_po', '=', '1');
+                    ->leftJoin('w_o_vehicles', 'vehicles.id', '=', 'w_o_vehicles.vehicle_id')
+                    ->leftJoin('work_orders', 'w_o_vehicles.work_order_id', '=', 'work_orders.id')
+                    ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                    ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
+                    ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
+                    // ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                    ->leftJoin('movement_grns', 'vehicles.movement_grn_id', '=', 'movement_grns.id')
+                    ->leftJoin('movements_reference', 'movement_grns.movement_reference_id', '=', 'movements_reference.id')
+                    ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
+                    ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
+                    ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
+                    ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+                    ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+                    ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+                    ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+                    ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
+                    ->leftJoin('inspection as inspection_grn', function ($join) {
+                        $join->on('vehicles.id', '=', 'inspection_grn.vehicle_id')
+                            ->where('inspection_grn.stage', '=', 'GRN');
+                    })
+                    ->leftJoin('inspection as inspection_pdi', function ($join) {
+                        $join->on('vehicles.id', '=', 'inspection_pdi.vehicle_id')
+                            ->where('inspection_pdi.stage', '=', 'PDI');
+                    })
+                    ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
+                    ->where('vehicles.status', 'Approved')
+                    ->where('purchasing_order.is_demand_planning_po', '=', '1');
                 foreach ($filters as $columnName => $values) {
                     if (in_array('__NULL__', $values)) {
                         // info($columnName);
@@ -3992,13 +4027,13 @@ public function availablevehicles(Request $request)
                     } else {
                         $data->whereIn($columnName, $values); // Regular filtering for selected values
                     }
-                } 
+                }
                 $data = $data->groupBy('vehicles.id');
-    }  
+            }
             if ($data) {
                 return DataTables::of($data)->toJson();
             }
-            }
+        }
         return view('vehicles.demandplaninigstock', ['salesperson' => $sales_persons]);
     }
     public function savesalesremarks(Request $request)
@@ -4067,7 +4102,7 @@ public function availablevehicles(Request $request)
         $quotationId = $request->input('quotation_id');
         $so = So::where('quotation_id', $quotationId)->first();
         $additionalData = $request->input('additional_data');
-        $variant = Varaint::where('name', $additionalData )->first();
+        $variant = Varaint::where('name', $additionalData)->first();
         if ($so) {
             $gdnCount = Vehicles::where('so_id', $so->id)->where('varaints_id', $variant->id)->whereNotNull('gdn_id')->count();
             // info($gdnCount);
@@ -4079,14 +4114,15 @@ public function availablevehicles(Request $request)
             }
         }
         return response()->json(['exists' => false]);
-    }   
-    public function Grnlist(Request $request) {
+    }
+    public function Grnlist(Request $request)
+    {
 
-        $grns = Movement::select('id','vin','reference_id','movement_grn_id')
-        ->with(['movementGrn:id,grn_number'])
-        ->whereHas('MovementGrn', function($query) {
-            $query->select('id','grn_number')->whereNotNull('grn_number');
-        })->get();
+        $grns = Movement::select('id', 'vin', 'reference_id', 'movement_grn_id')
+            ->with(['movementGrn:id,grn_number'])
+            ->whereHas('MovementGrn', function ($query) {
+                $query->select('id', 'grn_number')->whereNotNull('grn_number');
+            })->get();
 
         return view('grn_list.index', compact('grns'));
     }
