@@ -638,6 +638,9 @@ class SalesOrderController extends Controller
             // Generate latest quotation
             $file = $this->generateLatestQuotation($so->id);
 
+            // Cleanup any orphaned SO items and vehicles
+            $this->cleanupOrphanedSoItems($so->id);
+
             DB::commit();
             return redirect()->back()->with('success', 'Sales Order updated successfully.');
         } catch (\Exception $e) {
@@ -656,10 +659,22 @@ class SalesOrderController extends Controller
     {
         $logEntries = [];
 
-        // Fetch SO items to be deleted
+        // Get the SO ID from the variant
+        $soVariant = SoVariant::find($soVariantId);
+        $soId = $soVariant ? $soVariant->so_id : null;
+
+        // First try to find SO items by so_variant_id (primary method)
         $soItems = Soitems::whereIn('vehicles_id', $vehicleIds)
             ->where('so_variant_id', $soVariantId)
             ->get();
+
+        // If no items found by so_variant_id, try by so_id (fallback for older records)
+        if ($soItems->isEmpty() && $soId) {
+            $soItems = Soitems::whereIn('vehicles_id', $vehicleIds)
+                ->where('so_id', $soId)
+                ->whereNull('so_variant_id') // Only get items that don't have so_variant_id
+                ->get();
+        }
 
         if ($soItems->isEmpty()) {
             return $logEntries;
@@ -689,6 +704,93 @@ class SalesOrderController extends Controller
         }
 
         return $logEntries;
+    }
+
+    /**
+     * Cleanup orphaned SO items and vehicles that might be left after SO updates
+     */
+    public function cleanupOrphanedSoItems($soId)
+    {
+        try {
+            // Get all SO variants for this SO
+            $soVariantIds = SoVariant::where('so_id', $soId)->pluck('id');
+            
+            // Get all valid SO items (vehicles that are properly linked to SO variants)
+            $validSoItems = Soitems::whereIn('so_variant_id', $soVariantIds)->pluck('vehicles_id');
+            
+            // Also get SO items that might be linked by so_id (for older records)
+            // Only include SO items that don't have so_variant_id to avoid conflicts
+            $validSoItemsBySoId = Soitems::where('so_id', $soId)
+                ->whereNull('so_variant_id')
+                ->pluck('vehicles_id');
+            
+            // Combine both valid SO items
+            $allValidSoItems = $validSoItems->merge($validSoItemsBySoId)->unique();
+            
+            // Get all vehicles that have this SO ID
+            $soVehicles = Vehicles::where('so_id', $soId)->pluck('id');
+            
+            // Find orphaned vehicles (have so_id but no valid soitems)
+            $orphanedVehicles = $soVehicles->diff($allValidSoItems);
+            
+            if ($orphanedVehicles->count() > 0) {
+                // Clean up orphaned vehicles by setting their so_id to null
+                Vehicles::whereIn('id', $orphanedVehicles)->update(['so_id' => null]);
+                
+                Log::info('Cleaned up orphaned vehicles during SO update', [
+                    'so_id' => $soId,
+                    'orphaned_vehicle_count' => $orphanedVehicles->count(),
+                    'orphaned_vehicle_ids' => $orphanedVehicles->toArray(),
+                    'updated_by' => auth()->user()->email ?? 'system',
+                    'timestamp' => now(),
+                ]);
+            }
+            
+            // Clean up orphaned SO items that might exist
+            // First, clean up SO items linked by so_variant_id
+            $orphanedSoItemsByVariant = Soitems::whereIn('so_variant_id', $soVariantIds)
+                ->whereNotIn('vehicles_id', $allValidSoItems)
+                ->get();
+                
+            if ($orphanedSoItemsByVariant->count() > 0) {
+                foreach ($orphanedSoItemsByVariant as $orphanedItem) {
+                    $orphanedItem->delete();
+                }
+                
+                Log::info('Cleaned up orphaned SO items by variant during SO update', [
+                    'so_id' => $soId,
+                    'orphaned_so_items_count' => $orphanedSoItemsByVariant->count(),
+                    'updated_by' => auth()->user()->email ?? 'system',
+                    'timestamp' => now(),
+                ]);
+            }
+            
+            // Also clean up SO items linked by so_id that don't have valid vehicles
+            $orphanedSoItemsBySoId = Soitems::where('so_id', $soId)
+                ->whereNotIn('vehicles_id', $allValidSoItems)
+                ->get();
+                
+            if ($orphanedSoItemsBySoId->count() > 0) {
+                foreach ($orphanedSoItemsBySoId as $orphanedItem) {
+                    $orphanedItem->delete();
+                }
+                
+                Log::info('Cleaned up orphaned SO items by so_id during SO update', [
+                    'so_id' => $soId,
+                    'orphaned_so_items_count' => $orphanedSoItemsBySoId->count(),
+                    'updated_by' => auth()->user()->email ?? 'system',
+                    'timestamp' => now(),
+                ]);
+            }
+            
+        } catch (\Exception $e) {
+            Log::error('Error during cleanup of orphaned SO items', [
+                'so_id' => $soId,
+                'error' => $e->getMessage(),
+                'updated_by' => auth()->user()->email ?? 'system',
+                'timestamp' => now(),
+            ]);
+        }
     }
 
     public function generateLatestQuotation($id)
@@ -1420,6 +1522,9 @@ class SalesOrderController extends Controller
             $solog->so_id = $so->id;
             $solog->role = Auth::user()->selectedRole;
             $solog->save();
+
+            // Cleanup any orphaned SO items and vehicles
+            $this->cleanupOrphanedSoItems($so->id);
 
             DB::commit();
             return redirect()->back()->with('success', 'Sales Order updated successfully.');
