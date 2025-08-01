@@ -1431,10 +1431,26 @@ public function getBrandsAndModelLines(Request $request)
         foreach ($groupedTransitions as $po_number => $transactions) {
         foreach ($transactions as $index => $transaction) {
         $transaction->row_number = $index + 1;
-        // Always show total vehicles count in PO, not just vehicles in this transaction
-        $transaction->vehicle_count = Vehicles::where('purchasing_order_id', $id)
-                                        ->where('status', 'approved')
-                                        ->count();
+        
+        // Check if this is a vehicle-specific payment or general PO payment
+        if ($transaction->transaction_type == "Initiate Payment Request") {
+            // For vehicle payments, count actual vehicles involved in this transaction
+            $transaction->vehicle_count = \DB::table('vehicles_supplier_account_transaction')
+                                            ->where('sat_id', $transaction->id)
+                                            ->count();
+            
+            // Fallback: if vehicle count is 0, show total vehicles in PO
+            if ($transaction->vehicle_count == 0) {
+                $transaction->vehicle_count = Vehicles::where('purchasing_order_id', $id)
+                                                ->where('status', 'approved')
+                                                ->count();
+            }
+        } else {
+            // For other transaction types, show total vehicles in PO
+            $transaction->vehicle_count = Vehicles::where('purchasing_order_id', $id)
+                                            ->where('status', 'approved')
+                                            ->count();
+        }
         }
         }
         $accounts = SupplierAccount::with('supplier')->where('id', $id)->first();
