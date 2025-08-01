@@ -1431,8 +1431,9 @@ public function getBrandsAndModelLines(Request $request)
         foreach ($groupedTransitions as $po_number => $transactions) {
         foreach ($transactions as $index => $transaction) {
         $transaction->row_number = $index + 1;
-        $transaction->vehicle_count = \DB::table('vehicles_supplier_account_transaction')
-                                        ->where('sat_id', $transaction->id)
+        // Always show total vehicles count in PO, not just vehicles in this transaction
+        $transaction->vehicle_count = Vehicles::where('purchasing_order_id', $id)
+                                        ->where('status', 'approved')
                                         ->count();
         }
         }
@@ -4703,22 +4704,22 @@ public function submitPaymentDetails(Request $request)
         // info($remarks);
         $createdBy = auth()->user()->id; // Assuming you use authentication and want to log the user who created the record
         // Get purchase order details
-        $purchaseOrder = PurchasingOrder::find($purchaseOrderId);
-        if (!$purchaseOrder) { // Check if purchase order exists
+        $purchasingOrder = PurchasingOrder::find($purchaseOrderId);
+        if (!$purchasingOrder) { // Check if purchase order exists
             return response()->json(['error' => 'Purchase order not found'], 404);
         }
-        $supplierAccountId = $purchaseOrder->vendors_id;
+        $supplierAccountId = $purchasingOrder->vendors_id;
         // Check if supplier account exists, if not create a new one
         $supplierAccount = SupplierAccount::where('suppliers_id', $supplierAccountId)->first();
         if (!$supplierAccount) {
             $supplierAccount = new SupplierAccount();
             $supplierAccount->suppliers_id = $supplierAccountId;
-            $supplierAccount->currency = $purchaseOrder->currency;
+            $supplierAccount->currency = $purchasingOrder->currency;
             if (!$supplierAccount->save()) {
                 return response()->json(['error' => 'Failed to create supplier account'], 500);
             }
         }
-        $accountCurrency = $purchaseOrder->currency;
+        $accountCurrency = $purchasingOrder->currency;
         $transactionType = 'Initiate Payment Request';
         $status = 'Initiate Payment Request';
         $transactionAmount = 0;
@@ -4783,6 +4784,68 @@ public function submitPaymentDetails(Request $request)
             return response()->json(['error' => 'Failed to save purchased order paid amounts'], 500);
         }
 
+        // Check DP PO or not (Toyota PO handling)
+        if($purchasingOrder->is_demand_planning_purchase_order)
+        {
+            $pfiId = $purchasingOrder->PFIPurchasingOrder->pfi->id ?? '';
+            $pfiItemLatest = PfiItem::where('pfi_id', $pfiId)
+                                ->where('is_parent', false)
+                                ->first();
+            // Utilization qty update only for Toyota PO
+            if($pfiItemLatest) {
+                // only toyota PFI have child , so if child exist it will be toyota PO
+                $initiatedQtyUpdatedLOIItemIds = [];
+                
+                // Get vehicles for Toyota PO handling
+                if ($paymentOption == 'vehicle') {
+                    $vehicles = $request->input('vehicles');
+                } else {
+                    $vehicles = Vehicles::where('purchasing_order_id', $purchaseOrderId)
+                                        ->where('status', 'approved')
+                                        ->get();
+                }
+                
+                foreach ($vehicles as $vehicle) {
+                    $vehicle = Vehicles::find($vehicle['vehicleId']);
+                    $masterModel = MasterModel::find($vehicle->model_id);
+                    $possibleModels = MasterModel::where('model', $masterModel->model)
+                                            ->where('sfx',  $masterModel->sfx)
+                                            ->pluck('id')->toArray();
+                    $pfiItem = PfiItemPurchaseOrder::where('purchase_order_id', $purchasingOrder->id)
+                                                        ->whereIn('master_model_id', $possibleModels)
+                                                        ->first();
+                    $loiItem = LetterOfIndentItem::whereHas('pfiItems', function($query)use($pfiItem) {
+                        $query->where('is_parent', false)
+                        ->where('pfi_id', $pfiItem->pfi_id)
+                        ->where('parent_pfi_item_id', $pfiItem->pfi_item_id);
+                    })
+                    ->select("*", DB::raw('COALESCE(quantity, 0) - COALESCE(utilized_quantity, 0) as remaining_quantity'))
+                    ->havingRaw('remaining_quantity - po_payment_initiated_quantity > 0')
+                    ->first();
+                    // need to check with payment initiated qty with remaining qty
+                    if($loiItem) {
+                        // update po_payment_initiated_quantity and keep ids in array
+                        $current_po_payment_initiated_quantity = $loiItem->po_payment_initiated_quantity;
+
+                        $loiItem->po_payment_initiated_quantity = $current_po_payment_initiated_quantity + 1;
+                        $loiItem->save();
+
+                        $initiatedQtyUpdatedLOIItemIds[] = $loiItem->id;
+                    }else{
+                        // revise updated qty of po_payment_initiated_quantity
+                        foreach($initiatedQtyUpdatedLOIItemIds as $LOIItemId) {
+                            $item = LetterOfIndentItem::find($LOIItemId);
+                            $current_po_payment_initiated_quantity = $item->po_payment_initiated_quantity;
+
+                            $item->po_payment_initiated_quantity = $current_po_payment_initiated_quantity - 1;
+                            $item->save();
+                        }
+                        return response()->json(['error' => 'LOI Quantity not available to full fill request'], 500);
+                    }
+                }
+            }
+        }
+
         // If vehicles are involved, store in vehicles_supplier_account_transaction table
         if ($paymentOption == 'vehicle' || ($paymentOption == 'purchasedOrder' && $purchasedOrderOption == 'equalDivided')) {
             if ($paymentOption == 'vehicle') {
@@ -4792,61 +4855,6 @@ public function submitPaymentDetails(Request $request)
                                     ->where('status', 'approved')
                                     ->get();
             }
-          
-            $purchasingOrder = PurchasingOrder::find($purchaseOrderId);
-              // chcek DP PO or not
-
-              if($purchasingOrder->is_demand_planning_purchase_order)
-               {
-                    $pfiId = $purchasingOrder->PFIPurchasingOrder->pfi->id ?? '';
-                    $pfiItemLatest = PfiItem::where('pfi_id', $pfiId)
-                                        ->where('is_parent', false)
-                                        ->first();
-                    // Utilization qty update only for Toyota PO
-                    if($pfiItemLatest) {
-                        // only toyota PFI have child , so if child exist it will be toyota PO
-                        $initiatedQtyUpdatedLOIItemIds = [];
-                        foreach ($vehicles as $vehicle) {
-                            $vehicle = Vehicles::find($vehicle['vehicleId']);
-                            $masterModel = MasterModel::find($vehicle->model_id);
-                            $possibleModels = MasterModel::where('model', $masterModel->model)
-                                                    ->where('sfx',  $masterModel->sfx)
-                                                    ->pluck('id')->toArray();
-                            $pfiItem = PfiItemPurchaseOrder::where('purchase_order_id', $purchasingOrder->id)
-                                                                ->whereIn('master_model_id', $possibleModels)
-                                                                ->first();
-                            $loiItem = LetterOfIndentItem::whereHas('pfiItems', function($query)use($pfiItem) {
-                                $query->where('is_parent', false)
-                                ->where('pfi_id', $pfiItem->pfi_id)
-                                ->where('parent_pfi_item_id', $pfiItem->pfi_item_id);
-                            })
-                            ->select("*", DB::raw('COALESCE(quantity, 0) - COALESCE(utilized_quantity, 0) as remaining_quantity'))
-                            ->havingRaw('remaining_quantity - po_payment_initiated_quantity > 0')
-                            ->first();
-                            // need to check with payment initiated qty with remaining qty
-                            if($loiItem) {
-                                // update po_payment_initiated_quantity and keep ids in array
-                                $current_po_payment_initiated_quantity = $loiItem->po_payment_initiated_quantity;
-
-                                $loiItem->po_payment_initiated_quantity = $current_po_payment_initiated_quantity + 1;
-                                $loiItem->save();
-
-                                $initiatedQtyUpdatedLOIItemIds[] = $loiItem->id;
-                            }else{
-                                // revise updated qty of po_payment_initiated_quantity
-                                foreach($initiatedQtyUpdatedLOIItemIds as $LOIItemId) {
-                                    $item = LetterOfIndentItem::find($LOIItemId);
-                                    $current_po_payment_initiated_quantity = $item->po_payment_initiated_quantity;
-
-                                    $item->po_payment_initiated_quantity = $current_po_payment_initiated_quantity - 1;
-                                    $item->save();
-                                }
-                                return response()->json(['error' => 'LOI Quantity not available to full fill request'], 500);
-                            }
-                        }
-                    
-                    }
-                }
 
             foreach ($vehicles as $vehicle) {
                 $vehiclesSupplierAccountTransaction = new VehiclesSupplierAccountTransaction();
@@ -4860,7 +4868,6 @@ public function submitPaymentDetails(Request $request)
                     return response()->json(['error' => 'Failed to save vehicle supplier account transaction'], 500);
                 }
             }
-           
         }
         $purchasingordereventsLog = New PurchasingOrderEventsLog();
         $purchasingordereventsLog->event_type = "Payment Initation";
