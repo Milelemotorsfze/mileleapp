@@ -4726,15 +4726,14 @@ public function submitPaymentDetails(Request $request)
         if ($paymentOption == 'purchasedOrder') {
             $purchasedOrderOption = $request->input('purchasedOrderOption');
             $transactionAmount = $request->input('amount');
-            // Handle equalDivided case
+            // Handle equalDivided case - store the total amount, not divided amount
             if ($purchasedOrderOption == 'equalDivided') {
                 $vehicles = Vehicles::where('purchasing_order_id', $purchaseOrderId)
                                     ->where('status', 'approved')
                                     ->get();
                 $totalVehicles = $vehicles->count();
-                if ($totalVehicles > 0) {
-                    $transactionAmount = $transactionAmount / $totalVehicles;
-                }
+                // Keep the original total amount for transaction_amount, don't divide
+                // The division will be handled in vehicle-specific records
             }
         } else {
             $vehicles = $request->input('vehicles');
@@ -4862,7 +4861,16 @@ public function submitPaymentDetails(Request $request)
                 $vehiclesSupplierAccountTransaction->sat_id = $supplierAccountTransaction->id;
                 $vehiclesSupplierAccountTransaction->popa_id = $purchasedorderpaidamounts->id;
                 $vehiclesSupplierAccountTransaction->vpa_id = $vendorpayment->id;
-                $vehiclesSupplierAccountTransaction->amount = $vehicle['initiatedPrice'];
+                
+                // Calculate amount for each vehicle
+                if ($paymentOption == 'purchasedOrder' && $purchasedOrderOption == 'equalDivided') {
+                    // For equalDivided, divide the total amount equally among vehicles
+                    $vehiclesSupplierAccountTransaction->amount = $request->input('amount') / $totalVehicles;
+                } else {
+                    // For other cases, use the vehicle's initiated price
+                    $vehiclesSupplierAccountTransaction->amount = $vehicle['initiatedPrice'];
+                }
+                
                 $vehiclesSupplierAccountTransaction->status = 'pending';
                 if (!$vehiclesSupplierAccountTransaction->save()) {
                     return response()->json(['error' => 'Failed to save vehicle supplier account transaction'], 500);
