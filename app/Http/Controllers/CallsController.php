@@ -457,17 +457,19 @@ class CallsController extends Controller
 
         if ($request->input('sales-option') == "auto-assign") {
             Log::info("Starting auto-assignment for lead creation.");
-            $sales_person_id = $this->autoAssignSalesPerson(
+            $assignmentResult = $this->autoAssignSalesPerson(
                 $request->input('email'),
                 $request->input('phone'),
                 $request->input('language'),
                 $request->input('location')
             );
+            $sales_person_id = $assignmentResult['user_id'];
+            $assignmentReason = $assignmentResult['reason'];
             if ($sales_person_id) {
                 $salesPersonName = User::find($sales_person_id)?->name;
-                Log::info("Final Assigned Sales Person: $salesPersonName (ID: $sales_person_id)");
+                Log::info("Final Assigned Sales Person: $salesPersonName (ID: $sales_person_id) - Reason: $assignmentReason");
             } else {
-                Log::warning("No available sales person found for assignment.");
+                Log::warning("No available sales person found for assignment - Reason: $assignmentReason");
             }
         } else {
             $sales_person_id = $request->input('sales_person_id');
@@ -1269,21 +1271,24 @@ class CallsController extends Controller
                 if (!empty($rawPhoneForAutoAssign) && $rawPhoneForAutoAssign[0] !== '+') {
                     $rawPhoneForAutoAssign = '+' . $rawPhoneForAutoAssign;
                 }
-
+                
                 Log::info("Auto-assigning lead for: Email=$email, Phone=$rawPhoneForAutoAssign, Language=$language, Location=$location");
                 
-                $sales_person_id = $this->autoAssignSalesPerson(
+                $assignmentResult = $this->autoAssignSalesPerson(
                     $email,
                     $rawPhoneForAutoAssign,
                     $language,
                     $location
                 );
-
+                
+                $sales_person_id = $assignmentResult['user_id'];
+                $assignmentReason = $assignmentResult['reason'];
+                
                 if ($sales_person_id) {
                     $assignedPerson = User::find($sales_person_id);
-                    Log::info("Auto-assigned to: " . ($assignedPerson ? $assignedPerson->name : 'Unknown') . " (ID: $sales_person_id)");
+                    Log::info("Auto-assigned to: " . ($assignedPerson ? $assignedPerson->name : 'Unknown') . " (ID: $sales_person_id) - Reason: $assignmentReason");
                 } else {
-                    Log::warning("No suitable sales person found for auto-assignment");
+                    Log::warning("No suitable sales person found for auto-assignment - Reason: $assignmentReason");
                     $errorDescription .= 'No suitable sales person found for auto-assignment. ';
                 }
 
@@ -1883,87 +1888,19 @@ class CallsController extends Controller
         
         if ($request->input('sales-option') == "auto-assign") {
             Log::info("Starting auto-assignment for lead creation.");
-
-            $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
-            $excluded_user_ids = array_unique(array_merge($excluded_user_ids, [204, 42, 20])); // Always exclude Nabia Kamran (204), Abdul Azeem Liaqat (42), Hanif Azad (20)
-            $email = $request->input('email');
-            $phone = $request->input('phone');
-            $language = $request->input('language');
-            $location = $request->input('location');
-            $sales_person_id = null;
-
-            $cleanedPhone = $phone ? ltrim(preg_replace('/[^\d+]/', '', $phone), '+') : '';
-
-            $isAfrican = false;
-            if ($location && in_array($location, Country::where('is_african_country', 1)->pluck('name')->toArray())) {
-                $isAfrican = true;
-            }
-
-            $matchByEmail = !empty($email) ? Calls::where('email', $email)->whereNotNull('email')->orderBy('created_at', 'desc')->first() : null;
-            $matchByPhone = !empty($cleanedPhone) ? Calls::where('phone', 'LIKE', '%' . $cleanedPhone)->whereNotNull('phone')->orderBy('created_at', 'desc')->first() : null;
-
-            if ($matchByEmail && !in_array($matchByEmail->sales_person, $excluded_user_ids)) {
-                $sales_person_id = $matchByEmail->sales_person;
-                Log::info("Matched by Email (ANY rep) - Assigning to Sales Person ID: $sales_person_id");
-            } elseif ($matchByPhone && !in_array($matchByPhone->sales_person, $excluded_user_ids)) {
-                $sales_person_id = $matchByPhone->sales_person;
-                Log::info("Matched by Phone (ANY rep) - Assigning to Sales Person ID: $sales_person_id");
+            $assignmentResult = $this->autoAssignSalesPerson(
+                $request->input('email'),
+                $request->input('phone'),
+                $request->input('language'),
+                $request->input('location')
+            );
+            $sales_person_id = $assignmentResult['user_id'];
+            $assignmentReason = $assignmentResult['reason'];
+            if ($sales_person_id) {
+                $salesPersonName = User::find($sales_person_id)?->name;
+                Log::info("Final Assigned Sales Person: $salesPersonName (ID: $sales_person_id) - Reason: $assignmentReason");
             } else {
-                // fallback to round robin logic
-            }
-
-            if (!$sales_person_id && !empty($language)) {
-                $langMatched = SalesPersonLaugauges::whereIn('sales_person', $excluded_user_ids)
-                    ->where('language', $language)
-                    ->pluck('sales_person')
-                    ->toArray();
-
-                if (count($langMatched) === 1) {
-                    $sales_person_id = $langMatched[0];
-                } elseif (count($langMatched) > 1) {
-                    $lowestLeadLang = ModelHasRoles::select('model_id')
-                        ->where('role_id', 7)
-                        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-                        ->where('users.status', 'active')
-                        ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
-                        ->join('sales_person_laugauges', 'model_has_roles.model_id', '=', 'sales_person_laugauges.sales_person')
-                        ->whereIn('model_has_roles.model_id', $excluded_user_ids)
-                        ->whereIn('model_has_roles.model_id', $langMatched)
-                        ->where('sales_person_laugauges.language', $language)
-                        ->where('calls.status', 'New')
-                        ->groupBy('calls.sales_person')
-                        ->orderByRaw('COUNT(calls.id) ASC')
-                        ->first();
-
-                    if ($lowestLeadLang) {
-                        $sales_person_id = $lowestLeadLang->model_id;
-                    }
-                }
-            }
-
-            if (!$sales_person_id) {
-                $roundRobinQuery = ModelHasRoles::select('model_id')
-                    ->where('role_id', 7)
-                    ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-                    ->where('users.status', 'active')
-                    ->leftJoin('calls', function ($join) {
-                        $join->on('model_has_roles.model_id', '=', 'calls.sales_person')
-                            ->where('calls.status', 'New');
-                    })
-                    ->whereIn('model_has_roles.model_id', $excluded_user_ids);
-
-                if ($isAfrican) {
-                    $roundRobinQuery->where('users.is_dubai_sales_rep', 'Yes');
-                }
-
-                $fallbackPerson = $roundRobinQuery
-                    ->groupBy('model_has_roles.model_id')
-                    ->orderByRaw('COALESCE(COUNT(calls.id), 0) ASC')
-                    ->first();
-
-                if ($fallbackPerson) {
-                    $sales_person_id = $fallbackPerson->model_id;
-                }
+                Log::warning("No available sales person found for assignment - Reason: $assignmentReason");
             }
         } else {
             $sales_person_id = $request->input('sales_person_id');
@@ -2161,6 +2098,7 @@ class CallsController extends Controller
      */
     private function autoAssignSalesPerson($email, $phone, $language, $location)
     {
+        $assignmentReason = '';
         $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
         $excluded_user_ids = array_unique(array_merge($excluded_user_ids, [204, 42, 20])); // Always exclude Nabia Kamran (204), Abdul Azeem Liaqat (42), Hanif Azad (20)
         $allowed_users = [
@@ -2193,15 +2131,18 @@ class CallsController extends Controller
             $matchedUser = User::find($matchByEmail->sales_person);
             if ($matchedUser && in_array($matchedUser->name, $allowed_users)) {
                 $previousSalesPerson = $matchByEmail->sales_person;
+                $assignmentReason = "Previous assignment found by email - assigned to {$matchedUser->name}";
+                Log::info("Auto-assignment reason: $assignmentReason");
+                return ['user_id' => $previousSalesPerson, 'reason' => $assignmentReason];
             }
         } elseif ($matchByPhone && in_array($matchByPhone->sales_person, $allowed_user_ids)) {
             $matchedUser = User::find($matchByPhone->sales_person);
             if ($matchedUser && in_array($matchedUser->name, $allowed_users)) {
                 $previousSalesPerson = $matchByPhone->sales_person;
+                $assignmentReason = "Previous assignment found by phone - assigned to {$matchedUser->name}";
+                Log::info("Auto-assignment reason: $assignmentReason");
+                return ['user_id' => $previousSalesPerson, 'reason' => $assignmentReason];
             }
-        }
-        if ($previousSalesPerson) {
-            return $previousSalesPerson;
         }
 
         // 2. Proceed with New Assignment
@@ -2226,10 +2167,22 @@ class CallsController extends Controller
                 ->orderBy('lead_count', 'asc')
                 ->first();
             if ($leastLeadsUser) {
-                return $leastLeadsUser->sales_person;
+                $assignedUser = User::find($leastLeadsUser->sales_person);
+                $assignmentReason = "English language - Round robin assignment to {$assignedUser->name} (has {$leastLeadsUser->lead_count} pending leads)";
+                Log::info("Auto-assignment reason: $assignmentReason");
+                return ['user_id' => $leastLeadsUser->sales_person, 'reason' => $assignmentReason];
             } else {
                 // If no leads, just pick the first eligible user
-                return !empty($eligibleUserIds) ? $eligibleUserIds[0] : null;
+                if (!empty($eligibleUserIds)) {
+                    $firstUser = User::find($eligibleUserIds[0]);
+                    $assignmentReason = "English language - No pending leads found, assigned to first eligible user {$firstUser->name}";
+                    Log::info("Auto-assignment reason: $assignmentReason");
+                    return ['user_id' => $eligibleUserIds[0], 'reason' => $assignmentReason];
+                } else {
+                    $assignmentReason = "No eligible users found for English language";
+                    Log::warning("Auto-assignment failed: $assignmentReason");
+                    return ['user_id' => null, 'reason' => $assignmentReason];
+                }
             }
         } else {
             // Non-English language
@@ -2238,7 +2191,10 @@ class CallsController extends Controller
                 ->pluck('sales_person')
                 ->toArray();
             if (count($langMatched) === 1) {
-                return $langMatched[0];
+                $assignedUser = User::find($langMatched[0]);
+                $assignmentReason = "Non-English language ({$language}) - Single language match to {$assignedUser->name}";
+                Log::info("Auto-assignment reason: $assignmentReason");
+                return ['user_id' => $langMatched[0], 'reason' => $assignmentReason];
             } elseif (count($langMatched) > 1) {
                 // Round robin among those who speak the language
                 $leastLeadsUser = Calls::whereIn('sales_person', $langMatched)
@@ -2248,9 +2204,15 @@ class CallsController extends Controller
                     ->orderBy('lead_count', 'asc')
                     ->first();
                 if ($leastLeadsUser) {
-                    return $leastLeadsUser->sales_person;
+                    $assignedUser = User::find($leastLeadsUser->sales_person);
+                    $assignmentReason = "Non-English language ({$language}) - Multiple language matches, round robin to {$assignedUser->name} (has {$leastLeadsUser->lead_count} pending leads)";
+                    Log::info("Auto-assignment reason: $assignmentReason");
+                    return ['user_id' => $leastLeadsUser->sales_person, 'reason' => $assignmentReason];
                 } else {
-                    return $langMatched[0];
+                    $firstLangUser = User::find($langMatched[0]);
+                    $assignmentReason = "Non-English language ({$language}) - Multiple language matches, no pending leads, assigned to first language match {$firstLangUser->name}";
+                    Log::info("Auto-assignment reason: $assignmentReason");
+                    return ['user_id' => $langMatched[0], 'reason' => $assignmentReason];
                 }
             } else {
                 // No salesperson speaks the language, assign to any available salesperson
@@ -2261,9 +2223,21 @@ class CallsController extends Controller
                     ->orderBy('lead_count', 'asc')
                     ->first();
                 if ($leastLeadsUser) {
-                    return $leastLeadsUser->sales_person;
+                    $assignedUser = User::find($leastLeadsUser->sales_person);
+                    $assignmentReason = "Non-English language ({$language}) - No language match, round robin to {$assignedUser->name} (has {$leastLeadsUser->lead_count} pending leads)";
+                    Log::info("Auto-assignment reason: $assignmentReason");
+                    return ['user_id' => $leastLeadsUser->sales_person, 'reason' => $assignmentReason];
                 } else {
-                    return !empty($eligibleUserIds) ? $eligibleUserIds[0] : null;
+                    if (!empty($eligibleUserIds)) {
+                        $firstUser = User::find($eligibleUserIds[0]);
+                        $assignmentReason = "Non-English language ({$language}) - No language match, no pending leads, assigned to first eligible user {$firstUser->name}";
+                        Log::info("Auto-assignment reason: $assignmentReason");
+                        return ['user_id' => $eligibleUserIds[0], 'reason' => $assignmentReason];
+                    } else {
+                        $assignmentReason = "Non-English language ({$language}) - No eligible users found";
+                        Log::warning("Auto-assignment failed: $assignmentReason");
+                        return ['user_id' => null, 'reason' => $assignmentReason];
+                    }
                 }
             }
         }
@@ -2282,6 +2256,15 @@ class CallsController extends Controller
             ->orderByRaw('COALESCE(COUNT(calls.id), 0) ASC')
             ->first();
         
-        return $anyUser ? $anyUser->model_id : null;
+        if ($anyUser) {
+            $fallbackUser = User::find($anyUser->model_id);
+            $assignmentReason = "Final fallback - Assigned to {$fallbackUser->name} from allowed users list";
+            Log::info("Auto-assignment reason: $assignmentReason");
+            return ['user_id' => $anyUser->model_id, 'reason' => $assignmentReason];
+        } else {
+            $assignmentReason = "No eligible users found in final fallback";
+            Log::warning("Auto-assignment failed: $assignmentReason");
+            return ['user_id' => null, 'reason' => $assignmentReason];
+        }
     }
 }
