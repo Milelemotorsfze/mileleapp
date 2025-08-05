@@ -1146,38 +1146,38 @@ class WorkOrderController extends Controller
                     preg_match_all('/@\[([^\]]+)\]/', $comment['text'] ?? '', $matches);
                     $mentionedUserNames = $matches[1];
 
-                    // if (!empty($mentionedUserNames)) {
-                    //     $mentionedUsers = User::whereIn('name', $mentionedUserNames)->get();
+                    if (!empty($mentionedUserNames)) {
+                        $mentionedUsers = User::whereIn('name', $mentionedUserNames)->get();
 
-                    //     foreach ($mentionedUsers as $user) {
-                    //         // Queue email notifications for efficiency
-                    //         dispatch(function () use ($workOrder, $newCommentId, $user) {
-                    //             $template = [
-                    //                 'from' => 'no-reply@milele.com',
-                    //                 'from_name' => 'Milele Matrix'
-                    //             ];
-                    //             $customerName = $workOrder->customer_name ?? 'Unknown Customer';
-                    //             $subject = "You were mentioned in a comment - " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
-                    //             $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
-                    //             $accessLinkWithComment = $accessLink . '#comment-' . $newCommentId;
+                        foreach ($mentionedUsers as $user) {
+                            // Queue email notifications for efficiency
+                            dispatch(function () use ($workOrder, $newCommentId, $user) {
+                                $template = [
+                                    'from' => 'no-reply@milele.com',
+                                    'from_name' => 'Milele Matrix'
+                                ];
+                                $customerName = $workOrder->customer_name ?? 'Unknown Customer';
+                                $subject = "You were mentioned in a comment - " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
+                                $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+                                $accessLinkWithComment = $accessLink . '#comment-' . $newCommentId;
 
-                    //             // Retrieve the comment object from the database
-                    //             $comment = WOComments::find($newCommentId);
+                                // Retrieve the comment object from the database
+                                $comment = WOComments::find($newCommentId);
 
-                    //             Mail::send('work_order.emails.mentioned_in_comment', [
-                    //                 'workOrder' => $workOrder,
-                    //                 'accessLink' => $accessLink,
-                    //                 'accessLinkWithComment' => $accessLinkWithComment,
-                    //                 'comment' => $comment, // This ensures $comment is an object
-                    //                 'user' => $user // Pass the user object to the view
-                    //             ], function ($message) use ($subject, $template, $user) {
-                    //                 $message->from($template['from'], $template['from_name'])
-                    //                     ->to($user->email)
-                    //                     ->subject($subject);
-                    //             });
-                    //         })->onQueue('emails');
-                    //     }
-                    // }
+                                Mail::send('work_order.emails.mentioned_in_comment', [
+                                    'workOrder' => $workOrder,
+                                    'accessLink' => $accessLink,
+                                    'accessLinkWithComment' => $accessLinkWithComment,
+                                    'comment' => $comment, // This ensures $comment is an object
+                                    'user' => $user // Pass the user object to the view
+                                ], function ($message) use ($subject, $template, $user) {
+                                    $message->from($template['from'], $template['from_name'])
+                                        ->to($user->email)
+                                        ->subject($subject);
+                                });
+                            })->onQueue('emails');
+                        }
+                    }
                 }
             }
 
@@ -2696,9 +2696,9 @@ class WorkOrderController extends Controller
                 $checkRecords = $newComment->wo_histories()
                     ->whereIn('field_name', ['amount_received', 'balance_amount', 'currency', 'deposit_received_as', 'so_total_amount', 'so_vehicle_quantity'])
                     ->exists();
-                // if ($checkRecords) {
-                //     $this->sendSOAmountUpdateEmail($workOrder, $newComment);
-                // }
+                if ($checkRecords) {
+                    $this->sendSOAmountUpdateEmail($workOrder, $newComment);
+                }
                 $checkmainRecords = $newComment->wo_histories()
                     ->whereIn('field_name', [
                         'airline',
@@ -2756,9 +2756,9 @@ class WorkOrderController extends Controller
                         'notify_party',
                         'special_or_transit_clause_or_request',
                     ])->exists();
-                // if ($checkmainRecords) {
-                //     $this->sendDataUpdateEmail($workOrder, $newComment);
-                // }
+                if ($checkmainRecords) {
+                    $this->sendDataUpdateEmail($workOrder, $newComment);
+                }
             }
             if ($canCreateFinanceApproval == true) {
                 if (!$hasEditConfirmedPermission) {
@@ -2792,7 +2792,7 @@ class WorkOrderController extends Controller
                     }
                 }
                 // Call the private function to send the email
-                // $this->sendVehicleUpdateEmail($workOrder, $newComment);
+                $this->sendVehicleUpdateEmail($workOrder, $newComment);
             }
             (new UserActivityController)->createActivity('Update ' . $request->type . ' work order');
 
@@ -3206,7 +3206,7 @@ class WorkOrderController extends Controller
                     }
                     DB::commit();
                     // Send email notification
-                    // $this->sendFinanceApprovalEmail($workOrder, $woApprovals->status, $woApprovals->comments, $woApprovals->user->name);
+                    $this->sendFinanceApprovalEmail($workOrder, $woApprovals->status, $woApprovals->comments, $woApprovals->user->name);
                     return response()->json('success');
                 } else if ($woApprovals && $woApprovals->action_at != '') {
                     DB::commit();
@@ -3318,7 +3318,7 @@ class WorkOrderController extends Controller
 
                     DB::commit();
                     // Send email notification
-                    // $this->sendCOOApprovalEmail($workOrder, $woApprovals->status, $woApprovals->comments, $woApprovals->user->name);
+                    $this->sendCOOApprovalEmail($workOrder, $woApprovals->status, $woApprovals->comments, $woApprovals->user->name);
                     return response()->json('success');
                 } else if ($woApprovals && $woApprovals->action_at != '') {
                     DB::commit();
