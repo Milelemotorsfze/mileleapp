@@ -1208,19 +1208,73 @@ class CallsController extends Controller
             
             // Process leads without sales person using in-memory round robin
             Log::info("Starting auto-assignment for " . count($leadsWithoutSalesPerson) . " leads without sales person");
-            // Get eligible user IDs for random fallback
-            $eligibleUserIds = $allowed_user_ids;
+            // Initialize in-memory lead counts for fair distribution
+            $userLeadCounts = [];
+            foreach ($allowed_user_ids as $uid) {
+                $userLeadCounts[$uid] = Calls::where('sales_person', $uid)->where('status', 'New')->count();
+            }
             // Log eligible user IDs and names at the start
             $eligibleUsersLog = [];
             foreach ($allowed_user_ids as $uid) {
                 $user = User::find($uid);
                 if ($user) {
-                    $eligibleUsersLog[] = $user->name . ' (ID: ' . $uid . ')';
+                    $eligibleUsersLog[] = $user->name . ' (ID: ' . $uid . ', DB count: ' . $userLeadCounts[$uid] . ')';
                 }
             }
             Log::info('Eligible users for assignment: ' . implode(', ', $eligibleUsersLog));
             // Prepare assigned counts for summary
             $assignedCounts = array_fill_keys($allowed_user_ids, 0);
+            // Initialize rotation indices for each language+country (and fallback)
+            $rotationIndices = [];
+            $languageCountryUserMap = [];
+            $languageUserMap = [];
+            $countryUserMap = [];
+            // Build a map of language+country => eligible user IDs
+            foreach ($allowed_user_ids as $uid) {
+                $user = User::find($uid);
+                if ($user) {
+                    // Language extraction
+                    $userLanguages = [];
+                    if (property_exists($user, 'languages')) {
+                        $userLanguages = is_array($user->languages) ? $user->languages : explode(',', $user->languages);
+                    } else if (method_exists($user, 'languages')) {
+                        $userLanguages = $user->languages();
+                    } else if (isset($user->language)) {
+                        $userLanguages = is_array($user->language) ? $user->language : explode(',', $user->language);
+                    }
+                    // Country code extraction (assume $user->phone or $user->country_code)
+                    $userCountryCode = '';
+                    if (isset($user->country_code)) {
+                        $userCountryCode = trim($user->country_code);
+                    } else if (isset($user->phone)) {
+                        if (preg_match('/^\+(\d{1,4})/', $user->phone, $matches)) {
+                            $userCountryCode = $matches[1];
+                        }
+                    }
+                    foreach ($userLanguages as $lang) {
+                        $lang = trim(strtolower($lang));
+                        if ($lang) {
+                            $languageUserMap[$lang][] = $uid;
+                            if ($userCountryCode) {
+                                $languageCountryUserMap[$lang . '|' . $userCountryCode][] = $uid;
+                            }
+                        }
+                    }
+                    if ($userCountryCode) {
+                        $countryUserMap[$userCountryCode][] = $uid;
+                    }
+                }
+            }
+            $rotationIndices['fallback'] = 0;
+            foreach (array_keys($languageCountryUserMap) as $key) {
+                $rotationIndices[$key] = 0;
+            }
+            foreach (array_keys($languageUserMap) as $lang) {
+                $rotationIndices[$lang] = 0;
+            }
+            foreach (array_keys($countryUserMap) as $cc) {
+                $rotationIndices[$cc] = 0;
+            }
             foreach ($leadsWithoutSalesPerson as $row) {
                 $call = new Calls();
                 $name = $row[0];
@@ -1264,31 +1318,46 @@ class CallsController extends Controller
                 }
                 $remarksData = implode('###SEP###', $remarksArray);
                 $errorDescription = '';
-                // In-memory round robin assignment
+                // Assignment with language + phone country code business rule
                 $assignedUserId = null;
                 $assignmentReason = '';
                 $lang = is_string($language) ? trim(strtolower($language)) : '';
-                if ($lang === '' || $lang === 'not supported' || $lang === null) {
-                    // If language is missing or not supported, pick a random eligible user
-                    if (!empty($eligibleUserIds)) {
-                        $assignedUserId = $eligibleUserIds[array_rand($eligibleUserIds)];
-                        $assignedUser = User::find($assignedUserId);
-                        $assignmentReason = 'No language or not supported - assigned randomly to ' . $assignedUser->name . ' (ID: ' . $assignedUserId . ')';
-                    }
-                } else {
-                    // Find user with least leads in memory
-                    $minLeads = min($userLeadCounts);
-                    $candidates = array_keys($userLeadCounts, $minLeads, true);
-                    $assignedUserId = $candidates[array_rand($candidates)]; // random among those with least
-                    $assignedUser = User::find($assignedUserId);
-                    $assignmentReason = 'Round robin in-memory - assigned to ' . $assignedUser->name . ' (ID: ' . $assignedUserId . ') (has ' . $minLeads . ' pending leads)';
+                // Extract country code from lead phone
+                $leadPhone = trim($row[1]);
+                $leadCountryCode = '';
+                if (preg_match('/^\+(\d{1,4})/', $leadPhone, $matches)) {
+                    $leadCountryCode = $matches[1];
                 }
-                if ($assignedUserId !== null) {
-                    $assignedCounts[$assignedUserId]++;
+                $eligibleForThisLead = [];
+                $rotationKey = 'fallback';
+                // 1. Try language+country
+                if ($lang && $leadCountryCode && isset($languageCountryUserMap[$lang . '|' . $leadCountryCode]) && count($languageCountryUserMap[$lang . '|' . $leadCountryCode]) > 0) {
+                    $eligibleForThisLead = $languageCountryUserMap[$lang . '|' . $leadCountryCode];
+                    $rotationKey = $lang . '|' . $leadCountryCode;
+                    $assignmentReason = 'Language and phone country match';
                 }
-                Log::info("Auto-assigning lead for: Email=$email, Phone=" . trim($row[1]) . ", Language=$language, Location=$location");
+                // 2. Try language only
+                else if ($lang && isset($languageUserMap[$lang]) && count($languageUserMap[$lang]) > 0) {
+                    $eligibleForThisLead = $languageUserMap[$lang];
+                    $rotationKey = $lang;
+                    $assignmentReason = 'Language match only (no phone country match)';
+                }
+                // 3. Fallback to all
+                else {
+                    $eligibleForThisLead = $allowed_user_ids;
+                    $rotationKey = 'fallback';
+                    $assignmentReason = 'No language or phone match, fallback to all';
+                }
+                // Use rotation for this eligible set
+                $assignedUserId = $eligibleForThisLead[$rotationIndices[$rotationKey] % count($eligibleForThisLead)];
+                $assignedUser = User::find($assignedUserId);
+                $assignmentReason .= ' - assigned to ' . $assignedUser->name . ' (ID: ' . $assignedUserId . ')';
+                $rotationIndices[$rotationKey]++;
+                $userLeadCounts[$assignedUserId]++;
+                $assignedCounts[$assignedUserId]++;
+                // Log assignment
+                Log::info("Auto-assigning lead for: Email=$email, Phone=$leadPhone, Language=$language, Location=$location");
                 Log::info("Auto-assigned to: " . ($assignedUser ? $assignedUser->name : 'Unknown') . " (ID: $assignedUserId) - Reason: $assignmentReason");
-                // Save the lead using the new assignment
                 $date = Carbon::now();
                 $date->setTimezone('Asia/Dubai');
                 $formattedDate = $date->format('Y-m-d H:i:s');
