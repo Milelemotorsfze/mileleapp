@@ -100,6 +100,18 @@
 		background-color:#d9d9d9!important;
 		font-weight: 700!important;
 	}
+	
+	.edit-created-at {
+		padding: 2px 4px !important;
+		font-size: 0.6rem !important;
+		line-height: 1 !important;
+		border-radius: 3px !important;
+	}
+	
+	.edit-created-at:hover {
+		background-color: #007bff !important;
+		color: white !important;
+	}
 </style>
 @section('content')
 <div id="loading-overlay" style="display: none;">
@@ -601,7 +613,17 @@
 								@component('components.view-download-buttons', ['filePath' => 'wo/vehicle_handover_person_id/', 'fileName' => $data->vehicle_handover_person_id])@endcomponent
 								@endif
 								<td>{{ $data->CreatedBy->name ?? '' }}</td>
-								<td>{{ $data->formatDate($data->created_at) }}</td>
+								<td>
+									<div class="d-flex align-items-center">
+										<span class="created-at-display">{{ $data->formatDate($data->created_at) }}</span>
+										<button type="button" class="btn btn-sm btn-outline-primary ms-1 edit-created-at" 
+												data-work-order-id="{{ $data->id }}" 
+												data-current-date="{{ $data->created_at }}" 
+												title="Edit Created Date">
+											<i class="fas fa-edit" style="font-size: 0.7rem;"></i>
+										</button>
+									</div>
+								</td>
 								<td>{{ $data->UpdatedBy->name ?? '' }}</td>
 								<td>{{ $data->formatDate($data->updated_at) }}</td>
 								@if(isset($type) && $type != 'status_report')
@@ -622,6 +644,32 @@
 		</div>
     </div>
 @endif
+
+<!-- Modal for editing created_at -->
+<div class="modal fade" id="editCreatedAtModal" tabindex="-1" aria-labelledby="editCreatedAtModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCreatedAtModalLabel">Edit Created Date</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editCreatedAtForm">
+                    <div class="mb-3">
+                        <label for="created_at_input" class="form-label">Created Date</label>
+                        <input type="date" class="form-control" id="created_at_input" name="created_at" required>
+                    </div>
+                    <input type="hidden" id="work_order_id_input" name="work_order_id">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveCreatedAtBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 @push('scripts')
 
@@ -807,7 +855,7 @@
 		const type = 'all';  // Modify this if 'type' should be dynamically set based on other input
 		window.location.href = `/work-order-info/${type}`;
 	});
-	function exportData() {
+	        function exportData() {
             let search = $('#search').val(); 
 			let startDate = '';
 			let endDate = '';
@@ -823,5 +871,65 @@
            
             window.location.href = exportUrl;
         }
+
+        // Created At Edit Functionality
+        $(document).on('click', '.edit-created-at', function() {
+            const workOrderId = $(this).data('work-order-id');
+            const currentDate = $(this).data('current-date');
+            
+            // Set the work order ID in the hidden input
+            $('#work_order_id_input').val(workOrderId);
+            
+            // Format the current date for date input (YYYY-MM-DD)
+            const formattedDate = new Date(currentDate).toISOString().slice(0, 10);
+            $('#created_at_input').val(formattedDate);
+            
+            // Show the modal
+            $('#editCreatedAtModal').modal('show');
+        });
+
+        $('#saveCreatedAtBtn').on('click', function() {
+            const formData = {
+                work_order_id: $('#work_order_id_input').val(),
+                created_at: $('#created_at_input').val(),
+                _token: '{{ csrf_token() }}'
+            };
+
+            // Show loading overlay
+            $('#loading-overlay').css('display', 'flex').addClass('active');
+
+            $.ajax({
+                url: '{{ route("work-order.updateCreatedAt") }}',
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (response.success) {
+                        // Close the modal
+                        $('#editCreatedAtModal').modal('hide');
+                        
+                        // Show success message
+                        alertify.success(response.message);
+                        
+                        // Refresh the page after a short delay
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1000);
+                    } else {
+                        alertify.error(response.message || 'Failed to update created date.');
+                    }
+                },
+                error: function(xhr) {
+                    const response = xhr.responseJSON;
+                    alertify.error(response?.message || 'An error occurred while updating the created date.');
+                },
+                complete: function() {
+                    // Hide loading overlay
+                    $('#loading-overlay').removeClass('active');
+                    setTimeout(() => {
+                        $('#loading-overlay').css('display', 'none');
+                    }, 300);
+                }
+            });
+        });
 </script>
 @endpush
