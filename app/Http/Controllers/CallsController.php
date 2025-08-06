@@ -1318,7 +1318,7 @@ class CallsController extends Controller
                 }
                 $remarksData = implode('###SEP###', $remarksArray);
                 $errorDescription = '';
-                // Assignment with language + phone country code business rule
+                // Assignment with previous assignment check + language + phone country code business rule
                 $assignedUserId = null;
                 $assignmentReason = '';
                 $lang = is_string($language) ? trim(strtolower($language)) : '';
@@ -1328,31 +1328,47 @@ class CallsController extends Controller
                 if (preg_match('/^\+(\d{1,4})/', $leadPhone, $matches)) {
                     $leadCountryCode = $matches[1];
                 }
-                $eligibleForThisLead = [];
-                $rotationKey = 'fallback';
-                // 1. Try language+country
-                if ($lang && $leadCountryCode && isset($languageCountryUserMap[$lang . '|' . $leadCountryCode]) && count($languageCountryUserMap[$lang . '|' . $leadCountryCode]) > 0) {
-                    $eligibleForThisLead = $languageCountryUserMap[$lang . '|' . $leadCountryCode];
-                    $rotationKey = $lang . '|' . $leadCountryCode;
-                    $assignmentReason = 'Language and phone country match';
+                // 1. Check for previous assignment by phone or email
+                $previousAssignment = null;
+                if (!empty($leadPhone)) {
+                    $previousAssignment = Calls::where('phone', $leadPhone)->whereNotNull('sales_person')->orderBy('created_at', 'desc')->first();
                 }
-                // 2. Try language only
-                else if ($lang && isset($languageUserMap[$lang]) && count($languageUserMap[$lang]) > 0) {
-                    $eligibleForThisLead = $languageUserMap[$lang];
-                    $rotationKey = $lang;
-                    $assignmentReason = 'Language match only (no phone country match)';
+                if (!$previousAssignment && !empty($email)) {
+                    $previousAssignment = Calls::where('email', $email)->whereNotNull('sales_person')->orderBy('created_at', 'desc')->first();
                 }
-                // 3. Fallback to all
-                else {
-                    $eligibleForThisLead = $allowed_user_ids;
+                if ($previousAssignment && in_array($previousAssignment->sales_person, $allowed_user_ids)) {
+                    $assignedUserId = $previousAssignment->sales_person;
+                    $assignedUser = User::find($assignedUserId);
+                    $assignmentReason = 'Previous assignment found for phone/email - assigned to same salesperson: ' . ($assignedUser ? $assignedUser->name : 'Unknown') . ' (ID: ' . $assignedUserId . ')';
+                    Log::info("Previous assignment found: Phone=$leadPhone, Email=$email, Previous Salesperson: " . ($assignedUser ? $assignedUser->name : 'Unknown'));
+                } else {
+                    // 2. Proceed with language + phone country code business rules
+                    $eligibleForThisLead = [];
                     $rotationKey = 'fallback';
-                    $assignmentReason = 'No language or phone match, fallback to all';
+                    // 2a. Try language+country
+                    if ($lang && $leadCountryCode && isset($languageCountryUserMap[$lang . '|' . $leadCountryCode]) && count($languageCountryUserMap[$lang . '|' . $leadCountryCode]) > 0) {
+                        $eligibleForThisLead = $languageCountryUserMap[$lang . '|' . $leadCountryCode];
+                        $rotationKey = $lang . '|' . $leadCountryCode;
+                        $assignmentReason = 'Language and phone country match';
+                    }
+                    // 2b. Try language only
+                    else if ($lang && isset($languageUserMap[$lang]) && count($languageUserMap[$lang]) > 0) {
+                        $eligibleForThisLead = $languageUserMap[$lang];
+                        $rotationKey = $lang;
+                        $assignmentReason = 'Language match only (no phone country match)';
+                    }
+                    // 2c. Fallback to all
+                    else {
+                        $eligibleForThisLead = $allowed_user_ids;
+                        $rotationKey = 'fallback';
+                        $assignmentReason = 'No language or phone match, fallback to all';
+                    }
+                    // Use rotation for this eligible set
+                    $assignedUserId = $eligibleForThisLead[$rotationIndices[$rotationKey] % count($eligibleForThisLead)];
+                    $assignedUser = User::find($assignedUserId);
+                    $assignmentReason .= ' - assigned to ' . $assignedUser->name . ' (ID: ' . $assignedUserId . ')';
+                    $rotationIndices[$rotationKey]++;
                 }
-                // Use rotation for this eligible set
-                $assignedUserId = $eligibleForThisLead[$rotationIndices[$rotationKey] % count($eligibleForThisLead)];
-                $assignedUser = User::find($assignedUserId);
-                $assignmentReason .= ' - assigned to ' . $assignedUser->name . ' (ID: ' . $assignedUserId . ')';
-                $rotationIndices[$rotationKey]++;
                 $userLeadCounts[$assignedUserId]++;
                 $assignedCounts[$assignedUserId]++;
                 // Log assignment
