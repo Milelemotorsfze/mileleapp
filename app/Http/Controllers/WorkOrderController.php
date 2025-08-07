@@ -3637,4 +3637,51 @@ class WorkOrderController extends Controller
         $value = preg_replace('/[\x00-\x1F\x7F]/u', '', $value); // remove control chars
         return preg_replace('/\s+/', ' ', trim($value));
     }
+
+    /**
+     * Update the created_at field for a work order
+     */
+    public function updateCreatedAt(Request $request)
+    {
+        try {
+            $request->validate([
+                'work_order_id' => 'required|exists:work_orders,id',
+                'created_at' => 'required|date',
+            ]);
+
+            $workOrder = WorkOrder::findOrFail($request->work_order_id);
+            $oldCreatedAt = $workOrder->created_at;
+            
+            // Set the time to 00:00:00 for the date input
+            $newCreatedAt = $request->created_at . ' 00:00:00';
+            
+            // Update the created_at field
+            $workOrder->created_at = $newCreatedAt;
+            $workOrder->save();
+
+            // Create history record for the change
+            WORecordHistory::create([
+                'work_order_id' => $workOrder->id,
+                'field_name' => 'created_at',
+                'old_value' => $oldCreatedAt ? $oldCreatedAt->format('Y-m-d H:i:s') : null,
+                'new_value' => $newCreatedAt,
+                'type' => 'Change',
+                'user_id' => Auth::id(),
+                'changed_at' => Carbon::now(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Created date updated successfully.',
+                'formatted_date' => Carbon::parse($newCreatedAt)->format('d M Y')
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error updating created_at: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update created date. Please try again.'
+            ], 500);
+        }
+    }
 }
