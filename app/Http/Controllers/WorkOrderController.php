@@ -3676,4 +3676,56 @@ class WorkOrderController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Update the date field for a work order
+     */
+    public function updateDate(Request $request)
+    {
+        try {
+            $request->validate([
+                'work_order_id' => 'required|exists:work_orders,id',
+                'date' => 'required|date',
+            ]);
+
+            $workOrder = WorkOrder::findOrFail($request->work_order_id);
+            $oldDate = $workOrder->date;
+            
+            // Set the time to 00:00:00 for the date input
+            $newDate = $request->date . ' 00:00:00';
+            
+            // Update the date field, created_at, updated_at, and updated_by
+            $workOrder->date = $newDate;
+            $workOrder->created_at = $newDate; // Also update created_at with the new date
+            $workOrder->updated_at = Carbon::now();
+            $workOrder->updated_by = Auth::id();
+            $workOrder->save();
+
+            // Create history record for the change
+            WORecordHistory::create([
+                'work_order_id' => $workOrder->id,
+                'field_name' => 'date',
+                'old_value' => $oldDate ? Carbon::parse($oldDate)->format('Y-m-d H:i:s') : null,
+                'new_value' => $newDate,
+                'type' => 'Change',
+                'user_id' => Auth::id(),
+                'changed_at' => Carbon::now(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Date updated successfully.',
+                'formatted_date' => Carbon::parse($newDate)->format('d M Y'),
+                'updated_at_formatted' => Carbon::now()->format('d M Y'),
+                'updated_by_name' => Auth::user()->name
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error updating date: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update date. Please try again.'
+            ], 500);
+        }
+    }
 }

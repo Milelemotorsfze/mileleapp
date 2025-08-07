@@ -478,6 +478,7 @@ Route::get('/d', function () {
         Route::post('/save-filters', 'saveFilters')->name('save.filters');
         Route::post('/check-so-number', 'checkSONumber')->name('wo.checkSONumber');
         Route::post('/update-created-at', 'updateCreatedAt')->name('work-order.updateCreatedAt');
+        Route::post('/update-date', 'updateDate')->name('work-order.updateDate');
     });
     Route::controller(WoDocsStatusController::class)->group(function(){
         Route::post('/update-wo-doc-status', 'updateDocStatus')->name('wo.updateDocStatus');
