@@ -795,9 +795,11 @@ class CallsController extends Controller
 
     public function uploadingbulk(Request $request)
     {
+        Log::info("Starting bulk lead upload process");
         $validCountryCodes = CountryCodes::list();
         
         if (!$request->hasFile('file') || !$request->file('file')->isValid()) {
+            Log::warning("Bulk upload failed: Invalid file");
             return back()->with('error', 'Please Select The Correct File for Uploading');
         }
 
@@ -1268,10 +1270,10 @@ class CallsController extends Controller
                 $remarksData = implode('###SEP###', $remarksArray);
                 $errorDescription = '';
                 // Assignment with previous assignment check + language + phone country code business rule
+                $leadPhone = trim($row[1]);
+                
                 $assignedUserId = null;
                 $assignmentReason = '';
-                $langNorm = is_string($language) ? trim(strtolower($language)) : '';
-                $leadPhone = trim($row[1]);
                 $cleanedPhoneForMatch = '';
                 if (!empty($leadPhone)) {
                     $cleanedPhoneForMatch = ltrim(preg_replace('/[^\d+]/', '', $leadPhone), '+');
@@ -1288,81 +1290,82 @@ class CallsController extends Controller
                     $assignedUserId = $previousAssignment->sales_person;
                     $assignedUser = User::find($assignedUserId);
                     $assignmentReason = 'Previous assignment found for phone/email - assigned to same salesperson: ' . ($assignedUser ? $assignedUser->name : 'Unknown') . ' (ID: ' . $assignedUserId . ')';
-                    Log::info("Previous assignment found: Phone=$leadPhone, Email=$email, Previous Salesperson: " . ($assignedUser ? $assignedUser->name : 'Unknown'));
+                    $matchedOn = (!empty($leadPhone) && $previousAssignment->phone == $leadPhone) ? 'phone' : 'email';
+                    Log::info("Lead assigned in bulk upload", [
+                        'email' => $email,
+                        'phone' => $leadPhone,
+                        'assigned_to' => $assignedUser ? $assignedUser->name : 'Unknown',
+                        'matched_on' => $matchedOn,
+                        'matched_value' => $matchedOn == 'phone' ? $leadPhone : $email,
+                        'user_phone' => $matchedOn == 'phone' ? $previousAssignment->phone : null,
+                        'user_email' => $matchedOn == 'email' ? $previousAssignment->email : null,
+                        'reason' => $assignmentReason
+                    ]);
                 } else {
-                    // 2. Sort allowed users by current in-memory lead count (ascending)
-                    $sortedCandidates = $allowed_user_ids;
-                    usort($sortedCandidates, function ($a, $b) use ($userLeadCounts) {
-                        $countA = $userLeadCounts[$a] ?? 0;
-                        $countB = $userLeadCounts[$b] ?? 0;
-                        if ($countA === $countB) {
-                            return $a <=> $b;
-                        }
-                        return $countA <=> $countB;
-                    });
-
-                    // 3. Find first min-count candidate who has a matching email/phone/language among their existing leads
-                    $found = false;
-                    foreach ($sortedCandidates as $candidateId) {
-                        $hasMatch = Calls::where('sales_person', $candidateId)
-                            ->where(function ($q) use ($email, $cleanedPhoneForMatch, $langNorm) {
-                                if (!empty($email)) {
-                                    $q->orWhere('email', $email);
-                                }
-                                if (!empty($cleanedPhoneForMatch)) {
-                                    $q->orWhere('phone', 'LIKE', '%' . $cleanedPhoneForMatch);
-                                }
-                                if (!empty($langNorm)) {
-                                    $q->orWhereRaw('LOWER(language) = ?', [$langNorm]);
-                                }
-                            })
-                            ->exists();
-
-                        if ($hasMatch) {
-                            $assignedUserId = $candidateId;
-                            $assignedUser = User::find($assignedUserId);
-                            $assignmentReason = 'Assigned to ' . $assignedUser->name . ' (min-count candidate with matching email/phone/language)';
-                            $found = true;
-                            break;
-                        }
-                    }
-
-                    // 4. If none matched, try min-count candidate on the basis of language
-                    if (!$found) {
-                        $langMatchedIds = [];
-                        if (!empty($language)) {
-                            $langMatchedIds = SalesPersonLaugauges::whereIn('sales_person', $allowed_user_ids)
-                                ->where('language', $language)
-                                ->pluck('sales_person')
-                                ->toArray();
-                        }
+                    // 2. Check for language matching with even distribution
+                    $assignedUserId = null;
+                    if (!empty($language)) {
+                        $langMatchedIds = SalesPersonLaugauges::whereIn('sales_person', $allowed_user_ids)
+                            ->where('language', $language)
+                            ->pluck('sales_person')
+                            ->toArray();
+                        
                         if (!empty($langMatchedIds)) {
-                            // Choose min-count among language-matched users
-                            $langSorted = $langMatchedIds;
-                            usort($langSorted, function ($a, $b) use ($userLeadCounts) {
+                            // Sort language-matched users by current lead count (ascending) for even distribution
+                            usort($langMatchedIds, function ($a, $b) use ($userLeadCounts) {
                                 $countA = $userLeadCounts[$a] ?? 0;
                                 $countB = $userLeadCounts[$b] ?? 0;
                                 if ($countA === $countB) {
-                                    return $a <=> $b;
+                                    return $a <=> $b; // Tie-break by user ID
                                 }
-                                return $countA <=> $countB;
+                                return $countA <=> $countB; // Ascending by lead count
                             });
-                            $assignedUserId = $langSorted[0];
+                            
+                            // Assign to user with least leads among language-matched users
+                            $assignedUserId = $langMatchedIds[0];
                             $assignedUser = User::find($assignedUserId);
-                            $assignmentReason = 'No match - assigned to min-count language-matched user ' . $assignedUser->name;
-                        } else {
-                            // 5. Fall back to absolute min-count among all allowed
-                            $assignedUserId = $sortedCandidates[0];
-                            $assignedUser = User::find($assignedUserId);
-                            $assignmentReason = 'No match - assigned to min-count user ' . $assignedUser->name;
+                            $assignmentReason = 'Assigned to ' . $assignedUser->name . ' (language-matched user with least leads)';
+                            Log::info("Lead assigned in bulk upload", [
+                                'email' => $email,
+                                'phone' => $leadPhone,
+                                'assigned_to' => $assignedUser->name,
+                                'matched_on' => 'language',
+                                'matched_value' => $language,
+                                'user_id' => $assignedUserId,
+                                'lead_count' => $userLeadCounts[$assignedUserId] ?? 0,
+                                'reason' => $assignmentReason
+                            ]);
                         }
+                    }
+                    
+                    // 3. If no language match, assign to user with absolute minimum lead count
+                    if ($assignedUserId === null) {
+                        // Sort allowed users by current in-memory lead count (ascending)
+                        $sortedCandidates = $allowed_user_ids;
+                        usort($sortedCandidates, function ($a, $b) use ($userLeadCounts) {
+                            $countA = $userLeadCounts[$a] ?? 0;
+                            $countB = $userLeadCounts[$b] ?? 0;
+                            if ($countA === $countB) {
+                                return $a <=> $b;
+                            }
+                            return $countA <=> $countB;
+                        });
+                        
+                        $assignedUserId = $sortedCandidates[0];
+                        $assignedUser = User::find($assignedUserId);
+                        $assignmentReason = 'Assigned to ' . $assignedUser->name . ' (user with least leads)';
+                        Log::info("Lead assigned in bulk upload", [
+                            'email' => $email,
+                            'phone' => $leadPhone,
+                            'assigned_to' => $assignedUser->name,
+                            'matched_on' => 'least_leads',
+                            'lead_count' => $userLeadCounts[$assignedUserId] ?? 0,
+                            'reason' => $assignmentReason
+                        ]);
                     }
                 }
                 $userLeadCounts[$assignedUserId]++;
                 $assignedCounts[$assignedUserId]++;
-                // Log assignment
-                Log::info("Auto-assigning lead for: Email=$email, Phone=$leadPhone, Language=$language, Location=$location");
-                Log::info("Auto-assigned to: " . ($assignedUser ? $assignedUser->name : 'Unknown') . " (ID: $assignedUserId) - Reason: $assignmentReason");
                 $date = Carbon::now();
                 $date->setTimezone('Asia/Dubai');
                 $formattedDate = $date->format('Y-m-d H:i:s');
@@ -1451,31 +1454,40 @@ class CallsController extends Controller
                 $acceptedCount++;
             }
             // Log summary for each allowed user
-            foreach ($allowed_users as $userName) {
-                $user = User::where('name', $userName)->first();
-                if ($user) {
-                    $uid = $user->id;
-                    $count = isset($assignedCounts[$uid]) ? $assignedCounts[$uid] : 0;
-                    $reason = '';
-                    if (!in_array($uid, $allowed_user_ids)) {
-                        $reason = 'User not in allowed_user_ids (may be inactive, wrong role, or missing ModelHasRoles).';
-                    } elseif ($count === 0) {
-                        $reason = 'User was eligible but did not get any leads in this batch (round robin, random, or language mismatch).';
+            Log::info("Bulk upload assignment summary", [
+                'total_leads_processed' => count($rows),
+                'leads_with_sales_person' => count($leadsWithSalesPerson),
+                'leads_without_sales_person' => count($leadsWithoutSalesPerson),
+                'assignment_summary' => array_map(function($userName) use ($allowed_user_ids, $assignedCounts) {
+                    $user = User::where('name', $userName)->first();
+                    if ($user) {
+                        $uid = $user->id;
+                        $count = isset($assignedCounts[$uid]) ? $assignedCounts[$uid] : 0;
+                        return [
+                            'user_name' => $userName,
+                            'leads_assigned' => $count
+                        ];
                     } else {
-                        $reason = 'Assigned normally.';
+                        return [
+                            'user_name' => $userName,
+                            'error' => 'User not found in DB'
+                        ];
                     }
-                    Log::info("Assignment summary: $userName (ID: $uid) - Assigned: $count leads. Reason: $reason");
-                } else {
-                    Log::info("Assignment summary: $userName - User not found in DB.");
-                }
-            }
+                }, $allowed_users)
+            ]);
         }
 
         $useractivities =  New UserActivities();
         $useractivities->activity = "Create Bulk Leads";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-
+        
+        Log::info("Bulk lead upload process completed", [
+            'total_rows' => count($rows),
+            'accepted_count' => $acceptedCount,
+            'rejected_count' => $rejectedCount
+        ]);
+        
         return redirect()->route('calls.index')->with('success', "Data uploaded successfully! From the total " . count($rows) . " records, {$acceptedCount} were accepted.");
     }
 
@@ -2170,18 +2182,27 @@ class CallsController extends Controller
         if ($location && in_array($location, Country::where('is_african_country', 1)->pluck('name')->toArray())) {
             $isAfrican = true;
         }
+        
         $cleanedPhone = $phone ? ltrim(preg_replace('/[^\d+]/', '', $phone), '+') : '';
         $matchByEmail = !empty($email) ? Calls::where('email', $email)->whereNotNull('email')->orderBy('created_at', 'desc')->first() : null;
         $matchByPhone = !empty($cleanedPhone) ? Calls::where('phone', 'LIKE', '%' . $cleanedPhone)->whereNotNull('phone')->orderBy('created_at', 'desc')->first() : null;
 
-        // 1. Check for Previous Assignment
+        // 1. Check for Previous Assignment by email or phone
         $previousSalesPerson = null;
         if ($matchByEmail && in_array($matchByEmail->sales_person, $allowed_user_ids)) {
             $matchedUser = User::find($matchByEmail->sales_person);
             if ($matchedUser && in_array($matchedUser->name, $allowed_users)) {
                 $previousSalesPerson = $matchByEmail->sales_person;
                 $assignmentReason = "Previous assignment found by email - assigned to {$matchedUser->name}";
-                Log::info("Auto-assignment reason: $assignmentReason");
+                Log::info("Lead assigned", [
+                    'email' => $email,
+                    'phone' => $phone,
+                    'assigned_to' => $matchedUser->name,
+                    'matched_on' => 'email',
+                    'matched_value' => $email,
+                    'user_email' => $matchByEmail->email,
+                    'reason' => $assignmentReason
+                ]);
                 return ['user_id' => $previousSalesPerson, 'reason' => $assignmentReason];
             }
         } elseif ($matchByPhone && in_array($matchByPhone->sales_person, $allowed_user_ids)) {
@@ -2189,12 +2210,20 @@ class CallsController extends Controller
             if ($matchedUser && in_array($matchedUser->name, $allowed_users)) {
                 $previousSalesPerson = $matchByPhone->sales_person;
                 $assignmentReason = "Previous assignment found by phone - assigned to {$matchedUser->name}";
-                Log::info("Auto-assignment reason: $assignmentReason");
+                Log::info("Lead assigned", [
+                    'email' => $email,
+                    'phone' => $phone,
+                    'assigned_to' => $matchedUser->name,
+                    'matched_on' => 'phone',
+                    'matched_value' => $phone,
+                    'user_phone' => $matchByPhone->phone,
+                    'reason' => $assignmentReason
+                ]);
                 return ['user_id' => $previousSalesPerson, 'reason' => $assignmentReason];
             }
         }
 
-        // 2. Proceed with New Assignment using min-count + match-by(email/phone/language) strategy
+        // 2. Get eligible users based on location and other criteria
         $userQuery = ModelHasRoles::select('model_id')
             ->where('role_id', 7)
             ->join('users', 'model_has_roles.model_id', '=', 'users.id')
@@ -2214,74 +2243,66 @@ class CallsController extends Controller
                 ->pluck('lead_count', 'sales_person')
                 ->toArray();
 
-            // Sort candidates by current count asc, then by id asc
-            $sortedCandidates = $eligibleUserIds;
-            usort($sortedCandidates, function ($a, $b) use ($leadCounts) {
-                $countA = $leadCounts[$a] ?? 0;
-                $countB = $leadCounts[$b] ?? 0;
-                if ($countA === $countB) {
-                    return $a <=> $b;
-                }
-                return $countA <=> $countB;
-            });
-
-            $languageNorm = is_string($language) ? strtolower(trim($language)) : '';
-
-            foreach ($sortedCandidates as $candidateId) {
-                $matchExists = Calls::where('sales_person', $candidateId)
-                    ->where(function ($q) use ($email, $cleanedPhone, $languageNorm) {
-                        if (!empty($email)) {
-                            $q->orWhere('email', $email);
-                        }
-                        if (!empty($cleanedPhone)) {
-                            $q->orWhere('phone', 'LIKE', '%' . $cleanedPhone);
-                        }
-                        if (!empty($languageNorm)) {
-                            $q->orWhereRaw('LOWER(language) = ?', [$languageNorm]);
-                        }
-                    })
-                    ->exists();
-
-                if ($matchExists) {
-                    $assignedUser = User::find($candidateId);
-                    $assignmentReason = "Assigned to {$assignedUser->name} (min-count candidate with matching email/phone/language)";
-                    Log::info("Auto-assignment reason: $assignmentReason");
-                    return ['user_id' => $candidateId, 'reason' => $assignmentReason];
-                }
-            }
-
-            // No match found across candidates -> pick min-count user on the basis of language (if available)
-            $fallbackCandidate = null;
+            // 3. Check for language matching with even distribution
             if (!empty($language)) {
                 $langMatched = SalesPersonLaugauges::whereIn('sales_person', $eligibleUserIds)
                     ->where('language', $language)
                     ->pluck('sales_person')
                     ->toArray();
+                
                 if (!empty($langMatched)) {
-                    // Choose min-count among language-matched users
-                    $fallbackCandidate = array_reduce($langMatched, function ($carry, $uid) use ($leadCounts) {
-                        if ($carry === null) {
-                            return $uid;
+                    // Sort language-matched users by lead count (ascending) for even distribution
+                    usort($langMatched, function ($a, $b) use ($leadCounts) {
+                        $countA = $leadCounts[$a] ?? 0;
+                        $countB = $leadCounts[$b] ?? 0;
+                        if ($countA === $countB) {
+                            return $a <=> $b; // Tie-break by user ID
                         }
-                        $countCarry = $leadCounts[$carry] ?? 0;
-                        $countUid = $leadCounts[$uid] ?? 0;
-                        if ($countUid === $countCarry) {
-                            return $uid < $carry ? $uid : $carry; // tie-break by id
-                        }
-                        return $countUid < $countCarry ? $uid : $carry;
-                    }, null);
+                        return $countA <=> $countB; // Ascending by lead count
+                    });
+                    
+                    // Assign to user with least leads among language-matched users
+                    $assignedUserId = $langMatched[0];
+                    $assignedUser = User::find($assignedUserId);
+                    $currentCount = $leadCounts[$assignedUserId] ?? 0;
+                    $assignmentReason = "Assigned to {$assignedUser->name} (language-matched user with least leads: {$currentCount})";
+                    Log::info("Lead assigned", [
+                        'email' => $email,
+                        'phone' => $phone,
+                        'assigned_to' => $assignedUser->name,
+                        'matched_on' => 'language',
+                        'matched_value' => $language,
+                        'user_id' => $assignedUserId,
+                        'lead_count' => $currentCount,
+                        'reason' => $assignmentReason
+                    ]);
+                    return ['user_id' => $assignedUserId, 'reason' => $assignmentReason];
                 }
             }
-            if ($fallbackCandidate === null) {
-                // Fall back to absolute min-count among all eligible
-                $fallbackCandidate = $sortedCandidates[0];
-            }
+
+            // 4. Final fallback: Assign to user with absolute minimum lead count
+            $sortedCandidates = $eligibleUserIds;
+            usort($sortedCandidates, function ($a, $b) use ($leadCounts) {
+                $countA = $leadCounts[$a] ?? 0;
+                $countB = $leadCounts[$b] ?? 0;
+                if ($countA === $countB) {
+                    return $a <=> $b; // Tie-break by user ID
+                }
+                return $countA <=> $countB; // Ascending by lead count
+            });
+            
+            $fallbackCandidate = $sortedCandidates[0];
             $fallbackUser = User::find($fallbackCandidate);
             $currentCount = $leadCounts[$fallbackCandidate] ?? 0;
-            $assignmentReason = !empty($language)
-                ? "No field match - assigned to min-count language-matched user {$fallbackUser->name} (has {$currentCount} New leads)"
-                : "No field match - assigned to min-count user {$fallbackUser->name} (has {$currentCount} New leads)";
-            Log::info("Auto-assignment reason: $assignmentReason");
+            $assignmentReason = "Assigned to {$fallbackUser->name} (user with least leads: {$currentCount})";
+            Log::info("Lead assigned", [
+                'email' => $email,
+                'phone' => $phone,
+                'assigned_to' => $fallbackUser->name,
+                'matched_on' => 'least_leads',
+                'lead_count' => $currentCount,
+                'reason' => $assignmentReason
+            ]);
             return ['user_id' => $fallbackCandidate, 'reason' => $assignmentReason];
         }
         
@@ -2302,11 +2323,21 @@ class CallsController extends Controller
         if ($anyUser) {
             $fallbackUser = User::find($anyUser->model_id);
             $assignmentReason = "Final fallback - Assigned to {$fallbackUser->name} from allowed users list";
-            Log::info("Auto-assignment reason: $assignmentReason");
+            Log::info("Lead assigned", [
+                'email' => $email,
+                'phone' => $phone,
+                'assigned_to' => $fallbackUser->name,
+                'matched_on' => 'final_fallback',
+                'reason' => $assignmentReason
+            ]);
             return ['user_id' => $anyUser->model_id, 'reason' => $assignmentReason];
         } else {
             $assignmentReason = "No eligible users found in final fallback";
-            Log::warning("Auto-assignment failed: $assignmentReason");
+            Log::warning("Lead assignment failed", [
+                'email' => $email,
+                'phone' => $phone,
+                'reason' => $assignmentReason
+            ]);
             return ['user_id' => null, 'reason' => $assignmentReason];
         }
     }
