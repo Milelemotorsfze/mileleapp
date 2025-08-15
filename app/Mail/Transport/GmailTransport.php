@@ -22,11 +22,6 @@ class GmailTransport implements TransportInterface
 
     public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
-        if ($this->client->isAccessTokenExpired()) {
-            $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
-        }
-
-        $gmail = new Google_Service_Gmail($this->client);
         $rawMessage = $this->getMimeMessage($message);
         $gmailMessage = new Google_Service_Gmail_Message();
         $gmailMessage->setRaw($rawMessage);
