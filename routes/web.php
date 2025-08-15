@@ -641,6 +641,7 @@ Route::get('/d', function () {
     Route::resource('lead_source', LeadSourceController::class);
     Route::get('calls-bulk/createbulk', [CallsController::class,'createbulk'])->name('calls.createbulk');
     Route::post('/uploadingbulk', [CallsController::class, 'uploadingbulk'])->name('calls.uploadingbulk');
+    Route::get('/export-rejected-rows', [CallsController::class, 'exportRejectedRows'])->name('calls.export-rejected-rows');
     Route::post('/summernote/upload', [CallsController::class, 'upload'])->name('summernote.upload');
 
     Route::resource('strategy', StrategyController::class);
