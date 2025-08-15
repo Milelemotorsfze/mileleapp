@@ -1006,6 +1006,7 @@ class CallsController extends Controller
                 'Yacine Guella',
                 'Sarah Ferhane',
                 'Ayoub Ididir',
+                'Manal Khamalli',
             ];
             $allowed_user_ids = User::whereIn('name', $allowed_users)->pluck('id')->toArray();
             // Initialize lead counts for fair distribution
@@ -2171,6 +2172,7 @@ class CallsController extends Controller
             'Yacine Guella',
             'Sarah Ferhane',
             'Ayoub Ididir',
+            'Manal Khamalli',
         ];
         // 'Elie Zouein',
         // 'Manal Khamalli',
