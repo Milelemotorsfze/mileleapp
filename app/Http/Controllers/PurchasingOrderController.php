@@ -1481,6 +1481,7 @@ class PurchasingOrderController extends Controller
 
     public function importCsvFile(Request $request)
     {
+        \Log::info('PO CSV Import: request received');
         $request->validate([
             'import_file' => 'required|file|mimes:csv,txt',
             'po_number' => 'required|string',
@@ -1488,6 +1489,11 @@ class PurchasingOrderController extends Controller
 
         $file = $request->file('import_file');
         $poNumber = trim($request->input('po_number'));
+        \Log::info('PO CSV Import: validated input', [
+            'po_number' => $poNumber,
+            'file_original_name' => $file ? $file->getClientOriginalName() : null,
+            'user_id' => auth()->id(),
+        ]);
         $filtered = [];
         $header = null;
         $poIndex = null;
@@ -1506,9 +1512,16 @@ class PurchasingOrderController extends Controller
                             }
                         }
                         if ($poIndex === null) {
+                            \Log::warning('PO CSV Import: PO column not found in CSV header', [
+                                'header' => $header,
+                            ]);
                             fclose($handle);
                             return response()->json(['message' => 'PO column not found in CSV.'], 422);
                         }
+                        \Log::info('PO CSV Import: header parsed', [
+                            'header' => $header,
+                            'po_index' => $poIndex,
+                        ]);
                         continue;
                     }
                     if (count($row) !== count($header)) {
@@ -1522,8 +1535,14 @@ class PurchasingOrderController extends Controller
                 fclose($handle);
             }
         } else {
+            \Log::error('PO CSV Import: Unable to open uploaded file');
             return response()->json(['message' => 'Unable to open uploaded file.'], 500);
         }
+
+        \Log::info('PO CSV Import: filtered rows by PO', [
+            'po_number' => $poNumber,
+            'filtered_count' => count($filtered),
+        ]);
 
         // Map CSV columns for exterior & interior colors
         $vehiclesData = collect($filtered)->map(function($row) {
@@ -1621,6 +1640,10 @@ class PurchasingOrderController extends Controller
             }
         }
         if (!empty($invalidVins)) {
+            \Log::warning('PO CSV Import: invalid VINs found', [
+                'count' => count($invalidVins),
+                'examples' => array_slice($invalidVins, 0, 5),
+            ]);
             return response()->json([
                 'message' => 'Invalid VIN(s) found: ' . implode(', ', $invalidVins) . '. VINs must be alphanumeric with no spaces or special characters.'
             ], 422);
@@ -1646,6 +1669,10 @@ class PurchasingOrderController extends Controller
             }
         }
         if (!empty($missingColumns)) {
+            \Log::warning('PO CSV Import: missing required columns', [
+                'missing' => $missingColumns,
+                'header' => $header,
+            ]);
             return response()->json(['message' => 'Missing required column(s): ' . implode(', ', $missingColumns)], 422);
         }
 
@@ -1668,6 +1695,9 @@ class PurchasingOrderController extends Controller
             }
         }
         if (!empty($missingValueRows)) {
+            \Log::warning('PO CSV Import: missing required values', [
+                'rows' => $missingValueRows,
+            ]);
             return response()->json([
                 'message' => 'Missing required value(s) for column(s) "variant" or "po" in row(s): ' . implode(', ', $missingValueRows)
             ], 422);
@@ -1679,6 +1709,11 @@ class PurchasingOrderController extends Controller
                 $headerMap[strtolower(trim($h))] = $idx;
             }
         }
+
+        \Log::info('PO CSV Import: success', [
+            'vehicles_count' => count($vehiclesData),
+            'po_number' => $poNumber,
+        ]);
 
         return response()->json([
             'vehiclesData' => $vehiclesData

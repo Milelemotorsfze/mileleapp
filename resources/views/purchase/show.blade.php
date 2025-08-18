@@ -5566,6 +5566,10 @@ return [$color->id => $formattedName];
                     success: function(response) {
                         $('#importModal').modal('hide');
                         if (response.vehiclesData && Array.isArray(response.vehiclesData)) {
+                            var flashMessage = document.getElementById('flash-message');
+                            var filledBlankRowIndexes = {};
+                            var updatedCount = 0;
+                            var unmatchedVehicles = [];
                             // check number of vehicles in csv with available vehicles
                             var availableVehicles = $('#vehicleSectionTable tbody .vin').length;
                             if (response.vehiclesData.length > availableVehicles) {
@@ -5674,6 +5678,7 @@ return [$color->id => $formattedName];
                                             }
                                             usedVins[vehicle.vin] = true;
                                             updated = true;
+                                            updatedCount++;
                                             return false;
                                         }
                                     });
@@ -5734,6 +5739,7 @@ return [$color->id => $formattedName];
                                             }
                                             usedVins[vehicle.vin] = true;
                                             updated = true;
+                                            updatedCount++;
                                             return false;
                                         }
                                     });
@@ -5798,6 +5804,7 @@ return [$color->id => $formattedName];
                                                 $row.find('.ppmmyyy').text(vehicle.prod_month);
                                             }
                                             updated = true;
+                                            updatedCount++;
                                             return false;
                                         }
                                     });
@@ -5862,11 +5869,100 @@ return [$color->id => $formattedName];
                                             }
                                             usedVins[vehicle.vin] = true;
                                             updated = true;
+                                            updatedCount++;
                                             return false;
                                         }
                                     });
                                 }
+                                // --- FALLBACK: FILL FIRST BLANK VIN ROW IF STILL NOT UPDATED ---
+                                if (!updated) {
+                                    var filled = false;
+                                    $('#vehicleSectionTable tbody tr').each(function(rowIndex) {
+                                        var $row = $(this);
+                                        var vinCell = $row.find('.vin');
+                                        if (
+                                            vinCell.length > 0 &&
+                                            (!vinCell.text().trim() || vinCell.text().trim() === '-') &&
+                                            !filledBlankRowIndexes[rowIndex]
+                                        ) {
+                                            vinCell.text(vehicle.vin || '-');
+                                            $row.find('.dn').text(vehicle.dn || '');
+                                            $row.find('.engine').text(vehicle.engine || '');
+                                            // Exterior Color
+                                            var $exSelect = $row.find('select.ex-colour-select');
+                                            var exVal = '';
+                                            if (vehicle.ex_colour_id) {
+                                                exVal = vehicle.ex_colour_id;
+                                            } else if (vehicle.ex_colour) {
+                                                var csvColor = String(vehicle.ex_colour).trim().toLowerCase().replace(/\s+/g, '');
+                                                $exSelect.find('option').each(function() {
+                                                    var optionText = $(this).text().trim().toLowerCase().replace(/\s+/g, '');
+                                                    if (optionText === csvColor) {
+                                                        exVal = $(this).val();
+                                                    }
+                                                });
+                                            }
+                                            if (exVal && $exSelect.length) {
+                                                $exSelect.prop('disabled', false);
+                                                $exSelect.val(exVal).trigger('change');
+                                                $exSelect.prop('disabled', true);
+                                            }
+                                            // Interior Color
+                                            var $intSelect = $row.find('select.int-colour-select');
+                                            var intVal = '';
+                                            if (vehicle.int_colour_id) {
+                                                intVal = vehicle.int_colour_id;
+                                            } else if (vehicle.int_colour) {
+                                                $intSelect.find('option').each(function() {
+                                                    if ($(this).text().trim().toLowerCase() === String(vehicle.int_colour).trim().toLowerCase()) {
+                                                        intVal = $(this).val();
+                                                    }
+                                                });
+                                            }
+                                            if (intVal && $intSelect.length) {
+                                                $intSelect.prop('disabled', false);
+                                                $intSelect.val(intVal).trigger('change');
+                                                $intSelect.prop('disabled', true);
+                                            }
+                                            // Production Month
+                                            var $prodInput = $row.find('td.ppmmyyy input[type="date"]');
+                                            if ($prodInput.length > 0) {
+                                                $prodInput.val(vehicle.prod_month || '');
+                                            } else {
+                                                $row.find('.ppmmyyy').text(vehicle.prod_month || '');
+                                            }
+                                            // Estimated Arrival if present
+                                            var $estCellInput = $row.find('td.estimation_date input[type="date"]');
+                                            if ($estCellInput.length > 0) {
+                                                $estCellInput.val(vehicle.estimation_date || '');
+                                            } else {
+                                                $row.find('.estimation_date').text(vehicle.estimation_date || '');
+                                            }
+                                            filledBlankRowIndexes[rowIndex] = true;
+                                            updated = true;
+                                            updatedCount++;
+                                            filled = true;
+                                            return false; // break loop
+                                        }
+                                    });
+                                    if (!filled) {
+                                        unmatchedVehicles.push(vehicle);
+                                    }
+                                }
                             });
+                            // Show a lightweight success flash with counts
+                            if (flashMessage) {
+                                flashMessage.classList.remove('alert-danger');
+                                flashMessage.classList.add('alert-success');
+                                var unmatchedCount = unmatchedVehicles.length;
+                                flashMessage.textContent = 'Import applied successfully. Updated ' + updatedCount + ' row(s)' + (unmatchedCount ? (', unmatched: ' + unmatchedCount) : '') + '.';
+                                flashMessage.style.display = 'block';
+                                setTimeout(function() { flashMessage.style.display = 'none'; }, 3000);
+                            }
+                            // If there are unmatched vehicles, notify user explicitly
+                            if (unmatchedVehicles.length > 0) {
+                                alert('Some records could not be matched to existing rows and were not filled. Please review your CSV data. Unmatched count: ' + unmatchedVehicles.length);
+                            }
                         }
                     },
                     error: function(xhr) {
