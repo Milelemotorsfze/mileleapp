@@ -22,4 +22,9 @@ class MasterGrades extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function modelDescriptions()
+    {
+        return $this->hasMany(MasterModelDescription::class, 'master_vehicles_grades_id');
+    }
 }

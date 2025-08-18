@@ -9,6 +9,7 @@
 
 @section('content')
     @can('edit-master-models')
+    
     @php
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-master-models');
     @endphp
@@ -63,12 +64,12 @@
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label  class="form-label">Model Year</label>
-                        <input type="text" class="form-control" id="model-year" @if($disableEdit == 1) disabled title="Not allowed to edit! model already used in LOI/PFI/PO" @endif 
-                        name="model_year" placeholder="Enter Model Year">
+                            <input type="text" class="form-control" id="model-year" @if($disableEdit == 1) disabled title="Not allowed to edit! model already used in LOI/PFI/PO" @endif 
+                            name="model_year" placeholder="Enter Model Year">
                     </div>
                     @if($disableEdit == 1)
-                            <input type="hidden" name="model_year" value="{{ $masterModel->model_year }}">
-                        @endif
+                        <input type="hidden" name="model_year" value="{{ $masterModel->model_year }}">
+                    @endif
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
@@ -106,6 +107,9 @@
                                 <option value="{{ $variant->id }}" {{$masterModel->variant_id == $variant->id ? 'selected' : " "}}>{{$variant->name}}</option>
                             @endforeach
                         </select>
+                        @if($disableEdit == 1)
+                            <input type="hidden" name="variant_id" value="{{ $masterModel->variant_id }}">
+                        @endif
                         @if($disableEdit == 1)
                             <input type="hidden" name="variant_id" value="{{ $masterModel->variant_id }}">
                         @endif

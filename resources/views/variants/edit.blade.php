@@ -259,11 +259,47 @@
         $('#model').select2({
             placeholder: 'Select Model'
         })
-        $('#brand').on('change',function() {
+        $('#brand').on('change', function() {
             $('#brand-error').remove();
+            // Clear all related fields
+            $('input[name="model_detail"]').val('');
+            // If model description is a select, clear its options except default
+            if ($('#model_detail').is('select')) {
+                $('#model_detail').empty().append('<option value="">Select a Model</option>').val('').trigger('change');
+            }
+            $('input[name="steering"]').val('');
+            $('input[name="engine"]').val('');
+            $('input[name="fuel_type"]').val('');
+            $('input[name="transmission"]').val('');
+            $('input[name="window_type"]').val('');
+            $('input[name="drive_train"]').val('');
+            $('input[name="grade_name"]').val('');
+            $('input[name="specialEditions"]').val('');
+            $('input[name="others"]').val('');
+            // Clear all specification selects if present
+            $('#specification-details-container').empty();
+            $('#selected_specifications').val('');
         })
-        $('#model').on('change',function() {
+        $('#model').on('change', function() {
             $('#model-error').remove();
+            // Clear all related fields
+            $('input[name="model_detail"]').val('');
+            // If model description is a select, clear its options except default
+            if ($('#model_detail').is('select')) {
+                $('#model_detail').empty().append('<option value="">Select a Model</option>').val('').trigger('change');
+            }
+            $('input[name="steering"]').val('');
+            $('input[name="engine"]').val('');
+            $('input[name="fuel_type"]').val('');
+            $('input[name="transmission"]').val('');
+            $('input[name="window_type"]').val('');
+            $('input[name="drive_train"]').val('');
+            $('input[name="grade_name"]').val('');
+            $('input[name="specialEditions"]').val('');
+            $('input[name="others"]').val('');
+            // Clear all specification selects if present
+            $('#specification-details-container').empty();
+            $('#selected_specifications').val('');
         })
         $("#form-update").validate({
             ignore: [],
