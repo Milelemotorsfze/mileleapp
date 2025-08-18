@@ -9,6 +9,12 @@
                 <h4 class="card-title">
                     Master Model Lines
                 </h4>
+                @if (session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
             @can('view-model-lines-list')
                 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-model-lines-create');
@@ -75,13 +81,13 @@
                                         @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-model-lines-edit');
                                         @endphp
-                                        @if ($hasPermission)
                                         <td>
+                                            @if ($hasPermission && $modelLine->modelDescriptions->isNotEmpty())
                                             <a data-placement="top" href="{{ route('model-lines.edit', $modelLine->id) }}" class="btn btn-info btn-sm">
                                                 <i class="fa fa-edit"></i>
                                             </a>
+                                            @endif
                                         </td>
-                                        @endif
                                     @endcan
                                 </tr>
                         @endforeach
