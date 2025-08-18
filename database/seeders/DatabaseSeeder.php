@@ -34,6 +34,8 @@ class DatabaseSeeder extends Seeder
 //        $this->call(SettingsSeeder::class);
 //        $this->call(MasterVendorCategorySeeder::class);
 //        $this->call(MasterVendorSubCategorySeeder::class);
+        $this->call(LeadSourceSeeder::class);
+        $this->call(StrategySeeder::class);
         $this->call(ModelYearCalculationSeeder::class);
 
     }

@@ -1006,6 +1006,7 @@ class CallsController extends Controller
                 'Yacine Guella',
                 'Sarah Ferhane',
                 'Ayoub Ididir',
+                'Manal Khamalli',
             ];
             $allowed_user_ids = User::whereIn('name', $allowed_users)->pluck('id')->toArray();
             // Initialize lead counts for fair distribution
@@ -1079,27 +1080,35 @@ class CallsController extends Controller
                     $sales_person_id = null;
                 }
 
-                if ($source_name !== null) {
-                    $leadSource = LeadSource::where('source_name', $source_name)->first();
+                if ($source_name !== null && !empty(trim($source_name))) {
+                    $leadSource = LeadSource::where('source_name', trim($source_name))->first();
                     if ($leadSource) {
                         $lead_source_id = $leadSource->id;
                     } else { 
-                        $lead_source_id = 1;
+                        // Get the first available lead source as fallback
+                        $fallbackSource = LeadSource::where('status', 'active')->first();
+                        $lead_source_id = $fallbackSource ? $fallbackSource->id : null;
                     }
                 } 
                 else {
-                    $lead_source_id = 1;
+                    // Get the first available lead source as fallback
+                    $fallbackSource = LeadSource::where('status', 'active')->first();
+                    $lead_source_id = $fallbackSource ? $fallbackSource->id : null;
                 }
-                if ($strategies !== null) {
-                    $strategiesid = Strategy::where('name', $strategies)->first();
+                if ($strategies !== null && !empty(trim($strategies))) {
+                    $strategiesid = Strategy::where('name', trim($strategies))->first();
                     if ($strategiesid) {
                         $strategies_id = $strategiesid->id;
                     } else {
-                        $strategies_id = 1;
+                        // Get the first available strategy as fallback
+                        $fallbackStrategy = Strategy::where('status', 'active')->first();
+                        $strategies_id = $fallbackStrategy ? $fallbackStrategy->id : null;
                     }
                 } 
                 else {
-                    $strategies_id = 1;
+                    // Get the first available strategy as fallback
+                    $fallbackStrategy = Strategy::where('status', 'active')->first();
+                    $strategies_id = $fallbackStrategy ? $fallbackStrategy->id : null;
                 }
                 if ($language !== null) {
                     $language = Language::where('name', $language)->first();
@@ -1139,15 +1148,15 @@ class CallsController extends Controller
                 }
 
                 
-                if($lead_source_id === 1 || $sales_person_id === null || $language === 'Not Supported' || $location === 'Not Supported' || $strategies_id === 1)
+                if($lead_source_id === null || $sales_person_id === null || $language === 'Not Supported' || $location === 'Not Supported' || $strategies_id === null)
                 {
                     if ($sales_person_id === null) {
                         $errorDescription .= 'Invalid sales person. ';
                     }
-                    if ($lead_source_id === 1) {
+                    if ($lead_source_id === null) {
                         $errorDescription .= 'Invalid Source ';
                     }
-                    if ($strategies_id === 1) {
+                    if ($strategies_id === null) {
                         $errorDescription .= 'Invalid Strategies ';
                     }
                     if ($language === 'Not Supported') {
@@ -1186,23 +1195,84 @@ class CallsController extends Controller
                     $call->created_by = Auth::id();
                     $call->status = "New";
                     $call->location = $row[3];
-                    $call->save(); 
-                    $leads_notifications = New LeadsNotifications();
-                    $leads_notifications->calls_id =  $call->id;
-                    $leads_notifications->remarks = "New Assign Lead";
-                    $leads_notifications->status = "New";
-                    $leads_notifications->user_id = $sales_person_id;
-                    $leads_notifications->category = "New Assign Lead";
-                    $leads_notifications->save();
+                    
+                    try {
+                        $call->save();
+                    } catch (\Exception $e) {
+                        $errorMessage = "Database Error: ";
+                        if (strpos($e->getMessage(), 'foreign key constraint fails') !== false) {
+                            if (strpos($e->getMessage(), 'calls_source_foreign') !== false) {
+                                $errorMessage .= "Invalid lead source ID: {$lead_source_id}. ";
+                                if ($lead_source_id === null) {
+                                    $errorMessage .= "No valid lead source found in database. ";
+                                } else {
+                                    $errorMessage .= "Lead source ID {$lead_source_id} does not exist in lead_source table. ";
+                                }
+                            } elseif (strpos($e->getMessage(), 'calls_strategies_id_foreign') !== false) {
+                                $errorMessage .= "Invalid strategy ID: {$strategies_id}. ";
+                                if ($strategies_id === null) {
+                                    $errorMessage .= "No valid strategy found in database. ";
+                                } else {
+                                    $errorMessage .= "Strategy ID {$strategies_id} does not exist in strategies table. ";
+                                }
+                            } else {
+                                $errorMessage .= "Foreign key constraint violation. ";
+                            }
+                        } elseif (strpos($e->getMessage(), 'Integrity constraint violation') !== false) {
+                            $errorMessage .= "Data integrity violation. ";
+                        } else {
+                            $errorMessage .= $e->getMessage();
+                        }
+                        
+                        $errorMessage .= "Row data: Name='{$row[0]}', Email='{$row[2]}', Source='{$source_name}', Strategy='{$strategies}'";
+                        
+                        Log::error("Lead import failed: " . $errorMessage, [
+                            'exception' => $e->getMessage(),
+                            'row_data' => $row,
+                            'lead_source_id' => $lead_source_id,
+                            'strategies_id' => $strategies_id,
+                            'sales_person_id' => $sales_person_id
+                        ]);
+                        
+                        $row[] = $errorMessage;
+                        $rejectedRows[] = $row;
+                        $rejectedCount++;
+                        continue;
+                    } 
+                    try {
+                        $leads_notifications = New LeadsNotifications();
+                        $leads_notifications->calls_id =  $call->id;
+                        $leads_notifications->remarks = "New Assign Lead";
+                        $leads_notifications->status = "New";
+                        $leads_notifications->user_id = $sales_person_id;
+                        $leads_notifications->category = "New Assign Lead";
+                        $leads_notifications->save();
+                    } catch (\Exception $e) {
+                        Log::warning("Failed to create lead notification for call ID: {$call->id}", [
+                            'exception' => $e->getMessage(),
+                            'call_id' => $call->id,
+                            'user_id' => $sales_person_id
+                        ]);
+                        // Continue processing - notification failure shouldn't stop the lead import
+                    }
                     if ($model_line_name !== null) {
-                        $modelLine = MasterModelLines::where('model_line', $model_line_name)->first();
-                        if ($modelLine) {
-                            $model_line_id = $modelLine->id;
-                            $callsRequirement = new CallsRequirement();
-                            $callsRequirement->lead_id = $call->id;
-                            $callsRequirement->model_line_id = $model_line_id;
-                            $callsRequirement->save();
-                        } 
+                        try {
+                            $modelLine = MasterModelLines::where('model_line', $model_line_name)->first();
+                            if ($modelLine) {
+                                $model_line_id = $modelLine->id;
+                                $callsRequirement = new CallsRequirement();
+                                $callsRequirement->lead_id = $call->id;
+                                $callsRequirement->model_line_id = $model_line_id;
+                                $callsRequirement->save();
+                            } 
+                        } catch (\Exception $e) {
+                            Log::warning("Failed to create model line requirement for call ID: {$call->id}", [
+                                'exception' => $e->getMessage(),
+                                'call_id' => $call->id,
+                                'model_line_name' => $model_line_name
+                            ]);
+                            // Continue processing - model line requirement failure shouldn't stop the lead import
+                        }
                     }
                     $acceptedCount++;
                 }
@@ -1370,26 +1440,34 @@ class CallsController extends Controller
                 $date->setTimezone('Asia/Dubai');
                 $formattedDate = $date->format('Y-m-d H:i:s');
                 // Source
-                if ($source_name !== null) {
-                    $leadSource = LeadSource::where('source_name', $source_name)->first();
+                if ($source_name !== null && !empty(trim($source_name))) {
+                    $leadSource = LeadSource::where('source_name', trim($source_name))->first();
                     if ($leadSource) {
                         $lead_source_id = $leadSource->id;
                     } else { 
-                        $lead_source_id = 1;
+                        // Get the first available lead source as fallback
+                        $fallbackSource = LeadSource::where('status', 'active')->first();
+                        $lead_source_id = $fallbackSource ? $fallbackSource->id : null;
                     }
                 } else {
-                    $lead_source_id = 1;
+                    // Get the first available lead source as fallback
+                    $fallbackSource = LeadSource::where('status', 'active')->first();
+                    $lead_source_id = $fallbackSource ? $fallbackSource->id : null;
                 }
                 // Strategies
-                if ($strategies !== null) {
-                    $strategiesid = Strategy::where('name', $strategies)->first();
+                if ($strategies !== null && !empty(trim($strategies))) {
+                    $strategiesid = Strategy::where('name', trim($strategies))->first();
                     if ($strategiesid) {
                         $strategies_id = $strategiesid->id;
                     } else {
-                        $strategies_id = 1;
+                        // Get the first available strategy as fallback
+                        $fallbackStrategy = Strategy::where('status', 'active')->first();
+                        $strategies_id = $fallbackStrategy ? $fallbackStrategy->id : null;
                     }
                 } else {
-                    $strategies_id = 1;
+                    // Get the first available strategy as fallback
+                    $fallbackStrategy = Strategy::where('status', 'active')->first();
+                    $strategies_id = $fallbackStrategy ? $fallbackStrategy->id : null;
                 }
                 // Language
                 if ($language !== null) {
@@ -1423,33 +1501,94 @@ class CallsController extends Controller
                 $call->assign_time = Carbon::now();
                 $call->custom_brand_model = $row[9];
                 $call->remarks = $remarksData;
-                $call->source = $lead_source_id;
-                $call->strategies_id = $strategies_id;
-                $call->priority = $priority;
-                $call->language = is_array($row[6]) ? implode(', ', $row[6]) : $row[6];
-                $call->sales_person = $assignedUserId;
-                $call->created_at = $formattedDate;
-                $call->assign_time = $formattedDate;
-                $call->created_by = Auth::id();
-                $call->status = "New";
-                $call->location = $location;
-                $call->save(); 
-                $leads_notifications = New LeadsNotifications();
-                $leads_notifications->calls_id =  $call->id;
-                $leads_notifications->remarks = "New Assign Lead";
-                $leads_notifications->status = "New";
-                $leads_notifications->user_id = $assignedUserId;
-                $leads_notifications->category = "New Assign Lead";
-                $leads_notifications->save();
-                if ($model_line_name !== null) {
-                    $modelLine = MasterModelLines::where('model_line', $model_line_name)->first();
-                    if ($modelLine) {
-                        $model_line_id = $modelLine->id;
-                        $callsRequirement = new CallsRequirement();
-                        $callsRequirement->lead_id = $call->id;
-                        $callsRequirement->model_line_id = $model_line_id;
-                        $callsRequirement->save();
+                                    $call->source = $lead_source_id;
+                    $call->strategies_id = $strategies_id;
+                    $call->priority = $priority;
+                    $call->language = is_array($row[6]) ? implode(', ', $row[6]) : $row[6];
+                    $call->sales_person = $assignedUserId;
+                    $call->created_at = $formattedDate;
+                    $call->assign_time = $formattedDate;
+                    $call->created_by = Auth::id();
+                    $call->status = "New";
+                    $call->location = $location;
+                    
+                    try {
+                        $call->save();
+                    } catch (\Exception $e) {
+                        $errorMessage = "Database Error: ";
+                        if (strpos($e->getMessage(), 'foreign key constraint fails') !== false) {
+                            if (strpos($e->getMessage(), 'calls_source_foreign') !== false) {
+                                $errorMessage .= "Invalid lead source ID: {$lead_source_id}. ";
+                                if ($lead_source_id === null) {
+                                    $errorMessage .= "No valid lead source found in database. ";
+                                } else {
+                                    $errorMessage .= "Lead source ID {$lead_source_id} does not exist in lead_source table. ";
+                                }
+                            } elseif (strpos($e->getMessage(), 'calls_strategies_id_foreign') !== false) {
+                                $errorMessage .= "Invalid strategy ID: {$strategies_id}. ";
+                                if ($strategies_id === null) {
+                                    $errorMessage .= "No valid strategy found in database. ";
+                                } else {
+                                    $errorMessage .= "Strategy ID {$strategies_id} does not exist in strategies table. ";
+                                }
+                            } else {
+                                $errorMessage .= "Foreign key constraint violation. ";
+                            }
+                        } elseif (strpos($e->getMessage(), 'Integrity constraint violation') !== false) {
+                            $errorMessage .= "Data integrity violation. ";
+                        } else {
+                            $errorMessage .= $e->getMessage();
+                        }
+                        
+                        $errorMessage .= "Row data: Name='{$row[0]}', Email='{$row[2]}', Source='{$source_name}', Strategy='{$strategies}'";
+                        
+                        Log::error("Lead import failed: " . $errorMessage, [
+                            'exception' => $e->getMessage(),
+                            'row_data' => $row,
+                            'lead_source_id' => $lead_source_id,
+                            'strategies_id' => $strategies_id,
+                            'assigned_user_id' => $assignedUserId
+                        ]);
+                        
+                        $row[] = $errorMessage;
+                        $rejectedRows[] = $row;
+                        $rejectedCount++;
+                        continue;
                     } 
+                                    try {
+                        $leads_notifications = New LeadsNotifications();
+                        $leads_notifications->calls_id =  $call->id;
+                        $leads_notifications->remarks = "New Assign Lead";
+                        $leads_notifications->status = "New";
+                        $leads_notifications->user_id = $assignedUserId;
+                        $leads_notifications->category = "New Assign Lead";
+                        $leads_notifications->save();
+                    } catch (\Exception $e) {
+                        Log::warning("Failed to create lead notification for call ID: {$call->id}", [
+                            'exception' => $e->getMessage(),
+                            'call_id' => $call->id,
+                            'user_id' => $assignedUserId
+                        ]);
+                        // Continue processing - notification failure shouldn't stop the lead import
+                    }
+                if ($model_line_name !== null) {
+                    try {
+                        $modelLine = MasterModelLines::where('model_line', $model_line_name)->first();
+                        if ($modelLine) {
+                            $model_line_id = $modelLine->id;
+                            $callsRequirement = new CallsRequirement();
+                            $callsRequirement->lead_id = $call->id;
+                            $callsRequirement->model_line_id = $model_line_id;
+                            $callsRequirement->save();
+                        } 
+                    } catch (\Exception $e) {
+                        Log::warning("Failed to create model line requirement for call ID: {$call->id}", [
+                            'exception' => $e->getMessage(),
+                            'call_id' => $call->id,
+                            'model_line_name' => $model_line_name
+                        ]);
+                        // Continue processing - model line requirement failure shouldn't stop the lead import
+                    }
                 }
                 $acceptedCount++;
             }
@@ -1488,7 +1627,56 @@ class CallsController extends Controller
             'rejected_count' => $rejectedCount
         ]);
         
-        return redirect()->route('calls.index')->with('success', "Data uploaded successfully! From the total " . count($rows) . " records, {$acceptedCount} were accepted.");
+        if ($rejectedCount > 0) {
+            $errorSummary = "Data uploaded with issues! From the total " . count($rows) . " records:\n";
+            $errorSummary .= "✅ {$acceptedCount} were accepted successfully\n";
+            $errorSummary .= "❌ {$rejectedCount} were rejected due to errors\n\n";
+            $errorSummary .= "Please check the rejected rows for detailed error messages.";
+            
+            return redirect()->route('calls.index')
+                ->with('warning', $errorSummary)
+                ->with('rejectedRows', $rejectedRows)
+                ->with('acceptedCount', $acceptedCount)
+                ->with('rejectedCount', $rejectedCount);
+        } else {
+            return redirect()->route('calls.index')
+                ->with('success', "Data uploaded successfully! All " . count($rows) . " records were accepted.");
+        }
+    }
+
+    /**
+     * Export rejected rows from bulk upload with detailed error messages
+     */
+    public function exportRejectedRows(Request $request)
+    {
+        $rejectedRows = $request->session()->get('rejectedRows', []);
+        
+        if (empty($rejectedRows)) {
+            return redirect()->route('calls.index')->with('error', 'No rejected rows to export.');
+        }
+
+        $headers = [
+            'Name', 'Phone', 'Email', 'Location', 'Sales Person', 'Source', 
+            'Language', 'Brand', 'Model Line', 'Custom Brand Model', 'Strategies',
+            'Priority', 'Car Interested', 'Purchase Purpose', 'End User', 
+            'Destination Country', 'Planned Units', 'Experience', 'Shipping', 
+            'Payment Method', 'Previous Purchase', 'Timeline', 'Additional Notes', 'Error Message'
+        ];
+
+        $filename = 'rejected_leads_' . date('Y-m-d_H-i-s') . '.csv';
+        
+        $handle = fopen('php://output', 'w');
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        
+        fputcsv($handle, $headers);
+        
+        foreach ($rejectedRows as $row) {
+            fputcsv($handle, $row);
+        }
+        
+        fclose($handle);
+        exit;
     }
 
     public function checkExistence(Request $request)
@@ -2171,6 +2359,7 @@ class CallsController extends Controller
             'Yacine Guella',
             'Sarah Ferhane',
             'Ayoub Ididir',
+            'Manal Khamalli',
         ];
         // 'Elie Zouein',
         // 'Manal Khamalli',
@@ -2183,9 +2372,37 @@ class CallsController extends Controller
             $isAfrican = true;
         }
         
-        $cleanedPhone = $phone ? ltrim(preg_replace('/[^\d+]/', '', $phone), '+') : '';
-        $matchByEmail = !empty($email) ? Calls::where('email', $email)->whereNotNull('email')->orderBy('created_at', 'desc')->first() : null;
-        $matchByPhone = !empty($cleanedPhone) ? Calls::where('phone', 'LIKE', '%' . $cleanedPhone)->whereNotNull('phone')->orderBy('created_at', 'desc')->first() : null;
+        $cleanedPhone = '';
+        if (!empty($phone) && is_string($phone)) {
+            $cleanedPhone = ltrim(preg_replace('/[^\d+]/', '', $phone), '+');
+        }
+        
+        $matchByEmail = null;
+        if (!empty($email) && is_string($email)) {
+            try {
+                $matchByEmail = Calls::where('email', $email)->orderBy('created_at', 'desc')->first();
+            } catch (\Exception $e) {
+                Log::warning("Error querying email match in auto assignment", [
+                    'email' => $email,
+                    'error' => $e->getMessage()
+                ]);
+                $matchByEmail = null;
+            }
+        }
+        
+        $matchByPhone = null;
+        if (!empty($cleanedPhone) && strlen($cleanedPhone) > 0) {
+            try {
+                $matchByPhone = Calls::where('phone', 'LIKE', '%' . $cleanedPhone)->orderBy('created_at', 'desc')->first();
+            } catch (\Exception $e) {
+                Log::warning("Error querying phone match in auto assignment", [
+                    'phone' => $phone,
+                    'cleaned_phone' => $cleanedPhone,
+                    'error' => $e->getMessage()
+                ]);
+                $matchByPhone = null;
+            }
+        }
 
         // 1. Check for Previous Assignment by email or phone
         $previousSalesPerson = null;
@@ -2224,31 +2441,57 @@ class CallsController extends Controller
         }
 
         // 2. Get eligible users based on location and other criteria
-        $userQuery = ModelHasRoles::select('model_id')
-            ->where('role_id', 7)
-            ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-            ->where('users.status', 'active')
-            ->whereIn('model_has_roles.model_id', $allowed_user_ids);
-        if ($isAfrican) {
-            $userQuery->where('users.is_dubai_sales_rep', 'Yes');
+        try {
+            $userQuery = ModelHasRoles::select('model_id')
+                ->where('role_id', 7)
+                ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+                ->where('users.status', 'active')
+                ->whereIn('model_has_roles.model_id', $allowed_user_ids);
+            if ($isAfrican) {
+                $userQuery->where('users.is_dubai_sales_rep', 'Yes');
+            }
+            $eligibleUserIds = $userQuery->pluck('model_id')->toArray();
+        } catch (\Exception $e) {
+            Log::error("Error getting eligible users in auto assignment", [
+                'error' => $e->getMessage(),
+                'allowed_user_ids' => $allowed_user_ids,
+                'is_african' => $isAfrican
+            ]);
+            $eligibleUserIds = [];
         }
-        $eligibleUserIds = $userQuery->pluck('model_id')->toArray();
 
         if (!empty($eligibleUserIds)) {
             // Build current lead counts (New status) for eligible users
-            $leadCounts = Calls::whereIn('sales_person', $eligibleUserIds)
-                ->where('status', 'New')
-                ->selectRaw('sales_person, COUNT(*) as lead_count')
-                ->groupBy('sales_person')
-                ->pluck('lead_count', 'sales_person')
-                ->toArray();
+            try {
+                $leadCounts = Calls::whereIn('sales_person', $eligibleUserIds)
+                    ->where('status', 'New')
+                    ->selectRaw('sales_person, COUNT(*) as lead_count')
+                    ->groupBy('sales_person')
+                    ->pluck('lead_count', 'sales_person')
+                    ->toArray();
+            } catch (\Exception $e) {
+                Log::error("Error getting lead counts in auto assignment", [
+                    'error' => $e->getMessage(),
+                    'eligible_user_ids' => $eligibleUserIds
+                ]);
+                $leadCounts = [];
+            }
 
             // 3. Check for language matching with even distribution
-            if (!empty($language)) {
-                $langMatched = SalesPersonLaugauges::whereIn('sales_person', $eligibleUserIds)
-                    ->where('language', $language)
-                    ->pluck('sales_person')
-                    ->toArray();
+            if (!empty($language) && is_string($language)) {
+                try {
+                    $langMatched = SalesPersonLaugauges::whereIn('sales_person', $eligibleUserIds)
+                        ->where('language', $language)
+                        ->pluck('sales_person')
+                        ->toArray();
+                } catch (\Exception $e) {
+                    Log::error("Error getting language matched users in auto assignment", [
+                        'error' => $e->getMessage(),
+                        'language' => $language,
+                        'eligible_user_ids' => $eligibleUserIds
+                    ]);
+                    $langMatched = [];
+                }
                 
                 if (!empty($langMatched)) {
                     // Sort language-matched users by lead count (ascending) for even distribution
