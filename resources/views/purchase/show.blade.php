@@ -1840,13 +1840,12 @@ return [$color->id => $formattedName];
                                 <th style="vertical-align: middle;" id="int_color">Exterior Color</th>
                                 <th style="vertical-align: middle;" id="ex_color">Interior Color</th>
                                 <th>VIN Number</th>
-                                <th>DN Number</th>
                                 <th>Engine Number</th>
                                 <th>Upholstery</th>
                                 <th>Territory</th>
                                 <th style="vertical-align: middle;" id="estimated">Estimated Arrival</th>
                                 <th>Production Date</th>
-
+                                <th>DN Number</th>
                                 <th id="serno" style="vertical-align: middle;">Vehicle Status:</th>
                                 <!-- @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'po-approval', 'edit-po-colour-details', 'cancel-vehicle-purchased-order']);
@@ -1928,12 +1927,12 @@ return [$color->id => $formattedName];
                                     </select>
                                 </td>
                                 <td class="editable-field vin" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
-                                <td class="editable-field dn" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->dn->dn_number ?? '' }}</td>
                                 <td class="editable-field engine" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                                 <td class="" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->variant->upholestry }}</td>
                                 <td class="editable-field territory" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                                 <td class="editable-field estimation_date" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
                                 <td class="editable-field ppmmyyy" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
+                                <td class="editable-field dn" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->dn->dn_number ?? '' }}</td>
                                 @else
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
                                     <select name="ex_colour[]" class="form-control ex-colour-select" placeholder="Exterior Color" disabled>
@@ -1960,12 +1959,12 @@ return [$color->id => $formattedName];
                                     </select>
                                 </td>
                                 <td class="vin" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
-                                <td class="editable-field dn" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->dn->dn_number ?? '' }}</td>
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->variant->upholestry }}</td>
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
+                                <td class="editable-field dn" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->dn->dn_number ?? '' }}</td>
                                 @endif
                                 @else
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
@@ -1993,12 +1992,12 @@ return [$color->id => $formattedName];
                                     </select>
                                 </td>
                                 <td class="vin" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
-                                <td class="editable-field dn" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->dn->dn_number ?? '' }}</td>
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->variant->upholestry }}</td>
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
+                                <td class="editable-field dn" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->dn->dn_number ?? '' }}</td>
                                 @endif
                                 @endif
                                 @php
