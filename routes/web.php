@@ -477,6 +477,8 @@ Route::get('/d', function () {
         Route::post('work-order/revert-sales-approval', 'revertSalesApproval')->name('work-order.revert-sales-approval');
         Route::post('/save-filters', 'saveFilters')->name('save.filters');
         Route::post('/check-so-number', 'checkSONumber')->name('wo.checkSONumber');
+        Route::post('/update-created-at', 'updateCreatedAt')->name('work-order.updateCreatedAt');
+        Route::post('/update-date', 'updateDate')->name('work-order.updateDate');
     });
     Route::controller(WoDocsStatusController::class)->group(function(){
         Route::post('/update-wo-doc-status', 'updateDocStatus')->name('wo.updateDocStatus');
@@ -639,6 +641,7 @@ Route::get('/d', function () {
     Route::resource('lead_source', LeadSourceController::class);
     Route::get('calls-bulk/createbulk', [CallsController::class,'createbulk'])->name('calls.createbulk');
     Route::post('/uploadingbulk', [CallsController::class, 'uploadingbulk'])->name('calls.uploadingbulk');
+    Route::get('/export-rejected-rows', [CallsController::class, 'exportRejectedRows'])->name('calls.export-rejected-rows');
     Route::post('/summernote/upload', [CallsController::class, 'upload'])->name('summernote.upload');
 
     Route::resource('strategy', StrategyController::class);
@@ -1093,6 +1096,7 @@ Route::get('/d', function () {
     Route::post('/vehicles/hold/{id}', [VehiclesController::class, 'hold'])->name('vehicles.hold');
     Route::post('/transition/paymentconfirm', [PurchasingOrderController::class, 'paymentconfirm'])->name('transition.paymentconfirm');
     Route::get('/getdata', [PurchasingOrderController::class, 'getdata'])->name('purchased.getdata');
+    Route::post('/import-csv-file', [PurchasingOrderController::class, 'importCsvFile']);
 
 
 Route::get('/check-trashed-gdn', function () {
@@ -1195,4 +1199,6 @@ Route::get('/check-trashed-gdn', function () {
     Route::get('so-unique-check', [SalesOrderController::class, 'checkUniqueSoNumber'])->name('so.uniqueSoNumber');
     Route::get('so-variants', [SalesOrderController::class, 'getVariants'])->name('so.getVariants');
     Route::get('so-vins', [SalesOrderController::class, 'getVins'])->name('so.getVins');
+    Route::get('/get-grades/{modelId}', [ModeldescriptionController::class, 'getGrades']);
+    Route::get('/get-model-details/{model_line_id}', [ModeldescriptionController::class, 'getModelDetails']);
 });

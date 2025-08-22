@@ -16,7 +16,7 @@ class ModelLinesController extends Controller
      */
     public function index()
     {
-        $modelLines = MasterModelLines::orderBy('id','DESC')->get();
+        $modelLines = MasterModelLines::with('modelDescriptions')->orderBy('id','DESC')->get();
         (new UserActivityController)->createActivity('Open Master Model Lines');
         return view('model-lines.index', compact('modelLines'));
     }
@@ -81,10 +81,15 @@ class ModelLinesController extends Controller
      */
     public function edit(string $id)
     {
-        $modelLine = MasterModelLines::findOrFail($id);
-        $brands = Brand::all();
+        $modelLine = MasterModelLines::with('modelDescriptions')->findOrFail($id);
+        
+        // Check if model line has any model descriptions
+        if (count($modelLine->modelDescriptions) === 0) {
+            return redirect()->route('model-lines.index')->with('error', 'This action can`t be done.');
+        }
 
-        return view('model-lines.edit', compact('modelLine','brands'));
+        $brands = Brand::all();
+        return view('model-lines.edit', compact('modelLine', 'brands'));
     }
 
     /**

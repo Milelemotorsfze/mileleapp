@@ -7,11 +7,11 @@ table.dataTable {
     white-space: nowrap; /* Prevent text from wrapping into multiple lines */
 }
 /* Reduce padding for table cells */
-.table>tbody>tr>td, 
-.table>tbody>tr>th, 
-.table>tfoot>tr>td, 
-.table>tfoot>tr>th, 
-.table>thead>tr>td, 
+.table>tbody>tr>td,
+.table>tbody>tr>th,
+.table>tfoot>tr>td,
+.table>tfoot>tr>th,
+.table>thead>tr>td,
 .table>thead>tr>th {
     padding: 2px 3px; /* Decrease the padding */
     text-align: center;
@@ -20,7 +20,7 @@ table.dataTable {
 }
 table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td
 {
-   padding: 1px; 
+   padding: 1px;
 }
 /* Reduce the height of the rows */
 #dtBasicExample7 tbody tr {
@@ -360,7 +360,7 @@ table.dataTable thead th select {
                         @foreach($salesperson as $salesperson)
                                 <option value="{{ $salesperson->id }}">{{ $salesperson->name }}</option>
                             @endforeach
-                           
+
                         </select>
                     </div>
                     <div class="form-group">
@@ -530,7 +530,7 @@ table.dataTable thead th select {
       </div>
     </div>
   </div>
-</div>      
+</div>
   </div>
   @php
     $hasPricePermission = Auth::user()->hasPermissionForSelectedRole('selling-price-stock-report-view');
@@ -611,8 +611,8 @@ table.dataTable thead th select {
               <tbody>
               </tbody>
             </table>
-          </div> 
-        </div>  
+          </div>
+        </div>
       <div class="modal fade" id="variantview" tabindex="-1" aria-labelledby="variantviewLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -681,7 +681,7 @@ table.dataTable thead th select {
     name: 'movement_grns.grn_number',
     render: function(data, type, row) {
         if (row.inspection_status == 'Approved') {
-           
+
             return data;
         }
         return ''; // If no data, return empty
@@ -702,8 +702,8 @@ table.dataTable thead th select {
         return ''; // If no date, return empty
     }
 },
-{ 
-            data: 'id', 
+{
+            data: 'id',
             name: 'id',
             render: function(data, type, row) {
                 if (row.grn_inspectionid) {
@@ -713,7 +713,7 @@ table.dataTable thead th select {
                 }
             }
         },
-{ 
+{
             data: null,
             render: function(data, type, row) {
                 var grnDate = new Date(row.date); // Assuming `row.date` is the GRN date
@@ -743,8 +743,8 @@ table.dataTable thead th select {
 },
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'spn', name: 'sp.name' },
-                { 
-        data: 'sales_remarks', 
+                {
+        data: 'sales_remarks',
         name: 'vehicles.sales_remarks',
         render: function(data, type, row) {
             return data ? data : '';
@@ -782,15 +782,15 @@ table.dataTable thead th select {
         return ''; // If no date, return empty
     }
 },
-{ 
-        data: 'vehicle_document_status', 
+{
+        data: 'vehicle_document_status',
         name: 'vehicles.vehicle_document_status',
         render: function(data, type, row) {
             return data ? data : '';
         }
     },
-        { 
-            data: 'id', 
+        {
+            data: 'id',
             name: 'id',
             render: function(data, type, row) {
                 if (row.pdi_inspectionid) {
@@ -803,8 +803,8 @@ table.dataTable thead th select {
               { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
-                { 
-                data: 'variant', 
+                {
+                data: 'variant',
                 name: 'varaints.name',
                 render: function(data, type, row) {
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
@@ -848,15 +848,15 @@ table.dataTable thead th select {
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'fuel_type', name: 'varaints.fuel_type' },
                 { data: 'gearbox', name: 'varaints.gearbox' },
-                { 
-        data: 'exterior_color', 
+                {
+        data: 'exterior_color',
         name: 'ex_color.name',
         render: function(data, type, row) {
             return data ? data : '';
         }
     },
-    { 
-        data: 'interior_color', 
+    {
+        data: 'interior_color',
         name: 'int_color.name',
         render: function(data, type, row) {
             return data ? data : '';
@@ -905,8 +905,8 @@ table.dataTable thead th select {
     columns7.push(
                     // { data: 'gp', name: 'vehicles.gp' },
                     {
-            data: 'minimum_commission', 
-            name: 'vehicles.minimum_commission', 
+            data: 'minimum_commission',
+            name: 'vehicles.minimum_commission',
                     render: function(data, type, row) {
                         if (data) {
                             // Convert the string to a float, then format it with commas
@@ -922,8 +922,8 @@ table.dataTable thead th select {
                     }
         },
                     {
-                    data: 'price', 
-                    name: 'vehicles.price', 
+                    data: 'price',
+                    name: 'vehicles.price',
                     render: function(data, type, row) {
                         if (data) {
                             // Convert the string to a float, then format it with commas
@@ -941,15 +941,15 @@ table.dataTable thead th select {
     }
                 columns7.push(
                 { data: 'ownership_type', name: 'vehicles.ownership_type' },
-        { 
-        data: 'custom_inspection_number', 
+        {
+        data: 'custom_inspection_number',
         name: 'vehicles.custom_inspection_number',
         render: function(data, type, row) {
             return data ? data : '';
         }
     },
-    { 
-        data: 'custom_inspection_status', 
+    {
+        data: 'custom_inspection_status',
         name: 'vehicles.custom_inspection_status',
         render: function(data, type, row) {
             return data ? data : '';
@@ -1159,8 +1159,8 @@ if (hasManagementPermission) {
                         day: '2-digit', month: 'short', year: 'numeric'
                     });
                     select.append('<option value="' + d + '">' + formattedDate + '</option>');
-                } 
-                else if (columnHeader === 'Production Year') { 
+                }
+                else if (columnHeader === 'Production Year') {
                     var dateObj = new Date(d);
                     var formattedDate = dateObj.toLocaleDateString('en-GB', {
                         year: 'numeric',
@@ -1430,7 +1430,7 @@ function openModal(id) {
             {
             variantDetailsBody.append('<tr><th>Production Year</th></td><td>'+ response.basevaraint.my +'<td>' + response.variants.my + '</td></tr>');
             }
-            else 
+            else
             {
             variantDetailsBody.append('<tr><th>Production Year</th></td><td>'+ response.basevaraint.my +'<td></td></tr>');
             }
@@ -1446,7 +1446,7 @@ function openModal(id) {
             {
             variantDetailsBody.append('<tr><th>Gear</th></td><td>'+ response.basevaraint.gearbox +'<td>' + response.variants.gearbox + '</td></tr>');
             }
-            else 
+            else
             {
               variantDetailsBody.append('<tr><th>Gear</th></td><td>'+ response.basevaraint.gearbox +'<td></td></tr>');
             }
@@ -1464,10 +1464,10 @@ function openModal(id) {
             }
             else
             {
-              variantDetailsBody.append('<tr><th>Upholstery</th></td><td>'+ response.basevaraint.upholestry +'<td></td></tr>'); 
+              variantDetailsBody.append('<tr><th>Upholstery</th></td><td>'+ response.basevaraint.upholestry +'<td></td></tr>');
             }
             }
-            else 
+            else
             {
             variantDetailsBody.append('<tr><th>Attribute</th><th>Options</th></tr>');
             variantDetailsBody.append('<tr><th>Name</th><td>' + response.variants.name + '</td></tr>');
@@ -2036,7 +2036,7 @@ $(document).ready(function() {
 <script>
     document.getElementById('cancelBookingButton').addEventListener('click', function() {
         var vehicleId = document.getElementById('vehicle_id').value;
-        
+
         if(confirm('Are you sure you want to cancel this booking?')) {
             // Send AJAX request to cancel booking
             fetch('{{ route('booking.canceling') }}', {

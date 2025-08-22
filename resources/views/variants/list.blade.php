@@ -80,23 +80,25 @@
         <h4 class="card-title">
             Variants Info
         </h4>
+        @can('variants-create')
         @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
         @endphp
         @if ($hasPermission)
-        <a  class="btn btn-sm btn-info float-end" href="{{ route('variants.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create Varitants</a>
-        @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-description-info');
-        @endphp
-        @if ($hasPermission)
-        <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
-            <a  class="btn btn-sm btn-primary float-end" href="{{ route('modeldescription.index') }}" ><i class="fa fa-info-circle" aria-hidden="true"></i> Model Description</a>
-            @endif
+          <a  class="btn btn-sm btn-info float-end" href="{{ route('variants.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create Variants</a>
+          @php
+          $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-model-description-list');
+          @endphp
+          @if ($hasPermission)
+              <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
+              <a  class="btn btn-sm btn-primary float-end" href="{{ route('modeldescription.index') }}" ><i class="fa fa-info-circle" aria-hidden="true"></i> Model Description</a>
+          @endif
             <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
             <a  class="btn btn-sm btn-primary float-end" href="{{ route('model-lines.index') }}" ><i class="fa fa-info-circle" aria-hidden="true"></i> Model Lines</a>
             <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
             <a  class="btn btn-sm btn-primary float-end" href="{{ route('brands.index') }}" ><i class="fa fa-info-circle" aria-hidden="true"></i> Brands</a>
         @endif
+        @endcan
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -119,6 +121,12 @@
             <div class="alert alert-success" id="success-alert">
                 <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
                 {{ Session::get('success') }}
+            </div>
+        @endif
+        @if (Session::has('error'))
+            <div class="alert alert-error alert-danger" id="error-alert">
+                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                {{ Session::get('error') }}
             </div>
         @endif
         <div class="modal fade" id="variantview" tabindex="-1" aria-labelledby="variantviewLabel" aria-hidden="true">
@@ -155,7 +163,7 @@
                     <th>Steering</th>
                     <th>Upholstery</th>
                     <th>Created By</th>
-                    <th>Created At</th>                    
+                    <th>Created At</th>
                     @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
                     @endphp
@@ -216,7 +224,7 @@
                                 </td>
                                 @else
                                 <td class="nowrap-td">
-                                
+
                                 </td>
                                 @endif
                             @endif
@@ -225,7 +233,7 @@
                                 <a data-placement="top" id="{{ $variant->id }}" href="{{ route('variants.destroy',$variant->id) }}" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> </a>
                                 @endif
                             @endcan -->
-                        
+
                     </tr>
                 @endforeach
                 </tbody>
@@ -336,7 +344,7 @@ function openModal(id) {
             {
             variantDetailsBody.append('<tr><th>Production Year</th></td><td>'+ response.basevaraint.my +'<td>' + response.variants.my + '</td></tr>');
             }
-            else 
+            else
             {
             variantDetailsBody.append('<tr><th>Production Year</th></td><td>'+ response.basevaraint.my +'<td></td></tr>');
             }
@@ -352,7 +360,7 @@ function openModal(id) {
             {
             variantDetailsBody.append('<tr><th>Gear</th></td><td>'+ response.basevaraint.gearbox +'<td>' + response.variants.gearbox + '</td></tr>');
             }
-            else 
+            else
             {
               variantDetailsBody.append('<tr><th>Gear</th></td><td>'+ response.basevaraint.gearbox +'<td></td></tr>');
             }
@@ -370,10 +378,10 @@ function openModal(id) {
             }
             else
             {
-              variantDetailsBody.append('<tr><th>Upholstery</th></td><td>'+ response.basevaraint.upholestry +'<td></td></tr>'); 
+              variantDetailsBody.append('<tr><th>Upholstery</th></td><td>'+ response.basevaraint.upholestry +'<td></td></tr>');
             }
             }
-            else 
+            else
             {
             variantDetailsBody.append('<tr><th>Attribute</th><th>Options</th></tr>');
             variantDetailsBody.append('<tr><th>Name</th><td>' + response.variants.name + '</td></tr>');
@@ -432,7 +440,7 @@ function openModal(id) {
                 modifiedVariantTable.append(modifiedVariantBody);
                 modalBody.append(modifiedVariantTable);
             }
-            
+
             $('#variantview').modal('show');
         },
         error: function(xhr, status, error) {

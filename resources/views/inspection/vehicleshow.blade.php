@@ -194,6 +194,8 @@
                                         <option value="3.3" {{ old('engine') == '3.3' ? 'selected' : '' }}>3.3</option>
                                         <option value="3.4" {{ old('engine') == '3.4' ? 'selected' : '' }}>3.4</option>
                                         <option value="3.5" {{ old('engine') == '3.5' ? 'selected' : '' }}>3.5</option>
+                                        <option value="3.6" {{ old('engine') == '3.6' ? 'selected' : '' }}>3.6</option>
+                                        <option value="3.8" {{ old('engine') == '3.8' ? 'selected' : '' }}>3.8</option>
                                         <option value="4.0" {{ old('engine') == '4.0' ? 'selected' : '' }}>4.0</option>
                                         <option value="4.2" {{ old('engine') == '4.2' ? 'selected' : '' }}>4.2</option>
                                         <option value="4.4" {{ old('engine') == '4.4' ? 'selected' : '' }}>4.4</option>
@@ -201,6 +203,7 @@
                                         <option value="4.6" {{ old('engine') == '4.6' ? 'selected' : '' }}>4.6</option>
                                         <option value="4.8" {{ old('engine') == '4.8' ? 'selected' : '' }}>4.8</option>
                                         <option value="5.0" {{ old('engine') == '5.0' ? 'selected' : '' }}>5.0</option>
+                                        <option value="5.2" {{ old('engine') == '5.2' ? 'selected' : '' }}>5.2</option>
                                         <option value="5.3" {{ old('engine') == '5.3' ? 'selected' : '' }}>5.3</option>
                                         <option value="5.5" {{ old('engine') == '5.5' ? 'selected' : '' }}>5.5</option>
                                         <option value="5.6" {{ old('engine') == '5.6' ? 'selected' : '' }}>5.6</option>

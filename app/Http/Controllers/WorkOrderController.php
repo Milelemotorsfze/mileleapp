@@ -1146,38 +1146,38 @@ class WorkOrderController extends Controller
                     preg_match_all('/@\[([^\]]+)\]/', $comment['text'] ?? '', $matches);
                     $mentionedUserNames = $matches[1];
 
-                    // if (!empty($mentionedUserNames)) {
-                    //     $mentionedUsers = User::whereIn('name', $mentionedUserNames)->get();
+                    if (!empty($mentionedUserNames)) {
+                        $mentionedUsers = User::whereIn('name', $mentionedUserNames)->get();
 
-                    //     foreach ($mentionedUsers as $user) {
-                    //         // Queue email notifications for efficiency
-                    //         dispatch(function () use ($workOrder, $newCommentId, $user) {
-                    //             $template = [
-                    //                 'from' => 'no-reply@milele.com',
-                    //                 'from_name' => 'Milele Matrix'
-                    //             ];
-                    //             $customerName = $workOrder->customer_name ?? 'Unknown Customer';
-                    //             $subject = "You were mentioned in a comment - " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
-                    //             $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
-                    //             $accessLinkWithComment = $accessLink . '#comment-' . $newCommentId;
+                        foreach ($mentionedUsers as $user) {
+                            // Queue email notifications for efficiency
+                            dispatch(function () use ($workOrder, $newCommentId, $user) {
+                                $template = [
+                                    'from' => 'no-reply@milele.com',
+                                    'from_name' => 'Milele Matrix'
+                                ];
+                                $customerName = $workOrder->customer_name ?? 'Unknown Customer';
+                                $subject = "You were mentioned in a comment - " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
+                                $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+                                $accessLinkWithComment = $accessLink . '#comment-' . $newCommentId;
 
-                    //             // Retrieve the comment object from the database
-                    //             $comment = WOComments::find($newCommentId);
+                                // Retrieve the comment object from the database
+                                $comment = WOComments::find($newCommentId);
 
-                    //             Mail::send('work_order.emails.mentioned_in_comment', [
-                    //                 'workOrder' => $workOrder,
-                    //                 'accessLink' => $accessLink,
-                    //                 'accessLinkWithComment' => $accessLinkWithComment,
-                    //                 'comment' => $comment, // This ensures $comment is an object
-                    //                 'user' => $user // Pass the user object to the view
-                    //             ], function ($message) use ($subject, $template, $user) {
-                    //                 $message->from($template['from'], $template['from_name'])
-                    //                     ->to($user->email)
-                    //                     ->subject($subject);
-                    //             });
-                    //         })->onQueue('emails');
-                    //     }
-                    // }
+                                Mail::send('work_order.emails.mentioned_in_comment', [
+                                    'workOrder' => $workOrder,
+                                    'accessLink' => $accessLink,
+                                    'accessLinkWithComment' => $accessLinkWithComment,
+                                    'comment' => $comment, // This ensures $comment is an object
+                                    'user' => $user // Pass the user object to the view
+                                ], function ($message) use ($subject, $template, $user) {
+                                    $message->from($template['from'], $template['from_name'])
+                                        ->to($user->email)
+                                        ->subject($subject);
+                                });
+                            })->onQueue('emails');
+                        }
+                    }
                 }
             }
 
@@ -1203,55 +1203,55 @@ class WorkOrderController extends Controller
                 // $this->sendVehicleUpdateEmail($workOrder);
             }
             (new UserActivityController)->createActivity('Create ' . $request->type . ' work order');
-            // // Prepare the from details
-            // $template['from'] = 'no-reply@milele.com';
-            // $template['from_name'] = 'Milele Matrix';
+            // Prepare the from details
+            $template['from'] = 'no-reply@milele.com';
+            $template['from_name'] = 'Milele Matrix';
 
-            // // Handle cases where customer_name is null
-            // $customerName = $workOrder->customer_name ?? 'Unknown Customer';
+            // Handle cases where customer_name is null
+            $customerName = $workOrder->customer_name ?? 'Unknown Customer';
+            // Prepare email data
+            $subject = "New Work Order " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
+            
+            // Define a quick access link (adjust the route as needed)
+            $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
 
-            // // Prepare email data
-            // $subject = "New Work Order " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
+            // Retrieve and validate email addresses from .env
+            $financeEmail = filter_var(env('FINANCE_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+            $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+            // Get all users with 'can_send_wo_email' set to 'yes' from the database
+            $managementEmails = \App\Models\User::where('can_send_wo_email', 'yes')->pluck('email')->filter(function ($email) {
+                return filter_var($email, FILTER_VALIDATE_EMAIL);
+            })->toArray();
 
-            // // Define a quick access link (adjust the route as needed)
-            // $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+            // Log email addresses to help with debugging
+            \Log::info('Email Recipients:', [
+                'financeEmail' => $financeEmail,
+                'operationsEmail' => $operationsEmail,
+                'managementEmails' => implode(', ', $managementEmails) ?: 'none found',
+            ]);
+            // Combine all recipient emails into a single array
+            $recipients = array_filter(array_merge([$financeEmail, $operationsEmail], $managementEmails));
+            // Log and handle invalid email addresses (but do not throw an exception, just log)
+            if (empty($recipients)) {
+                \Log::info('No valid recipients found. Skipping email sending for Work Order: ' . $workOrder->wo_number);
+                return;
+            }
 
-            // // Retrieve and validate email addresses from .env
-            // $financeEmail = filter_var(env('FINANCE_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
-            // $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
-            // // Get all users with 'can_send_wo_email' set to 'yes' from the database
-            // $managementEmails = \App\Models\User::where('can_send_wo_email', 'yes')->pluck('email')->filter(function ($email) {
-            //     return filter_var($email, FILTER_VALIDATE_EMAIL);
-            // })->toArray();
-            // // Log email addresses to help with debugging
-            // \Log::info('Email Recipients:', [
-            //     'financeEmail' => $financeEmail,
-            //     'operationsEmail' => $operationsEmail,
-            //     'managementEmails' => implode(', ', $managementEmails) ?: 'none found',
-            // ]);
-            // // Combine all recipient emails into a single array
-            // $recipients = array_filter(array_merge([$financeEmail, $operationsEmail], $managementEmails));
-            // // Log and handle invalid email addresses (but do not throw an exception, just log)
-            // if (empty($recipients)) {
-            //     \Log::info('No valid recipients found. Skipping email sending for Work Order: ' . $workOrder->wo_number);
-            //     return;
-            // }
-
-            // // Send email using a Blade template
-            // Mail::send('work_order.emails.new_wo', [
-            //     'workOrder' => $workOrder,
-            //     'accessLink' => $accessLink,
-            // ], function ($message) use ($subject, $recipients, $template) {
-            //     $message->from($template['from'], $template['from_name'])
-            //         ->to($recipients)
-            //         ->subject($subject);
-            // });
-            // $checkRecords = $workOrder->dataHistories()
-            //     ->whereIn('field_name', ['amount_received', 'balance_amount', 'currency', 'deposit_received_as', 'so_total_amount', 'so_vehicle_quantity'])
-            //     ->exists();
-            // if ($checkRecords) {
-            //     $this->sendSOAmountUpdateEmail($workOrder, null);
-            // }
+            // Send email using a Blade template
+            Mail::send('work_order.emails.new_wo', [
+                'workOrder' => $workOrder,
+                'accessLink' => $accessLink,
+            ], function ($message) use ($subject, $recipients, $template) {
+                $message->from($template['from'], $template['from_name'])
+                    ->to($recipients)
+                    ->subject($subject);
+            });
+            $checkRecords = $workOrder->dataHistories()
+                ->whereIn('field_name', ['amount_received', 'balance_amount', 'currency', 'deposit_received_as', 'so_total_amount', 'so_vehicle_quantity'])
+                ->exists();
+            if ($checkRecords) {
+                $this->sendSOAmountUpdateEmail($workOrder, null);
+            }
             // Commit the transaction
             DB::commit();
 
@@ -1314,23 +1314,19 @@ class WorkOrderController extends Controller
         // Get the current date and time in d M Y, h:i:s A format
         $currentDateTime = now()->format('d M Y, h:i:s A');
         // Send email using a Blade template
-        try {
-            Mail::send('work_order.emails.amount_update', [
-                'workOrder' => $workOrder,
-                'accessLink' => $accessLink,
-                'authUserName' => $authUserName, // Pass the authenticated user's name
-                'authUserEmail' => $authUserEmail, // Pass the authenticated user's email
-                'currentDateTime' => $currentDateTime, // Pass the current date and time
-                'comment' => $comment,
-                'hasEditConfirmedPermission' => $hasEditConfirmedPermission, // Pass the permission flag
-            ], function ($message) use ($subject, $recipients, $template) {
-                $message->from($template['from'], $template['from_name'])
-                    ->to($recipients)
-                    ->subject($subject);
-            });
-        } catch (\Exception $e) {
-            \Log::error($e);
-        }
+        Mail::send('work_order.emails.amount_update', [
+            'workOrder' => $workOrder,
+            'accessLink' => $accessLink,
+            'authUserName' => $authUserName, // Pass the authenticated user's name
+            'authUserEmail' => $authUserEmail, // Pass the authenticated user's email
+            'currentDateTime' => $currentDateTime, // Pass the current date and time
+            'comment' => $comment,
+            'hasEditConfirmedPermission' => $hasEditConfirmedPermission, // Pass the permission flag
+        ], function ($message) use ($subject, $recipients, $template) {
+            $message->from($template['from'], $template['from_name'])
+                ->to($recipients)
+                ->subject($subject);
+        });
     }
     private function sendDataUpdateEmail($workOrder, $comment)
     {
@@ -1370,23 +1366,19 @@ class WorkOrderController extends Controller
         // Get the current date and time in d M Y, h:i:s A format
         $currentDateTime = now()->format('d M Y, h:i:s A');
         // Send email using a Blade template
-        try {
-            Mail::send('work_order.emails.data_update', [
-                'workOrder' => $workOrder,
-                'accessLink' => $accessLink,
-                'authUserName' => $authUserName, // Pass the authenticated user's name
-                'authUserEmail' => $authUserEmail,
-                'currentDateTime' => $currentDateTime, // Pass the current date and time
-                'comment' => $comment,
-                'hasEditConfirmedPermission' => $hasEditConfirmedPermission, // Pass the permission flag
-            ], function ($message) use ($subject, $emailList, $template) {
-                $message->from($template['from'], $template['from_name'])
-                    ->to($emailList->toArray()) // Convert the collection to an array
-                    ->subject($subject);
-            });
-        } catch (\Exception $e) {
-            \Log::error($e);
-        }
+        Mail::send('work_order.emails.data_update', [
+            'workOrder' => $workOrder,
+            'accessLink' => $accessLink,
+            'authUserName' => $authUserName, // Pass the authenticated user's name
+            'authUserEmail' => $authUserEmail,
+            'currentDateTime' => $currentDateTime, // Pass the current date and time
+            'comment' => $comment,
+            'hasEditConfirmedPermission' => $hasEditConfirmedPermission, // Pass the permission flag
+        ], function ($message) use ($subject, $emailList, $template) {
+            $message->from($template['from'], $template['from_name'])
+                ->to($emailList->toArray()) // Convert the collection to an array
+                ->subject($subject);
+        });
     }
     private function sendVehicleUpdateEmail($workOrder, $newComment)
     {
@@ -1422,23 +1414,19 @@ class WorkOrderController extends Controller
         // Get the current date and time in d M Y, h:i:s A format
         $currentDateTime = now()->format('d M Y, h:i:s A');
         // Send email using a Blade template
-        try {
-            Mail::send('work_order.emails.vehicle_update', [
-                'workOrder' => $workOrder,
-                'accessLink' => $accessLink,
-                'newComment' => $newComment,
-                'authUserName' => $authUserName, // Pass the authenticated user's name
-                'authUserEmail' => $authUserEmail,
-                'currentDateTime' => $currentDateTime, // Pass the current date and time
-                'hasEditConfirmedPermission' => $hasEditConfirmedPermission, // Pass the permission flag
-            ], function ($message) use ($subject, $managementEmails, $template) {
-                $message->from($template['from'], $template['from_name'])
-                    ->to($managementEmails)
-                    ->subject($subject);
-            });
-        } catch (\Exception $e) {
-            \Log::error($e);
-        }
+        Mail::send('work_order.emails.vehicle_update', [
+            'workOrder' => $workOrder,
+            'accessLink' => $accessLink,
+            'newComment' => $newComment,
+            'authUserName' => $authUserName, // Pass the authenticated user's name
+            'authUserEmail' => $authUserEmail,
+            'currentDateTime' => $currentDateTime, // Pass the current date and time
+            'hasEditConfirmedPermission' => $hasEditConfirmedPermission, // Pass the permission flag
+        ], function ($message) use ($subject, $managementEmails, $template) {
+            $message->from($template['from'], $template['from_name'])
+                ->to($managementEmails)
+                ->subject($subject);
+        });
     }
     public function processNewAddons($woVehicles, $addonData, $authId)
     {
@@ -2708,9 +2696,9 @@ class WorkOrderController extends Controller
                 $checkRecords = $newComment->wo_histories()
                     ->whereIn('field_name', ['amount_received', 'balance_amount', 'currency', 'deposit_received_as', 'so_total_amount', 'so_vehicle_quantity'])
                     ->exists();
-                // if ($checkRecords) {
-                //     $this->sendSOAmountUpdateEmail($workOrder, $newComment);
-                // }
+                if ($checkRecords) {
+                    $this->sendSOAmountUpdateEmail($workOrder, $newComment);
+                }
                 $checkmainRecords = $newComment->wo_histories()
                     ->whereIn('field_name', [
                         'airline',
@@ -2768,9 +2756,9 @@ class WorkOrderController extends Controller
                         'notify_party',
                         'special_or_transit_clause_or_request',
                     ])->exists();
-                // if ($checkmainRecords) {
-                //     $this->sendDataUpdateEmail($workOrder, $newComment);
-                // }
+                if ($checkmainRecords) {
+                    $this->sendDataUpdateEmail($workOrder, $newComment);
+                }
             }
             if ($canCreateFinanceApproval == true) {
                 if (!$hasEditConfirmedPermission) {
@@ -2804,7 +2792,7 @@ class WorkOrderController extends Controller
                     }
                 }
                 // Call the private function to send the email
-                // $this->sendVehicleUpdateEmail($workOrder, $newComment);
+                $this->sendVehicleUpdateEmail($workOrder, $newComment);
             }
             (new UserActivityController)->createActivity('Update ' . $request->type . ' work order');
 
@@ -2973,28 +2961,28 @@ class WorkOrderController extends Controller
         if (!empty($mentionedUserNames)) {
             $mentionedUsers = User::whereIn('name', $mentionedUserNames)->get();
 
-            // foreach ($mentionedUsers as $user) {
-            //     // Queue email notifications for efficiency
-            //     dispatch(function () use ($workOrder, $comment, $user) {
-            //         $template['from'] = 'no-reply@milele.com';
-            //         $template['from_name'] = 'Milele Matrix';
-            //         $customerName = $workOrder->customer_name ?? 'Unknown Customer';
-            //         $subject = "You were mentioned in a comment - " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
-            //         $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
-            //         $accessLinkWithComment = $accessLink . '#comment-' . $comment->id;
-            //         Mail::send('work_order.emails.mentioned_in_comment', [
-            //             'workOrder' => $workOrder,
-            //             'accessLink' => $accessLink,
-            //             'accessLinkWithComment' => $accessLinkWithComment,
-            //             'comment' => $comment,
-            //             'user' => $user // Pass the user variable to the view
-            //         ], function ($message) use ($subject, $template, $user) {
-            //             $message->from($template['from'], $template['from_name'])
-            //                 ->to($user->email)
-            //                 ->subject($subject);
-            //         });
-            //     })->onQueue('emails');
-            // }
+            foreach ($mentionedUsers as $user) {
+                // Queue email notifications for efficiency
+                dispatch(function () use ($workOrder, $comment, $user) {
+                    $template['from'] = 'no-reply@milele.com';
+                    $template['from_name'] = 'Milele Matrix';
+                    $customerName = $workOrder->customer_name ?? 'Unknown Customer';
+                    $subject = "You were mentioned in a comment - " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
+                    $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+                    $accessLinkWithComment = $accessLink . '#comment-' . $comment->id;
+                    Mail::send('work_order.emails.mentioned_in_comment', [
+                        'workOrder' => $workOrder,
+                        'accessLink' => $accessLink,
+                        'accessLinkWithComment' => $accessLinkWithComment,
+                        'comment' => $comment,
+                        'user' => $user // Pass the user variable to the view
+                    ], function ($message) use ($subject, $template, $user) {
+                        $message->from($template['from'], $template['from_name'])
+                            ->to($user->email)
+                            ->subject($subject);
+                    });
+                })->onQueue('emails');
+            }
         }
 
         return response()->json($comment->load('files', 'mentionedUsers', 'user'), 201);
@@ -3164,61 +3152,61 @@ class WorkOrderController extends Controller
                             ->where('status', 'pending')
                             ->orderBy('id', 'ASC')
                             ->first();
-                        // if ($cooPending) {
-                        //     // Prepare the from details
-                        //     $template['from'] = 'no-reply@milele.com';
-                        //     $template['from_name'] = 'Milele Matrix';
+                        if ($cooPending) {
+                            // Prepare the from details
+                            $template['from'] = 'no-reply@milele.com';
+                            $template['from_name'] = 'Milele Matrix';
 
-                        //     // Handle cases where customer_name is null
-                        //     $customerName = $workOrder->customer_name ?? 'Unknown Customer';
+                            // Handle cases where customer_name is null
+                            $customerName = $workOrder->customer_name ?? 'Unknown Customer';
 
-                        //     // Prepare email data
-                        //     $subject = "Finance approved the work order " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
-                        //     // Define a quick access link (adjust the route as needed)
-                        //     $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
-                        //     $approvalHistoryLink = env('BASE_URL') . '/coo-approval-history/' . $workOrder->id;
+                            // Prepare email data
+                            $subject = "Finance approved the work order " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
+                            // Define a quick access link (adjust the route as needed)
+                            $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+                            $approvalHistoryLink = env('BASE_URL') . '/coo-approval-history/' . $workOrder->id;
 
-                        //     $rolesWithPermission = Role::whereHas('permissions', function ($query) {
-                        //         $query->where('name', 'do-coo-office-approval');
-                        //     })->pluck('id')->toArray();
-                        //     // Get users with the required roles and valid email addresses
-                        //     $recipients = \App\Models\User::role($rolesWithPermission)
-                        //         ->whereIn('status', ['new', 'active'])
-                        //         ->where('password', '!=', '')
-                        //         ->whereHas('roles')
-                        //         ->pluck('email')
-                        //         ->filter(function ($email) {
-                        //             return filter_var($email, FILTER_VALIDATE_EMAIL);
-                        //         })->toArray();
-                        //     // Get the emails to exclude from the environment variable
-                        //     $excludedEmails = explode(',', env('DONT_SEND_EMAIL', ''));
+                            $rolesWithPermission = Role::whereHas('permissions', function ($query) {
+                                $query->where('name', 'do-coo-office-approval');
+                            })->pluck('id')->toArray();
+                            // Get users with the required roles and valid email addresses
+                            $recipients = \App\Models\User::role($rolesWithPermission)
+                                ->whereIn('status', ['new', 'active'])
+                                ->where('password', '!=', '')
+                                ->whereHas('roles')
+                                ->pluck('email')
+                                ->filter(function ($email) {
+                                    return filter_var($email, FILTER_VALIDATE_EMAIL);
+                                })->toArray();
+                            // Get the emails to exclude from the environment variable
+                            $excludedEmails = explode(',', env('DONT_SEND_EMAIL', ''));
 
-                        //     // Filter out the excluded emails
-                        //     $filteredRecipients = array_diff($recipients, $excludedEmails);
-                        //     // Log email addresses to help with debugging
-                        //     \Log::info('Email Recipients:', [
-                        //         'recipients' => implode(', ', $filteredRecipients) ?: 'none found',
-                        //     ]);
-                        //     // Log and handle invalid email addresses (but do not throw an exception, just log)
-                        //     if (empty($filteredRecipients)) {
-                        //         \Log::info('No valid recipients found. Skipping email sending for Work Order: ' . $workOrder->wo_number);
-                        //         return;
-                        //     }
-                        //     // Send email using a Blade template
-                        //     Mail::send('work_order.emails.confirmed_coo_pending', [
-                        //         'workOrder' => $workOrder,
-                        //         'accessLink' => $accessLink,
-                        //         'approvalHistoryLink' => $approvalHistoryLink,
-                        //     ], function ($message) use ($subject, $filteredRecipients, $template) {
-                        //         $message->from($template['from'], $template['from_name'])
-                        //             ->to($filteredRecipients)
-                        //             ->subject($subject);
-                        //     });
-                        // }
+                            // Filter out the excluded emails
+                            $filteredRecipients = array_diff($recipients, $excludedEmails);
+                            // Log email addresses to help with debugging
+                            \Log::info('Email Recipients:', [
+                                'recipients' => implode(', ', $filteredRecipients) ?: 'none found',
+                            ]);
+                            // Log and handle invalid email addresses (but do not throw an exception, just log)
+                            if (empty($filteredRecipients)) {
+                                \Log::info('No valid recipients found. Skipping email sending for Work Order: ' . $workOrder->wo_number);
+                                return;
+                            }
+                            // Send email using a Blade template
+                            Mail::send('work_order.emails.confirmed_coo_pending', [
+                                'workOrder' => $workOrder,
+                                'accessLink' => $accessLink,
+                                'approvalHistoryLink' => $approvalHistoryLink,
+                            ], function ($message) use ($subject, $filteredRecipients, $template) {
+                                $message->from($template['from'], $template['from_name'])
+                                    ->to($filteredRecipients)
+                                    ->subject($subject);
+                            });
+                        }
                     }
                     DB::commit();
                     // Send email notification
-                    // $this->sendFinanceApprovalEmail($workOrder, $woApprovals->status, $woApprovals->comments, $woApprovals->user->name);
+                    $this->sendFinanceApprovalEmail($workOrder, $woApprovals->status, $woApprovals->comments, $woApprovals->user->name);
                     return response()->json('success');
                 } else if ($woApprovals && $woApprovals->action_at != '') {
                     DB::commit();
@@ -3330,7 +3318,7 @@ class WorkOrderController extends Controller
 
                     DB::commit();
                     // Send email notification
-                    // $this->sendCOOApprovalEmail($workOrder, $woApprovals->status, $woApprovals->comments, $woApprovals->user->name);
+                    $this->sendCOOApprovalEmail($workOrder, $woApprovals->status, $woApprovals->comments, $woApprovals->user->name);
                     return response()->json('success');
                 } else if ($woApprovals && $woApprovals->action_at != '') {
                     DB::commit();
@@ -3443,48 +3431,48 @@ class WorkOrderController extends Controller
                         ->where('status', 'pending')
                         ->orderBy('id', 'ASC')
                         ->first();
-                    // if ($financePending) {
-                    //     // Prepare the from details
-                    //     $template['from'] = 'no-reply@milele.com';
-                    //     $template['from_name'] = 'Milele Matrix';
+                    if ($financePending) {
+                        // Prepare the from details
+                        $template['from'] = 'no-reply@milele.com';
+                        $template['from_name'] = 'Milele Matrix';
 
-                    //     // Handle cases where customer_name is null
-                    //     $customerName = $wo->customer_name ?? 'Unknown Customer';
+                        // Handle cases where customer_name is null
+                        $customerName = $wo->customer_name ?? 'Unknown Customer';
 
-                    //     // Prepare email data
-                    //     $subject = "Sales support confirmed the work order " . $wo->wo_number . " " . $customerName . " " . $wo->vehicle_count . " Unit " . $wo->type_name;
+                        // Prepare email data
+                        $subject = "Sales support confirmed the work order " . $wo->wo_number . " " . $customerName . " " . $wo->vehicle_count . " Unit " . $wo->type_name;
 
-                    //     // Define a quick access link (adjust the route as needed)
-                    //     $accessLink = env('BASE_URL') . '/work-order/' . $wo->id;
-                    //     $approvalHistoryLink = env('BASE_URL') . '/finance-approval-history/' . $wo->id;
+                        // Define a quick access link (adjust the route as needed)
+                        $accessLink = env('BASE_URL') . '/work-order/' . $wo->id;
+                        $approvalHistoryLink = env('BASE_URL') . '/finance-approval-history/' . $wo->id;
 
-                    //     $rolesWithPermission = Role::whereHas('permissions', function ($query) {
-                    //         $query->where('name', 'do-finance-approval');
-                    //     })->pluck('id')->toArray();
-                    //     $recipients = \App\Models\User::role($rolesWithPermission)->whereIn('status', ['new', 'active'])->where('password', '!=', '')->whereHas('roles')
-                    //         ->pluck('email')->filter(function ($email) {
-                    //             return filter_var($email, FILTER_VALIDATE_EMAIL);
-                    //         })->toArray();
-                    //     // Log email addresses to help with debugging
-                    //     \Log::info('Email Recipients:', [
-                    //         'recipients' => implode(', ', $recipients) ?: 'none found',
-                    //     ]);
-                    //     // Log and handle invalid email addresses (but do not throw an exception, just log)
-                    //     if (empty($recipients)) {
-                    //         \Log::info('No valid recipients found. Skipping email sending for Work Order: ' . $wo->wo_number);
-                    //         return;
-                    //     }
-                    //     // Send email using a Blade template
-                    //     Mail::send('work_order.emails.confirmed_fin_pending', [
-                    //         'workOrder' => $wo,
-                    //         'accessLink' => $accessLink,
-                    //         'approvalHistoryLink' => $approvalHistoryLink,
-                    //     ], function ($message) use ($subject, $recipients, $template) {
-                    //         $message->from($template['from'], $template['from_name'])
-                    //             ->to($recipients)
-                    //             ->subject($subject);
-                    //     });
-                    // }
+                        $rolesWithPermission = Role::whereHas('permissions', function ($query) {
+                            $query->where('name', 'do-finance-approval');
+                        })->pluck('id')->toArray();
+                        $recipients = \App\Models\User::role($rolesWithPermission)->whereIn('status', ['new', 'active'])->where('password', '!=', '')->whereHas('roles')
+                            ->pluck('email')->filter(function ($email) {
+                                return filter_var($email, FILTER_VALIDATE_EMAIL);
+                            })->toArray();
+                        // Log email addresses to help with debugging
+                        \Log::info('Email Recipients:', [
+                            'recipients' => implode(', ', $recipients) ?: 'none found',
+                        ]);
+                        // Log and handle invalid email addresses (but do not throw an exception, just log)
+                        if (empty($recipients)) {
+                            \Log::info('No valid recipients found. Skipping email sending for Work Order: ' . $wo->wo_number);
+                            return;
+                        }
+                        // Send email using a Blade template
+                        Mail::send('work_order.emails.confirmed_fin_pending', [
+                            'workOrder' => $wo,
+                            'accessLink' => $accessLink,
+                            'approvalHistoryLink' => $approvalHistoryLink,
+                        ], function ($message) use ($subject, $recipients, $template) {
+                            $message->from($template['from'], $template['from_name'])
+                                ->to($recipients)
+                                ->subject($subject);
+                        });
+                    }
                     DB::commit();
                     return response()->json('success');
                 } else if ($wo && $wo->sales_support_data_confirmation_at != '') {
@@ -3648,5 +3636,104 @@ class WorkOrderController extends Controller
         $value = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
         $value = preg_replace('/[\x00-\x1F\x7F]/u', '', $value); // remove control chars
         return preg_replace('/\s+/', ' ', trim($value));
+    }
+
+    /**
+     * Update the created_at field for a work order
+     */
+    public function updateCreatedAt(Request $request)
+    {
+        try {
+            $request->validate([
+                'work_order_id' => 'required|exists:work_orders,id',
+                'created_at' => 'required|date',
+            ]);
+
+            $workOrder = WorkOrder::findOrFail($request->work_order_id);
+            $oldCreatedAt = $workOrder->created_at;
+            
+            // Set the time to 00:00:00 for the date input
+            $newCreatedAt = $request->created_at . ' 00:00:00';
+            
+            // Update the created_at field
+            $workOrder->created_at = $newCreatedAt;
+            $workOrder->save();
+
+            // Create history record for the change
+            WORecordHistory::create([
+                'work_order_id' => $workOrder->id,
+                'field_name' => 'created_at',
+                'old_value' => $oldCreatedAt ? $oldCreatedAt->format('Y-m-d H:i:s') : null,
+                'new_value' => $newCreatedAt,
+                'type' => 'Change',
+                'user_id' => Auth::id(),
+                'changed_at' => Carbon::now(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Created date updated successfully.',
+                'formatted_date' => Carbon::parse($newCreatedAt)->format('d M Y')
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error updating created_at: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update created date. Please try again.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Update the date field for a work order
+     */
+    public function updateDate(Request $request)
+    {
+        try {
+            $request->validate([
+                'work_order_id' => 'required|exists:work_orders,id',
+                'date' => 'required|date',
+            ]);
+
+            $workOrder = WorkOrder::findOrFail($request->work_order_id);
+            $oldDate = $workOrder->date;
+            
+            // Set the time to 00:00:00 for the date input
+            $newDate = $request->date . ' 00:00:00';
+            
+            // Update the date field, created_at, updated_at, and updated_by
+            $workOrder->date = $newDate;
+            $workOrder->created_at = $newDate; // Also update created_at with the new date
+            $workOrder->updated_at = Carbon::now();
+            $workOrder->updated_by = Auth::id();
+            $workOrder->save();
+
+            // Create history record for the change
+            WORecordHistory::create([
+                'work_order_id' => $workOrder->id,
+                'field_name' => 'date',
+                'old_value' => $oldDate ? Carbon::parse($oldDate)->format('Y-m-d H:i:s') : null,
+                'new_value' => $newDate,
+                'type' => 'Change',
+                'user_id' => Auth::id(),
+                'changed_at' => Carbon::now(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Date updated successfully.',
+                'formatted_date' => Carbon::parse($newDate)->format('d M Y'),
+                'updated_at_formatted' => Carbon::now()->format('d M Y'),
+                'updated_by_name' => Auth::user()->name
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error updating date: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update date. Please try again.'
+            ], 500);
+        }
     }
 }

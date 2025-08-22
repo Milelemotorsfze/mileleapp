@@ -100,6 +100,18 @@
 		background-color:#d9d9d9!important;
 		font-weight: 700!important;
 	}
+	
+	.edit-created-at {
+		padding: 2px 4px !important;
+		font-size: 0.6rem !important;
+		line-height: 1 !important;
+		border-radius: 3px !important;
+	}
+	
+	.edit-created-at:hover {
+		background-color: #007bff !important;
+		color: white !important;
+	}
 </style>
 @section('content')
 <div id="loading-overlay" style="display: none;">
@@ -537,7 +549,17 @@
 								<td>{{ $data->salesPerson->name ?? '' }}</td>
 								<td>{{ $data->so_number ?? '' }}</td>
 								<td>{{ $data->wo_number ?? '' }}</td>
-								<td>{{ $data->formatDate($data->date) }}</td>
+								<td>
+									<div class="d-flex align-items-center">
+										<span class="date-display">{{ $data->formatDate($data->date) }}</span>
+										<button type="button" class="btn btn-sm btn-outline-primary ms-1 edit-date" 
+												data-work-order-id="{{ $data->id }}" 
+												data-current-date="{{ $data->date }}" 
+												title="Edit Date">
+											<i class="fas fa-edit" style="font-size: 0.7rem;"></i>
+										</button>
+									</div>
+								</td>
 								@if(isset($type) && in_array($type, ['export_exw', 'export_cnf', 'all', 'status_report']))
 									<td>{{ $data->is_batch == 0 ? 'Single' : ($data->batch ?? '') }}</td>
 								@endif
@@ -600,10 +622,10 @@
 								@component('components.view-download-buttons', ['filePath' => 'wo/enduser_contract/', 'fileName' => $data->enduser_contract])@endcomponent
 								@component('components.view-download-buttons', ['filePath' => 'wo/vehicle_handover_person_id/', 'fileName' => $data->vehicle_handover_person_id])@endcomponent
 								@endif
-								<td>{{ $data->CreatedBy->name ?? '' }}</td>
-								<td>{{ $data->formatDate($data->created_at) }}</td>
-								<td>{{ $data->UpdatedBy->name ?? '' }}</td>
-								<td>{{ $data->formatDate($data->updated_at) }}</td>
+								<td class="created-by-cell" data-work-order-id="{{ $data->id }}">{{ $data->CreatedBy->name ?? '' }}</td>
+								<td class="created-at-cell" data-work-order-id="{{ $data->id }}">{{ $data->formatDate($data->created_at) }}</td>
+								<td class="updated-by-cell" data-work-order-id="{{ $data->id }}">{{ $data->UpdatedBy->name ?? '' }}</td>
+								<td class="updated-at-cell" data-work-order-id="{{ $data->id }}">{{ $data->formatDate($data->updated_at) }}</td>
 								@if(isset($type) && $type != 'status_report')
 									<td>{{ $data->salesSupportDataConfirmationBy->name ?? '' }}</td>
 									<td>{{ $data->formatDate($data->sales_support_data_confirmation_at) }}</td>
@@ -622,6 +644,32 @@
 		</div>
     </div>
 @endif
+
+<!-- Modal for editing date -->
+<div class="modal fade" id="editDateModal" tabindex="-1" aria-labelledby="editDateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editDateModalLabel">Edit Date</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editDateForm">
+                    <div class="mb-3">
+                        <label for="date_input" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="date_input" name="date" required>
+                    </div>
+                    <input type="hidden" id="work_order_id_input" name="work_order_id">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveDateBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 @push('scripts')
 
@@ -807,7 +855,7 @@
 		const type = 'all';  // Modify this if 'type' should be dynamically set based on other input
 		window.location.href = `/work-order-info/${type}`;
 	});
-	function exportData() {
+	        function exportData() {
             let search = $('#search').val(); 
 			let startDate = '';
 			let endDate = '';
@@ -823,5 +871,89 @@
            
             window.location.href = exportUrl;
         }
+
+        // Date Edit Functionality
+        $(document).on('click', '.edit-date', function() {
+            const workOrderId = $(this).data('work-order-id');
+            const currentDate = $(this).data('current-date');
+            
+            // Set the work order ID in the hidden input
+            $('#work_order_id_input').val(workOrderId);
+            
+            // Format the current date for date input (YYYY-MM-DD)
+            const formattedDate = new Date(currentDate).toISOString().slice(0, 10);
+            $('#date_input').val(formattedDate);
+            
+            // Show the modal
+            $('#editDateModal').modal('show');
+        });
+
+        $('#saveDateBtn').on('click', function() {
+            const formData = {
+                work_order_id: $('#work_order_id_input').val(),
+                date: $('#date_input').val(),
+                _token: '{{ csrf_token() }}'
+            };
+
+            // Show loading overlay
+            $('#loading-overlay').css('display', 'flex').addClass('active');
+
+            $.ajax({
+                url: '{{ route("work-order.updateDate") }}',
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (response.success) {
+                        // Close the modal
+                        $('#editDateModal').modal('hide');
+                        
+                        // Show success message
+                        alertify.success(response.message);
+                        
+                        // Update the date display without refreshing
+                        const workOrderId = $('#work_order_id_input').val();
+                        const newFormattedDate = response.formatted_date;
+                        
+                        // Find the specific row and update the date display
+                        const dateCell = $(`.edit-date[data-work-order-id="${workOrderId}"]`).closest('td').find('.date-display');
+                        if (dateCell.length) {
+                            dateCell.text(newFormattedDate);
+                        }
+                        
+                        // Update the created_at field
+                        const createdAtCell = $(`.created-at-cell[data-work-order-id="${workOrderId}"]`);
+                        if (createdAtCell.length) {
+                            createdAtCell.text(newFormattedDate);
+                        }
+                        
+                        // Update the updated_at field
+                        const updatedAtCell = $(`.updated-at-cell[data-work-order-id="${workOrderId}"]`);
+                        if (updatedAtCell.length) {
+                            updatedAtCell.text(response.updated_at_formatted);
+                        }
+                        
+                        // Update the updated_by field
+                        const updatedByCell = $(`.updated-by-cell[data-work-order-id="${workOrderId}"]`);
+                        if (updatedByCell.length) {
+                            updatedByCell.text(response.updated_by_name);
+                        }
+                        
+                    } else {
+                        alertify.error(response.message || 'Failed to update date.');
+                    }
+                },
+                error: function(xhr) {
+                    const response = xhr.responseJSON;
+                    alertify.error(response?.message || 'An error occurred while updating the date.');
+                },
+                complete: function() {
+                    // Hide loading overlay
+                    $('#loading-overlay').removeClass('active');
+                    setTimeout(() => {
+                        $('#loading-overlay').css('display', 'none');
+                    }, 300);
+                }
+            });
+        });
 </script>
 @endpush

@@ -457,17 +457,19 @@ class CallsController extends Controller
 
         if ($request->input('sales-option') == "auto-assign") {
             Log::info("Starting auto-assignment for lead creation.");
-            $sales_person_id = $this->autoAssignSalesPerson(
+            $assignmentResult = $this->autoAssignSalesPerson(
                 $request->input('email'),
                 $request->input('phone'),
                 $request->input('language'),
                 $request->input('location')
             );
+            $sales_person_id = $assignmentResult['user_id'];
+            $assignmentReason = $assignmentResult['reason'];
             if ($sales_person_id) {
                 $salesPersonName = User::find($sales_person_id)?->name;
-                Log::info("Final Assigned Sales Person: $salesPersonName (ID: $sales_person_id)");
+                Log::info("Final Assigned Sales Person: $salesPersonName (ID: $sales_person_id) - Reason: $assignmentReason");
             } else {
-                Log::warning("No available sales person found for assignment.");
+                Log::warning("No available sales person found for assignment - Reason: $assignmentReason");
             }
         } else {
             $sales_person_id = $request->input('sales_person_id');
@@ -793,9 +795,11 @@ class CallsController extends Controller
 
     public function uploadingbulk(Request $request)
     {
+        Log::info("Starting bulk lead upload process");
         $validCountryCodes = CountryCodes::list();
         
         if (!$request->hasFile('file') || !$request->file('file')->isValid()) {
+            Log::warning("Bulk upload failed: Invalid file");
             return back()->with('error', 'Please Select The Correct File for Uploading');
         }
 
@@ -992,7 +996,7 @@ class CallsController extends Controller
         }
 
         else {
-            // At the top of the else block, before the foreach ($rows as $row):
+            // Define allowed users for auto-assignment
             $allowed_users = [
                 'Lincoln Mukwada',
                 'Nwanneka Nwani',
@@ -1002,15 +1006,28 @@ class CallsController extends Controller
                 'Yacine Guella',
                 'Sarah Ferhane',
                 'Ayoub Ididir',
+                'Manal Khamalli',
             ];
             $allowed_user_ids = User::whereIn('name', $allowed_users)->pluck('id')->toArray();
+            // Initialize lead counts for fair distribution
             $userLeadCounts = [];
             foreach ($allowed_user_ids as $uid) {
                 $userLeadCounts[$uid] = Calls::where('sales_person', $uid)->where('status', 'New')->count();
             }
-            // ...
-            // Then, inside the foreach ($rows as $row), use only the round-robin/least-leads logic for assignment, without re-initializing these arrays.
-            foreach ($rows as $row) {
+            // Separate leads into two groups: with and without sales person
+            $leadsWithSalesPerson = [];
+            $leadsWithoutSalesPerson = [];
+            foreach ($rows as $index => $row) {
+                $sales_person = trim($row[4]); // Sales person column
+                if (!empty($sales_person)) {
+                    $leadsWithSalesPerson[] = $row;
+                } else {
+                    $leadsWithoutSalesPerson[] = $row;
+                }
+            }
+            Log::info("Processing bulk upload: " . count($leadsWithSalesPerson) . " leads with sales person, " . count($leadsWithoutSalesPerson) . " leads without sales person");
+            // Process leads with specified sales person first
+            foreach ($leadsWithSalesPerson as $row) {
                 $call = new Calls();
                 $name = $row[0];
                 $email = $row[2];
@@ -1034,9 +1051,7 @@ class CallsController extends Controller
                 $prevPurchase = trim($row[20]);
                 $timeline = trim($row[21]);
                 $additionalNotes = trim($row[22]);
-
                 $remarksArray = [];
-
                 if ($carInterested || $purchasePurpose || $endUser || $destinationCountry || $plannedUnits || $experience || $shipping || $paymentMethod || $prevPurchase || $timeline) {
                     $remarksArray[] = 'Lead Summary - Qualification Notes:';
                     if ($carInterested) $remarksArray[] = "1. Car Interested In: $carInterested";
@@ -1053,87 +1068,47 @@ class CallsController extends Controller
                 if ($additionalNotes) {
                     $remarksArray[] = "General Remark / Additional Notes: $additionalNotes";
                 }
-
                 $remarksData = implode('###SEP###', $remarksArray);
-
                 $errorDescription = '';
-
-                // Assignment logic
-                if (!empty($sales_person)) {
-                    // If sales person is specified, assign directly (bypass auto-assignment rules)
-                    $salesPerson = User::where('name', $sales_person)->first();
-                    if ($salesPerson) {
-                        $sales_person_id = $salesPerson->id;
-                    } else {
-                        $errorDescription .= 'Specified Sales Person not found. ';
-                        $sales_person_id = null;
-                    }
+                // Assignment logic for leads with specified sales person
+                $salesPerson = User::where('name', $sales_person)->first();
+                if ($salesPerson) {
+                    $sales_person_id = $salesPerson->id;
+                    Log::info("Direct assignment: Lead assigned to " . $salesPerson->name . " (ID: $sales_person_id)");
                 } else {
-                    // Fair round-robin/least-leads logic for bulk upload
-                    // Filter eligible users by language/location if needed
-                    $allowed_users = [
-                        'Lincoln Mukwada',
-                        'Nwanneka Nwani',
-                        'Raymond Chikoki',
-                        'Ali Arous',
-                        'Mohamad Azizi',
-                        'Yacine Guella',
-                        'Sarah Ferhane',
-                        'Ayoub Ididir',
-                    ];
-                    $allowed_user_ids = User::whereIn('name', $allowed_users)->pluck('id')->toArray();
-
-                    // Build initial lead counts for each allowed user
-                    $userLeadCounts = [];
-                    foreach ($allowed_user_ids as $uid) {
-                        $userLeadCounts[$uid] = Calls::where('sales_person', $uid)->where('status', 'New')->count();
-                    }
-
-                    // Auto-assignment logic for empty sales person field
-                    $rawPhoneForAutoAssign = trim($row[1]);
-                    if (!empty($rawPhoneForAutoAssign) && $rawPhoneForAutoAssign[0] !== '+') {
-                        $rawPhoneForAutoAssign = '+' . $rawPhoneForAutoAssign;
-                    }
-                    
-                    Log::info("Auto-assigning lead for: Email=$email, Phone=$rawPhoneForAutoAssign, Language=$language, Location=$location");
-                    
-                    $sales_person_id = $this->autoAssignSalesPerson(
-                        $email,
-                        $rawPhoneForAutoAssign,
-                        $language,
-                        $location
-                    );
-                    
-                    if ($sales_person_id) {
-                        $assignedPerson = User::find($sales_person_id);
-                        Log::info("Auto-assigned to: " . ($assignedPerson ? $assignedPerson->name : 'Unknown') . " (ID: $sales_person_id)");
-                    } else {
-                        Log::warning("No suitable sales person found for auto-assignment");
-                        $errorDescription .= 'No suitable sales person found for auto-assignment. ';
-                    }
+                    $errorDescription .= 'Specified Sales Person not found. ';
+                    $sales_person_id = null;
                 }
 
-                if ($source_name !== null) {
-                    $leadSource = LeadSource::where('source_name', $source_name)->first();
+                if ($source_name !== null && !empty(trim($source_name))) {
+                    $leadSource = LeadSource::where('source_name', trim($source_name))->first();
                     if ($leadSource) {
                         $lead_source_id = $leadSource->id;
                     } else { 
-                        $lead_source_id = 1;
+                        // Get the first available lead source as fallback
+                        $fallbackSource = LeadSource::where('status', 'active')->first();
+                        $lead_source_id = $fallbackSource ? $fallbackSource->id : null;
                     }
                 } 
                 else {
-                    $lead_source_id = 1;
+                    // Get the first available lead source as fallback
+                    $fallbackSource = LeadSource::where('status', 'active')->first();
+                    $lead_source_id = $fallbackSource ? $fallbackSource->id : null;
                 }
-                if ($strategies !== null) {
-                    $strategiesid = Strategy::where('name', $strategies)->first();
+                if ($strategies !== null && !empty(trim($strategies))) {
+                    $strategiesid = Strategy::where('name', trim($strategies))->first();
                     if ($strategiesid) {
                         $strategies_id = $strategiesid->id;
                     } else {
-                        $strategies_id = 1;
+                        // Get the first available strategy as fallback
+                        $fallbackStrategy = Strategy::where('status', 'active')->first();
+                        $strategies_id = $fallbackStrategy ? $fallbackStrategy->id : null;
                     }
                 } 
                 else {
-                    $strategies_id = 1;
+                    // Get the first available strategy as fallback
+                    $fallbackStrategy = Strategy::where('status', 'active')->first();
+                    $strategies_id = $fallbackStrategy ? $fallbackStrategy->id : null;
                 }
                 if ($language !== null) {
                     $language = Language::where('name', $language)->first();
@@ -1173,15 +1148,15 @@ class CallsController extends Controller
                 }
 
                 
-                if($lead_source_id === 1 || $sales_person_id === null || $language === 'Not Supported' || $location === 'Not Supported' || $strategies_id === 1)
+                if($lead_source_id === null || $sales_person_id === null || $language === 'Not Supported' || $location === 'Not Supported' || $strategies_id === null)
                 {
                     if ($sales_person_id === null) {
                         $errorDescription .= 'Invalid sales person. ';
                     }
-                    if ($lead_source_id === 1) {
+                    if ($lead_source_id === null) {
                         $errorDescription .= 'Invalid Source ';
                     }
-                    if ($strategies_id === 1) {
+                    if ($strategies_id === null) {
                         $errorDescription .= 'Invalid Strategies ';
                     }
                     if ($language === 'Not Supported') {
@@ -1220,15 +1195,384 @@ class CallsController extends Controller
                     $call->created_by = Auth::id();
                     $call->status = "New";
                     $call->location = $row[3];
-                    $call->save(); 
-                    $leads_notifications = New LeadsNotifications();
-                    $leads_notifications->calls_id =  $call->id;
-                    $leads_notifications->remarks = "New Assign Lead";
-                    $leads_notifications->status = "New";
-                    $leads_notifications->user_id = $sales_person_id;
-                    $leads_notifications->category = "New Assign Lead";
-                    $leads_notifications->save();
+                    
+                    try {
+                        $call->save();
+                    } catch (\Exception $e) {
+                        $errorMessage = "Database Error: ";
+                        if (strpos($e->getMessage(), 'foreign key constraint fails') !== false) {
+                            if (strpos($e->getMessage(), 'calls_source_foreign') !== false) {
+                                $errorMessage .= "Invalid lead source ID: {$lead_source_id}. ";
+                                if ($lead_source_id === null) {
+                                    $errorMessage .= "No valid lead source found in database. ";
+                                } else {
+                                    $errorMessage .= "Lead source ID {$lead_source_id} does not exist in lead_source table. ";
+                                }
+                            } elseif (strpos($e->getMessage(), 'calls_strategies_id_foreign') !== false) {
+                                $errorMessage .= "Invalid strategy ID: {$strategies_id}. ";
+                                if ($strategies_id === null) {
+                                    $errorMessage .= "No valid strategy found in database. ";
+                                } else {
+                                    $errorMessage .= "Strategy ID {$strategies_id} does not exist in strategies table. ";
+                                }
+                            } else {
+                                $errorMessage .= "Foreign key constraint violation. ";
+                            }
+                        } elseif (strpos($e->getMessage(), 'Integrity constraint violation') !== false) {
+                            $errorMessage .= "Data integrity violation. ";
+                        } else {
+                            $errorMessage .= $e->getMessage();
+                        }
+                        
+                        $errorMessage .= "Row data: Name='{$row[0]}', Email='{$row[2]}', Source='{$source_name}', Strategy='{$strategies}'";
+                        
+                        Log::error("Lead import failed: " . $errorMessage, [
+                            'exception' => $e->getMessage(),
+                            'row_data' => $row,
+                            'lead_source_id' => $lead_source_id,
+                            'strategies_id' => $strategies_id,
+                            'sales_person_id' => $sales_person_id
+                        ]);
+                        
+                        $row[] = $errorMessage;
+                        $rejectedRows[] = $row;
+                        $rejectedCount++;
+                        continue;
+                    } 
+                    try {
+                        $leads_notifications = New LeadsNotifications();
+                        $leads_notifications->calls_id =  $call->id;
+                        $leads_notifications->remarks = "New Assign Lead";
+                        $leads_notifications->status = "New";
+                        $leads_notifications->user_id = $sales_person_id;
+                        $leads_notifications->category = "New Assign Lead";
+                        $leads_notifications->save();
+                    } catch (\Exception $e) {
+                        Log::warning("Failed to create lead notification for call ID: {$call->id}", [
+                            'exception' => $e->getMessage(),
+                            'call_id' => $call->id,
+                            'user_id' => $sales_person_id
+                        ]);
+                        // Continue processing - notification failure shouldn't stop the lead import
+                    }
                     if ($model_line_name !== null) {
+                        try {
+                            $modelLine = MasterModelLines::where('model_line', $model_line_name)->first();
+                            if ($modelLine) {
+                                $model_line_id = $modelLine->id;
+                                $callsRequirement = new CallsRequirement();
+                                $callsRequirement->lead_id = $call->id;
+                                $callsRequirement->model_line_id = $model_line_id;
+                                $callsRequirement->save();
+                            } 
+                        } catch (\Exception $e) {
+                            Log::warning("Failed to create model line requirement for call ID: {$call->id}", [
+                                'exception' => $e->getMessage(),
+                                'call_id' => $call->id,
+                                'model_line_name' => $model_line_name
+                            ]);
+                            // Continue processing - model line requirement failure shouldn't stop the lead import
+                        }
+                    }
+                    $acceptedCount++;
+                }
+            }
+            
+            // Process leads without sales person using in-memory round robin
+            Log::info("Starting auto-assignment for " . count($leadsWithoutSalesPerson) . " leads without sales person");
+            // Initialize in-memory lead counts for fair distribution
+            $userLeadCounts = [];
+            foreach ($allowed_user_ids as $uid) {
+                $userLeadCounts[$uid] = Calls::where('sales_person', $uid)->where('status', 'New')->count();
+            }
+            // Log eligible user IDs and names at the start
+            $eligibleUsersLog = [];
+            foreach ($allowed_user_ids as $uid) {
+                $user = User::find($uid);
+                if ($user) {
+                    $eligibleUsersLog[] = $user->name . ' (ID: ' . $uid . ', DB count: ' . $userLeadCounts[$uid] . ')';
+                }
+            }
+            Log::info('Eligible users for assignment: ' . implode(', ', $eligibleUsersLog));
+            // Prepare assigned counts for summary
+            $assignedCounts = array_fill_keys($allowed_user_ids, 0);
+            foreach ($leadsWithoutSalesPerson as $row) {
+                $call = new Calls();
+                $name = $row[0];
+                $email = $row[2];
+                $sales_person = $row[4]; // This will be empty for this group
+                $source_name = $row[5];
+                $language = $row[6];
+                $location = $row[3];
+                $brand =  $row[7];
+                $model_line_name = $row[8];
+                $custom_brand_model = $row[9];
+                $strategies = $row[10];
+                $priority = strtolower(trim($row[11]));
+                $carInterested = trim($row[12]);
+                $purchasePurpose = trim($row[13]);
+                $endUser = trim($row[14]);
+                $destinationCountry = trim($row[15]);
+                $plannedUnits = trim($row[16]);
+                $experience = trim($row[17]);
+                $shipping = trim($row[18]);
+                $paymentMethod = trim($row[19]);
+                $prevPurchase = trim($row[20]);
+                $timeline = trim($row[21]);
+                $additionalNotes = trim($row[22]);
+                $remarksArray = [];
+                if ($carInterested || $purchasePurpose || $endUser || $destinationCountry || $plannedUnits || $experience || $shipping || $paymentMethod || $prevPurchase || $timeline) {
+                    $remarksArray[] = 'Lead Summary - Qualification Notes:';
+                    if ($carInterested) $remarksArray[] = "1. Car Interested In: $carInterested";
+                    if ($purchasePurpose) $remarksArray[] = "2. Purpose of Purchase: $purchasePurpose";
+                    if ($endUser) $remarksArray[] = "3. End User: $endUser";
+                    if ($destinationCountry) $remarksArray[] = "4. Destination Country: $destinationCountry";
+                    if ($plannedUnits) $remarksArray[] = "5. Planned Units: $plannedUnits";
+                    if ($experience) $remarksArray[] = "6. Experience with UAE Sourcing: $experience";
+                    if ($shipping) $remarksArray[] = "7. Shipping Assistance Required: $shipping";
+                    if ($paymentMethod) $remarksArray[] = "8. Payment Method: $paymentMethod";
+                    if ($prevPurchase) $remarksArray[] = "9. Previous Purchase History: $prevPurchase";
+                    if ($timeline) $remarksArray[] = "10. Purchase Timeline: $timeline";
+                }
+                if ($additionalNotes) {
+                    $remarksArray[] = "General Remark / Additional Notes: $additionalNotes";
+                }
+                $remarksData = implode('###SEP###', $remarksArray);
+                $errorDescription = '';
+                // Assignment with previous assignment check + language + phone country code business rule
+                $leadPhone = trim($row[1]);
+                
+                $assignedUserId = null;
+                $assignmentReason = '';
+                $cleanedPhoneForMatch = '';
+                if (!empty($leadPhone)) {
+                    $cleanedPhoneForMatch = ltrim(preg_replace('/[^\d+]/', '', $leadPhone), '+');
+                }
+                // 1. Check for previous assignment by phone or email
+                $previousAssignment = null;
+                if (!empty($leadPhone)) {
+                    $previousAssignment = Calls::where('phone', $leadPhone)->whereNotNull('sales_person')->orderBy('created_at', 'desc')->first();
+                }
+                if (!$previousAssignment && !empty($email)) {
+                    $previousAssignment = Calls::where('email', $email)->whereNotNull('sales_person')->orderBy('created_at', 'desc')->first();
+                }
+                if ($previousAssignment && in_array($previousAssignment->sales_person, $allowed_user_ids)) {
+                    $assignedUserId = $previousAssignment->sales_person;
+                    $assignedUser = User::find($assignedUserId);
+                    $assignmentReason = 'Previous assignment found for phone/email - assigned to same salesperson: ' . ($assignedUser ? $assignedUser->name : 'Unknown') . ' (ID: ' . $assignedUserId . ')';
+                    $matchedOn = (!empty($leadPhone) && $previousAssignment->phone == $leadPhone) ? 'phone' : 'email';
+                    Log::info("Lead assigned in bulk upload", [
+                        'email' => $email,
+                        'phone' => $leadPhone,
+                        'assigned_to' => $assignedUser ? $assignedUser->name : 'Unknown',
+                        'matched_on' => $matchedOn,
+                        'matched_value' => $matchedOn == 'phone' ? $leadPhone : $email,
+                        'user_phone' => $matchedOn == 'phone' ? $previousAssignment->phone : null,
+                        'user_email' => $matchedOn == 'email' ? $previousAssignment->email : null,
+                        'reason' => $assignmentReason
+                    ]);
+                } else {
+                    // 2. Check for language matching with even distribution
+                    $assignedUserId = null;
+                    if (!empty($language)) {
+                        $langMatchedIds = SalesPersonLaugauges::whereIn('sales_person', $allowed_user_ids)
+                            ->where('language', $language)
+                            ->pluck('sales_person')
+                            ->toArray();
+                        
+                        if (!empty($langMatchedIds)) {
+                            // Sort language-matched users by current lead count (ascending) for even distribution
+                            usort($langMatchedIds, function ($a, $b) use ($userLeadCounts) {
+                                $countA = $userLeadCounts[$a] ?? 0;
+                                $countB = $userLeadCounts[$b] ?? 0;
+                                if ($countA === $countB) {
+                                    return $a <=> $b; // Tie-break by user ID
+                                }
+                                return $countA <=> $countB; // Ascending by lead count
+                            });
+                            
+                            // Assign to user with least leads among language-matched users
+                            $assignedUserId = $langMatchedIds[0];
+                            $assignedUser = User::find($assignedUserId);
+                            $assignmentReason = 'Assigned to ' . $assignedUser->name . ' (language-matched user with least leads)';
+                            Log::info("Lead assigned in bulk upload", [
+                                'email' => $email,
+                                'phone' => $leadPhone,
+                                'assigned_to' => $assignedUser->name,
+                                'matched_on' => 'language',
+                                'matched_value' => $language,
+                                'user_id' => $assignedUserId,
+                                'lead_count' => $userLeadCounts[$assignedUserId] ?? 0,
+                                'reason' => $assignmentReason
+                            ]);
+                        }
+                    }
+                    
+                    // 3. If no language match, assign to user with absolute minimum lead count
+                    if ($assignedUserId === null) {
+                        // Sort allowed users by current in-memory lead count (ascending)
+                        $sortedCandidates = $allowed_user_ids;
+                        usort($sortedCandidates, function ($a, $b) use ($userLeadCounts) {
+                            $countA = $userLeadCounts[$a] ?? 0;
+                            $countB = $userLeadCounts[$b] ?? 0;
+                            if ($countA === $countB) {
+                                return $a <=> $b;
+                            }
+                            return $countA <=> $countB;
+                        });
+                        
+                        $assignedUserId = $sortedCandidates[0];
+                        $assignedUser = User::find($assignedUserId);
+                        $assignmentReason = 'Assigned to ' . $assignedUser->name . ' (user with least leads)';
+                        Log::info("Lead assigned in bulk upload", [
+                            'email' => $email,
+                            'phone' => $leadPhone,
+                            'assigned_to' => $assignedUser->name,
+                            'matched_on' => 'least_leads',
+                            'lead_count' => $userLeadCounts[$assignedUserId] ?? 0,
+                            'reason' => $assignmentReason
+                        ]);
+                    }
+                }
+                $userLeadCounts[$assignedUserId]++;
+                $assignedCounts[$assignedUserId]++;
+                $date = Carbon::now();
+                $date->setTimezone('Asia/Dubai');
+                $formattedDate = $date->format('Y-m-d H:i:s');
+                // Source
+                if ($source_name !== null && !empty(trim($source_name))) {
+                    $leadSource = LeadSource::where('source_name', trim($source_name))->first();
+                    if ($leadSource) {
+                        $lead_source_id = $leadSource->id;
+                    } else { 
+                        // Get the first available lead source as fallback
+                        $fallbackSource = LeadSource::where('status', 'active')->first();
+                        $lead_source_id = $fallbackSource ? $fallbackSource->id : null;
+                    }
+                } else {
+                    // Get the first available lead source as fallback
+                    $fallbackSource = LeadSource::where('status', 'active')->first();
+                    $lead_source_id = $fallbackSource ? $fallbackSource->id : null;
+                }
+                // Strategies
+                if ($strategies !== null && !empty(trim($strategies))) {
+                    $strategiesid = Strategy::where('name', trim($strategies))->first();
+                    if ($strategiesid) {
+                        $strategies_id = $strategiesid->id;
+                    } else {
+                        // Get the first available strategy as fallback
+                        $fallbackStrategy = Strategy::where('status', 'active')->first();
+                        $strategies_id = $fallbackStrategy ? $fallbackStrategy->id : null;
+                    }
+                } else {
+                    // Get the first available strategy as fallback
+                    $fallbackStrategy = Strategy::where('status', 'active')->first();
+                    $strategies_id = $fallbackStrategy ? $fallbackStrategy->id : null;
+                }
+                // Language
+                if ($language !== null) {
+                    $languageObj = Language::where('name', $language)->first();
+                    if ($languageObj) {
+                        $language = $languageObj->name;
+                    } else {
+                        $language = 'Not Supported';
+                    }
+                } else {
+                    $language = 'Not Supported';
+                }
+                // Location
+                if (!empty($location)) {
+                    $locationRecord = Country::where('name', $location)->first();
+                    if ($locationRecord) {
+                        $location = $locationRecord->name;
+                    } else {
+                        $location = null;
+                    }
+                } else {
+                    $location = null;
+                }
+                $rawPhoneForDb = trim($row[1]);
+                if (!empty($rawPhoneForDb) && $rawPhoneForDb[0] !== '+') {
+                    $rawPhoneForDb = '+' . $rawPhoneForDb;
+                }
+                $call->name = !empty(trim($row[0])) ? trim($row[0]) : null;
+                $call->phone = $rawPhoneForDb ?? null;
+                $call->email = !empty(trim($row[2])) ? trim($row[2]) : null;
+                $call->assign_time = Carbon::now();
+                $call->custom_brand_model = $row[9];
+                $call->remarks = $remarksData;
+                                    $call->source = $lead_source_id;
+                    $call->strategies_id = $strategies_id;
+                    $call->priority = $priority;
+                    $call->language = is_array($row[6]) ? implode(', ', $row[6]) : $row[6];
+                    $call->sales_person = $assignedUserId;
+                    $call->created_at = $formattedDate;
+                    $call->assign_time = $formattedDate;
+                    $call->created_by = Auth::id();
+                    $call->status = "New";
+                    $call->location = $location;
+                    
+                    try {
+                        $call->save();
+                    } catch (\Exception $e) {
+                        $errorMessage = "Database Error: ";
+                        if (strpos($e->getMessage(), 'foreign key constraint fails') !== false) {
+                            if (strpos($e->getMessage(), 'calls_source_foreign') !== false) {
+                                $errorMessage .= "Invalid lead source ID: {$lead_source_id}. ";
+                                if ($lead_source_id === null) {
+                                    $errorMessage .= "No valid lead source found in database. ";
+                                } else {
+                                    $errorMessage .= "Lead source ID {$lead_source_id} does not exist in lead_source table. ";
+                                }
+                            } elseif (strpos($e->getMessage(), 'calls_strategies_id_foreign') !== false) {
+                                $errorMessage .= "Invalid strategy ID: {$strategies_id}. ";
+                                if ($strategies_id === null) {
+                                    $errorMessage .= "No valid strategy found in database. ";
+                                } else {
+                                    $errorMessage .= "Strategy ID {$strategies_id} does not exist in strategies table. ";
+                                }
+                            } else {
+                                $errorMessage .= "Foreign key constraint violation. ";
+                            }
+                        } elseif (strpos($e->getMessage(), 'Integrity constraint violation') !== false) {
+                            $errorMessage .= "Data integrity violation. ";
+                        } else {
+                            $errorMessage .= $e->getMessage();
+                        }
+                        
+                        $errorMessage .= "Row data: Name='{$row[0]}', Email='{$row[2]}', Source='{$source_name}', Strategy='{$strategies}'";
+                        
+                        Log::error("Lead import failed: " . $errorMessage, [
+                            'exception' => $e->getMessage(),
+                            'row_data' => $row,
+                            'lead_source_id' => $lead_source_id,
+                            'strategies_id' => $strategies_id,
+                            'assigned_user_id' => $assignedUserId
+                        ]);
+                        
+                        $row[] = $errorMessage;
+                        $rejectedRows[] = $row;
+                        $rejectedCount++;
+                        continue;
+                    } 
+                                    try {
+                        $leads_notifications = New LeadsNotifications();
+                        $leads_notifications->calls_id =  $call->id;
+                        $leads_notifications->remarks = "New Assign Lead";
+                        $leads_notifications->status = "New";
+                        $leads_notifications->user_id = $assignedUserId;
+                        $leads_notifications->category = "New Assign Lead";
+                        $leads_notifications->save();
+                    } catch (\Exception $e) {
+                        Log::warning("Failed to create lead notification for call ID: {$call->id}", [
+                            'exception' => $e->getMessage(),
+                            'call_id' => $call->id,
+                            'user_id' => $assignedUserId
+                        ]);
+                        // Continue processing - notification failure shouldn't stop the lead import
+                    }
+                if ($model_line_name !== null) {
+                    try {
                         $modelLine = MasterModelLines::where('model_line', $model_line_name)->first();
                         if ($modelLine) {
                             $model_line_id = $modelLine->id;
@@ -1237,18 +1581,102 @@ class CallsController extends Controller
                             $callsRequirement->model_line_id = $model_line_id;
                             $callsRequirement->save();
                         } 
+                    } catch (\Exception $e) {
+                        Log::warning("Failed to create model line requirement for call ID: {$call->id}", [
+                            'exception' => $e->getMessage(),
+                            'call_id' => $call->id,
+                            'model_line_name' => $model_line_name
+                        ]);
+                        // Continue processing - model line requirement failure shouldn't stop the lead import
                     }
-                    $acceptedCount++;
                 }
+                $acceptedCount++;
             }
+            // Log summary for each allowed user
+            Log::info("Bulk upload assignment summary", [
+                'total_leads_processed' => count($rows),
+                'leads_with_sales_person' => count($leadsWithSalesPerson),
+                'leads_without_sales_person' => count($leadsWithoutSalesPerson),
+                'assignment_summary' => array_map(function($userName) use ($allowed_user_ids, $assignedCounts) {
+                    $user = User::where('name', $userName)->first();
+                    if ($user) {
+                        $uid = $user->id;
+                        $count = isset($assignedCounts[$uid]) ? $assignedCounts[$uid] : 0;
+                        return [
+                            'user_name' => $userName,
+                            'leads_assigned' => $count
+                        ];
+                    } else {
+                        return [
+                            'user_name' => $userName,
+                            'error' => 'User not found in DB'
+                        ];
+                    }
+                }, $allowed_users)
+            ]);
         }
 
         $useractivities =  New UserActivities();
         $useractivities->activity = "Create Bulk Leads";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
+        
+        Log::info("Bulk lead upload process completed", [
+            'total_rows' => count($rows),
+            'accepted_count' => $acceptedCount,
+            'rejected_count' => $rejectedCount
+        ]);
+        
+        if ($rejectedCount > 0) {
+            $errorSummary = "Data uploaded with issues! From the total " . count($rows) . " records:\n";
+            $errorSummary .= "✅ {$acceptedCount} were accepted successfully\n";
+            $errorSummary .= "❌ {$rejectedCount} were rejected due to errors\n\n";
+            $errorSummary .= "Please check the rejected rows for detailed error messages.";
+            
+            return redirect()->route('calls.index')
+                ->with('warning', $errorSummary)
+                ->with('rejectedRows', $rejectedRows)
+                ->with('acceptedCount', $acceptedCount)
+                ->with('rejectedCount', $rejectedCount);
+        } else {
+            return redirect()->route('calls.index')
+                ->with('success', "Data uploaded successfully! All " . count($rows) . " records were accepted.");
+        }
+    }
 
-        return redirect()->route('calls.index')->with('success', "Data uploaded successfully! From the total " . count($rows) . " records, {$acceptedCount} were accepted.");
+    /**
+     * Export rejected rows from bulk upload with detailed error messages
+     */
+    public function exportRejectedRows(Request $request)
+    {
+        $rejectedRows = $request->session()->get('rejectedRows', []);
+        
+        if (empty($rejectedRows)) {
+            return redirect()->route('calls.index')->with('error', 'No rejected rows to export.');
+        }
+
+        $headers = [
+            'Name', 'Phone', 'Email', 'Location', 'Sales Person', 'Source', 
+            'Language', 'Brand', 'Model Line', 'Custom Brand Model', 'Strategies',
+            'Priority', 'Car Interested', 'Purchase Purpose', 'End User', 
+            'Destination Country', 'Planned Units', 'Experience', 'Shipping', 
+            'Payment Method', 'Previous Purchase', 'Timeline', 'Additional Notes', 'Error Message'
+        ];
+
+        $filename = 'rejected_leads_' . date('Y-m-d_H-i-s') . '.csv';
+        
+        $handle = fopen('php://output', 'w');
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        
+        fputcsv($handle, $headers);
+        
+        foreach ($rejectedRows as $row) {
+            fputcsv($handle, $row);
+        }
+        
+        fclose($handle);
+        exit;
     }
 
     public function checkExistence(Request $request)
@@ -1709,87 +2137,19 @@ class CallsController extends Controller
         
         if ($request->input('sales-option') == "auto-assign") {
             Log::info("Starting auto-assignment for lead creation.");
-
-            $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
-            $excluded_user_ids = array_unique(array_merge($excluded_user_ids, [204, 42, 20])); // Always exclude Nabia Kamran (204), Abdul Azeem Liaqat (42), Hanif Azad (20)
-            $email = $request->input('email');
-            $phone = $request->input('phone');
-            $language = $request->input('language');
-            $location = $request->input('location');
-            $sales_person_id = null;
-
-            $cleanedPhone = $phone ? ltrim(preg_replace('/[^\d+]/', '', $phone), '+') : '';
-
-            $isAfrican = false;
-            if ($location && in_array($location, Country::where('is_african_country', 1)->pluck('name')->toArray())) {
-                $isAfrican = true;
-            }
-
-            $matchByEmail = !empty($email) ? Calls::where('email', $email)->whereNotNull('email')->orderBy('created_at', 'desc')->first() : null;
-            $matchByPhone = !empty($cleanedPhone) ? Calls::where('phone', 'LIKE', '%' . $cleanedPhone)->whereNotNull('phone')->orderBy('created_at', 'desc')->first() : null;
-
-            if ($matchByEmail && !in_array($matchByEmail->sales_person, $excluded_user_ids)) {
-                $sales_person_id = $matchByEmail->sales_person;
-                Log::info("Matched by Email (ANY rep) - Assigning to Sales Person ID: $sales_person_id");
-            } elseif ($matchByPhone && !in_array($matchByPhone->sales_person, $excluded_user_ids)) {
-                $sales_person_id = $matchByPhone->sales_person;
-                Log::info("Matched by Phone (ANY rep) - Assigning to Sales Person ID: $sales_person_id");
+            $assignmentResult = $this->autoAssignSalesPerson(
+                $request->input('email'),
+                $request->input('phone'),
+                $request->input('language'),
+                $request->input('location')
+            );
+            $sales_person_id = $assignmentResult['user_id'];
+            $assignmentReason = $assignmentResult['reason'];
+            if ($sales_person_id) {
+                $salesPersonName = User::find($sales_person_id)?->name;
+                Log::info("Final Assigned Sales Person: $salesPersonName (ID: $sales_person_id) - Reason: $assignmentReason");
             } else {
-                // fallback to round robin logic
-            }
-
-            if (!$sales_person_id && !empty($language)) {
-                $langMatched = SalesPersonLaugauges::whereIn('sales_person', $excluded_user_ids)
-                    ->where('language', $language)
-                    ->pluck('sales_person')
-                    ->toArray();
-
-                if (count($langMatched) === 1) {
-                    $sales_person_id = $langMatched[0];
-                } elseif (count($langMatched) > 1) {
-                    $lowestLeadLang = ModelHasRoles::select('model_id')
-                        ->where('role_id', 7)
-                        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-                        ->where('users.status', 'active')
-                        ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
-                        ->join('sales_person_laugauges', 'model_has_roles.model_id', '=', 'sales_person_laugauges.sales_person')
-                        ->whereIn('model_has_roles.model_id', $excluded_user_ids)
-                        ->whereIn('model_has_roles.model_id', $langMatched)
-                        ->where('sales_person_laugauges.language', $language)
-                        ->where('calls.status', 'New')
-                        ->groupBy('calls.sales_person')
-                        ->orderByRaw('COUNT(calls.id) ASC')
-                        ->first();
-
-                    if ($lowestLeadLang) {
-                        $sales_person_id = $lowestLeadLang->model_id;
-                    }
-                }
-            }
-
-            if (!$sales_person_id) {
-                $roundRobinQuery = ModelHasRoles::select('model_id')
-                    ->where('role_id', 7)
-                    ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-                    ->where('users.status', 'active')
-                    ->leftJoin('calls', function ($join) {
-                        $join->on('model_has_roles.model_id', '=', 'calls.sales_person')
-                            ->where('calls.status', 'New');
-                    })
-                    ->whereIn('model_has_roles.model_id', $excluded_user_ids);
-
-                if ($isAfrican) {
-                    $roundRobinQuery->where('users.is_dubai_sales_rep', 'Yes');
-                }
-
-                $fallbackPerson = $roundRobinQuery
-                    ->groupBy('model_has_roles.model_id')
-                    ->orderByRaw('COALESCE(COUNT(calls.id), 0) ASC')
-                    ->first();
-
-                if ($fallbackPerson) {
-                    $sales_person_id = $fallbackPerson->model_id;
-                }
+                Log::warning("No available sales person found for assignment - Reason: $assignmentReason");
             }
         } else {
             $sales_person_id = $request->input('sales_person_id');
@@ -1987,6 +2347,7 @@ class CallsController extends Controller
      */
     private function autoAssignSalesPerson($email, $phone, $language, $location)
     {
+        $assignmentReason = '';
         $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
         $excluded_user_ids = array_unique(array_merge($excluded_user_ids, [204, 42, 20])); // Always exclude Nabia Kamran (204), Abdul Azeem Liaqat (42), Hanif Azad (20)
         $allowed_users = [
@@ -1998,6 +2359,7 @@ class CallsController extends Controller
             'Yacine Guella',
             'Sarah Ferhane',
             'Ayoub Ididir',
+            'Manal Khamalli',
         ];
         // 'Elie Zouein',
         // 'Manal Khamalli',
@@ -2009,89 +2371,182 @@ class CallsController extends Controller
         if ($location && in_array($location, Country::where('is_african_country', 1)->pluck('name')->toArray())) {
             $isAfrican = true;
         }
-        $cleanedPhone = $phone ? ltrim(preg_replace('/[^\d+]/', '', $phone), '+') : '';
-        $matchByEmail = !empty($email) ? Calls::where('email', $email)->whereNotNull('email')->orderBy('created_at', 'desc')->first() : null;
-        $matchByPhone = !empty($cleanedPhone) ? Calls::where('phone', 'LIKE', '%' . $cleanedPhone)->whereNotNull('phone')->orderBy('created_at', 'desc')->first() : null;
+        
+        $cleanedPhone = '';
+        if (!empty($phone) && is_string($phone)) {
+            $cleanedPhone = ltrim(preg_replace('/[^\d+]/', '', $phone), '+');
+        }
+        
+        $matchByEmail = null;
+        if (!empty($email) && is_string($email)) {
+            try {
+                $matchByEmail = Calls::where('email', $email)->orderBy('created_at', 'desc')->first();
+            } catch (\Exception $e) {
+                Log::warning("Error querying email match in auto assignment", [
+                    'email' => $email,
+                    'error' => $e->getMessage()
+                ]);
+                $matchByEmail = null;
+            }
+        }
+        
+        $matchByPhone = null;
+        if (!empty($cleanedPhone) && strlen($cleanedPhone) > 0) {
+            try {
+                $matchByPhone = Calls::where('phone', 'LIKE', '%' . $cleanedPhone)->orderBy('created_at', 'desc')->first();
+            } catch (\Exception $e) {
+                Log::warning("Error querying phone match in auto assignment", [
+                    'phone' => $phone,
+                    'cleaned_phone' => $cleanedPhone,
+                    'error' => $e->getMessage()
+                ]);
+                $matchByPhone = null;
+            }
+        }
 
-        // 1. Check for Previous Assignment
+        // 1. Check for Previous Assignment by email or phone
         $previousSalesPerson = null;
         if ($matchByEmail && in_array($matchByEmail->sales_person, $allowed_user_ids)) {
             $matchedUser = User::find($matchByEmail->sales_person);
             if ($matchedUser && in_array($matchedUser->name, $allowed_users)) {
                 $previousSalesPerson = $matchByEmail->sales_person;
+                $assignmentReason = "Previous assignment found by email - assigned to {$matchedUser->name}";
+                Log::info("Lead assigned", [
+                    'email' => $email,
+                    'phone' => $phone,
+                    'assigned_to' => $matchedUser->name,
+                    'matched_on' => 'email',
+                    'matched_value' => $email,
+                    'user_email' => $matchByEmail->email,
+                    'reason' => $assignmentReason
+                ]);
+                return ['user_id' => $previousSalesPerson, 'reason' => $assignmentReason];
             }
         } elseif ($matchByPhone && in_array($matchByPhone->sales_person, $allowed_user_ids)) {
             $matchedUser = User::find($matchByPhone->sales_person);
             if ($matchedUser && in_array($matchedUser->name, $allowed_users)) {
                 $previousSalesPerson = $matchByPhone->sales_person;
+                $assignmentReason = "Previous assignment found by phone - assigned to {$matchedUser->name}";
+                Log::info("Lead assigned", [
+                    'email' => $email,
+                    'phone' => $phone,
+                    'assigned_to' => $matchedUser->name,
+                    'matched_on' => 'phone',
+                    'matched_value' => $phone,
+                    'user_phone' => $matchByPhone->phone,
+                    'reason' => $assignmentReason
+                ]);
+                return ['user_id' => $previousSalesPerson, 'reason' => $assignmentReason];
             }
         }
-        if ($previousSalesPerson) {
-            return $previousSalesPerson;
-        }
 
-        // 2. Proceed with New Assignment
-        // 3. Language Check
-        $userQuery = ModelHasRoles::select('model_id')
-            ->where('role_id', 7)
-            ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-            ->where('users.status', 'active')
-            ->whereIn('model_has_roles.model_id', $allowed_user_ids);
-        if ($isAfrican) {
-            $userQuery->where('users.is_dubai_sales_rep', 'Yes');
-        }
-        $eligibleUserIds = $userQuery->pluck('model_id')->toArray();
-
-        // If language is English
-        if (strtolower($language) === 'english') {
-            // Assign to the salesperson with the least number of pending leads (round robin among all eligible)
-            $leastLeadsUser = Calls::whereIn('sales_person', $eligibleUserIds)
-                ->where('status', 'New')
-                ->selectRaw('sales_person, COUNT(*) as lead_count')
-                ->groupBy('sales_person')
-                ->orderBy('lead_count', 'asc')
-                ->first();
-            if ($leastLeadsUser) {
-                return $leastLeadsUser->sales_person;
-            } else {
-                // If no leads, just pick the first eligible user
-                return !empty($eligibleUserIds) ? $eligibleUserIds[0] : null;
+        // 2. Get eligible users based on location and other criteria
+        try {
+            $userQuery = ModelHasRoles::select('model_id')
+                ->where('role_id', 7)
+                ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+                ->where('users.status', 'active')
+                ->whereIn('model_has_roles.model_id', $allowed_user_ids);
+            if ($isAfrican) {
+                $userQuery->where('users.is_dubai_sales_rep', 'Yes');
             }
-        } else {
-            // Non-English language
-            $langMatched = SalesPersonLaugauges::whereIn('sales_person', $eligibleUserIds)
-                ->where('language', $language)
-                ->pluck('sales_person')
-                ->toArray();
-            if (count($langMatched) === 1) {
-                return $langMatched[0];
-            } elseif (count($langMatched) > 1) {
-                // Round robin among those who speak the language
-                $leastLeadsUser = Calls::whereIn('sales_person', $langMatched)
+            $eligibleUserIds = $userQuery->pluck('model_id')->toArray();
+        } catch (\Exception $e) {
+            Log::error("Error getting eligible users in auto assignment", [
+                'error' => $e->getMessage(),
+                'allowed_user_ids' => $allowed_user_ids,
+                'is_african' => $isAfrican
+            ]);
+            $eligibleUserIds = [];
+        }
+
+        if (!empty($eligibleUserIds)) {
+            // Build current lead counts (New status) for eligible users
+            try {
+                $leadCounts = Calls::whereIn('sales_person', $eligibleUserIds)
                     ->where('status', 'New')
                     ->selectRaw('sales_person, COUNT(*) as lead_count')
                     ->groupBy('sales_person')
-                    ->orderBy('lead_count', 'asc')
-                    ->first();
-                if ($leastLeadsUser) {
-                    return $leastLeadsUser->sales_person;
-                } else {
-                    return $langMatched[0];
+                    ->pluck('lead_count', 'sales_person')
+                    ->toArray();
+            } catch (\Exception $e) {
+                Log::error("Error getting lead counts in auto assignment", [
+                    'error' => $e->getMessage(),
+                    'eligible_user_ids' => $eligibleUserIds
+                ]);
+                $leadCounts = [];
+            }
+
+            // 3. Check for language matching with even distribution
+            if (!empty($language) && is_string($language)) {
+                try {
+                    $langMatched = SalesPersonLaugauges::whereIn('sales_person', $eligibleUserIds)
+                        ->where('language', $language)
+                        ->pluck('sales_person')
+                        ->toArray();
+                } catch (\Exception $e) {
+                    Log::error("Error getting language matched users in auto assignment", [
+                        'error' => $e->getMessage(),
+                        'language' => $language,
+                        'eligible_user_ids' => $eligibleUserIds
+                    ]);
+                    $langMatched = [];
                 }
-            } else {
-                // No salesperson speaks the language, assign to any available salesperson
-                $leastLeadsUser = Calls::whereIn('sales_person', $eligibleUserIds)
-                    ->where('status', 'New')
-                    ->selectRaw('sales_person, COUNT(*) as lead_count')
-                    ->groupBy('sales_person')
-                    ->orderBy('lead_count', 'asc')
-                    ->first();
-                if ($leastLeadsUser) {
-                    return $leastLeadsUser->sales_person;
-                } else {
-                    return !empty($eligibleUserIds) ? $eligibleUserIds[0] : null;
+                
+                if (!empty($langMatched)) {
+                    // Sort language-matched users by lead count (ascending) for even distribution
+                    usort($langMatched, function ($a, $b) use ($leadCounts) {
+                        $countA = $leadCounts[$a] ?? 0;
+                        $countB = $leadCounts[$b] ?? 0;
+                        if ($countA === $countB) {
+                            return $a <=> $b; // Tie-break by user ID
+                        }
+                        return $countA <=> $countB; // Ascending by lead count
+                    });
+                    
+                    // Assign to user with least leads among language-matched users
+                    $assignedUserId = $langMatched[0];
+                    $assignedUser = User::find($assignedUserId);
+                    $currentCount = $leadCounts[$assignedUserId] ?? 0;
+                    $assignmentReason = "Assigned to {$assignedUser->name} (language-matched user with least leads: {$currentCount})";
+                    Log::info("Lead assigned", [
+                        'email' => $email,
+                        'phone' => $phone,
+                        'assigned_to' => $assignedUser->name,
+                        'matched_on' => 'language',
+                        'matched_value' => $language,
+                        'user_id' => $assignedUserId,
+                        'lead_count' => $currentCount,
+                        'reason' => $assignmentReason
+                    ]);
+                    return ['user_id' => $assignedUserId, 'reason' => $assignmentReason];
                 }
             }
+
+            // 4. Final fallback: Assign to user with absolute minimum lead count
+            $sortedCandidates = $eligibleUserIds;
+            usort($sortedCandidates, function ($a, $b) use ($leadCounts) {
+                $countA = $leadCounts[$a] ?? 0;
+                $countB = $leadCounts[$b] ?? 0;
+                if ($countA === $countB) {
+                    return $a <=> $b; // Tie-break by user ID
+                }
+                return $countA <=> $countB; // Ascending by lead count
+            });
+            
+            $fallbackCandidate = $sortedCandidates[0];
+            $fallbackUser = User::find($fallbackCandidate);
+            $currentCount = $leadCounts[$fallbackCandidate] ?? 0;
+            $assignmentReason = "Assigned to {$fallbackUser->name} (user with least leads: {$currentCount})";
+            Log::info("Lead assigned", [
+                'email' => $email,
+                'phone' => $phone,
+                'assigned_to' => $fallbackUser->name,
+                'matched_on' => 'least_leads',
+                'lead_count' => $currentCount,
+                'reason' => $assignmentReason
+            ]);
+            return ['user_id' => $fallbackCandidate, 'reason' => $assignmentReason];
         }
         
         // FINAL FALLBACK: If no eligible user found, assign to any available active salesperson from allowed list
@@ -2108,6 +2563,25 @@ class CallsController extends Controller
             ->orderByRaw('COALESCE(COUNT(calls.id), 0) ASC')
             ->first();
         
-        return $anyUser ? $anyUser->model_id : null;
+        if ($anyUser) {
+            $fallbackUser = User::find($anyUser->model_id);
+            $assignmentReason = "Final fallback - Assigned to {$fallbackUser->name} from allowed users list";
+            Log::info("Lead assigned", [
+                'email' => $email,
+                'phone' => $phone,
+                'assigned_to' => $fallbackUser->name,
+                'matched_on' => 'final_fallback',
+                'reason' => $assignmentReason
+            ]);
+            return ['user_id' => $anyUser->model_id, 'reason' => $assignmentReason];
+        } else {
+            $assignmentReason = "No eligible users found in final fallback";
+            Log::warning("Lead assignment failed", [
+                'email' => $email,
+                'phone' => $phone,
+                'reason' => $assignmentReason
+            ]);
+            return ['user_id' => null, 'reason' => $assignmentReason];
+        }
     }
 }

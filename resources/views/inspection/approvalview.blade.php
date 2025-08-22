@@ -134,28 +134,31 @@
                     <option value="1.5" @if($variant_request->engine == '1.5') selected @endif>1.5</option>
                     <option value="1.6" @if($variant_request->engine == '1.6') selected @endif>1.6</option>
                     <option value="1.8" @if($variant_request->engine == '1.8') selected @endif>1.8</option>
-                    <option value="2" @if($variant_request->engine == '2') selected @endif>2</option>
+                    <option value="2.0" @if($variant_request->engine == '2.0') selected @endif>2.0</option>
                     <option value="2.2" @if($variant_request->engine == '2.2') selected @endif>2.2</option>
                     <option value="2.4" @if($variant_request->engine == '2.4') selected @endif>2.4</option>
                     <option value="2.5" @if($variant_request->engine == '2.5') selected @endif>2.5</option>
                     <option value="2.7" @if($variant_request->engine == '2.7') selected @endif>2.7</option>
                     <option value="2.8" @if($variant_request->engine == '2.8') selected @endif>2.8</option>
-                    <option value="3" @if($variant_request->engine == '3') selected @endif>3</option>
+                    <option value="3.0" @if($variant_request->engine == '3.0') selected @endif>3.0</option>
                     <option value="3.3" @if($variant_request->engine == '3.3') selected @endif>3.3</option>
                     <option value="3.4" @if($variant_request->engine == '3.4') selected @endif>3.4</option>
                     <option value="3.5" @if($variant_request->engine == '3.5') selected @endif>3.5</option>
-                    <option value="4" @if($variant_request->engine == '4') selected @endif>4</option>
+                    <option value="3.6" @if($variant_request->engine == '3.6') selected @endif>3.6</option>
+                    <option value="3.8" @if($variant_request->engine == '3.8') selected @endif>3.8</option>
+                    <option value="4.0" @if($variant_request->engine == '4.0') selected @endif>4.0</option>
                     <option value="4.2" @if($variant_request->engine == '4.2') selected @endif>4.2</option>
                     <option value="4.4" @if($variant_request->engine == '4.4') selected @endif>4.4</option>
                     <option value="4.5" @if($variant_request->engine == '4.5') selected @endif>4.5</option>
                     <option value="4.8" @if($variant_request->engine == '4.8') selected @endif>4.8</option>
                     <option value="5.0" @if($variant_request->engine == '5.0') selected @endif>5.0</option>
+                    <option value="5.2" @if($variant_request->engine == '5.2') selected @endif>5.2</option>
                     <option value="5.3" @if($variant_request->engine == '5.3') selected @endif>5.3</option>
                     <option value="5.5" @if($variant_request->engine == '5.5') selected @endif>5.5</option>
                     <option value="5.6" @if($variant_request->engine == '5.6') selected @endif>5.6</option>
                     <option value="5.7" @if($variant_request->engine == '5.7') selected @endif>5.7</option>
                     <option value="5.9" @if($variant_request->engine == '5.9') selected @endif>5.9</option>
-                    <option value="6" @if($variant_request->engine == '6') selected @endif>6</option>
+                    <option value="6.0" @if($variant_request->engine == '6.0') selected @endif>6.0</option>
                     <option value="6.2" @if($variant_request->engine == '6.2') selected @endif>6.2</option>
                     <option value="6.7" @if($variant_request->engine == '6.7') selected @endif>6.7</option>
                  </select>
