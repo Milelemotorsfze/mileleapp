@@ -1715,6 +1715,25 @@ class PurchasingOrderController extends Controller
             'po_number' => $poNumber,
         ]);
 
+        // If estimation_date is not set for the PO, do not import DN; leave empty and alert user
+        $po = PurchasingOrder::where('po_number', $poNumber)->first();
+        $poHasEstimation = false;
+        if ($po) {
+            $poHasEstimation = Vehicles::where('purchasing_order_id', $po->id)
+                ->whereNotNull('estimation_date')
+                ->exists();
+        }
+        if (!$poHasEstimation) {
+            foreach ($vehiclesData as &$row) {
+                $row['dn'] = '';
+            }
+            unset($row);
+            return response()->json([
+                'vehiclesData' => $vehiclesData,
+                'message' => 'DN cannot be added as payment is not released yet.'
+            ]);
+        }
+
         return response()->json([
             'vehiclesData' => $vehiclesData
         ]);
@@ -2111,6 +2130,16 @@ class PurchasingOrderController extends Controller
                     }
 
                     if ($fieldName === 'dn') {
+                        // Guard: DN can be added only after payment release
+                        $poHasEstimation = Vehicles::where('purchasing_order_id', $vehicle->purchasing_order_id)
+                            ->whereNotNull('estimation_date')
+                            ->exists();
+                        if (!$poHasEstimation) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'Before payment release DN number cannot be added.'
+                            ], 422);
+                        }
                         // Check if this DN number already exists for this vehicle
                         $existingDn = VehicleDn::where('vehicles_id', $vehicleId)
                         ->where('dn_number', $fieldValue)
@@ -2127,6 +2156,8 @@ class PurchasingOrderController extends Controller
                             $vehicledn->batch = $batchNumber;
                             $vehicledn->save();
                             $vehicle->dn_id = $vehicledn->id;
+                            // Update estimation_date to now + 7 days when DN is created via inline update
+                            $vehicle->estimation_date = \Carbon\Carbon::now()->addDays(7)->format('Y-m-d');
                             $vehicle->save();
                         } else {
                             $vehicle->dn_id = $existingDn->id;
@@ -5266,6 +5297,13 @@ class PurchasingOrderController extends Controller
             $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
             $purchasingordereventsLog->description = "Finance Manager Forward Payment Inititaion Request to the CEO office For Payment Released";
             $purchasingordereventsLog->save();
+            // If vendor is AMS, update vehicles' estimated_date to current date + 20 days on payment release
+            if (isset($purchasingOrder->supplier) && strtoupper($purchasingOrder->supplier->supplier ?? '') === 'AMS') {
+                $releaseDate = Carbon::now();
+                $newEstimatedDate = $releaseDate->copy()->addDays(20)->format('Y-m-d');
+                Vehicles::where('purchasing_order_id', $purchasingOrder->id)
+                    ->update(['estimation_date' => $newEstimatedDate]);
+            }
             return response()->json(['success' => true, 'message' => 'Payment submitted successfully']);
         } catch (\Exception $e) {
             Log::error('Payment submission failed', ['error' => $e->getMessage()]);
@@ -5830,6 +5868,17 @@ class PurchasingOrderController extends Controller
         $purchasingOrderId = $request->input('purchasingOrderId');
         $type = $request->input('type');
 
+        // Guard: DN can be added only after payment release (indicated by estimation_date present)
+        $hasEstimationDate = Vehicles::where('purchasing_order_id', $purchasingOrderId)
+            ->whereNotNull('estimation_date')
+            ->exists();
+        if (!$hasEstimationDate) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Before payment release DN number cannot be added.'
+            ], 422);
+        }
+
         if ($type == 'full') {
             $dnNumber = $request->input('dnNumber');
 
@@ -5862,6 +5911,8 @@ class PurchasingOrderController extends Controller
                     $vehicledn->batch = $batchNumber;
                     $vehicledn->save();
                     $vehicle->dn_id = $vehicledn->id;
+                    // Update estimation_date to now + 7 days when DN is created
+                    $vehicle->estimation_date = \Carbon\Carbon::now()->addDays(7)->format('Y-m-d');
                     $vehicle->save();
                 } else {
                     $vehicle->dn_id = $existingDn->id;
@@ -5903,6 +5954,8 @@ class PurchasingOrderController extends Controller
                     // Check if the vehicle exists before assigning the dn_id
                     if ($vehicle) {
                         $vehicle->dn_id = $vehicledn->id;
+                        // Update estimation_date to now + 7 days when DN is created
+                        $vehicle->estimation_date = \Carbon\Carbon::now()->addDays(7)->format('Y-m-d');
                         $vehicle->save();
                     } else {
                         // Log or handle the error if the vehicle ID is invalid
