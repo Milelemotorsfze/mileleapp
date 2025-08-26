@@ -5569,6 +5569,24 @@ return [$color->id => $formattedName];
                             var filledBlankRowIndexes = {};
                             var updatedCount = 0;
                             var unmatchedVehicles = [];
+                            
+                            // Show backend warnings if any
+                            if (response.warningMessage) {
+                                alert('Import completed with warnings:\n\n' + response.warningMessage);
+                            }
+                            
+                            // Show unmatched variants from backend if any
+                            if (response.unmatchedVariants && response.unmatchedVariants.length > 0) {
+                                var backendUnmatchedMsg = 'The following variants could not be found in the system:\n\n';
+                                response.unmatchedVariants.forEach(function(variant, index) {
+                                    backendUnmatchedMsg += (index + 1) + '. Variant: ' + variant.variant + '\n';
+                                    backendUnmatchedMsg += '   Row: ' + variant.row + '\n';
+                                    backendUnmatchedMsg += '   Issue: ' + variant.issue + '\n\n';
+                                });
+                                backendUnmatchedMsg += 'These variants will not be imported.';
+                                alert(backendUnmatchedMsg);
+                            }
+                            
                             // check number of vehicles in csv with available vehicles
                             var availableVehicles = $('#vehicleSectionTable tbody .vin').length;
                             if (response.vehiclesData.length > availableVehicles) {
@@ -5949,18 +5967,42 @@ return [$color->id => $formattedName];
                                     }
                                 }
                             });
-                            // Show a lightweight success flash with counts
+                            // Show a lightweight success flash with counts and unmatched details
                             if (flashMessage) {
                                 flashMessage.classList.remove('alert-danger');
                                 flashMessage.classList.add('alert-success');
                                 var unmatchedCount = unmatchedVehicles.length;
-                                flashMessage.textContent = 'Import applied successfully. Updated ' + updatedCount + ' row(s)' + (unmatchedCount ? (', unmatched: ' + unmatchedCount) : '') + '.';
+                                var flashText = 'Import applied successfully. Updated ' + updatedCount + ' row(s)';
+                                
+                                if (unmatchedCount > 0) {
+                                    flashText += ', unmatched: ' + unmatchedCount + ' variant(s)';
+                                    // Add unmatched variant names to flash message
+                                    var unmatchedVariants = unmatchedVehicles.map(function(vehicle) {
+                                        return vehicle.variant || 'Unknown';
+                                    }).join(', ');
+                                    flashText += ' (' + unmatchedVariants + ')';
+                                }
+                                
+                                flashMessage.textContent = flashText;
                                 flashMessage.style.display = 'block';
-                                setTimeout(function() { flashMessage.style.display = 'none'; }, 3000);
+                                setTimeout(function() { flashMessage.style.display = 'none'; }, 5000); // Increased timeout for longer message
                             }
-                            // If there are unmatched vehicles, notify user explicitly
+                            // If there are unmatched vehicles, notify user explicitly with details
                             if (unmatchedVehicles.length > 0) {
-                                alert('Some records could not be matched to existing rows and were not filled. Please review your CSV data. Unmatched count: ' + unmatchedVehicles.length);
+                                var unmatchedDetails = 'Some records could not be matched to existing rows and were not filled.\n\n';
+                                unmatchedDetails += 'Unmatched Variants:\n';
+                                unmatchedVehicles.forEach(function(vehicle, index) {
+                                    unmatchedDetails += (index + 1) + '. Variant: ' + (vehicle.variant || 'N/A') + '\n';
+                                    if (vehicle.vin && vehicle.vin !== '-') {
+                                        unmatchedDetails += '   VIN: ' + vehicle.vin + '\n';
+                                    }
+                                    if (vehicle.dn && vehicle.dn !== '-') {
+                                        unmatchedDetails += '   DN: ' + vehicle.dn + '\n';
+                                    }
+                                    unmatchedDetails += '\n';
+                                });
+                                unmatchedDetails += 'Please review your CSV data and ensure these variants exist in the system.';
+                                alert(unmatchedDetails);
                             }
                         }
                     },
