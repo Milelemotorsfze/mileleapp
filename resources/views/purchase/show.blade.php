@@ -1840,13 +1840,12 @@ return [$color->id => $formattedName];
                                 <th style="vertical-align: middle;" id="int_color">Exterior Color</th>
                                 <th style="vertical-align: middle;" id="ex_color">Interior Color</th>
                                 <th>VIN Number</th>
-                                <th>DN Number</th>
                                 <th>Engine Number</th>
                                 <th>Upholstery</th>
                                 <th>Territory</th>
                                 <th style="vertical-align: middle;" id="estimated">Estimated Arrival</th>
                                 <th>Production Date</th>
-
+                                <th>DN Number</th>
                                 <th id="serno" style="vertical-align: middle;">Vehicle Status:</th>
                                 <!-- @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'po-approval', 'edit-po-colour-details', 'cancel-vehicle-purchased-order']);
@@ -1928,12 +1927,12 @@ return [$color->id => $formattedName];
                                     </select>
                                 </td>
                                 <td class="editable-field vin" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
-                                <td class="editable-field dn" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->dn->dn_number ?? '' }}</td>
                                 <td class="editable-field engine" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                                 <td class="" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->variant->upholestry }}</td>
                                 <td class="editable-field territory" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                                 <td class="editable-field estimation_date" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
                                 <td class="editable-field ppmmyyy" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
+                                <td class="editable-field dn" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->dn->dn_number ?? '' }}</td>
                                 @else
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
                                     <select name="ex_colour[]" class="form-control ex-colour-select" placeholder="Exterior Color" disabled>
@@ -1960,12 +1959,12 @@ return [$color->id => $formattedName];
                                     </select>
                                 </td>
                                 <td class="vin" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
-                                <td class="editable-field dn" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->dn->dn_number ?? '' }}</td>
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->variant->upholestry }}</td>
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
+                                <td class="editable-field dn" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->dn->dn_number ?? '' }}</td>
                                 @endif
                                 @else
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
@@ -1993,12 +1992,12 @@ return [$color->id => $formattedName];
                                     </select>
                                 </td>
                                 <td class="vin" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
-                                <td class="editable-field dn" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->dn->dn_number ?? '' }}</td>
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->variant->upholestry }}</td>
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
                                 <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
+                                <td class="editable-field dn" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->dn->dn_number ?? '' }}</td>
                                 @endif
                                 @endif
                                 @php
@@ -5581,6 +5580,46 @@ return [$color->id => $formattedName];
                             var filledBlankRowIndexes = {};
                             var updatedCount = 0;
                             var unmatchedVehicles = [];
+                            
+                            // Check if CSV file is empty or has no data
+                            if (response.vehiclesData.length === 0) {
+                                alert('⚠️ CSV file appears to be empty or contains no valid data.\n\nPlease check your CSV file and ensure it contains vehicle information.');
+                                return;
+                            }
+                            
+                            // Prepare comprehensive message for all scenarios
+                            var comprehensiveMessage = '';
+                            var showComprehensiveAlert = false;
+                            
+                            // Collect all information for the comprehensive message
+                            var backendIssues = [];
+                            var backendWarnings = [];
+                            
+                            // Backend validation issues
+                            if (response.unmatchedVariants && response.unmatchedVariants.length > 0) {
+                                backendIssues.push('Variants not found in system: ' + response.unmatchedVariants.length);
+                            }
+                            
+                            // Backend warnings
+                            if (response.warningMessage) {
+                                backendWarnings.push('Data quality warnings present');
+                            }
+                            
+                            // Build comprehensive message
+                            if (backendIssues.length > 0) {
+                                comprehensiveMessage += '❌ Import Validation Issues:\n';
+                                comprehensiveMessage += '   • ' + backendIssues.join('\n   • ') + '\n\n';
+                                showComprehensiveAlert = true;
+                            }
+                            
+                            if (backendWarnings.length > 0) {
+                                comprehensiveMessage += '⚠️ Import Warnings:\n';
+                                comprehensiveMessage += '   • ' + backendWarnings.join('\n   • ') + '\n\n';
+                                showComprehensiveAlert = true;
+                            }
+                            
+
+                            
                             // check number of vehicles in csv with available vehicles
                             var availableVehicles = $('#vehicleSectionTable tbody .vin').length;
                             if (response.vehiclesData.length > availableVehicles) {
@@ -5961,18 +6000,87 @@ return [$color->id => $formattedName];
                                     }
                                 }
                             });
-                            // Show a lightweight success flash with counts
+                            // Show appropriate flash message based on the situation
                             if (flashMessage) {
-                                flashMessage.classList.remove('alert-danger');
-                                flashMessage.classList.add('alert-success');
                                 var unmatchedCount = unmatchedVehicles.length;
-                                flashMessage.textContent = 'Import applied successfully. Updated ' + updatedCount + ' row(s)' + (unmatchedCount ? (', unmatched: ' + unmatchedCount) : '') + '.';
-                                flashMessage.style.display = 'block';
-                                setTimeout(function() { flashMessage.style.display = 'none'; }, 3000);
+                                
+                                // Only show flash message if there's something meaningful to show
+                                if (updatedCount > 0 || unmatchedCount > 0) {
+                                    if (updatedCount === 0 && unmatchedCount > 0) {
+                                        // No records were matched - show warning
+                                        flashMessage.classList.remove('alert-success');
+                                        flashMessage.classList.add('alert-warning');
+                                        flashMessage.textContent = '⚠️ Import completed but NO records were matched or added to the system.';
+                                    } else if (updatedCount > 0) {
+                                        // Some records were matched - show success
+                                        flashMessage.classList.remove('alert-warning');
+                                        flashMessage.classList.add('alert-success');
+                                        var flashText = 'Import applied successfully. Updated ' + updatedCount + ' row(s)';
+                                        
+                                        if (unmatchedCount > 0) {
+                                            flashText += ', unmatched: ' + unmatchedCount + ' variant(s)';
+                                            // Add unmatched variant names to flash message
+                                            var unmatchedVariants = unmatchedVehicles.map(function(vehicle) {
+                                                return vehicle.variant || 'Unknown';
+                                            }).join(', ');
+                                            flashText += ' (' + unmatchedVariants + ')';
+                                        }
+                                        
+                                        flashMessage.textContent = flashText;
+                                    }
+                                    
+                                    flashMessage.style.display = 'block';
+                                    setTimeout(function() { flashMessage.style.display = 'none'; }, 5000);
+                                }
                             }
-                            // If there are unmatched vehicles, notify user explicitly
+                            
+                            // Add frontend matching results to comprehensive message
                             if (unmatchedVehicles.length > 0) {
-                                alert('Some records could not be matched to existing rows and were not filled. Please review your CSV data. Unmatched count: ' + unmatchedVehicles.length);
+                                if (comprehensiveMessage) {
+                                    comprehensiveMessage += '\n';
+                                }
+                                
+                                if (updatedCount === 0 && unmatchedVehicles.length > 0) {
+                                    comprehensiveMessage += '🚨 No records were matched from your CSV file!\n\n';
+                                    comprehensiveMessage += '📊 Import Summary:\n';
+                                    comprehensiveMessage += '   • Total CSV records: ' + response.vehiclesData.length + '\n';
+                                    comprehensiveMessage += '   • Records matched: 0\n';
+                                    comprehensiveMessage += '   • Records unmatched: ' + unmatchedVehicles.length + '\n\n';
+                                } else {
+                                    comprehensiveMessage += '⚠️ Some records could not be matched to existing rows:\n\n';
+                                    comprehensiveMessage += '📊 Import Summary:\n';
+                                    comprehensiveMessage += '   • Total CSV records: ' + response.vehiclesData.length + '\n';
+                                    comprehensiveMessage += '   • Records matched: ' + updatedCount + '\n';
+                                    comprehensiveMessage += '   • Records unmatched: ' + unmatchedVehicles.length + '\n\n';
+                                }
+                                
+                                comprehensiveMessage += '📋 Unmatched Variants:\n';
+                                unmatchedVehicles.forEach(function(vehicle, index) {
+                                    comprehensiveMessage += (index + 1) + '. Variant: ' + (vehicle.variant || 'N/A') + '\n';
+                                    if (vehicle.vin && vehicle.vin !== '-') {
+                                        comprehensiveMessage += '   VIN: ' + vehicle.vin + '\n';
+                                    }
+                                    if (vehicle.dn && vehicle.dn !== '-') {
+                                        comprehensiveMessage += '   DN: ' + vehicle.dn + '\n';
+                                    }
+                                    comprehensiveMessage += '\n';
+                                });
+                                
+                                if (updatedCount === 0) {
+                                    comprehensiveMessage += '💡 No records were added to the system. Please check:\n';
+                                    comprehensiveMessage += '   1. Your CSV data is correct\n';
+                                    comprehensiveMessage += '   2. Variants exist in the system\n';
+                                    comprehensiveMessage += '   3. VIN numbers match existing records';
+                                } else {
+                                    comprehensiveMessage += '💡 Please review your CSV data and ensure these variants exist in the system.';
+                                }
+                                
+                                showComprehensiveAlert = true;
+                            }
+                            
+                            // Show the final comprehensive message with all information
+                            if (showComprehensiveAlert) {
+                                alert(comprehensiveMessage);
                             }
                         }
                     },
