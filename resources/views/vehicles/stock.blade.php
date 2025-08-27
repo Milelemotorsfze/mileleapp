@@ -671,7 +671,7 @@ table.dataTable thead th select {
             var formattedDate = dateObj.toLocaleDateString('en-GB', {
                 day: '2-digit', month: 'short', year: 'numeric'
             });
-            return formattedDate + ' <button class="btn btn-sm btn-outline-primary edit-estimation-date" data-vehicle-id="' + row.id + '" data-current-date="' + data + '" style="padding: 2px 6px; font-size: 10px; margin-left: 5px;"><i class="fas fa-edit"></i></button>';
+            return formattedDate + ' <button class="edit-estimation-date" data-vehicle-id="' + row.id + '" data-current-date="' + data + '" style="padding: 2px 6px; font-size: 10px; margin-left: 5px; background: none; border: none; color: #007bff; cursor: pointer; border-radius: 3px; transition: all 0.2s ease;"><i class="fas fa-edit"></i></button>';
         }
         return ''; // If no date, return empty
     }
@@ -1259,10 +1259,11 @@ var hideAllButton = $('<button>')
             var vehicleId = $(this).data('vehicle-id');
             var currentDate = $(this).data('current-date');
             
-            // Create a date input field
-            var dateInput = $('<input type="date" class="form-control form-control-sm" value="' + currentDate + '" style="width: 120px; display: inline-block;">');
-            var saveButton = $('<button class="btn btn-sm btn-success" style="margin-left: 5px; padding: 2px 6px; font-size: 10px;"><i class="fas fa-save"></i></button>');
-            var cancelButton = $('<button class="btn btn-sm btn-secondary" style="margin-left: 2px; padding: 2px 6px; font-size: 10px;"><i class="fas fa-times"></i></button>');
+            // Create a date input field with unique IDs
+            var uniqueId = 'edit_' + vehicleId + '_' + Date.now();
+            var dateInput = $('<input type="date" id="' + uniqueId + '_date" class="form-control form-control-sm" value="' + currentDate + '" style="width: 120px; display: inline-block;">');
+            var saveButton = $('<button id="' + uniqueId + '_save" class="btn btn-sm btn-success" style="margin-left: 5px; padding: 2px 6px; font-size: 10px;"><i class="fas fa-save"></i></button>');
+            var cancelButton = $('<button id="' + uniqueId + '_cancel" class="btn btn-sm btn-secondary" style="margin-left: 2px; padding: 2px 6px; font-size: 10px;"><i class="fas fa-times"></i></button>');
             
             // Replace the button with input and save/cancel buttons
             var $cell = $(this).closest('td');
@@ -1271,11 +1272,11 @@ var hideAllButton = $('<button>')
             $cell.html(dateInput[0].outerHTML + saveButton[0].outerHTML + cancelButton[0].outerHTML);
             
             // Focus on the date input
-            dateInput.focus();
+            $('#' + uniqueId + '_date').focus();
             
             // Save button click handler
-            saveButton.on('click', function() {
-                var newDate = dateInput.val();
+            $('#' + uniqueId + '_save').on('click', function() {
+                var newDate = $('#' + uniqueId + '_date').val();
                 if (newDate) {
                     // Send AJAX request to update the date
                     $.ajax({
@@ -1293,7 +1294,7 @@ var hideAllButton = $('<button>')
                                 var formattedDate = dateObj.toLocaleDateString('en-GB', {
                                     day: '2-digit', month: 'short', year: 'numeric'
                                 });
-                                $cell.html(formattedDate + ' <button class="btn btn-sm btn-outline-primary edit-estimation-date" data-vehicle-id="' + vehicleId + '" data-current-date="' + newDate + '" style="padding: 2px 6px; font-size: 10px; margin-left: 5px;"><i class="fas fa-edit"></i></button>');
+                                $cell.html(formattedDate + ' <button class="edit-estimation-date" data-vehicle-id="' + vehicleId + '" data-current-date="' + newDate + '" style="padding: 2px 6px; font-size: 10px; margin-left: 5px; background: none; border: none; color: #0077ffff; cursor: pointer; border-radius: 3px; transition: all 0.2s ease;"><i class="fas fa-edit"></i></button>');
                                 
                                 // Show success message
                                 alertify.success('Estimation date updated successfully!');
@@ -1313,14 +1314,14 @@ var hideAllButton = $('<button>')
             });
             
             // Cancel button click handler
-            cancelButton.on('click', function() {
+            $('#' + uniqueId + '_cancel').on('click', function() {
                 $cell.html(originalContent);
             });
             
             // Handle Enter key on date input
-            dateInput.on('keypress', function(e) {
+            $('#' + uniqueId + '_date').on('keypress', function(e) {
                 if (e.which === 13) { // Enter key
-                    saveButton.click();
+                    $('#' + uniqueId + '_save').click();
                 }
             });
             

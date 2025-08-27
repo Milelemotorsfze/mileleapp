@@ -4136,6 +4136,7 @@ class VehiclesController extends Controller
 
         try {
             $vehicle = Vehicles::findOrFail($request->input('vehicle_id'));
+            $oldValue = $vehicle->estimation_date; // Capture the old value before updating
             $vehicle->estimation_date = $request->input('estimation_date');
             $vehicle->save();
 
@@ -4143,14 +4144,17 @@ class VehiclesController extends Controller
             Vehicleslog::create([
                 'vehicles_id' => $vehicle->id,
                 'field' => 'estimation_date',
-                'old_value' => $vehicle->getOriginal('estimation_date'),
-                'status' => 'Updated',
+                'old_value' => $oldValue,
+                'new_value' => $vehicle->estimation_date,
+                'status' => 'Updated estimation date to ' . $vehicle->estimation_date,
                 'created_by' => Auth::id(),
-                'created_at' => now(),
+                'time' => now()->format('H:i:s'),
+                'date' => now()->format('Y-m-d'),
             ]);
 
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
+            \Log::error('Error updating estimation date: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Failed to update estimation date']);
         }
     }
