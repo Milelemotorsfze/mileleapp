@@ -4837,6 +4837,335 @@ class PurchasingOrderController extends Controller
         }
         return redirect()->back()->with('success', 'Payment Status Updated');
     }
+
+    public function savePaymentDetails(Request $request)
+    {
+        try { // Added try-catch for overall error handling
+            $paymentOption = $request->input('paymentOption');
+            $purchaseOrderId = $request->input('purchaseOrderId');
+            $remarks = $request->input('remarks');
+            $createdBy = auth()->user()->id; // Assuming you use authentication and want to log the user who created the record
+            
+            // Get purchase order details
+            $purchaseOrder = PurchasingOrder::find($purchaseOrderId);
+            if (!$purchaseOrder) { // Check if purchase order exists
+                return response()->json(['error' => 'Purchase order not found'], 404);
+            }
+            $supplierAccountId = $purchaseOrder->vendors_id;
+            
+            // Check if supplier account exists, if not create a new one
+            $supplierAccount = SupplierAccount::where('suppliers_id', $supplierAccountId)->first();
+            if (!$supplierAccount) {
+                $supplierAccount = new SupplierAccount();
+                $supplierAccount->suppliers_id = $supplierAccountId;
+                $supplierAccount->currency = $purchaseOrder->currency;
+                if (!$supplierAccount->save()) {
+                    return response()->json(['error' => 'Failed to create supplier account'], 500);
+                }
+            }
+            
+            $accountCurrency = $purchaseOrder->currency;
+            $transactionType = 'Draft';
+            $status = 'Draft';
+            $transactionAmount = 0;
+            
+            if ($paymentOption == 'purchasedOrder') {
+                $purchasedOrderOption = $request->input('purchasedOrderOption');
+                $transactionAmount = $request->input('amount');
+                // Handle equalDivided case
+                if ($purchasedOrderOption == 'equalDivided') {
+                    $vehicles = Vehicles::where('purchasing_order_id', $purchaseOrderId)
+                                        ->where('status', 'approved')
+                                        ->get();
+                    $totalVehicles = $vehicles->count();
+                    if ($totalVehicles > 0) {
+                        $transactionAmount = $transactionAmount / $totalVehicles;
+                    }
+                }
+            } else {
+                $vehicles = $request->input('vehicles');
+                foreach ($vehicles as $vehicle) {
+                    $transactionAmount += $vehicle['initiatedPrice'];
+                }
+            }
+            
+            // Store in supplier_account_transaction table
+            $supplierAccountTransaction = new SupplierAccountTransaction();
+            $supplierAccountTransaction->transaction_type = $transactionType;
+            $supplierAccountTransaction->purchasing_order_id = $purchaseOrderId;
+            $supplierAccountTransaction->supplier_account_id = $supplierAccount->id;
+            $supplierAccountTransaction->created_by = $createdBy;
+            $supplierAccountTransaction->account_currency = $accountCurrency;
+            $supplierAccountTransaction->transaction_amount = $transactionAmount;
+            $supplierAccountTransaction->remarks = $remarks;
+            $supplierAccountTransaction->status = $status;
+            
+            if (!$supplierAccountTransaction->save()) {
+                return response()->json(['error' => 'Failed to save supplier account transaction'], 500);
+            }
+            
+            $adjustmentAmount = $request->input('adjustmentAmount');
+            $vendorpayment = new VendorPaymentAdjustments();
+            $vendorpayment->amount = $adjustmentAmount ?: $transactionAmount; // Condensed assignment
+            $vendorpayment->type = $adjustmentAmount ? 'Adjustment' : 'No Adjustment';
+            $vendorpayment->supplier_account_id = $supplierAccount->id; // Correct foreign key reference
+            $vendorpayment->purchasing_order_id = $purchaseOrderId;
+            $vendorpayment->created_by = $createdBy;
+            $vendorpayment->totalamount = $transactionAmount;
+            $vendorpayment->status = 'Draft';
+            $vendorpayment->sat_id = $supplierAccountTransaction->id;
+            $vendorpayment->remaining_amount = $adjustmentAmount ? $transactionAmount - $adjustmentAmount : 0;
+            
+            if (!$vendorpayment->save()) {
+                return response()->json(['error' => 'Failed to save vendor payment adjustment'], 500);
+            }
+            
+            // Store in Purchased Order Paid Amounts
+            $purchasedorderpaidamounts = new PurchasedOrderPaidAmounts();
+            $purchasedorderpaidamounts->amount = $transactionAmount;
+            $purchasedorderpaidamounts->created_by = $createdBy;
+            $purchasedorderpaidamounts->purchasing_order_id = $purchaseOrderId;
+            $purchasedorderpaidamounts->status = 'Draft';
+            $purchasedorderpaidamounts->sat_id = $supplierAccountTransaction->id;
+            
+            if (!$purchasedorderpaidamounts->save()) {
+                return response()->json(['error' => 'Failed to save purchased order paid amounts'], 500);
+            }
+
+            // If vehicles are involved, store in vehicles_supplier_account_transaction table
+            if ($paymentOption == 'vehicle' || ($paymentOption == 'purchasedOrder' && $purchasedOrderOption == 'equalDivided')) {
+                if ($paymentOption == 'vehicle') {
+                    $vehicles = $request->input('vehicles');
+                } else {
+                    $vehicles = Vehicles::where('purchasing_order_id', $purchaseOrderId)
+                                        ->where('status', 'approved')
+                                        ->get();
+                }
+                foreach ($vehicles as $vehicle) {
+                    $vehiclesSupplierAccountTransaction = new VehiclesSupplierAccountTransaction();
+                    $vehiclesSupplierAccountTransaction->vehicles_id = $vehicle['vehicleId'];
+                    $vehiclesSupplierAccountTransaction->sat_id = $supplierAccountTransaction->id;
+                    $vehiclesSupplierAccountTransaction->popa_id = $purchasedorderpaidamounts->id;
+                    $vehiclesSupplierAccountTransaction->vpa_id = $vendorpayment->id;
+                    $vehiclesSupplierAccountTransaction->amount = $vehicle['initiatedPrice'];
+                    $vehiclesSupplierAccountTransaction->status = 'Draft';
+                    if (!$vehiclesSupplierAccountTransaction->save()) {
+                        return response()->json(['error' => 'Failed to save vehicle supplier account transaction'], 500);
+                    }
+                }
+            }
+            $purchasingordereventsLog = New PurchasingOrderEventsLog();
+            $purchasingordereventsLog->event_type = "Payment Initiation Saved";
+            $purchasingordereventsLog->created_by = auth()->user()->id;
+            $purchasingordereventsLog->purchasing_order_id = $purchaseOrderId;
+            $purchasingordereventsLog->description = "Payment Inititaion Save By the PO Creator";
+            $purchasingordereventsLog->save();
+            return response()->json(['message' => 'Payment details saved successfully'], 200);
+        } catch (Exception $e) { // Catch any exception
+            return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
+        }
+    }
+    public function submitPaymentDetails(Request $request)
+    {
+        // payment initiation function
+        try { // Added try-catch for overall error handling
+
+            DB::beginTransaction();
+            $paymentOption = $request->input('paymentOption');
+            $purchaseOrderId = $request->input('purchaseOrderId');
+            $remarks = $request->input('remarks');
+            // info($remarks);
+            $createdBy = auth()->user()->id; // Assuming you use authentication and want to log the user who created the record
+            // Get purchase order details
+            $purchasingOrder = PurchasingOrder::find($purchaseOrderId);
+            if (!$purchasingOrder) { // Check if purchase order exists
+                return response()->json(['error' => 'Purchase order not found'], 404);
+            }
+            $supplierAccountId = $purchasingOrder->vendors_id;
+            // Check if supplier account exists, if not create a new one
+            $supplierAccount = SupplierAccount::where('suppliers_id', $supplierAccountId)->first();
+            if (!$supplierAccount) {
+                $supplierAccount = new SupplierAccount();
+                $supplierAccount->suppliers_id = $supplierAccountId;
+                $supplierAccount->currency = $purchasingOrder->currency;
+                if (!$supplierAccount->save()) {
+                    return response()->json(['error' => 'Failed to create supplier account'], 500);
+                }
+            }
+            $accountCurrency = $purchasingOrder->currency;
+            $transactionType = 'Initiate Payment Request';
+            $status = 'Initiate Payment Request';
+            $transactionAmount = 0;
+            if ($paymentOption == 'purchasedOrder') {
+                $purchasedOrderOption = $request->input('purchasedOrderOption');
+                $transactionAmount = $request->input('amount');
+                // Handle equalDivided case - store the total amount, not divided amount
+                if ($purchasedOrderOption == 'equalDivided') {
+                    $vehicles = Vehicles::where('purchasing_order_id', $purchaseOrderId)
+                                        ->where('status', 'approved')
+                                        ->get();
+                    $totalVehicles = $vehicles->count();
+                    // Keep the original total amount for transaction_amount, don't divide
+                    // The division will be handled in vehicle-specific records
+                }
+            } else {
+                $vehicles = $request->input('vehicles');
+                foreach ($vehicles as $vehicle) {
+                    $transactionAmount += $vehicle['initiatedPrice'];
+                }
+            }
+            // Store in supplier_account_transaction table
+            $supplierAccountTransaction = new SupplierAccountTransaction();
+            $supplierAccountTransaction->transaction_type = $transactionType;
+            $supplierAccountTransaction->purchasing_order_id = $purchaseOrderId;
+            $supplierAccountTransaction->supplier_account_id = $supplierAccount->id;
+            $supplierAccountTransaction->created_by = $createdBy;
+            $supplierAccountTransaction->account_currency = $accountCurrency;
+            $supplierAccountTransaction->transaction_amount = $transactionAmount;
+            $supplierAccountTransaction->remarks = $remarks;
+            $supplierAccountTransaction->status = $status;
+            
+            if (!$supplierAccountTransaction->save()) {
+                return response()->json(['error' => 'Failed to save supplier account transaction'], 500);
+            }
+            $adjustmentAmount = $request->input('adjustmentAmount');
+            $vendorpayment = new VendorPaymentAdjustments();
+            $vendorpayment->amount = $adjustmentAmount ?: $transactionAmount; // Condensed assignment
+            $vendorpayment->type = $adjustmentAmount ? 'Adjustment' : 'No Adjustment';
+            $vendorpayment->supplier_account_id = $supplierAccount->id; // Correct foreign key reference
+            $vendorpayment->purchasing_order_id = $purchaseOrderId;
+            $vendorpayment->created_by = $createdBy;
+            $vendorpayment->totalamount = $transactionAmount;
+            $vendorpayment->status = 'pending';
+            $vendorpayment->sat_id = $supplierAccountTransaction->id;
+            $vendorpayment->remaining_amount = $adjustmentAmount ? $transactionAmount - $adjustmentAmount : 0;
+            
+            if (!$vendorpayment->save()) {
+                return response()->json(['error' => 'Failed to save vendor payment adjustment'], 500);
+            }
+            
+            // Store in Purchased Order Paid Amounts
+            $purchasedorderpaidamounts = new PurchasedOrderPaidAmounts();
+            $purchasedorderpaidamounts->amount = $transactionAmount;
+            $purchasedorderpaidamounts->created_by = $createdBy;
+            $purchasedorderpaidamounts->purchasing_order_id = $purchaseOrderId;
+            $purchasedorderpaidamounts->status = 'Initiate Payment Request';
+            $purchasedorderpaidamounts->sat_id = $supplierAccountTransaction->id;
+            
+            if (!$purchasedorderpaidamounts->save()) {
+                return response()->json(['error' => 'Failed to save purchased order paid amounts'], 500);
+            }
+
+            // Check DP PO or not (Toyota PO handling)
+            if($purchasingOrder->is_demand_planning_purchase_order)
+            {
+                $pfiId = $purchasingOrder->PFIPurchasingOrder->pfi->id ?? '';
+                $pfiItemLatest = PfiItem::where('pfi_id', $pfiId)
+                                    ->where('is_parent', false)
+                                    ->first();
+                // Utilization qty update only for Toyota PO
+                if($pfiItemLatest) {
+                    // only toyota PFI have child , so if child exist it will be toyota PO
+                    $initiatedQtyUpdatedLOIItemIds = [];
+                    
+                    // Get vehicles for Toyota PO handling
+                    if ($paymentOption == 'vehicle') {
+                        $vehicles = $request->input('vehicles');
+                    } else {
+                        $vehicles = Vehicles::where('purchasing_order_id', $purchaseOrderId)
+                                            ->where('status', 'approved')
+                                            ->get();
+                    }
+                    
+                    foreach ($vehicles as $vehicle) {
+                        $vehicle = Vehicles::find($vehicle['vehicleId']);
+                        $masterModel = MasterModel::find($vehicle->model_id);
+                        $possibleModels = MasterModel::where('model', $masterModel->model)
+                                                ->where('sfx',  $masterModel->sfx)
+                                                ->pluck('id')->toArray();
+                        $pfiItem = PfiItemPurchaseOrder::where('purchase_order_id', $purchasingOrder->id)
+                                                            ->whereIn('master_model_id', $possibleModels)
+                                                            ->first();
+                        $loiItem = LetterOfIndentItem::whereHas('pfiItems', function($query)use($pfiItem) {
+                            $query->where('is_parent', false)
+                            ->where('pfi_id', $pfiItem->pfi_id)
+                            ->where('parent_pfi_item_id', $pfiItem->pfi_item_id);
+                        })
+                        ->select("*", DB::raw('COALESCE(quantity, 0) - COALESCE(utilized_quantity, 0) as remaining_quantity'))
+                        ->havingRaw('remaining_quantity - po_payment_initiated_quantity > 0')
+                        ->first();
+                        // need to check with payment initiated qty with remaining qty
+                        if($loiItem) {
+                            // update po_payment_initiated_quantity and keep ids in array
+                            $current_po_payment_initiated_quantity = $loiItem->po_payment_initiated_quantity;
+
+                            $loiItem->po_payment_initiated_quantity = $current_po_payment_initiated_quantity + 1;
+                            $loiItem->save();
+
+                            $initiatedQtyUpdatedLOIItemIds[] = $loiItem->id;
+                        }else{
+                            // revise updated qty of po_payment_initiated_quantity
+                            foreach($initiatedQtyUpdatedLOIItemIds as $LOIItemId) {
+                                $item = LetterOfIndentItem::find($LOIItemId);
+                                $current_po_payment_initiated_quantity = $item->po_payment_initiated_quantity;
+
+                                $item->po_payment_initiated_quantity = $current_po_payment_initiated_quantity - 1;
+                                $item->save();
+                            }
+                            return response()->json(['error' => 'LOI Quantity not available to full fill request'], 500);
+                        }
+                    }
+                }
+            }
+
+            // If vehicles are involved, store in vehicles_supplier_account_transaction table
+            if ($paymentOption == 'vehicle' || ($paymentOption == 'purchasedOrder' && $purchasedOrderOption == 'equalDivided')) {
+                if ($paymentOption == 'vehicle') {
+                    $vehicles = $request->input('vehicles');
+                } else {
+                    $vehicles = Vehicles::where('purchasing_order_id', $purchaseOrderId)
+                                        ->where('status', 'approved')
+                                        ->get();
+                }
+
+                foreach ($vehicles as $vehicle) {
+                    $vehiclesSupplierAccountTransaction = new VehiclesSupplierAccountTransaction();
+                    $vehiclesSupplierAccountTransaction->vehicles_id = $vehicle['vehicleId'];
+                    $vehiclesSupplierAccountTransaction->sat_id = $supplierAccountTransaction->id;
+                    $vehiclesSupplierAccountTransaction->popa_id = $purchasedorderpaidamounts->id;
+                    $vehiclesSupplierAccountTransaction->vpa_id = $vendorpayment->id;
+                    
+                    // Calculate amount for each vehicle
+                    if ($paymentOption == 'purchasedOrder' && $purchasedOrderOption == 'equalDivided') {
+                        // For equalDivided, divide the total amount equally among vehicles
+                        $vehiclesSupplierAccountTransaction->amount = $request->input('amount') / $totalVehicles;
+                    } else {
+                        // For other cases, use the vehicle's initiated price
+                        $vehiclesSupplierAccountTransaction->amount = $vehicle['initiatedPrice'];
+                    }
+                    
+                    $vehiclesSupplierAccountTransaction->status = 'pending';
+                    if (!$vehiclesSupplierAccountTransaction->save()) {
+                        return response()->json(['error' => 'Failed to save vehicle supplier account transaction'], 500);
+                    }
+                }
+            }
+            $purchasingordereventsLog = New PurchasingOrderEventsLog();
+            $purchasingordereventsLog->event_type = "Payment Initation";
+            $purchasingordereventsLog->created_by = auth()->user()->id;
+            $purchasingordereventsLog->purchasing_order_id = $purchaseOrderId;
+            $purchasingordereventsLog->description = "Payment Inititaion Request to the Procurement Manager";
+            $purchasingordereventsLog->save();
+
+            $purchasingOrder->payment_initiated_status = PurchasingOrder::PAYMENT_STATUS_INITIATED;
+            $purchasingOrder->save();
+            DB::commit();
+
+            return response()->json(['message' => 'Payment details saved successfully'], 200);
+        } catch (Exception $e) { // Catch any exception
+            return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
+        }
+    }
     public function handleActionInitiate(Request $request)
     {
         $transitionId = $request->input('id');
