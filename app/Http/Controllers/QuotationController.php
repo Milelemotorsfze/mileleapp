@@ -38,6 +38,7 @@ use App\Models\QuotationVins;
 use App\Models\Vehicles;
 use App\Models\Vehiclescarts;
 use App\Models\MasterModelLines;
+use App\Models\MasterModelDescription;
 use App\Models\CartAddon;
 use App\Models\So;
 use App\Models\MuitlpleAgents;
@@ -261,8 +262,16 @@ class QuotationController extends Controller
                    
                }
                $isVehicle = 1;
-               $quotationItem->brand_id = $request->brand_ids[$key];
-               $quotationItem->model_line_id = $request->model_line_ids[$key];
+               
+               // Validate brand_id exists before setting it
+               if (!empty($request->brand_ids[$key]) && Brand::find($request->brand_ids[$key])) {
+                   $quotationItem->brand_id = $request->brand_ids[$key];
+               }
+               
+               // Validate model_line_id exists before setting it
+               if (!empty($request->model_line_ids[$key]) && MasterModelLines::find($request->model_line_ids[$key])) {
+                   $quotationItem->model_line_id = $request->model_line_ids[$key];
+               }
             //    info($quotationItem->brand_id);
            }else if($request->types[$key] == 'Other') {
                $item = OtherLogisticsCharges::find($request->reference_ids[$key]);
@@ -271,33 +280,71 @@ class QuotationController extends Controller
                $item = MasterModelLines::find($request->reference_ids[$key]);
                   $isVehicle = 1;
 
-               $quotationItem->brand_id = $request->brand_ids[$key];
-               $quotationItem->model_line_id = $request->model_line_ids[$key];
+               // Validate brand_id exists before setting it
+               if (!empty($request->brand_ids[$key]) && Brand::find($request->brand_ids[$key])) {
+                   $quotationItem->brand_id = $request->brand_ids[$key];
+               }
+               
+               // Validate model_line_id exists before setting it
+               if (!empty($request->model_line_ids[$key]) && MasterModelLines::find($request->model_line_ids[$key])) {
+                   $quotationItem->model_line_id = $request->model_line_ids[$key];
+               }
 
            }else if($request->types[$key] == 'Brand') {
                $item = Brand::find($request->reference_ids[$key]);
                  $isVehicle = 1;
 
-               $quotationItem->brand_id = $request->brand_ids[$key];
-               $quotationItem->model_line_id = $request->model_line_ids[$key];
+               // Validate brand_id exists before setting it
+               if (!empty($request->brand_ids[$key]) && Brand::find($request->brand_ids[$key])) {
+                   $quotationItem->brand_id = $request->brand_ids[$key];
+               }
+               
+               // Validate model_line_id exists before setting it
+               if (!empty($request->model_line_ids[$key]) && MasterModelLines::find($request->model_line_ids[$key])) {
+                   $quotationItem->model_line_id = $request->model_line_ids[$key];
+               }
 
            } else if($request->types[$key] == 'Accessory' || $request->types[$key] == 'SparePart' || $request->types[$key] == 'Kit') {
 
                $item = AddonDetails::find($request->reference_ids[$key]);
 
                $quotationItem->addon_type = $request->addon_types[$key];
-               $quotationItem->brand_id = $request->brand_ids[$key];
-               $quotationItem->model_line_id = $request->model_line_ids[$key];
-               $quotationItem->model_description_id = $request->model_description_ids[$key];
+               
+               // Validate brand_id exists before setting it
+               if (!empty($request->brand_ids[$key]) && Brand::find($request->brand_ids[$key])) {
+                   $quotationItem->brand_id = $request->brand_ids[$key];
+               }
+               
+               // Validate model_line_id exists before setting it
+               if (!empty($request->model_line_ids[$key]) && MasterModelLines::find($request->model_line_ids[$key])) {
+                   $quotationItem->model_line_id = $request->model_line_ids[$key];
+               }
+               
+               // Validate model_description_id exists before setting it
+               if (!empty($request->model_description_ids[$key]) && MasterModelDescription::find($request->model_description_ids[$key])) {
+                   $quotationItem->model_description_id = $request->model_description_ids[$key];
+               }
            }else if($request->types[$key] == 'Addon') {
                if($request->reference_ids[$key] != 'Other') {
 
                    $item = Addon::find($request->reference_ids[$key]);
                }
                $quotationItem->addon_type = $request->addon_types[$key];
-               $quotationItem->brand_id = $request->brand_ids[$key];
-               $quotationItem->model_line_id = $request->model_line_ids[$key];
-               $quotationItem->model_description_id = $request->model_description_ids[$key];
+               
+               // Validate brand_id exists before setting it
+               if (!empty($request->brand_ids[$key]) && Brand::find($request->brand_ids[$key])) {
+                   $quotationItem->brand_id = $request->brand_ids[$key];
+               }
+               
+               // Validate model_line_id exists before setting it
+               if (!empty($request->model_line_ids[$key]) && MasterModelLines::find($request->model_line_ids[$key])) {
+                   $quotationItem->model_line_id = $request->model_line_ids[$key];
+               }
+               
+               // Validate model_description_id exists before setting it
+               if (!empty($request->model_description_ids[$key]) && MasterModelDescription::find($request->model_description_ids[$key])) {
+                   $quotationItem->model_description_id = $request->model_description_ids[$key];
+               }
            }
             if($item) {
                 $quotationItem->reference()->associate($item);
@@ -818,8 +865,16 @@ class QuotationController extends Controller
                    
                }
                $isVehicle = 1;
-               $quotationItem->brand_id = $request->brand_ids[$key];
-               $quotationItem->model_line_id = $request->model_line_ids[$key];
+               
+               // Validate brand_id exists before setting it
+               if (!empty($request->brand_ids[$key]) && Brand::find($request->brand_ids[$key])) {
+                   $quotationItem->brand_id = $request->brand_ids[$key];
+               }
+               
+               // Validate model_line_id exists before setting it
+               if (!empty($request->model_line_ids[$key]) && MasterModelLines::find($request->model_line_ids[$key])) {
+                   $quotationItem->model_line_id = $request->model_line_ids[$key];
+               }
            }else if($request->types[$key] == 'Other') {
                $item = OtherLogisticsCharges::find($request->reference_ids[$key]);
 
@@ -827,28 +882,58 @@ class QuotationController extends Controller
                $item = MasterModelLines::find($request->reference_ids[$key]);
                   $isVehicle = 1;
 
-               $quotationItem->brand_id = $request->brand_ids[$key];
-               $quotationItem->model_line_id = $request->model_line_ids[$key];
+               // Validate brand_id exists before setting it
+               if (!empty($request->brand_ids[$key]) && Brand::find($request->brand_ids[$key])) {
+                   $quotationItem->brand_id = $request->brand_ids[$key];
+               }
+               
+               // Validate model_line_id exists before setting it
+               if (!empty($request->model_line_ids[$key]) && MasterModelLines::find($request->model_line_ids[$key])) {
+                   $quotationItem->model_line_id = $request->model_line_ids[$key];
+               }
 
            }else if($request->types[$key] == 'Brand') {
                $item = Brand::find($request->reference_ids[$key]);
                  $isVehicle = 1;
 
-               $quotationItem->brand_id = $request->brand_ids[$key];
-               $quotationItem->model_line_id = $request->model_line_ids[$key];
+               // Validate brand_id exists before setting it
+               if (!empty($request->brand_ids[$key]) && Brand::find($request->brand_ids[$key])) {
+                   $quotationItem->brand_id = $request->brand_ids[$key];
+               }
+               
+               // Validate model_line_id exists before setting it
+               if (!empty($request->model_line_ids[$key]) && MasterModelLines::find($request->model_line_ids[$key])) {
+                   $quotationItem->model_line_id = $request->model_line_ids[$key];
+               }
 
            } else if($request->types[$key] == 'Accessory' || $request->types[$key] == 'SparePart' || $request->types[$key] == 'Kit') {
                $item = AddonDetails::find($request->reference_ids[$key]);
                $quotationItem->addon_type = $request->addon_types[$key];
-               $quotationItem->brand_id = $request->brand_ids[$key];
-               $quotationItem->model_line_id = $request->model_line_ids[$key];
+               
+               // Validate brand_id exists before setting it
+               if (!empty($request->brand_ids[$key]) && Brand::find($request->brand_ids[$key])) {
+                   $quotationItem->brand_id = $request->brand_ids[$key];
+               }
+               
+               // Validate model_line_id exists before setting it
+               if (!empty($request->model_line_ids[$key]) && MasterModelLines::find($request->model_line_ids[$key])) {
+                   $quotationItem->model_line_id = $request->model_line_ids[$key];
+               }
            }else if($request->types[$key] == 'Addon') {
                if($request->reference_ids[$key] != 'Other') {
                    $item = Addon::find($request->reference_ids[$key]);
                }
                $quotationItem->addon_type = $request->addon_types[$key];
-               $quotationItem->brand_id = $request->brand_ids[$key];
-               $quotationItem->model_line_id = $request->model_line_ids[$key];
+               
+               // Validate brand_id exists before setting it
+               if (!empty($request->brand_ids[$key]) && Brand::find($request->brand_ids[$key])) {
+                   $quotationItem->brand_id = $request->brand_ids[$key];
+               }
+               
+               // Validate model_line_id exists before setting it
+               if (!empty($request->model_line_ids[$key]) && MasterModelLines::find($request->model_line_ids[$key])) {
+                   $quotationItem->model_line_id = $request->model_line_ids[$key];
+               }
            }
             if($item && !isset($request->vehiclesitemsid[$key])) {
                 $quotationItem->reference()->associate($item);

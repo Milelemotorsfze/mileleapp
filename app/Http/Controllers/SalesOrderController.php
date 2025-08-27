@@ -828,8 +828,15 @@ class SalesOrderController extends Controller
                 $quotationItem->quotation_id = $so->quotation_id;
                 $quotationItem->reference_type = 'App\Models\Varaint';
                 $quotationItem->reference_id  = $soVariant->variant_id;
-                $quotationItem->model_line_id  = $soVariant->variant->master_model_lines->id ?? NULL;
-                $quotationItem->brand_id  =    $soVariant->variant->brand->id ?? NULL;
+                // Validate model_line_id exists before setting it
+                if ($soVariant->variant->master_model_lines && $soVariant->variant->master_model_lines->id) {
+                    $quotationItem->model_line_id = $soVariant->variant->master_model_lines->id;
+                }
+                
+                // Validate brand_id exists before setting it
+                if ($soVariant->variant->brand && $soVariant->variant->brand->id) {
+                    $quotationItem->brand_id = $soVariant->variant->brand->id;
+                }
                 $quotationItem->description =  $soVariant->description;
                 $quotationItem->unit_price =  $soVariant->price;
                 $quotationItem->quantity =    $soVariant->quantity;
@@ -843,17 +850,28 @@ class SalesOrderController extends Controller
                 $soVariant->save();
             } else {
                 // Update the existing quotation item
-                QuotationItem::where('id', $soVariant->quotation_item_id)->update([
+                // Prepare update data with validation
+                $updateData = [
                     'reference_id' => $soVariant->variant_id,
-                    'model_line_id' => $soVariant->variant->master_model_lines->id ?? NULL,
-                    'brand_id'  => $soVariant->variant->brand->id ?? NULL,
                     'description' => $soVariant->description,
                     'unit_price' => $soVariant->price,
                     'quantity' => $soVariant->quantity,
                     'is_addon' => 0,
                     'is_enable' => 1,
                     'total_amount' => $soVariant->quantity * $soVariant->price,
-                ]);
+                ];
+                
+                // Validate model_line_id exists before setting it
+                if ($soVariant->variant->master_model_lines && $soVariant->variant->master_model_lines->id) {
+                    $updateData['model_line_id'] = $soVariant->variant->master_model_lines->id;
+                }
+                
+                // Validate brand_id exists before setting it
+                if ($soVariant->variant->brand && $soVariant->variant->brand->id) {
+                    $updateData['brand_id'] = $soVariant->variant->brand->id;
+                }
+                
+                QuotationItem::where('id', $soVariant->quotation_item_id)->update($updateData);
             }
         }
 

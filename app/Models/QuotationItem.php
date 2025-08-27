@@ -14,6 +14,18 @@ class QuotationItem extends Model
         'description',
         'unit_price',
         'quantity',
+        'brand_id',
+        'model_line_id',
+        'model_description_id',
+        'addon_type',
+        'is_addon',
+        'is_enable',
+        'quotation_id',
+        'uuid',
+        'created_by',
+        'system_code_amount',
+        'system_code_currency',
+        'total_amount',
     ];
     public function reference()
     {
