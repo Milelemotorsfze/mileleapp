@@ -634,6 +634,10 @@ table.dataTable thead th select {
   <script>
         $(document).ready(function () {
         var now = new Date();
+        @php
+        $hasEditEstimationDatePermission = Auth::user()->hasPermissionForSelectedRole('edit-estimation-date');
+        @endphp
+        var hasEditEstimationDatePermission = {{ $hasEditEstimationDatePermission ? 'true' : 'false' }};
         var columns7 = [
             {
         data: null,
@@ -671,7 +675,11 @@ table.dataTable thead th select {
             var formattedDate = dateObj.toLocaleDateString('en-GB', {
                 day: '2-digit', month: 'short', year: 'numeric'
             });
-            return formattedDate + ' <button class="edit-estimation-date" data-vehicle-id="' + row.id + '" data-current-date="' + data + '" style="padding: 2px 6px; font-size: 10px; margin-left: 5px; background: none; border: none; color: #007bff; cursor: pointer; border-radius: 3px; transition: all 0.2s ease;"><i class="fas fa-edit"></i></button>';
+            if (hasEditEstimationDatePermission) {
+                return formattedDate + ' <button class="edit-estimation-date" data-vehicle-id="' + row.id + '" data-current-date="' + data + '" style="padding: 2px 6px; font-size: 10px; margin-left: 5px; background: none; border: none; color: #007bff; cursor: pointer; border-radius: 3px; transition: all 0.2s ease;"><i class="fas fa-edit"></i></button>';
+            } else {
+                return formattedDate;
+            }
         }
         return ''; // If no date, return empty
     }
@@ -1294,7 +1302,11 @@ var hideAllButton = $('<button>')
                                 var formattedDate = dateObj.toLocaleDateString('en-GB', {
                                     day: '2-digit', month: 'short', year: 'numeric'
                                 });
-                                $cell.html(formattedDate + ' <button class="edit-estimation-date" data-vehicle-id="' + vehicleId + '" data-current-date="' + newDate + '" style="padding: 2px 6px; font-size: 10px; margin-left: 5px; background: none; border: none; color: #0077ffff; cursor: pointer; border-radius: 3px; transition: all 0.2s ease;"><i class="fas fa-edit"></i></button>');
+                                if (hasEditEstimationDatePermission) {
+                                    $cell.html(formattedDate + ' <button class="edit-estimation-date" data-vehicle-id="' + vehicleId + '" data-current-date="' + newDate + '" style="padding: 2px 6px; font-size: 10px; margin-left: 5px; background: none; border: none; color: #007bff; cursor: pointer; border-radius: 3px; transition: all 0.2s ease;"><i class="fas fa-edit"></i></button>');
+                                } else {
+                                    $cell.html(formattedDate);
+                                }
                                 
                                 // Show success message
                                 alertify.success('Estimation date updated successfully!');
