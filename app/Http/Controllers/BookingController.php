@@ -156,8 +156,14 @@ public function store(Request $request)
         $etd = $request->input('etd');
         $selectedData = json_decode($request->input('selectedData'), true);
         foreach ($selectedData as $item) {
-        $vehicleId = $item['vehicleId'];
-        $days = $item['days'];
+            $vehicleId = $item['vehicleId'] ?? null;
+            $days = $item['days'] ?? null;
+            
+            // Skip if required data is missing
+            if (!$vehicleId) {
+                continue;
+            }
+            
             BookingRequest::create([
                 'date' => $date,
                 'status' => "New",
