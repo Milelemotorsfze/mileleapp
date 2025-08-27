@@ -5414,7 +5414,11 @@ return [$color->id => $formattedName];
                             }, 500);
                         },
                         error: function(xhr, status, error) {
-                            alert('Error saving DN Number: ' + error);
+                            var msg = 'Error saving DN Number.';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                msg = xhr.responseJSON.message;
+                            }
+                            alert(msg);
                         },
                         complete: function() {
                             $btn.prop('disabled', false);
@@ -5464,7 +5468,11 @@ return [$color->id => $formattedName];
                             }, 500);
                         },
                         error: function(xhr, status, error) {
-                            alert('Error saving DN Numbers: ' + error);
+                            var msg = 'Error saving DN Numbers.';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                msg = xhr.responseJSON.message;
+                            }
+                            alert(msg);
                         },
                         complete: function() {
                             $btn.prop('disabled', false);
@@ -5565,6 +5573,9 @@ return [$color->id => $formattedName];
                     success: function(response) {
                         $('#importModal').modal('hide');
                         if (response.vehiclesData && Array.isArray(response.vehiclesData)) {
+                            if (response.message) {
+                                alert(response.message);
+                            }
                             var flashMessage = document.getElementById('flash-message');
                             var filledBlankRowIndexes = {};
                             var updatedCount = 0;

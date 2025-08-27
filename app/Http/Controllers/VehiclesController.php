@@ -4126,4 +4126,32 @@ class VehiclesController extends Controller
 
         return view('grn_list.index', compact('grns'));
     }
+
+    public function updateEstimationDate(Request $request)
+    {
+        $request->validate([
+            'vehicle_id' => 'required|exists:vehicles,id',
+            'estimation_date' => 'required|date',
+        ]);
+
+        try {
+            $vehicle = Vehicles::findOrFail($request->input('vehicle_id'));
+            $vehicle->estimation_date = $request->input('estimation_date');
+            $vehicle->save();
+
+            // Log the change
+            Vehicleslog::create([
+                'vehicles_id' => $vehicle->id,
+                'field' => 'estimation_date',
+                'old_value' => $vehicle->getOriginal('estimation_date'),
+                'status' => 'Updated',
+                'created_by' => Auth::id(),
+                'created_at' => now(),
+            ]);
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to update estimation date']);
+        }
+    }
 }

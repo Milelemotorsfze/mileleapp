@@ -1838,6 +1838,25 @@ class PurchasingOrderController extends Controller
             'warnings_count' => count($variantWarnings),
         ]);
 
+        // If estimation_date is not set for the PO, do not import DN; leave empty and alert user
+        $po = PurchasingOrder::where('po_number', $poNumber)->first();
+        $poHasEstimation = false;
+        if ($po) {
+            $poHasEstimation = Vehicles::where('purchasing_order_id', $po->id)
+                ->whereNotNull('estimation_date')
+                ->exists();
+        }
+        if (!$poHasEstimation) {
+            foreach ($vehiclesData as &$row) {
+                $row['dn'] = '';
+            }
+            unset($row);
+            return response()->json([
+                'vehiclesData' => $vehiclesData,
+                'message' => 'DN cannot be added as payment is not released yet.'
+            ]);
+        }
+
         return response()->json([
             'vehiclesData' => $vehiclesData,
             'warningMessage' => $warningMessage,
@@ -2238,6 +2257,16 @@ class PurchasingOrderController extends Controller
                     }
 
                     if ($fieldName === 'dn') {
+                        // Guard: DN can be added only after payment release
+                        $poHasEstimation = Vehicles::where('purchasing_order_id', $vehicle->purchasing_order_id)
+                            ->whereNotNull('estimation_date')
+                            ->exists();
+                        if (!$poHasEstimation) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'Before payment release DN number cannot be added.'
+                            ], 422);
+                        }
                         // Check if this DN number already exists for this vehicle
                         $existingDn = VehicleDn::where('vehicles_id', $vehicleId)
                         ->where('dn_number', $fieldValue)
@@ -2254,6 +2283,8 @@ class PurchasingOrderController extends Controller
                             $vehicledn->batch = $batchNumber;
                             $vehicledn->save();
                             $vehicle->dn_id = $vehicledn->id;
+                            // Update estimation_date to now + 7 days when DN is created via inline update
+                            $vehicle->estimation_date = \Carbon\Carbon::now()->addDays(7)->format('Y-m-d');
                             $vehicle->save();
                         } else {
                             $vehicle->dn_id = $existingDn->id;
@@ -4873,6 +4904,390 @@ class PurchasingOrderController extends Controller
         $purchasingordereventsLog->save();
         return response()->json(['message' => 'Payment details saved successfully'], 200);
     }
+    public function getVendorAndBalance($purchaseOrderId)
+    {
+        $purchaseOrder = PurchasingOrder::find($purchaseOrderId);
+        if (!$purchaseOrder) {
+            return response()->json(['error' => 'Purchase order not found'], 404);
+        }
+
+        $vendorId = $purchaseOrder->vendors_id;
+        $supplierAccount = SupplierAccount::where('suppliers_id', $vendorId)->first();
+        if (!$supplierAccount) {
+            return response()->json(['error' => 'Supplier account not found'], 404);
+        }
+        return response()->json([
+            'supplier_account_id' => $supplierAccount->id,
+            'current_balance' => $supplierAccount->current_balance,
+        ]);
+    }
+    public function submitforpayment(Request $request)
+    {
+        $transitionId = $request->input('id');
+        $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
+        if ($supplierAccountTransaction) {
+            $supplierAccountTransaction->transaction_type = 'Initiate Payment Request';
+            $supplierAccountTransaction->status = 'Initiate Payment Request';
+            $supplierAccountTransaction->save();
+        }
+
+        $purchasedOrderPaidAmounts = PurchasedOrderPaidAmounts::where('sat_id', $transitionId)->first();
+        if ($purchasedOrderPaidAmounts) {
+            $purchasedOrderPaidAmounts->status = 'Initiate Payment Request';
+            $purchasedOrderPaidAmounts->save();
+        }
+        $vendorPayment = VendorPaymentAdjustments::where('sat_id', $transitionId)->first();
+        if ($vendorPayment) {
+            $vendorPayment->status = 'pending';
+            $vendorPayment->save();
+        }
+        $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+        $transactionCount = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->count();
+        foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
+            $vehicleTransaction->status = 'pending';
+            $vehicleTransaction->save();
+        }
+        $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
+        $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
+        $currency = $supplierAccountTransaction->account_currency;
+        if ($purchasingOrder->is_demand_planning_po == 1) {
+            $recipients = config('mail.custom_recipients.dp');
+            Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+        } else {
+            $recipients = config('mail.custom_recipients.cso');
+            Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+        }
+        $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+            "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+            "Payment Amount: " . $supplierAccountTransaction->transaction_amount . "\n" .
+            "Total Amount: " . $purchasingOrder->totalcost . "\n" .
+            "Stage: " . "Payment Initiation\n" .
+            "Number of Units: " . $transactionCount . " Vehicles\n" .
+            "Order URL: " . $orderUrl;
+        $notification = new DepartmentNotifications();
+        $notification->module = 'Procurement';
+        $notification->type = 'Information';
+        $notification->detail = $detailText;
+        $notification->save();
+        if ($purchasingOrder->is_demand_planning_po == 1) {
+            $dnaccess = new Dnaccess();
+            $dnaccess->master_departments_id = 4;
+            $dnaccess->department_notifications_id = $notification->id;
+            $dnaccess->save();
+        } else {
+            $dnaccess = new Dnaccess();
+            $dnaccess->master_departments_id = 15;
+            $dnaccess->department_notifications_id = $notification->id;
+            $dnaccess->save();
+        }
+        $purchasingordereventsLog = new PurchasingOrderEventsLog();
+        $purchasingordereventsLog->event_type = "Payment Initation";
+        $purchasingordereventsLog->created_by = auth()->user()->id;
+        $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+        $purchasingordereventsLog->description = "Procurement Manager Forward Payment Inititaion Request to the Finance Department";
+        $purchasingordereventsLog->save();
+        return response()->json(['message' => 'Payment details saved successfully'], 200);
+    }
+    public function submitPayment(Request $request)
+    {
+        try {
+            $transitionId = $request->input('transitionId');
+            $bankAccount = $request->input('bankAccount');
+            $file = $request->file('file');
+            $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
+            if ($supplierAccountTransaction) {
+                if ($file) {
+                    $fileNameToStore = time() . '_' . $file->getClientOriginalName();
+                    $path = $file->move(public_path('storage/transition_file'), $fileNameToStore);
+                    $supplierAccountTransaction->transition_file = 'storage/transition_file/' . $fileNameToStore;
+                }
+                $supplierAccountTransaction->transaction_type = 'Pre-Debit';
+                $supplierAccountTransaction->status = 'pending';
+                $supplierAccountTransaction->bank_accounts_id =  $bankAccount;
+                $supplierAccountTransaction->save();
+                $supplierAccount = SupplierAccount::where('id', $supplierAccountTransaction->supplier_account_id)->first(); {
+                    $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
+                    if ($purchasingOrder) {
+                        $currency = $purchasingOrder->currency;
+                        $transactionAmount = $supplierAccountTransaction->transaction_amount;
+                        // Conversion rates
+                        $conversionRates = [
+                            "USD" => 3.67,
+                            "EUR" => 3.94,
+                            "GBP" => 4.67,
+                            "JPY" => 0.025,
+                            "AUD" => 2.29,
+                            "AED" => 1,
+                            "CAD" => 2.68,
+                            "PHP" => 0.063,
+                            'SAR' => 0.98,
+                        ];
+                        // Check if the currencies are different
+                        if ($purchasingOrder->currency != $supplierAccount->currency) {
+                            // Convert the transactionAmount to the SupplierAccount currency
+                            $purchasingOrderConversionRate = $conversionRates[$purchasingOrder->currency] ?? 1;
+                            $supplierAccountConversionRate = $conversionRates[$supplierAccount->currency] ?? 1;
+
+                            // Convert the transaction amount from the purchasing order currency to the supplier account currency
+                            $transactionAmountInAED = $supplierAccountTransaction->transaction_amount * $purchasingOrderConversionRate; // Convert to base currency (e.g. AED)
+                            $totalCostConverted = $transactionAmountInAED / $supplierAccountConversionRate; // Convert from AED to supplier account currency
+                        } else {
+                            $totalCostConverted = $supplierAccountTransaction->transaction_amount;
+                        }
+
+                        $account_balance = $supplierAccount->current_balance + $totalCostConverted;
+                        $supplierAccount->current_balance = $account_balance <= 0 ? 0 : $account_balance;
+
+                        $supplierAccount->save();
+                    }
+                }
+            }
+            $purchasedOrderPaidAmounts = PurchasedOrderPaidAmounts::where('sat_id', $transitionId)->first();
+            if ($purchasedOrderPaidAmounts) {
+                $purchasedOrderPaidAmounts->status = 'Suggested Payment';
+                $purchasedOrderPaidAmounts->save();
+            }
+            $vendorPayment = VendorPaymentAdjustments::where('sat_id', $transitionId)->first();
+            if ($vendorPayment) {
+                $vendorPayment->status = 'Initiate';
+                $vendorPayment->save();
+            }
+            $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+            $transactionCount = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->count();
+            foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
+                $vehicleTransaction->status = 'Initiate';
+                $vehicleTransaction->save();
+            }
+            $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
+            $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
+            $currency = $supplierAccountTransaction->account_currency;
+            if ($purchasingOrder->is_demand_planning_po == 1) {
+                // $recipients = config('mail.custom_recipients.dp');
+                // Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+            } else {
+                $recipients = config('mail.custom_recipients.cso');
+                Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+            }
+            $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+                "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+                "Payment Amount: " . $supplierAccountTransaction->transaction_amount . "\n" .
+                "Total Amount: " . $purchasingOrder->totalcost . "\n" .
+                "Stage: " . "Payment Initiation\n" .
+                "Number of Units: " . $transactionCount . " Vehicles\n" .
+                "Order URL: " . $orderUrl;
+            $notification = new DepartmentNotifications();
+            $notification->module = 'Procurement';
+            $notification->type = 'Information';
+            $notification->detail = $detailText;
+            $notification->save();
+            if ($purchasingOrder->is_demand_planning_po == 1) {
+                $dnaccess = new Dnaccess();
+                $dnaccess->master_departments_id = 4;
+                $dnaccess->department_notifications_id = $notification->id;
+                $dnaccess->save();
+            } else {
+                $dnaccess = new Dnaccess();
+                $dnaccess->master_departments_id = 15;
+                $dnaccess->department_notifications_id = $notification->id;
+                $dnaccess->save();
+            }
+            $purchasingordereventsLog = new PurchasingOrderEventsLog();
+            $purchasingordereventsLog->event_type = "Payment Initation";
+            $purchasingordereventsLog->created_by = auth()->user()->id;
+            $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+            $purchasingordereventsLog->description = "Finance Manager Forward Payment Inititaion Request to the CEO office For Payment Released";
+            $purchasingordereventsLog->save();
+            // If vendor is AMS, update vehicles' estimated_date to current date + 20 days on payment release
+            if (isset($purchasingOrder->supplier) && strtoupper($purchasingOrder->supplier->supplier ?? '') === 'AMS') {
+                $releaseDate = Carbon::now();
+                $newEstimatedDate = $releaseDate->copy()->addDays(20)->format('Y-m-d');
+                Vehicles::where('purchasing_order_id', $purchasingOrder->id)
+                    ->update(['estimation_date' => $newEstimatedDate]);
+            }
+            return response()->json(['success' => true, 'message' => 'Payment submitted successfully']);
+        } catch (\Exception $e) {
+            Log::error('Payment submission failed', ['error' => $e->getMessage()]);
+            return response()->json(['success' => false, 'message' => 'Error submitting payment', 'error' => $e->getMessage()], 500);
+        }
+    }
+    public function approveTransition(Request $request)
+    {
+        // update utilization qty
+        try {
+
+            DB::beginTransaction();
+
+            $transitionId = $request->input('transition_id');
+            $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
+            if ($supplierAccountTransaction) {
+                $supplierAccountTransaction->transaction_type = 'Released';
+                $supplierAccountTransaction->status = 'Approved';
+                $supplierAccountTransaction->payment_released_date = Carbon::now()->format('Y-m-d');
+                $supplierAccountTransaction->save();
+            }
+            $purchasedOrderPaidAmounts = PurchasedOrderPaidAmounts::where('sat_id', $transitionId)->first();
+            if ($purchasedOrderPaidAmounts) {
+                $purchasedOrderPaidAmounts->status = 'Approved';
+                $purchasedOrderPaidAmounts->save();
+            }
+            $vendorPayment = VendorPaymentAdjustments::where('sat_id', $transitionId)->first();
+            if ($vendorPayment) {
+                $vendorPayment->status = 'Approved';
+                $vendorPayment->save();
+            }
+            $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
+
+            $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+            $transactionCount = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->count();
+            foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
+                $vehicleTransaction->status = 'Approved';
+                $vehicleTransaction->save();
+                $vehiclespaid = VehiclePurchasingCost::where('vehicles_id', $vehicleTransaction->vehicles_id)->first();
+                $vehiclespaid->total_paid_amount += $vehicleTransaction->amount;
+                $vehiclespaid->save();
+                // DP PO
+                if ($purchasingOrder->is_demand_planning_purchase_order) {
+                    $pfiId = $purchasingOrder->PFIPurchasingOrder->pfi->id ?? '';
+                    $pfiItemLatest = PfiItem::where('pfi_id', $pfiId)
+                        ->where('is_parent', false)
+                        ->first();
+                    // Utilization qty update only for Toyota PO
+                    if ($pfiItemLatest) {
+                        // only toyota PFI have child , so if child exist it will be toyota PO
+                        $vehicle = Vehicles::find($vehicleTransaction->vehicles_id);
+                        $masterModel = MasterModel::find($vehicle->model_id);
+                        $possibleModels = MasterModel::where('model', $masterModel->model)
+                            ->where('sfx',  $masterModel->sfx)
+                            ->pluck('id')->toArray();
+                        $pfiItem = PfiItemPurchaseOrder::where('purchase_order_id', $purchasingOrder->id)
+                            ->whereIn('master_model_id', $possibleModels)
+                            ->first();
+                        $loiItem = LetterOfIndentItem::whereHas('pfiItems', function ($query) use ($pfiItem) {
+                            $query->where('is_parent', false)
+                                ->where('pfi_id', $pfiItem->pfi_id)
+                                ->where('parent_pfi_item_id', $pfiItem->pfi_item_id);
+                        })
+                            ->first();
+                        if ($loiItem) {
+                            $latestUtilizedQuantity = $loiItem->utilized_quantity + 1;
+                            $loiItem->po_payment_initiated_quantity = $loiItem->po_payment_initiated_quantity - 1;
+                            $loiItem->utilized_quantity = $latestUtilizedQuantity;
+                            $loiItem->save();
+                        }
+                    }
+                }
+            }
+
+            // payment status update => check transaction include full po qty or not
+            $purchaseOrderQty = PurchasingOrderItems::where('purchasing_order_id', $purchasingOrder->id)
+                ->sum('qty');
+            $transitionQty = $vehiclesSupplierAccountTransactions->count();
+            if ($transitionQty == $purchaseOrderQty) {
+                $purchasingOrder->payment_status = PurchasingOrder::PAYMENT_STATUS_PAID;
+            } else {
+                $purchasingOrder->payment_status = PurchasingOrder::PAYMENT_STATUS_PARTIALY_PAID;
+            }
+            $purchasingOrder->save();
+
+            // if PO is Dp => Seal the PFI Document with milele seal
+            if ($purchasingOrder->is_demand_planning_purchase_order) {
+                $pdf = new Fpdi();
+                $pfiId = $purchasingOrder->PFIPurchasingOrder->pfi->id ?? '';
+                $pfi = PFI::find($pfiId);
+                if (!$pfi->pfi_document_with_sign) {
+                    if ($pfi->new_pfi_document_without_sign) {
+                        $destinationPath = 'New_PFI_document_without_sign/' . $pfi->new_pfi_document_without_sign;
+                    } else {
+                        $destinationPath = 'PFI_document_withoutsign/' . $pfi->pfi_document_without_sign;
+                    }
+                    if ($pfi->new_pfi_document_without_sign || $pfi->pfi_document_without_sign) {
+
+                        $pageCount = $pdf->setSourceFile($destinationPath);
+
+                        for ($i = 1; $i <= $pageCount; $i++) {
+                            $pdf->setPrintHeader(false);
+                            $pdf->AddPage();
+                            $tplIdx = $pdf->importPage($i);
+                            $pdf->useTemplate($tplIdx);
+                            if ($i == $pageCount) {
+                                $pdf->Image('milele_seal.png', 80, 230, 50, 35);
+                            }
+                        }
+
+                        $signedFileName = 'MILELE - ' . $pfi->pfi_reference_number . '.pdf';
+                        $directory = public_path('PFI_Document_with_sign');
+                        \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
+                        if (File::exists(public_path('PFI_Document_with_sign/' . $signedFileName))) {
+                            File::delete(public_path('PFI_Document_with_sign/' . $signedFileName));
+                        }
+                        $pdf->Output($directory . '/' . $signedFileName, 'F');
+                        $pfi->pfi_document_with_sign = $signedFileName;
+                        $pfi->save();
+                    }
+                }
+            }
+
+            $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
+            $currency = $supplierAccountTransaction->account_currency;
+            if ($purchasingOrder->is_demand_planning_po == 1) {
+                $recipients = [
+                    config('mail.custom_recipients.dp'),
+                    config('mail.custom_recipients.finance'),
+                ];
+                Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+            } else {
+                $recipients = [
+                    config('mail.custom_recipients.cso'),
+                    config('mail.custom_recipients.finance'),
+                ];
+                Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+            }
+            $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+                "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+                "Payment Amount: " . $supplierAccountTransaction->transaction_amount . "\n" .
+                "Total Amount: " . $purchasingOrder->totalcost . "\n" .
+                "Stage: " . "Payment Released\n" .
+                "Number of Units: " . $transactionCount . " Vehicles\n" .
+                "Order URL: " . $orderUrl;
+            $notification = new DepartmentNotifications();
+            $notification->module = 'Procurement';
+            $notification->type = 'Information';
+            $notification->detail = $detailText;
+            $notification->save();
+            if ($purchasingOrder->is_demand_planning_po == 1) {
+                $dnaccess = new Dnaccess();
+                $dnaccess->master_departments_id = 4;
+                $dnaccess->department_notifications_id = $notification->id;
+                $dnaccess->save();
+                $dnaccess = new Dnaccess();
+                $dnaccess->master_departments_id = 1;
+                $dnaccess->department_notifications_id = $notification->id;
+                $dnaccess->save();
+            } else {
+                $dnaccess = new Dnaccess();
+                $dnaccess->master_departments_id = 15;
+                $dnaccess->department_notifications_id = $notification->id;
+                $dnaccess->save();
+                $dnaccess = new Dnaccess();
+                $dnaccess->master_departments_id = 1;
+                $dnaccess->department_notifications_id = $notification->id;
+                $dnaccess->save();
+            }
+            $purchasingordereventsLog = new PurchasingOrderEventsLog();
+            $purchasingordereventsLog->event_type = "Payment Released";
+            $purchasingordereventsLog->created_by = auth()->user()->id;
+            $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+            $purchasingordereventsLog->description = "CEO office Released Confirmed";
+            $purchasingordereventsLog->save();
+            DB::commit();
+
+            return response()->json(['success' => true, 'transition_id' => $transitionId]);
+        } catch (\Exception $e) {
+            info($e->getMessage());
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            // return response()->json(['success' => true, 'transition_id' => $transitionId]);
+        }
+    }
 
     public function rejectTransition(Request $request)
     {
@@ -5253,6 +5668,17 @@ class PurchasingOrderController extends Controller
         $purchasingOrderId = $request->input('purchasingOrderId');
         $type = $request->input('type');
 
+        // Guard: DN can be added only after payment release (indicated by estimation_date present)
+        $hasEstimationDate = Vehicles::where('purchasing_order_id', $purchasingOrderId)
+            ->whereNotNull('estimation_date')
+            ->exists();
+        if (!$hasEstimationDate) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Before payment release DN number cannot be added.'
+            ], 422);
+        }
+
         if ($type == 'full') {
             $dnNumber = $request->input('dnNumber');
 
@@ -5285,6 +5711,8 @@ class PurchasingOrderController extends Controller
                     $vehicledn->batch = $batchNumber;
                     $vehicledn->save();
                     $vehicle->dn_id = $vehicledn->id;
+                    // Update estimation_date to now + 7 days when DN is created
+                    $vehicle->estimation_date = \Carbon\Carbon::now()->addDays(7)->format('Y-m-d');
                     $vehicle->save();
                 } else {
                     $vehicle->dn_id = $existingDn->id;
@@ -5326,6 +5754,8 @@ class PurchasingOrderController extends Controller
                     // Check if the vehicle exists before assigning the dn_id
                     if ($vehicle) {
                         $vehicle->dn_id = $vehicledn->id;
+                        // Update estimation_date to now + 7 days when DN is created
+                        $vehicle->estimation_date = \Carbon\Carbon::now()->addDays(7)->format('Y-m-d');
                         $vehicle->save();
                     } else {
                         // Log or handle the error if the vehicle ID is invalid

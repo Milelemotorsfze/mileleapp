@@ -671,7 +671,7 @@ table.dataTable thead th select {
             var formattedDate = dateObj.toLocaleDateString('en-GB', {
                 day: '2-digit', month: 'short', year: 'numeric'
             });
-            return formattedDate;
+            return formattedDate + ' <button class="btn btn-sm btn-outline-primary edit-estimation-date" data-vehicle-id="' + row.id + '" data-current-date="' + data + '" style="padding: 2px 6px; font-size: 10px; margin-left: 5px;"><i class="fas fa-edit"></i></button>';
         }
         return ''; // If no date, return empty
     }
@@ -1249,6 +1249,87 @@ var hideAllButton = $('<button>')
             } else {
                 $('.row-badge7').hide();
             }
+        });
+
+        // Event handler for estimation date edit button
+        $(document).on('click', '.edit-estimation-date', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            var vehicleId = $(this).data('vehicle-id');
+            var currentDate = $(this).data('current-date');
+            
+            // Create a date input field
+            var dateInput = $('<input type="date" class="form-control form-control-sm" value="' + currentDate + '" style="width: 120px; display: inline-block;">');
+            var saveButton = $('<button class="btn btn-sm btn-success" style="margin-left: 5px; padding: 2px 6px; font-size: 10px;"><i class="fas fa-save"></i></button>');
+            var cancelButton = $('<button class="btn btn-sm btn-secondary" style="margin-left: 2px; padding: 2px 6px; font-size: 10px;"><i class="fas fa-times"></i></button>');
+            
+            // Replace the button with input and save/cancel buttons
+            var $cell = $(this).closest('td');
+            var originalContent = $cell.html();
+            
+            $cell.html(dateInput[0].outerHTML + saveButton[0].outerHTML + cancelButton[0].outerHTML);
+            
+            // Focus on the date input
+            dateInput.focus();
+            
+            // Save button click handler
+            saveButton.on('click', function() {
+                var newDate = dateInput.val();
+                if (newDate) {
+                    // Send AJAX request to update the date
+                    $.ajax({
+                        url: '{{ route("vehicles.update-estimation-date") }}',
+                        type: 'POST',
+                        data: {
+                            vehicle_id: vehicleId,
+                            estimation_date: newDate,
+                            _token: $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                // Update the cell content with new date and edit button
+                                var dateObj = new Date(newDate);
+                                var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                                    day: '2-digit', month: 'short', year: 'numeric'
+                                });
+                                $cell.html(formattedDate + ' <button class="btn btn-sm btn-outline-primary edit-estimation-date" data-vehicle-id="' + vehicleId + '" data-current-date="' + newDate + '" style="padding: 2px 6px; font-size: 10px; margin-left: 5px;"><i class="fas fa-edit"></i></button>');
+                                
+                                // Show success message
+                                alertify.success('Estimation date updated successfully!');
+                            } else {
+                                // Restore original content on error
+                                $cell.html(originalContent);
+                                alertify.error('Failed to update estimation date!');
+                            }
+                        },
+                        error: function() {
+                            // Restore original content on error
+                            $cell.html(originalContent);
+                            alertify.error('Failed to update estimation date!');
+                        }
+                    });
+                }
+            });
+            
+            // Cancel button click handler
+            cancelButton.on('click', function() {
+                $cell.html(originalContent);
+            });
+            
+            // Handle Enter key on date input
+            dateInput.on('keypress', function(e) {
+                if (e.which === 13) { // Enter key
+                    saveButton.click();
+                }
+            });
+            
+            // Handle Escape key
+            $(document).one('keydown', function(e) {
+                if (e.which === 27) { // Escape key
+                    $cell.html(originalContent);
+                }
+            });
         });
         $('#dtBasicExample7 tbody').off('click', 'tr');
 // Add specific click event listeners for relevant columns
