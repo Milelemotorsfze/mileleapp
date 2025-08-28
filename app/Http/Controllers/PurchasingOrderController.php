@@ -2286,6 +2286,9 @@ class PurchasingOrderController extends Controller
                             // Update estimation_date to now + 7 days when DN is created via inline update
                             $vehicle->estimation_date = \Carbon\Carbon::now()->addDays(7)->format('Y-m-d');
                             $vehicle->save();
+                            
+                            // Send email notification for DN created
+                            $this->sendDnCreatedEmailNotification($vehicle, $fieldValue);
                         } else {
                             $vehicle->dn_id = $existingDn->id;
                             $vehicle->save();
@@ -6043,6 +6046,8 @@ class PurchasingOrderController extends Controller
                     // Update estimation_date to now + 7 days when DN is created
                     $vehicle->estimation_date = \Carbon\Carbon::now()->addDays(7)->format('Y-m-d');
                     $vehicle->save();
+                    // Send email notification for DN created
+                    $this->sendDnCreatedEmailNotification($vehicle, $dnNumber);
                 } else {
                     $vehicle->dn_id = $existingDn->id;
                     $vehicle->save();
@@ -6086,6 +6091,8 @@ class PurchasingOrderController extends Controller
                         // Update estimation_date to now + 7 days when DN is created
                         $vehicle->estimation_date = \Carbon\Carbon::now()->addDays(7)->format('Y-m-d');
                         $vehicle->save();
+                        // Send email notification for DN created
+                        $this->sendDnCreatedEmailNotification($vehicle, $dnNumber);
                     } else {
                         // Log or handle the error if the vehicle ID is invalid
                         \Log::error("Vehicle with ID {$vehicleId} not found.");
@@ -6095,6 +6102,147 @@ class PurchasingOrderController extends Controller
         }
         return response()->json(['success' => true]);
     }
+    
+    /**
+     * Send email notifications when DN is created and estimation date is set
+     * @param Vehicles $vehicle
+     * @param string $dnNumber
+     */
+    private function sendDnCreatedEmailNotification(Vehicles $vehicle, string $dnNumber)
+    {
+        try {
+            // Get all vehicles in the same PO that have DN created
+            $poId = $vehicle->purchasing_order_id;
+            $vehiclesWithDn = Vehicles::where('purchasing_order_id', $poId)
+                ->whereNotNull('dn_id')
+                ->with(['variant', 'purchasingOrder', 'exterior', 'so.salesperson'])
+                ->get();
+                // Determine vehicle status based on business logic
+                // dd($this->determineVehicleStatus($vehicle));
+                $vehicleStatus = $this->determineVehicleStatus($vehicle);
+
+            // Prepare email data with all vehicles
+            $emailData = [
+                'poNumber' => $vehicle->purchasingOrder->po_number ?? 'N/A',
+                'estimationDate' => $vehicle->estimation_date,
+                'vehicles' => $vehiclesWithDn->map(function($veh) {
+                    return [
+                        'srNo' => $veh->id ?? 'N/A',
+                        'poNumber' => $veh->purchasingOrder->po_number ?? 'N/A',
+                        'vin' => $veh->vin ?? 'N/A',
+                        'variant' => $veh->variant->name ?? 'N/A',
+                        'exterior' => $veh->exterior->name ?? 'N/A',
+                        'eta' => $veh->estimation_date ? \Carbon\Carbon::parse($veh->estimation_date)->format('d M Y') : 'N/A',
+                    ];
+                })->toArray(),
+                'totalVehicles' => $vehiclesWithDn->count(),
+                'vehicleStatus' => $vehicleStatus,
+            ];
+
+            if ($vehicleStatus === 'booked') {
+                // Send email to reservation salesperson (booking_person_id)
+                $this->sendVehicleEmail($vehicle, $emailData, 'booked');
+            } elseif ($vehicleStatus === 'sold') {
+                // Send email to SO salesperson (so.sales_person_id)
+                $this->sendVehicleEmail($vehicle, $emailData, 'sold');
+            }
+            
+        } catch (\Exception $e) {
+            \Log::error('Error sending DN created email notification: ' . $e->getMessage(), [
+                'vehicle_id' => $vehicle->id,
+                'po_number' => $vehicle->purchasingOrder->po_number ?? 'N/A',
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
+     * Determine vehicle status based on business logic from VehiclesController
+     * @param Vehicles $vehicle
+     * @return string
+     */
+    private function determineVehicleStatus(Vehicles $vehicle): string
+    {
+        // Status 1: Booked - Has active reservation, not sold yet
+        if (!$vehicle->gdn_id && !$vehicle->so_id && $vehicle->reservation_end_date && 
+            \Carbon\Carbon::parse($vehicle->reservation_end_date)->isFuture()) {
+            return 'booked';
+        }
+        
+        // Status 2: Sold - Inspected, has Sales Order, not delivered
+        if ($vehicle->inspection_date && !$vehicle->gdn_id && $vehicle->so_id && $vehicle->movement_grn_id) {
+            return 'sold';
+        }
+        
+        // Default case for any other combination
+        return 'unknown';
+    }
+    
+    /**
+     * Send unified email notification for vehicles based on status
+     * @param Vehicles $vehicle
+     * @param array $emailData
+     * @param string $status
+     */
+    private function sendVehicleEmail(Vehicles $vehicle, array $emailData, string $status)
+    {
+        try {
+            $salesperson = null;
+            $subject = '';
+            
+            if ($status === 'booked') {
+                // Get the reservation salesperson (booking_person_id)
+                $salesperson = User::find($vehicle->booking_person_id);
+                $subject = 'DN Created: ' . $emailData['poNumber'];
+                
+                if (!$salesperson || !$salesperson->email) {
+                    \Log::warning('Reservation salesperson not found or has no email', [
+                        'vehicle_id' => $vehicle->id,
+                        'booking_person_id' => $vehicle->booking_person_id
+                    ]);
+                    return;
+                }
+            } elseif ($status === 'sold') {
+                // Get the SO salesperson
+                $salesperson = $vehicle->so->salesperson ?? null;
+                $subject = 'DN Created: ' . $emailData['poNumber'];
+                
+                if (!$salesperson || !$salesperson->email) {
+                    \Log::warning('SO salesperson not found or has no email', [
+                        'vehicle_id' => $vehicle->id,
+                        'so_id' => $vehicle->so_id
+                    ]);
+                    return;
+                }
+            }
+            
+            // Add salesperson to email data
+            $emailData['salesperson'] = $salesperson;
+            
+            // Send email using unified template
+            Mail::send('emails.dn_created_notification', $emailData, function ($message) use ($salesperson, $subject) {
+                $message->to($salesperson->email, $salesperson->name)
+                        ->subject($subject);
+            });
+            
+            \Log::info('DN created email sent successfully', [
+                'vehicle_id' => $vehicle->id,
+                'status' => $status,
+                'salesperson_email' => $salesperson->email,
+                'po_number' => $emailData['poNumber']
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error sending vehicle email: ' . $e->getMessage(), [
+                'vehicle_id' => $vehicle->id,
+                'status' => $status,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+    
+
+
     public function getVehiclesdn($purchaseOrderId)
     {
         $vehicles = Vehicles::where('purchasing_order_id', $purchaseOrderId)
