@@ -2924,6 +2924,9 @@ class VehiclesController extends Controller
                             ->where('inspection_pdi.stage', '=', 'PDI');
                     })
                     ->where('vehicles.status', 'Approved');
+                
+
+                
                 foreach ($filters as $columnName => $values) {
                     if (in_array('__NULL__', $values)) {
                         $data->whereNull($columnName); // Filter for NULL values
@@ -4156,6 +4159,129 @@ class VehiclesController extends Controller
         } catch (\Exception $e) {
             \Log::error('Error updating estimation date: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Failed to update estimation date']);
+        }
+    }
+
+    public function uploadEtaCsv(Request $request)
+    {
+        $request->validate([
+            'csv_file' => 'required|file|mimes:csv',
+        ]);
+
+        try {
+            $file = $request->file('csv_file');
+            $path = $file->getRealPath();
+            
+            $data = array_map('str_getcsv', file($path));
+            $headers = array_shift($data); // Remove header row
+            
+            // Validate headers
+            $expectedHeaders = ['PO Number', 'VIN', 'ETA'];
+            if (count(array_diff($expectedHeaders, $headers)) > 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid CSV format. Expected headers: PO Number, VIN, ETA'
+                ]);
+            }
+            
+            $updatedCount = 0;
+            $errors = [];
+            $updatedPOs = []; // Track which PO's were updated
+            
+            foreach ($data as $rowIndex => $row) {
+                if (count($row) < 3) {
+                    $errors[] = "Row " . ($rowIndex + 2) . ": Insufficient columns";
+                    continue;
+                }
+                
+                $poNumber = trim($row[0]);
+                $vin = trim($row[1]);
+                $eta = trim($row[2]);
+                
+                // Validate required fields
+                if (empty($poNumber) || empty($eta)) {
+                    $errors[] = "Row " . ($rowIndex + 2) . ": PO Number and ETA are required";
+                    continue;
+                }
+                
+                // Validate ETA format (dd-mm-yy)
+                if (!preg_match('/^\d{2}-\d{2}-\d{2}$/', $eta)) {
+                    $errors[] = "Row " . ($rowIndex + 2) . ": Invalid ETA format. Use dd-mm-yy";
+                    continue;
+                }
+                
+                // Convert ETA to database format (Y-m-d)
+                $etaParts = explode('-', $eta);
+                $etaDate = '20' . $etaParts[2] . '-' . $etaParts[1] . '-' . $etaParts[0];
+                
+                try {
+                    // Find vehicles by PO number
+                    $vehicles = Vehicles::whereHas('purchasingOrder', function($query) use ($poNumber) {
+                        $query->where('po_number', 'LIKE', '%' . $poNumber . '%');
+                    });
+                    
+                    // If VIN is provided, filter by VIN as well
+                    if (!empty($vin)) {
+                        $vehicles = $vehicles->where('vin', 'LIKE', '%' . $vin . '%');
+                    }
+                    
+                    $vehicles = $vehicles->get();
+                    
+                    if ($vehicles->count() > 0) {
+                        foreach ($vehicles as $vehicle) {
+                            $oldValue = $vehicle->estimation_date;
+                            $vehicle->estimation_date = $etaDate;
+                            $vehicle->save();
+                            
+                            // Log the change
+                            Vehicleslog::create([
+                                'vehicles_id' => $vehicle->id,
+                                'field' => 'estimation_date',
+                                'old_value' => $oldValue,
+                                'new_value' => $etaDate,
+                                'status' => 'Updated estimation date via CSV upload - PO: ' . $poNumber,
+                                'created_by' => Auth::id(),
+                                'time' => now()->format('H:i:s'),
+                                'date' => now()->format('Y-m-d'),
+                            ]);
+                            
+                            $updatedCount++;
+                        }
+                        
+                        // Add PO to updated list if not already there
+                        if (!in_array($poNumber, $updatedPOs)) {
+                            $updatedPOs[] = $poNumber;
+                        }
+                    } else {
+                        $errors[] = "Row " . ($rowIndex + 2) . ": No vehicles found for PO: " . $poNumber . ($vin ? " and VIN: " . $vin : "");
+                    }
+                } catch (\Exception $e) {
+                    $errors[] = "Row " . ($rowIndex + 2) . ": " . $e->getMessage();
+                }
+            }
+            
+            $message = "Successfully updated " . $updatedCount . " vehicles";
+            if (count($errors) > 0) {
+                $message .= ". Errors: " . implode('; ', array_slice($errors, 0, 5));
+                if (count($errors) > 5) {
+                    $message .= " and " . (count($errors) - 5) . " more errors";
+                }
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'updated_count' => $updatedCount,
+                'error_count' => count($errors),
+                'updated_pos' => $updatedPOs
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error uploading ETA CSV: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to process CSV file: ' . $e->getMessage()
+            ]);
         }
     }
 }

@@ -938,6 +938,7 @@ Route::get('/d', function () {
     Route::get('/user/{id}/{date}', [UserController::class, 'showUseractivities'])->name('user.showUseractivitie');
     // vehicle stock report
     Route::get('/stock-count-filter',[VehiclesController::class, 'stockCountFilter'])->name('vehicle-stock-report.filter');
+    Route::post('/vehicles/upload-eta-csv',[VehiclesController::class, 'uploadEtaCsv'])->name('vehicles.upload-eta-csv');
     // Master Data
     Route::resource('brands', BrandController::class);
     Route::resource('model-lines', ModelLinesController::class);
