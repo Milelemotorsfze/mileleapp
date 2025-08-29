@@ -939,6 +939,7 @@ Route::get('/d', function () {
     // vehicle stock report
     Route::get('/stock-count-filter',[VehiclesController::class, 'stockCountFilter'])->name('vehicle-stock-report.filter');
     Route::post('/vehicles/upload-eta-csv',[VehiclesController::class, 'uploadEtaCsv'])->name('vehicles.upload-eta-csv');
+    Route::post('/vehicles/trigger-estimation-reminders',[VehiclesController::class, 'triggerEstimationReminders'])->name('vehicles.trigger-estimation-reminders');
     // Master Data
     Route::resource('brands', BrandController::class);
     Route::resource('model-lines', ModelLinesController::class);

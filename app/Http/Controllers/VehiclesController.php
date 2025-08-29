@@ -42,6 +42,7 @@ use Carbon\CarbonTimeZone;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
 
 class VehiclesController extends Controller
 {
@@ -4282,6 +4283,71 @@ class VehiclesController extends Controller
                 'success' => false,
                 'message' => 'Failed to process CSV file: ' . $e->getMessage()
             ]);
+        }
+    }
+
+    /**
+     * Send estimation date reminders
+     */
+    public function triggerEstimationReminders()
+    {
+        $today = Carbon::now();
+        
+        // Check for vehicles with estimation dates in the next 5 days
+        $vehiclesNeedingReminders = collect();
+        
+        for ($days = 1; $days <= 5; $days++) {
+            $targetDate = $today->copy()->addDays($days)->format('Y-m-d');
+            
+            $vehicles = Vehicles::where('estimation_date', $targetDate)
+                ->whereNotNull('estimation_date')
+                ->where('status', '!=', 'cancel')
+                ->with(['variant.brand', 'variant.master_model_lines', 'warehouse'])
+                ->get();
+            
+            if ($vehicles->count() > 0) {
+                // Add days remaining info to each vehicle
+                foreach ($vehicles as $vehicle) {
+                    $vehicle->days_remaining = $days;
+                }
+                
+                $vehiclesNeedingReminders = $vehiclesNeedingReminders->merge($vehicles);
+            }
+        }
+        
+        // Send email if vehicles found
+        if ($vehiclesNeedingReminders->count() > 0) {
+            $this->sendManualReminderEmail($vehiclesNeedingReminders, null);
+            \Log::info('Estimation reminder email sent for ' . $vehiclesNeedingReminders->count() . ' vehicles');
+        }
+    }
+    
+    /**
+     * Send manual consolidated reminder email to all teams
+     */
+    private function sendManualReminderEmail($vehicles, $daysLeft)
+    {
+        try {
+            // Get all team email addresses
+            $departmentEmails = config('departments.estimation_reminders', []);
+
+            $allEmails = [];
+            foreach ($departmentEmails as $emails) {
+                $allEmails = array_merge($allEmails, $emails);
+            }
+            
+            // Remove duplicates and filter out default placeholder emails
+            $allEmails = array_unique($allEmails);
+            $allEmails = array_filter($allEmails, function($email) {
+                return !str_contains($email, '@company.com') && !empty($email);
+            });
+            
+            // Send single consolidated email to all teams
+            Mail::to($allEmails)->send(new \App\Mail\EstimationDateReminder($vehicles, $daysLeft));
+            \Log::info("Manual consolidated estimation reminder sent to " . count($allEmails) . " team members");
+            
+        } catch (\Exception $e) {
+            \Log::error("Failed to send manual consolidated estimation reminder email: " . $e->getMessage());
         }
     }
 }
