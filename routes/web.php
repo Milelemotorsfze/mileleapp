@@ -938,6 +938,8 @@ Route::get('/d', function () {
     Route::get('/user/{id}/{date}', [UserController::class, 'showUseractivities'])->name('user.showUseractivitie');
     // vehicle stock report
     Route::get('/stock-count-filter',[VehiclesController::class, 'stockCountFilter'])->name('vehicle-stock-report.filter');
+    Route::post('/vehicles/upload-eta-csv',[VehiclesController::class, 'uploadEtaCsv'])->name('vehicles.upload-eta-csv');
+    Route::post('/vehicles/trigger-estimation-reminders',[VehiclesController::class, 'triggerEstimationReminders'])->name('vehicles.trigger-estimation-reminders');
     // Master Data
     Route::resource('brands', BrandController::class);
     Route::resource('model-lines', ModelLinesController::class);
@@ -1181,7 +1183,7 @@ Route::get('/check-trashed-gdn', function () {
     Route::post('/onwership-update', [VehiclesController::class, 'saveonwership'])->name('vehicles.saveonwership');
     Route::post('/purchasing-order/check-po-number-edit', [PurchasingOrderController::class, 'checkPoNumberedit'])->name('purchasing-order.checkPoNumberedit');
     Route::post('/custom-documentstatus-update', [VehiclesController::class, 'customdocumentstatusupdate'])->name('vehicles.customdocumentstatusupdate');
-Route::post('/vehicles/update-estimation-date', [VehiclesController::class, 'updateEstimationDate'])->name('vehicles.update-estimation-date');
+    Route::post('/vehicles/update-estimation-date', [VehiclesController::class, 'updateEstimationDate'])->name('vehicles.update-estimation-date');
     Route::get('/variants/{id}/editvar', [VariantController::class, 'editvar'])->name('variants.editvar');
     Route::post('/variants/storevar/{variant}', [VariantController::class, 'storevar'])->name('variants.storevar');
     Route::resource('modeldescription', ModeldescriptionController::class);

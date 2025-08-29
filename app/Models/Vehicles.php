@@ -46,6 +46,7 @@ class Vehicles extends Model
         'inspection_date',
         'procurement_vehicle_remarks',
         'purchased_paid_percentage',
+        'estimation_date',
 
     ];
     public function dn()

@@ -42,6 +42,7 @@ use Carbon\CarbonTimeZone;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
 
 class VehiclesController extends Controller
 {
@@ -2924,6 +2925,9 @@ class VehiclesController extends Controller
                             ->where('inspection_pdi.stage', '=', 'PDI');
                     })
                     ->where('vehicles.status', 'Approved');
+                
+
+                
                 foreach ($filters as $columnName => $values) {
                     if (in_array('__NULL__', $values)) {
                         $data->whereNull($columnName); // Filter for NULL values
@@ -4136,6 +4140,7 @@ class VehiclesController extends Controller
 
         try {
             $vehicle = Vehicles::findOrFail($request->input('vehicle_id'));
+            $oldValue = $vehicle->estimation_date; // Capture the old value before updating
             $vehicle->estimation_date = $request->input('estimation_date');
             $vehicle->save();
 
@@ -4143,15 +4148,206 @@ class VehiclesController extends Controller
             Vehicleslog::create([
                 'vehicles_id' => $vehicle->id,
                 'field' => 'estimation_date',
-                'old_value' => $vehicle->getOriginal('estimation_date'),
-                'status' => 'Updated',
+                'old_value' => $oldValue,
+                'new_value' => $vehicle->estimation_date,
+                'status' => 'Updated estimation date to ' . $vehicle->estimation_date,
                 'created_by' => Auth::id(),
-                'created_at' => now(),
+                'time' => now()->format('H:i:s'),
+                'date' => now()->format('Y-m-d'),
             ]);
 
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
+            \Log::error('Error updating estimation date: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Failed to update estimation date']);
+        }
+    }
+
+    public function uploadEtaCsv(Request $request)
+    {
+        $request->validate([
+            'csv_file' => 'required|file|mimes:csv',
+        ]);
+
+        try {
+            $file = $request->file('csv_file');
+            $path = $file->getRealPath();
+            
+            $data = array_map('str_getcsv', file($path));
+            $headers = array_shift($data); // Remove header row
+            
+            // Validate headers
+            $expectedHeaders = ['PO Number', 'VIN', 'ETA'];
+            if (count(array_diff($expectedHeaders, $headers)) > 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid CSV format. Expected headers: PO Number, VIN, ETA'
+                ]);
+            }
+            
+            $updatedCount = 0;
+            $errors = [];
+            $updatedPOs = []; // Track which PO's were updated
+            
+            foreach ($data as $rowIndex => $row) {
+                if (count($row) < 3) {
+                    $errors[] = "Row " . ($rowIndex + 2) . ": Insufficient columns";
+                    continue;
+                }
+                
+                $poNumber = trim($row[0]);
+                $vin = trim($row[1]);
+                $eta = trim($row[2]);
+                
+                // Validate required fields
+                if (empty($poNumber) || empty($eta)) {
+                    $errors[] = "Row " . ($rowIndex + 2) . ": PO Number and ETA are required";
+                    continue;
+                }
+                
+                // Validate ETA format (dd-mm-yy)
+                if (!preg_match('/^\d{2}-\d{2}-\d{2}$/', $eta)) {
+                    $errors[] = "Row " . ($rowIndex + 2) . ": Invalid ETA format. Use dd-mm-yy";
+                    continue;
+                }
+                
+                // Convert ETA to database format (Y-m-d)
+                $etaParts = explode('-', $eta);
+                $etaDate = '20' . $etaParts[2] . '-' . $etaParts[1] . '-' . $etaParts[0];
+                
+                try {
+                    // Find vehicles by PO number
+                    $vehicles = Vehicles::whereHas('purchasingOrder', function($query) use ($poNumber) {
+                        $query->where('po_number', 'LIKE', '%' . $poNumber . '%');
+                    });
+                    
+                    // If VIN is provided, filter by VIN as well
+                    if (!empty($vin)) {
+                        $vehicles = $vehicles->where('vin', 'LIKE', '%' . $vin . '%');
+                    }
+                    
+                    $vehicles = $vehicles->get();
+                    
+                    if ($vehicles->count() > 0) {
+                        foreach ($vehicles as $vehicle) {
+                            $oldValue = $vehicle->estimation_date;
+                            $vehicle->estimation_date = $etaDate;
+                            $vehicle->save();
+                            
+                            // Log the change
+                            Vehicleslog::create([
+                                'vehicles_id' => $vehicle->id,
+                                'field' => 'estimation_date',
+                                'old_value' => $oldValue,
+                                'new_value' => $etaDate,
+                                'status' => 'Updated estimation date via CSV upload - PO: ' . $poNumber,
+                                'created_by' => Auth::id(),
+                                'time' => now()->format('H:i:s'),
+                                'date' => now()->format('Y-m-d'),
+                            ]);
+                            
+                            $updatedCount++;
+                        }
+                        
+                        // Add PO to updated list if not already there
+                        if (!in_array($poNumber, $updatedPOs)) {
+                            $updatedPOs[] = $poNumber;
+                        }
+                    } else {
+                        $errors[] = "Row " . ($rowIndex + 2) . ": No vehicles found for PO: " . $poNumber . ($vin ? " and VIN: " . $vin : "");
+                    }
+                } catch (\Exception $e) {
+                    $errors[] = "Row " . ($rowIndex + 2) . ": " . $e->getMessage();
+                }
+            }
+            
+            $message = "Successfully updated " . $updatedCount . " vehicles";
+            if (count($errors) > 0) {
+                $message .= ". Errors: " . implode('; ', array_slice($errors, 0, 5));
+                if (count($errors) > 5) {
+                    $message .= " and " . (count($errors) - 5) . " more errors";
+                }
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'updated_count' => $updatedCount,
+                'error_count' => count($errors),
+                'updated_pos' => $updatedPOs
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error uploading ETA CSV: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to process CSV file: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Send estimation date reminders
+     */
+    public function triggerEstimationReminders()
+    {
+        $today = Carbon::now();
+        
+        // Check for vehicles with estimation dates in the next 5 days
+        $vehiclesNeedingReminders = collect();
+        
+        for ($days = 1; $days <= 5; $days++) {
+            $targetDate = $today->copy()->addDays($days)->format('Y-m-d');
+            
+            $vehicles = Vehicles::where('estimation_date', $targetDate)
+                ->whereNotNull('estimation_date')
+                ->where('status', '!=', 'cancel')
+                ->with(['variant.brand', 'variant.master_model_lines', 'warehouse'])
+                ->get();
+            
+            if ($vehicles->count() > 0) {
+                // Add days remaining info to each vehicle
+                foreach ($vehicles as $vehicle) {
+                    $vehicle->days_remaining = $days;
+                }
+                
+                $vehiclesNeedingReminders = $vehiclesNeedingReminders->merge($vehicles);
+            }
+        }
+        
+        // Send email if vehicles found
+        if ($vehiclesNeedingReminders->count() > 0) {
+            $this->sendManualReminderEmail($vehiclesNeedingReminders, null);
+            \Log::info('Estimation reminder email sent for ' . $vehiclesNeedingReminders->count() . ' vehicles');
+        }
+    }
+    
+    /**
+     * Send manual consolidated reminder email to all teams
+     */
+    private function sendManualReminderEmail($vehicles, $daysLeft)
+    {
+        try {
+            // Get all team email addresses
+            $departmentEmails = config('departments.estimation_reminders', []);
+
+            $allEmails = [];
+            foreach ($departmentEmails as $emails) {
+                $allEmails = array_merge($allEmails, $emails);
+            }
+            
+            // Remove duplicates and filter out default placeholder emails
+            $allEmails = array_unique($allEmails);
+            $allEmails = array_filter($allEmails, function($email) {
+                return !str_contains($email, '@company.com') && !empty($email);
+            });
+            
+            // Send single consolidated email to all teams
+            Mail::to($allEmails)->send(new \App\Mail\EstimationDateReminder($vehicles, $daysLeft));
+            \Log::info("Manual consolidated estimation reminder sent to " . count($allEmails) . " team members");
+            
+        } catch (\Exception $e) {
+            \Log::error("Failed to send manual consolidated estimation reminder email: " . $e->getMessage());
         }
     }
 }
