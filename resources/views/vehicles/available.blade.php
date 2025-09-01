@@ -583,6 +583,14 @@ table.dataTable thead th select {
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
 @endif
+@php
+$hasEditEstimationDatePermission = Auth::user()->hasPermissionForSelectedRole('edit-estimation-date');
+@endphp
+@if ($hasEditEstimationDatePermission)
+<button type="button" class="btn btn-primary mb-2 ms-2" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
+    <i class="bi bi-upload"></i> Upload ETA CSV
+</button>
+@endif
 <div class="table-responsive" style="height: 80vh;">
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
@@ -661,10 +669,65 @@ table.dataTable thead th select {
       </div>
     </div>
   </div>
+
+  <!-- CSV Upload Modal -->
+  <div class="modal fade" id="csvUploadModal" tabindex="-1" aria-labelledby="csvUploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="csvUploadModalLabel">Upload ETA CSV</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="csvUploadForm" enctype="multipart/form-data">
+            @csrf
+            <div class="mb-3">
+              <label for="csvFile" class="form-label">Select CSV File</label>
+              <input type="file" class="form-control" id="csvFile" name="csv_file" accept=".csv" required>
+              <div class="form-text">File should contain: PO Number, VIN (optional), ETA (dd-mm-yy)</div>
+            </div>
+            <div class="mb-3">
+              <a href="#" onclick="downloadSampleCSV()" class="text-decoration-none">
+                <i class="bi bi-download"></i> Download Sample CSV
+              </a>
+            </div>
+            
+            <!-- Upload Progress and Results Section -->
+            <div id="uploadProgress" style="display: none;">
+              <div class="alert alert-info">
+                <div class="d-flex align-items-center">
+                  <div class="spinner-border spinner-border-sm me-2" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                  <span>Processing CSV file...</span>
+                </div>
+              </div>
+            </div>
+            
+            <div id="uploadResults" style="display: none;">
+              <div class="alert alert-success">
+                <h6><i class="bi bi-check-circle"></i> Upload Results</h6>
+                <div id="resultsContent"></div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="closeModalBtn" onclick="closeModalAndRefresh()">Close</button>
+          <button type="button" class="btn btn-primary" onclick="uploadCSV()">Upload</button>
+        </div>
+      </div>
+    </div>
+  </div>
       </div>
     </div>
   </div>
 <script>
+        @php
+        $hasEditEstimationDatePermission = Auth::user()->hasPermissionForSelectedRole('edit-estimation-date');
+        @endphp
+        var hasEditEstimationDatePermission = {{ $hasEditEstimationDatePermission ? 'true' : 'false' }};
+        
         $(document).ready(function () {
         var now = new Date();
     var columns3 = [
@@ -704,7 +767,11 @@ table.dataTable thead th select {
             var formattedDate = dateObj.toLocaleDateString('en-GB', {
                 day: '2-digit', month: 'short', year: 'numeric'
             });
-            return formattedDate;
+            if (hasEditEstimationDatePermission) {
+                return formattedDate + ' <button class="edit-estimation-date" data-vehicle-id="' + row.id + '" data-current-date="' + data + '" style="padding: 2px 6px; font-size: 10px; margin-left: 5px; background: none; border: none; color: #007bff; cursor: pointer; border-radius: 3px; transition: all 0.2s ease;"><i class="fas fa-edit"></i></button>';
+            } else {
+                return formattedDate;
+            }
         }
         return ''; // If no date, return empty
     }
@@ -2153,7 +2220,241 @@ $(document).ready(function() {
         sendReply(messageId);
     });
 });
+
+    // Event handler for estimation date edit button
+    $(document).on('click', '.edit-estimation-date', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        var vehicleId = $(this).data('vehicle-id');
+        var currentDate = $(this).data('current-date');
+        
+        // Create a date input field with unique IDs
+        var uniqueId = 'edit_' + vehicleId + '_' + Date.now();
+        var dateInput = $('<input type="date" id="' + uniqueId + '_date" class="form-control form-control-sm" value="' + currentDate + '" style="width: 120px; display: inline-block;">');
+        var saveButton = $('<button id="' + uniqueId + '_save" class="btn btn-sm btn-success" style="margin-left: 5px; padding: 2px 6px; font-size: 10px;"><i class="fas fa-save"></i></button>');
+        var cancelButton = $('<button id="' + uniqueId + '_cancel" class="btn btn-sm btn-secondary" style="margin-left: 2px; padding: 2px 6px; font-size: 10px;"><i class="fas fa-times"></i></button>');
+        
+        // Replace the button with input and save/cancel buttons
+        var $cell = $(this).closest('td');
+        var originalContent = $cell.html();
+        
+        $cell.html(dateInput[0].outerHTML + saveButton[0].outerHTML + cancelButton[0].outerHTML);
+        
+        // Focus on the date input
+        $('#' + uniqueId + '_date').focus();
+        
+        // Save button click handler
+        $('#' + uniqueId + '_save').on('click', function() {
+            var newDate = $('#' + uniqueId + '_date').val();
+            if (newDate) {
+                // Send AJAX request to update the date
+                $.ajax({
+                    url: '{{ route("vehicles.update-estimation-date") }}',
+                    type: 'POST',
+                    data: {
+                        vehicle_id: vehicleId,
+                        estimation_date: newDate,
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Update the cell content with new date and edit button
+                            var dateObj = new Date(newDate);
+                            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                                day: '2-digit', month: 'short', year: 'numeric'
+                            });
+                            if (hasEditEstimationDatePermission) {
+                                $cell.html(formattedDate + ' <button class="edit-estimation-date" data-vehicle-id="' + vehicleId + '" data-current-date="' + newDate + '" style="padding: 2px 6px; font-size: 10px; margin-left: 5px; background: none; border: none; color: #007bff; cursor: pointer; border-radius: 3px; transition: all 0.2s ease;"><i class="fas fa-edit"></i></button>');
+                            } else {
+                                $cell.html(formattedDate);
+                            }
+                            
+                            // Show success message
+                            alertify.success('Estimation date updated successfully!');
+                        } else {
+                            // Restore original content on error
+                            $cell.html(originalContent);
+                            alertify.error('Failed to update estimation date!');
+                        }
+                    },
+                    error: function() {
+                        // Restore original content on error
+                        $cell.html(originalContent);
+                        alertify.error('Failed to update estimation date!');
+                    }
+                });
+            }
+        });
+        
+        // Cancel button click handler
+        $('#' + uniqueId + '_cancel').on('click', function() {
+            $cell.html(originalContent);
+        });
+        
+        // Handle Enter key on date input
+        $('#' + uniqueId + '_date').on('keypress', function(e) {
+            if (e.which === 13) { // Enter key
+                $('#' + uniqueId + '_save').click();
+            }
+        });
+        
+        // Handle Escape key
+        $(document).one('keydown', function(e) {
+            if (e.which === 27) { // Escape key
+                $cell.html(originalContent);
+            }
+        });
+    });
+
+    // Reset CSV upload modal when opened
+    $('#csvUploadModal').on('show.bs.modal', function () {
+        document.getElementById('uploadProgress').style.display = 'none';
+        document.getElementById('uploadResults').style.display = 'none';
+        document.getElementById('csvFile').value = '';
+        // Reset modal title to original
+        document.getElementById('csvUploadModalLabel').innerHTML = 'Upload ETA CSV';
+        // Reset close button to default behavior for new uploads
+        document.getElementById('closeModalBtn').onclick = closeModalAndRefresh;
+    });
+
 </script>
+
+<script>
+// CSV Upload Functions - Global scope
+function uploadCSV() {
+    const fileInput = document.getElementById('csvFile');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        alert('Please select a CSV file');
+        return;
+    }
+    
+    if (file.type !== 'csv' && !file.name.endsWith('.csv')) {
+        alert('Please select a valid CSV file');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('csv_file', file);
+    formData.append('_token', document.querySelector('input[name="_token"]').value);
+    
+    // Show progress indicator
+    document.getElementById('uploadProgress').style.display = 'block';
+    document.getElementById('uploadResults').style.display = 'none';
+    
+    // Show loading state
+    const uploadBtn = document.querySelector('#csvUploadModal .btn-primary');
+    const originalText = uploadBtn.innerHTML;
+    uploadBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Uploading...';
+    uploadBtn.disabled = true;
+    
+    fetch('/vehicles/upload-eta-csv', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Hide progress indicator
+        document.getElementById('uploadProgress').style.display = 'none';
+        
+        if (data.success) {
+            // Update modal title to show success
+            document.getElementById('csvUploadModalLabel').innerHTML = '<i class="bi bi-check-circle-fill text-success"></i> Upload Successful!';
+            
+            // Show results in modal
+            const resultsContent = document.getElementById('resultsContent');
+            let resultsHtml = `
+                <div class="alert alert-success mb-3">
+                    <h6 class="mb-2"><i class="bi bi-check-circle-fill"></i> CSV Upload Completed Successfully!</h6>
+                    <p class="mb-0">Your ETA data has been updated in the system.</p>
+                </div>
+                <div class="mb-2">
+                    <strong>✅ Successfully Updated:</strong> ${data.updated_count} vehicle(s)
+                </div>
+            `;
+            
+            if (data.updated_pos && data.updated_pos.length > 0) {
+                resultsHtml += `
+                    <div class="mb-2">
+                        <strong>📋 Updated PO's:</strong> ${data.updated_pos.join(', ')}
+                    </div>
+                `;
+            }
+            
+            if (data.error_count > 0) {
+                resultsHtml += `
+                    <div class="mb-2 text-warning">
+                        <strong>⚠️ Errors:</strong> ${data.error_count} error(s) occurred
+                    </div>
+                `;
+            }
+            
+            resultsContent.innerHTML = resultsHtml;
+            document.getElementById('uploadResults').style.display = 'block';
+            
+            // Modal stays open until user closes it manually
+            // Table will be refreshed when user clicks the Close button
+            
+        } else {
+            // Show error in results section
+            const resultsContent = document.getElementById('resultsContent');
+            resultsContent.innerHTML = `
+                <div class="text-danger">
+                    <strong>❌ Upload Failed:</strong> ${data.message}
+                </div>
+            `;
+            document.getElementById('uploadResults').style.display = 'block';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        
+        // Hide progress indicator
+        document.getElementById('uploadProgress').style.display = 'none';
+        
+        // Show error in results section
+        const resultsContent = document.getElementById('resultsContent');
+        resultsContent.innerHTML = `
+            <div class="text-danger">
+                <strong>❌ Upload Error:</strong> An error occurred while uploading the file
+            </div>
+        `;
+        document.getElementById('uploadResults').style.display = 'block';
+    })
+    .finally(() => {
+        // Reset button state
+        uploadBtn.innerHTML = originalText;
+        uploadBtn.disabled = false;
+        // Reset file input
+        fileInput.value = '';
+    });
+}
+
+function downloadSampleCSV() {
+    const csvContent = 'PO Number,VIN,ETA\nPO-001,ABC12345678901234,15-12-24\nPO-002,,20-12-24\nPO-003,DEF12345678901234,25-12-24';
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'eta_sample.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+// Function to close modal and refresh page
+function closeModalAndRefresh() {
+    // Close the modal
+    $('#csvUploadModal').modal('hide');
+    
+    // Refresh the entire page to show latest data
+    window.location.reload();
+}
+</script>
+
 <script>
     document.getElementById('cancelBookingButton').addEventListener('click', function() {
         var vehicleId = document.getElementById('vehicle_id').value;
