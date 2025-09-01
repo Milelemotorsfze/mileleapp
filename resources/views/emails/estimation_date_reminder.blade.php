@@ -22,7 +22,7 @@
         }
         .header {
             text-align: center;
-            padding: 20px 0;
+            padding: 10px 0;
             background-color: #dc3545;
             color: #ffffff;
             border-top-left-radius: 8px;
@@ -31,6 +31,7 @@
         .header h1 {
             margin: 0;
             font-size: 24px;
+            font-weight: bold;
         }
         .content {
             padding: 20px;
@@ -63,7 +64,7 @@
             border-bottom: 1px solid #e0e0e0;
         }
         .vehicles-table th {
-            background: linear-gradient(135deg, #00466a 0%, #0066aa 100%);
+            background: #012b4d;
             color: #ffffff;
             font-weight: bold;
             text-transform: uppercase;
