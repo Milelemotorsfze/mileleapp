@@ -2617,6 +2617,11 @@ return [$color->id => $formattedName];
                                 @else
                                 <td></td>
                                 @endif
+                                @if($vehicleslog->new_value)
+                                <td>{{ date('d-M-Y', strtotime($vehicleslog->new_value)) }}</td>
+                                @else
+                                <td></td>
+                                @endif
                                 @elseif($vehicleslog->field === "ppmmyyy")
                                 @if($vehicleslog->old_value)
                                 <td>{{ date('d-M-Y', strtotime($vehicleslog->old_value)) }}</td>
