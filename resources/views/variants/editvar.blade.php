@@ -287,7 +287,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
             <div class="col-lg-12 col-md-12 col-sm-12" id="variant">
                 <div class="mb-3">
                     <label for="choices-single-default" class="form-label">Variant Details</label>
-                    <input type="text" class="form-control variant" name="variant" id="variant" value="{{$variant->detail}}" readonly />
+                    <input type="text" class="form-control variant" name="variant" id="variant" value="{{$variant->detail}}" />
                 </div>
             </div>
             <div class="row" id="specification-details-container">
