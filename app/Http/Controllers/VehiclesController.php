@@ -4144,16 +4144,20 @@ class VehiclesController extends Controller
             $vehicle->estimation_date = $request->input('estimation_date');
             $vehicle->save();
 
-            // Log the change
+            // Log the change with proper timezone and role information
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $currentDateTime = Carbon::now($dubaiTimeZone);
+            
             Vehicleslog::create([
                 'vehicles_id' => $vehicle->id,
                 'field' => 'estimation_date',
-                'old_value' => $oldValue,
-                'new_value' => $vehicle->estimation_date,
-                'status' => 'Updated estimation date to ' . $vehicle->estimation_date,
+                'old_value' => $oldValue ? Carbon::parse($oldValue)->format('Y-m-d') : null,
+                'new_value' => $vehicle->estimation_date ? Carbon::parse($vehicle->estimation_date)->format('Y-m-d') : null,
+                'status' => 'Updated estimation date to ' . ($vehicle->estimation_date ? Carbon::parse($vehicle->estimation_date)->format('Y-m-d') : 'null'),
                 'created_by' => Auth::id(),
-                'time' => now()->format('H:i:s'),
-                'date' => now()->format('Y-m-d'),
+                'role' => Auth::user()->selectedRole,
+                'time' => $currentDateTime->toTimeString(),
+                'date' => $currentDateTime->toDateString(),
             ]);
 
             return response()->json(['success' => true]);
@@ -4234,16 +4238,20 @@ class VehiclesController extends Controller
                             $vehicle->estimation_date = $etaDate;
                             $vehicle->save();
                             
-                            // Log the change
+                            // Log the change with proper timezone and role information
+                            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                            $currentDateTime = Carbon::now($dubaiTimeZone);
+                            
                             Vehicleslog::create([
                                 'vehicles_id' => $vehicle->id,
                                 'field' => 'estimation_date',
-                                'old_value' => $oldValue,
-                                'new_value' => $etaDate,
+                                'old_value' => $oldValue ? Carbon::parse($oldValue)->format('Y-m-d') : null,
+                                'new_value' => $etaDate ? Carbon::parse($etaDate)->format('Y-m-d') : null,
                                 'status' => 'Updated estimation date via CSV upload - PO: ' . $poNumber,
                                 'created_by' => Auth::id(),
-                                'time' => now()->format('H:i:s'),
-                                'date' => now()->format('Y-m-d'),
+                                'role' => Auth::user()->selectedRole,
+                                'time' => $currentDateTime->toTimeString(),
+                                'date' => $currentDateTime->toDateString(),
                             ]);
                             
                             $updatedCount++;
