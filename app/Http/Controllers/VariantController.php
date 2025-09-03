@@ -115,7 +115,11 @@ public function store(Request $request)
 
     try {
     $selectedSpecifications = json_decode(request('selected_specifications'), true);
-    ksort($selectedSpecifications);
+    if (is_array($selectedSpecifications)) {
+        ksort($selectedSpecifications);
+    } else {
+        $selectedSpecifications = [];
+    }
 
     $gradeValue = null;
     foreach ($selectedSpecifications as $specificationData) {
@@ -1008,7 +1012,11 @@ public function store(Request $request)
         try {
             (new UserActivityController)->createActivity('Editing Variant');
             $selectedSpecifications = json_decode(request('selected_specifications'), true);
-            ksort($selectedSpecifications);
+            if (is_array($selectedSpecifications)) {
+                ksort($selectedSpecifications);
+            } else {
+                $selectedSpecifications = [];
+            }
             $totalSpecifications = count($selectedSpecifications);
             $existingVariantop = Varaint::where('brands_id', $request->input('brands_id'))
                 ->where('master_model_lines_id', $request->input('master_model_lines_id'))
