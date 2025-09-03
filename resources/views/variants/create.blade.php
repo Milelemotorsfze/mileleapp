@@ -615,7 +615,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
                     },
                     title: "Error",
                 });
-            });
+            }
+        });
 
             // Assemble final variant string
             var Detail = [];
@@ -630,8 +631,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
 
             // Set final result in .variant input field
             $('.variant').val(Detail.join(', '));
-
-        }
 
 
         $(document).on('change', 'input[name^="variantcheckbox"], input[name^="fieldvariants"]', function() {
