@@ -4776,6 +4776,7 @@ return [$color->id => $formattedName];
                         url: `/getVehicles/${purchaseOrderId}`,
                         method: 'GET',
                         success: function(response) {
+                            console.log('getVehicles (allVehicles) response:', response);
                             if (!$.fn.DataTable.isDataTable('#vehicleTable')) {
                                 vehicleTable = $('#vehicleTable').DataTable({
                                     "pageLength": 10, // This will display all rows by default
@@ -4802,6 +4803,11 @@ return [$color->id => $formattedName];
                                 ]).draw(false);
                             });
                             $('#vehicleTableContainer').show();
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error fetching vehicles (allVehicles):', error);
+                            console.error('Response:', xhr.responseText);
+                            alert('Error fetching vehicles: ' + error);
                         }
                     });
                 } else if (this.value === 'oneByOne') {
@@ -4811,10 +4817,11 @@ return [$color->id => $formattedName];
                         url: `/getVehicles/${purchaseOrderId}`,
                         method: 'GET',
                         success: function(response) {
+                            console.log('getVehicles response:', response);
                             const vehicleSelectDropdown = $('#vehicleSelectDropdown');
                             vehicleSelectDropdown.empty();
                             response.forEach(vehicle => {
-                                vehicleSelectDropdown.append(`<option value="${vehicle.id}">${vehicle.id}</option>`);
+                                vehicleSelectDropdown.append(`<option value="${vehicle.id}">${vehicle.vin}</option>`);
                             });
                             $('#vehicleTableContainer').show();
                             if (!$.fn.DataTable.isDataTable('#vehicleTable')) {
@@ -4826,6 +4833,11 @@ return [$color->id => $formattedName];
                                     ] // Adding "All" option in the length menu
                                 });
                             }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error fetching vehicles:', error);
+                            console.error('Response:', xhr.responseText);
+                            alert('Error fetching vehicles: ' + error);
                         }
                     });
                 } else {
@@ -4841,6 +4853,7 @@ return [$color->id => $formattedName];
                         url: `/getVehicleDetails/${vehicleId}`,
                         method: 'GET',
                         success: function(response) {
+                            console.log('getVehicleDetails response:', response);
                             const formattedPrice = formatPrice(response.vehicle_purchasing_cost ? response.vehicle_purchasing_cost.unit_price : 'N/A');
                             vehicleTable.row.add([
                                 response.id,
@@ -4855,6 +4868,11 @@ return [$color->id => $formattedName];
                             $(`#vehicleSelectDropdown option[value="${response.id}"]`).prop('disabled', true);
                             $('#vehicleTableContainer').show();
                             $('#vehicleSelectDropdown').select2();
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error fetching vehicle details:', error);
+                            console.error('Response:', xhr.responseText);
+                            alert('Error fetching vehicle details: ' + error);
                         }
                     });
                 });

@@ -6264,6 +6264,31 @@ class PurchasingOrderController extends Controller
 
         return response()->json(['exists' => $exists]);
     }
+    public function getVehicles($purchaseOrderId)
+    {
+        $vehicles = Vehicles::where('purchasing_order_id', $purchaseOrderId)
+            ->where('status', 'Approved')
+            ->with(['variant.brand', 'variant.master_model_lines', 'vehiclePurchasingCost'])
+            ->get();
+        
+        return response()->json($vehicles);
+    }
+
+    public function getVehicleDetails($vehicleId)
+    {
+        $vehicle = Vehicles::with([
+            'variant.brand', 
+            'variant.master_model_lines', 
+            'vehiclePurchasingCost'
+        ])->find($vehicleId);
+        
+        if (!$vehicle) {
+            return response()->json(['error' => 'Vehicle not found'], 404);
+        }
+        
+        return response()->json($vehicle);
+    }
+
     public function sendTransferCopy(Request $request)
     {
         $purchasingOrder = PurchasingOrder::find($request->purchasing_order_id);
