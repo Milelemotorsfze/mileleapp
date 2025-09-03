@@ -71,7 +71,7 @@
     <div class="content">
         <p>Dear <strong>{{ $salesperson->name }}</strong>,</p>
         
-        <p>We are pleased to inform you that the Following Vehicle(s) ETA has been changed.</p>
+        <p>We are pleased to inform you that the following vehicles’ DN has been received, and the ETA has been updated as follows.</p>
         
         <h3>Vehicles with DN Created:</h3>
         <div class="vehicle-table">

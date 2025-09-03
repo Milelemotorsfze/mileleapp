@@ -4209,15 +4209,42 @@ class VehiclesController extends Controller
                     continue;
                 }
                 
-                // Validate ETA format (dd-mm-yy)
-                if (!preg_match('/^\d{2}-\d{2}-\d{2}$/', $eta)) {
-                    $errors[] = "Row " . ($rowIndex + 2) . ": Invalid ETA format. Use dd-mm-yy";
+                // Validate ETA format (dd-mmm-yy or dd-mmm-yyyy)
+                if (!preg_match('/^\d{1,2}-[A-Za-z]{3}-\d{2,4}$/', $eta)) {
+                    $errors[] = "Row " . ($rowIndex + 2) . ": Invalid ETA format. Use dd-mmm-yy (e.g., 16-Sep-25)";
                     continue;
                 }
                 
                 // Convert ETA to database format (Y-m-d)
                 $etaParts = explode('-', $eta);
-                $etaDate = '20' . $etaParts[2] . '-' . $etaParts[1] . '-' . $etaParts[0];
+                $day = str_pad($etaParts[0], 2, '0', STR_PAD_LEFT);
+                $month = $etaParts[1];
+                $year = $etaParts[2];
+                
+                // Convert month name to number
+                $monthMap = [
+                    'Jan' => '01', 'Feb' => '02', 'Mar' => '03', 'Apr' => '04',
+                    'May' => '05', 'Jun' => '06', 'Jul' => '07', 'Aug' => '08',
+                    'Sep' => '09', 'Oct' => '10', 'Nov' => '11', 'Dec' => '12'
+                ];
+                
+                if (!isset($monthMap[$month])) {
+                    $errors[] = "Row " . ($rowIndex + 2) . ": Invalid month. Use 3-letter month (Jan, Feb, Mar, etc.)";
+                    continue;
+                }
+                
+                // Handle year format (yy or yyyy)
+                if (strlen($year) == 2) {
+                    $year = '20' . $year;
+                }
+                
+                $etaDate = $year . '-' . $monthMap[$month] . '-' . $day;
+                
+                // Validate the date is actually valid
+                if (!checkdate($monthMap[$month], $day, $year)) {
+                    $errors[] = "Row " . ($rowIndex + 2) . ": Invalid date. Please check day, month, and year";
+                    continue;
+                }
                 
                 try {
                     // Find vehicles by PO number
