@@ -435,7 +435,17 @@ public function store(Request $request)
         }
     }
     (new UserActivityController)->createActivity('Creating New Variant');
-    $model_details= $request->input('model_detail');
+    $model_detail_id = $request->input('model_detail');
+    $model_details = null;
+    
+    // Get the actual model description text from the ID
+    if($model_detail_id) {
+        $modelDescription = \App\Models\MasterModelDescription::find($model_detail_id);
+        if($modelDescription) {
+            $model_details = $modelDescription->model_description;
+        }
+    }
+    
     if($model_details == null){
         $steering = $request->input('steering');
         $master_model_lines_id = $request->input('master_model_lines_id');
@@ -543,6 +553,7 @@ public function store(Request $request)
     $variant->gearbox = $request->input('gearbox');
     $variant->name = $name;
     $variant->model_detail = $model_details;
+    $variant->master_model_descriptions_id = $model_detail_id;
     $variant->detail = $variant_details;
     $variant->my = $request->input('my');
     $variant->created_by = auth()->user()->id;
@@ -1037,7 +1048,17 @@ public function store(Request $request)
             DB::statement('SET FOREIGN_KEY_CHECKS=0;');
             VariantItems::where('varaint_id', $variant->id)->delete();
             DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-            $model_details = $request->input('model_detail');
+            $model_detail_id = $request->input('model_detail');
+            $model_details = null;
+            
+            // Get the actual model description text from the ID
+            if($model_detail_id) {
+                $modelDescription = \App\Models\MasterModelDescription::find($model_detail_id);
+                if($modelDescription) {
+                    $model_details = $modelDescription->model_description;
+                }
+            }
+            
             if ($model_details == null) {
                 $steering = $request->input('steering');
                 $master_model_lines_id = $request->input('master_model_lines_id');
@@ -1103,7 +1124,7 @@ public function store(Request $request)
             $variant->gearbox = $request->input('gearbox');
             $variant->grade_name = $grade_name = $request->input('grade_name');
             $variant->window_type = $request->input('window_type');
-            $variant->master_model_descriptions_id = $request->input('model_detail');
+            $variant->master_model_descriptions_id = $model_detail_id;
             $variant->model_detail = $model_details;
             $variant->detail = $variant_details;
             $variant->my = $request->input('my');
