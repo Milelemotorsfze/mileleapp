@@ -651,7 +651,7 @@ table.dataTable thead th select {
             <div class="mb-3">
               <label for="csvFile" class="form-label">Select CSV File</label>
               <input type="file" class="form-control" id="csvFile" name="csv_file" accept=".csv" required>
-              <div class="form-text">File should contain: PO Number, VIN (optional), ETA (dd-mm-yy)</div>
+              <div class="form-text">File should contain: PO Number, VIN (optional), ETA (dd-mmm-yy)</div>
             </div>
             <div class="mb-3">
               <a href="#" onclick="downloadSampleCSV()" class="text-decoration-none">
@@ -1663,7 +1663,7 @@ function uploadCSV() {
 }
 
 function downloadSampleCSV() {
-    const csvContent = 'PO Number,VIN,ETA\nPO-001,ABC12345678901234,15-12-24\nPO-002,,20-12-24\nPO-003,DEF12345678901234,25-12-24';
+    const csvContent = 'PO Number,VIN,ETA\nPO-001,ABC12345678901234,15-Jan-25\nPO-002,,20-Feb-25\nPO-003,DEF12345678901234,25-Mar-25';
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
