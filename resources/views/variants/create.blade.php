@@ -709,6 +709,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
         // Form Submission Validation
         $('#form-create').on('submit', function(e) {
             var variantValue = $('.variant').val().trim();
+            // SFX validation commented out - SFX is not required
+            /*
             let isSFXExist = false;
             let isSfxSelected = false;
             let SFXspecificationId = '';
@@ -756,6 +758,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
                     $('select[name="specification_' + SFXspecificationId + '"]').removeClass('is-invalid');
                 }
             }
+            */
 
             // Check if Variant Details is empty
             if (!variantValue) {
