@@ -1882,6 +1882,13 @@ class PurchasingOrderController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // Debug: Log when this method is called
+        \Log::info('update method called', [
+            'po_id' => $id,
+            'request_data' => $request->all(),
+            'user_id' => auth()->user()->id ?? 'system'
+        ]);
+        
         DB::beginTransaction();
         $useractivities =  new UserActivities();
         $useractivities->activity = "Update the Purchased order details";
@@ -1979,8 +1986,31 @@ class PurchasingOrderController extends Controller
             $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
             // return $purchasingOrder;
             if ($purchasingOrder) {
-                $purchasingOrder->status = 'Pending Approval';
-                $purchasingOrder->save();
+                // Check if only estimation_date fields were updated
+                $onlyEstimationDateUpdated = false;
+                if ($variantNames == null) {
+                    // Check if the request only contains estimation_date updates
+                    $requestData = $request->all();
+                    $estimationDateFields = ['estimated_arrival', 'estimation_date'];
+                    $hasNonEstimationFields = false;
+                    
+                    foreach ($requestData as $key => $value) {
+                        if (!in_array($key, $estimationDateFields) && !empty($value) && $key !== '_token') {
+                            $hasNonEstimationFields = true;
+                            break;
+                        }
+                    }
+                    
+                    $onlyEstimationDateUpdated = !$hasNonEstimationFields;
+                }
+                
+                // Only change PO status to 'Pending Approval' if:
+                // 1. New vehicles are being added, OR
+                // 2. Existing vehicles are being updated (but not only estimation_date)
+                if ($variantNames != null || !$onlyEstimationDateUpdated) {
+                    $purchasingOrder->status = 'Pending Approval';
+                    $purchasingOrder->save();
+                }
             }
 
             //         Demand planning PO
@@ -2159,6 +2189,12 @@ class PurchasingOrderController extends Controller
     }
     public function updatepurchasingData(Request $request)
     {
+        // Debug: Log when this method is called
+        \Log::info('updatepurchasingData method called', [
+            'request_data' => $request->json()->all(),
+            'user_id' => auth()->user()->id ?? 'system'
+        ]);
+        
         $updatedData = $request->json()->all();
         $updatedVins = [];
         foreach ($updatedData as $data) {
@@ -2323,9 +2359,16 @@ class PurchasingOrderController extends Controller
                             }
                         }
 
-                        $purchasingOrder->status = 'Pending Approval';
-                        $purchasingOrder->save();
                     }
+                    // STRICT CHECK: Only change PO status if more than just estimation_date is updated
+                    if (!empty($changes)) {
+                        // If the only changed field is estimation_date, skip status update
+                        if (!(count($changes) === 1 && array_key_exists('estimation_date', $changes))) {
+                            $purchasingOrder->status = 'Pending Approval';
+                            $purchasingOrder->save();
+                        }
+                    }
+
                 }
             }
         }
@@ -3853,13 +3896,29 @@ class PurchasingOrderController extends Controller
         ];
         // Store old values
         $oldValues = $purchasingOrder->only($fieldsToUpdate);
+        
+        // Check if only estimation_date related fields are being updated
+        $onlyEstimationDateUpdated = true;
+        $estimationDateFields = ['estimated_arrival', 'estimation_date'];
+        
+        foreach ($fieldsToUpdate as $field) {
+            if ($request->has($field) && !in_array($field, $estimationDateFields)) {
+                $onlyEstimationDateUpdated = false;
+                break;
+            }
+        }
+        
         // Update purchasing order details
         foreach ($fieldsToUpdate as $field) {
             if ($request->has($field)) {
                 $purchasingOrder->$field = $request->input($field);
             }
         }
-        $purchasingOrder->status = "Pending Approval";
+        
+        // Only change PO status to 'Pending Approval' if not only estimation_date fields are updated
+        if (!$onlyEstimationDateUpdated) {
+            $purchasingOrder->status = "Pending Approval";
+        }
         $changedFields = [];
         if ($request->hasFile('uploadPL')) {
             if ($purchasingOrder->pl_file_path) {

@@ -276,7 +276,7 @@
                             var exColourCol = $('<div class="col-lg-1 col-md-6 mb-5 mt-md-2"><select name="ex_colour[]" class="exterior-colours form-control"><option value="">Exterior Color</option></select></div>');
                             var intColourCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><select name="int_colour[]" class="interior-colours form-control"><option value="">Interior Color</option></select></div>');
                             var vinCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
-                            var estimatedCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="date" name="estimated_arrival[]" class="form-control"></div>');
+                            var estimatedCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="date" name="estimated_arrival[]" class="form-control" value=""></div>');
                             var engineNumber = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" name="engine_number[]" class="form-control"></div>');
                             var unitPrice = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" title="'+ price +'"  value="' + price + '" name="unit_prices[]" readonly class="form-control"></div>');
                             var removeBtn = $('<div class="col-lg-1 col-md-6 mt-md-2"><button type="button" data-unit-price="' + price + '" data-approved-id="' + dataid + '" class="btn btn-danger remove-vehicle-row-btn"><i class="fas fa-times"></i></button></div>');
