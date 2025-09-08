@@ -87,7 +87,10 @@ class VariantController extends Controller
                     }
                 }
                 ksort($details);
-                $variant->detail = implode(', ', array_merge($details, $otherDetails));
+                // Only generate detail if it's not already present in the database
+                if (empty($variant->detail) || $variant->detail === 'null') {
+                    $variant->detail = implode(', ', array_merge($details, $otherDetails));
+                }
             }
         }
         return view('variants.list', compact('variants'));
@@ -651,6 +654,7 @@ public function store(Request $request)
         $variant->fuel_type = $request->input('fuel_type');
         $variant->gearbox = $request->input('gearbox');
         $variant->my = $request->input('my');
+        // Handle variant details - save as-is from payload
         $variant->detail = $request->input('detail');
         $variant->seat = $request->input('seat');
         $variant->model_detail = $request->input('model_detail');
