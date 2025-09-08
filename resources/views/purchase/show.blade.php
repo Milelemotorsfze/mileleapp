@@ -3096,7 +3096,7 @@ return [$color->id => $formattedName];
                     var variantCol = $('<td><input type="hidden" name="variant_id[]" value="' + selectedVariant + '" class="form-control" readonly></div>' + selectedVariant + '</td>');
                     var brandCol = $('<td>' + brand + '</td>');
                     var masterModelLineCol = $('<td>' + masterModelLine + '</td>');
-                    var estimatedCol = $('<td><input type="date" name="estimated_arrival[]" class="form-control"></td>');
+                    var estimatedCol = $('<td><input type="date" name="estimated_arrival[]" class="form-control" value=""></td>');
                     var territoryCol = $('<td><input type="text" name="territory[]" class="form-control"></td>');
                     var exColourCol = $('<td><select name="ex_colour[]" class="form-control"><option value="">Exterior Color</option></select></td>');
                     var intColourCol = $('<td><select name="int_colour[]" class="form-control"><option value="">Interior Color</option></select></td>');

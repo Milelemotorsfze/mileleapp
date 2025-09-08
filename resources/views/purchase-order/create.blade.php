@@ -456,7 +456,7 @@
                                         </select>
                                     </div>
                                     <div class="col-lg-1 col-md-6 mt-md-2">
-                                        <input type="date" name="estimated_arrival[]" class="form-control">
+                                        <input type="date" name="estimated_arrival[]" class="form-control" value="">
                                     </div>
                                     <div class="col-lg-1 col-md-6 mt-md-2">
                                         <input type="text" name="engine_number[]" class="form-control" >
