@@ -2205,11 +2205,24 @@ class PurchasingOrderController extends Controller
             if ($vehicle) {
                 $oldValues = $vehicle->getAttributes();
                 if ($fieldName !== 'dn') {
-                    $vehicle->setAttribute($fieldName, $fieldValue);
-                    $vehicle->save();
-                    
-                    // For estimation_date, treat it as a normal field update and skip DN logic
+                    // For estimation_date, handle it separately to avoid double saving
                     if ($fieldName === 'estimation_date') {
+                        \Log::info('ESTIMATION_DATE DEBUG: Processing estimation_date update', [
+                            'vehicleId' => $vehicleId,
+                            'fieldName' => $fieldName,
+                            'fieldValue' => $fieldValue,
+                            'oldValue' => $oldValues['estimation_date'] ?? 'null'
+                        ]);
+                        
+                        // Set the attribute and save the vehicle
+                        $vehicle->setAttribute($fieldName, $fieldValue);
+                        $vehicle->save();
+                        
+                        \Log::info('ESTIMATION_DATE DEBUG: Vehicle saved with new value', [
+                            'vehicleId' => $vehicleId,
+                            'savedValue' => $vehicle->estimation_date
+                        ]);
+                        
                         // Log the estimation_date update
                         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                         $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -2245,31 +2258,96 @@ class PurchasingOrderController extends Controller
                             if ($purchasingOrderPFI) {
                                 $supplierInventory = SupplierInventory::find($vehicle->supplier_inventory_id);
                                 if ($supplierInventory) {
-                                    $supplierInventory->eta_import = \Illuminate\Support\Carbon::parse($fieldValue)->format('Y-m-d');
-                                    $supplierInventory->save();
+                                    try {
+                                        $supplierInventory->eta_import = \Illuminate\Support\Carbon::parse($fieldValue)->format('Y-m-d');
+                                        $supplierInventory->save();
+                                    } catch (\Exception $e) {
+                                        \Log::warning('Failed to parse estimation_date for supplier inventory', [
+                                            'fieldValue' => $fieldValue,
+                                            'vehicleId' => $vehicleId,
+                                            'error' => $e->getMessage()
+                                        ]);
+                                    }
                                 }
                             }
                         }
                         
                         // Skip the rest of the processing for estimation_date
                         continue;
+                    } else {
+                        // For other fields, set attribute and save
+                        $vehicle->setAttribute($fieldName, $fieldValue);
+                        $vehicle->save();
                     }
-                }
-                $changes = [];
-                foreach ($oldValues as $field => $oldValue) {
-                    if ($field !== 'created_at' && $field !== 'updated_at') {
-                        $newValue = $vehicle->$field;
-                        if ($oldValue != $newValue) {
-                            $changes[$field] = [
-                                'old_value' => $oldValue,
-                                'new_value' => $newValue,
-                            ];
+                } else {
+                    // Handle DN field processing
+                    if ($fieldName === 'dn' && $fieldValue !== null && $fieldValue !== '') {
+                        \Log::info('DN DEBUG: Processing DN field', [
+                            'vehicleId' => $vehicleId,
+                            'fieldName' => $fieldName,
+                            'fieldValue' => $fieldValue
+                        ]);
+                        
+                        // Guard: DN can be added only after payment release
+                        $poHasEstimation = Vehicles::where('purchasing_order_id', $vehicle->purchasing_order_id)
+                            ->whereNotNull('estimation_date')
+                            ->exists();
+                        if (!$poHasEstimation) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'Before payment release DN number cannot be added.'
+                            ], 422);
+                        }
+                        // Check if this DN number already exists for this vehicle
+                        $existingDn = VehicleDn::where('vehicles_id', $vehicleId)
+                        ->where('dn_number', $fieldValue)
+                        ->first();
+                        if (!$existingDn) {
+                            $latestVehicleDn = VehicleDn::where('vehicles_id', $vehicleId)
+                            ->orderBy('created_at', 'desc')
+                                ->first();
+                                $batchNumber = ($latestVehicleDn && $latestVehicleDn->batch) ? ($latestVehicleDn->batch + 1) : 1;
+                                $vehicledn = new VehicleDn();
+                            $vehicledn->dn_number = $fieldValue;
+                            $vehicledn->vehicles_id = $vehicleId;
+                            $vehicledn->created_by = auth()->user()->id;
+                            $vehicledn->batch = $batchNumber;
+                            $vehicledn->save();
+                            $vehicle->dn_id = $vehicledn->id;
+                            // Update estimation_date to now + 7 days when DN is created via inline update
+                            \Log::info('DN DEBUG: Adding +7 days to estimation_date', [
+                                'vehicleId' => $vehicleId,
+                                'oldEstimationDate' => $vehicle->estimation_date,
+                                'newEstimationDate' => \Carbon\Carbon::now()->addDays(7)->format('Y-m-d')
+                            ]);
+                            $vehicle->estimation_date = \Carbon\Carbon::now()->addDays(7)->format('Y-m-d');
+                            $vehicle->save();
+                            
+                            // Send email notification for DN created
+                            $this->sendDnCreatedEmailNotification($vehicle, $fieldValue);
+                        } else {
+                            $vehicle->dn_id = $existingDn->id;
+                            $vehicle->save();
                         }
                     }
                 }
-                // info($changes);
-                if (!empty($changes) || $fieldName === 'dn') {
-                    if ($fieldName !== 'dn') {
+                
+                // Only process changes for non-estimation_date fields
+                if ($fieldName !== 'estimation_date') {
+                    $changes = [];
+                    foreach ($oldValues as $field => $oldValue) {
+                        if ($field !== 'created_at' && $field !== 'updated_at' && $field !== 'estimation_date') {
+                            $newValue = $vehicle->$field;
+                            if ($oldValue != $newValue) {
+                                $changes[$field] = [
+                                    'old_value' => $oldValue,
+                                    'new_value' => $newValue,
+                                ];
+                            }
+                        }
+                    }
+                    // info($changes);
+                    if (!empty($changes)) {
                         $vehicle->save();
                     }
                     $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
@@ -2319,9 +2397,8 @@ class PurchasingOrderController extends Controller
                             $oldvalue = $change['old_value'] ?? "";
                             $namevalue = $change['new_value'];
                         } elseif ($field == 'estimation_date') {
-                            $newfield = "Estimation Date";
-                            $oldvalue = $change['old_value'] ?? "";
-                            $namevalue = $change['new_value'];
+                            // estimation_date is handled separately, skip this
+                            continue;
                         } else {
                             $newfield = $field;
                             $oldvalue = $change['old_value'] ?? "";
@@ -2338,74 +2415,34 @@ class PurchasingOrderController extends Controller
                         $purchasingordereventsLog->description = $description;
                         $purchasingordereventsLog->save();
                     }
+                    // Only process supplier inventory for non-estimation_date fields
+                    if ($fieldName !== 'estimation_date') {
+                        $purchasingOrderId = $vehicle->purchasing_order_id;
+                        $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
+                        if ($purchasingOrder) {
+                            $purchasingOrderPFI = PFIItemPurchaseOrder::where('purchase_order_id', $purchasingOrderId)->first();
+                            if ($purchasingOrderPFI) {
+                                $supplierInventory = SupplierInventory::find($vehicle->supplier_inventory_id);
+                                if ($supplierInventory) {
+                                    if ($fieldName == 'vin') {
+                                        $supplierInventory->chasis = $fieldValue;
+                                    }
+                                    if ($fieldName == 'int_colour') {
+                                        $supplierInventory->interior_color_code_id = $fieldValue ?? '';
+                                    }
+                                    if ($fieldName == 'ex_colour') {
+                                        $supplierInventory->exterior_color_code_id = $fieldValue ?? '';
+                                    }
+                                    if ($fieldName == 'engine') {
+                                        $supplierInventory->engine_number = $fieldValue ?? '';
+                                    }
+                                    $action = str_replace('_', ' ', $fieldName) . " updated";
+                                    (new SupplierInventoryController)->inventoryLog($action, $supplierInventory->id);
 
-                    if ($fieldName === 'dn') {
-                        // Guard: DN can be added only after payment release
-                        $poHasEstimation = Vehicles::where('purchasing_order_id', $vehicle->purchasing_order_id)
-                            ->whereNotNull('estimation_date')
-                            ->exists();
-                        if (!$poHasEstimation) {
-                            return response()->json([
-                                'success' => false,
-                                'message' => 'Before payment release DN number cannot be added.'
-                            ], 422);
-                        }
-                        // Check if this DN number already exists for this vehicle
-                        $existingDn = VehicleDn::where('vehicles_id', $vehicleId)
-                        ->where('dn_number', $fieldValue)
-                        ->first();
-                        if (!$existingDn) {
-                            $latestVehicleDn = VehicleDn::where('vehicles_id', $vehicleId)
-                            ->orderBy('created_at', 'desc')
-                                ->first();
-                                $batchNumber = ($latestVehicleDn && $latestVehicleDn->batch) ? ($latestVehicleDn->batch + 1) : 1;
-                                $vehicledn = new VehicleDn();
-                            $vehicledn->dn_number = $fieldValue;
-                            $vehicledn->vehicles_id = $vehicleId;
-                            $vehicledn->created_by = auth()->user()->id;
-                            $vehicledn->batch = $batchNumber;
-                            $vehicledn->save();
-                            $vehicle->dn_id = $vehicledn->id;
-                            // Update estimation_date to now + 7 days when DN is created via inline update
-                            $vehicle->estimation_date = \Carbon\Carbon::now()->addDays(7)->format('Y-m-d');
-                            $vehicle->save();
-                            
-                            // Send email notification for DN created
-                            $this->sendDnCreatedEmailNotification($vehicle, $fieldValue);
-                        } else {
-                            $vehicle->dn_id = $existingDn->id;
-                            $vehicle->save();
-                        }
-                    }
-                    $purchasingOrderId = $vehicle->purchasing_order_id;
-                    $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
-                    if ($purchasingOrder) {
-                        $purchasingOrderPFI = PFIItemPurchaseOrder::where('purchase_order_id', $purchasingOrderId)->first();
-                        if ($purchasingOrderPFI) {
-                            $supplierInventory = SupplierInventory::find($vehicle->supplier_inventory_id);
-                            if ($supplierInventory) {
-                                if ($fieldName == 'vin') {
-                                    $supplierInventory->chasis = $fieldValue;
+                                    $supplierInventory->save();
                                 }
-                                if ($fieldName == 'estimation_date') {
-                                    $supplierInventory->eta_import =  \Illuminate\Support\Carbon::parse($fieldValue)->format('Y-m-d');
-                                }
-                                if ($fieldName == 'int_colour') {
-                                    $supplierInventory->interior_color_code_id = $fieldValue ?? '';
-                                }
-                                if ($fieldName == 'ex_colour') {
-                                    $supplierInventory->exterior_color_code_id = $fieldValue ?? '';
-                                }
-                                if ($fieldName == 'engine') {
-                                    $supplierInventory->engine_number = $fieldValue ?? '';
-                                }
-                                $action = str_replace('_', ' ', $fieldName) . " updated";
-                                (new SupplierInventoryController)->inventoryLog($action, $supplierInventory->id);
-
-                                $supplierInventory->save();
                             }
                         }
-
                     }
                     // STRICT CHECK: Only change PO status if more than just estimation_date is updated
                     if (!empty($changes)) {
