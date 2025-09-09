@@ -2207,6 +2207,53 @@ class PurchasingOrderController extends Controller
                 if ($fieldName !== 'dn') {
                     $vehicle->setAttribute($fieldName, $fieldValue);
                     $vehicle->save();
+                    
+                    // For estimation_date, treat it as a normal field update and skip DN logic
+                    if ($fieldName === 'estimation_date') {
+                        // Log the estimation_date update
+                        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                        $currentDateTime = Carbon::now($dubaiTimeZone);
+                        
+                        $vehicleslog = new Vehicleslog();
+                        $vehicleslog->time = $currentDateTime->toTimeString();
+                        $vehicleslog->date = $currentDateTime->toDateString();
+                        $vehicleslog->status = 'Update Vehicles On Purchased Order';
+                        $vehicleslog->vehicles_id = $vehicleId;
+                        $vehicleslog->field = 'estimation_date';
+                        $vehicleslog->old_value = $oldValues['estimation_date'] ?? '';
+                        $vehicleslog->new_value = $fieldValue;
+                        $vehicleslog->created_by = auth()->user()->id;
+                        $vehicleslog->role = Auth::user()->selectedRole;
+                        $vehicleslog->save();
+                        
+                        // Create purchasing order events log
+                        $purchasingordereventsLog = new PurchasingOrderEventsLog();
+                        $purchasingordereventsLog->event_type = "Changes into Vehicle date";
+                        $purchasingordereventsLog->created_by = auth()->user()->id;
+                        $purchasingordereventsLog->purchasing_order_id = $vehicle->purchasing_order_id;
+                        $purchasingordereventsLog->field = "Estimation Date";
+                        $purchasingordereventsLog->old_value = $oldValues['estimation_date'] ?? '';
+                        $purchasingordereventsLog->new_value = $fieldValue;
+                        $purchasingordereventsLog->description = "Vehicle reference is $vehicleId change the Estimation Date from " . ($oldValues['estimation_date'] ?? '') . " to $fieldValue";
+                        $purchasingordereventsLog->save();
+                        
+                        // Update supplier inventory if needed
+                        $purchasingOrderId = $vehicle->purchasing_order_id;
+                        $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
+                        if ($purchasingOrder) {
+                            $purchasingOrderPFI = PFIItemPurchaseOrder::where('purchase_order_id', $purchasingOrderId)->first();
+                            if ($purchasingOrderPFI) {
+                                $supplierInventory = SupplierInventory::find($vehicle->supplier_inventory_id);
+                                if ($supplierInventory) {
+                                    $supplierInventory->eta_import = \Illuminate\Support\Carbon::parse($fieldValue)->format('Y-m-d');
+                                    $supplierInventory->save();
+                                }
+                            }
+                        }
+                        
+                        // Skip the rest of the processing for estimation_date
+                        continue;
+                    }
                 }
                 $changes = [];
                 foreach ($oldValues as $field => $oldValue) {
