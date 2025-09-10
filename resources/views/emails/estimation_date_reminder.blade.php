@@ -152,7 +152,7 @@
                     @foreach($vehicles as $index => $vehicle)
                     <tr>
                         <td class="sr-no">{{ $index + 1 }}</td>
-                        <td>{{ $vehicle->po_number ?? 'N/A' }}</td>
+                        <td>{{ $vehicle->purchasingOrder->po_number ?? 'N/A' }}</td>
                         <td>{{ $vehicle->vin ?? 'N/A' }}</td>
                         <td>{{ $vehicle->variant->name ?? 'N/A' }}</td>
                         <td>{{ $vehicle->exterior_color ?? 'N/A' }}</td>
