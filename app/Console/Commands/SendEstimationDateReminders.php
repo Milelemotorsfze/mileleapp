@@ -42,7 +42,7 @@ class SendEstimationDateReminders extends Command
                 $vehicles = \App\Models\Vehicles::where('estimation_date', $targetDate)
                     ->whereNotNull('estimation_date')
                     ->where('status', '!=', 'cancel')
-                    ->with(['variant.brand', 'variant.master_model_lines', 'warehouse'])
+                    ->with(['variant.brand', 'variant.master_model_lines', 'warehouse', 'purchasingOrder'])
                     ->get();
                 
                 if ($vehicles->count() > 0) {
