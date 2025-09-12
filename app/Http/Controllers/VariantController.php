@@ -30,7 +30,7 @@ class VariantController extends Controller
     public function index()
     {
         (new UserActivityController)->createActivity('Open Variant Information Page');
-        $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
+        $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option', 'masterModelDescription'])
             ->orderBy('id', 'DESC')
             ->get();
         $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
