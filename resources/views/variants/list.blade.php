@@ -181,7 +181,7 @@
                     @endif
                         <td class="nowrap-td capitalize-first-letter">{{ $variant->brand->brand_name ?? 'null' }}</td>
                         <td class="nowrap-td capitalize-first-letter">{{ $variant->master_model_lines->model_line ?? 'null' }}</td>
-                        <td class="nowrap-td capitalize-first-letter">{{ $variant->model_detail ?? 'null' }}</td>
+                        <td class="nowrap-td capitalize-first-letter">{{ $variant->masterModelDescription->model_description ?? $variant->model_detail ?? 'null' }}</td>
                         <td class="nowrap-td">{{ ucfirst(strtolower($variant->my ?? 'null' )) }}</td>
                         <td class="nowrap-td">{{ $variant->netsuite_name}}</td>
                         <td class="nowrap-td capitalize-first-letter">

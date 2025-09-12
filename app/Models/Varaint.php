@@ -40,6 +40,10 @@ class Varaint extends Model
     {
         return $this->belongsTo(Brand::class,'brands_id');
     }
+    public function masterModelDescription()
+    {
+        return $this->belongsTo(MasterModelDescription::class,'master_model_descriptions_id');
+    }
     public function getIsDeletableAttribute() {
 
         $variant = Varaint::find($this->id);
