@@ -9,6 +9,25 @@ class Varaint extends Model
 {
     use HasFactory;
     protected $table = 'varaints';
+    protected $fillable = [
+        'brands_id',
+        'netsuite_name',
+        'master_model_lines_id',
+        'steering',
+        'fuel_type',
+        'engine',
+        'upholestry',
+        'coo',
+        'drive_train',
+        'gearbox',
+        'name',
+        'model_detail',
+        'master_model_descriptions_id',
+        'detail',
+        'my',
+        'created_by',
+        'category'
+    ];
     protected $appends = [
         'is_deletable',
     ];
@@ -42,7 +61,7 @@ class Varaint extends Model
     }
     public function masterModelDescription()
     {
-        return $this->belongsTo(MasterModelDescription::class,'master_model_descriptions_id');
+        return $this->belongsTo(MasterModelDescription::class, 'master_model_descriptions_id', 'id');
     }
     public function getIsDeletableAttribute() {
 
