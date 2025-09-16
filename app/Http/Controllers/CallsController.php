@@ -2289,7 +2289,7 @@ class CallsController extends Controller
         }
         $data->select(
             'c.name',
-            \DB::raw('CAST(c.phone AS UNSIGNED) as phone'),
+            \DB::raw('CAST(c.phone AS CHAR) as phone'),
             'c.email',
             'c.remarks',
             'c.location',
@@ -2337,6 +2337,12 @@ class CallsController extends Controller
             }
 
             unset($row->remarks); // Remove original remarks
+            
+            // Convert phone to string and ensure it's treated as text in Excel
+            if (isset($row->phone)) {
+                $row->phone = " " . (string)$row->phone;
+            }
+            
             $parsedResults[] = array_merge((array) $row, $parsed);
         }
         return Excel::download(new LeadsExport($parsedResults, $headings), 'leads_export.xlsx');
