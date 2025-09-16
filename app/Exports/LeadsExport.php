@@ -4,8 +4,10 @@ namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class LeadsExport implements FromCollection, WithHeadings
+class LeadsExport implements FromCollection, WithHeadings, WithColumnFormatting
 {
     protected $data;
     protected $headings;
@@ -25,5 +27,12 @@ class LeadsExport implements FromCollection, WithHeadings
     {
         // Use the headings provided during instantiation
         return $this->headings;
+    }
+
+    public function columnFormats(): array
+    {
+        return [
+            'B' => NumberFormat::FORMAT_TEXT, // Phone column (2nd column)
+        ];
     }
 }
