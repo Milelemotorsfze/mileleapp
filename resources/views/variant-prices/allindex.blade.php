@@ -93,6 +93,31 @@
       </div>
     </div>
   </div>
+
+<!-- Price Change Reason Modal -->
+<div class="modal fade" id="priceChangeReasonModal" tabindex="-1" aria-labelledby="priceChangeReasonModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="priceChangeReasonModalLabel">Price Change Reason</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="priceChangeReasonForm">
+                    <div class="mb-3">
+                        <label for="priceChangeReason" class="form-label">Please provide a reason for the price change:</label>
+                        <textarea class="form-control" id="priceChangeReason" name="reason" rows="4" placeholder="Enter the reason for changing the price..." maxlength="500"></textarea>
+                        <div class="form-text">Maximum 500 characters</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmPriceChange">Confirm Price Change</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="table-responsive" style="height: 74vh;">
         <table id="dtBasicExample1" class="table table-striped table-editable table-edits table-bordered">
         <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
@@ -197,55 +222,104 @@
             this.value = this.value.replace(/[^0-9%]/g, '');
         });
 
-        function saveField(varaints_id, int_colour, ex_colour, fieldName, newValue) {
-    // Remove any commas from price before sending
-    if (fieldName === 'price') {
-        newValue = newValue.replace(/,/g, ''); // Remove commas
-    }
+        // Store the current field data for the modal
+        var currentFieldData = {};
 
-    console.log('Sending data:', {
-        varaints_id: varaints_id,
-        int_colour: int_colour,
-        ex_colour: ex_colour,
-        field: fieldName,
-        value: newValue
-    });
-    if(newValue.length > 0) {
-        $.ajax({
-            url: "{{ route('variantprices.allvariantpriceupdate') }}",
-            method: "POST",
-            data: {
-                _token: "{{ csrf_token() }}",
+        function saveField(varaints_id, int_colour, ex_colour, fieldName, newValue, reason = '') {
+            // Remove any commas from price before sending
+            if (fieldName === 'price') {
+                newValue = newValue.replace(/,/g, ''); // Remove commas
+            }
+
+            console.log('Sending data:', {
+                varaints_id: varaints_id,
+                int_colour: int_colour,
+                ex_colour: ex_colour,
+                field: fieldName,
+                value: newValue,
+                reason: reason
+            });
+            if(newValue.length > 0) {
+                $.ajax({
+                    url: "{{ route('variantprices.allvariantpriceupdate') }}",
+                    method: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        varaints_id: varaints_id,
+                        int_colour: int_colour,
+                        ex_colour: ex_colour,
+                        field: fieldName,
+                        value: newValue,
+                        reason: reason
+                    },
+                    success: function(response) {
+                        table.ajax.reload(null, false); // Reload the table data
+                        // Show success message
+                        var confirm = alertify.confirm('Price updated successfully and notification sent to departments!',function (e) {
+                        }).set({title:"Success"});
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422) {
+                        const errors = xhr.responseJSON.errors;
+                        let errorMessages = '';
+                        for (let field in errors) {
+                            errorMessages += errors[field].join(', ') + '\n';
+                        }
+                        var confirm = alertify.confirm(''+errorMessages+'',function (e) {
+                        }).set({title:"Validation Error"});
+                        table.ajax.reload(null, false);
+                    } else {
+                        var confirm = alertify.confirm('Something went wrong',function (e) {
+                        }).set({title:"Something went wrong"});
+                        table.ajax.reload(null, false);
+                    }
+                        console.log('Error:', xhr.responseText);
+                    }
+                });
+            } 
+           
+        }
+
+        // Function to show price change reason modal
+        function showPriceChangeModal(varaints_id, int_colour, ex_colour, fieldName, newValue) {
+            currentFieldData = {
                 varaints_id: varaints_id,
                 int_colour: int_colour,
                 ex_colour: ex_colour,
                 field: fieldName,
                 value: newValue
-            },
-            success: function(response) {
-                table.ajax.reload(null, false); // Reload the table data
-            },
-            error: function(xhr) {
-                if (xhr.status === 422) {
-                const errors = xhr.responseJSON.errors;
-                let errorMessages = '';
-                for (let field in errors) {
-                    errorMessages += errors[field].join(', ') + '\n';
-                }
-                var confirm = alertify.confirm(''+errorMessages+'',function (e) {
-                }).set({title:"Validation Error"});
-                table.ajax.reload(null, false);
-            } else {
-                var confirm = alertify.confirm('Something went wrong',function (e) {
-                }).set({title:"Something went wrong"});
-                table.ajax.reload(null, false);
+            };
+            
+            // Clear previous reason
+            $('#priceChangeReason').val('');
+            
+            // Show modal
+            $('#priceChangeReasonModal').modal('show');
+        }
+
+        // Handle confirm price change button
+        $('#confirmPriceChange').on('click', function() {
+            var reason = $('#priceChangeReason').val().trim();
+            
+            // Validate reason is not empty
+            if (reason === '') {
+                alert('Please provide a reason for the price change.');
+                return;
             }
-                console.log('Error:', xhr.responseText);
-            }
+            
+            // Close modal
+            $('#priceChangeReasonModal').modal('hide');
+            
+            // Proceed with the price update
+            saveField(
+                currentFieldData.varaints_id,
+                currentFieldData.int_colour,
+                currentFieldData.ex_colour,
+                currentFieldData.field,
+                currentFieldData.value,
+                reason
+            );
         });
-    } 
-   
-}
 
 // Handling the GP input blur event
 $('#dtBasicExample1').on('blur', 'input.editable-gp', function () {
@@ -278,8 +352,10 @@ $('#dtBasicExample1').on('blur', 'input.editable-price', function () {
 
     $this.val(newValue); // Set the formatted value
 
-    // Save the updated Price value, removing commas before sending
-    saveField($this.data('varaint-id'), $this.data('int-colour'), $this.data('ex-colour'), 'price', newValue.replace(/,/g, ''));
+    // Show modal for price change reason
+    if (newValue !== '') {
+        showPriceChangeModal($this.data('varaint-id'), $this.data('int-colour'), $this.data('ex-colour'), 'price', newValue.replace(/,/g, ''));
+    }
 });
 $('#dtBasicExample1').on('blur', 'input.editable-minimum_commission', function () {
     var $this = $(this);
@@ -291,8 +367,10 @@ $('#dtBasicExample1').on('blur', 'input.editable-minimum_commission', function (
 
     $this.val(newValue); // Set the formatted value
 
-    // Save the updated Price value, removing commas before sending
-    saveField($this.data('varaint-id'), $this.data('int-colour'), $this.data('ex-colour'), 'minimum_commission', newValue.replace(/,/g, ''));
+    // Show modal for price change reason
+    if (newValue !== '') {
+        showPriceChangeModal($this.data('varaint-id'), $this.data('int-colour'), $this.data('ex-colour'), 'minimum_commission', newValue.replace(/,/g, ''));
+    }
 });
     });
     function openModal(id) {
