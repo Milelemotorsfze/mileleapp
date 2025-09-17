@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ColorCode;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use App\Events\DataUpdatedEvent;
 use App\Models\VehicleApprovalRequests;
 use App\Models\Vehicles;
@@ -42,7 +43,6 @@ use Carbon\CarbonTimeZone;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Mail;
 
 class VehiclesController extends Controller
 {
@@ -3252,7 +3252,8 @@ class VehiclesController extends Controller
             [
                 'varaints_id' => 'required|integer|exists:varaints,id',
                 'field' => 'required|string|in:price,gp,minimum_commission',
-                'value' => 'required|string'
+                'value' => 'required|string',
+                'reason' => 'nullable|string|max:500'
             ],
             ['value.required' => 'Valid amount value is required']
         );
@@ -3279,22 +3280,37 @@ class VehiclesController extends Controller
             $query->whereNull('ex_colour');
         }
 
-        $vehicles = $query->get();
+        $vehicles = $query->select([
+            'vehicles.*',
+            'brands.brand_name',
+            'varaints.name as variant_name',
+            'master_model_lines.model_line',
+            'int_color.name as interior_color',
+            'ex_color.name as exterior_color',
+        ])
+        ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+        ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+        ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+        ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+        ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
+        ->get();
 
         if ($vehicles->count() <= 0) {
             return response()->json(['error' => 'Vehicle not found'], 404);
         }
 
+        // Store old value for email notification
+        $oldValue = $vehicles->first()->{$request->field};
+        $field = $request->field;
+        $value = $request->value;
+        if ($field == 'price') {
+            $value = str_replace(',', '', $value);
+        }
+        if ($field == 'minimum_commission') {
+            $value = str_replace(',', '', $value);
+        }
+
         foreach ($vehicles as $vehicle) {
-            $oldValue = $vehicle->{$request->field};
-            $field = $request->field;
-            $value = $request->value;
-            if ($field == 'price') {
-                $value = str_replace(',', '', $value);
-            }
-            if ($field == 'minimum_commission') {
-                $value = str_replace(',', '', $value);
-            }
             $vehicle->$field = $value ?? 0;
             $vehicle->save();
             $currentDateTime = Carbon::now();
@@ -3312,7 +3328,55 @@ class VehiclesController extends Controller
             $vehicleslog->save();
         }
 
+        // Send email notification to departments
+        try {
+            $this->sendPriceUpdateNotification($vehicles, $field, $oldValue, $value, $request->reason);
+        } catch (\Exception $e) {
+            \Log::error('Failed to send price update notification: ' . $e->getMessage());
+        }
+
         return response()->json(['success' => 'Vehicle updated successfully']);
+    }
+
+    /**
+     * Send price update notification email to departments
+     */
+    private function sendPriceUpdateNotification($vehicles, $field, $oldValue, $newValue, $reason = null)
+    {
+        try {
+            // Get department email addresses
+            $departmentEmails = config('departments.price_update_notifications', []);
+
+            $allEmails = [];
+            foreach ($departmentEmails as $emails) {
+                $allEmails = array_merge($allEmails, $emails);
+            }
+            
+            // Remove duplicates and filter out default placeholder emails
+            $allEmails = array_unique($allEmails);
+            $allEmails = array_filter($allEmails, function($email) {
+                return !str_contains($email, '@company.com') && !empty($email);
+            });
+
+            if (count($allEmails) > 0) {
+                $updatedBy = auth()->user();
+                
+                Mail::to($allEmails)->send(new \App\Mail\VariantPriceUpdateNotification(
+                    $vehicles,
+                    null, // variant is no longer needed since we have the data in vehicles
+                    $field,
+                    $oldValue,
+                    $newValue,
+                    $reason,
+                    $updatedBy
+                ));
+                
+                \Log::info("Price update notification sent to " . count($allEmails) . " department members");
+            }
+            
+        } catch (\Exception $e) {
+            \Log::error("Failed to send price update notification email: " . $e->getMessage());
+        }
     }
     public function custominspectionupdate(Request $request)
     {
