@@ -43,19 +43,42 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .vehicles-table th,
         .vehicles-table td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 12px 8px;
             text-align: left;
+            vertical-align: middle;
         }
         .vehicles-table th {
-            background-color: #f2f2f2;
+            background-color: #2c3e50;
+            color: white;
             font-weight: bold;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
         }
         .vehicles-table tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: #f8f9fa;
+        }
+        .vehicles-table tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+        .vehicles-table tr:hover {
+            background-color: #e8f4f8;
+        }
+        .vehicles-table td {
+            border-left: 1px solid #e0e0e0;
+            border-right: 1px solid #e0e0e0;
+        }
+        .vehicles-table td:first-child {
+            border-left: 1px solid #ddd;
+        }
+        .vehicles-table td:last-child {
+            border-right: 1px solid #ddd;
         }
         .price-change {
             background-color: #fff3cd;
@@ -106,34 +129,36 @@
     @endif
 
     <div class="variant-details">
-        <h3>Affected Vehicle</h3>
+        <h3>🚗 Affected Vehicles ({{ $vehicles->count() }} vehicle{{ $vehicles->count() != 1 ? 's' : '' }})</h3>
         @if($vehicles->count() > 0)
-        <table class="vehicles-table">
-            <thead>
-                <tr>
-                    <th>Brand</th>
-                    <th>Model Line</th>
-                    <th>Variant</th>
-                    <th>Interior Color</th>
-                    <th>Exterior Color</th>
-                    <th>Current Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($vehicles as $vehicle)
-                <tr>
-                    <td>{{ $vehicle->brand_name ?? 'N/A' }}</td>
-                    <td>{{ $vehicle->model_line ?? 'N/A' }}</td>
-                    <td>{{ $vehicle->variant_name ?? 'N/A' }}</td>
-                    <td>{{ $vehicle->interior_color ?? 'N/A' }}</td>
-                    <td>{{ $vehicle->exterior_color ?? 'N/A' }}</td>
-                    <td>{{ number_format($vehicle->price, 0, '.', ',') }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+        <div style="overflow-x: auto;">
+            <table class="vehicles-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Brand</th>
+                        <th style="width: 20%;">Model Line</th>
+                        <th style="width: 25%;">Variant</th>
+                        <th style="width: 15%;">Interior Color</th>
+                        <th style="width: 15%;">Exterior Color</th>
+                        <th style="width: 10%; text-align: right;">Current Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($vehicles as $vehicle)
+                    <tr>
+                        <td><strong>{{ $vehicle->brand_name ?? 'N/A' }}</strong></td>
+                        <td>{{ $vehicle->model_line ?? 'N/A' }}</td>
+                        <td><em>{{ $vehicle->variant_name ?? 'N/A' }}</em></td>
+                        <td>{{ $vehicle->interior_color ?? 'N/A' }}</td>
+                        <td>{{ $vehicle->exterior_color ?? 'N/A' }}</td>
+                        <td style="text-align: right; font-weight: bold; color: #2c3e50;">{{ number_format($vehicle->price, 0, '.', ',') }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
         @else
-        <p>No vehicles found for this variant.</p>
+        <p style="text-align: center; color: #666; font-style: italic;">No vehicles found for this variant.</p>
         @endif
     </div>
 
