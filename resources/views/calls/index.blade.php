@@ -295,7 +295,7 @@
                      @php
                      $sales_persons_name = "";
                      $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
-                     $sales_persons_name = $sales_persons->name;
+                     $sales_persons_name = $sales_persons ? $sales_persons->name : 'N/A';
                      @endphp  
                     <td class="nowrap-td">{{ $sales_persons_name }}</td>
                     @php
@@ -401,7 +401,7 @@
                      @php
                      $sales_persons_name = "";
                      $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
-                     $sales_persons_name = $sales_persons->name;
+                     $sales_persons_name = $sales_persons ? $sales_persons->name : 'N/A';
                      @endphp  
                     <td class="nowrap-td">{{ $sales_persons_name }}</td>
                     @php

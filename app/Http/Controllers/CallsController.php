@@ -282,7 +282,7 @@ class CallsController extends Controller
                     return $call->priority;
                 })
                 ->addColumn('salesperson', function ($call) {
-                    return $call->salesperson->name;
+                    return $call->salesperson ? $call->salesperson->name : 'N/A';
                 })
                 ->addColumn('leadsource', function ($call) {
                     return $call->leadssouces ? $call->leadssouces->source_name : '';
