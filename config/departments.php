@@ -36,12 +36,6 @@ return [
         'marketing' => [
             env('MARKETING_TEAM_EMAIL', 'team.marketing@milele.com'),
         ],
-        'operations' => [
-            env('OPERATIONS_TEAM_EMAIL', 'team.operations@milele.com'),
-        ],
-        'demand_planning' => [
-            env('DP_TEAM_EMAIL', 'team.dp@milele.com'),
-        ],
         'sales' => [
             env('SALES_TEAM_EMAIL', 'team.sales@milele.com'),
         ],
