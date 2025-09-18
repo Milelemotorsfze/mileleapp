@@ -630,7 +630,15 @@ public function store(Request $request)
             ];
         }
         $selectedModelDescriptionId = $variant->master_model_descriptions_id;
-        $modelDescriptions = \App\Models\MasterModelDescription::where('model_line_id', $modelLineId)->get();
+        $modelDescriptions = \App\Models\MasterModelDescription::where('model_line_id', $modelLineId)
+            ->where('steering', $variant->steering)
+            ->where('engine', $variant->engine)
+            ->where('fuel_type', $variant->fuel_type)->get();
+        
+        // If no model descriptions match the specific criteria, fall back to all descriptions for this model line
+        if ($modelDescriptions->isEmpty()) {
+            $modelDescriptions = \App\Models\MasterModelDescription::where('model_line_id', $modelLineId)->get();
+        }
         return view('variants.duplicate', compact('countries', 'variant', 'brand', 'brands', 'masterModelLines', 'variantItems', 'data', 'masterModelLine', 'modelDescriptions'));
     }
 
@@ -1006,6 +1014,11 @@ public function store(Request $request)
             ->where('steering', $variant->steering)
             ->where('engine', $variant->engine)
             ->where('fuel_type', $variant->fuel_type)->get();
+        
+        // If no model descriptions match the specific criteria, fall back to all descriptions for this model line
+        if ($modelDescriptions->isEmpty()) {
+            $modelDescriptions = \App\Models\MasterModelDescription::where('model_line_id', $modelLineId)->get();
+        }
         return view('variants.editvar', compact('countries', 'variant', 'brand', 'brands', 'masterModelLines', 'variantItems', 'data', 'masterModelLine', 'modelDescriptions'));
     }
     public function storevar(Request $request, $variant)
