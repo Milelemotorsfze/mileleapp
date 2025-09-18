@@ -2338,9 +2338,9 @@ class CallsController extends Controller
 
             unset($row->remarks); // Remove original remarks
             
-            // Convert phone to string and ensure it's treated as text in Excel
+            // Format phone number with country code and remove spaces
             if (isset($row->phone)) {
-                $row->phone = " " . (string)$row->phone;
+                $row->phone = $this->formatPhoneNumberForExport($row->phone);
             }
             
             $parsedResults[] = array_merge((array) $row, $parsed);
@@ -2589,5 +2589,24 @@ class CallsController extends Controller
             ]);
             return ['user_id' => null, 'reason' => $assignmentReason];
         }
+    }
+
+    /**
+     * Format phone number for export with country code and remove spaces
+     */
+    private function formatPhoneNumberForExport($phone)
+    {
+        if (empty($phone)) {
+            return '';
+        }
+
+        // Convert to string and remove all spaces
+        $phone = trim((string)$phone);
+        $phone = str_replace(' ', '', $phone);
+        
+        // Remove all non-digit characters except +
+        $phone = preg_replace('/[^\d+]/', '', $phone);
+        
+        return $phone;
     }
 }
