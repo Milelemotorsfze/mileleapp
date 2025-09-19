@@ -26,7 +26,7 @@ return [
         ],
         'qc_team' => [
             env('QC_TEAM_EMAIL', 'team.qc@milele.com'),
-        // ],
+        ],
         // 'developer' => [
         //     env('DEVELOPER_EMAIL', 'basharat.ali@milele.com'),
         // ],
@@ -38,7 +38,7 @@ return [
         ],
         'sales' => [
             env('SALES_TEAM_EMAIL', 'team.sales@milele.com'),
-        // ],
+        ],
         // 'developer' => [
         //     env('DEVELOPER_EMAIL', 'basharat.ali@milele.com'),
         // ],
