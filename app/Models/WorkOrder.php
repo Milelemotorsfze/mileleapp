@@ -134,6 +134,8 @@ class WorkOrder extends Model
         'delivery_summary',
         'is_delivery_initial_stage',
     ];
+
+
     public function getStatusAttribute() {
         $status = '';
         

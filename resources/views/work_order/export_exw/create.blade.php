@@ -2336,11 +2336,20 @@ try {
 						method: form.method,
 						body: formData,
 						headers: {
-							'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+							'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+							'Accept': 'application/json',
+							'X-Requested-With': 'XMLHttpRequest'
 						}
 					}).then(response => {
 						if (!response.ok) {
-							return response.text().then(text => { throw new Error(text) });
+							return response.text().then(text => { 
+								try {
+									const errorData = JSON.parse(text);
+									throw new Error(errorData.message || text);
+								} catch (e) {
+									throw new Error(text);
+								}
+							});
 						}
 						return response.json();
 					}).then(data => {

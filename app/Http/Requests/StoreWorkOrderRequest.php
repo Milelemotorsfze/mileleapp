@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\So;
 
 class StoreWorkOrderRequest extends FormRequest
 {
@@ -23,16 +24,34 @@ class StoreWorkOrderRequest extends FormRequest
     {
         return [
             'type' => 'required|string',
-            // 'date' => 'required|date',
-            'so_number' => 'required|string|regex:/^SO-\d{6}$/|not_in:SO-000000',
-            // 'batch' =>'required',
-            // 'wo_number' =>'required',
+            'so_number' => [
+                'required',
+                'string',
+                'regex:/^SO-\d{6}$/',
+                'not_in:SO-000000',
+                function ($attribute, $value, $fail) {
+                    // Check if SO exists in sales order table
+                    if (!So::where('so_number', $value)->exists()) {
+                        $fail('The selected sales order does not exist.');
+                    }
+                }
+            ],
             'contact_number' => 'regex:/^[0-9]$/',
             'customer_email' => 'nullable|email|max:255',
             'customer_representative_email' => 'nullable|email|max:255',
             'freight_agent_email' => 'nullable|email|max:255',
-            // Add other fields and validation rules as needed
-            // 'customer_company_number.main' => 'required|numeric',
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     */
+    public function messages(): array
+    {
+        return [
+            'so_number.required' => 'Sales Order number is required.',
+            'so_number.regex' => 'Sales Order number must be in format SO-######.',
+            'so_number.not_in' => 'SO-000000 is not a valid Sales Order number.',
         ];
     }
 }
