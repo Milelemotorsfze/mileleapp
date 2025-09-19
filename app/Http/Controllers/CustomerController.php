@@ -360,7 +360,7 @@ class CustomerController extends Controller
 }
 public function createcustomers()
 {
-    $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->whereIn('id', [6, 16, 35, 40])->get();
+    $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
     $countries = CountryListFacade::getList('en');
     return view('clients.create', compact('countries', 'LeadSource'));
 }
