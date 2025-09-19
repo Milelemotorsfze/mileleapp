@@ -759,10 +759,10 @@ class WorkOrderController extends Controller
                 }
             }
         }
+
         DB::beginTransaction();
         try {
             $authId = Auth::id();
-            $validated = $request->validated();
             $input = $request->all();
             $input['customer_company_number'] = $request->customer_company_number['full'] ?? null;
             $input['customer_representative_contact'] = $request->customer_representative_contact['full'] ?? null;
@@ -1751,6 +1751,7 @@ class WorkOrderController extends Controller
         if (!is_null($workOrder->sales_support_data_confirmation_at) && !$hasEditConfirmedPermission) {
             return response()->json(['success' => false, 'message' => "Can't edit the work order because the sales support confirmed the data."], 400);
         }
+
         DB::beginTransaction();
         try {
             $canCreateFinanceApproval = false;
