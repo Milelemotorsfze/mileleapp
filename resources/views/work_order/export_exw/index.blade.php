@@ -428,7 +428,7 @@
 													</a>
 												</li>
 											@endif
-											@if ($data->sales_support_data_confirmation_at && $data->finance_approval_status == 'Approved' && $data->coo_approval_status == 'Approved' && $canChangeDocStatus)
+											@if ($data->sales_support_data_confirmation_at && $data->coo_approval_status == 'Approved' && $data->finance_approval_status == 'Approved' && $canChangeDocStatus)
 												<li>
 													<a class="btn btn-sm btn-info btn-full-width" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#updateDocStatusModal_{{$data->id}}">
 														<i class="fa fa-file" aria-hidden="true"></i> Update Doc Status
@@ -507,7 +507,7 @@
 									@endif
 								</td>
 								<td>
-									@if($data->sales_support_data_confirmation_at && $data->finance_approval_status === 'Approved' && $data->coo_approval_status === 'Approved')
+									@if($data->sales_support_data_confirmation_at && $data->coo_approval_status === 'Approved' && $data->finance_approval_status === 'Approved')
 										<div class="tooltip-container">
 										<label class="badge {{ $data->getBadgeClass($data->docs_status) }}">
 											<strong>{{ strtoupper($data->docs_status) }}</strong>
@@ -526,21 +526,21 @@
 									</div>
 								</td>
 								<td>
-									@if($data->sales_support_data_confirmation_at && $data->finance_approval_status === 'Approved' && $data->coo_approval_status === 'Approved')
+									@if($data->sales_support_data_confirmation_at && $data->coo_approval_status === 'Approved' && $data->finance_approval_status === 'Approved')
 										<label class="badge {{ $data->getBadgeClass($data->vehicles_modification_summary) }}">
 											<strong>{{ strtoupper($data->vehicles_modification_summary) }}</strong>
 										</label>
 									@endif
 								</td>
 								<td>
-									@if($data->sales_support_data_confirmation_at && $data->finance_approval_status === 'Approved' && $data->coo_approval_status === 'Approved')
+									@if($data->sales_support_data_confirmation_at && $data->coo_approval_status === 'Approved' && $data->finance_approval_status === 'Approved')
 										<label class="badge {{ $data->getBadgeClass($data->pdi_summary) }}">
 											<strong>{{ strtoupper($data->pdi_summary ?? '') }}</strong>
 										</label>
 									@endif
 								</td>
 								<td>
-									@if($data->sales_support_data_confirmation_at && $data->finance_approval_status === 'Approved' && $data->coo_approval_status === 'Approved')
+									@if($data->sales_support_data_confirmation_at && $data->coo_approval_status === 'Approved' && $data->finance_approval_status === 'Approved')
 										<label class="badge {{ $data->getBadgeClass($data->delivery_summary) }}">
 											<strong>{{ strtoupper($data->delivery_summary ?? '') }}</strong>
 										</label>

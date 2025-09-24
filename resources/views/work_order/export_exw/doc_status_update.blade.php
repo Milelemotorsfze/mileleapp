@@ -81,7 +81,7 @@
         </div>
     </div>
 </div>
-@if($data->sales_support_data_confirmation_at != '' && $data->finance_approval_status == 'Approved' && $data->coo_approval_status == 'Approved')
+@if($data->sales_support_data_confirmation_at != '' && $data->coo_approval_status == 'Approved' && $data->finance_approval_status == 'Approved')
 <script type="text/javascript">
     function toggleFields_{{$data->id}}() {
         const selectedStatusInput = document.querySelector('input[name="docStatus_{{$data->id}}"]:checked');

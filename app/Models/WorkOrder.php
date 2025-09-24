@@ -162,7 +162,7 @@ class WorkOrder extends Model
     }
     public function getCanRevertConfirmationAttribute() {
         $canRevert = 'yes';
-        if(($this->sales_support_data_confirmation == 'Confirmed' && $this->finance_approval_status == 'Approved' && $this->coo_approval_status == 'Approved')
+        if(($this->sales_support_data_confirmation == 'Confirmed' && $this->coo_approval_status == 'Approved' && $this->finance_approval_status == 'Approved')
             && (($this->docs_status != 'Blank' && $this->docs_status != 'Not Initiated') || $this->is_modification_initial_stage == 'no' 
                 || $this->is_pdi_initial_stage == 'no' || $this->is_delivery_initial_stage == 'no')) {
                 $canRevert = 'no';
