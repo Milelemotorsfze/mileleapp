@@ -5,7 +5,7 @@
         $boeData = $workOrder->boe ?? []; 
     @endphp
 
-    @if($workOrder->sales_support_data_confirmation_at != '' && $workOrder->finance_approval_status == 'Approved' && $workOrder->coo_approval_status == 'Approved')
+    @if($workOrder->sales_support_data_confirmation_at != '' && $workOrder->coo_approval_status == 'Approved' && $workOrder->finance_approval_status == 'Approved')
         @php
         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['can-change-documentation-status']);
         @endphp
