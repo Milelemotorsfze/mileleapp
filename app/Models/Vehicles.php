@@ -131,6 +131,14 @@ class Vehicles extends Model
     {
         return $this->hasMany(WOVehicles::class, 'vehicle_id', 'id');
     }
+    
+    public function woVehicleWithPdiStatus()
+    {
+        return $this->hasMany(WOVehicles::class, 'vehicle_id', 'id')
+                    ->whereHas('pdiStatus', function($query) {
+                        $query->whereIn('status', ['Scheduled', 'Completed']);
+                    });
+    }
     public function incidents()
     {
         return $this->hasMany(Incident::class, 'vehicle_id');
