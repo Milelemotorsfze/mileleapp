@@ -1878,8 +1878,16 @@ public function submitGdn(Request $request)
         $gdnRecord->gdn_number = $request->gdn;
         $gdnRecord->date = $oldgdn->date;
         $gdnRecord->save();
-        // Associate the GRN with the vehicle
+        
+        // Get Customer warehouse ID for location update
+        $customerWarehouse = \App\Models\Warehouse::where('name', 'Customer')->first();
+        $customerWarehouseId = $customerWarehouse ? $customerWarehouse->id : null;
+        
+        // Associate the GRN with the vehicle and update location to Customer
         $vehicle->gdn_id = $gdnRecord->id;
+        if ($customerWarehouseId) {
+            $vehicle->latest_location = $customerWarehouseId;
+        }
         $vehicle->save();
         return response()->json([
             'success' => true,
