@@ -44,6 +44,11 @@ class WOVehicleDeliveryStatusController extends Controller
 
         // Fetch the work order vehicle and related data
         $woVehicle = WOVehicles::findOrFail($validatedData['woVehicleId']);
+        
+        // Sync location change to vehicles table if location was updated
+        if (isset($validatedData['location']) && $validatedData['location']) {
+            $this->syncLocationToVehicles($woVehicle, $validatedData['location']);
+        }
         $workOrder = $woVehicle->workOrder;
 
         // Retrieve email addresses from the users table where can_send_wo_email is true
@@ -148,5 +153,53 @@ class WOVehicleDeliveryStatusController extends Controller
 
         // Return the view with the status history and navigation data
         return view('work_order.export_exw.delivery-status-history', compact('data', 'type', 'woVehicleId', 'previous', 'next', 'workOrder', 'vehicle'));
+    }
+
+    /**
+     * Sync location change from Work Order to vehicles table
+     */
+    private function syncLocationToVehicles($woVehicle, $masterLocationId)
+    {
+        try {
+            // Get the master office location
+            $masterLocation = \App\Models\Masters\MasterOfficeLocation::find($masterLocationId);
+            if (!$masterLocation) {
+                \Log::warning('Master office location not found for ID: ' . $masterLocationId);
+                return;
+            }
+
+            // Find corresponding warehouse by name
+            $warehouse = \App\Models\Warehouse::where('name', $masterLocation->name)->first();
+            if (!$warehouse) {
+                \Log::warning('Warehouse not found for master location: ' . $masterLocation->name);
+                return;
+            }
+
+            // Update the vehicle's latest_location
+            $vehicle = $woVehicle->vehicle;
+            if ($vehicle) {
+                $oldLocation = $vehicle->latest_location;
+                $vehicle->update(['latest_location' => $warehouse->id]);
+                
+                \Log::info('Synced location from Work Order to vehicles table', [
+                    'vehicle_id' => $vehicle->id,
+                    'vin' => $vehicle->vin,
+                    'wo_vehicle_id' => $woVehicle->id,
+                    'old_location' => $oldLocation,
+                    'new_location' => $warehouse->id,
+                    'warehouse_name' => $warehouse->name,
+                    'master_location_name' => $masterLocation->name,
+                    'updated_by' => auth()->user()->email ?? 'system'
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            \Log::error('Error syncing location from Work Order to vehicles', [
+                'wo_vehicle_id' => $woVehicle->id,
+                'master_location_id' => $masterLocationId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
     }
 }

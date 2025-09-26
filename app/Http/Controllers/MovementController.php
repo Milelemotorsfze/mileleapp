@@ -421,7 +421,17 @@ class MovementController extends Controller
                 $gdn = new Gdn();
                 $gdn->date = $date;
                 $gdn->save();
-                Vehicles::whereIn('vin', $gdnVins)->update(['gdn_id' => $gdn->id]);
+                
+                // Get Customer warehouse ID for location update
+                $customerWarehouse = \App\Models\Warehouse::where('name', 'Customer')->first();
+                $customerWarehouseId = $customerWarehouse ? $customerWarehouse->id : null;
+                
+                // Update vehicles with GDN ID and set location to Customer
+                $updateData = ['gdn_id' => $gdn->id];
+                if ($customerWarehouseId) {
+                    $updateData['latest_location'] = $customerWarehouseId;
+                }
+                Vehicles::whereIn('vin', $gdnVins)->update($updateData);
                 $vehicleIds = Vehicles::whereIn('vin', $gdnVins)->pluck('id')->toArray();
                 foreach($vehicleIds as $vehicleId) {
                     $vehicleslog = new Vehicleslog();
