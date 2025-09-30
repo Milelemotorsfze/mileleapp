@@ -10,6 +10,8 @@ use App\Models\MasterModelLines;
 use App\Models\Inspection;
 use App\Models\ColorCode;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PDICompletionNotification;
 
 class VehiclePicturesController extends Controller
 {
@@ -65,6 +67,9 @@ class VehiclePicturesController extends Controller
                         $currentDate = now();
                         $vehicle->pdi_date = $currentDate;
                         $vehicle->save();
+                        
+                        // Send PDI completion notification to sales person
+                        $this->sendPDICompletionNotification($vehicle, $currentDate);
                     }
                     
                 }
@@ -240,4 +245,44 @@ public function saving(Request $request)
         return response()->json(['error' => 'Failed to save links'], 500);
     }
 }
+
+    /**
+     * Send PDI completion notification to sales person
+     */
+    private function sendPDICompletionNotification($vehicle, $pdiDate)
+    {
+        try {
+            // Load vehicle with relationships for complete data
+            $vehicle->load(['so.salesperson', 'variant.brand', 'exterior', 'interior', 'warehouse', 'so']);
+            
+            // Get sales person from SO
+            $salesPerson = $vehicle->so && $vehicle->so->salesperson ? $vehicle->so->salesperson : null;
+            
+            if ($salesPerson && $salesPerson->email) {
+                Mail::to($salesPerson->email)->send(new PDICompletionNotification($vehicle, $salesPerson, $pdiDate));
+                
+                // Log successful notification
+                \Log::info('PDI completion notification sent successfully', [
+                    'vehicle_id' => $vehicle->id,
+                    'vin' => $vehicle->vin,
+                    'sales_person_email' => $salesPerson->email,
+                    'pdi_date' => $pdiDate
+                ]);
+            } else {
+                \Log::warning('PDI completion notification skipped - no sales person email found', [
+                    'vehicle_id' => $vehicle->id,
+                    'vin' => $vehicle->vin,
+                    'so_id' => $vehicle->so_id
+                ]);
+            }
+        } catch (\Exception $e) {
+            // Log error but don't break the main flow
+            \Log::error('Failed to send PDI completion notification', [
+                'vehicle_id' => $vehicle->id,
+                'vin' => $vehicle->vin,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+    }
 }

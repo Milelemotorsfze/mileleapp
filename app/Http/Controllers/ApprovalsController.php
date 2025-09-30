@@ -8,6 +8,7 @@ use App\Events\DataUpdatedEvent;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\PDICompletionNotification;
 use App\Models\Vehicles;
 use Illuminate\Support\Facades\Validator;
 use App\Models\VehicleExtraItems;
@@ -688,6 +689,9 @@ class ApprovalsController extends Controller
             {
                 $vehicles->pdi_remarks = $comments;
                 $vehicles->pdi_date = $currentDate;
+                
+                // Send PDI completion notification to sales person
+                $this->sendPDICompletionNotification($vehicles, $currentDate);
             }
             else
             {
@@ -1363,6 +1367,10 @@ class ApprovalsController extends Controller
             $vehicles->pdi_date     = $currentDate;
             $vehicles->pdi_remarks  = $remarks;
             $vehicles->save();
+            
+            // Send PDI completion notification to sales person
+            $this->sendPDICompletionNotification($vehicles, $currentDate);
+            
             event(new DataUpdatedEvent(['id' => $inspection->vehicle_id, 'message' => "Data Update"]));
         return response()->json(['message' => 'Data saved successfully']);
     }
@@ -1893,5 +1901,45 @@ public function submitGdn(Request $request)
             'success' => true,
             'message' => 'Netsuite GRN added successfully',
         ]);
+    }
+
+    /**
+     * Send PDI completion notification to sales person
+     */
+    private function sendPDICompletionNotification($vehicle, $pdiDate)
+    {
+        try {
+            // Load vehicle with relationships for complete data
+            $vehicle->load(['so.salesperson', 'variant.brand', 'exterior', 'interior', 'warehouse', 'so']);
+            
+            // Get sales person from SO
+            $salesPerson = $vehicle->so && $vehicle->so->salesperson ? $vehicle->so->salesperson : null;
+            
+            if ($salesPerson && $salesPerson->email) {
+                Mail::to($salesPerson->email)->send(new PDICompletionNotification($vehicle, $salesPerson, $pdiDate));
+                
+                // Log successful notification
+                \Log::info('PDI completion notification sent successfully', [
+                    'vehicle_id' => $vehicle->id,
+                    'vin' => $vehicle->vin,
+                    'sales_person_email' => $salesPerson->email,
+                    'pdi_date' => $pdiDate
+                ]);
+            } else {
+                \Log::warning('PDI completion notification skipped - no sales person email found', [
+                    'vehicle_id' => $vehicle->id,
+                    'vin' => $vehicle->vin,
+                    'so_id' => $vehicle->so_id
+                ]);
+            }
+        } catch (\Exception $e) {
+            // Log error but don't break the main flow
+            \Log::error('Failed to send PDI completion notification', [
+                'vehicle_id' => $vehicle->id,
+                'vin' => $vehicle->vin,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
     }
 }
