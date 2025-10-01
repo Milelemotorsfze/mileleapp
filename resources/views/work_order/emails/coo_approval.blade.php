@@ -10,7 +10,11 @@
 </head>
 <body>
     <p>Dear Team,</p>
-    <p>The following work order has been processed:</p>
+    @if($status == 'approved')
+        <p>COO has approved the work order {{ $workOrder->wo_number }}. Please do the Finance approval.</p>
+    @else
+        <p>The following work order has been processed:</p>
+    @endif
     <p>
         <strong>Work Order Number:</strong> {{ $workOrder->wo_number }}<br>
         <strong>Customer Name:</strong> {{ $workOrder->customer_name ?? 'Unknown Customer' }}<br>
@@ -33,7 +37,11 @@
     </p>
     <p>
         <a href="{{ $accessLink }}">Click here to view the work order</a><br>
-        <a href="{{ $approvalHistoryLink }}">Click here to view the coo office approval history</a>
+        @if($status == 'approved')
+            <a href="{{ $approvalHistoryLink }}">Click here to view the Finance approval history</a>
+        @else
+            <a href="{{ $approvalHistoryLink }}">Click here to view the coo office approval history</a>
+        @endif
     </p>
     <p>Best Regards,<br>Milele Matrix</p>
 </body>

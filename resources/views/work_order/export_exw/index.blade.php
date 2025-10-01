@@ -209,15 +209,15 @@
 							'options' => $salesSupportDataConfirmations,
 							'selected' => $filters['sales_support_filter'] ?? []
 						],
-						'finance-approval-filter' => [
-							'label' => 'Fin. Approval',
-							'options' => $financeApprovalStatuses,
-							'selected' => $filters['finance_approval_filter'] ?? []
-						],
 						'coo-approval-filter' => [
 							'label' => 'COO Approval',
 							'options' => $cooApprovalStatuses,
 							'selected' => $filters['coo_approval_filter'] ?? []
+						],
+						'finance-approval-filter' => [
+							'label' => 'Fin. Approval',
+							'options' => $financeApprovalStatuses,
+							'selected' => $filters['finance_approval_filter'] ?? []
 						],
 						'docs-status-filter' => [
 							'label' => 'Documentation',
@@ -357,8 +357,8 @@
 							<th rowspan="2" class="light">Vehilce Count</th>
 						</tr>
 						<tr>
-							<td class="dark">Finance</td>
 							<td class="dark">COO Office</td>
+							<td class="dark">Finance</td>
 							@if(isset($type) && $type != 'status_report')
 								<td class="dark">Name</td>
 								<td class="dark">Email</td>
@@ -493,16 +493,16 @@
 									</label>
 								</td>
 								<td>
-									@if($data->can_show_fin_approval === 'yes')
-										<label class="badge {{ $data->financeApprovalBadgeClass() }}">
-											<strong>{{ strtoupper($data->finance_approval_status) }}</strong>
+									@if($data->can_show_coo_approval === 'yes')
+										<label class="badge {{ $data->cooApprovalBadgeClass() }}">
+											<strong>{{ strtoupper($data->coo_approval_status) }}</strong>
 										</label>
 									@endif
 								</td>
 								<td>
-									@if($data->can_show_coo_approval === 'yes')
-										<label class="badge {{ $data->cooApprovalBadgeClass() }}">
-											<strong>{{ strtoupper($data->coo_approval_status) }}</strong>
+									@if($data->can_show_fin_approval === 'yes')
+										<label class="badge {{ $data->financeApprovalBadgeClass() }}">
+											<strong>{{ strtoupper($data->finance_approval_status) }}</strong>
 										</label>
 									@endif
 								</td>

@@ -55,14 +55,14 @@
     </div>
 @endif
 @if(isset($workOrder))
-@if($workOrder->finance_approval_status != '')
+@if($workOrder->coo_approval_status != '')
 	@php
-	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-finance-approval-history']);
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-coo-approval-history']);
 	@endphp
 	@if ($hasPermission)
-		<a class="me-2 btn btn-sm btn-info" 
-			href="{{route('fetchFinanceApprovalHistory',$workOrder->id)}}">
-			<i class="fas fa-eye"></i> Fin. Approval Log
+		<a class="me-2 btn btn-sm btn-info"
+			href="{{route('fetchCooApprovalHistory',$workOrder->id)}}">
+			<i class="fas fa-eye"></i> COO Approval Log
 		</a>
 	@endif
 @endif
@@ -125,14 +125,14 @@
     </div>
 </div>
 @if(isset($workOrder))
-@if($workOrder->coo_approval_status != '')
+@if($workOrder->finance_approval_status != '')
 	@php
-	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-coo-approval-history']);
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-finance-approval-history']);
 	@endphp
 	@if ($hasPermission)
-		<a class="me-2 btn btn-sm btn-info"
-			href="{{route('fetchCooApprovalHistory',$workOrder->id)}}">
-			<i class="fas fa-eye"></i> COO Approval Log
+		<a class="me-2 btn btn-sm btn-info" 
+			href="{{route('fetchFinanceApprovalHistory',$workOrder->id)}}">
+			<i class="fas fa-eye"></i> Fin. Approval Log
 		</a>
 	@endif
 @endif

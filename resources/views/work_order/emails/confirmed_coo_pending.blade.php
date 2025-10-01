@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Finance Approved the work order</title>
+    <title>Sales support confirmed the work order</title>
 </head>
 <body>
     <p>Dear,</p>
-    <p>Finance Approved the work order {{ $workOrder->wo_number }}. Please do the COO Officce approval.</p>
+    <p>Sales support confirmed the work order {{ $workOrder->wo_number }}. Please do the COO Office approval.</p>
 
     <p>
         <strong>Work Order Number:</strong> {{ $workOrder->wo_number }}<br>

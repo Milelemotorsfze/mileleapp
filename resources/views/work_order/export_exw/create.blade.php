@@ -204,15 +204,15 @@
 						SALES SUPPORT: <strong>{{ strtoupper($workOrder->sales_support_data_confirmation ?? '') }}</strong>
 					</label>
 					
-					@if($workOrder->can_show_fin_approval === 'yes')
-						<label class="badge {{ $workOrder->getFormBadgeClass($workOrder->finance_approval_status, 'approval') }}">
-							FINANCE: <strong>{{ strtoupper($workOrder->finance_approval_status ?? '') }}</strong>
-						</label>
-					@endif
-
 					@if($workOrder->can_show_coo_approval === 'yes')
 						<label class="badge {{ $workOrder->getFormBadgeClass($workOrder->coo_approval_status, 'approval') }}">
 							COO OFFICE: <strong>{{ strtoupper($workOrder->coo_approval_status ?? '') }}</strong>
+						</label>
+					@endif
+
+					@if($workOrder->can_show_fin_approval === 'yes')
+						<label class="badge {{ $workOrder->getFormBadgeClass($workOrder->finance_approval_status, 'approval') }}">
+							FINANCE: <strong>{{ strtoupper($workOrder->finance_approval_status ?? '') }}</strong>
 						</label>
 					@endif
 					

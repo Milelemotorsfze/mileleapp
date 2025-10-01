@@ -200,7 +200,10 @@ class WorkOrder extends Model
                             ->orderBy('id', 'ASC')
                             ->first();
 
-        if (isset($current) && isset($first) && $current->id == $first->id && $this->sales_support_data_confirmation_at == '' && $current->status == 'pending') {
+        // Finance approval can only be shown if COO approval is approved
+        if (isset($current) && isset($first) && $current->id == $first->id 
+            && ($this->sales_support_data_confirmation_at == '' || $this->coo_approval_status != 'Approved')
+            && $current->status == 'pending') {
             $canShowFinApproval = 'no';
         }
 
@@ -237,8 +240,9 @@ class WorkOrder extends Model
                             ->orderBy('id', 'ASC')
                             ->first();
 
+        // COO approval can only be shown if sales support data is confirmed
         if (isset($current) && isset($first) && $current->id == $first->id 
-            && ($this->sales_support_data_confirmation_at == '' || $this->finance_approval_status != 'Approved')
+            && $this->sales_support_data_confirmation_at == '' 
             && $current->status == 'pending') {
             $canShowCOOApproval = 'no';
         }
@@ -250,8 +254,8 @@ class WorkOrder extends Model
         $status = 'Blank';  // Default status if conditions are not met
 
         if ($this->sales_support_data_confirmation_at && 
-            $this->finance_approval_status === 'Approved' && 
-            $this->coo_approval_status === 'Approved') {
+            $this->coo_approval_status === 'Approved' && 
+            $this->finance_approval_status === 'Approved') {
             $status = 'Not Initiated';
         }
 
