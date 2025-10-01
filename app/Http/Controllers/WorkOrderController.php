@@ -3261,11 +3261,22 @@ class WorkOrderController extends Controller
 
                     // If COO approval is approved, trigger finance approval notification
                     if (isset($woApprovals) && $woApprovals->status == 'approved') {
+                        // Create finance approval record if it doesn't exist
                         $financePending = WOApprovals::where('work_order_id', $workOrder->id)
                             ->where('type', 'finance')
                             ->where('status', 'pending')
                             ->orderBy('id', 'ASC')
                             ->first();
+                        
+                        if (!$financePending) {
+                            $financePending = WOApprovals::create([
+                                'work_order_id' => $workOrder->id,
+                                'type' => 'finance',
+                                'status' => 'pending',
+                                'action_at' => NULL,
+                            ]);
+                        }
+                        
                         if ($financePending) {
                             // Prepare the from details
                             $template['from'] = 'no-reply@milele.com';
@@ -3422,12 +3433,36 @@ class WorkOrderController extends Controller
                         'type' => 'Set',
                         'changed_at' => Carbon::now()
                     ]);
-                    $financePending = WOApprovals::where('work_order_id', $wo->id)
-                        ->where('type', 'finance')
-                        ->where('status', 'pending')
-                        ->orderBy('id', 'ASC')
+                    // Create COO approval record if it doesn't exist
+                    $existingCooApproval = WOApprovals::where('work_order_id', $wo->id)
+                        ->where('type', 'coo')
                         ->first();
-                    if ($financePending) {
+                    
+                    if (!$existingCooApproval) {
+                        $cooPending = WOApprovals::create([
+                            'work_order_id' => $wo->id,
+                            'type' => 'coo',
+                            'status' => 'pending',
+                            'action_at' => NULL,
+                        ]);
+                        \Log::info('COO approval record created for work order: ' . $wo->wo_number . ' (ID: ' . $wo->id . ')');
+                    } else {
+                        // If COO approval exists but is not pending, create a new one
+                        if ($existingCooApproval->status != 'pending') {
+                            $cooPending = WOApprovals::create([
+                                'work_order_id' => $wo->id,
+                                'type' => 'coo',
+                                'status' => 'pending',
+                                'action_at' => NULL,
+                            ]);
+                            \Log::info('New COO approval record created for work order: ' . $wo->wo_number . ' (ID: ' . $wo->id . ') - Previous status: ' . $existingCooApproval->status);
+                        } else {
+                            $cooPending = $existingCooApproval;
+                            \Log::info('Existing COO approval record found for work order: ' . $wo->wo_number . ' (ID: ' . $wo->id . ') - Status: ' . $existingCooApproval->status);
+                        }
+                    }
+                    
+                    if ($cooPending) {
                         // Prepare the from details
                         $template['from'] = 'no-reply@milele.com';
                         $template['from_name'] = 'Milele Matrix';
@@ -3440,10 +3475,10 @@ class WorkOrderController extends Controller
 
                         // Define a quick access link (adjust the route as needed)
                         $accessLink = env('BASE_URL') . '/work-order/' . $wo->id;
-                        $approvalHistoryLink = env('BASE_URL') . '/finance-approval-history/' . $wo->id;
+                        $approvalHistoryLink = env('BASE_URL') . '/coo-approval-history/' . $wo->id;
 
                         $rolesWithPermission = Role::whereHas('permissions', function ($query) {
-                            $query->where('name', 'do-finance-approval');
+                            $query->where('name', 'do-coo-office-approval');
                         })->pluck('id')->toArray();
                         $recipients = \App\Models\User::role($rolesWithPermission)->whereIn('status', ['new', 'active'])->where('password', '!=', '')->whereHas('roles')
                             ->pluck('email')->filter(function ($email) {
@@ -3459,7 +3494,7 @@ class WorkOrderController extends Controller
                             return;
                         }
                         // Send email using a Blade template
-                        Mail::send('work_order.emails.confirmed_fin_pending', [
+                        Mail::send('work_order.emails.confirmed_coo_pending', [
                             'workOrder' => $wo,
                             'accessLink' => $accessLink,
                             'approvalHistoryLink' => $approvalHistoryLink,
