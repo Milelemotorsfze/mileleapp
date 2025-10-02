@@ -401,23 +401,6 @@ class MovementController extends Controller
                                 }
             }
             if (!empty($gdnVins)) {
-                // Check if any vehicles are in PDI status before creating GDN
-                $vehiclesInPdi = Vehicles::whereIn('vin', $gdnVins)
-                    ->where(function($query) {
-                        $query->whereNotNull('pdi_date') // PDI completed but not yet delivered
-                              ->orWhereHas('woVehicle', function($woQuery) {
-                                  $woQuery->whereHas('pdiStatus', function($pdiQuery) {
-                                      $pdiQuery->whereIn('status', ['Scheduled', 'Completed']);
-                                  });
-                              });
-                    })
-                    ->get();
-
-                if ($vehiclesInPdi->count() > 0) {
-                    $vinList = $vehiclesInPdi->pluck('vin')->implode(', ');
-                    return redirect()->back()->with('error', "Cannot create GDN for vehicles in PDI status. Vehicles: {$vinList}");
-                }
-
                 $gdn = new Gdn();
                 $gdn->date = $date;
                 $gdn->save();

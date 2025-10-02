@@ -1751,12 +1751,6 @@ public function addingnetsuitegdn(Request $request)
                 ->whereNotNull('vehicles.so_id')
                 ->whereNotNull('vehicles.gdn_id')
                 ->whereNull('gdn.gdn_number')
-                ->whereNull('vehicles.pdi_date') // Exclude vehicles with PDI completed
-                ->whereDoesntHave('woVehicle', function($woQuery) {
-                    $woQuery->whereHas('pdiStatus', function($pdiQuery) {
-                        $pdiQuery->whereIn('status', ['Scheduled', 'Completed']);
-                    });
-                })
                 ->groupBy('vehicles.id');
         } else {
             $data = Vehicles::select([
@@ -1817,18 +1811,6 @@ public function submitGdn(Request $request)
                 'message' => 'Vehicle not found',
             ], 404);
         }
-
-        // Check if vehicle is in PDI status
-        $isInPdi = $vehicle->pdi_date !== null || 
-                   $vehicle->woVehicleWithPdiStatus()->exists();
-        
-        if ($isInPdi) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cannot assign GDN to vehicle in PDI status. Please complete PDI first.',
-            ], 422);
-        }
-
         // Retrieve the GRN record by grn_id in the vehicle record
         $gdnRecord = Gdn::find($vehicle->gdn_id);
         if (!$gdnRecord) {
@@ -1868,18 +1850,6 @@ public function submitGdn(Request $request)
                 'message' => 'Vehicle not found',
             ], 404);
         }
-
-        // Check if vehicle is in PDI status
-        $isInPdi = $vehicle->pdi_date !== null || 
-                   $vehicle->woVehicleWithPdiStatus()->exists();
-        
-        if ($isInPdi) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cannot assign GDN to vehicle in PDI status. Please complete PDI first.',
-            ], 422);
-        }
-
         $oldgdn = Gdn::where('id', $vehicle->gdn_id)->first();
         // Create new GRN record
         $gdnRecord = new Gdn();

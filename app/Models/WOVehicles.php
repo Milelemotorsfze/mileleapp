@@ -155,11 +155,6 @@ class WOVehicles extends Model
         return $this->hasOne(WOVehiclePDIStatus::class, 'w_o_vehicle_id') // Explicitly define the foreign key here
             ->latestOfMany('created_at');  // Sort by the date field
     }
-    
-    public function pdiStatus()
-    {
-        return $this->hasMany(WOVehiclePDIStatus::class, 'w_o_vehicle_id');
-    }
     public function latestDeliveryStatus()
     {
         return $this->hasOne(WOVehicleDeliveryStatus::class, 'w_o_vehicle_id') // Explicitly define the foreign key here
