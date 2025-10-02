@@ -53,10 +53,6 @@
      GDN Info
      <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </h4>
-    <div class="alert alert-info" role="alert">
-        <i class="fa fa-info-circle"></i>
-        <strong>Note:</strong> Only vehicles with completed PDI are shown here. To add GDN, please confirm or complete the PDI first.
-    </div>
     <br>
     <ul class="nav nav-pills nav-fill">
       <li class="nav-item">
@@ -242,16 +238,11 @@
                 },
                 success: function(response) {
                     $('#netsuiteModal').modal('hide');
-                    alertify.success('GDN assigned successfully');
+                    alertify.success('GDN successfully');
                     table1.ajax.reload();
                 },
                 error: function(xhr) {
-                    if (xhr.status === 422) {
-                        var response = JSON.parse(xhr.responseText);
-                        alertify.error(response.message || 'Validation error occurred');
-                    } else {
-                        alertify.error('An error occurred. Please try again.');
-                    }
+                    alert('An error occurred. Please try again.');
                 }
             });
         });
@@ -273,16 +264,11 @@
                 },
                 success: function(response) {
                     $('#modalupdateModal').modal('hide');
-                    alertify.success('GDN updated successfully');
+                    alertify.success('GDN successfully');
                     table2.ajax.reload();
                 },
                 error: function(xhr) {
-                    if (xhr.status === 422) {
-                        var response = JSON.parse(xhr.responseText);
-                        alertify.error(response.message || 'Validation error occurred');
-                    } else {
-                        alertify.error('An error occurred. Please try again.');
-                    }
+                    alert('An error occurred. Please try again.');
                 }
             });
         });
