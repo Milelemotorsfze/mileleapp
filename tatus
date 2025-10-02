@@ -1,0 +1,80 @@
+[33mcommit 23aeccb5a17fead474e553746fe2125b069e81e4[m
+Author: Basharat Ali <basharat.ali@milele.com>
+Date:   Thu Sep 25 12:42:49 2025 +0500
+
+    GDN & PDI validation
+
+[1mdiff --git a/app/Http/Controllers/ApprovalsController.php b/app/Http/Controllers/ApprovalsController.php[m
+[1mindex 05bde4d9..6044e6bf 100644[m
+[1m--- a/app/Http/Controllers/ApprovalsController.php[m
+[1m+++ b/app/Http/Controllers/ApprovalsController.php[m
+[36m@@ -1743,6 +1743,12 @@[m [mpublic function addingnetsuitegdn(Request $request)[m
+                 ->whereNotNull('vehicles.so_id')[m
+                 ->whereNotNull('vehicles.gdn_id')[m
+                 ->whereNull('gdn.gdn_number')[m
+[32m+[m[32m                ->whereNull('vehicles.pdi_date') // Exclude vehicles with PDI completed[m
+[32m+[m[32m                ->whereDoesntHave('woVehicle', function($woQuery) {[m
+[32m+[m[32m                    $woQuery->whereHas('pdiStatus', function($pdiQuery) {[m
+[32m+[m[32m                        $pdiQuery->whereIn('status', ['Scheduled', 'Completed']);[m
+[32m+[m[32m                    });[m
+[32m+[m[32m                })[m
+                 ->groupBy('vehicles.id');[m
+         } else {[m
+             $data = Vehicles::select([[m
+[36m@@ -1803,6 +1809,18 @@[m [mpublic function submitGdn(Request $request)[m
+                 'message' => 'Vehicle not found',[m
+             ], 404);[m
+         }[m
+[32m+[m
+[32m+[m[32m        // Check if vehicle is in PDI status[m
+[32m+[m[32m        $isInPdi = $vehicle->pdi_date !== null ||[m[41m [m
+[32m+[m[32m                   $vehicle->woVehicleWithPdiStatus()->exists();[m
+[32m+[m[41m        [m
+[32m+[m[32m        if ($isInPdi) {[m
+[32m+[m[32m            return response()->json([[m
+[32m+[m[32m                'success' => false,[m
+[32m+[m[32m                'message' => 'Cannot assign GDN to vehicle in PDI status. Please complete PDI first.',[m
+[32m+[m[32m            ], 422);[m
+[32m+[m[32m        }[m
+[32m+[m
+         // Retrieve the GRN record by grn_id in the vehicle record[m
+         $gdnRecord = Gdn::find($vehicle->gdn_id);[m
+         if (!$gdnRecord) {[m
+[36m@@ -1842,6 +1860,18 @@[m [mpublic function addGdn(Request $request)[m
+                 'message' => 'Vehicle not found',[m
+             ], 404);[m
+         }[m
+[32m+[m
+[32m+[m[32m        // Check if vehicle is in PDI status[m
+[32m+[m[32m        $isInPdi = $vehicle->pdi_date !== null ||[m[41m [m
+[32m+[m[32m                   $vehicle->woVehicleWithPdiStatus()->exists();[m
+[32m+[m[41m        [m
+[32m+[m[32m        if ($isInPdi) {[m
+[32m+[m[32m            return response()->json([[m
+[32m+[m[32m                'success' => false,[m
+[32m+[m[32m                'message' => 'Cannot assign GDN to vehicle in PDI status. Please complete PDI first.',[m
+[32m+[m[32m            ], 422);[m
+[32m+[m[32m        }[m
+[32m+[m
+         $oldgdn = Gdn::where('id', $vehicle->gdn_id)->first();[m
+         // Create new GRN record[m
+         $gdnRecord = new Gdn();[m
+[1mdiff --git a/app/Http/Controllers/MovementController.php b/app/Http/Controllers/MovementController.php[m
+[1mindex f5475daf..c8d77434 100644[m
+[1m--- a/app/Http/Controllers/MovementController.php[m
+[1m+++ b/app/Http/Controllers/MovementController.php[m
+[36m@@ -401,6 +401,23 @@[m [mpublic function store(Request $request)[m
+                                 }[m
+             }[m
+             if (!empty($gdnVins)) {[m
+[32m+[m[32m                // Check if any vehicles are in PDI status before creating GDN[m
+[32m+[m[32m                $vehiclesInPdi = Vehicles::whereIn('vin', $gdnVins)[m
+[32m+[m[32m                    ->where(function($query) {[m
+[32m+[m[32m                        $query->whereNotNull('pdi_date') // PDI completed but not yet delivered[m
+[32m+[m[32m                              ->orWhereHas('woVehicle', function($woQuery) {[m
+[32m+[m[32m                                  $woQuery->whereHas('pdiStatus', function($pdiQuery) {[m
+[32m+[m[32m [33m9cbcef08[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Revert "GDN & PDI validation"
+[33mae987bdb[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32minspection[m[33m)[m Merge pull request #1175 from Milelemotorsfze/work-order
+[33mf89693a2[m[33m ([m[1;31morigin/work-order[m[33m, [m[1;32mwork-order[m[33m)[m swaped the COO & finance approval of WO
+[33mce574656[m Merge pull request #1174 from Milelemotorsfze/inspection
+[33m5670d94b[m[33m ([m[1;31morigin/inspection[m[33m)[m email notification on PDI completion to sales person
