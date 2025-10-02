@@ -16,6 +16,22 @@ use App\Models\Masters\MasterOfficeLocation;
 
 class WoVehicleController extends Controller
 {
+    /**
+     * Filter out fahad@milele.com from email recipient lists
+     * This ensures fahad@milele.com never receives work order emails
+     */
+    private function filterExcludedEmails($emails)
+    {
+        $excludedEmails = ['fahad@milele.com'];
+        
+        if (is_array($emails)) {
+            return array_filter($emails, function($email) use ($excludedEmails) {
+                return !in_array(strtolower(trim($email)), array_map('strtolower', $excludedEmails));
+            });
+        }
+        
+        return $emails;
+    }
     public function updateVehModiStatus(Request $request)
     {
         // Validate the incoming request data
@@ -69,6 +85,9 @@ class WoVehicleController extends Controller
             $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function($email) {
                 return filter_var($email, FILTER_VALIDATE_EMAIL);
             })->toArray();
+            
+            // Filter out excluded emails (fahad@milele.com)
+            $managementEmails = $this->filterExcludedEmails($managementEmails);
             // Retrieve and validate email addresses for other recipients
             $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL);
             $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
@@ -92,6 +111,9 @@ class WoVehicleController extends Controller
             }
             // Initialize recipient list with management emails from the database
             $recipients = array_filter(array_merge($managementEmails, [$operationsEmail]));
+            
+            // Filter out excluded emails (fahad@milele.com)
+            $recipients = $this->filterExcludedEmails($recipients);
             // Add createdByEmail if valid
             if ($createdByEmail) {
                 $recipients[] = $createdByEmail;

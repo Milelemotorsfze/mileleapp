@@ -13,6 +13,22 @@ use App\Models\WorkOrder;
 
 class WoStatusController extends Controller
 {
+    /**
+     * Filter out fahad@milele.com from email recipient lists
+     * This ensures fahad@milele.com never receives work order emails
+     */
+    private function filterExcludedEmails($emails)
+    {
+        $excludedEmails = ['fahad@milele.com'];
+        
+        if (is_array($emails)) {
+            return array_filter($emails, function($email) use ($excludedEmails) {
+                return !in_array(strtolower(trim($email)), array_map('strtolower', $excludedEmails));
+            });
+        }
+        
+        return $emails;
+    }
     public function updateStatus(Request $request)
     {
         // Validate the incoming request data
@@ -57,6 +73,9 @@ class WoStatusController extends Controller
         $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function($email) {
             return filter_var($email, FILTER_VALIDATE_EMAIL);
         })->toArray();
+        
+        // Filter out excluded emails (fahad@milele.com)
+        $managementEmails = $this->filterExcludedEmails($managementEmails);
         // Log and handle if no management emails are found
         if (empty($managementEmails)) {
             \Log::info('No valid email addresses found for users with permission to receive WO emails. Skipping email for WO-' . $workOrder->wo_number);
@@ -71,6 +90,9 @@ class WoStatusController extends Controller
         }
         // Combine all valid recipient emails
         $recipients = array_filter(array_merge($managementEmails, [$operationsEmail]));
+        
+        // Filter out excluded emails (fahad@milele.com)
+        $recipients = $this->filterExcludedEmails($recipients);
         // If no valid recipients, skip sending the email
         if (empty($recipients)) {
             \Log::info('No valid recipients found. Skipping email sending for WO-' . $workOrder->wo_number);

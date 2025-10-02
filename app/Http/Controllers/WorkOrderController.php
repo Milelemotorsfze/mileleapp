@@ -48,6 +48,22 @@ use Rap2hpoutre\FastExcel\FastExcel;
 
 class WorkOrderController extends Controller
 {
+    /**
+     * Filter out fahad@milele.com from email recipient lists
+     * This ensures fahad@milele.com never receives work order emails
+     */
+    private function filterExcludedEmails($emails)
+    {
+        $excludedEmails = ['fahad@milele.com'];
+        
+        if (is_array($emails)) {
+            return array_filter($emails, function($email) use ($excludedEmails) {
+                return !in_array(strtolower(trim($email)), array_map('strtolower', $excludedEmails));
+            });
+        }
+        
+        return $emails;
+    }
     public function workOrderCreate($type)
     {
         $authId = Auth::id();
@@ -1222,6 +1238,9 @@ class WorkOrderController extends Controller
             $managementEmails = \App\Models\User::where('can_send_wo_email', 'yes')->pluck('email')->filter(function ($email) {
                 return filter_var($email, FILTER_VALIDATE_EMAIL);
             })->toArray();
+            
+            // Filter out excluded emails (fahad@milele.com)
+            $managementEmails = $this->filterExcludedEmails($managementEmails);
 
             // Log email addresses to help with debugging
             \Log::info('Email Recipients:', [
@@ -1231,6 +1250,9 @@ class WorkOrderController extends Controller
             ]);
             // Combine all recipient emails into a single array
             $recipients = array_filter(array_merge([$financeEmail, $operationsEmail], $managementEmails));
+            
+            // Filter out excluded emails (fahad@milele.com)
+            $recipients = $this->filterExcludedEmails($recipients);
             // Log and handle invalid email addresses (but do not throw an exception, just log)
             if (empty($recipients)) {
                 \Log::info('No valid recipients found. Skipping email sending for Work Order: ' . $workOrder->wo_number);
@@ -1292,6 +1314,9 @@ class WorkOrderController extends Controller
         $managementEmails = \App\Models\User::where('can_send_wo_email', 'yes')->pluck('email')->filter(function ($email) {
             return filter_var($email, FILTER_VALIDATE_EMAIL);
         })->toArray();
+        
+        // Filter out excluded emails (fahad@milele.com)
+        $managementEmails = $this->filterExcludedEmails($managementEmails);
         // Retrieve the CreatedBy user's email and validate it
         $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
         // Log email addresses to help with debugging
@@ -1303,6 +1328,9 @@ class WorkOrderController extends Controller
         ]);
         // Combine all recipient emails into a single array
         $recipients = array_filter(array_merge([$financeEmail, $operationsEmail, $createdByEmail], $managementEmails));
+        
+        // Filter out excluded emails (fahad@milele.com)
+        $recipients = $this->filterExcludedEmails($recipients);
         // If no valid recipients, log the issue and skip sending the email
         if (empty($recipients)) {
             \Log::info('No valid recipients found. Skipping email sending for WO-' . $workOrder->order_number);
@@ -1403,6 +1431,9 @@ class WorkOrderController extends Controller
         $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function ($email) {
             return filter_var($email, FILTER_VALIDATE_EMAIL);
         })->toArray();
+        
+        // Filter out excluded emails (fahad@milele.com)
+        $managementEmails = $this->filterExcludedEmails($managementEmails);
         // Log and skip sending if there are no valid email addresses
         if (empty($managementEmails)) {
             \Log::info('No valid email addresses found for users with permission to receive WO emails. Skipping email for WO-' . $workOrder->order_number);
@@ -3183,6 +3214,9 @@ class WorkOrderController extends Controller
         $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function ($email) {
             return filter_var($email, FILTER_VALIDATE_EMAIL);
         })->toArray();
+        
+        // Filter out excluded emails (fahad@milele.com)
+        $managementEmails = $this->filterExcludedEmails($managementEmails);
         // Retrieve and validate email addresses from .env for finance and operations teams
         $financeEmail = filter_var(env('FINANCE_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
         $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
@@ -3199,6 +3233,9 @@ class WorkOrderController extends Controller
         ]);
         // Combine all recipient emails into a single array
         $recipients = array_filter(array_merge([$financeEmail, $operationsEmail, $createdByEmail], $managementEmails));
+        
+        // Filter out excluded emails (fahad@milele.com)
+        $recipients = $this->filterExcludedEmails($recipients);
         // If no valid recipients, log the issue and skip sending the email
         if (empty($recipients)) {
             \Log::info('No valid recipients found. Skipping email sending for WO-' . $workOrder->wo_number);
@@ -3359,6 +3396,9 @@ class WorkOrderController extends Controller
         $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function ($email) {
             return filter_var($email, FILTER_VALIDATE_EMAIL);
         })->toArray();
+        
+        // Filter out excluded emails (fahad@milele.com)
+        $managementEmails = $this->filterExcludedEmails($managementEmails);
         // Retrieve and validate email addresses from .env for finance and operations teams
         $financeEmail = filter_var(env('FINANCE_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
         $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
@@ -3375,6 +3415,9 @@ class WorkOrderController extends Controller
         ]);
         // Combine all recipient emails into a single array
         $recipients = array_filter(array_merge([$financeEmail, $operationsEmail, $createdByEmail], $managementEmails));
+        
+        // Filter out excluded emails (fahad@milele.com)
+        $recipients = $this->filterExcludedEmails($recipients);
         // If no valid recipients, log the issue and skip sending the email
         if (empty($recipients)) {
             \Log::info('No valid recipients found. Skipping email sending for WO-' . $workOrder->wo_number);
@@ -3484,6 +3527,10 @@ class WorkOrderController extends Controller
                             ->pluck('email')->filter(function ($email) {
                                 return filter_var($email, FILTER_VALIDATE_EMAIL);
                             })->toArray();
+                        
+                        // Filter out excluded emails (fahad@milele.com)
+                        $recipients = $this->filterExcludedEmails($recipients);
+                            
                         // Log email addresses to help with debugging
                         \Log::info('Email Recipients:', [
                             'recipients' => implode(', ', $recipients) ?: 'none found',
