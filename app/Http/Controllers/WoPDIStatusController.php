@@ -15,6 +15,22 @@ use Illuminate\Validation\Rule;
 
 class WoPDIStatusController extends Controller
 {
+    /**
+     * Filter out fahad@milele.com from email recipient lists
+     * This ensures fahad@milele.com never receives work order emails
+     */
+    private function filterExcludedEmails($emails)
+    {
+        $excludedEmails = ['fahad@milele.com'];
+        
+        if (is_array($emails)) {
+            return array_filter($emails, function($email) use ($excludedEmails) {
+                return !in_array(strtolower(trim($email)), array_map('strtolower', $excludedEmails));
+            });
+        }
+        
+        return $emails;
+    }
     public function updateVehPdiStatus(Request $request)
     {
         $validatedData = $request->validate([
@@ -79,6 +95,9 @@ class WoPDIStatusController extends Controller
             $managementEmails = \App\Models\User::where('can_send_wo_email', 'yes')->pluck('email')->filter(function($email) {
                 return filter_var($email, FILTER_VALIDATE_EMAIL);
             })->toArray();
+            
+            // Filter out excluded emails (fahad@milele.com)
+            $managementEmails = $this->filterExcludedEmails($managementEmails);
 
             // Log email addresses to help with debugging
             \Log::info('Email Recipients:', [
@@ -98,6 +117,9 @@ class WoPDIStatusController extends Controller
 
             // Initialize recipient list with operations email and management emails from the database
             $recipients = array_filter(array_merge([$operationsEmail, $createdByEmail], $managementEmails));
+            
+            // Filter out excluded emails (fahad@milele.com)
+            $recipients = $this->filterExcludedEmails($recipients);
 
             // Handle salesPersonEmail conditions
             if ($shouldSendToSalesPerson) {
