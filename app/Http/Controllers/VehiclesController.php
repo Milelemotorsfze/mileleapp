@@ -3253,7 +3253,8 @@ class VehiclesController extends Controller
                 'varaints_id' => 'required|integer|exists:varaints,id',
                 'field' => 'required|string|in:price,gp,minimum_commission',
                 'value' => 'required|string',
-                'reason' => 'nullable|string|max:500'
+                'reason' => 'nullable|string|max:500',
+                'notify_departments' => 'nullable'
             ],
             ['value.required' => 'Valid amount value is required']
         );
@@ -3328,11 +3329,29 @@ class VehiclesController extends Controller
             $vehicleslog->save();
         }
 
-        // Send email notification to departments
-        try {
-            $this->sendPriceUpdateNotification($vehicles, $field, $oldValue, $value, $request->reason);
-        } catch (\Exception $e) {
-            \Log::error('Failed to send price update notification: ' . $e->getMessage());
+        // Send email notification to departments only if requested
+        $notifyDepartmentsInput = $request->input('notify_departments');
+        $notifyDepartments = false;
+        
+        // Convert various boolean representations to actual boolean
+        if ($notifyDepartmentsInput === true || $notifyDepartmentsInput === 'true' || $notifyDepartmentsInput === '1' || $notifyDepartmentsInput === 1) {
+            $notifyDepartments = true;
+        }
+        
+        \Log::info('Price update notification request', [
+            'notify_departments_input' => $notifyDepartmentsInput,
+            'notify_departments_converted' => $notifyDepartments,
+            'field' => $field,
+            'old_value' => $oldValue,
+            'new_value' => $value
+        ]);
+        
+        if ($notifyDepartments) {
+            try {
+                $this->sendPriceUpdateNotification($vehicles, $field, $oldValue, $value, $request->reason);
+            } catch (\Exception $e) {
+                \Log::error('Failed to send price update notification: ' . $e->getMessage());
+            }
         }
 
         return response()->json(['success' => 'Vehicle updated successfully']);
