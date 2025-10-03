@@ -33,15 +33,18 @@ return [
     ],
 
     'price_update_notifications' => [
-        'marketing' => [
-            env('MARKETING_TEAM_EMAIL', 'team.marketing@milele.com'),
-        ],
-        'sales' => [
-            env('SALES_TEAM_EMAIL', 'team.sales@milele.com'),
-        ],
-        // 'developer' => [
-        //     env('DEVELOPER_EMAIL', 'basharat.ali@milele.com'),
+        // 'marketing' => [
+        //     env('MARKETING_TEAM_EMAIL', 'team.marketing@milele.com'),
         // ],
+        // 'sales' => [
+        //     env('SALES_TEAM_EMAIL', 'team.sales@milele.com'),
+        // ],
+        'demand_planning' => [
+            env('DP_TEAM_EMAIL', 'basharat.ali@milele.com'),
+        ],
+        'developer' => [
+            env('DEVELOPER_EMAIL', 'basharat.ali@milele.com'),
+        ],
     ],
 
     /*

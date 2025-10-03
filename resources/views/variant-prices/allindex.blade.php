@@ -186,7 +186,8 @@
                     name: 'vehicles.price', 
                     render: function (data, type, row) {
                         var displayValue = data === null || data == 0 ? '' : data;
-                        return `<input type="text" class="editable-price" data-varaint-id="${row.varaints_id}" data-int-colour="${row.int_colour}" data-ex-colour="${row.ex_colour}" value="${displayValue}" />`;
+                        var originalValue = data === null || data == 0 ? '0' : data;
+                        return `<input type="text" class="editable-price" data-varaint-id="${row.varaints_id}" data-int-colour="${row.int_colour}" data-ex-colour="${row.ex_colour}" data-original-value="${originalValue}" value="${displayValue}" />`;
                     }
                 },
             ],
@@ -224,60 +225,114 @@
 
         // Store the current field data for the modal
         var currentFieldData = {};
+        var originalPrice = null; // Store original price for comparison
 
-        function saveField(varaints_id, int_colour, ex_colour, fieldName, newValue, reason = '') {
+        function saveField(varaints_id, int_colour, ex_colour, fieldName, newValue, reason = '', notifyDepartments = false) {
             // Remove any commas from price before sending
             if (fieldName === 'price') {
                 newValue = newValue.replace(/,/g, ''); // Remove commas
             }
 
-            console.log('Sending data:', {
+            console.log('saveField called with:', {
                 varaints_id: varaints_id,
                 int_colour: int_colour,
                 ex_colour: ex_colour,
                 field: fieldName,
                 value: newValue,
-                reason: reason
+                reason: reason,
+                notify_departments: notifyDepartments,
+                notify_departments_type: typeof notifyDepartments
             });
-            if(newValue.length > 0) {
-                $.ajax({
-                    url: "{{ route('variantprices.allvariantpriceupdate') }}",
-                    method: "POST",
-                    data: {
-                        _token: "{{ csrf_token() }}",
-                        varaints_id: varaints_id,
-                        int_colour: int_colour,
-                        ex_colour: ex_colour,
-                        field: fieldName,
-                        value: newValue,
-                        reason: reason
-                    },
-                    success: function(response) {
-                        table.ajax.reload(null, false); // Reload the table data
-                        // Show success message
-                        var confirm = alertify.confirm('Price updated successfully and notification sent to departments!',function (e) {
-                        }).set({title:"Success"});
-                    },
-                    error: function(xhr) {
-                        if (xhr.status === 422) {
-                        const errors = xhr.responseJSON.errors;
-                        let errorMessages = '';
-                        for (let field in errors) {
-                            errorMessages += errors[field].join(', ') + '\n';
-                        }
-                        var confirm = alertify.confirm(''+errorMessages+'',function (e) {
-                        }).set({title:"Validation Error"});
-                        table.ajax.reload(null, false);
-                    } else {
-                        var confirm = alertify.confirm('Something went wrong',function (e) {
-                        }).set({title:"Something went wrong"});
-                        table.ajax.reload(null, false);
+            // Always make the AJAX call if we reach this point (price has changed)
+            $.ajax({
+                url: "{{ route('variantprices.allvariantpriceupdate') }}",
+                method: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    varaints_id: varaints_id,
+                    int_colour: int_colour,
+                    ex_colour: ex_colour,
+                    field: fieldName,
+                    value: newValue,
+                    reason: reason,
+                    notify_departments: notifyDepartments
+                },
+                success: function(response) {
+                    console.log('AJAX Success:', response);
+                    console.log('notifyDepartments in success:', notifyDepartments);
+                    table.ajax.reload(null, false); // Reload the table data
+                    // Show success message based on notification preference
+                    var message = notifyDepartments ? 
+                        'Price updated successfully and notification sent to departments!' : 
+                        'Price updated successfully!';
+                    console.log('Showing success message:', message);
+                    var alert = alertify.alert(message, function () {
+                        // Reload after user acknowledges
+                        location.reload();
+                    }).set({title:"Success"});
+                },
+                error: function(xhr) {
+                    console.log('AJAX Error:', xhr);
+                    console.log('Error status:', xhr.status);
+                    console.log('Error response:', xhr.responseText);
+                    if (xhr.status === 422) {
+                    const errors = xhr.responseJSON.errors;
+                    let errorMessages = '';
+                    for (let field in errors) {
+                        errorMessages += errors[field].join(', ') + '\n';
                     }
-                        console.log('Error:', xhr.responseText);
-                    }
-                });
-            } 
+                    var confirm = alertify.confirm(''+errorMessages+'',function (e) {
+                    }).set({title:"Validation Error"});
+                    table.ajax.reload(null, false);
+                } else {
+                    var confirm = alertify.confirm('Something went wrong',function (e) {
+                    }).set({title:"Something went wrong"});
+                    table.ajax.reload(null, false);
+                }
+                }
+            }); 
            
+        }
+
+        // Function to check if price has changed and show appropriate modal
+        function checkPriceChange(varaints_id, int_colour, ex_colour, fieldName, newValue, originalValue) {
+            var numericNewValue = parseFloat(newValue.replace(/,/g, ''));
+            var numericOriginalValue = parseFloat(originalValue.replace(/,/g, '')) || 0;
+            
+            console.log('Price change check:', {
+                newValue: newValue,
+                originalValue: originalValue,
+                numericNewValue: numericNewValue,
+                numericOriginalValue: numericOriginalValue,
+                hasChanged: numericNewValue !== numericOriginalValue
+            });
+            
+            // Check if price has actually changed
+            if (numericNewValue === numericOriginalValue) {
+                // No change, don't do anything - just return
+                console.log('No price change detected, skipping update');
+                return;
+            }
+            
+            // Price has changed, show reason modal
+            currentFieldData = {
+                varaints_id: varaints_id,
+                int_colour: int_colour,
+                ex_colour: ex_colour,
+                field: fieldName,
+                value: newValue,
+                originalValue: originalValue
+            };
+            
+            // Clear previous reason
+            $('#priceChangeReason').val('');
+            
+            // Update modal title based on price change direction
+            var changeDirection = numericNewValue > numericOriginalValue ? 'increased' : 'decreased';
+            $('#priceChangeReasonModalLabel').text('Price ' + changeDirection + ' - Please provide reason');
+            
+            // Show modal
+            $('#priceChangeReasonModal').modal('show');
         }
 
         // Function to show price change reason modal
@@ -299,7 +354,9 @@
 
         // Handle confirm price change button
         $('#confirmPriceChange').on('click', function() {
+            console.log('Confirm price change button clicked');
             var reason = $('#priceChangeReason').val().trim();
+            console.log('Reason provided:', reason);
             
             // Validate reason is not empty
             if (reason === '') {
@@ -310,15 +367,43 @@
             // Close modal
             $('#priceChangeReasonModal').modal('hide');
             
-            // Proceed with the price update
-            saveField(
-                currentFieldData.varaints_id,
-                currentFieldData.int_colour,
-                currentFieldData.ex_colour,
-                currentFieldData.field,
-                currentFieldData.value,
-                reason
+            // Show notification confirmation alert
+            var numericNewValue = parseFloat(currentFieldData.value.replace(/,/g, ''));
+            var numericOriginalValue = parseFloat(currentFieldData.originalValue.replace(/,/g, '')) || 0;
+            var changeAmount = Math.abs(numericNewValue - numericOriginalValue);
+            var changeDirection = numericNewValue > numericOriginalValue ? 'increased' : 'decreased';
+            
+            console.log('About to show alertify confirm dialog');
+            var dialog = alertify.confirm(
+                `Price has ${changeDirection} by ${changeAmount.toLocaleString()}. Do you want to notify departments about this change?`
             );
+            dialog.set({ title: "Notify Departments?", labels: { ok: "Notify", cancel: "Don't Notify" } });
+            dialog.set('onok', function(){
+                console.log('Alertify onok fired');
+                console.log('User clicked Notify - proceeding with email notification');
+                saveField(
+                    currentFieldData.varaints_id,
+                    currentFieldData.int_colour,
+                    currentFieldData.ex_colour,
+                    currentFieldData.field,
+                    currentFieldData.value,
+                    reason,
+                    true // notify departments
+                );
+            });
+            dialog.set('oncancel', function(){
+                console.log('Alertify oncancel fired');
+                console.log('User clicked Don\'t Notify - proceeding with update without email');
+                saveField(
+                    currentFieldData.varaints_id,
+                    currentFieldData.int_colour,
+                    currentFieldData.ex_colour,
+                    currentFieldData.field,
+                    currentFieldData.value,
+                    reason,
+                    false // don't notify departments
+                );
+            });
         });
 
 // Handling the GP input blur event
@@ -345,17 +430,19 @@ $('#dtBasicExample1').on('blur', 'input.editable-gp', function () {
 $('#dtBasicExample1').on('blur', 'input.editable-price', function () {
     var $this = $(this);
     var newValue = $this.val().replace(/[^0-9]/g, ''); // Ensure only digits are kept
+    var originalValue = $this.data('original-value') || '0'; // Get original value
 
-    if (newValue !== '') {
+    // If new value is empty, set it to 0 for comparison
+    if (newValue === '') {
+        newValue = '0';
+    } else {
         newValue = parseInt(newValue).toLocaleString(); // Format number with commas
     }
 
     $this.val(newValue); // Set the formatted value
 
-    // Show modal for price change reason
-    if (newValue !== '') {
-        showPriceChangeModal($this.data('varaint-id'), $this.data('int-colour'), $this.data('ex-colour'), 'price', newValue.replace(/,/g, ''));
-    }
+    // Always check if price has changed (even if new value is 0)
+    checkPriceChange($this.data('varaint-id'), $this.data('int-colour'), $this.data('ex-colour'), 'price', newValue.replace(/,/g, ''), originalValue);
 });
 $('#dtBasicExample1').on('blur', 'input.editable-minimum_commission', function () {
     var $this = $(this);
