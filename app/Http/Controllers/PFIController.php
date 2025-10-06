@@ -638,7 +638,7 @@ class PFIController extends Controller
         DB::commit();
 
         $supplier = Supplier::find($request->supplier_id);
-        if($supplier->supplier == 'AMS' && !$request->has('file')) {
+        if($supplier->supplier == 'CPS Middle East Automobiles Trading FZE' && !$request->has('file')) {
             return redirect()->route('pfi.pfi-document',['id' => Crypt::encrypt($pfi->id),'type' => 'NEW']);
         }
 
@@ -970,7 +970,7 @@ class PFIController extends Controller
         DB::commit();
         
         $supplier = Supplier::find($request->supplier_id);
-            if($supplier->supplier == 'AMS' && !$request->has('file')){
+            if($supplier->supplier == 'CPS Middle East Automobiles Trading FZE' && !$request->has('file')){
                 return redirect()->route('pfi.pfi-document',['id' => Crypt::encrypt($pfi->id),'type' => 'EDIT']);
             }else{
                 return redirect()->route('pfi.index')->with('message', 'PFI Updated Successfully');
@@ -1099,7 +1099,7 @@ class PFIController extends Controller
         if($supplier && $masterModel) {
             if($supplier->is_MMC == true) {
                 $price = $masterModel->amount_belgium > 0 ?  $masterModel->amount_belgium : 0;
-            }else if($supplier->is_AMS == true) {
+            }else if($supplier->is_AMS == true || $supplier->supplier == 'CPS Middle East Automobiles Trading FZE') {
                 $price = $masterModel->amount_uae > 0 ? $masterModel->amount_uae : 0;
             }else{
                 $price = 0;

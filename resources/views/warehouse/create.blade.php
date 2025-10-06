@@ -122,7 +122,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details')
             <select class="form-control" autofocus name="vendors_id" id="vendors" required>
                 <option value="" disabled>Select The Vendor</option>
                 @foreach($vendors as $vendors)
-                <option value="{{ $vendors->id }}" {{ $vendors->id == 1149 ? 'selected' : '' }}>
+                <option value="{{ $vendors->id }}" {{ $vendors->supplier == 'CPS Middle East Automobiles Trading FZE' ? 'selected' : '' }}>
                     {{ $vendors->supplier }}
                 </option>
                 @endforeach

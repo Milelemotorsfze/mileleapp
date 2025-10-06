@@ -5572,8 +5572,8 @@ class PurchasingOrderController extends Controller
             $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
             $purchasingordereventsLog->description = "Finance Manager Forward Payment Inititaion Request to the CEO office For Payment Released";
             $purchasingordereventsLog->save();
-            // If vendor is AMS, update vehicles' estimated_date to current date + 20 days on payment release
-            if (isset($purchasingOrder->supplier) && strtoupper($purchasingOrder->supplier->supplier ?? '') === 'AMS') {
+            // If vendor is CPS, update vehicles' estimated_date to current date + 20 days on payment release
+            if (isset($purchasingOrder->supplier) && $purchasingOrder->supplier->supplier === 'CPS Middle East Automobiles Trading FZE') {
                 $releaseDate = Carbon::now();
                 $newEstimatedDate = $releaseDate->copy()->addDays(20)->format('Y-m-d');
                 Vehicles::where('purchasing_order_id', $purchasingOrder->id)
