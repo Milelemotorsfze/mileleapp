@@ -581,6 +581,44 @@ return [$color->id => $formattedName];
         $('#fd').select2();
         $('#pol').select2();
         $('#pod').select2();
+        
+        // Auto-select "100% Advance" payment terms when CPS Middle East Automobiles Trading FZE is selected
+        $('#vendors').on('change', function() {
+            var selectedVendor = $(this).find('option:selected').text().trim();
+            var cpsVendorName = 'CPS Middle East Automobiles Trading FZE';
+            
+            // Check if CPS vendor is selected (with flexible matching for spaces/variations)
+            if (selectedVendor === cpsVendorName || 
+                selectedVendor.replace(/\s+/g, ' ').trim() === cpsVendorName ||
+                selectedVendor.toLowerCase().includes('cps') && selectedVendor.toLowerCase().includes('middle east')) {
+                
+                // Find and select "100% Advance" payment term
+                var paymentTermSelect = $('#payment_term');
+                var advanceOption = paymentTermSelect.find('option').filter(function() {
+                    var optionText = $(this).text().trim().toLowerCase();
+                    return optionText.includes('100%') && optionText.includes('advance');
+                });
+                
+                if (advanceOption.length > 0) {
+                    paymentTermSelect.val(advanceOption.val()).trigger('change');
+                } else {
+                    // If "100% Advance" doesn't exist, try to find similar terms
+                    var similarOption = paymentTermSelect.find('option').filter(function() {
+                        var optionText = $(this).text().trim().toLowerCase();
+                        return optionText.includes('advance') || optionText.includes('100');
+                    });
+                    
+                    if (similarOption.length > 0) {
+                        paymentTermSelect.val(similarOption.first().val()).trigger('change');
+                    }
+                }
+            }
+        });
+        
+        // Trigger the change event on page load if CPS is already selected
+        if ($('#vendors option:selected').text().trim() === 'CPS Middle East Automobiles Trading FZE') {
+            $('#vendors').trigger('change');
+        }
     });
 </script>
 @endpush

@@ -314,6 +314,39 @@
         placeholder: "Select Prefered Destination",
         maximumSelectionLength: 1
     })
+    
+    // Auto-select "100% Advance" payment terms when CPS Middle East Automobiles Trading FZE is the vendor
+    $(document).ready(function() {
+        var vendorName = "{{ $pfi->supplier->supplier ?? '' }}";
+        var cpsVendorName = 'CPS Middle East Automobiles Trading FZE';
+        
+        // Check if CPS vendor is selected (with flexible matching for spaces/variations)
+        if (vendorName === cpsVendorName || 
+            vendorName.replace(/\s+/g, ' ').trim() === cpsVendorName ||
+            vendorName.toLowerCase().includes('cps') && vendorName.toLowerCase().includes('middle east')) {
+            
+            // Find and select "100% Advance" payment term
+            var paymentTermSelect = $('#payment_term_id');
+            var advanceOption = paymentTermSelect.find('option').filter(function() {
+                var optionText = $(this).text().trim().toLowerCase();
+                return optionText.includes('100%') && optionText.includes('advance');
+            });
+            
+            if (advanceOption.length > 0) {
+                paymentTermSelect.val(advanceOption.val()).trigger('change');
+            } else {
+                // If "100% Advance" doesn't exist, try to find similar terms
+                var similarOption = paymentTermSelect.find('option').filter(function() {
+                    var optionText = $(this).text().trim().toLowerCase();
+                    return optionText.includes('advance') || optionText.includes('100');
+                });
+                
+                if (similarOption.length > 0) {
+                    paymentTermSelect.val(similarOption.first().val()).trigger('change');
+                }
+            }
+        }
+    });
     function checkDuplicateVIN() {
         var vinValues = $('input[name="vin[]"]').map(function() {
             return $(this).val();
