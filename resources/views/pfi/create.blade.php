@@ -103,7 +103,7 @@
                                                     <label for="choices-single-default" class="form-label">Vendor</label>
                                                     <select class="form-control widthinput" name="supplier_id" id="supplier-id" multiple >
                                                         @foreach($suppliers as $supplier)
-                                                            <option value="{{$supplier->id}}" {{ $supplier->supplier == 'AMS' ? 'selected' : '' }} data-is-MMC="{{$supplier->is_MMC}}" data-is-AMS="{{$supplier->is_AMS}}" >
+                                                            <option value="{{$supplier->id}}" {{ $supplier->supplier == 'CPS Middle East Automobiles Trading FZE' ? 'selected' : '' }} data-is-MMC="{{$supplier->is_MMC}}" data-is-AMS="{{$supplier->is_AMS}}" >
                                                                 {{ $supplier->supplier }}
                                                             </option>
                                                         @endforeach

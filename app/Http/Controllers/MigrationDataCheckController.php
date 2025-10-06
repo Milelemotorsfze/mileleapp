@@ -340,9 +340,9 @@ class MigrationDataCheckController extends Controller
         $allPfi = PFI::select('id','supplier_id','currency')->get();
         foreach($allPfi as $pfi) {
             $supplier = Supplier::find($pfi->supplier_id);
-            if($supplier->supplier == 'AMS') {
+            if($supplier->supplier == 'CPS Middle East Automobiles Trading FZE') {
                 if($pfi->currency == 'EUR') {
-                    return "For AMS EUR is not allowed, The pfi Id is - ".$pfi->id;
+                    return "For CPS EUR is not allowed, The pfi Id is - ".$pfi->id;
                 }
             }
         }
