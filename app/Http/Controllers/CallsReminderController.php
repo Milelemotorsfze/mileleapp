@@ -1,0 +1,224 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Calls;
+use App\Models\User;
+use App\Mail\LeadsReminderMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
+
+class CallsReminderController extends Controller
+{
+    /**
+     * Send reminder emails to all sales persons with their assigned leads
+     */
+    public function sendReminderEmails($leadType = 'new')
+    {
+        try {
+            Log::info("Starting leads reminder email process for {$leadType} leads");
+            
+            // Determine status filter based on lead type
+            $statusFilter = $leadType === 'new' ? ['New'] : ['contacted', 'working'];
+            
+            // Get all sales persons who have leads with specified status
+            $salesPersons = User::whereHas('assignedLeads', function ($query) use ($statusFilter) {
+                $query->whereIn('status', $statusFilter);
+            })->with(['assignedLeads' => function ($query) use ($statusFilter) {
+                $query->whereIn('status', $statusFilter)
+                      ->orderBy('created_at', 'asc');
+            }])->get();
+
+            $emailsSent = 0;
+            $totalLeads = 0;
+
+            foreach ($salesPersons as $salesPerson) {
+                $leads = $salesPerson->assignedLeads;
+                
+                if ($leads->count() > 0) {
+                    $totalLeads += $leads->count();
+                    
+                    // Calculate separate counts for contacted/working leads
+                    $contactedCount = 0;
+                    $workingCount = 0;
+                    if ($leadType === 'contacted_working') {
+                        $contactedCount = $leads->where('status', 'contacted')->count();
+                        $workingCount = $leads->where('status', 'working')->count();
+                    }
+                    
+                    // Prepare leads data with pending days
+                    $leadsData = $leads->map(function ($lead) {
+                        $pendingDays = Carbon::parse($lead->created_at)->diffInDays(Carbon::now());
+                        return [
+                            'id' => $lead->id,
+                            'name' => $lead->name,
+                            'phone' => $lead->phone,
+                            'email' => $lead->email,
+                            'location' => $lead->location,
+                            'created_at' => $lead->created_at,
+                            'pending_days' => $pendingDays,
+                            'url' => 'http://mileleapp.test/callsdeatilspage/' . $lead->id // Direct URL for viewing leads
+                        ];
+                    });
+
+                    // Send email to sales person (using test email for testing)
+                    $testEmail = 'basharat.ali@milele.com';
+                    
+                    try {
+                        // Use configured Gmail driver for both local and production
+                        
+                        Mail::to($testEmail)->send(new LeadsReminderMail($salesPerson, $leadsData, $leadType, $contactedCount, $workingCount));
+                        Log::info("✅ Email sent successfully to {$testEmail} for sales person {$salesPerson->name} ({$leadType} leads)");
+                        $emailsSent++;
+                    } catch (\Exception $e) {
+                        Log::error("❌ Email sending failed for {$salesPerson->name}: " . $e->getMessage());
+                        Log::error("Email error details: " . $e->getTraceAsString());
+                        Log::error("Mail configuration: " . json_encode([
+                            'default' => config('mail.default'),
+                            'host' => config('mail.mailers.smtp.host'),
+                            'port' => config('mail.mailers.smtp.port'),
+                            'username' => config('mail.mailers.smtp.username'),
+                            'from_address' => config('mail.from.address')
+                        ]));
+                    }
+                }
+            }
+
+            Log::info("Leads reminder process completed. Emails sent: {$emailsSent}, Total leads: {$totalLeads}");
+            
+            return response()->json([
+                'success' => true,
+                'message' => "Reminder emails sent successfully",
+                'emails_sent' => $emailsSent,
+                'total_leads' => $totalLeads
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error in leads reminder process: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error sending reminder emails: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Send reminder email to specific sales person
+     */
+    public function sendReminderToSalesPerson($salesPersonId, $leadType = 'new')
+    {
+        try {
+            $salesPerson = User::findOrFail($salesPersonId);
+            
+            // Determine status filter based on lead type
+            $statusFilter = $leadType === 'new' ? ['New'] : ['contacted', 'working'];
+            
+            $leads = Calls::where('sales_person', $salesPersonId)
+                           ->whereIn('status', $statusFilter)
+                           ->orderBy('created_at', 'asc')
+                           ->get();
+
+            if ($leads->count() > 0) {
+                // Calculate separate counts for contacted/working leads
+                $contactedCount = 0;
+                $workingCount = 0;
+                if ($leadType === 'contacted_working') {
+                    $contactedCount = $leads->where('status', 'contacted')->count();
+                    $workingCount = $leads->where('status', 'working')->count();
+                }
+                
+                $leadsData = $leads->map(function ($lead) {
+                    $pendingDays = Carbon::parse($lead->created_at)->diffInDays(Carbon::now());
+                    return [
+                        'id' => $lead->id,
+                        'name' => $lead->name,
+                        'phone' => $lead->phone,
+                        'email' => $lead->email,
+                        'location' => $lead->location,
+                        'created_at' => $lead->created_at,
+                        'pending_days' => $pendingDays,
+                        'url' => 'http://mileleapp.test/callsdeatilspage/' . $lead->id // Direct URL for viewing leads
+                    ];
+                });
+
+                // Send email to sales person (using test email for testing)
+                $testEmail = 'basharat.ali@milele.com';
+                
+                try {
+                    // Use configured Gmail driver for both local and production
+                    
+                    Mail::to($testEmail)->send(new LeadsReminderMail($salesPerson, $leadsData, $leadType, $contactedCount, $workingCount));
+                    Log::info("✅ Email sent successfully to {$testEmail} for sales person {$salesPerson->name} ({$leadType} leads)");
+                } catch (\Exception $e) {
+                    Log::error("❌ Email sending failed for {$salesPerson->name}: " . $e->getMessage());
+                    Log::error("Email error details: " . $e->getTraceAsString());
+                    Log::error("Mail configuration: " . json_encode([
+                        'default' => config('mail.default'),
+                        'host' => config('mail.mailers.smtp.host'),
+                        'port' => config('mail.mailers.smtp.port'),
+                        'username' => config('mail.mailers.smtp.username'),
+                        'from_address' => config('mail.from.address')
+                    ]));
+                }
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => "Reminder email sent to {$salesPerson->name}",
+                    'emails_sent' => 1,
+                    'leads_count' => $leads->count()
+                ]);
+            } else {
+                return response()->json([
+                    'success' => true,
+                    'message' => "No new leads found for {$salesPerson->name}",
+                    'emails_sent' => 0,
+                    'leads_count' => 0
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Error sending reminder to sales person: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error sending reminder email: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get reminder statistics
+     */
+    public function getReminderStats()
+    {
+        try {
+            $stats = [
+                'total_sales_persons' => User::whereHas('assignedLeads', function ($query) {
+                    $query->where('status', 'New');
+                })->count(),
+                'total_new_leads' => Calls::where('status', 'New')->count(),
+                'leads_by_sales_person' => User::whereHas('assignedLeads', function ($query) {
+                    $query->where('status', 'New');
+                })->withCount(['assignedLeads' => function ($query) {
+                    $query->where('status', 'New');
+                }])->get(['id', 'name', 'email', 'assigned_leads_count'])
+            ];
+
+            return response()->json([
+                'success' => true,
+                'data' => $stats
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error getting reminder stats: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error getting statistics: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+}

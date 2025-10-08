@@ -25,6 +25,13 @@ class Kernel extends ConsoleKernel
         // $schedule->command('send:wo_boe_status')->dailyAt('09:00');
         // $schedule->command('claim_submission_reminder')->dailyAt('09:00');
         // $schedule->command('backup:run --only-db')->daily();
+        
+        // Leads reminder emails at 9AM and 6PM (New leads)
+        $schedule->command('leads:send-reminder')->dailyAt('09:00');
+        $schedule->command('leads:send-reminder')->dailyAt('18:00');
+        
+        // Friday reminder emails at 9AM (Contacted/Working leads)
+        $schedule->command('leads:send-friday-reminder')->weeklyOn(5, '09:00'); // Friday at 9AM
     }
 
     /**
@@ -45,5 +52,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\CheckLOIExpiry::class,
         \App\Console\Commands\ClearExpiredReservations::class,
         \App\Console\Commands\SendEstimationDateReminders::class,
+        \App\Console\Commands\SendLeadsReminder::class,
+        \App\Console\Commands\SendFridayLeadsReminder::class,
     ];
 }
