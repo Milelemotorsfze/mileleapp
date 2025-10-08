@@ -1162,6 +1162,11 @@ Route::get('/check-trashed-gdn', function () {
     Route::get('/get-model-lines/{brandId}', [DailyleadsController::class, 'getModelLines']);
     Route::get('/get-trim-variants/{modelLineId}', [DailyleadsController::class, 'getTrimAndVariants']);
     Route::post('/upload-file', [DailyleadsController::class, 'fileupload'])->name('leadsfile.upload');
+    
+    // Leads Reminder Routes
+    Route::get('/leads-reminder/send', [App\Http\Controllers\CallsReminderController::class, 'sendReminderEmails'])->name('leads.reminder.send');
+    Route::get('/leads-reminder/send/{salesPersonId}', [App\Http\Controllers\CallsReminderController::class, 'sendReminderToSalesPerson'])->name('leads.reminder.send.salesperson');
+    Route::get('/leads-reminder/stats', [App\Http\Controllers\CallsReminderController::class, 'getReminderStats'])->name('leads.reminder.stats');
     Route::delete('/remove-file', [DailyleadsController::class, 'removeFile'])->name('leadsfile.remove');
     Route::post('/store-log', [DailyleadsController::class, 'storeLog'])->name('store.log');
     Route::get('/get-logs/{lead_id}', [DailyleadsController::class, 'getLogs'])->name('get.logs');
