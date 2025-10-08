@@ -171,11 +171,11 @@
             @foreach ($variantitems as $index => $variantitem)
                 @if ($index % 2 == 0)
                 <tr>
-                    <td>{{$variantitem->model_specification->name}}</td>
-                    <td>{{$variantitem->model_specification_option->name}}</td>
+                    <td>{{$variantitem->model_specification->name ?? 'N/A'}}</td>
+                    <td>{{$variantitem->model_specification_option->name ?? 'N/A'}}</td>
                 @else
-                    <td>{{$variantitem->model_specification->name}}</td>
-                    <td>{{$variantitem->model_specification_option->name}}</td>
+                    <td>{{$variantitem->model_specification->name ?? 'N/A'}}</td>
+                    <td>{{$variantitem->model_specification_option->name ?? 'N/A'}}</td>
                 </tr>
                 @endif
             @endforeach
