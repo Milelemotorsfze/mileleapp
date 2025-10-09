@@ -230,22 +230,38 @@ class CallsReminderController extends Controller
         try {
             Log::info('Starting daily leads report process');
             
-            // Get all sales persons with their leads grouped by status
+            // Increase memory limit for large datasets
+            ini_set('memory_limit', '512M');
+            
+            // Get sales persons with pagination to avoid memory issues
             $salesPersons = User::whereHas('assignedLeads', function ($query) {
                 $query->whereIn('status', ['New', 'contacted', 'working']);
             })->with(['assignedLeads' => function ($query) {
                 $query->whereIn('status', ['New', 'contacted', 'working'])
-                      ->orderBy('created_at', 'asc');
+                      ->orderBy('created_at', 'asc')
+                      ->limit(100); // Limit to 100 leads per salesperson to prevent memory issues
             }])->get();
 
             $reportData = [];
             $totalLeads = 0;
+            $salesPersonSummary = [];
 
             foreach ($salesPersons as $salesPerson) {
                 $leads = $salesPerson->assignedLeads;
                 
                 if ($leads->count() > 0) {
                     $totalLeads += $leads->count();
+                    
+                    // Get total count for this salesperson (not limited)
+                    $totalCountForSalesPerson = \App\Models\Calls::where('sales_person', $salesPerson->id)
+                        ->whereIn('status', ['New', 'contacted', 'working'])
+                        ->count();
+                    
+                    $salesPersonSummary[] = [
+                        'name' => $salesPerson->name,
+                        'total_leads' => $totalCountForSalesPerson,
+                        'displayed_leads' => $leads->count()
+                    ];
                     
                     $leadsData = $leads->map(function ($lead) {
                         $pendingDays = Carbon::parse($lead->created_at)->diffInDays(Carbon::now());
@@ -270,7 +286,7 @@ class CallsReminderController extends Controller
             $CSOemail = 'basharat.ali@milele.com';
             
             try {
-                Mail::to($CSOemail)->send(new \App\Mail\DailyLeadsReportMail($reportData, $totalLeads));
+                Mail::to($CSOemail)->send(new \App\Mail\DailyLeadsReportMail($reportData, $totalLeads, $salesPersonSummary));
                 Log::info("✅ Daily report sent successfully to {$CSOemail}");
                 
                 return response()->json([
