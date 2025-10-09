@@ -221,4 +221,82 @@ class CallsReminderController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Send daily report to management with structured table data
+     */
+    public function sendDailyReport()
+    {
+        try {
+            Log::info('Starting daily leads report process');
+            
+            // Get all sales persons with their leads grouped by status
+            $salesPersons = User::whereHas('assignedLeads', function ($query) {
+                $query->whereIn('status', ['New', 'contacted', 'working']);
+            })->with(['assignedLeads' => function ($query) {
+                $query->whereIn('status', ['New', 'contacted', 'working'])
+                      ->orderBy('created_at', 'asc');
+            }])->get();
+
+            $reportData = [];
+            $totalLeads = 0;
+
+            foreach ($salesPersons as $salesPerson) {
+                $leads = $salesPerson->assignedLeads;
+                
+                if ($leads->count() > 0) {
+                    $totalLeads += $leads->count();
+                    
+                    $leadsData = $leads->map(function ($lead) {
+                        $pendingDays = Carbon::parse($lead->created_at)->diffInDays(Carbon::now());
+                        return [
+                            'id' => $lead->id,
+                            'name' => $lead->name,
+                            'status' => $lead->status,
+                            'pending_days' => $pendingDays,
+                            'url' => 'http://mileleapp.test/callsdeatilspage/' . $lead->id
+                        ];
+                    });
+
+                    $reportData[] = [
+                        'salesperson' => $salesPerson,
+                        'leads' => $leadsData,
+                        'count' => $leads->count()
+                    ];
+                }
+            }
+
+            // Send email to management
+            $CSOemail = 'basharat.ali@milele.com';
+            
+            try {
+                Mail::to($CSOemail)->send(new \App\Mail\DailyLeadsReportMail($reportData, $totalLeads));
+                Log::info("✅ Daily report sent successfully to {$CSOemail}");
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => "Daily report sent successfully",
+                    'emails_sent' => 1,
+                    'total_leads' => $totalLeads,
+                    'sales_persons' => count($reportData)
+                ]);
+            } catch (\Exception $e) {
+                Log::error("❌ Daily report sending failed: " . $e->getMessage());
+                Log::error("Email error details: " . $e->getTraceAsString());
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error sending daily report: ' . $e->getMessage()
+                ], 500);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Error in daily report process: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error generating daily report: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
