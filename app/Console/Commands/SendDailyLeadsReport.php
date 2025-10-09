@@ -37,7 +37,7 @@ class SendDailyLeadsReport extends Command
             
             if ($response->success) {
                 $this->info("✅ Daily report sent successfully!");
-                $this->info("📧 Email sent to: basharat.ali@milele.com");
+                $this->info("📧 Email sent to: abdul@milele.com");
                 $this->info("📊 Total leads: " . ($response->total_leads ?? 'N/A'));
                 $this->info("👥 Sales persons: " . ($response->sales_persons ?? 'N/A'));
                 
