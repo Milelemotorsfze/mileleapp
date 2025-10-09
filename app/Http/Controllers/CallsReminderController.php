@@ -63,17 +63,15 @@ class CallsReminderController extends Controller
                         ];
                     });
 
-                    // Send email to sales person (using test email for testing)
-                    $testEmail = 'basharat.ali@milele.com';
-                    
+                    // Send email to sales person
                     try {
                         // Use configured Gmail driver for both local and production
                         
-                        Mail::to($testEmail)->send(new LeadsReminderMail($salesPerson, $leadsData, $leadType, $contactedCount, $workingCount));
-                        Log::info("✅ Email sent successfully to {$testEmail} for sales person {$salesPerson->name} ({$leadType} leads)");
+                        Mail::to($salesPerson->email)->send(new LeadsReminderMail($salesPerson, $leadsData, $leadType, $contactedCount, $workingCount));
+                        Log::info("Email sent successfully to {$salesPerson->email} for sales person {$salesPerson->name} ({$leadType} leads)");
                         $emailsSent++;
                     } catch (\Exception $e) {
-                        Log::error("❌ Email sending failed for {$salesPerson->name}: " . $e->getMessage());
+                        Log::error("Email sending failed for {$salesPerson->name}: " . $e->getMessage());
                         Log::error("Email error details: " . $e->getTraceAsString());
                         Log::error("Mail configuration: " . json_encode([
                             'default' => config('mail.default'),
@@ -144,16 +142,14 @@ class CallsReminderController extends Controller
                     ];
                 });
 
-                // Send email to sales person (using test email for testing)
-                $testEmail = 'basharat.ali@milele.com';
-                
+                // Send email to sales person
                 try {
                     // Use configured Gmail driver for both local and production
                     
-                    Mail::to($testEmail)->send(new LeadsReminderMail($salesPerson, $leadsData, $leadType, $contactedCount, $workingCount));
-                    Log::info("✅ Email sent successfully to {$testEmail} for sales person {$salesPerson->name} ({$leadType} leads)");
+                    Mail::to($salesPerson->email)->send(new LeadsReminderMail($salesPerson, $leadsData, $leadType, $contactedCount, $workingCount));
+                    Log::info("Email sent successfully to {$salesPerson->email} for sales person {$salesPerson->name} ({$leadType} leads)");
                 } catch (\Exception $e) {
-                    Log::error("❌ Email sending failed for {$salesPerson->name}: " . $e->getMessage());
+                    Log::error("Email sending failed for {$salesPerson->name}: " . $e->getMessage());
                     Log::error("Email error details: " . $e->getTraceAsString());
                     Log::error("Mail configuration: " . json_encode([
                         'default' => config('mail.default'),
@@ -283,11 +279,11 @@ class CallsReminderController extends Controller
             }
 
             // Send email to management
-            $CSOemail = 'basharat.ali@milele.com';
+            $CSOemail = 'abdul@milele.com';
             
             try {
                 Mail::to($CSOemail)->send(new \App\Mail\DailyLeadsReportMail($reportData, $totalLeads, $salesPersonSummary));
-                Log::info("✅ Daily report sent successfully to {$CSOemail}");
+                Log::info("Daily report sent successfully to {$CSOemail}");
                 
                 return response()->json([
                     'success' => true,
@@ -297,7 +293,7 @@ class CallsReminderController extends Controller
                     'sales_persons' => count($reportData)
                 ]);
             } catch (\Exception $e) {
-                Log::error("❌ Daily report sending failed: " . $e->getMessage());
+                Log::error("Daily report sending failed: " . $e->getMessage());
                 Log::error("Email error details: " . $e->getTraceAsString());
                 
                 return response()->json([
