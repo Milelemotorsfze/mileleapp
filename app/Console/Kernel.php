@@ -32,6 +32,9 @@ class Kernel extends ConsoleKernel
         
         // Friday reminder emails at 9AM (Contacted/Working leads)
         $schedule->command('leads:send-friday-reminder')->weeklyOn(5, '09:00'); // Friday at 9AM
+        
+        // Daily management report at 7PM
+        $schedule->command('leads:send-daily-report')->dailyAt('19:00'); // 7PM daily
     }
 
     /**
@@ -54,5 +57,6 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SendEstimationDateReminders::class,
         \App\Console\Commands\SendLeadsReminder::class,
         \App\Console\Commands\SendFridayLeadsReminder::class,
+        \App\Console\Commands\SendDailyLeadsReport::class,
     ];
 }

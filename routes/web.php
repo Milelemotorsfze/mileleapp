@@ -1167,6 +1167,9 @@ Route::get('/check-trashed-gdn', function () {
     Route::get('/leads-reminder/send', [App\Http\Controllers\CallsReminderController::class, 'sendReminderEmails'])->name('leads.reminder.send');
     Route::get('/leads-reminder/send/{salesPersonId}', [App\Http\Controllers\CallsReminderController::class, 'sendReminderToSalesPerson'])->name('leads.reminder.send.salesperson');
     Route::get('/leads-reminder/stats', [App\Http\Controllers\CallsReminderController::class, 'getReminderStats'])->name('leads.reminder.stats');
+    
+    // Daily Report Routes
+    Route::get('/leads-daily-report/send', [App\Http\Controllers\CallsReminderController::class, 'sendDailyReport'])->name('leads.daily.report.send');
     Route::delete('/remove-file', [DailyleadsController::class, 'removeFile'])->name('leadsfile.remove');
     Route::post('/store-log', [DailyleadsController::class, 'storeLog'])->name('store.log');
     Route::get('/get-logs/{lead_id}', [DailyleadsController::class, 'getLogs'])->name('get.logs');
