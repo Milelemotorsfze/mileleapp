@@ -180,6 +180,24 @@
         <div class="summary">
             <h3>📈 Summary</h3>
             <p><strong>Total Leads:</strong> {{ $totalLeads }} | <strong>Sales Persons:</strong> {{ $totalSalesPersons }} | <strong>Report Date:</strong> {{ now()->format('M j, Y g:i A') }}</p>
+            <p style="color: #666; font-size: 12px; margin-top: 5px;"><em>Note: Limited to 100 most recent leads per salesperson to ensure email deliverability and prevent memory issues</em></p>
+            
+            @if(isset($salesPersonSummary) && count($salesPersonSummary) > 0)
+                <div style="margin-top: 15px; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
+                    <h4 style="margin: 0 0 10px 0; color: #333; font-size: 14px;">📊 Complete Sales Team Overview:</h4>
+                    <div style="font-size: 12px; line-height: 1.4;">
+                        @foreach($salesPersonSummary as $summary)
+                            <div style="margin-bottom: 3px;">
+                                <strong>{{ $summary['name'] }}:</strong> 
+                                {{ $summary['total_leads'] }} total leads 
+                                @if($summary['displayed_leads'] < $summary['total_leads'])
+                                    (showing {{ $summary['displayed_leads'] }} most recent)
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
         </div>
 
         <table>

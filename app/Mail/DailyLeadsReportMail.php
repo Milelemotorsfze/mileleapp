@@ -15,14 +15,16 @@ class DailyLeadsReportMail extends Mailable
 
     public $reportData;
     public $totalLeads;
+    public $salesPersonSummary;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($reportData, $totalLeads)
+    public function __construct($reportData, $totalLeads, $salesPersonSummary = [])
     {
         $this->reportData = $reportData;
         $this->totalLeads = $totalLeads;
+        $this->salesPersonSummary = $salesPersonSummary;
     }
 
     /**
@@ -45,7 +47,8 @@ class DailyLeadsReportMail extends Mailable
             with: [
                 'reportData' => $this->reportData,
                 'totalLeads' => $this->totalLeads,
-                'totalSalesPersons' => count($this->reportData)
+                'totalSalesPersons' => count($this->reportData),
+                'salesPersonSummary' => $this->salesPersonSummary
             ]
         );
     }
