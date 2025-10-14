@@ -501,6 +501,7 @@ class CallsController extends Controller
                 'strategies_id' => $strategies_id->id,
                 'priority' => $request->input('priority'),
                 'custom_brand_model' => $request->input('custom_brand_model'),
+                'csr_price' => $request->input('csr_price'),
                 'language' => is_array($request->input('language')) ? implode(', ', $request->input('language')) : $request->input('language'),
                 'created_at' => $formattedDate,
                 'assign_time' => $formattedDate,

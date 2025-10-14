@@ -332,6 +332,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <label>Purchase Timeline:</label>
                     <input type="text" name="purchase_timeline" class="form-control mb-3" id="purchase_timeline" placeholder="Purchase Timeline" value="{{ old('purchase_timeline') }}">
                 </div>
+                <div class="col-lg-4 col-md-6 col-sm-12 remarks-single-div-container">
+                    <label>CSR Price:</label>
+                    <input type="number" name="csr_price" class="form-control mb-3" id="csr_price" placeholder="CSR Price" value="{{ old('csr_price') }}" step="0.01" min="0">
+                </div>
                 <div class="col-md-12 remarks-single-div-container">
                     <label>General Remark / Additional Notes:</label>
                     <textarea class="form-control" name="general_remark" id="general_remark" placeholder="Additional Extra Remarks/Notes">{{ old('general_remark') }}</textarea>
