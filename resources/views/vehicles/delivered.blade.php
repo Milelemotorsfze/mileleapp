@@ -601,7 +601,6 @@ table.dataTable thead th select {
                   <th>Minimum Commission</th>
                   <!-- <th>GP %</th> -->
                     <th>Price</th>
-                    <th>CSR Price</th>
                 @endif
                   <th>Document Owership</th>
                   <th>Custom Inspection Number</th>
@@ -876,23 +875,6 @@ var columns6 = [
                         }
                         return ''; // Return an empty string if there's no price
                     }
-                },
-                {
-                    data: 'csr_price', 
-                    name: 'vehicles.csr_price', 
-                    render: function(data, type, row) {
-                        if (data) {
-                            // Convert the string to a float, then format it with commas
-                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0
-                            });
-
-                            // Return the CSR price wrapped in a span with button-like styling
-                            return '<span style="display: inline-block; background-color: #007bff; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
-                        }
-                        return ''; // Return an empty string if there's no CSR price
-                    }
                 });
             }
                 columns6.push(
@@ -997,17 +979,15 @@ if (hasManagementPermission) {
     columnMap[32] = 'costprice';
     columnMap[33] = 'vehicles.minimum_commission';
     columnMap[34] = 'vehicles.price';
-    columnMap[35] = 'vehicles.csr_price';
-    columnMap[36] = 'vehicles.ownership_type';
-    columnMap[37] = 'vehicles.custom_inspection_number';
-    columnMap[38] = 'vehicles.custom_inspection_status';
-} else if (hasPricePermission) {
-    columnMap[32] = 'vehicles.minimum_commission';
-    columnMap[33] = 'vehicles.price';
-    columnMap[34] = 'vehicles.csr_price';
     columnMap[35] = 'vehicles.ownership_type';
     columnMap[36] = 'vehicles.custom_inspection_number';
     columnMap[37] = 'vehicles.custom_inspection_status';
+} else if (hasPricePermission) {
+    columnMap[32] = 'vehicles.minimum_commission';
+    columnMap[33] = 'vehicles.price';
+    columnMap[34] = 'vehicles.ownership_type';
+    columnMap[35] = 'vehicles.custom_inspection_number';
+    columnMap[36] = 'vehicles.custom_inspection_status';
 } else {
     columnMap[32] = 'vehicles.ownership_type';
     columnMap[33] = 'vehicles.custom_inspection_number';
