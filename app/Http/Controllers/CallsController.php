@@ -722,6 +722,7 @@ class CallsController extends Controller
 		$model->language = is_array($request->input('language')) ? implode(', ', $request->input('language')) : $request->input('language');
         $model->strategies_id = $strategies_id;
         $model->priority = $request->input('priority');
+        $model->csr_price = $request->input('csr_price');
 		$model->status = "New";
 		$model->save();
 		}
