@@ -744,6 +744,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                                         <p class="card-text text-muted"><strong>Final Destination:</strong> {{ $requirement->country->name ?? 'N/A' }}</p>
                                         <p class="card-text text-muted"><strong>Asking Price:</strong> {{ $requirement->asking_price }}</p>
                                         <p class="card-text text-muted"><strong>Offer Price:</strong> {{ $requirement->offer_price }}</p>
+                                        @if($lead->csr_price)
+                                        <p class="card-text text-muted"><strong>CSR Price:</strong> <span style="display: inline-block; background-color: #007bff; color: white; padding: 3px 8px; border-radius: 3px; font-weight: bold;">{{ number_format($lead->csr_price, 0, '.', ',') }}</span></p>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -1303,6 +1306,9 @@ $('#addModelLineForm').submit(function(e) {
                 '<p class="card-text text-muted"><strong>Quantity:</strong> ' + response.qty + '</p>' +
                 '<p class="card-text text-muted"><strong>Asking Price:</strong> ' + response.asking_price + '</p>' +
                 '<p class="card-text text-muted"><strong>Offer Price:</strong> ' + response.offer_price + '</p>' +
+                @if($lead->csr_price)
+                '<p class="card-text text-muted"><strong>CSR Price:</strong> <span style="display: inline-block; background-color: #007bff; color: white; padding: 3px 8px; border-radius: 3px; font-weight: bold;">{{ number_format($lead->csr_price, 0, '.', ',') }}</span></p>' +
+                @endif
                 '<p class="card-text text-muted"><strong>Country:</strong> ' + response.country + '</p>' +
                 '</div>' +
                 '</div>' +

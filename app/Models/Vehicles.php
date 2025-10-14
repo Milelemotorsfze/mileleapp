@@ -47,6 +47,7 @@ class Vehicles extends Model
         'procurement_vehicle_remarks',
         'purchased_paid_percentage',
         'estimation_date',
+        'csr_price',
 
     ];
     public function dn()

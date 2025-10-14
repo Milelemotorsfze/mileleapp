@@ -64,6 +64,23 @@
         white-space: nowrap;
         height: 10px;
     }
+    .pending-price-change {
+        background-color: #fff3cd !important;
+        border-color: #ffeaa7 !important;
+    }
+    .csr-required-blink {
+        animation: blink 1s infinite;
+        border-color: #dc3545 !important;
+    }
+    @keyframes blink {
+        0%, 50% { background-color: #f8d7da; }
+        51%, 100% { background-color: #fff; }
+    }
+    .update-prices-btn {
+        padding: 2px 6px !important;
+        font-size: 11px !important;
+        line-height: 1.2 !important;
+    }
 </style>
 @section('content')
 <div class="card-header">
@@ -130,6 +147,8 @@
                     <th>Minimum Commission</th>
                     <!-- <th>GP</th> -->
                     <th>Price</th>
+                    <th>CSR Price</th>
+                    <th>Action</th>
                 </tr>
                 <tr>
                     <th><select class="filter-select"><option value="">All</option></select></th>
@@ -140,6 +159,8 @@
                     <th><select class="filter-select"><option value="">All</option></select></th>
                     <!-- <th><select class="filter-select"><option value="">All</option></select></th> -->
                     <th><select class="filter-select"><option value="">All</option></select></th>
+                    <th><select class="filter-select"><option value="">All</option></select></th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -190,6 +211,30 @@
                         return `<input type="text" class="editable-price" data-varaint-id="${row.varaints_id}" data-int-colour="${row.int_colour}" data-ex-colour="${row.ex_colour}" data-original-value="${originalValue}" value="${displayValue}" />`;
                     }
                 },
+                {
+                    data: 'csr_price', 
+                    name: 'vehicles.csr_price', 
+                    render: function (data, type, row) {
+                        var displayValue = data === null || data == 0 ? '' : data;
+                        var originalValue = data === null || data == 0 ? '0' : data;
+                        return `<input type="text" class="editable-csr_price" data-varaint-id="${row.varaints_id}" data-int-colour="${row.int_colour}" data-ex-colour="${row.ex_colour}" data-original-value="${originalValue}" value="${displayValue}" />`;
+                    }
+                },
+                {
+                    data: null,
+                    name: 'action',
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, row) {
+                        return `<button class="btn btn-xs btn-primary update-prices-btn" 
+                                data-varaint-id="${row.varaints_id}" 
+                                data-int-colour="${row.int_colour}" 
+                                data-ex-colour="${row.ex_colour}"
+                                disabled>
+                                Update
+                                </button>`;
+                    }
+                },
             ],
             pageLength: -1,
             initComplete: function () {
@@ -213,9 +258,20 @@
         // Allow only positive numbers in Price field (no negative signs)
         $('#dtBasicExample1').on('input', 'input.editable-price', function () {
             this.value = this.value.replace(/[^0-9]/g, '');
+            var varaints_id = $(this).data('varaint-id');
+            var int_colour = $(this).data('int-colour');
+            var ex_colour = $(this).data('ex-colour');
+            checkUpdateButton(varaints_id, int_colour, ex_colour);
         });
         $('#dtBasicExample1').on('input', 'input.editable-minimum_commission', function () {
             this.value = this.value.replace(/[^0-9]/g, '');
+        });
+        $('#dtBasicExample1').on('input', 'input.editable-csr_price', function () {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            var varaints_id = $(this).data('varaint-id');
+            var int_colour = $(this).data('int-colour');
+            var ex_colour = $(this).data('ex-colour');
+            checkUpdateButton(varaints_id, int_colour, ex_colour);
         });
 
         // Allow only positive numbers and % sign in GP field (no negative signs)
@@ -226,6 +282,7 @@
         // Store the current field data for the modal
         var currentFieldData = {};
         var originalPrice = null; // Store original price for comparison
+        
 
         function saveField(varaints_id, int_colour, ex_colour, fieldName, newValue, reason = '', notifyDepartments = false) {
             // Remove any commas from price before sending
@@ -243,6 +300,15 @@
                 notify_departments: notifyDepartments,
                 notify_departments_type: typeof notifyDepartments
             });
+            
+            // Additional debugging for price updates
+            if (fieldName === 'price' || fieldName === 'csr_price') {
+                console.log('Price field update details:', {
+                    field: fieldName,
+                    value: newValue,
+                    timestamp: new Date().toISOString()
+                });
+            }
             // Always make the AJAX call if we reach this point (price has changed)
             $.ajax({
                 url: "{{ route('variantprices.allvariantpriceupdate') }}",
@@ -260,15 +326,23 @@
                 success: function(response) {
                     console.log('AJAX Success:', response);
                     console.log('notifyDepartments in success:', notifyDepartments);
-                    table.ajax.reload(null, false); // Reload the table data
+                    
+                    // Update the specific field value in the table without full reload
+                    var fieldInput = $(`input.editable-${fieldName}[data-varaint-id="${varaints_id}"][data-int-colour="${int_colour}"][data-ex-colour="${ex_colour}"]`);
+                    var formattedValue = parseFloat(response.new_value || newValue).toLocaleString();
+                    fieldInput.val(formattedValue);
+                    fieldInput.data('original-value', response.new_value || newValue);
+                    
+                    // Update button status after successful update
+                    checkUpdateButton(varaints_id, int_colour, ex_colour);
+                    
                     // Show success message based on notification preference
                     var message = notifyDepartments ? 
                         'Price updated successfully and notification sent to departments!' : 
                         'Price updated successfully!';
                     console.log('Showing success message:', message);
                     var alert = alertify.alert(message, function () {
-                        // Reload after user acknowledges
-                        location.reload();
+                        // No need to reload the page
                     }).set({title:"Success"});
                 },
                 error: function(xhr) {
@@ -276,63 +350,68 @@
                     console.log('Error status:', xhr.status);
                     console.log('Error response:', xhr.responseText);
                     if (xhr.status === 422) {
-                    const errors = xhr.responseJSON.errors;
-                    let errorMessages = '';
-                    for (let field in errors) {
-                        errorMessages += errors[field].join(', ') + '\n';
+                        const response = xhr.responseJSON;
+                        
+                        // Check if it's a CSR price validation error
+                        if (response.requires_csr_price) {
+                            var confirm = alertify.alert(response.error, function (e) {
+                                // Focus on the CSR price field for this variant
+                                var csrPriceInput = $(`input.editable-csr_price[data-varaint-id="${varaints_id}"][data-int-colour="${int_colour}"][data-ex-colour="${ex_colour}"]`);
+                                csrPriceInput.focus();
+                            }).set({title:"CSR Price Required"});
+                        } else if (response.field && response.error) {
+                            // Handle field-specific validation errors (like price must be > 0)
+                            var fieldName = response.field.replace('_', ' ');
+                            var confirm = alertify.alert(response.error, function (e) {
+                                // Focus on the specific field that has the error
+                                var fieldInput = $(`input.editable-${response.field}[data-varaint-id="${varaints_id}"][data-int-colour="${int_colour}"][data-ex-colour="${ex_colour}"]`);
+                                fieldInput.focus();
+                            }).set({title: fieldName + " Validation Error"});
+                        } else {
+                            // Handle other validation errors
+                            const errors = response.errors;
+                            let errorMessages = '';
+                            for (let field in errors) {
+                                errorMessages += errors[field].join(', ') + '\n';
+                            }
+                            var confirm = alertify.confirm(''+errorMessages+'',function (e) {
+                            }).set({title:"Validation Error"});
+                        }
+                    } else {
+                        var confirm = alertify.confirm('Something went wrong',function (e) {
+                        }).set({title:"Something went wrong"});
                     }
-                    var confirm = alertify.confirm(''+errorMessages+'',function (e) {
-                    }).set({title:"Validation Error"});
-                    table.ajax.reload(null, false);
-                } else {
-                    var confirm = alertify.confirm('Something went wrong',function (e) {
-                    }).set({title:"Something went wrong"});
-                    table.ajax.reload(null, false);
-                }
                 }
             }); 
            
         }
 
-        // Function to check if price has changed and show appropriate modal
-        function checkPriceChange(varaints_id, int_colour, ex_colour, fieldName, newValue, originalValue) {
-            var numericNewValue = parseFloat(newValue.replace(/,/g, ''));
-            var numericOriginalValue = parseFloat(originalValue.replace(/,/g, '')) || 0;
+        // Function to check if update button should be enabled
+        function checkUpdateButton(varaints_id, int_colour, ex_colour) {
+            var priceInput = $(`input.editable-price[data-varaint-id="${varaints_id}"][data-int-colour="${int_colour}"][data-ex-colour="${ex_colour}"]`);
+            var csrPriceInput = $(`input.editable-csr_price[data-varaint-id="${varaints_id}"][data-int-colour="${int_colour}"][data-ex-colour="${ex_colour}"]`);
+            var updateBtn = $(`button.update-prices-btn[data-varaint-id="${varaints_id}"][data-int-colour="${int_colour}"][data-ex-colour="${ex_colour}"]`);
             
-            console.log('Price change check:', {
-                newValue: newValue,
-                originalValue: originalValue,
-                numericNewValue: numericNewValue,
-                numericOriginalValue: numericOriginalValue,
-                hasChanged: numericNewValue !== numericOriginalValue
-            });
+            var priceValue = priceInput.val().replace(/[^0-9]/g, '');
+            var csrPriceValue = csrPriceInput.val().replace(/[^0-9]/g, '');
+            var priceNumeric = parseFloat(priceValue) || 0;
+            var csrPriceNumeric = parseFloat(csrPriceValue) || 0;
             
-            // Check if price has actually changed
-            if (numericNewValue === numericOriginalValue) {
-                // No change, don't do anything - just return
-                console.log('No price change detected, skipping update');
-                return;
+            // Get original values
+            var originalPrice = parseFloat(priceInput.data('original-value') || '0') || 0;
+            var originalCsrPrice = parseFloat(csrPriceInput.data('original-value') || '0') || 0;
+            
+            // Check if both fields have valid values and at least one has changed
+            var priceChanged = priceNumeric !== originalPrice;
+            var csrPriceChanged = csrPriceNumeric !== originalCsrPrice;
+            var bothValid = priceNumeric > 0 && csrPriceNumeric > 0;
+            var hasChanges = priceChanged || csrPriceChanged;
+            
+            if (bothValid && hasChanges) {
+                updateBtn.prop('disabled', false).removeClass('btn-secondary').addClass('btn-primary');
+            } else {
+                updateBtn.prop('disabled', true).removeClass('btn-primary').addClass('btn-secondary');
             }
-            
-            // Price has changed, show reason modal
-            currentFieldData = {
-                varaints_id: varaints_id,
-                int_colour: int_colour,
-                ex_colour: ex_colour,
-                field: fieldName,
-                value: newValue,
-                originalValue: originalValue
-            };
-            
-            // Clear previous reason
-            $('#priceChangeReason').val('');
-            
-            // Update modal title based on price change direction
-            var changeDirection = numericNewValue > numericOriginalValue ? 'increased' : 'decreased';
-            $('#priceChangeReasonModalLabel').text('Price ' + changeDirection + ' - Please provide reason');
-            
-            // Show modal
-            $('#priceChangeReasonModal').modal('show');
         }
 
         // Function to show price change reason modal
@@ -367,44 +446,42 @@
             // Close modal
             $('#priceChangeReasonModal').modal('hide');
             
-            // Show notification confirmation alert
-            var numericNewValue = parseFloat(currentFieldData.value.replace(/,/g, ''));
-            var numericOriginalValue = parseFloat(currentFieldData.originalValue.replace(/,/g, '')) || 0;
-            var changeAmount = Math.abs(numericNewValue - numericOriginalValue);
-            var changeDirection = numericNewValue > numericOriginalValue ? 'increased' : 'decreased';
-            
-            console.log('About to show alertify confirm dialog');
-            var dialog = alertify.confirm(
-                `Price has ${changeDirection} by ${changeAmount.toLocaleString()}. Do you want to notify departments about this change?`
-            );
-            dialog.set({ title: "Notify Departments?", labels: { ok: "Notify", cancel: "Don't Notify" } });
-            dialog.set('onok', function(){
-                console.log('Alertify onok fired');
-                console.log('User clicked Notify - proceeding with email notification');
-                saveField(
-                    currentFieldData.varaints_id,
-                    currentFieldData.int_colour,
-                    currentFieldData.ex_colour,
-                    currentFieldData.field,
-                    currentFieldData.value,
-                    reason,
-                    true // notify departments
-                );
-            });
-            dialog.set('oncancel', function(){
-                console.log('Alertify oncancel fired');
-                console.log('User clicked Don\'t Notify - proceeding with update without email');
-                saveField(
-                    currentFieldData.varaints_id,
-                    currentFieldData.int_colour,
-                    currentFieldData.ex_colour,
-                    currentFieldData.field,
-                    currentFieldData.value,
-                    reason,
-                    false // don't notify departments
-                );
-            });
+            // Update both price and CSR price
+            updateBothPrices(currentFieldData, reason);
         });
+        
+        // Function to update both prices
+        function updateBothPrices(data, reason) {
+            var priceChanged = data.price !== data.original_price;
+            var csrPriceChanged = data.csr_price !== data.original_csr_price;
+            
+            if (priceChanged && csrPriceChanged) {
+                // Both changed, show notification dialog
+                var dialog = alertify.confirm(
+                    'Both Price and CSR Price have been updated. Do you want to notify departments about these changes?'
+                );
+                dialog.set({ title: "Notify Departments?", labels: { ok: "Notify", cancel: "Don't Notify" } });
+                dialog.set('onok', function(){
+                    updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'price', data.price, reason, true);
+                    updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'csr_price', data.csr_price, reason, true);
+                });
+                dialog.set('oncancel', function(){
+                    updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'price', data.price, reason, false);
+                    updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'csr_price', data.csr_price, reason, false);
+                });
+            } else if (priceChanged) {
+                // Only price changed
+                updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'price', data.price, reason, false);
+            } else if (csrPriceChanged) {
+                // Only CSR price changed
+                updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'csr_price', data.csr_price, reason, false);
+            }
+        }
+        
+        // Function to update a single price field
+        function updatePriceField(varaints_id, int_colour, ex_colour, field, value, reason, notifyDepartments) {
+            saveField(varaints_id, int_colour, ex_colour, field, value, reason, notifyDepartments);
+        }
 
 // Handling the GP input blur event
 $('#dtBasicExample1').on('blur', 'input.editable-gp', function () {
@@ -430,7 +507,6 @@ $('#dtBasicExample1').on('blur', 'input.editable-gp', function () {
 $('#dtBasicExample1').on('blur', 'input.editable-price', function () {
     var $this = $(this);
     var newValue = $this.val().replace(/[^0-9]/g, ''); // Ensure only digits are kept
-    var originalValue = $this.data('original-value') || '0'; // Get original value
 
     // If new value is empty, set it to 0 for comparison
     if (newValue === '') {
@@ -440,11 +516,42 @@ $('#dtBasicExample1').on('blur', 'input.editable-price', function () {
     }
 
     $this.val(newValue); // Set the formatted value
-
-    // Always check if price has changed (even if new value is 0)
-    checkPriceChange($this.data('varaint-id'), $this.data('int-colour'), $this.data('ex-colour'), 'price', newValue.replace(/,/g, ''), originalValue);
+    
+    // Check update button status
+    checkUpdateButton($this.data('varaint-id'), $this.data('int-colour'), $this.data('ex-colour'));
 });
 $('#dtBasicExample1').on('blur', 'input.editable-minimum_commission', function () {
+    var $this = $(this);
+    var newValue = $this.val().replace(/[^0-9]/g, ''); // Ensure only digits are kept
+    var originalValue = $this.data('original-value') || '0'; // Get original value
+
+    if (newValue !== '') {
+        newValue = parseInt(newValue).toLocaleString(); // Format number with commas
+    }
+
+    $this.val(newValue); // Set the formatted value
+
+    // Only process if there's an actual value change
+    var numericNewValue = parseFloat(newValue.replace(/,/g, '')) || 0;
+    var numericOriginalValue = parseFloat(originalValue.replace(/,/g, '')) || 0;
+    
+    if (numericNewValue !== numericOriginalValue) {
+        // Validate that minimum commission is not 0 or empty
+        if (numericNewValue <= 0) {
+            alert('Minimum Commission cannot be 0 or empty. Please enter a valid value.');
+            // Reset to original value
+            var originalFormattedValue = numericOriginalValue === 0 ? '' : numericOriginalValue.toLocaleString();
+            $this.val(originalFormattedValue);
+            return;
+        }
+        
+        // Value has changed and is valid, save directly without reason modal
+        saveField($this.data('varaint-id'), $this.data('int-colour'), $this.data('ex-colour'), 'minimum_commission', newValue.replace(/,/g, ''), '', false);
+    }
+    // If no change, do nothing
+});
+
+$('#dtBasicExample1').on('blur', 'input.editable-csr_price', function () {
     var $this = $(this);
     var newValue = $this.val().replace(/[^0-9]/g, ''); // Ensure only digits are kept
 
@@ -453,11 +560,45 @@ $('#dtBasicExample1').on('blur', 'input.editable-minimum_commission', function (
     }
 
     $this.val(newValue); // Set the formatted value
+    
+    // Check update button status
+    checkUpdateButton($this.data('varaint-id'), $this.data('int-colour'), $this.data('ex-colour'));
+});
 
-    // Show modal for price change reason
-    if (newValue !== '') {
-        showPriceChangeModal($this.data('varaint-id'), $this.data('int-colour'), $this.data('ex-colour'), 'minimum_commission', newValue.replace(/,/g, ''));
-    }
+// Handle update button click
+$('#dtBasicExample1').on('click', 'button.update-prices-btn', function () {
+    var $this = $(this);
+    var varaints_id = $this.data('varaint-id');
+    var int_colour = $this.data('int-colour');
+    var ex_colour = $this.data('ex-colour');
+    
+    var priceInput = $(`input.editable-price[data-varaint-id="${varaints_id}"][data-int-colour="${int_colour}"][data-ex-colour="${ex_colour}"]`);
+    var csrPriceInput = $(`input.editable-csr_price[data-varaint-id="${varaints_id}"][data-int-colour="${int_colour}"][data-ex-colour="${ex_colour}"]`);
+    
+    var priceValue = priceInput.val().replace(/[^0-9]/g, '');
+    var csrPriceValue = csrPriceInput.val().replace(/[^0-9]/g, '');
+    var originalPrice = priceInput.data('original-value') || '0';
+    var originalCsrPrice = csrPriceInput.data('original-value') || '0';
+    
+    // Store the data for the modal
+    currentFieldData = {
+        varaints_id: varaints_id,
+        int_colour: int_colour,
+        ex_colour: ex_colour,
+        price: priceValue,
+        csr_price: csrPriceValue,
+        original_price: originalPrice,
+        original_csr_price: originalCsrPrice
+    };
+    
+    // Clear previous reason
+    $('#priceChangeReason').val('');
+    
+    // Update modal title
+    $('#priceChangeReasonModalLabel').text('Update Prices - Please provide reason');
+    
+    // Show modal
+    $('#priceChangeReasonModal').modal('show');
 });
     });
     function openModal(id) {
