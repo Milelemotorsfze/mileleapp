@@ -140,47 +140,16 @@ public function store(Request $request)
     }
 
     $totalSpecifications = count($selectedSpecifications);
-    $existingVariantop = Varaint::where('brands_id', $request->input('brands_id'))
-        ->where('master_model_lines_id', $request->input('master_model_lines_id'))
-        ->where('fuel_type', $request->input('fuel_type'))
-        ->where('engine', $request->input('engine'))
-        ->where('coo', $request->input('coo'))
-        ->where('my', $request->input('my'))
-        ->where('drive_train', $request->input('drive_train'))
-        ->where('gearbox', $request->input('gearbox'))
-        ->where('steering', $request->input('steering'))
-        ->where('upholestry', $request->input('upholestry'))
-        ->whereHas('variantItems', function ($q) use ($selectedSpecifications) {
-            $q->whereIn('model_specification_id', array_column($selectedSpecifications, 'specification_id'))
-              ->whereIn('model_specification_options_id', array_column($selectedSpecifications, 'value'));
-        })
-        ->orderBy('created_at', 'desc')
-        ->first();
-    if ($existingVariantop) {
-        // Check if all specifications and values match
-        $matchedSpecifications = 0;
-        foreach ($selectedSpecifications as $specificationData) {
-            $matchFound = $existingVariantop->variantItems->contains(function ($variantItem) use ($specificationData) {
-                return $variantItem->model_specification_id == $specificationData['specification_id'] &&
-                       $variantItem->model_specification_options_id == $specificationData['value'];
-            });
-    
-            if ($matchFound) {
-                $matchedSpecifications++;
-            }
-        }
-        if ($matchedSpecifications == $totalSpecifications) {
-            return redirect()->route('variants.index')->with('error', 'Variant with the same specifications and options already exists');
-        }
-    }
+    // Removed the first validation check that was causing issues when only year is changed
+    // The second validation check below handles the proper duplicate detection
     $existingspecifications = Varaint::with('VariantItems')
         ->where('brands_id', $request->input('brands_id'))
         ->where('master_model_lines_id', $request->input('master_model_lines_id'))
         ->where('coo', $request->input('coo'))
-        ->where('my', $request->input('my'))
         ->where('engine', $request->input('engine'))
         ->where('drive_train', $request->input('drive_train'))
         ->where('gearbox', $request->input('gearbox'))
+        ->where('steering', $request->input('steering'))
         ->where('upholestry', $request->input('upholestry'))
         ->whereHas('variantItems', function ($q) use ($selectedSpecifications) {
             $q->whereIn('model_specification_id', array_column($selectedSpecifications, 'specification_id'))
@@ -1040,7 +1009,6 @@ public function store(Request $request)
                 ->where('fuel_type', $request->input('fuel_type'))
                 ->where('engine', $request->input('engine'))
                 ->where('coo', $request->input('coo'))
-                ->where('my', $request->input('my'))
                 ->where('drive_train', $request->input('drive_train'))
                 ->where('gearbox', $request->input('gearbox'))
                 ->where('steering', $request->input('steering'))
