@@ -185,6 +185,17 @@ public function store(Request $request)
             if ($yearDifferent || $modelDetailDifferent) {
                 // Either year or model description is different, allow the duplicate to proceed
                 // Generate a completely new name instead of incrementing existing one
+                
+                // Debug logging
+                \Log::info('Variant Duplicate Detection - Allowing duplicate due to different year/model description', [
+                    'yearDifferent' => $yearDifferent,
+                    'modelDetailDifferent' => $modelDetailDifferent,
+                    'requestYear' => $requestYear,
+                    'existingYear' => $existingYear,
+                    'requestModelDetail' => $requestModelDetail,
+                    'existingModelDetail' => $existingModelDetail
+                ]);
+                
                 $steering = $request->input('steering');
                 if($steering == "LHD"){
                     $steeringn = "L";
@@ -229,6 +240,16 @@ public function store(Request $request)
                 }
                 $namepart .= $engine . $f;
                 
+                // Debug logging for name generation
+                \Log::info('Variant Name Generation - Creating new name', [
+                    'steeringn' => $steeringn,
+                    'model_line' => $model_line,
+                    'gradeValue' => $gradeValue,
+                    'engine' => $engine,
+                    'fuel_type' => $f,
+                    'namepart' => $namepart
+                ]);
+                
                 // Find the highest number for this base name pattern
                 $maxVariant = Varaint::where('name', 'like', $namepart . '_%')
                     ->orderByRaw("CAST(SUBSTRING_INDEX(name, '_', -1) AS UNSIGNED) DESC")
@@ -251,6 +272,40 @@ public function store(Request $request)
                 } else {
                     $name = $namepart . '_1';
                 }
+                
+                // Double-check for name collision and keep incrementing until we find a unique name
+                $counter = 1;
+                $baseName = $namepart;
+                $originalName = $name;
+                
+                \Log::info('Variant Name Generation - Checking for collisions', [
+                    'originalName' => $originalName,
+                    'baseName' => $baseName
+                ]);
+                
+                while (Varaint::where('name', $name)->exists()) {
+                    $name = $baseName . '_' . $counter;
+                    $counter++;
+                    
+                    \Log::info('Variant Name Generation - Name collision found, trying next', [
+                        'collisionName' => $name,
+                        'counter' => $counter
+                    ]);
+                    
+                    // Safety break to prevent infinite loop
+                    if ($counter > 999) {
+                        $name = $baseName . '_' . time(); // Use timestamp as fallback
+                        \Log::warning('Variant Name Generation - Used timestamp fallback', [
+                            'finalName' => $name
+                        ]);
+                        break;
+                    }
+                }
+                
+                \Log::info('Variant Name Generation - Final name generated', [
+                    'finalName' => $name,
+                    'iterations' => $counter - 1
+                ]);
             } else {
                 // Both year and model description are the same, throw error
                 return redirect()->back()->with('error', 'Variant with the same specifications, year, and model description already exists');
