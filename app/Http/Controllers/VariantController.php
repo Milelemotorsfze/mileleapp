@@ -170,6 +170,27 @@ public function store(Request $request)
             }
         }
         if ($sematchedSpecifications == $totalSpecifications) {
+            // Check if the year (my field) is different - if so, allow the duplicate
+            $requestYear = $request->input('my');
+            $existingYear = $existingspecifications->my;
+            
+            if ($requestYear && $existingYear && $requestYear != $existingYear) {
+                // Years are different, allow the duplicate to proceed
+                // Continue with name generation instead of throwing error
+            } else {
+                // Years are the same or one is missing, check for model description difference
+                $requestModelDetail = $request->input('model_detail');
+                $existingModelDetail = $existingspecifications->model_detail;
+                
+                if ($requestModelDetail && $existingModelDetail && $requestModelDetail != $existingModelDetail) {
+                    // Model descriptions are different, allow the duplicate to proceed
+                    // Continue with name generation instead of throwing error
+                } else {
+                    // Both year and model description are the same, throw error
+                    return redirect()->back()->with('error', 'Variant with the same specifications, year, and model description already exists');
+                }
+            }
+            
             $steering = $request->input('steering');
             if($steering == "LHD"){
                 $steeringn = "L";
@@ -1034,7 +1055,26 @@ public function store(Request $request)
                     }
                 }
                 if ($matchedSpecifications == $totalSpecifications) {
-                    return redirect()->back()->with('error', 'Variant with the same specifications and options already exists');
+                    // Check if the year (my field) is different - if so, allow the duplicate
+                    $requestYear = $request->input('my');
+                    $existingYear = $existingVariantop->my;
+                    
+                    if ($requestYear && $existingYear && $requestYear != $existingYear) {
+                        // Years are different, allow the duplicate to proceed
+                        // Continue with update instead of throwing error
+                    } else {
+                        // Years are the same or one is missing, check for model description difference
+                        $requestModelDetail = $request->input('model_detail');
+                        $existingModelDetail = $existingVariantop->model_detail;
+                        
+                        if ($requestModelDetail && $existingModelDetail && $requestModelDetail != $existingModelDetail) {
+                            // Model descriptions are different, allow the duplicate to proceed
+                            // Continue with update instead of throwing error
+                        } else {
+                            // Both year and model description are the same, throw error
+                            return redirect()->back()->with('error', 'Variant with the same specifications, year, and model description already exists');
+                        }
+                    }
                 }
             }
             $variant = Varaint::findOrFail($variant);
