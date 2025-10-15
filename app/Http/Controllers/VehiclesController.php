@@ -3232,7 +3232,7 @@ class VehiclesController extends Controller
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                ->groupBy('varaints.id', 'int_color.id', 'ex_color.id');
+                ->groupBy('brands.brand_name', 'vehicles.gp', 'vehicles.minimum_commission', 'vehicles.varaints_id', 'vehicles.int_colour', 'vehicles.ex_colour', 'vehicles.price', 'vehicles.csr_price', 'varaints.name', 'master_model_lines.model_line', 'int_color.name', 'ex_color.name');
 
             return DataTables::of($data)
                 ->editColumn('price', function ($data) {
