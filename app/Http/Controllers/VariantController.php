@@ -174,100 +174,86 @@ public function store(Request $request)
             $requestYear = $request->input('my');
             $existingYear = $existingspecifications->my;
             
-            if ($requestYear && $existingYear && $requestYear != $existingYear) {
-                // Years are different, allow the duplicate to proceed
-                // Continue with name generation instead of throwing error
-            } else {
-                // Years are the same or one is missing, check for model description difference
-                $requestModelDetail = $request->input('model_detail');
-                $existingModelDetail = $existingspecifications->model_detail;
-                
-                if ($requestModelDetail && $existingModelDetail && $requestModelDetail != $existingModelDetail) {
-                    // Model descriptions are different, allow the duplicate to proceed
-                    // Continue with name generation instead of throwing error
-                } else {
-                    // Both year and model description are the same, throw error
-                    return redirect()->back()->with('error', 'Variant with the same specifications, year, and model description already exists');
+            // Check if the model description is different
+            $requestModelDetail = $request->input('model_detail');
+            $existingModelDetail = $existingspecifications->model_detail;
+            
+            // Allow duplicate if either year OR model description is different
+            $yearDifferent = ($requestYear && $existingYear && $requestYear != $existingYear);
+            $modelDetailDifferent = ($requestModelDetail && $existingModelDetail && $requestModelDetail != $existingModelDetail);
+            
+            if ($yearDifferent || $modelDetailDifferent) {
+                // Either year or model description is different, allow the duplicate to proceed
+                // Generate a completely new name instead of incrementing existing one
+                $steering = $request->input('steering');
+                if($steering == "LHD"){
+                    $steeringn = "L";
                 }
-            }
-            
-            $steering = $request->input('steering');
-            if($steering == "LHD"){
-                $steeringn = "L";
-            }
-            else{
-                $steeringn = "R";
-            }
-            $master_model_lines_id = $request->input('master_model_lines_id');
-            $engine = $request->input('engine');
-            $fuel_type = $request->input('fuel_type');
-            if($fuel_type == "Petrol")
-            {
-                $f = "P";
-            }
-            else if($fuel_type == "Diesel") 
-            {
-                $f = "D";
-            }
-            else if($fuel_type == "PHEV") 
-            {
-                $f = "PHEV";
-            }
-            else if($fuel_type == "MHEV") 
-            {
-                $f = "MHEV";
-            }
-            else if($fuel_type == "PH") 
-            {
-                $f = "PH";
-            }
-            else
-            {
-                $f = "EV";
-            }
+                else{
+                    $steeringn = "R";
+                }
+                $master_model_lines_id = $request->input('master_model_lines_id');
+                $engine = $request->input('engine');
+                $fuel_type = $request->input('fuel_type');
+                if($fuel_type == "Petrol")
+                {
+                    $f = "P";
+                }
+                else if($fuel_type == "Diesel") 
+                {
+                    $f = "D";
+                }
+                else if($fuel_type == "PHEV") 
+                {
+                    $f = "PHEV";
+                }
+                else if($fuel_type == "MHEV") 
+                {
+                    $f = "MHEV";
+                }
+                else if($fuel_type == "PH") 
+                {
+                    $f = "PH";
+                }
+                else
+                {
+                    $f = "EV";
+                }
 
-            $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
-            $existingName = $existingspecifications->name;
-            $parts = explode('_', $existingName);
-            if (count($parts) > 1) {
-                $lastNumber = end($parts);
-            
-                if (is_numeric($lastNumber)) {
-                    // $namepart = $steeringn . $model_line . $engine . $f;
-                    $namepart = $steeringn . $model_line;
-
-                    if ($gradeValue) {
-                        $namepart .= $gradeValue;
-                    }
-
-                    $namepart .= $engine . $f;
-
-                    $newNumber = (int)$lastNumber + 1;
-                    $name = $namepart . '_' . $newNumber;  // Use $namepart directly
-                } else {
-                    $NewexistingName = substr($existingName, 0, -1);
-                    $parts = explode('_', $NewexistingName);
-            
+                $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
+                
+                // Generate new name from scratch
+                $namepart = $steeringn . $model_line;
+                if ($gradeValue) {
+                    $namepart .= $gradeValue;
+                }
+                $namepart .= $engine . $f;
+                
+                // Find the highest number for this base name pattern
+                $maxVariant = Varaint::where('name', 'like', $namepart . '_%')
+                    ->orderByRaw("CAST(SUBSTRING_INDEX(name, '_', -1) AS UNSIGNED) DESC")
+                    ->first();
+                
+                if ($maxVariant) {
+                    $existingName = $maxVariant->name;
+                    $parts = explode('_', $existingName);
                     if (count($parts) > 1) {
                         $lastNumber = end($parts);
-            
                         if (is_numeric($lastNumber)) {
-                            // $namepart =  $steeringn . $model_line . $engine . $f;
-                            $namepart = $steeringn . $model_line;
-
-                            if ($gradeValue) {
-                                $namepart .= $gradeValue;
-                            }
-
-                            $namepart .= $engine . $f;
                             $newNumber = (int)$lastNumber + 1;
-                            $name = $namepart . '_' . $newNumber;  // Use $namepart directly
-                        } 
+                            $name = $namepart . '_' . $newNumber;
+                        } else {
+                            $name = $namepart . '_1';
+                        }
+                    } else {
+                        $name = $namepart . '_1';
                     }
+                } else {
+                    $name = $namepart . '_1';
                 }
-            }        
-            else {
-                $name = $existingName . '_1';
+            } else {
+                // Both year and model description are the same, throw error
+                return redirect()->back()->with('error', 'Variant with the same specifications, year, and model description already exists');
             }
         }
         else{
@@ -1059,21 +1045,20 @@ public function store(Request $request)
                     $requestYear = $request->input('my');
                     $existingYear = $existingVariantop->my;
                     
-                    if ($requestYear && $existingYear && $requestYear != $existingYear) {
-                        // Years are different, allow the duplicate to proceed
+                    // Check if the model description is different
+                    $requestModelDetail = $request->input('model_detail');
+                    $existingModelDetail = $existingVariantop->model_detail;
+                    
+                    // Allow duplicate if either year OR model description is different
+                    $yearDifferent = ($requestYear && $existingYear && $requestYear != $existingYear);
+                    $modelDetailDifferent = ($requestModelDetail && $existingModelDetail && $requestModelDetail != $existingModelDetail);
+                    
+                    if ($yearDifferent || $modelDetailDifferent) {
+                        // Either year or model description is different, allow the duplicate to proceed
                         // Continue with update instead of throwing error
                     } else {
-                        // Years are the same or one is missing, check for model description difference
-                        $requestModelDetail = $request->input('model_detail');
-                        $existingModelDetail = $existingVariantop->model_detail;
-                        
-                        if ($requestModelDetail && $existingModelDetail && $requestModelDetail != $existingModelDetail) {
-                            // Model descriptions are different, allow the duplicate to proceed
-                            // Continue with update instead of throwing error
-                        } else {
-                            // Both year and model description are the same, throw error
-                            return redirect()->back()->with('error', 'Variant with the same specifications, year, and model description already exists');
-                        }
+                        // Both year and model description are the same, throw error
+                        return redirect()->back()->with('error', 'Variant with the same specifications, year, and model description already exists');
                     }
                 }
             }
