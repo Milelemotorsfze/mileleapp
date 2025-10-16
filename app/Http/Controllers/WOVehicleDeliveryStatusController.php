@@ -64,6 +64,19 @@ class WOVehicleDeliveryStatusController extends Controller
         // Sync location change to vehicles table if location was updated
         if (isset($validatedData['location']) && $validatedData['location']) {
             $this->syncLocationToVehicles($woVehicle, $validatedData['location']);
+        } else {
+            // Auto-set location to Customer when status is Delivered and GDN is provided (only if no location was explicitly provided)
+            if (in_array($validatedData['status'], ['Delivered', 'Delivered With Docs Hold']) && 
+                !empty($validatedData['gdn_number'])) {
+                
+                // Find Customer master location
+                $customerMasterLocation = \App\Models\Masters\MasterOfficeLocation::where('name', 'Customer')->first();
+                if ($customerMasterLocation) {
+                    // Update the delivery status record with Customer location
+                    $statusTracking->update(['location' => $customerMasterLocation->id]);
+                    $this->syncLocationToVehicles($woVehicle, $customerMasterLocation->id);
+                }
+            }
         }
         $workOrder = $woVehicle->workOrder;
 
