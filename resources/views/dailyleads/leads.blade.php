@@ -791,8 +791,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         @endphp
 
         {!! nl2br($formatted) !!}
+        
+        @if($lead->csr_price)
+        <br><br>
+        <strong>CSR Price:</strong> <span style="display: inline-block; background-color: #007bff; color: white; padding: 3px 8px; border-radius: 3px; font-weight: bold;">{{ number_format($lead->csr_price, 0, '.', ',') }}</span>
+        @endif
     @else
         <p class="text-muted">No remarks.</p>
+        @if($lead->csr_price)
+        <br><br>
+        <strong>CSR Price:</strong> <span style="display: inline-block; background-color: #007bff; color: white; padding: 3px 8px; border-radius: 3px; font-weight: bold;">{{ number_format($lead->csr_price, 0, '.', ',') }}</span>
+        @endif
     @endif
 </div>
 

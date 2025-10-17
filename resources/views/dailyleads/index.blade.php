@@ -1274,10 +1274,11 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
   <script>
     $(document).on('click', '.read-more-link', function(e) {
         e.preventDefault();
-      const rawRemarks = $(this).data('remarks-raw') || $(this).data('remarks');
-      const formatted = formatRemarks(rawRemarks, 0);
+      const fullContent = $(this).data('remarks-raw') || $(this).data('remarks');
+      
+      console.log('Full content for modal:', fullContent);
 
-      $('#remarksModalBody').html(formatted);
+      $('#remarksModalBody').html(fullContent);
       $('#remarksModal').modal('show');
     });
 </script>
@@ -2146,7 +2147,7 @@ function s2ab(s) {
 </script>
 
 <script>
-function formatRemarks(rawData, limit = 20) {
+function formatRemarks(rawData, limit = 20, csrPrice = null) {
 
     if (!rawData) return '';
 
@@ -2159,17 +2160,32 @@ function formatRemarks(rawData, limit = 20) {
     data = data.replace(/^(?=\d+\.\s)/m, '<br>');
     data = data.replace(/(\d+\.\s*[^:\n]+:.*)(?=<br>General Remark|<br><br>General Remark|General Remark)/is, '$1<br>');
 
+    // Create CSR Price HTML if available
+    let csrPriceHtml = '';
+    if (csrPrice && csrPrice > 0) {
+        const formattedCsrPrice = parseFloat(csrPrice).toLocaleString('en-US', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        });
+        csrPriceHtml = `<br><strong>CSR Price:</strong> <span style="display: inline-block; background-color: #007bff; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 12px;">${formattedCsrPrice}</span>`;
+    }
+
+    // Full content with CSR price for modal
+    let fullContent = data + csrPriceHtml;
+
+    // Check if we need to truncate (only check the remarks part, not CSR price)
     const tempDiv = $('<div>').html(data);
     const plainText = tempDiv.text().trim();
 
     if (limit > 0 && plainText.length > limit) {
         let shortText = plainText.substring(0, limit) + '...';
-        let escapedData = data.replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        let escapedData = fullContent.replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
-        return `${shortText} <a href="#" class="text-primary read-more-link" data-remarks="${escapedData}">Read More</a>`;
+        // Show CSR price in the list view too
+        return `${shortText}${csrPriceHtml} <a href="#" class="text-primary read-more-link" data-remarks="${escapedData}" data-csr-price="${csrPrice || ''}">Read More</a>`;
     }
 
-    return data;
+    return fullContent;
 }
 </script>
 
@@ -2214,7 +2230,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                       return div.textContent.trim();
                     }
 
-                    return formatRemarks(data);
+                    return formatRemarks(data, 20, row.csr_price);
                   }
                 },
           {
@@ -2397,7 +2413,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                       return div.textContent.trim();
                     }
 
-                    return formatRemarks(data);
+                    return formatRemarks(data, 20, row.csr_price);
                   }
                 },
 
@@ -2543,7 +2559,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                       return div.textContent.trim();
                     }
 
-                    return formatRemarks(data);
+                    return formatRemarks(data, 20, row.csr_price);
                   }
                 },
                 {
@@ -2778,7 +2794,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                       return div.textContent.trim();
                     }
 
-                    return formatRemarks(data);
+                    return formatRemarks(data, 20, row.csr_price);
                   }
                 },
 
@@ -3020,7 +3036,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                       return div.textContent.trim();
                     }
 
-                    return formatRemarks(data);
+                    return formatRemarks(data, 20, row.csr_price);
                   }
                 },
 
@@ -3290,7 +3306,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
               return div.textContent.trim();
             }
 
-            return formatRemarks(data);
+            return formatRemarks(data, 20, row.csr_price);
           }
         },
       {
@@ -3425,7 +3441,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
               return div.textContent.trim();
             }
 
-            return formatRemarks(data);
+            return formatRemarks(data, 20, row.csr_price);
           }
         },
 
@@ -3552,7 +3568,7 @@ $('#my-table_filter').hide();
               return div.textContent.trim();
             }
 
-            return formatRemarks(data);
+            return formatRemarks(data, 20, row.csr_price);
           }
         },
         { data: 'createdby', name: 'users.name' },

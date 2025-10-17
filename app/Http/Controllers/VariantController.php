@@ -140,47 +140,16 @@ public function store(Request $request)
     }
 
     $totalSpecifications = count($selectedSpecifications);
-    $existingVariantop = Varaint::where('brands_id', $request->input('brands_id'))
-        ->where('master_model_lines_id', $request->input('master_model_lines_id'))
-        ->where('fuel_type', $request->input('fuel_type'))
-        ->where('engine', $request->input('engine'))
-        ->where('coo', $request->input('coo'))
-        ->where('my', $request->input('my'))
-        ->where('drive_train', $request->input('drive_train'))
-        ->where('gearbox', $request->input('gearbox'))
-        ->where('steering', $request->input('steering'))
-        ->where('upholestry', $request->input('upholestry'))
-        ->whereHas('variantItems', function ($q) use ($selectedSpecifications) {
-            $q->whereIn('model_specification_id', array_column($selectedSpecifications, 'specification_id'))
-              ->whereIn('model_specification_options_id', array_column($selectedSpecifications, 'value'));
-        })
-        ->orderBy('created_at', 'desc')
-        ->first();
-    if ($existingVariantop) {
-        // Check if all specifications and values match
-        $matchedSpecifications = 0;
-        foreach ($selectedSpecifications as $specificationData) {
-            $matchFound = $existingVariantop->variantItems->contains(function ($variantItem) use ($specificationData) {
-                return $variantItem->model_specification_id == $specificationData['specification_id'] &&
-                       $variantItem->model_specification_options_id == $specificationData['value'];
-            });
-    
-            if ($matchFound) {
-                $matchedSpecifications++;
-            }
-        }
-        if ($matchedSpecifications == $totalSpecifications) {
-            return redirect()->route('variants.index')->with('error', 'Variant with the same specifications and options already exists');
-        }
-    }
+    // Removed the first validation check that was causing issues when only year is changed
+    // The second validation check below handles the proper duplicate detection
     $existingspecifications = Varaint::with('VariantItems')
         ->where('brands_id', $request->input('brands_id'))
         ->where('master_model_lines_id', $request->input('master_model_lines_id'))
         ->where('coo', $request->input('coo'))
-        ->where('my', $request->input('my'))
         ->where('engine', $request->input('engine'))
         ->where('drive_train', $request->input('drive_train'))
         ->where('gearbox', $request->input('gearbox'))
+        ->where('steering', $request->input('steering'))
         ->where('upholestry', $request->input('upholestry'))
         ->whereHas('variantItems', function ($q) use ($selectedSpecifications) {
             $q->whereIn('model_specification_id', array_column($selectedSpecifications, 'specification_id'))
@@ -201,83 +170,145 @@ public function store(Request $request)
             }
         }
         if ($sematchedSpecifications == $totalSpecifications) {
-            $steering = $request->input('steering');
-            if($steering == "LHD"){
-                $steeringn = "L";
-            }
-            else{
-                $steeringn = "R";
-            }
-            $master_model_lines_id = $request->input('master_model_lines_id');
-            $engine = $request->input('engine');
-            $fuel_type = $request->input('fuel_type');
-            if($fuel_type == "Petrol")
-            {
-                $f = "P";
-            }
-            else if($fuel_type == "Diesel") 
-            {
-                $f = "D";
-            }
-            else if($fuel_type == "PHEV") 
-            {
-                $f = "PHEV";
-            }
-            else if($fuel_type == "MHEV") 
-            {
-                $f = "MHEV";
-            }
-            else if($fuel_type == "PH") 
-            {
-                $f = "PH";
-            }
-            else
-            {
-                $f = "EV";
-            }
-
-            $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
-            $existingName = $existingspecifications->name;
-            $parts = explode('_', $existingName);
-            if (count($parts) > 1) {
-                $lastNumber = end($parts);
+            // Check if the year (my field) is different - if so, allow the duplicate
+            $requestYear = $request->input('my');
+            $existingYear = $existingspecifications->my;
             
-                if (is_numeric($lastNumber)) {
-                    // $namepart = $steeringn . $model_line . $engine . $f;
-                    $namepart = $steeringn . $model_line;
-
-                    if ($gradeValue) {
-                        $namepart .= $gradeValue;
-                    }
-
-                    $namepart .= $engine . $f;
-
-                    $newNumber = (int)$lastNumber + 1;
-                    $name = $namepart . '_' . $newNumber;  // Use $namepart directly
-                } else {
-                    $NewexistingName = substr($existingName, 0, -1);
-                    $parts = explode('_', $NewexistingName);
+            // Check if the model description is different
+            $requestModelDetail = $request->input('model_detail');
+            $existingModelDetail = $existingspecifications->model_detail;
             
+            // Allow duplicate if either year OR model description is different
+            $yearDifferent = ($requestYear && $existingYear && $requestYear != $existingYear);
+            $modelDetailDifferent = ($requestModelDetail && $existingModelDetail && $requestModelDetail != $existingModelDetail);
+            
+            if ($yearDifferent || $modelDetailDifferent) {
+                // Either year or model description is different, allow the duplicate to proceed
+                // Generate a completely new name instead of incrementing existing one
+                
+                // Debug logging
+                \Log::info('Variant Duplicate Detection - Allowing duplicate due to different year/model description', [
+                    'yearDifferent' => $yearDifferent,
+                    'modelDetailDifferent' => $modelDetailDifferent,
+                    'requestYear' => $requestYear,
+                    'existingYear' => $existingYear,
+                    'requestModelDetail' => $requestModelDetail,
+                    'existingModelDetail' => $existingModelDetail
+                ]);
+                
+                $steering = $request->input('steering');
+                if($steering == "LHD"){
+                    $steeringn = "L";
+                }
+                else{
+                    $steeringn = "R";
+                }
+                $master_model_lines_id = $request->input('master_model_lines_id');
+                $engine = $request->input('engine');
+                $fuel_type = $request->input('fuel_type');
+                if($fuel_type == "Petrol")
+                {
+                    $f = "P";
+                }
+                else if($fuel_type == "Diesel") 
+                {
+                    $f = "D";
+                }
+                else if($fuel_type == "PHEV") 
+                {
+                    $f = "PHEV";
+                }
+                else if($fuel_type == "MHEV") 
+                {
+                    $f = "MHEV";
+                }
+                else if($fuel_type == "PH") 
+                {
+                    $f = "PH";
+                }
+                else
+                {
+                    $f = "EV";
+                }
+
+                $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
+                
+                // Generate new name from scratch
+                $namepart = $steeringn . $model_line;
+                if ($gradeValue) {
+                    $namepart .= $gradeValue;
+                }
+                $namepart .= $engine . $f;
+                
+                // Debug logging for name generation
+                \Log::info('Variant Name Generation - Creating new name', [
+                    'steeringn' => $steeringn,
+                    'model_line' => $model_line,
+                    'gradeValue' => $gradeValue,
+                    'engine' => $engine,
+                    'fuel_type' => $f,
+                    'namepart' => $namepart
+                ]);
+                
+                // Find the highest number for this base name pattern
+                $maxVariant = Varaint::where('name', 'like', $namepart . '_%')
+                    ->orderByRaw("CAST(SUBSTRING_INDEX(name, '_', -1) AS UNSIGNED) DESC")
+                    ->first();
+                
+                if ($maxVariant) {
+                    $existingName = $maxVariant->name;
+                    $parts = explode('_', $existingName);
                     if (count($parts) > 1) {
                         $lastNumber = end($parts);
-            
                         if (is_numeric($lastNumber)) {
-                            // $namepart =  $steeringn . $model_line . $engine . $f;
-                            $namepart = $steeringn . $model_line;
-
-                            if ($gradeValue) {
-                                $namepart .= $gradeValue;
-                            }
-
-                            $namepart .= $engine . $f;
                             $newNumber = (int)$lastNumber + 1;
-                            $name = $namepart . '_' . $newNumber;  // Use $namepart directly
-                        } 
+                            $name = $namepart . '_' . $newNumber;
+                        } else {
+                            $name = $namepart . '_1';
+                        }
+                    } else {
+                        $name = $namepart . '_1';
+                    }
+                } else {
+                    $name = $namepart . '_1';
+                }
+                
+                // Double-check for name collision and keep incrementing until we find a unique name
+                $counter = 1;
+                $baseName = $namepart;
+                $originalName = $name;
+                
+                \Log::info('Variant Name Generation - Checking for collisions', [
+                    'originalName' => $originalName,
+                    'baseName' => $baseName
+                ]);
+                
+                while (Varaint::where('name', $name)->exists()) {
+                    $name = $baseName . '_' . $counter;
+                    $counter++;
+                    
+                    \Log::info('Variant Name Generation - Name collision found, trying next', [
+                        'collisionName' => $name,
+                        'counter' => $counter
+                    ]);
+                    
+                    // Safety break to prevent infinite loop
+                    if ($counter > 999) {
+                        $name = $baseName . '_' . time(); // Use timestamp as fallback
+                        \Log::warning('Variant Name Generation - Used timestamp fallback', [
+                            'finalName' => $name
+                        ]);
+                        break;
                     }
                 }
-            }        
-            else {
-                $name = $existingName . '_1';
+                
+                \Log::info('Variant Name Generation - Final name generated', [
+                    'finalName' => $name,
+                    'iterations' => $counter - 1
+                ]);
+            } else {
+                // Both year and model description are the same, throw error
+                return redirect()->back()->with('error', 'Variant with the same specifications, year, and model description already exists');
             }
         }
         else{
@@ -1040,7 +1071,6 @@ public function store(Request $request)
                 ->where('fuel_type', $request->input('fuel_type'))
                 ->where('engine', $request->input('engine'))
                 ->where('coo', $request->input('coo'))
-                ->where('my', $request->input('my'))
                 ->where('drive_train', $request->input('drive_train'))
                 ->where('gearbox', $request->input('gearbox'))
                 ->where('steering', $request->input('steering'))
@@ -1066,7 +1096,25 @@ public function store(Request $request)
                     }
                 }
                 if ($matchedSpecifications == $totalSpecifications) {
-                    return redirect()->back()->with('error', 'Variant with the same specifications and options already exists');
+                    // Check if the year (my field) is different - if so, allow the duplicate
+                    $requestYear = $request->input('my');
+                    $existingYear = $existingVariantop->my;
+                    
+                    // Check if the model description is different
+                    $requestModelDetail = $request->input('model_detail');
+                    $existingModelDetail = $existingVariantop->model_detail;
+                    
+                    // Allow duplicate if either year OR model description is different
+                    $yearDifferent = ($requestYear && $existingYear && $requestYear != $existingYear);
+                    $modelDetailDifferent = ($requestModelDetail && $existingModelDetail && $requestModelDetail != $existingModelDetail);
+                    
+                    if ($yearDifferent || $modelDetailDifferent) {
+                        // Either year or model description is different, allow the duplicate to proceed
+                        // Continue with update instead of throwing error
+                    } else {
+                        // Both year and model description are the same, throw error
+                        return redirect()->back()->with('error', 'Variant with the same specifications, year, and model description already exists');
+                    }
                 }
             }
             $variant = Varaint::findOrFail($variant);

@@ -26,6 +26,7 @@ class Calls extends Model
         'strategies_id',
         'priority',
         'custom_brand_model',
+        'csr_price',
         'created_at',
         'leadtype',
         'customer_coming_type',

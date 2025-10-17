@@ -1422,7 +1422,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                                 </td> 
                                                                 <td colspan="3">Location : {{ $vehicle->latestDeliveryStatus->locationName->name ?? '' }}</td>
 
-                                                            @elseif($vehicle->delivery_status == 'Delivered') 
+                                                           @elseif($vehicle->delivery_status == 'Delivered') 
                                                                 
                                                                     <td colspan="2">GDN Number : {{ $vehicle->latestDeliveryStatus->gdn_number ?? '' }}</td>
                                                                     <td colspan="3">Delivered At : @if(!empty($vehicle->latestDeliveryStatus->delivered_at)){{ \Carbon\Carbon::parse($vehicle->latestDeliveryStatus->delivered_at)->format('d M Y') }}@endif</td>

@@ -63,17 +63,15 @@ class CallsReminderController extends Controller
                         ];
                     });
 
-                    // Send email to sales person (using test email for testing)
-                    $testEmail = 'basharat.ali@milele.com';
-                    
+                    // Send email to sales person
                     try {
                         // Use configured Gmail driver for both local and production
                         
-                        Mail::to($testEmail)->send(new LeadsReminderMail($salesPerson, $leadsData, $leadType, $contactedCount, $workingCount));
-                        Log::info("✅ Email sent successfully to {$testEmail} for sales person {$salesPerson->name} ({$leadType} leads)");
+                        Mail::to($salesPerson->email)->send(new LeadsReminderMail($salesPerson, $leadsData, $leadType, $contactedCount, $workingCount));
+                        Log::info("Email sent successfully to {$salesPerson->email} for sales person {$salesPerson->name} ({$leadType} leads)");
                         $emailsSent++;
                     } catch (\Exception $e) {
-                        Log::error("❌ Email sending failed for {$salesPerson->name}: " . $e->getMessage());
+                        Log::error("Email sending failed for {$salesPerson->name}: " . $e->getMessage());
                         Log::error("Email error details: " . $e->getTraceAsString());
                         Log::error("Mail configuration: " . json_encode([
                             'default' => config('mail.default'),
@@ -144,16 +142,14 @@ class CallsReminderController extends Controller
                     ];
                 });
 
-                // Send email to sales person (using test email for testing)
-                $testEmail = 'basharat.ali@milele.com';
-                
+                // Send email to sales person
                 try {
                     // Use configured Gmail driver for both local and production
                     
-                    Mail::to($testEmail)->send(new LeadsReminderMail($salesPerson, $leadsData, $leadType, $contactedCount, $workingCount));
-                    Log::info("✅ Email sent successfully to {$testEmail} for sales person {$salesPerson->name} ({$leadType} leads)");
+                    Mail::to($salesPerson->email)->send(new LeadsReminderMail($salesPerson, $leadsData, $leadType, $contactedCount, $workingCount));
+                    Log::info("Email sent successfully to {$salesPerson->email} for sales person {$salesPerson->name} ({$leadType} leads)");
                 } catch (\Exception $e) {
-                    Log::error("❌ Email sending failed for {$salesPerson->name}: " . $e->getMessage());
+                    Log::error("Email sending failed for {$salesPerson->name}: " . $e->getMessage());
                     Log::error("Email error details: " . $e->getTraceAsString());
                     Log::error("Mail configuration: " . json_encode([
                         'default' => config('mail.default'),
@@ -218,6 +214,100 @@ class CallsReminderController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error getting statistics: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Send daily report to management with structured table data
+     */
+    public function sendDailyReport()
+    {
+        try {
+            Log::info('Starting daily leads report process');
+            
+            // Increase memory limit for large datasets
+            ini_set('memory_limit', '512M');
+            
+            // Get sales persons with pagination to avoid memory issues
+            $salesPersons = User::whereHas('assignedLeads', function ($query) {
+                $query->whereIn('status', ['New', 'contacted', 'working']);
+            })->with(['assignedLeads' => function ($query) {
+                $query->whereIn('status', ['New', 'contacted', 'working'])
+                      ->orderBy('created_at', 'asc')
+                      ->limit(100); // Limit to 100 leads per salesperson to prevent memory issues
+            }])->get();
+
+            $reportData = [];
+            $totalLeads = 0;
+            $salesPersonSummary = [];
+
+            foreach ($salesPersons as $salesPerson) {
+                $leads = $salesPerson->assignedLeads;
+                
+                if ($leads->count() > 0) {
+                    $totalLeads += $leads->count();
+                    
+                    // Get total count for this salesperson (not limited)
+                    $totalCountForSalesPerson = \App\Models\Calls::where('sales_person', $salesPerson->id)
+                        ->whereIn('status', ['New', 'contacted', 'working'])
+                        ->count();
+                    
+                    $salesPersonSummary[] = [
+                        'name' => $salesPerson->name,
+                        'total_leads' => $totalCountForSalesPerson,
+                        'displayed_leads' => $leads->count()
+                    ];
+                    
+                    $leadsData = $leads->map(function ($lead) {
+                        $pendingDays = Carbon::parse($lead->created_at)->diffInDays(Carbon::now());
+                        return [
+                            'id' => $lead->id,
+                            'name' => $lead->name,
+                            'status' => $lead->status,
+                            'pending_days' => $pendingDays,
+                            'url' => 'http://mileleapp.test/callsdeatilspage/' . $lead->id
+                        ];
+                    });
+
+                    $reportData[] = [
+                        'salesperson' => $salesPerson,
+                        'leads' => $leadsData,
+                        'count' => $leads->count()
+                    ];
+                }
+            }
+
+            // Send email to management
+            $CSOemail = 'abdul@milele.com';
+            
+            try {
+                Mail::to($CSOemail)->send(new \App\Mail\DailyLeadsReportMail($reportData, $totalLeads, $salesPersonSummary));
+                Log::info("Daily report sent successfully to {$CSOemail}");
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => "Daily report sent successfully",
+                    'emails_sent' => 1,
+                    'total_leads' => $totalLeads,
+                    'sales_persons' => count($reportData)
+                ]);
+            } catch (\Exception $e) {
+                Log::error("Daily report sending failed: " . $e->getMessage());
+                Log::error("Email error details: " . $e->getTraceAsString());
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error sending daily report: ' . $e->getMessage()
+                ], 500);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Error in daily report process: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error generating daily report: ' . $e->getMessage()
             ], 500);
         }
     }

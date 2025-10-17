@@ -3221,6 +3221,7 @@ class VehiclesController extends Controller
                 'vehicles.int_colour',
                 'vehicles.ex_colour',
                 'vehicles.price',
+                'vehicles.csr_price',
                 'varaints.name',
                 'master_model_lines.model_line',
                 'int_color.name as interior_color',
@@ -3231,11 +3232,14 @@ class VehiclesController extends Controller
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                ->groupBy('varaints.id', 'int_color.id', 'ex_color.id');
+                ->groupBy('brands.brand_name', 'vehicles.gp', 'vehicles.minimum_commission', 'vehicles.varaints_id', 'vehicles.int_colour', 'vehicles.ex_colour', 'vehicles.price', 'vehicles.csr_price', 'varaints.name', 'master_model_lines.model_line', 'int_color.name', 'ex_color.name');
 
             return DataTables::of($data)
                 ->editColumn('price', function ($data) {
                     return number_format($data->price, 0, '.', ',');
+                })
+                ->editColumn('csr_price', function ($data) {
+                    return number_format($data->csr_price, 0, '.', ',');
                 })
                 ->editColumn('minimum_commission', function ($data) {
                     return number_format($data->minimum_commission, 0, '.', ',');
@@ -3251,12 +3255,15 @@ class VehiclesController extends Controller
             $request->all(),
             [
                 'varaints_id' => 'required|integer|exists:varaints,id',
-                'field' => 'required|string|in:price,gp,minimum_commission',
-                'value' => 'required|string',
+                'field' => 'required|string|in:price,gp,minimum_commission,csr_price',
+                'value' => 'required|string|min:1',
                 'reason' => 'nullable|string|max:500',
                 'notify_departments' => 'nullable'
             ],
-            ['value.required' => 'Valid amount value is required']
+            [
+                'value.required' => 'Valid amount value is required',
+                'value.min' => 'Price value cannot be empty or 0'
+            ]
         );
 
         if ($validator->fails()) {
@@ -3300,6 +3307,9 @@ class VehiclesController extends Controller
             return response()->json(['error' => 'Vehicle not found'], 404);
         }
 
+        // Note: CSR price validation is now handled on the frontend
+        // Server-side validation removed to allow simultaneous updates
+
         // Store old value for email notification
         $oldValue = $vehicles->first()->{$request->field};
         $field = $request->field;
@@ -3310,10 +3320,36 @@ class VehiclesController extends Controller
         if ($field == 'minimum_commission') {
             $value = str_replace(',', '', $value);
         }
+        if ($field == 'csr_price') {
+            $value = str_replace(',', '', $value);
+        }
+        
+        // Additional validation for numeric fields to ensure they're greater than 0
+        if (in_array($field, ['price', 'csr_price', 'minimum_commission'])) {
+            $numericValue = floatval($value);
+            if ($numericValue <= 0) {
+                return response()->json([
+                    'success' => false,
+                    'error' => ucfirst(str_replace('_', ' ', $field)) . ' must be greater than 0.',
+                    'field' => $field
+                ], 422);
+            }
+        }
 
         foreach ($vehicles as $vehicle) {
             $vehicle->$field = $value ?? 0;
             $vehicle->save();
+            
+            // Log the update for debugging
+            \Log::info("Vehicle price update", [
+                'vehicle_id' => $vehicle->id,
+                'field' => $field,
+                'old_value' => $oldValue,
+                'new_value' => $value,
+                'csr_price' => $vehicle->csr_price,
+                'price' => $vehicle->price
+            ]);
+            
             $currentDateTime = Carbon::now();
             $vehicleslog = new Vehicleslog();
             $vehicleslog->time = $currentDateTime->toTimeString();
@@ -3354,7 +3390,12 @@ class VehiclesController extends Controller
             }
         }
 
-        return response()->json(['success' => 'Vehicle updated successfully']);
+        return response()->json([
+            'success' => true,
+            'message' => 'Vehicle updated successfully',
+            'new_value' => $value,
+            'field' => $field
+        ]);
     }
 
     /**
