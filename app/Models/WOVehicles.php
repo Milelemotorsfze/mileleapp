@@ -175,3 +175,4 @@ class WOVehicles extends Model
     {
         return $this->hasOne(WOVehicleDeliveryStatus::class, 'w_o_vehicle_id');
     }
+}
