@@ -1422,27 +1422,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                                 </td> 
                                                                 <td colspan="3">Location : {{ $vehicle->latestDeliveryStatus->locationName->name ?? '' }}</td>
 
-                                                            @elseif($vehicle->delivery_status == 'Delivered') 
+                                                           @elseif($vehicle->delivery_status == 'Delivered') 
                                                                 
                                                                     <td colspan="2">GDN Number : {{ $vehicle->latestDeliveryStatus->gdn_number ?? '' }}</td>
                                                                     <td colspan="3">Delivered At : @if(!empty($vehicle->latestDeliveryStatus->delivered_at)){{ \Carbon\Carbon::parse($vehicle->latestDeliveryStatus->delivered_at)->format('d M Y') }}@endif</td>
-                                                                    <td colspan="2">Location : 
-                                                                        @if(in_array($vehicle->delivery_status, ['Delivered', 'Delivered With Docs Hold']))
-                                                                            Customer
-                                                                        @else
-                                                                            {{ $vehicle->latestDeliveryStatus->locationName->name ?? '' }}
-                                                                        @endif
-                                                                    </td>
                                                                     @elseif($vehicle->delivery_status == 'Delivered With Docs Hold')
                                                                 <td colspan="3">Delivery At : @if(!empty($vehicle->latestDeliveryStatus->doc_delivery_date))
                                                                         {{ \Carbon\Carbon::parse($vehicle->latestDeliveryStatus->doc_delivery_date)->format('d M Y') }}
-                                                                    @endif
-                                                                </td>
-                                                                <td colspan="2">Location : 
-                                                                    @if(in_array($vehicle->delivery_status, ['Delivered', 'Delivered With Docs Hold']))
-                                                                        Customer
-                                                                    @else
-                                                                        {{ $vehicle->latestDeliveryStatus->locationName->name ?? '' }}
                                                                     @endif
                                                                 </td> 
                                                             @endif

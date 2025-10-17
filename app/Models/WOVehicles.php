@@ -46,8 +46,6 @@ class WOVehicles extends Model
         'modification_status',
         'pdi_status',
         'delivery_status',
-        'effective_location',
-        'location_name',
     ];
     public function getCertificationPerVinNameAttribute() {
         $certification = '';
@@ -177,45 +175,3 @@ class WOVehicles extends Model
     {
         return $this->hasOne(WOVehicleDeliveryStatus::class, 'w_o_vehicle_id');
     }
-    
-    public function vehicle()
-    {
-        return $this->belongsTo(Vehicles::class, 'vehicle_id');
-    }
-    
-    /**
-     * Get the effective location for display purposes
-     * If delivery status is Delivered, show Customer location
-     * Otherwise show the actual vehicle location
-     */
-    public function getEffectiveLocationAttribute()
-    {
-        // If delivery status is Delivered or Delivered With Docs Hold, show Customer
-        if (in_array($this->delivery_status, ['Delivered', 'Delivered With Docs Hold'])) {
-            return 'Customer';
-        }
-        
-        // Otherwise return the actual vehicle location
-        return $this->vehicle->warehouse->name ?? 'Unknown';
-    }
-    
-    /**
-     * Get the effective location name for display purposes
-     * This method handles the case where delivery status is Delivered
-     */
-    public function getLocationNameAttribute()
-    {
-        // If delivery status is Delivered or Delivered With Docs Hold, show Customer
-        if (in_array($this->delivery_status, ['Delivered', 'Delivered With Docs Hold'])) {
-            return 'Customer';
-        }
-        
-        // For Ready status, show the delivery status location if available
-        if ($this->delivery_status == 'Ready' && $this->latestDeliveryStatus && $this->latestDeliveryStatus->locationName) {
-            return $this->latestDeliveryStatus->locationName->name;
-        }
-        
-        // Otherwise return the actual vehicle location
-        return $this->vehicle->warehouse->name ?? 'Unknown';
-    }
-}

@@ -143,13 +143,7 @@
                                             {{ \Carbon\Carbon::parse($one->delivery_at)->format('d M Y, h:i:s A') }}
                                         @endif
                                     </td>                                     
-                                    <td>
-                                        @if(in_array($one->status, ['Delivered', 'Delivered With Docs Hold']))
-                                            Customer
-                                        @else
-                                            {{$one->locationName->name ?? ''}}
-                                        @endif
-                                    </td> 
+                                    <td>{{$one->locationName->name ?? ''}}</td> 
                                     <td>{{$one->gdn_number ?? ''}}</td>  
                                     <td>
                                         @if(!empty($one->delivered_at))
