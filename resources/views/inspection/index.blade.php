@@ -349,10 +349,10 @@
             data: 'detail', 
             name: 'varaints.detail',
             render: function(data, type, row) {
-                if (type === 'display' && data.length > 50) {
+                if (type === 'display' && data && data.length > 50) {
                     return data.substr(0, 50) + '<span class="read-more">... <a href="#">Read More</a></span>';
                 } else {
-                    return data;
+                    return data || '';
                 }
             }
         },
@@ -393,10 +393,10 @@
                     data: 'detail', 
                     name: 'varaints.detail',
                     render: function(data, type, row) {
-                        if (type === 'display' && data.length > 50) {
+                        if (type === 'display' && data && data.length > 50) {
                             return data.substr(0, 50) + '<span class="read-more">... <a href="#">Read More</a></span>';
                         } else {
-                            return data;
+                            return data || '';
                         }
                     }
                 },
@@ -434,9 +434,9 @@
                     data: 'grn_number',
                     name: 'movement_grns.grn_number',
                     render: function(data, type, row) {
-                        if (row.inspection_status == 'Approved') {
+                        if (row && row.inspection_status == 'Approved') {
                           
-                            return data;
+                            return data || '';
                         }
                         return ''; // If no data, return empty
                     }
@@ -453,10 +453,10 @@
             data: 'detail', 
             name: 'varaints.detail',
             render: function(data, type, row) {
-                if (type === 'display' && data.length > 50) {
+                if (type === 'display' && data && data.length > 50) {
                     return data.substr(0, 50) + '<span class="read-more">... <a href="#">Read More</a></span>';
                 } else {
-                    return data;
+                    return data || '';
                 }
             }
         },
@@ -490,9 +490,9 @@
                     data: 'grn_number',
                     name: 'movement_grns.grn_number',
                     render: function(data, type, row) {
-                        if (row.inspection_status == 'Approved') {
+                        if (row && row.inspection_status == 'Approved') {
                           
-                            return data;
+                            return data || '';
                         }
                         return ''; // If no data, return empty
                     }
@@ -511,10 +511,10 @@
             data: 'detail', 
             name: 'varaints.detail',
             render: function(data, type, row) {
-                if (type === 'display' && data.length > 50) {
+                if (type === 'display' && data && data.length > 50) {
                     return data.substr(0, 50) + '<span class="read-more">... <a href="#">Read More</a></span>';
                 } else {
-                    return data;
+                    return data || '';
                 }
             }
         },
@@ -548,9 +548,9 @@
                     data: 'grn_number',
                     name: 'movement_grns.grn_number',
                     render: function(data, type, row) {
-                        if (row.inspection_status == 'Approved') {
+                        if (row && row.inspection_status == 'Approved') {
                           
-                            return data;
+                            return data || '';
                         }
                         return ''; // If no data, return empty
                     }
@@ -571,10 +571,10 @@
             data: 'detail', 
             name: 'varaints.detail',
             render: function(data, type, row) {
-                if (type === 'display' && data.length > 50) {
+                if (type === 'display' && data && data.length > 50) {
                     return data.substr(0, 50) + '<span class="read-more">... <a href="#">Read More</a></span>';
                 } else {
-                    return data;
+                    return data || '';
                 }
             }
         },
@@ -608,9 +608,9 @@
                     data: 'grn_number',
                     name: 'movement_grns.grn_number',
                     render: function(data, type, row) {
-                        if (row.inspection_status == 'Approved') {
+                        if (row && row.inspection_status == 'Approved') {
                           
-                            return data;
+                            return data || '';
                         }
                         return ''; // If no data, return empty
                     }
@@ -627,10 +627,10 @@
             data: 'detail', 
             name: 'varaints.detail',
             render: function(data, type, row) {
-                if (type === 'display' && data.length > 50) {
+                if (type === 'display' && data && data.length > 50) {
                     return data.substr(0, 50) + '<span class="read-more">... <a href="#">Read More</a></span>';
                 } else {
-                    return data;
+                    return data || '';
                 }
             }
         },

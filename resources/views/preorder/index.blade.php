@@ -314,10 +314,10 @@ function savepolist() {
             data: 'detail', 
             name: 'varaints.detail',
             render: function(data, type, row) {
-                if (type === 'display' && data.length > 50) {
+                if (type === 'display' && data && data.length > 50) {
                     return data.substr(0, 50) + '<span class="read-more">... <a href="#">Read More</a></span>';
                 } else {
-                    return data;
+                    return data || '';
                 }
             }
         },
@@ -369,10 +369,10 @@ function savepolist() {
             data: 'detail', 
             name: 'varaints.detail',
             render: function(data, type, row) {
-                if (type === 'display' && data.length > 50) {
+                if (type === 'display' && data && data.length > 50) {
                     return data.substr(0, 50) + '<span class="read-more">... <a href="#">Read More</a></span>';
                 } else {
-                    return data;
+                    return data || '';
                 }
             }
         },
@@ -422,10 +422,10 @@ function savepolist() {
             data: 'detail', 
             name: 'varaints.detail',
             render: function(data, type, row) {
-                if (type === 'display' && data.length > 50) {
+                if (type === 'display' && data && data.length > 50) {
                     return data.substr(0, 50) + '<span class="read-more">... <a href="#">Read More</a></span>';
                 } else {
-                    return data;
+                    return data || '';
                 }
             }
         },
@@ -477,10 +477,10 @@ function savepolist() {
             data: 'detail', 
             name: 'varaints.detail',
             render: function(data, type, row) {
-                if (type === 'display' && data.length > 50) {
+                if (type === 'display' && data && data.length > 50) {
                     return data.substr(0, 50) + '<span class="read-more">... <a href="#">Read More</a></span>';
                 } else {
-                    return data;
+                    return data || '';
                 }
             }
         },
@@ -528,10 +528,10 @@ function savepolist() {
             data: 'detail', 
             name: 'varaints.detail',
             render: function(data, type, row) {
-                if (type === 'display' && data.length > 50) {
+                if (type === 'display' && data && data.length > 50) {
                     return data.substr(0, 50) + '<span class="read-more">... <a href="#">Read More</a></span>';
                 } else {
-                    return data;
+                    return data || '';
                 }
             }
         },
