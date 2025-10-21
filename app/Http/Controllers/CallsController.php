@@ -876,6 +876,8 @@ class CallsController extends Controller
             $prevPurchase = isset($headerMap['PREVIOUS PURCHASE HISTORY']) ? trim($row[$headerMap['PREVIOUS PURCHASE HISTORY']] ?? '') : '';
             $timeline = isset($headerMap['PURCHASE TIMELINE']) ? trim($row[$headerMap['PURCHASE TIMELINE']] ?? '') : '';
             $additionalNotes = isset($headerMap['ADDITIONAL NOTES']) ? trim($row[$headerMap['ADDITIONAL NOTES']] ?? '') : '';
+            $csrPrice = isset($headerMap['CSR PRICE']) ? trim($row[$headerMap['CSR PRICE']] ?? '') : '';
+            $csrCurrency = isset($headerMap['CSR CURRENCY']) ? trim($row[$headerMap['CSR CURRENCY']] ?? '') : '';
 
             $cleanPhone = preg_replace('/[\s\-]/', '', $rawPhone); 
             
@@ -975,7 +977,7 @@ class CallsController extends Controller
             $sheet = $spreadsheet->getActiveSheet();
             $headers = [
                 'Name', 'Phone', 'Email', 'Location', 'Sales Person', 'Source Name', 'Language',
-                'Brand', 'Model Line Name', 'Custom Brand Model', 'Strategies', 'Priority', 'Error Description'
+                'Brand', 'Model Line Name', 'Custom Brand Model', 'Strategies', 'Priority', 'CSR Price', 'CSR Currency', 'Error Description'
             ];
             $sheet->fromArray($headers, null, 'A1');
 
@@ -1199,6 +1201,8 @@ class CallsController extends Controller
                     $call->created_by = Auth::id();
                     $call->status = "New";
                     $call->location = $row[3];
+                    $call->csr_price = !empty($csrPrice) ? $csrPrice : null;
+                    $call->csr_currency = !empty($csrCurrency) ? $csrCurrency : 'AED';
                     
                     try {
                         $call->save();
@@ -1515,6 +1519,8 @@ class CallsController extends Controller
                     $call->created_by = Auth::id();
                     $call->status = "New";
                     $call->location = $location;
+                    $call->csr_price = !empty($csrPrice) ? $csrPrice : null;
+                    $call->csr_currency = !empty($csrCurrency) ? $csrCurrency : 'AED';
                     
                     try {
                         $call->save();
