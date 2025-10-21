@@ -456,6 +456,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         <label>CSR Price:</label>
                         <input type="number" name="csr_price" class="form-control mb-3" id="csr_price" placeholder="CSR Price" value="{{ old('csr_price', $calls->csr_price) }}" step="0.01" min="0">
                     </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12 remarks-single-div-container">
+                        <label>CSR Currency:</label>
+                        <select class="form-control mb-3" name="csr_currency" id="csr_currency">
+                            <option value="AED" {{ old('csr_currency', $calls->csr_currency ?? 'AED') == 'AED' ? 'selected' : '' }}>AED</option>
+                            <option value="USD" {{ old('csr_currency', $calls->csr_currency ?? 'AED') == 'USD' ? 'selected' : '' }}>USD</option>
+                            <option value="EUR" {{ old('csr_currency', $calls->csr_currency ?? 'AED') == 'EUR' ? 'selected' : '' }}>EUR</option>
+                        </select>
+                    </div>
                     <div class="col-md-12 remarks-single-div-container">
                         <label>General Remark / Additional Notes:</label>
                         <textarea class="form-control" name="general_remark" id="general_remark" placeholder="Additional Extra Remarks/Notes">{{ old('general_remark', $parsedRemarks['General Remark / Additional Notes'] ?? '') }}</textarea>
