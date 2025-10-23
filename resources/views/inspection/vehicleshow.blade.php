@@ -644,24 +644,33 @@
 </script> -->
 <script>
 $(document).ready(function() {
+    // Global variable to store selected specifications
+    var selectedSpecifications = [];
+
     // Function to perform actions based on the selected model line
     function performModelActions(selectedModelLineId) {
         $('#fuel, #coo, #steering, #gear, #drive_train, #my, #ex, #int, #engine, #Upholstery').show();
+        // Reset the global array when model changes
         selectedSpecifications = [];
+        $('#selected_specifications').val('');
 
+        console.log('=== DEBUG: Loading specifications for model line ID:', selectedModelLineId);
         $.ajax({
             type: 'GET',
             url: '/getSpecificationDetails/' + selectedModelLineId,
             success: function(response) {
+                console.log('=== DEBUG: API Response received:', response);
                 var data = response.data;
+                console.log('=== DEBUG: Number of specifications:', data ? data.length : 'undefined');
                 $('#specification-details-container').empty();
                 var selectedSpecifications = [];
 
                 data.forEach(function(item) {
                     var specification = item.specification;
                     var options = item.options;
+                    console.log('=== DEBUG: Processing spec:', specification.name, 'ID:', specification.id, 'Options:', options.length);
                     if (options.length > 0) {
-                    var select = $('<select class="form-control" name="specification_' + specification.id + '"data-specification-id="' + specification.id + '">');
+                    var select = $('<select class="form-control" name="specification_' + specification.id + '" data-specification-id="' + specification.id + '">');
                     select.append('<option value="" disabled selected>Select an Option</option>');
 
                     options.forEach(function(option) {
@@ -675,13 +684,32 @@ $(document).ready(function() {
                     });
                     var selectContainer = $('<div class="d-flex align-items-center"></div>');
                     selectContainer.append(select).append(addButton);
+                    
+                    // Handle specification selection changes
                     select.on('change', function() {
                         var selectedValue = $(this).val();
-                        selectedSpecifications.push({
-                            specification_id: specification.id,
-                            value: selectedValue
+                        var specificationId = specification.id;
+                        console.log('=== DEBUG: Specification changed - ID:', specificationId, 'Value:', selectedValue);
+                        
+                        // Remove existing entry for this specification if it exists
+                        selectedSpecifications = selectedSpecifications.filter(function(item) {
+                            return item.specification_id !== specificationId;
                         });
-                        $('#selected_specifications').val(JSON.stringify(selectedSpecifications));
+                        console.log('=== DEBUG: After filtering, selectedSpecifications:', selectedSpecifications);
+                        
+                        // Add new selection if a value is selected
+                        if (selectedValue && selectedValue !== '') {
+                            selectedSpecifications.push({
+                                specification_id: specificationId,
+                                value: selectedValue
+                            });
+                            console.log('=== DEBUG: Added new selection, selectedSpecifications:', selectedSpecifications);
+                        }
+                        
+                        // Update the hidden field with the current selections
+                        var jsonValue = JSON.stringify(selectedSpecifications);
+                        $('#selected_specifications').val(jsonValue);
+                        console.log('=== DEBUG: Updated hidden field with JSON:', jsonValue);
                     });
 
                     var specificationColumn = $('<div class="col-lg-4 mb-3">');
@@ -690,6 +718,11 @@ $(document).ready(function() {
                     $('#specification-details-container').append(specificationColumn);
                 }
                 });
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading specifications:', error);
+                console.error('Response:', xhr.responseText);
+                $('#specification-details-container').html('<div class="alert alert-danger">Error loading specifications. Please try again.</div>');
             }
         });
 
@@ -702,6 +735,35 @@ $(document).ready(function() {
     // Bind the function to the change event of the model dropdown
     $('#model').on('change', function() {
         performModelActions($(this).val());
+    });
+
+    // Add form validation before submission
+    $('#inspection-form').on('submit', function(e) {
+        console.log('=== DEBUG: Form submission started');
+        console.log('=== DEBUG: selectedSpecifications array:', selectedSpecifications);
+        console.log('=== DEBUG: selectedSpecifications length:', selectedSpecifications.length);
+        console.log('=== DEBUG: Hidden field value:', $('#selected_specifications').val());
+        
+        // Check if any specifications are selected
+        if (selectedSpecifications.length === 0) {
+            e.preventDefault();
+            console.log('=== DEBUG: No specifications selected, preventing form submission');
+            alert('Please select at least one specification before submitting the form.');
+            return false;
+        }
+        
+        // Check if all required fields are filled
+        var modelLine = $('#model').val();
+        if (!modelLine) {
+            e.preventDefault();
+            console.log('=== DEBUG: No model line selected, preventing form submission');
+            alert('Please select a model line.');
+            return false;
+        }
+        
+        console.log('=== DEBUG: Form validation passed, allowing submission');
+        // If all validations pass, allow form submission
+        return true;
     });
 });
 </script>

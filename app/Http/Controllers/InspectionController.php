@@ -367,8 +367,18 @@ class InspectionController extends Controller
         $newfeatures->vehicle_id = $id;
         $newfeatures->save();
         $selectedSpecifications = json_decode(request('selected_specifications'), true);
+        
+        // Debug logging
+        Log::info('=== DEBUG: Inspection Update - selected_specifications received:', [
+            'raw_input' => request('selected_specifications'),
+            'decoded' => $selectedSpecifications,
+            'is_empty' => empty($selectedSpecifications),
+            'is_array' => is_array($selectedSpecifications),
+            'count' => is_array($selectedSpecifications) ? count($selectedSpecifications) : 'not_array'
+        ]);
 
         if (empty($selectedSpecifications)) {
+            Log::warning('=== DEBUG: No specifications selected - redirecting back with error');
             return redirect()->back()->with('error', 'No specifications selected.');
         }
         ksort($selectedSpecifications);
