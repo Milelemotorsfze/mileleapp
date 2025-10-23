@@ -3365,7 +3365,7 @@ class VehiclesController extends Controller
             $vehicleslog->save();
         }
 
-        // Send email notification to departments only if requested
+        // Send email notification to departments only if requested and field is not CSR price
         $notifyDepartmentsInput = $request->input('notify_departments');
         $notifyDepartments = false;
         
@@ -3374,12 +3374,18 @@ class VehiclesController extends Controller
             $notifyDepartments = true;
         }
         
+        // Don't send notifications for CSR price updates
+        if ($field === 'csr_price') {
+            $notifyDepartments = false;
+        }
+        
         \Log::info('Price update notification request', [
             'notify_departments_input' => $notifyDepartmentsInput,
             'notify_departments_converted' => $notifyDepartments,
             'field' => $field,
             'old_value' => $oldValue,
-            'new_value' => $value
+            'new_value' => $value,
+            'csr_price_excluded' => $field === 'csr_price'
         ]);
         
         if ($notifyDepartments) {
