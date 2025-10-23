@@ -377,11 +377,16 @@ class InspectionController extends Controller
             'count' => is_array($selectedSpecifications) ? count($selectedSpecifications) : 'not_array'
         ]);
 
-        if (empty($selectedSpecifications)) {
-            Log::warning('=== DEBUG: No specifications selected - redirecting back with error');
+        // Only require specifications if they are provided and not empty
+        if (request('selected_specifications') && empty($selectedSpecifications)) {
+            Log::warning('=== DEBUG: Specifications field provided but empty - redirecting back with error');
             return redirect()->back()->with('error', 'No specifications selected.');
         }
-        ksort($selectedSpecifications);
+        // Only process specifications if they exist
+        if (!empty($selectedSpecifications)) {
+            ksort($selectedSpecifications);
+        }
+        
         $variant_request = new VariantRequest();
         $variant_request->brands_id = $request->input('brands_id');
         $variant_request->master_model_lines_id = $request->input('master_model_lines_id');
@@ -397,7 +402,10 @@ class InspectionController extends Controller
         $variant_request->ex_colour = $request->input('ex_colour');
         $variant_request->save(); 
         $variant_requestId = $variant_request->id;
-        foreach ($selectedSpecifications as $specificationData) {
+        
+        // Only process specifications if they exist
+        if (!empty($selectedSpecifications)) {
+            foreach ($selectedSpecifications as $specificationData) {
             $existingSpecification = VariantRequestItems::where('variant_request_id', $variant_requestId)
                 ->where('model_specification_id', $specificationData['specification_id'])
                 ->exists();
@@ -407,6 +415,7 @@ class InspectionController extends Controller
                 $specification->model_specification_id = $specificationData['specification_id'];
                 $specification->model_specification_options_id = $specificationData['value'];
                 $specification->save();
+            }
             }
         }        
             $extraItems = [

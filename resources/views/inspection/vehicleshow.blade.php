@@ -665,11 +665,15 @@ $(document).ready(function() {
                 $('#specification-details-container').empty();
                 var selectedSpecifications = [];
 
+                // Track if any specifications are available
+                var hasSpecifications = false;
+                
                 data.forEach(function(item) {
                     var specification = item.specification;
                     var options = item.options;
                     console.log('=== DEBUG: Processing spec:', specification.name, 'ID:', specification.id, 'Options:', options.length);
                     if (options.length > 0) {
+                        hasSpecifications = true;
                     var select = $('<select class="form-control" name="specification_' + specification.id + '" data-specification-id="' + specification.id + '">');
                     select.append('<option value="" disabled selected>Select an Option</option>');
 
@@ -718,6 +722,14 @@ $(document).ready(function() {
                     $('#specification-details-container').append(specificationColumn);
                 }
                 });
+                
+                // Store whether specifications are available globally
+                window.hasSpecificationsAvailable = hasSpecifications;
+                console.log('=== DEBUG: Specifications available:', hasSpecifications);
+                
+                if (!hasSpecifications) {
+                    $('#specification-details-container').html('<div class="alert alert-info">No specifications available for this model line. You can proceed without selecting specifications.</div>');
+                }
             },
             error: function(xhr, status, error) {
                 console.error('Error loading specifications:', error);
@@ -743,13 +755,19 @@ $(document).ready(function() {
         console.log('=== DEBUG: selectedSpecifications array:', selectedSpecifications);
         console.log('=== DEBUG: selectedSpecifications length:', selectedSpecifications.length);
         console.log('=== DEBUG: Hidden field value:', $('#selected_specifications').val());
+        console.log('=== DEBUG: Specifications available:', window.hasSpecificationsAvailable);
         
-        // Check if any specifications are selected
-        if (selectedSpecifications.length === 0) {
+        // Only check for specifications if they are available
+        if (window.hasSpecificationsAvailable && selectedSpecifications.length === 0) {
             e.preventDefault();
-            console.log('=== DEBUG: No specifications selected, preventing form submission');
+            console.log('=== DEBUG: Specifications are available but none selected, preventing form submission');
             alert('Please select at least one specification before submitting the form.');
             return false;
+        }
+        
+        // If no specifications are available, allow submission
+        if (!window.hasSpecificationsAvailable) {
+            console.log('=== DEBUG: No specifications available, allowing submission without specifications');
         }
         
         // Check if all required fields are filled
