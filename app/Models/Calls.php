@@ -27,6 +27,7 @@ class Calls extends Model
         'priority',
         'custom_brand_model',
         'csr_price',
+        'csr_currency',
         'created_at',
         'leadtype',
         'customer_coming_type',

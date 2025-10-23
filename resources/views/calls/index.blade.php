@@ -222,7 +222,10 @@
                       @endphp
                       {!! $shortText !!}
                       @if(strlen($stripped) > 20)
-                          <a href="#" class="text-primary read-more-link" data-remarks="{!! htmlspecialchars($calls->remarks, ENT_QUOTES) !!}">Read More</a>
+                          <a href="#" class="text-primary read-more-link" 
+                             data-remarks="{!! htmlspecialchars($calls->remarks, ENT_QUOTES) !!}"
+                             data-csr-price="{{ $calls->csr_price }}"
+                             data-csr-currency="{{ $calls->csr_currency ?? 'AED' }}">Read More</a>
                       @endif
                     </td>
 
@@ -334,7 +337,10 @@
                       @endphp
                       {!! $shortText !!}
                       @if(strlen($stripped) > 20)
-                          <a href="#" class="text-primary read-more-link" data-remarks="{!! htmlspecialchars($calls->remarks, ENT_QUOTES) !!}">Read More</a>
+                          <a href="#" class="text-primary read-more-link" 
+                             data-remarks="{!! htmlspecialchars($calls->remarks, ENT_QUOTES) !!}"
+                             data-csr-price="{{ $calls->csr_price }}"
+                             data-csr-currency="{{ $calls->csr_currency ?? 'AED' }}">Read More</a>
                       @endif
                   </td>
 
@@ -440,7 +446,10 @@
                       @endphp
                       {!! $shortText !!}
                       @if(strlen($stripped) > 20)
-                          <a href="#" class="text-primary read-more-link" data-remarks="{!! htmlspecialchars($calls->remarks, ENT_QUOTES) !!}">Read More</a>
+                          <a href="#" class="text-primary read-more-link" 
+                             data-remarks="{!! htmlspecialchars($calls->remarks, ENT_QUOTES) !!}"
+                             data-csr-price="{{ $calls->csr_price }}"
+                             data-csr-currency="{{ $calls->csr_currency ?? 'AED' }}">Read More</a>
                       @endif
                     </td>
                     <!-- @php
@@ -492,6 +501,8 @@
 $(document).on('click', '.read-more-link', function(e) {
     e.preventDefault();
     var remarks = $(this).data('remarks');
+    var csrPrice = $(this).data('csr-price');
+    var csrCurrency = $(this).data('csr-currency');
 
     if (remarks.includes('###SEP###')) {
         const lines = remarks.split('###SEP###');
@@ -509,14 +520,41 @@ $(document).on('click', '.read-more-link', function(e) {
                     return `<br><div><strong>${label}</strong>${value}</div>`;
                 }
 
+                // Convert numbered points to bullet points
+                if (label.match(/^\d+\.\s/)) {
+                    const cleanLabel = label.replace(/^\d+\.\s/, '• ');
+                    return `<div><strong>${cleanLabel}</strong>${value}</div>`;
+                }
+
                 return `<div><strong>${label}</strong>${value}</div>`;
             } else {
                 return `<div>${line}</div>`;
             }
         }).join('');
-        $('#remarksModalBody').html(formatted);
+        
+        // Add CSR Price information
+        let csrPriceHtml = '';
+        if (csrPrice && csrPrice !== '' && csrPrice !== '0') {
+            // Format price with commas
+            const formattedPrice = parseFloat(csrPrice).toLocaleString('en-IN');
+            csrPriceHtml = `<div class="mt-3 p-3 bg-light border rounded">
+                <h6><strong>CSR Price Information:</strong></h6>
+                <p><strong>Price:</strong> ${formattedPrice} ${csrCurrency || 'AED'}</p>
+            </div>`;
+        }
+        
+        $('#remarksModalBody').html(formatted + csrPriceHtml);
       } else {
-          $('#remarksModalBody').html(`<div>${remarks}</div>`);
+          let csrPriceHtml = '';
+          if (csrPrice && csrPrice !== '' && csrPrice !== '0') {
+              // Format price with commas
+              const formattedPrice = parseFloat(csrPrice).toLocaleString('en-IN');
+              csrPriceHtml = `<div class="mt-3 p-3 bg-light border rounded">
+                  <h6><strong>CSR Price Information:</strong></h6>
+                  <p><strong>Price:</strong> ${formattedPrice} ${csrCurrency || 'AED'}</p>
+              </div>`;
+          }
+          $('#remarksModalBody').html(`<div>${remarks}</div>` + csrPriceHtml);
       }
 
       $('#remarksModal').modal('show');

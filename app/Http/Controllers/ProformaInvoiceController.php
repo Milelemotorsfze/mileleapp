@@ -494,7 +494,9 @@ class ProformaInvoiceController extends Controller {
         return redirect()->route('not_access_page');
          }
         $quotation_details = QuotationDetail::where('quotation_id', $quotation->id)->first();
-        $quotationitems = QuotationItem::with('varaint')->with('addon')->with('quotationVins')->with('shippingdocuments')->with('shippingcertification')->with('otherlogisticscharges')->where('quotation_id', $quotation->id)->get();
+        $quotationitems = QuotationItem::with(['varaint', 'addon', 'quotationVins', 'shippingdocuments', 'shippingcertification', 'otherlogisticscharges'])
+            ->where('quotation_id', $quotation->id)
+            ->get();
         $quotation_vins = [];
         foreach ($quotationitems as $quotationitem) {
             $quotation_vins = QuotationVins::where('quotation_items_id', $quotationitem->id)->get();
