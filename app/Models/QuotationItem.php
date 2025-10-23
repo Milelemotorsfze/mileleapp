@@ -85,8 +85,7 @@ class QuotationItem extends Model
     }
     public function getQuotationAddonItemsAttribute()
     {
-        $items = QuotationSubItem::with('quotationItem')
-            ->whereHas('quotationItem', function ($query) {
+        $items = QuotationSubItem::whereHas('quotationItem', function ($query) {
                 $query->where('is_enable', true);
             })
             ->where('quotation_item_parent_id', $this->id)
