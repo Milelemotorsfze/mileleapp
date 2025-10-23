@@ -456,24 +456,28 @@
             var csrPriceChanged = data.csr_price !== data.original_csr_price;
             
             if (priceChanged && csrPriceChanged) {
-                // Both changed, show notification dialog
+                // Both changed, show notification dialog only for price (not CSR price)
                 var dialog = alertify.confirm(
-                    'Both Price and CSR Price have been updated. Do you want to notify departments about these changes?'
+                    'Both Price and CSR Price have been updated. Do you want to notify departments about the Price change? (CSR Price updates will not trigger notifications)'
                 );
                 dialog.set({ title: "Notify Departments?", labels: { ok: "Notify", cancel: "Don't Notify" } });
                 dialog.set('onok', function(){
+                    // Update price with notification enabled
                     updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'price', data.price, reason, true);
-                    updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'csr_price', data.csr_price, reason, true);
+                    // Update CSR price without notification (always false)
+                    updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'csr_price', data.csr_price, reason, false);
                 });
                 dialog.set('oncancel', function(){
+                    // Update price without notification
                     updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'price', data.price, reason, false);
+                    // Update CSR price without notification (always false)
                     updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'csr_price', data.csr_price, reason, false);
                 });
             } else if (priceChanged) {
                 // Only price changed
                 updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'price', data.price, reason, false);
             } else if (csrPriceChanged) {
-                // Only CSR price changed
+                // Only CSR price changed - no notification dialog
                 updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'csr_price', data.csr_price, reason, false);
             }
         }
