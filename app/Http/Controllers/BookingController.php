@@ -164,13 +164,6 @@ public function store(Request $request)
                 continue;
             }
             
-            // Validate that the vehicle exists before creating booking request
-            $vehicle = Vehicles::find($vehicleId);
-            if (!$vehicle) {
-                \Log::warning("Attempted to create booking request for non-existent vehicle ID: {$vehicleId}");
-                continue;
-            }
-            
             BookingRequest::create([
                 'date' => $date,
                 'status' => "New",
