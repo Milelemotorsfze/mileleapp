@@ -1275,10 +1275,26 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
     $(document).on('click', '.read-more-link', function(e) {
         e.preventDefault();
       const fullContent = $(this).data('remarks-raw') || $(this).data('remarks');
+      const csrPrice = $(this).data('csr-price');
+      const csrCurrency = $(this).data('csr-currency') || 'AED';
       
       console.log('Full content for modal:', fullContent);
 
-      $('#remarksModalBody').html(fullContent);
+      let modalContent = fullContent;
+      
+      // Add CSR Price if available
+      if (csrPrice && csrPrice !== '' && csrPrice !== '0') {
+        const formattedPrice = parseFloat(csrPrice).toLocaleString('en-US', {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        });
+        modalContent += `<div class="mt-3 p-3 bg-light border rounded">
+          <h6><strong>CSR Price Information:</strong></h6>
+          <p><strong>Price:</strong> ${formattedPrice} ${csrCurrency}</p>
+        </div>`;
+      }
+      
+      $('#remarksModalBody').html(modalContent);
       $('#remarksModal').modal('show');
     });
 </script>
@@ -2147,7 +2163,7 @@ function s2ab(s) {
 </script>
 
 <script>
-function formatRemarks(rawData, limit = 20, csrPrice = null) {
+function formatRemarks(rawData, limit = 20, csrPrice = null, csrCurrency = 'AED') {
 
     if (!rawData) return '';
 
@@ -2167,7 +2183,7 @@ function formatRemarks(rawData, limit = 20, csrPrice = null) {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         });
-        csrPriceHtml = `<br><strong>CSR Price:</strong> <span style="display: inline-block; background-color: #007bff; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 12px;">${formattedCsrPrice}</span>`;
+        csrPriceHtml = `<br><strong>CSR Price:</strong> <span style="display: inline-block; background-color: #007bff; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 12px;">${formattedCsrPrice} ${csrCurrency}</span>`;
     }
 
     // Full content with CSR price for modal
@@ -2182,7 +2198,7 @@ function formatRemarks(rawData, limit = 20, csrPrice = null) {
         let escapedData = fullContent.replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
         // Show CSR price in the list view too
-        return `${shortText}${csrPriceHtml} <a href="#" class="text-primary read-more-link" data-remarks="${escapedData}" data-csr-price="${csrPrice || ''}">Read More</a>`;
+        return `${shortText}${csrPriceHtml} <a href="#" class="text-primary read-more-link" data-remarks="${escapedData}" data-csr-price="${csrPrice || ''}" data-csr-currency="${csrCurrency || 'AED'}">Read More</a>`;
     }
 
     return fullContent;
@@ -2230,7 +2246,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                       return div.textContent.trim();
                     }
 
-                    return formatRemarks(data, 20, row.csr_price);
+                    return formatRemarks(data, 20, row.csr_price, row.csr_currency);
                   }
                 },
           {
@@ -2413,7 +2429,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                       return div.textContent.trim();
                     }
 
-                    return formatRemarks(data, 20, row.csr_price);
+                    return formatRemarks(data, 20, row.csr_price, row.csr_currency);
                   }
                 },
 
@@ -2559,7 +2575,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                       return div.textContent.trim();
                     }
 
-                    return formatRemarks(data, 20, row.csr_price);
+                    return formatRemarks(data, 20, row.csr_price, row.csr_currency);
                   }
                 },
                 {
@@ -2794,7 +2810,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                       return div.textContent.trim();
                     }
 
-                    return formatRemarks(data, 20, row.csr_price);
+                    return formatRemarks(data, 20, row.csr_price, row.csr_currency);
                   }
                 },
 
@@ -3036,7 +3052,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                       return div.textContent.trim();
                     }
 
-                    return formatRemarks(data, 20, row.csr_price);
+                    return formatRemarks(data, 20, row.csr_price, row.csr_currency);
                   }
                 },
 
