@@ -566,10 +566,10 @@
             layer.batchDraw();
         });
         var form = document.getElementById('inspection-form');
-        document.getElementById('submit-button').addEventListener('click', function() {
+        // Set canvas data when the form is about to submit
+        form.addEventListener('submit', function(e) {
             var canvas = stage.toDataURL();
             document.getElementById('canvas-image').value = canvas;
-            form.submit();
         });
         document.getElementById('reset-button').addEventListener('click', function() {
             layer.destroy();
@@ -663,7 +663,8 @@ $(document).ready(function() {
                 var data = response.data;
                 console.log('=== DEBUG: Number of specifications:', data ? data.length : 'undefined');
                 $('#specification-details-container').empty();
-                var selectedSpecifications = [];
+                // Don't redeclare selectedSpecifications here - use the global variable
+                selectedSpecifications = [];
 
                 // Track if any specifications are available
                 var hasSpecifications = false;
@@ -757,8 +758,21 @@ $(document).ready(function() {
         console.log('=== DEBUG: Hidden field value:', $('#selected_specifications').val());
         console.log('=== DEBUG: Specifications available:', window.hasSpecificationsAvailable);
         
+        // Parse the hidden field to check for selected specifications
+        var hiddenFieldValue = $('#selected_specifications').val();
+        var parsedSpecifications = [];
+        if (hiddenFieldValue) {
+            try {
+                parsedSpecifications = JSON.parse(hiddenFieldValue);
+            } catch (e) {
+                console.error('Error parsing selected_specifications:', e);
+                parsedSpecifications = [];
+            }
+        }
+        console.log('=== DEBUG: Parsed specifications count:', parsedSpecifications.length);
+        
         // Only check for specifications if they are available
-        if (window.hasSpecificationsAvailable && selectedSpecifications.length === 0) {
+        if (window.hasSpecificationsAvailable && parsedSpecifications.length === 0) {
             e.preventDefault();
             console.log('=== DEBUG: Specifications are available but none selected, preventing form submission');
             alert('Please select at least one specification before submitting the form.');
