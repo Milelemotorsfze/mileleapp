@@ -769,6 +769,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                 '<strong>Lead Summary - Qualification Notes:</strong><br>',
                 $formatted
             );
+            // Convert numbered points to bullet points
+            $formatted = preg_replace('/(\d+)\.(\s*[^:\n]+):/', '•$2:', $formatted);
             $formatted = preg_replace('/^(?=\d+\.\s)/m', '<br>', $formatted, 1);
 
             $formatted = preg_replace(
