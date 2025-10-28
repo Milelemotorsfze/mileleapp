@@ -1674,7 +1674,8 @@ class CallsController extends Controller
             'Language', 'Brand', 'Model Line', 'Custom Brand Model', 'Strategies',
             'Priority', 'Car Interested', 'Purchase Purpose', 'End User', 
             'Destination Country', 'Planned Units', 'Experience', 'Shipping', 
-            'Payment Method', 'Previous Purchase', 'Timeline', 'Additional Notes', 'Error Message'
+            'Payment Method', 'Previous Purchase', 'Timeline', 'Additional Notes', 
+            'CSR Price', 'CSR Currency', 'Error Message'
         ];
 
         $filename = 'rejected_leads_' . date('Y-m-d_H-i-s') . '.csv';
@@ -2270,7 +2271,9 @@ class CallsController extends Controller
             'Payment Method',
             'Previous Purchase History',
             'Purchase Timeline',
-            'General Remark / Additional Notes'
+            'General Remark / Additional Notes',
+            'CSR Price',
+            'CSR Currency'
         ];
 
         $data = \DB::table('calls as c')
@@ -2316,7 +2319,9 @@ class CallsController extends Controller
             'ls.source_name as lead_source_name',
             \DB::raw('IFNULL(st.name, "No Strategy") as strategies'),
             'mml.model_line as model_line',
-            'c.status'
+            'c.status',
+            'c.csr_price',
+            'c.csr_currency'
         );
         $results = $data->get()->toArray();
 
@@ -2357,7 +2362,20 @@ class CallsController extends Controller
                 $row->phone = $this->formatPhoneNumberForExport($row->phone);
             }
             
-            $parsedResults[] = array_merge((array) $row, $parsed);
+            // Convert row to array and handle CSR price and currency
+            $rowArray = (array) $row;
+            
+            // Format CSR price with separators if it exists and is numeric
+            if (isset($rowArray['csr_price']) && is_numeric($rowArray['csr_price']) && $rowArray['csr_price'] > 0) {
+                $rowArray['csr_price'] = number_format($rowArray['csr_price'], 2, '.', ',');
+            } else {
+                $rowArray['csr_price'] = '';
+            }
+            
+            // Use actual CSR currency value or default to AED
+            $rowArray['csr_currency'] = isset($rowArray['csr_currency']) && !empty($rowArray['csr_currency']) ? $rowArray['csr_currency'] : 'AED';
+            
+            $parsedResults[] = array_merge($rowArray, $parsed);
         }
         return Excel::download(new LeadsExport($parsedResults, $headings), 'leads_export.xlsx');
     }
