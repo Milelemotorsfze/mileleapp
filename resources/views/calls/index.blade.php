@@ -535,8 +535,11 @@ $(document).on('click', '.read-more-link', function(e) {
         // Add CSR Price information
         let csrPriceHtml = '';
         if (csrPrice && csrPrice !== '' && csrPrice !== '0') {
-            // Format price with commas
-            const formattedPrice = parseFloat(csrPrice).toLocaleString('en-IN');
+            // Format price with commas and separators
+            const formattedPrice = parseFloat(csrPrice).toLocaleString('en-US', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            });
             csrPriceHtml = `<div class="mt-3 p-3 bg-light border rounded">
                 <h6><strong>CSR Price Information:</strong></h6>
                 <p><strong>Price:</strong> ${formattedPrice} ${csrCurrency || 'AED'}</p>
@@ -547,8 +550,11 @@ $(document).on('click', '.read-more-link', function(e) {
       } else {
           let csrPriceHtml = '';
           if (csrPrice && csrPrice !== '' && csrPrice !== '0') {
-              // Format price with commas
-              const formattedPrice = parseFloat(csrPrice).toLocaleString('en-IN');
+              // Format price with commas and separators
+              const formattedPrice = parseFloat(csrPrice).toLocaleString('en-US', {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2
+              });
               csrPriceHtml = `<div class="mt-3 p-3 bg-light border rounded">
                   <h6><strong>CSR Price Information:</strong></h6>
                   <p><strong>Price:</strong> ${formattedPrice} ${csrCurrency || 'AED'}</p>

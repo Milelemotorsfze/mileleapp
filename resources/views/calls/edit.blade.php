@@ -454,7 +454,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12 remarks-single-div-container">
                         <label>CSR Price:</label>
-                        <input type="number" name="csr_price" class="form-control mb-3" id="csr_price" placeholder="CSR Price" value="{{ old('csr_price', $calls->csr_price) }}" step="0.01" min="0">
+                        <input type="text" name="csr_price" class="form-control mb-3" id="csr_price" placeholder="CSR Price" value="{{ old('csr_price', $calls->csr_price ? number_format($calls->csr_price, 2, '.', ',') : '') }}">
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12 remarks-single-div-container">
                         <label>CSR Currency:</label>
@@ -955,6 +955,26 @@ redirect()->route('home')->send();
         $('.remove-row-btn').click(function(e) {
             e.preventDefault();
             $(this).closest('.row').remove();
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        // Format CSR price input with separators
+        $('#csr_price').on('input', function() {
+            let value = $(this).val().replace(/[^0-9.]/g, '');
+            if (value) {
+                let parts = value.split('.');
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                $(this).val(parts.join('.'));
+            }
+        });
+
+        // Clean the value before form submission
+        $('#calls').on('submit', function() {
+            let csrPriceValue = $('#csr_price').val().replace(/,/g, '');
+            $('#csr_price').val(csrPriceValue);
         });
     });
 </script>

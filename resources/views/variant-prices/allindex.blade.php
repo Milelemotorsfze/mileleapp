@@ -215,7 +215,10 @@
                     data: 'csr_price', 
                     name: 'vehicles.csr_price', 
                     render: function (data, type, row) {
-                        var displayValue = data === null || data == 0 ? '' : data;
+                        var displayValue = data === null || data == 0 ? '' : parseFloat(data).toLocaleString('en-US', {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 2
+                        });
                         var originalValue = data === null || data == 0 ? '0' : data;
                         return `<input type="text" class="editable-csr_price" data-varaint-id="${row.varaints_id}" data-int-colour="${row.int_colour}" data-ex-colour="${row.ex_colour}" data-original-value="${originalValue}" value="${displayValue}" />`;
                     }
@@ -267,7 +270,12 @@
             this.value = this.value.replace(/[^0-9]/g, '');
         });
         $('#dtBasicExample1').on('input', 'input.editable-csr_price', function () {
-            this.value = this.value.replace(/[^0-9]/g, '');
+            let value = $(this).val().replace(/[^0-9.]/g, '');
+            if (value) {
+                let parts = value.split('.');
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                $(this).val(parts.join('.'));
+            }
             var varaints_id = $(this).data('varaint-id');
             var int_colour = $(this).data('int-colour');
             var ex_colour = $(this).data('ex-colour');
@@ -557,14 +565,19 @@ $('#dtBasicExample1').on('blur', 'input.editable-minimum_commission', function (
 
 $('#dtBasicExample1').on('blur', 'input.editable-csr_price', function () {
     var $this = $(this);
-    var newValue = $this.val().replace(/[^0-9]/g, ''); // Ensure only digits are kept
-
-    if (newValue !== '') {
-        newValue = parseInt(newValue).toLocaleString(); // Format number with commas
+    var rawValue = $this.val().replace(/,/g, ''); // Remove commas but keep decimal points
+    
+    if (rawValue !== '') {
+        var numericValue = parseFloat(rawValue);
+        if (!isNaN(numericValue)) {
+            var formattedValue = numericValue.toLocaleString('en-US', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            });
+            $this.val(formattedValue);
+        }
     }
 
-    $this.val(newValue); // Set the formatted value
-    
     // Check update button status
     checkUpdateButton($this.data('varaint-id'), $this.data('int-colour'), $this.data('ex-colour'));
 });
@@ -580,7 +593,7 @@ $('#dtBasicExample1').on('click', 'button.update-prices-btn', function () {
     var csrPriceInput = $(`input.editable-csr_price[data-varaint-id="${varaints_id}"][data-int-colour="${int_colour}"][data-ex-colour="${ex_colour}"]`);
     
     var priceValue = priceInput.val().replace(/[^0-9]/g, '');
-    var csrPriceValue = csrPriceInput.val().replace(/[^0-9]/g, '');
+    var csrPriceValue = csrPriceInput.val().replace(/,/g, ''); // Remove commas but keep decimal points
     var originalPrice = priceInput.data('original-value') || '0';
     var originalCsrPrice = csrPriceInput.data('original-value') || '0';
     

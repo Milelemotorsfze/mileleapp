@@ -1286,7 +1286,7 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
       if (csrPrice && csrPrice !== '' && csrPrice !== '0') {
         const formattedPrice = parseFloat(csrPrice).toLocaleString('en-US', {
           minimumFractionDigits: 0,
-          maximumFractionDigits: 0
+          maximumFractionDigits: 2
         });
         modalContent += `<div class="mt-3 p-3 bg-light border rounded">
           <h6><strong>CSR Price Information:</strong></h6>
@@ -2181,7 +2181,7 @@ function formatRemarks(rawData, limit = 20, csrPrice = null, csrCurrency = 'AED'
     if (csrPrice && csrPrice > 0) {
         const formattedCsrPrice = parseFloat(csrPrice).toLocaleString('en-US', {
             minimumFractionDigits: 0,
-            maximumFractionDigits: 0
+            maximumFractionDigits: 2
         });
         csrPriceHtml = `<br><strong>CSR Price:</strong> <span style="display: inline-block; background-color: #007bff; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 12px;">${formattedCsrPrice} ${csrCurrency}</span>`;
     }
