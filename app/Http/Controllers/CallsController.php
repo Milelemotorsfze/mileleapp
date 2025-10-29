@@ -2327,6 +2327,7 @@ class CallsController extends Controller
 
         $parsedResults = [];
         foreach ($results as $row) {
+            // Parse remarks for additional fields
             $parsed = [
                 'Car Interested In' => '',
                 'Purpose of Purchase' => '',
@@ -2355,27 +2356,53 @@ class CallsController extends Controller
                 }
             }
 
-            unset($row->remarks); // Remove original remarks
-            
             // Format phone number with country code and remove spaces
-            if (isset($row->phone)) {
-                $row->phone = $this->formatPhoneNumberForExport($row->phone);
+            $formattedPhone = '';
+            if (isset($row->phone) && !empty($row->phone)) {
+                $formattedPhone = $this->formatPhoneNumberForExport($row->phone);
             }
             
-            // Convert row to array and handle CSR price and currency
-            $rowArray = (array) $row;
-            
             // Format CSR price with separators if it exists and is numeric
-            if (isset($rowArray['csr_price']) && is_numeric($rowArray['csr_price']) && $rowArray['csr_price'] > 0) {
-                $rowArray['csr_price'] = number_format($rowArray['csr_price'], 2, '.', ',');
-            } else {
-                $rowArray['csr_price'] = '';
+            $csrPrice = '';
+            if (isset($row->csr_price) && is_numeric($row->csr_price) && $row->csr_price > 0) {
+                $csrPrice = number_format($row->csr_price, 2, '.', ',');
             }
             
             // Use actual CSR currency value or default to AED
-            $rowArray['csr_currency'] = isset($rowArray['csr_currency']) && !empty($rowArray['csr_currency']) ? $rowArray['csr_currency'] : 'AED';
+            $csrCurrency = isset($row->csr_currency) && !empty($row->csr_currency) ? $row->csr_currency : 'AED';
             
-            $parsedResults[] = array_merge($rowArray, $parsed);
+            // Create properly ordered array matching the headers exactly
+            $rowData = [
+                'Name' => $row->name ?? '',
+                'Phone' => $formattedPhone,
+                'Email' => $row->email ?? '',
+                'Location' => $row->location ?? '',
+                'Language' => $row->language ?? '',
+                'Created At' => $row->created_at ?? '',
+                'Type' => $row->type ?? '',
+                'Priority' => $row->priority ?? '',
+                'Custom Brand Model' => $row->custom_brand_model ?? '',
+                'Sales Person Name' => $row->sales_person_name ?? '',
+                'Lead Source Name' => $row->lead_source_name ?? '',
+                'Strategies' => $row->strategies ?? '',
+                'Model Line' => $row->model_line ?? '',
+                'Status' => $row->status ?? '',
+                'Car Interested In' => $parsed['Car Interested In'],
+                'Purpose of Purchase' => $parsed['Purpose of Purchase'],
+                'End User' => $parsed['End User'],
+                'Destination Country' => $parsed['Destination Country'],
+                'Planned Units' => $parsed['Planned Units'],
+                'Experience with UAE Sourcing' => $parsed['Experience with UAE Sourcing'],
+                'Shipping Assistance Required' => $parsed['Shipping Assistance Required'],
+                'Payment Method' => $parsed['Payment Method'],
+                'Previous Purchase History' => $parsed['Previous Purchase History'],
+                'Purchase Timeline' => $parsed['Purchase Timeline'],
+                'General Remark / Additional Notes' => $parsed['General Remark / Additional Notes'],
+                'CSR Price' => $csrPrice,
+                'CSR Currency' => $csrCurrency
+            ];
+            
+            $parsedResults[] = $rowData;
         }
         return Excel::download(new LeadsExport($parsedResults, $headings), 'leads_export.xlsx');
     }
@@ -2638,6 +2665,14 @@ class CallsController extends Controller
         
         // Remove all non-digit characters except +
         $phone = preg_replace('/[^\d+]/', '', $phone);
+        
+        // If phone doesn't start with +, add it for international format
+        if (!empty($phone) && !str_starts_with($phone, '+')) {
+            // If it starts with country code (like 971), add +
+            if (strlen($phone) >= 10) {
+                $phone = '+' . $phone;
+            }
+        }
         
         return $phone;
     }
