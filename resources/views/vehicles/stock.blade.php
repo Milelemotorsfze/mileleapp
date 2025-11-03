@@ -1684,6 +1684,10 @@ function closeModalAndRefresh() {
     window.location.reload();
 }
 
+function generatePDF(vehicleId) {
+    var url = `/viewgrnreport/method?vehicle_id=${vehicleId}`;
+    window.open(url, '_blank');
+}
 function generatePDFpdi(vehicleId) {
     var url = `/viewpdireport/method?vehicle_id=${vehicleId}`;
     window.open(url, '_blank');
