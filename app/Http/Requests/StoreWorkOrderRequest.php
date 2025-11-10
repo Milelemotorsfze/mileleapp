@@ -30,9 +30,16 @@ class StoreWorkOrderRequest extends FormRequest
                 'regex:/^SO-\d{6}$/',
                 'not_in:SO-000000',
                 function ($attribute, $value, $fail) {
-                    // Check if SO exists in sales order table
-                    if (!So::where('so_number', $value)->exists()) {
-                        $fail('The selected sales order does not exist.');
+                    // Check if SO exists in sales order table and is not cancelled
+                    $so = So::where('so_number', $value)
+                        ->where(function ($query) {
+                            $query->where('status', '!=', 'Cancelled')
+                                ->orWhereNull('status');
+                        })
+                        ->first();
+                    
+                    if (!$so) {
+                        $fail('The selected sales order does not exist or has been cancelled.');
                     }
                 }
             ],
