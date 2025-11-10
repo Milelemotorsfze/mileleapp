@@ -850,6 +850,25 @@ class WorkOrderController extends Controller
             } else {
                 $input['lto'] = null;
             }
+            
+            // Additional safety check: Verify SO exists and is not cancelled
+            if (isset($request->so_number)) {
+                $so = So::where('so_number', $request->so_number)
+                    ->where(function ($query) {
+                        $query->where('status', '!=', 'Cancelled')
+                            ->orWhereNull('status');
+                    })
+                    ->first();
+                
+                if (!$so) {
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false, 
+                        'message' => 'The selected sales order does not exist or has been cancelled.'
+                    ], 422);
+                }
+            }
+            
             $workOrder = WorkOrder::create($input);
             $createwostatus = [
                 'wo_id' => $workOrder->id,
@@ -2094,6 +2113,25 @@ class WorkOrderController extends Controller
             if (!empty($changes)) {
                 WORecordHistory::insert($changes);
             }
+            
+            // Validate SO number if it's being changed
+            if (isset($newData['so_number']) && $newData['so_number'] != $workOrder->so_number) {
+                $so = So::where('so_number', $newData['so_number'])
+                    ->where(function ($query) {
+                        $query->where('status', '!=', 'Cancelled')
+                            ->orWhereNull('status');
+                    })
+                    ->first();
+                
+                if (!$so) {
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false, 
+                        'message' => 'The selected sales order does not exist or has been cancelled.'
+                    ], 422);
+                }
+            }
+            
             $workOrder['updated_by'] = $authId;
             // Update the WorkOrder
             $workOrder->update($newData);
