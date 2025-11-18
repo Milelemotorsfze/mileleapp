@@ -135,6 +135,10 @@ $grades = $oldModelId ? \App\Models\MasterGrades::where('model_line_id', $oldMod
                     <select class="form-control select2" autofocus name="fuel_type" id="fuel" required>
                         <option value="Petrol" {{ old('fuel_type') == 'Petrol' ? 'selected' : '' }}>Petrol</option>
                         <option value="Diesel" {{ old('fuel_type') == 'Diesel' ? 'selected' : '' }}>Diesel</option>
+                        <option value="Diesel Hybrid" {{ old('fuel_type') == 'Diesel Hybrid' ? 'selected' : '' }}>Diesel Hybrid</option>
+                        <option value="Petrol MHEV" {{ old('fuel_type') == 'Petrol MHEV' ? 'selected' : '' }}>Petrol MHEV</option>
+                        <option value="Diesel MHEV" {{ old('fuel_type') == 'Diesel MHEV' ? 'selected' : '' }}>Diesel MHEV</option>
+                        <option value="Diesel PHEV" {{ old('fuel_type') == 'Diesel PHEV' ? 'selected' : '' }}>Diesel PHEV</option>
                         <option value="PH" {{ old('fuel_type') == 'PH' ? 'selected' : '' }}>P HEV (Petrol hybrid electrical)</option>
                         <option value="P HEV" {{ old('fuel_type') == 'P HEV' ? 'selected' : '' }}>PHEV (Plug in electrical hybrid)</option>
                         <option value="M HEV" {{ old('fuel_type') == 'M HEV' ? 'selected' : '' }}>M HEV</option>
