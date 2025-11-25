@@ -2922,6 +2922,14 @@ return [$color->id => $formattedName];
         const editBtn = document.querySelector('.edit-btn');
         const importBtn = document.querySelector('.import-btn');
         const updateBtn = document.querySelector('.update-btn');
+
+        // Capture initial values so we only send actual changes to the server.
+        editableFields.forEach(field => {
+            const selectElement = field.querySelector('select');
+            const initialValue = selectElement ? (selectElement.value ?? '') : field.innerText.trim();
+            field.dataset.originalValue = initialValue ?? '';
+        });
+
         if (editBtn && updateBtn && importBtn) {
             editBtn.addEventListener('click', () => {
                 editBtn.style.display = 'none';
@@ -2997,27 +3005,38 @@ return [$color->id => $formattedName];
                             }
                         });
                         const updatedData = [];
+                        const fieldsWithChanges = [];
                         editableFields.forEach(field => {
                             const fieldName = field.classList[1];
-                            const fieldValue = field.innerText.trim();
+                            const originalValue = field.dataset.originalValue ?? '';
                             const selectElement = field.querySelector('select');
+                            let newValue = '';
                             if (selectElement) {
                                 const selectedOption = selectElement.options[selectElement.selectedIndex];
-                                const selectedValue = selectedOption.value;
-                                const selectedText = selectedOption.text;
-                                updatedData.push({
-                                    id: field.getAttribute('data-vehicle-id'),
-                                    name: fieldName,
-                                    value: selectedValue
-                                });
+                                newValue = selectedOption ? selectedOption.value : '';
                             } else {
-                                updatedData.push({
-                                    id: field.getAttribute('data-vehicle-id'),
-                                    name: fieldName,
-                                    value: fieldValue
-                                });
+                                newValue = field.innerText.trim();
                             }
+                            if (newValue === originalValue) {
+                                return;
+                            }
+                            updatedData.push({
+                                id: field.getAttribute('data-vehicle-id'),
+                                name: fieldName,
+                                value: newValue
+                            });
+                            fieldsWithChanges.push({
+                                fieldElement: field,
+                                newValue: newValue
+                            });
                         });
+                        if (updatedData.length === 0) {
+                            alert('No changes detected to update.');
+                            editBtn.style.display = 'block';
+                            updateBtn.style.display = 'none';
+                            importBtn.style.display = 'none';
+                            return;
+                        }
                         console.log(updatedData);
                         fetch('{{ route('purchasing.updateData')}}', {
                                     method: 'POST',
@@ -3033,6 +3052,11 @@ return [$color->id => $formattedName];
                                 const flashMessage = document.getElementById('flash-message');
                                 flashMessage.textContent = 'Data updated successfully';
                                 flashMessage.style.display = 'block';
+
+                                // Persist new baseline values so subsequent edits compare correctly.
+                                fieldsWithChanges.forEach(item => {
+                                    item.fieldElement.dataset.originalValue = item.newValue ?? '';
+                                });
 
                                 // Hide the flash message after 5 seconds
                                 setTimeout(() => {
