@@ -9,6 +9,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
    <h4 class="card-title">
       Users Info
    </h4>
+   @can('user-list-active')
+   @php
+   $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-list-active']);
+   @endphp
+   @if ($hasPermission)
+   <a class="btn btn-sm btn-primary float-end" href="{{ route('users.export') }}" text-align: right>
+   <i class="fa fa-file-excel-o" aria-hidden="true"></i> Export
+   </a>
+   <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
+   @endif
+   @endcan
    @can('user-create')
    @php
    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create']);

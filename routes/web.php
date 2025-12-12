@@ -199,6 +199,7 @@ Route::get('/d', function () {
     Route::post('/update-save-skill', [ProfileController::class, 'saveskill'])->name('profile.saveskill');
     Route::post('/update-history-info', [ProfileController::class, 'updatehistoryInfo'])->name('profile.updatehistoryInfo');
     // User
+    Route::get('users/export', [UserController::class, 'export'])->name('users.export');
     Route::resource('users', UserController::class);
     Route::get('/getUser/{id}', [UserController::class, 'getUserById']);
     Route::get('/users-search', [UserController::class, 'searchUsers']);

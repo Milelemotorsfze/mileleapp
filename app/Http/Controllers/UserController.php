@@ -26,6 +26,8 @@ namespace App\Http\Controllers;
     use Validator;
     use Exception;
     use App\Models\HRM\Employee\EmployeeProfile;
+    use App\Exports\UsersExport;
+    use Maatwebsite\Excel\Facades\Excel;
     class UserController extends Controller
     {
         public function index(Request $request)
@@ -249,6 +251,17 @@ namespace App\Http\Controllers;
             (new UserActivityController)->createActivity('Restore User');
             return redirect()->route('users.index')
                             ->with('success','User updated successfully');
+        }
+        public function export()
+        {
+            $users = User::with(['empProfile.designation', 'empProfile.department'])
+                ->orderBy('status', 'DESC')
+                ->whereIn('status', ['new', 'active'])
+                ->where('password', '!=', '')
+                ->whereHas('roles')
+                ->get();
+
+            return Excel::download(new UsersExport($users), 'users.xlsx');
         }
         public function updateRole(Request $request, $roleId)
         {
