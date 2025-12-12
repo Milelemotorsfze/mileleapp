@@ -256,7 +256,7 @@ namespace App\Http\Controllers;
         {
             $users = User::with(['empProfile.designation', 'empProfile.department'])
                 ->orderBy('status', 'DESC')
-                ->whereIn('status', ['new', 'active'])
+                ->whereIn('status', ['new', 'active', 'inactive'])
                 ->where('password', '!=', '')
                 ->whereHas('roles')
                 ->get();
