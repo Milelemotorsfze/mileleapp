@@ -233,12 +233,14 @@ public function store(Request $request)
 
                 $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
                 
-                // Generate new name from scratch
+                // Generate new name from scratch (use space-less base for lookups)
                 $namepart = $steeringn . $model_line;
                 if ($gradeValue) {
                     $namepart .= $gradeValue;
                 }
                 $namepart .= $engine . $f;
+                // Remove spaces so lookup and saved name stay aligned
+                $namepart = str_replace(' ', '', $namepart);
                 
                 // Debug logging for name generation
                 \Log::info('Variant Name Generation - Creating new name', [
