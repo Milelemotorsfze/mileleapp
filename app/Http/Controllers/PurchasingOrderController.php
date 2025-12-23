@@ -1299,6 +1299,8 @@ class PurchasingOrderController extends Controller
                   ]);
             }
         ])->where('purchasing_order_id', $id)->get();
+        $vehicleIds = $vehicles->pluck('id');
+        $purchasingOrderTotalCost = VehiclePurchasingCost::whereIn('vehicles_id', $vehicleIds)->sum('unit_price');
         $vehiclesdel = Vehicles::onlyTrashed()->where('purchasing_order_id', $id)->get();
         $vendorsname = Supplier::where('id', $purchasingOrder->vendors_id)->value('supplier');
         $vehicleslog = Vehicleslog::whereNull('category')->whereIn('vehicles_id', $vehicles->pluck('id'))->get();
@@ -1475,7 +1477,8 @@ class PurchasingOrderController extends Controller
             'additionalpaymentpapproved',
             'additionalpaymentintreq',
             'vehiclesdn',
-            'purchaseOrders'
+            'purchaseOrders',
+            'purchasingOrderTotalCost'
         ));
     }
 
@@ -4425,188 +4428,198 @@ class PurchasingOrderController extends Controller
     }
     public function updatePrices(Request $request)
     {
-        $prices = $request->input('prices');
-        $totalPrice = intval($request->input('total_price'));
-        $purchasingOrderId = $request->input('purchasing_order_id');
-        $userId = auth()->id();
-        $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
-        $orderCurrency = $purchasingOrder->currency;
-        $supplierAccount = SupplierAccount::where('suppliers_id', $purchasingOrder->vendors_id)->first();
+        DB::beginTransaction();
+        try {
+            $prices = $request->input('prices');
+            $purchasingOrderId = $request->input('purchasing_order_id');
+            $userId = auth()->id();
+            $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
+            $orderCurrency = $purchasingOrder->currency;
+            $supplierAccount = SupplierAccount::where('suppliers_id', $purchasingOrder->vendors_id)->first();
 
-        if (!$supplierAccount) {
-            $createsupplieracc = new SupplierAccount();
-            $createsupplieracc->opening_balance = 0;
-            $createsupplieracc->current_balance = 0;
-            $createsupplieracc->suppliers_id = $purchasingOrder->vendors_id;
-            $createsupplieracc->currency = $orderCurrency;
-            $createsupplieracc->save();
-            $supplierAccount = $createsupplieracc;
-        }
-
-        $accountCurrency = $supplierAccount->currency;
-
-        $conversionRates = [
-            'USD' => 3.67,
-            'EUR' => 4.03,
-            'GBP' => 4.66,
-            'JPY' => 0.023,
-            'CAD' => 2.69,
-            "PHP" => 0.063,
-            'SAR' => 0.98,
-        ];
-
-        $totalDifference = 0;
-        $priceChanges = [];
-        $totalAmountOfChanges = 0;
-        $totalVehiclesChanged = 0;
-        foreach ($prices as $priceData) {
-            $vehicleId = $priceData['vehicle_id'];
-            $newPrice = $priceData['new_price'];
-            $vehicleCost = VehiclePurchasingCost::where('vehicles_id', $vehicleId)->first();
-            $oldPrice = $vehicleCost->unit_price;
-            $priceDifference = $oldPrice - $newPrice;
-
-            if ($priceDifference != 0) {
-                $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-                $currentDateTime = Carbon::now($dubaiTimeZone);
-
-                $vehicleslog = new Vehicleslog();
-                $vehicleslog->time = $currentDateTime->toTimeString();
-                $vehicleslog->date = $currentDateTime->toDateString();
-                $vehicleslog->status = 'Update Vehicles Price';
-                $vehicleslog->vehicles_id = $vehicleId;
-                $vehicleslog->field = "Price";
-                $vehicleslog->old_value = $oldPrice;
-                $vehicleslog->new_value = $newPrice;
-                $vehicleslog->created_by = $userId;
-                $vehicleslog->role = Auth::user()->selectedRole;
-                $vehicleslog->save();
-                $statuses = [
-                    'Payment Release Approved',
-                    'Payment Completed',
-                    'Vendor Confirmed',
-                    'Incoming Stock'
-                ];
-
-                $vehiclesalreadypaid = Vehicles::where('id', $vehicleId)
-                    ->where(function ($query) use ($statuses) {
-                        $query->whereIn('payment_status', $statuses)
-                            ->where('purchased_paid_percentage', 100)
-                            ->whereNull('remaining_payment_status');
-                    })
-                    ->first();
-                $vehicleAlreadyPaidOrRemainingInStatuses = Vehicles::where('id', $vehicleId)
-                    ->where(function ($query) use ($statuses) {
-                        $query->whereIn('payment_status', $statuses)
-                            ->where('purchased_paid_percentage', 100)
-                            ->orWhereIn('remaining_payment_status', $statuses);
-                    })
-                    ->first();
-                $priceChange = abs($priceDifference);
-                $changeType = $priceDifference > 0 ? 'discount' : 'surcharge';
-
-                $priceupdates = new PurchasedOrderPriceChanges();
-                $priceupdates->purchasing_order_id = $purchasingOrderId;
-                $priceupdates->vehicles_id = $vehicleId;
-                $priceupdates->original_price = $oldPrice;
-                $priceupdates->new_price = $newPrice;
-                $priceupdates->price_change = $priceChange;
-                $priceupdates->change_type = $changeType;
-                $priceupdates->save();
-
-                $vehicle = Vehicles::find($vehicleId);
-                $priceChanges[] = [
-                    'vehicle_reference' => $vehicle->id,
-                    'Vin' => $vehicle->vin,
-                    'variant_name' => $vehicle->variant->name,
-                    'old_price' => $oldPrice,
-                    'new_price' => $newPrice,
-                    'changed_by' => auth()->user()->name,
-                ];
-
-                $totalAmountOfChanges += $priceDifference;
-                $totalVehiclesChanged++;
-
-                if ($orderCurrency !== $accountCurrency) {
-                    $priceDifferenceInAccountCurrency = $this->convertCurrency($priceDifference, $orderCurrency, $accountCurrency, $conversionRates);
-        } else {
-                    $priceDifferenceInAccountCurrency = $priceDifference;
-                }
-
-                $totalDifference += $priceDifferenceInAccountCurrency;
-
-                $vehicleCost->update(['unit_price' => $newPrice]);
-
-                if (!empty($vehiclesalreadypaid) && !empty($vehicleAlreadyPaidOrRemainingInStatuses)) {
-                    // $supplierAccount->current_balance += $totalDifference;
-                    // $supplierAccount->save();
-
-                    SupplierAccountTransaction::create([
-                        'transaction_type' => $totalDifference > 0 ? 'Debit' : 'Credit',
-                        'purchasing_order_id' => $purchasingOrderId,
-                        'supplier_account_id' => $supplierAccount->id,
-                        'created_by' => $userId,
-                        'account_currency' => $accountCurrency,
-                        'transaction_amount' => abs($totalDifference),
-                    ]);
-                }
-                if ($purchasingOrder->is_demand_planning_po == 1) {
-                    $recipients = [
-                        config('mail.custom_recipients.dp'),
-                        config('mail.custom_recipients.finance'),
-                    ];
-                } else {
-                    $recipients = [
-                        config('mail.custom_recipients.cso'),
-                        config('mail.custom_recipients.finance'),
-                    ];
-                }
-                $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
-                // Format the detail text including the price changes information
-                $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
-                    "PFI Number: " . $purchasingOrder->pl_number . "\n" .
-                    "Stage: " . "Price Change\n" .
-                    "Order URL: " . $orderUrl . "\n\n" .
-                    "Price Changes:\n";
-
-                foreach ($priceChanges as $priceChange) {
-                    $detailText .= "Vehicle ID: " . $priceChange['vehicle_reference'] .
-                        " (VIN: " . $priceChange['Vin'] . ", Variant: " . $priceChange['variant_name'] . "): " .
-                        "From '" . number_format($priceChange['old_price'], 2) . "' to '" .
-                        number_format($priceChange['new_price'], 2) . "'\n" .
-                        "Changed by: " . $priceChange['changed_by'] . "\n";
-                }
-
-                // Save the notification
-                $notification = new DepartmentNotifications();
-                $notification->module = 'Procurement';
-                $notification->type = 'Information';
-                $notification->detail = $detailText;
-                $notification->save();
-                if ($purchasingOrder->is_demand_planning_po == 1) {
-                    $dnaccess = new Dnaccess();
-                    $dnaccess->master_departments_id = 4;
-                    $dnaccess->department_notifications_id = $notification->id;
-                    $dnaccess->save();
-                    $dnaccess = new Dnaccess();
-                    $dnaccess->master_departments_id = 1;
-                    $dnaccess->department_notifications_id = $notification->id;
-                    $dnaccess->save();
-                } else {
-                    $dnaccess = new Dnaccess();
-                    $dnaccess->master_departments_id = 15;
-                    $dnaccess->department_notifications_id = $notification->id;
-                    $dnaccess->save();
-                    $dnaccess = new Dnaccess();
-                    $dnaccess->master_departments_id = 1;
-                    $dnaccess->department_notifications_id = $notification->id;
-                    $dnaccess->save();
-                }
-                Mail::to($recipients)->send(new PriceChangeNotification($purchasingOrder->po_number, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged, $orderUrl));
+            if (!$supplierAccount) {
+                $createsupplieracc = new SupplierAccount();
+                $createsupplieracc->opening_balance = 0;
+                $createsupplieracc->current_balance = 0;
+                $createsupplieracc->suppliers_id = $purchasingOrder->vendors_id;
+                $createsupplieracc->currency = $orderCurrency;
+                $createsupplieracc->save();
+                $supplierAccount = $createsupplieracc;
             }
-        }
 
-        $purchasingOrder->update(['totalcost' => $totalPrice]);
+            $accountCurrency = $supplierAccount->currency;
+
+            $conversionRates = [
+                'USD' => 3.67,
+                'EUR' => 4.03,
+                'GBP' => 4.66,
+                'JPY' => 0.023,
+                'CAD' => 2.69,
+                "PHP" => 0.063,
+                'SAR' => 0.98,
+            ];
+
+            $totalDifference = 0;
+            $priceChanges = [];
+            $totalAmountOfChanges = 0;
+            $totalVehiclesChanged = 0;
+            foreach ($prices as $priceData) {
+                $vehicleId = $priceData['vehicle_id'];
+                $newPrice = $priceData['new_price'];
+                $vehicleCost = VehiclePurchasingCost::where('vehicles_id', $vehicleId)->first();
+                $oldPrice = $vehicleCost->unit_price;
+                $priceDifference = $oldPrice - $newPrice;
+
+                if ($priceDifference != 0) {
+                    $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                    $currentDateTime = Carbon::now($dubaiTimeZone);
+
+                    $vehicleslog = new Vehicleslog();
+                    $vehicleslog->time = $currentDateTime->toTimeString();
+                    $vehicleslog->date = $currentDateTime->toDateString();
+                    $vehicleslog->status = 'Update Vehicles Price';
+                    $vehicleslog->vehicles_id = $vehicleId;
+                    $vehicleslog->field = "Price";
+                    $vehicleslog->old_value = $oldPrice;
+                    $vehicleslog->new_value = $newPrice;
+                    $vehicleslog->created_by = $userId;
+                    $vehicleslog->role = Auth::user()->selectedRole;
+                    $vehicleslog->save();
+                    $statuses = [
+                        'Payment Release Approved',
+                        'Payment Completed',
+                        'Vendor Confirmed',
+                        'Incoming Stock'
+                    ];
+
+                    $vehiclesalreadypaid = Vehicles::where('id', $vehicleId)
+                        ->where(function ($query) use ($statuses) {
+                            $query->whereIn('payment_status', $statuses)
+                                ->where('purchased_paid_percentage', 100)
+                                ->whereNull('remaining_payment_status');
+                        })
+                        ->first();
+                    $vehicleAlreadyPaidOrRemainingInStatuses = Vehicles::where('id', $vehicleId)
+                        ->where(function ($query) use ($statuses) {
+                            $query->whereIn('payment_status', $statuses)
+                                ->where('purchased_paid_percentage', 100)
+                                ->orWhereIn('remaining_payment_status', $statuses);
+                        })
+                        ->first();
+                    $priceChange = abs($priceDifference);
+                    $changeType = $priceDifference > 0 ? 'discount' : 'surcharge';
+
+                    $priceupdates = new PurchasedOrderPriceChanges();
+                    $priceupdates->purchasing_order_id = $purchasingOrderId;
+                    $priceupdates->vehicles_id = $vehicleId;
+                    $priceupdates->original_price = $oldPrice;
+                    $priceupdates->new_price = $newPrice;
+                    $priceupdates->price_change = $priceChange;
+                    $priceupdates->change_type = $changeType;
+                    $priceupdates->save();
+
+                    $vehicle = Vehicles::find($vehicleId);
+                    $priceChanges[] = [
+                        'vehicle_reference' => $vehicle->id,
+                        'Vin' => $vehicle->vin,
+                        'variant_name' => $vehicle->variant->name,
+                        'old_price' => $oldPrice,
+                        'new_price' => $newPrice,
+                        'changed_by' => auth()->user()->name,
+                    ];
+
+                    $totalAmountOfChanges += $priceDifference;
+                    $totalVehiclesChanged++;
+
+                    if ($orderCurrency !== $accountCurrency) {
+                        $priceDifferenceInAccountCurrency = $this->convertCurrency($priceDifference, $orderCurrency, $accountCurrency, $conversionRates);
+                    } else {
+                        $priceDifferenceInAccountCurrency = $priceDifference;
+                    }
+
+                    $totalDifference += $priceDifferenceInAccountCurrency;
+
+                    $vehicleCost->update(['unit_price' => $newPrice]);
+
+                    if (!empty($vehiclesalreadypaid) && !empty($vehicleAlreadyPaidOrRemainingInStatuses)) {
+                        SupplierAccountTransaction::create([
+                            'transaction_type' => $totalDifference > 0 ? 'Debit' : 'Credit',
+                            'purchasing_order_id' => $purchasingOrderId,
+                            'supplier_account_id' => $supplierAccount->id,
+                            'created_by' => $userId,
+                            'account_currency' => $accountCurrency,
+                            'transaction_amount' => abs($totalDifference),
+                        ]);
+                    }
+                    if ($purchasingOrder->is_demand_planning_po == 1) {
+                        $recipients = [
+                            config('mail.custom_recipients.dp'),
+                            config('mail.custom_recipients.finance'),
+                        ];
+                    } else {
+                        $recipients = [
+                            config('mail.custom_recipients.cso'),
+                            config('mail.custom_recipients.finance'),
+                        ];
+                    }
+                    $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
+                    $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+                        "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+                        "Stage: " . "Price Change\n" .
+                        "Order URL: " . $orderUrl . "\n\n" .
+                        "Price Changes:\n";
+
+                    foreach ($priceChanges as $priceChange) {
+                        $detailText .= "Vehicle ID: " . $priceChange['vehicle_reference'] .
+                            " (VIN: " . $priceChange['Vin'] . ", Variant: " . $priceChange['variant_name'] . "): " .
+                            "From '" . number_format($priceChange['old_price'], 2) . "' to '" .
+                            number_format($priceChange['new_price'], 2) . "'\n" .
+                            "Changed by: " . $priceChange['changed_by'] . "\n";
+                    }
+
+                    $notification = new DepartmentNotifications();
+                    $notification->module = 'Procurement';
+                    $notification->type = 'Information';
+                    $notification->detail = $detailText;
+                    $notification->save();
+                    if ($purchasingOrder->is_demand_planning_po == 1) {
+                        $dnaccess = new Dnaccess();
+                        $dnaccess->master_departments_id = 4;
+                        $dnaccess->department_notifications_id = $notification->id;
+                        $dnaccess->save();
+                        $dnaccess = new Dnaccess();
+                        $dnaccess->master_departments_id = 1;
+                        $dnaccess->department_notifications_id = $notification->id;
+                        $dnaccess->save();
+                    } else {
+                        $dnaccess = new Dnaccess();
+                        $dnaccess->master_departments_id = 15;
+                        $dnaccess->department_notifications_id = $notification->id;
+                        $dnaccess->save();
+                        $dnaccess = new Dnaccess();
+                        $dnaccess->master_departments_id = 1;
+                        $dnaccess->department_notifications_id = $notification->id;
+                        $dnaccess->save();
+                    }
+                    Mail::to($recipients)->send(new PriceChangeNotification($purchasingOrder->po_number, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged, $orderUrl));
+                }
+            }
+
+            // Recalculate PO total cost from current vehicle costs to avoid drift
+            $vehicleIds = Vehicles::where('purchasing_order_id', $purchasingOrderId)
+                ->whereNull('deleted_at')
+                ->pluck('id');
+            $recalculatedTotal = VehiclePurchasingCost::whereIn('vehicles_id', $vehicleIds)->sum('unit_price');
+            $purchasingOrder->totalcost = $recalculatedTotal;
+            $purchasingOrder->save();
+
+            DB::commit();
+
+            return response()->json(['message' => 'Price updated successfully'], 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Failed to update prices'], 500);
+        }
     }
     private function convertCurrency($amount, $fromCurrency, $toCurrency, $conversionRates)
     {
