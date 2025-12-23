@@ -1170,7 +1170,7 @@ return [$color->id => $formattedName];
                     </div>
                     <div class="col-lg-6 col-md-9 col-sm-12">
                         <span>{{ count($vehicles) }} /
-                            {{ number_format($purchasingOrder->totalcost, 0, '.', ',') }} - {{ $purchasingOrder->currency }}
+                            {{ number_format($purchasingOrderTotalCost ?? $purchasingOrder->totalcost, 0, '.', ',') }} - {{ $purchasingOrder->currency }}
                         </span>
                     </div>
                 </div>
