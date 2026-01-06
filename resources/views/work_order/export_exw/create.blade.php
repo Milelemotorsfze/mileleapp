@@ -1189,17 +1189,67 @@
 {!! json_encode($vins, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) !!}
 </script>
 
-{{-- JS block to parse safely --}}
+{{-- JS block to parse safely with robust error handling --}}
 <script>
 let customers = [];
 let vins = [];
 
-try {
-    customers = JSON.parse(document.getElementById('customers-json').textContent);
-    vins = JSON.parse(document.getElementById('vins-json').textContent);
-    console.log("Customers & VINs loaded successfully");
-} catch (e) {
-    console.error("JSON parse failed:", e);
+function loadJSONData() {
+    try {
+        const customersElement = document.getElementById('customers-json');
+        const vinsElement = document.getElementById('vins-json');
+        
+        if (customersElement && customersElement.textContent) {
+            const customersText = customersElement.textContent.trim();
+            if (customersText && customersText.length > 0) {
+                customers = JSON.parse(customersText);
+            }
+        }
+        
+        if (vinsElement && vinsElement.textContent) {
+            const vinsText = vinsElement.textContent.trim();
+            if (vinsText && vinsText.length > 0) {
+                vins = JSON.parse(vinsText);
+            }
+        }
+        
+        // Ensure they are arrays
+        if (!Array.isArray(customers)) customers = [];
+        if (!Array.isArray(vins)) vins = [];
+        
+        console.log("Customers & VINs loaded successfully", {
+            customersCount: customers.length,
+            vinsCount: vins.length
+        });
+        return true;
+    } catch (e) {
+        console.error("JSON parse failed:", e);
+        // Ensure arrays are initialized even on error
+        if (!Array.isArray(customers)) customers = [];
+        if (!Array.isArray(vins)) vins = [];
+        return false;
+    }
+}
+
+// Load immediately
+loadJSONData();
+
+// Retry after DOM is fully ready (in case script elements weren't ready)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        if (customers.length === 0 || vins.length === 0) {
+            console.warn("Retrying JSON data load after DOM ready");
+            loadJSONData();
+        }
+    });
+} else {
+    // DOM already ready, try once more if data is missing
+    if (customers.length === 0 || vins.length === 0) {
+        setTimeout(function() {
+            console.warn("Retrying JSON data load after delay");
+            loadJSONData();
+        }, 100);
+    }
 }
 </script>
 	<script type="text/javascript">
@@ -1294,40 +1344,81 @@ try {
 		@endif
 
 		const mentions = ["@Alice", "@Bob", "@Charlie"]; 
-		var input = document.querySelector("#customer_company_number");
-		var iti = window.intlTelInput(document.querySelector("#customer_company_number"), {
-			separateDialCode: true,
-			preferredCountries:["ae"],
-			hiddenInput: "full",
-			utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-		});
-		var customer_representative_contact = window.intlTelInput(document.querySelector("#customer_representative_contact"), {
-			separateDialCode: true,
-			preferredCountries:["ae"],
-			hiddenInput: "full",
-			utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-		});
-		var delivery_contact_person_number = window.intlTelInput(document.querySelector("#delivery_contact_person_number"), {
-			separateDialCode: true,
-			preferredCountries:["ae"],
-			hiddenInput: "full",
-			utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-		});
-		if(type == 'export_exw') {
-			var freight_agent_contact_number = window.intlTelInput(document.querySelector("#freight_agent_contact_number"), {
-				separateDialCode: true,
-				preferredCountries:["ae"],
-				hiddenInput: "full",
-				utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-			});
+		var input, iti, customer_representative_contact, delivery_contact_person_number, freight_agent_contact_number, transporting_driver_contact_number;
+		
+		// Initialize intlTelInput with error handling to prevent layout issues
+		try {
+			input = document.querySelector("#customer_company_number");
+			if (input) {
+				iti = window.intlTelInput(input, {
+					separateDialCode: true,
+					preferredCountries:["ae"],
+					hiddenInput: "full",
+					utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+				});
+			}
+		} catch (e) {
+			console.error("Failed to initialize customer_company_number intlTelInput:", e);
 		}
+		
+		try {
+			var customerRepInput = document.querySelector("#customer_representative_contact");
+			if (customerRepInput) {
+				customer_representative_contact = window.intlTelInput(customerRepInput, {
+					separateDialCode: true,
+					preferredCountries:["ae"],
+					hiddenInput: "full",
+					utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+				});
+			}
+		} catch (e) {
+			console.error("Failed to initialize customer_representative_contact intlTelInput:", e);
+		}
+		
+		try {
+			var deliveryInput = document.querySelector("#delivery_contact_person_number");
+			if (deliveryInput) {
+				delivery_contact_person_number = window.intlTelInput(deliveryInput, {
+					separateDialCode: true,
+					preferredCountries:["ae"],
+					hiddenInput: "full",
+					utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+				});
+			}
+		} catch (e) {
+			console.error("Failed to initialize delivery_contact_person_number intlTelInput:", e);
+		}
+		
+		if(type == 'export_exw') {
+			try {
+				var freightInput = document.querySelector("#freight_agent_contact_number");
+				if (freightInput) {
+					freight_agent_contact_number = window.intlTelInput(freightInput, {
+						separateDialCode: true,
+						preferredCountries:["ae"],
+						hiddenInput: "full",
+						utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+					});
+				}
+			} catch (e) {
+				console.error("Failed to initialize freight_agent_contact_number intlTelInput:", e);
+			}
+		}
+		
 		if(type == 'export_exw' || type == 'export_cnf') {
-			var transporting_driver_contact_number = window.intlTelInput(document.querySelector("#transporting_driver_contact_number"), {
-				separateDialCode: true,
-				preferredCountries:["ae"],
-				hiddenInput: "full",
-				utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-			});	
+			try {
+				var transportInput = document.querySelector("#transporting_driver_contact_number");
+				if (transportInput) {
+					transporting_driver_contact_number = window.intlTelInput(transportInput, {
+						separateDialCode: true,
+						preferredCountries:["ae"],
+						hiddenInput: "full",
+						utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+					});
+				}
+			} catch (e) {
+				console.error("Failed to initialize transporting_driver_contact_number intlTelInput:", e);
+			}
 		}
 		$(document).ready(function () { 
 			$.ajaxSetup({
@@ -1339,16 +1430,26 @@ try {
 			document.getElementById('submit-from-top').addEventListener('click', function() { 
 				document.getElementById('submit').click();
 			});
-				$('#sales_person_id').select2({
-					allowClear: true,
-					maximumSelectionLength: 1,
-					placeholder:"Choose Sales Person",
-				});
-				$('#customer_name').select2({
-					allowClear: true,
-					maximumSelectionLength: 1,
-					placeholder:"Choose Customer Name",
-				});
+				// Initialize Select2 dropdowns with error handling
+				try {
+					$('#sales_person_id').select2({
+						allowClear: true,
+						maximumSelectionLength: 1,
+						placeholder:"Choose Sales Person",
+					});
+				} catch (e) {
+					console.error("Failed to initialize sales_person_id select2:", e);
+				}
+				
+				try {
+					$('#customer_name').select2({
+						allowClear: true,
+						maximumSelectionLength: 1,
+						placeholder:"Choose Customer Name",
+					});
+				} catch (e) {
+					console.error("Failed to initialize customer_name select2:", e);
+				}
 
 
 				if(workOrder == null || workOrder.deposit_received_as == null) {
@@ -1391,15 +1492,41 @@ try {
 				if(workOrder !== null) {
 					$('#customer_address').val(workOrder.customer_address);
 					$('#customer_email').val(workOrder.customer_email);
-					var customer_company_numberFull = workOrder.customer_company_number ? workOrder.customer_company_number.replace(/\s+/g, '') : '';
-					iti.setNumber(customer_company_numberFull);
-					var customer_representative_contactFull = workOrder.customer_representative_contact ? workOrder.customer_representative_contact.replace(/\s+/g, '') : '';
-					customer_representative_contact.setNumber(customer_representative_contactFull);
-					var delivery_contact_person_numberFull = workOrder.delivery_contact_person_number ? workOrder.delivery_contact_person_number.replace(/\s+/g, '') : '';
-					delivery_contact_person_number.setNumber(delivery_contact_person_numberFull);
-					var freight_agent_contact_numberFull = workOrder.freight_agent_contact_number ? workOrder.freight_agent_contact_number.replace(/\s+/g, '') : '';
-					if (freight_agent_contact_number && typeof freight_agent_contact_number.setNumber === 'function') {
-						freight_agent_contact_number.setNumber(freight_agent_contact_numberFull);
+					// Set phone numbers with safety checks
+					try {
+						var customer_company_numberFull = workOrder.customer_company_number ? workOrder.customer_company_number.replace(/\s+/g, '') : '';
+						if (iti && typeof iti.setNumber === 'function') {
+							iti.setNumber(customer_company_numberFull);
+						}
+					} catch (e) {
+						console.error("Failed to set customer_company_number:", e);
+					}
+					
+					try {
+						var customer_representative_contactFull = workOrder.customer_representative_contact ? workOrder.customer_representative_contact.replace(/\s+/g, '') : '';
+						if (customer_representative_contact && typeof customer_representative_contact.setNumber === 'function') {
+							customer_representative_contact.setNumber(customer_representative_contactFull);
+						}
+					} catch (e) {
+						console.error("Failed to set customer_representative_contact:", e);
+					}
+					
+					try {
+						var delivery_contact_person_numberFull = workOrder.delivery_contact_person_number ? workOrder.delivery_contact_person_number.replace(/\s+/g, '') : '';
+						if (delivery_contact_person_number && typeof delivery_contact_person_number.setNumber === 'function') {
+							delivery_contact_person_number.setNumber(delivery_contact_person_numberFull);
+						}
+					} catch (e) {
+						console.error("Failed to set delivery_contact_person_number:", e);
+					}
+					
+					try {
+						var freight_agent_contact_numberFull = workOrder.freight_agent_contact_number ? workOrder.freight_agent_contact_number.replace(/\s+/g, '') : '';
+						if (freight_agent_contact_number && typeof freight_agent_contact_number.setNumber === 'function') {
+							freight_agent_contact_number.setNumber(freight_agent_contact_numberFull);
+						}
+					} catch (e) {
+						console.error("Failed to set freight_agent_contact_number:", e);
 					} 
 					if(workOrder.transport_type == 'air') {
 						airRelation();
@@ -1409,9 +1536,17 @@ try {
 					}
 					else if(workOrder.transport_type == 'road') {
 						roadRelation();
-						var transporting_driver_contact_numberFull = workOrder.transporting_driver_contact_number ? workOrder.transporting_driver_contact_number.replace(/\s+/g, '') : '';
-						transporting_driver_contact_number.setNumber(transporting_driver_contact_numberFull);
-						sanitizeNumberInput(input);			
+						try {
+							var transporting_driver_contact_numberFull = workOrder.transporting_driver_contact_number ? workOrder.transporting_driver_contact_number.replace(/\s+/g, '') : '';
+							if (transporting_driver_contact_number && typeof transporting_driver_contact_number.setNumber === 'function') {
+								transporting_driver_contact_number.setNumber(transporting_driver_contact_numberFull);
+							}
+							if (input && typeof sanitizeNumberInput === 'function') {
+								sanitizeNumberInput(input);
+							}
+						} catch (e) {
+							console.error("Failed to set transporting_driver_contact_number:", e);
+						}
 					}
 				}
 				
@@ -1517,27 +1652,58 @@ try {
 					$("#boe-div").hide();
 				}
 				
-				$('#vin_multiple').select2({
-					allowClear: true,
-					placeholder:"VIN",
-				});
-				$('#vin').select2({
-					allowClear: true,
-					maximumSelectionLength: 1,
-					placeholder:"VIN",
-				});
-				$('#user_id').select2({
-					allowClear: true,
-					maximumSelectionLength: 1,
-					placeholder:"Select User",
-				});
+				// Initialize VIN select2 with error handling
+				try {
+					$('#vin_multiple').select2({
+						allowClear: true,
+						placeholder:"VIN",
+					});
+				} catch (e) {
+					console.error("Failed to initialize VIN select2:", e);
+					// Fallback: try again after a short delay
+					setTimeout(function() {
+						try {
+							$('#vin_multiple').select2({
+								allowClear: true,
+								placeholder:"VIN",
+							});
+						} catch (e2) {
+							console.error("VIN select2 initialization failed again:", e2);
+						}
+					}, 500);
+				}
+				// Initialize other Select2 dropdowns with error handling
+				try {
+					$('#vin').select2({
+						allowClear: true,
+						maximumSelectionLength: 1,
+						placeholder:"VIN",
+					});
+				} catch (e) {
+					console.error("Failed to initialize vin select2:", e);
+				}
+				
+				try {
+					$('#user_id').select2({
+						allowClear: true,
+						maximumSelectionLength: 1,
+						placeholder:"Select User",
+					});
+				} catch (e) {
+					console.error("Failed to initialize user_id select2:", e);
+				}
 				function setCustomerRelations(selectedCustomerUniqueId) {
 					$('#customer_address').val('');
 					$('#customer_email').val('');
 					$('#customer_company_number').val('');         
 					if (selectedCustomerUniqueId != null) {
-						for (var i = 0; i < customerCount; i++) {
-							if (customers[i].unique_id == selectedCustomerUniqueId) { 
+						// Ensure customers array is available
+						if (!Array.isArray(customers) || customers.length === 0) {
+							console.warn("Customers data not loaded");
+							return;
+						}
+						for (var i = 0; i < customerCount && i < customers.length; i++) {
+							if (customers[i] && customers[i].unique_id == selectedCustomerUniqueId) { 
 								if (customers[i].customer_address != null) {
 									$('#customer_address').val(customers[i]?.customer_address);
 								}
@@ -1545,9 +1711,17 @@ try {
 									$('#customer_email').val(customers[i]?.customer_email);
 								}
 								if (customers[i].customer_company_number != null) { 
-									var fullPhoneNumber = customers[i].customer_company_number ? customers[i].customer_company_number.replace(/\s+/g, '') : '';
-									iti.setNumber(fullPhoneNumber);
-									sanitizeNumberInput(input);
+									try {
+										var fullPhoneNumber = customers[i].customer_company_number ? customers[i].customer_company_number.replace(/\s+/g, '') : '';
+										if (iti && typeof iti.setNumber === 'function') {
+											iti.setNumber(fullPhoneNumber);
+										}
+										if (input && typeof sanitizeNumberInput === 'function') {
+											sanitizeNumberInput(input);
+										}
+									} catch (e) {
+										console.error("Failed to set customer company number:", e);
+									}
 								}
 							}
 						}
@@ -1567,11 +1741,16 @@ try {
 
 				function airRelation() {
 					$("#airline-div").show();
-					$('#airline').select2({
-						allowClear: true,
-						maximumSelectionLength: 1,
-						placeholder:"Choose Airline",
-					});
+					// Initialize airline select2 with error handling
+					try {
+						$('#airline').select2({
+							allowClear: true,
+							maximumSelectionLength: 1,
+							placeholder:"Choose Airline",
+						});
+					} catch (e) {
+						console.error("Failed to initialize airline select2:", e);
+					}
 					$("#airway-bill-div").show();
 					$("#brn-div").hide();
 					$("#brn-file-div").show();
@@ -2715,9 +2894,15 @@ try {
 			function addVIN() { 
 				var selectedVIN = $("#vin_multiple").val(); 
 				if (selectedVIN != '' && selectedVIN.length > 0) { 
+					// Ensure vins array is available
+					if (!Array.isArray(vins) || vins.length === 0) {
+						console.error("VINs data not loaded. Please refresh the page.");
+						alert("VIN data is not available. Please refresh the page and try again.");
+						return;
+					}
 					for (var j = 0; j < selectedVIN.length; j++) { 
 						for (var i = 0; i < vins.length; i++) { 
-							if (vins[i].vin != null && vins[i].vin == selectedVIN[j]) { 
+							if (vins[i] && vins[i].vin != null && vins[i].vin == selectedVIN[j]) { 
 								var data = { 
 									id: '',
 									vehicle_id : vins[i]?.id ?? '',
@@ -3554,10 +3739,15 @@ try {
 					$('#deposit_aganist_vehicle').append(new Option(vin, vin));
 				});
 
-				$('#deposit_aganist_vehicle').select2({
-					allowClear: true,
-					placeholder: "Choose Vehicle"
-				});
+				// Initialize deposit_aganist_vehicle select2 with error handling
+				try {
+					$('#deposit_aganist_vehicle').select2({
+						allowClear: true,
+						placeholder: "Choose Vehicle"
+					});
+				} catch (e) {
+					console.error("Failed to initialize deposit_aganist_vehicle select2:", e);
+				}
 
 				$('#deposit_aganist_vehicle').val(previouslySelectedValues.filter(function(value) {
 					return addedVins.includes(value);
