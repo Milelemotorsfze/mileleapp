@@ -158,7 +158,7 @@
                             type: 'GET',
                             data: { query: query },
                             success: function(response) {
-                                console.log(response); 
+								// Removed console.log to prevent inspector cache eviction
                                 if (response.users && response.users.length > 0) {
                                     renderCallback(response.users.map(user => ({
                                         id: user.id,
@@ -196,7 +196,7 @@
                 if (response && response.comments) {
                     renderComments(response.comments); 
                 } else {
-                    console.error('Unexpected response structure:', response);
+			// Removed console.error to prevent inspector cache eviction
                 }
             },
             error: function(error) {
@@ -211,9 +211,9 @@
     }
     function addComment(commentData = {}) {
         const { text = '', parent_id = null, id = null, created_at = new Date().toISOString(), files = [], wo_histories = [], new_vehicles = [], removed_vehicles = [], updated_vehicles = [] } = commentData;
-        console.log(new_vehicles);
+		// Removed console.log to prevent inspector cache eviction
         if (!id || (text === '' && files.length === 0)) {
-            console.error('Invalid comment data:', commentData);
+			// Removed console.error to prevent inspector cache eviction
             return;
         }
 
@@ -978,12 +978,12 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-                console.log('Comment added:', response); 
+				// Removed console.log to prevent inspector cache eviction
                 addComment(response);
                 submitButton.prop('disabled', false);
             },
             error: function(error) {
-                console.error('Error adding comment:', error);
+			// Removed console.error to prevent inspector cache eviction
 
                 if (error.responseJSON && error.responseJSON.errors && error.responseJSON.errors['files.0']) {
                     alert(error.responseJSON.errors['files.0'][0]); 
