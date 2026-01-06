@@ -1611,183 +1611,197 @@ class WorkOrderController extends Controller
      */
     public function edit(WorkOrder $workOrder)
     {
-        $previous = $next = '';
-        $authId = Auth::id();
-        // Store permission checks
-        $hasFullAccess = Auth::user()->hasPermissionForSelectedRole([
-            'edit-all-export-exw-work-order',
-            'edit-all-export-cnf-work-order',
-            'edit-all-local-sale-work-order'
-        ]);
-
-        $hasLimitedAccess = Auth::user()->hasPermissionForSelectedRole([
-            'edit-current-user-export-exw-work-order',
-            'edit-current-user-export-cnf-work-order',
-            'edit-current-user-local-sale-work-order'
-        ]);
-        $type = $workOrder->type;
-        // Build the query to retrieve the work order
-        $workOrderQuery = WorkOrder::where('id', $workOrder->id)
-            ->with('vehicles.addons', 'comments', 'financePendingApproval', 'cooPendingApproval');
-
-        // Apply the created_by condition if the user has limited access
-        if ($hasLimitedAccess) {
-            $workOrderQuery->where('created_by', $authId);
-        }
-
         try {
-            // Execute the query to get the work order
-            $workOrder = $workOrderQuery->firstOrFail();
-        } catch (ModelNotFoundException $e) {
-            $errorMsg = "Sorry! You don't have permission to access this page.";
-            return view('hrm.notaccess', compact('errorMsg'));
-        }
-        // Retrieve previous and next work order IDs
-        $previous = WorkOrder::where('type', $type)
-            ->where('id', '<', $workOrder->id)
-            ->when($hasLimitedAccess, function ($query) use ($authId) {
-                return $query->where('created_by', $authId);
-            })
-            ->max('id');
+            $previous = $next = '';
+            $authId = Auth::id();
+            // Store permission checks
+            $hasFullAccess = Auth::user()->hasPermissionForSelectedRole([
+                'edit-all-export-exw-work-order',
+                'edit-all-export-cnf-work-order',
+                'edit-all-local-sale-work-order'
+            ]);
 
-        $next = WorkOrder::where('type', $type)
-            ->where('id', '>', $workOrder->id)
-            ->when($hasLimitedAccess, function ($query) use ($authId) {
-                return $query->where('created_by', $authId);
-            })
-            ->min('id');
+            $hasLimitedAccess = Auth::user()->hasPermissionForSelectedRole([
+                'edit-current-user-export-exw-work-order',
+                'edit-current-user-export-cnf-work-order',
+                'edit-current-user-local-sale-work-order'
+            ]);
+            $type = $workOrder->type;
+            // Build the query to retrieve the work order
+            $workOrderQuery = WorkOrder::where('id', $workOrder->id)
+                ->with('vehicles.addons', 'comments', 'financePendingApproval', 'cooPendingApproval');
 
-        // Select data from the WorkOrder table
-        $workOrders = WorkOrder::select(
-            DB::raw('TRIM(customer_name) as customer_name'),
-            'customer_email',
-            'customer_company_number',
-            'customer_address',
-            DB::raw('(IF(customer_email IS NOT NULL, 1, 0) + IF(customer_company_number IS NOT NULL, 1, 0) + IF(customer_address IS NOT NULL, 1, 0)) as score'),
-            DB::raw("'App\\Models\\WorkOrder' as reference_type"),
-            DB::raw('NULL as country_id'), // Assuming WorkOrder does not have is_demand_planning_customer field
-            DB::raw('NULL as is_demand_planning_customer'),
-            DB::raw("CONCAT(TRIM(customer_name), '_', IFNULL(customer_email, ''), '_', IFNULL(customer_company_number, '')) as unique_id")
-        );
+            // Apply the created_by condition if the user has limited access
+            if ($hasLimitedAccess) {
+                $workOrderQuery->where('created_by', $authId);
+            }
 
-        // Select and transform data from the Clients table
-        $clients = Clients::select(
-            DB::raw('TRIM(name) as customer_name'),
-            DB::raw('email as customer_email'),
-            DB::raw('phone as customer_company_number'),
-            DB::raw('NULL as customer_address'),
-            DB::raw('(IF(email IS NOT NULL, 1, 0) + IF(phone IS NOT NULL, 1, 0)) as score'),
-            DB::raw("'App\\Models\\Clients' as reference_type"),
-            'country_id',
-            'is_demand_planning_customer',
-            DB::raw("CONCAT(TRIM(name), '_', IFNULL(email, ''), '_', IFNULL(phone, ''), '_', IFNULL(country_id, '')) as unique_id")
-        );
-        // Apply the permission-based condition
-        if ($hasLimitedAccess) {
-            // Add the created_by condition for limited access
-            $workOrders->where('created_by', $authId);
-            $clients->where('created_by', $authId);
-        }
-        // Combine the results using union
-        $combinedResults = $workOrders
-            ->union($clients)
-            ->get();
+            try {
+                // Execute the query to get the work order
+                $workOrder = $workOrderQuery->firstOrFail();
+            } catch (ModelNotFoundException $e) {
+                $errorMsg = "Sorry! You don't have permission to access this page.";
+                return view('hrm.notaccess', compact('errorMsg'));
+            }
+            // Retrieve previous and next work order IDs
+            $previous = WorkOrder::where('type', $type)
+                ->where('id', '<', $workOrder->id)
+                ->when($hasLimitedAccess, function ($query) use ($authId) {
+                    return $query->where('created_by', $authId);
+                })
+                ->max('id');
 
-        // Clean up customer names in PHP
-        $combinedResults = $combinedResults->map(function ($item) {
-            // Replace multiple spaces with a single space
-            $item->customer_name = preg_replace('/\s+/', ' ', trim($item->customer_name));
-            return $item;
-        });
+            $next = WorkOrder::where('type', $type)
+                ->where('id', '>', $workOrder->id)
+                ->when($hasLimitedAccess, function ($query) use ($authId) {
+                    return $query->where('created_by', $authId);
+                })
+                ->min('id');
 
-        // Process combined results to remove duplicates based on unique_id
-        $customers = $combinedResults->groupBy('unique_id')->map(function ($items) {
-            // Sort items by score in descending order and then take the first item
-            return $items->sortByDesc('score')->first();
-        })->values()->sortBy('customer_name');
+            // Select data from the WorkOrder table
+            $workOrders = WorkOrder::select(
+                DB::raw('TRIM(customer_name) as customer_name'),
+                'customer_email',
+                'customer_company_number',
+                'customer_address',
+                DB::raw('(IF(customer_email IS NOT NULL, 1, 0) + IF(customer_company_number IS NOT NULL, 1, 0) + IF(customer_address IS NOT NULL, 1, 0)) as score'),
+                DB::raw("'App\\Models\\WorkOrder' as reference_type"),
+                DB::raw('NULL as country_id'), // Assuming WorkOrder does not have is_demand_planning_customer field
+                DB::raw('NULL as is_demand_planning_customer'),
+                DB::raw("CONCAT(TRIM(customer_name), '_', IFNULL(customer_email, ''), '_', IFNULL(customer_company_number, '')) as unique_id")
+            );
+
+            // Select and transform data from the Clients table
+            $clients = Clients::select(
+                DB::raw('TRIM(name) as customer_name'),
+                DB::raw('email as customer_email'),
+                DB::raw('phone as customer_company_number'),
+                DB::raw('NULL as customer_address'),
+                DB::raw('(IF(email IS NOT NULL, 1, 0) + IF(phone IS NOT NULL, 1, 0)) as score'),
+                DB::raw("'App\\Models\\Clients' as reference_type"),
+                'country_id',
+                'is_demand_planning_customer',
+                DB::raw("CONCAT(TRIM(name), '_', IFNULL(email, ''), '_', IFNULL(phone, ''), '_', IFNULL(country_id, '')) as unique_id")
+            );
+            // Apply the permission-based condition
+            if ($hasLimitedAccess) {
+                // Add the created_by condition for limited access
+                $workOrders->where('created_by', $authId);
+                $clients->where('created_by', $authId);
+            }
+            // Combine the results using union
+            $combinedResults = $workOrders
+                ->union($clients)
+                ->get();
+
+            // Clean up customer names in PHP
+            $combinedResults = $combinedResults->map(function ($item) {
+                // Replace multiple spaces with a single space
+                $item->customer_name = preg_replace('/\s+/', ' ', trim($item->customer_name));
+                return $item;
+            });
+
+            // Process combined results to remove duplicates based on unique_id
+            $customers = $combinedResults->groupBy('unique_id')->map(function ($items) {
+                // Sort items by score in descending order and then take the first item
+                return $items->sortByDesc('score')->first();
+            })->values()->sortBy('customer_name');
 
 
-        // Get the count of customers
-        $customerCount = $customers->count();
-        $users = User::orderBy('name', 'ASC')->where('status', 'active')->whereNotIn('id', [1, 16])->whereHas('empProfile', function ($q) {
-            $q = $q->where('type', 'employee');
-        })->get();
-        // $accSpaKits = AddonDetails::select('addon_code')->distinct();
+            // Get the count of customers
+            $customerCount = $customers->count();
+            $users = User::orderBy('name', 'ASC')->where('status', 'active')->whereNotIn('id', [1, 16])->whereHas('empProfile', function ($q) {
+                $q = $q->where('type', 'employee');
+            })->get();
+            // $accSpaKits = AddonDetails::select('addon_code')->distinct();
 
-        $airlines = MasterAirlines::orderBy('name', 'ASC')->get();
-        $vins = Vehicles::orderBy('vin', 'ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand', 'interior', 'exterior', 'warehouseLocation', 'document')->get()->unique('vin')
-            ->values();
-        $kit = AddonDetails::select('addon_details.id', 'addon_details.addon_code', DB::raw("CONCAT(addons.name, 
-                IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
-                "), DB::raw("'App\\Models\\AddonDetails' as reference_type"))
-            ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
-            ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
-            ->where('addon_details.addon_type_name', 'K')
-            ->orderBy('addon_details.id', 'asc')
-            ->get();
-        $accessories = AddonDetails::select('addon_details.id', 'addon_details.addon_code', DB::raw("CONCAT(addons.name, 
-                IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
-                "), DB::raw("'App\\Models\\AddonDetails' as reference_type"))
-            ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
-            ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
-            ->where('addon_details.addon_type_name', 'P')
-            ->orderBy('addon_details.id', 'asc')
-            ->get();
-        $spareParts = AddonDetails::select('addon_details.id', 'addon_details.addon_code', DB::raw("CONCAT(addons.name, 
-                IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
-                "), DB::raw("'App\\Models\\AddonDetails' as reference_type"))
-            ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
-            ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
-            ->where('addon_details.addon_type_name', 'SP')
-            ->orderBy('addon_details.id', 'asc')
-            ->get();
-        $charges = MasterCharges::select(
-            'master_charges.id',
-            'master_charges.addon_code',
-            DB::raw("CONCAT(
-                IF(master_charges.name IS NOT NULL, master_charges.name, ''), 
-                IF(master_charges.name IS NOT NULL AND master_charges.description IS NOT NULL, ' - ', ''), 
-                IF(master_charges.description IS NOT NULL, master_charges.description, '')) as addon_name"),
-            DB::raw("'App\\Models\\Masters\\MasterCharges' as reference_type")
-        )
-            ->orderBy('master_charges.id', 'asc')
-            ->get();
-        // Merge collections
-        $addons = $accessories->merge($spareParts)->merge($kit);
-        $salesPersons = [];
-        $hasAllSalesAccess = Auth::user()->hasPermissionForSelectedRole([
-            'create-wo-for-all-sales-person'
-        ]);
-        if ($hasAllSalesAccess) {
-            $salesPersons = User::where(function ($query) use ($workOrder) {
-                // Main condition for active sales reps
-                $query->where(function ($q) {
-                    $q->where('status', 'active')
-                        ->where('is_sales_rep', 'Yes')
-                        ->whereNotIn('id', [1, 16])
-                        ->whereHas('empProfile', function ($sub) {
-                            $sub->where('type', 'employee');
-                        });
-                });
-
-                // Additional condition to include the specific sales_person_id
-                if ($workOrder && $workOrder->sales_person_id) {
-                    $query->orWhere('id', $workOrder->sales_person_id);
-                }
-            })
-                ->orderBy('name', 'ASC')
-                ->get()
-                ->unique('id')
+            $airlines = MasterAirlines::orderBy('name', 'ASC')->get();
+            $vins = Vehicles::orderBy('vin', 'ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand', 'interior', 'exterior', 'warehouseLocation', 'document')->get()->unique('vin')
                 ->values();
+            $kit = AddonDetails::select('addon_details.id', 'addon_details.addon_code', DB::raw("CONCAT(addons.name, 
+                    IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
+                    "), DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+                ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
+                ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
+                ->where('addon_details.addon_type_name', 'K')
+                ->orderBy('addon_details.id', 'asc')
+                ->get();
+            $accessories = AddonDetails::select('addon_details.id', 'addon_details.addon_code', DB::raw("CONCAT(addons.name, 
+                    IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
+                    "), DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+                ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
+                ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
+                ->where('addon_details.addon_type_name', 'P')
+                ->orderBy('addon_details.id', 'asc')
+                ->get();
+            $spareParts = AddonDetails::select('addon_details.id', 'addon_details.addon_code', DB::raw("CONCAT(addons.name, 
+                    IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
+                    "), DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+                ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
+                ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
+                ->where('addon_details.addon_type_name', 'SP')
+                ->orderBy('addon_details.id', 'asc')
+                ->get();
+            $charges = MasterCharges::select(
+                'master_charges.id',
+                'master_charges.addon_code',
+                DB::raw("CONCAT(
+                    IF(master_charges.name IS NOT NULL, master_charges.name, ''), 
+                    IF(master_charges.name IS NOT NULL AND master_charges.description IS NOT NULL, ' - ', ''), 
+                    IF(master_charges.description IS NOT NULL, master_charges.description, '')) as addon_name"),
+                DB::raw("'App\\Models\\Masters\\MasterCharges' as reference_type")
+            )
+                ->orderBy('master_charges.id', 'asc')
+                ->get();
+            // Merge collections
+            $addons = $accessories->merge($spareParts)->merge($kit);
+            $salesPersons = [];
+            $hasAllSalesAccess = Auth::user()->hasPermissionForSelectedRole([
+                'create-wo-for-all-sales-person'
+            ]);
+            if ($hasAllSalesAccess) {
+                $salesPersons = User::where(function ($query) use ($workOrder) {
+                    // Main condition for active sales reps
+                    $query->where(function ($q) {
+                        $q->where('status', 'active')
+                            ->where('is_sales_rep', 'Yes')
+                            ->whereNotIn('id', [1, 16])
+                            ->whereHas('empProfile', function ($sub) {
+                                $sub->where('type', 'employee');
+                            });
+                    });
+
+                    // Additional condition to include the specific sales_person_id
+                    if ($workOrder && $workOrder->sales_person_id) {
+                        $query->orWhere('id', $workOrder->sales_person_id);
+                    }
+                })
+                    ->orderBy('name', 'ASC')
+                    ->get()
+                    ->unique('id')
+                    ->values();
+            }
+            $canDisableBatch = false;
+            $otherWo = WorkOrder::whereNot('id', $workOrder->id)->where('so_number', $workOrder->so_number)->get();
+            if (count($otherWo) > 0) {
+                $canDisableBatch = true;
+            }
+            return view('work_order.export_exw.create', compact('canDisableBatch', 'previous', 'next', 'workOrder', 'customerCount', 'type', 'customers', 'airlines', 'vins', 'users', 'addons', 'charges', 'salesPersons'))->with([
+                'vinsJson' => $vins->toJson(), // Single encoding here
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Error in WorkOrderController@edit', [
+                'work_order_id' => $workOrder->id ?? null,
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()
+                ->back()
+                ->with('error', 'An unexpected error occurred while loading the work order edit page.');
         }
-        $canDisableBatch = false;
-        $otherWo = WorkOrder::whereNot('id', $workOrder->id)->where('so_number', $workOrder->so_number)->get();
-        if (count($otherWo) > 0) {
-            $canDisableBatch = true;
-        }
-        return view('work_order.export_exw.create', compact('canDisableBatch', 'previous', 'next', 'workOrder', 'customerCount', 'type', 'customers', 'airlines', 'vins', 'users', 'addons', 'charges', 'salesPersons'))->with([
-            'vinsJson' => $vins->toJson(), // Single encoding here
-        ]);
     }
 
     /**
