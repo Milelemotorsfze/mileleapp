@@ -1220,7 +1220,71 @@ try {
 		var vinWithoutBoe = [];
 		var authUserPermission = @json($allfieldPermission ? 'true' : 'false');
 		@if(isset($workOrder))
-			var workOrder = @json($workOrder);
+			@php
+				// Optimize workOrder object to only include fields used in JavaScript to prevent inspector cache eviction
+				$minimalWorkOrder = [
+					'id' => $workOrder->id,
+					'deposit_received_as' => $workOrder->deposit_received_as,
+					'signed_pfi' => $workOrder->signed_pfi,
+					'signed_contract' => $workOrder->signed_contract,
+					'payment_receipts' => $workOrder->payment_receipts,
+					'noc' => $workOrder->noc,
+					'enduser_trade_license' => $workOrder->enduser_trade_license,
+					'enduser_passport' => $workOrder->enduser_passport,
+					'enduser_contract' => $workOrder->enduser_contract,
+					'vehicle_handover_person_id' => $workOrder->vehicle_handover_person_id,
+					'brn_file' => $workOrder->brn_file,
+					'customer_reference_id' => $workOrder->customer_reference_id,
+					'customer_name' => $workOrder->customer_name,
+					'customer_address' => $workOrder->customer_address,
+					'customer_email' => $workOrder->customer_email,
+					'customer_company_number' => $workOrder->customer_company_number,
+					'customer_representative_contact' => $workOrder->customer_representative_contact,
+					'delivery_contact_person_number' => $workOrder->delivery_contact_person_number,
+					'freight_agent_contact_number' => $workOrder->freight_agent_contact_number,
+					'transport_type' => $workOrder->transport_type,
+					'transporting_driver_contact_number' => $workOrder->transporting_driver_contact_number,
+					'sales_support_data_confirmation_at' => $workOrder->sales_support_data_confirmation_at,
+					'vehicles' => $workOrder->vehicles ? $workOrder->vehicles->map(function($vehicle) {
+						return [
+							'id' => $vehicle->id,
+							'vehicle_id' => $vehicle->vehicle_id,
+							'vin' => $vehicle->vin,
+							'brand' => $vehicle->brand,
+							'variant' => $vehicle->variant,
+							'engine' => $vehicle->engine,
+							'model_description' => $vehicle->model_description,
+							'model_year' => $vehicle->model_year,
+							'model_year_to_mention_on_documents' => $vehicle->model_year_to_mention_on_documents,
+							'steering' => $vehicle->steering,
+							'exterior_colour' => $vehicle->exterior_colour,
+							'interior_colour' => $vehicle->interior_colour,
+							'warehouse' => $vehicle->warehouse,
+							'territory' => $vehicle->territory,
+							'preferred_destination' => $vehicle->preferred_destination,
+							'import_document_type' => $vehicle->import_document_type,
+							'ownership_name' => $vehicle->ownership_name,
+							'certification_per_vin' => $vehicle->certification_per_vin,
+							'certification_per_vin_name' => $vehicle->certification_per_vin_name,
+							'modification_or_jobs_to_perform_per_vin' => $vehicle->modification_or_jobs_to_perform_per_vin,
+							'special_request_or_remarks' => $vehicle->special_request_or_remarks,
+							'deposit_received' => $vehicle->deposit_received,
+							'boe_number' => $vehicle->boe_number,
+							'shipment' => $vehicle->shipment ?? null,
+							'addons' => $vehicle->addons ? $vehicle->addons->map(function($addon) {
+								return [
+									'id' => $addon->id,
+									'addon_code' => $addon->addon_code ?? null,
+									'addon_quantity' => $addon->addon_quantity ?? $addon->quantity ?? null,
+									'addon_description' => $addon->addon_description ?? $addon->description ?? null,
+									'created_at' => $addon->created_at ? $addon->created_at->toDateTimeString() : null,
+								];
+							})->toArray() : []
+						];
+					})->toArray() : []
+				];
+			@endphp
+			var workOrder = @json($minimalWorkOrder);
 		@else
 			var workOrder = null;
 			document.addEventListener("DOMContentLoaded", function() {
@@ -1271,7 +1335,7 @@ try {
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 				}
 			});
-			console.log('Is vins an array:', Array.isArray(vins));
+			// Removed console.log to prevent inspector cache eviction
 			document.getElementById('submit-from-top').addEventListener('click', function() { 
 				document.getElementById('submit').click();
 			});
@@ -1841,7 +1905,7 @@ try {
 								type: 'GET',
 								data: { query: query },
 								success: function(response) {
-									console.log(response); 
+									// Removed console.log to prevent inspector cache eviction 
 									if (response.users && response.users.length > 0) {
 										renderCallback(response.users.map(user => ({
 											id: user.id,
