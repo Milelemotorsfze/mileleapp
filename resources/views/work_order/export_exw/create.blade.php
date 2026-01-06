@@ -1218,12 +1218,32 @@ $formAction = isset($workOrder)
 @endif
 {{-- Customers --}}
 <script id="customers-json" type="application/json">
-{!! json_encode($customers, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) !!}
+@php
+try {
+    $customersJson = json_encode($customers, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+    if ($customersJson === false) {
+        $customersJson = json_encode([], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+    }
+} catch (\Exception $e) {
+    $customersJson = json_encode([], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+}
+@endphp
+{!! $customersJson !!}
 </script>
 
 {{-- VINs --}}
 <script id="vins-json" type="application/json">
-{!! json_encode($vins, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) !!}
+@php
+try {
+    $vinsJson = json_encode($vins, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+    if ($vinsJson === false) {
+        $vinsJson = json_encode([], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+    }
+} catch (\Exception $e) {
+    $vinsJson = json_encode([], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+}
+@endphp
+{!! $vinsJson !!}
 </script>
 
 {{-- JS block to parse safely --}}
@@ -1236,14 +1256,25 @@ $formAction = isset($workOrder)
 		const vinsElement = document.getElementById('vins-json');
 		
 		if (customersElement) {
-			customers = JSON.parse(customersElement.textContent);
+			const customersText = customersElement.textContent.trim();
+			if (customersText) {
+				customers = JSON.parse(customersText);
+			}
 		}
 		if (vinsElement) {
-			vins = JSON.parse(vinsElement.textContent);
+			const vinsText = vinsElement.textContent.trim();
+			if (vinsText) {
+				vins = JSON.parse(vinsText);
+			}
 		}
 		console.log("Customers & VINs loaded successfully");
 	} catch (e) {
 		console.error("JSON parse failed:", e);
+		console.error("Error details:", {
+			message: e.message,
+			name: e.name,
+			stack: e.stack
+		});
 	}
 </script>
 <script type="text/javascript">
