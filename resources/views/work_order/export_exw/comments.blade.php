@@ -88,9 +88,7 @@
     </div>
 </div>
 <script>
-    // Use only the Work Order ID in JavaScript to avoid embedding the full object,
-    // which can be very large and cause DevTools inspector cache eviction.
-    var workOrderId = {{ $workOrder->id ?? 'null' }};
+    var workOrder = {!! json_encode($workOrder) !!};
     const allowedFileTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf']; 
 
     document.getElementById('comment-files').addEventListener('change', function() {
@@ -160,7 +158,7 @@
                             type: 'GET',
                             data: { query: query },
                             success: function(response) {
-								// Removed console.log to prevent inspector cache eviction
+                                console.log(response); 
                                 if (response.users && response.users.length > 0) {
                                     renderCallback(response.users.map(user => ({
                                         id: user.id,
@@ -188,6 +186,9 @@
             const commentId = $(this).closest('.comment').data('comment-id');
             initializeMentions(`#reply-input-${commentId}`);
         });
+        
+
+        const workOrderId = workOrder.id; 
         $.ajax({
             url: `/comments/${workOrderId}`, 
             type: 'GET',
@@ -195,7 +196,7 @@
                 if (response && response.comments) {
                     renderComments(response.comments); 
                 } else {
-			// Removed console.error to prevent inspector cache eviction
+                    console.error('Unexpected response structure:', response);
                 }
             },
             error: function(error) {
@@ -210,9 +211,9 @@
     }
     function addComment(commentData = {}) {
         const { text = '', parent_id = null, id = null, created_at = new Date().toISOString(), files = [], wo_histories = [], new_vehicles = [], removed_vehicles = [], updated_vehicles = [] } = commentData;
-		// Removed console.log to prevent inspector cache eviction
+        console.log(new_vehicles);
         if (!id || (text === '' && files.length === 0)) {
-			// Removed console.error to prevent inspector cache eviction
+            console.error('Invalid comment data:', commentData);
             return;
         }
 
@@ -954,7 +955,7 @@
         const formData = new FormData();
         formData.append('text', commentText.trim() === '' ? '' : commentText); 
         formData.append('parent_id', parentId ? parentId : '');
-        formData.append('work_order_id', workOrderId);
+        formData.append('work_order_id', workOrder.id);
         formData.append('mentions', JSON.stringify(mentionedUserIds)); 
 
         for (const file of filesInput) {
@@ -977,12 +978,12 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-				// Removed console.log to prevent inspector cache eviction
+                console.log('Comment added:', response); 
                 addComment(response);
                 submitButton.prop('disabled', false);
             },
             error: function(error) {
-			// Removed console.error to prevent inspector cache eviction
+                console.error('Error adding comment:', error);
 
                 if (error.responseJSON && error.responseJSON.errors && error.responseJSON.errors['files.0']) {
                     alert(error.responseJSON.errors['files.0'][0]); 
