@@ -1250,6 +1250,7 @@ try {
 <script>
 	let customers = [];
 	let vins = [];
+	let dataLoadError = false;
 
 	try {
 		const customersElement = document.getElementById('customers-json');
@@ -1259,22 +1260,50 @@ try {
 			const customersText = customersElement.textContent.trim();
 			if (customersText) {
 				customers = JSON.parse(customersText);
+				// Ensure it's an array
+				if (!Array.isArray(customers)) {
+					console.warn("Customers data is not an array, converting to array");
+					customers = [];
+				}
 			}
+		} else {
+			console.warn("Customers JSON element not found");
 		}
+		
 		if (vinsElement) {
 			const vinsText = vinsElement.textContent.trim();
 			if (vinsText) {
 				vins = JSON.parse(vinsText);
+				// Ensure it's an array
+				if (!Array.isArray(vins)) {
+					console.warn("VINs data is not an array, converting to array");
+					vins = [];
+				}
 			}
+		} else {
+			console.warn("VINs JSON element not found");
 		}
-		console.log("Customers & VINs loaded successfully");
+		
+		console.log("Customers & VINs loaded successfully", {
+			customersCount: customers.length,
+			vinsCount: vins.length
+		});
 	} catch (e) {
+		dataLoadError = true;
 		console.error("JSON parse failed:", e);
 		console.error("Error details:", {
 			message: e.message,
 			name: e.name,
 			stack: e.stack
 		});
+		// Ensure arrays are initialized even on error
+		customers = Array.isArray(customers) ? customers : [];
+		vins = Array.isArray(vins) ? vins : [];
+		
+		// Show user-friendly error if critical
+		if (typeof window !== 'undefined' && window.console) {
+			console.error("⚠️ Data loading error: Some features may not work correctly. Please refresh the page.");
+		}
 	}
 </script>
 <script type="text/javascript">
@@ -1540,9 +1569,9 @@ try {
 			$('#customer_address').val('');
 			$('#customer_email').val('');
 			$('#customer_company_number').val('');
-			if (selectedCustomerUniqueId != null) {
-				for (var i = 0; i < customerCount; i++) {
-					if (customers[i].unique_id == selectedCustomerUniqueId) {
+			if (selectedCustomerUniqueId != null && Array.isArray(customers) && customers.length > 0) {
+				for (var i = 0; i < customerCount && i < customers.length; i++) {
+					if (customers[i] && customers[i].unique_id == selectedCustomerUniqueId) {
 						if (customers[i].customer_address != null) {
 							$('#customer_address').val(customers[i]?.customer_address);
 						}
@@ -2427,26 +2456,57 @@ try {
 					'Accept': 'application/json',
 					'X-Requested-With': 'XMLHttpRequest'
 				}
-			}).then(response => {
-				if (!response.ok) {
-					return response.text().then(text => {
-						try {
-							const errorData = JSON.parse(text);
-							throw new Error(errorData.message || text);
-						} catch (e) {
-							throw new Error(text);
-						}
-					});
+			}).then(async response => {
+				// Log response metadata before consuming body (helps with DevTools cache)
+				const contentType = response.headers.get('content-type') || '';
+				const contentLength = response.headers.get('content-length');
+				
+				console.log('Response status:', response.status, response.statusText);
+				console.log('Content-Type:', contentType);
+				if (contentLength) {
+					console.log('Content-Length:', contentLength, 'bytes');
 				}
+				
+				if (!response.ok) {
+					// For errors, try to get a reasonable amount of text
+					const text = await response.text();
+					// Log first 500 chars to avoid huge console output
+					console.error('Error response preview:', text.substring(0, 500));
+					
+					try {
+						const errorData = JSON.parse(text);
+						throw new Error(errorData.message || errorData.error || 'An error occurred');
+					} catch (e) {
+						// If it's already an Error, rethrow it
+						if (e instanceof Error && e.message) {
+							throw e;
+						}
+						// Otherwise, use a truncated version if too long
+						const errorMessage = text.length > 500 ? text.substring(0, 500) + '...' : text;
+						throw new Error(errorMessage || 'An error occurred');
+					}
+				}
+				
+				// For successful responses, parse JSON
 				return response.json();
 			}).then(data => {
 				if (data.success) {
 					window.location.href = `{{ url('work-order-info') }}/${type}`;
 				} else {
-					throw new Error(data.message);
+					throw new Error(data.message || 'Operation failed');
 				}
 			}).catch(error => {
-				alert(error.message);
+				// Show user-friendly error message
+				const errorMessage = error.message || 'An unexpected error occurred. Please try again.';
+				alert(errorMessage);
+				
+				// Log full error for debugging (but keep it concise)
+				console.error('Form submission error:', {
+					message: error.message,
+					name: error.name,
+					stack: error.stack ? error.stack.split('\n').slice(0, 5).join('\n') : 'No stack trace'
+				});
+				
 				// if (error.message === "Can't edit the work order because the sales support confirmed the data.") {
 				// 	document.querySelectorAll('#WOForm #submit').forEach(function(element) {
 				// 		element.disabled = true;
@@ -2457,7 +2517,6 @@ try {
 				// 		submitFromTopButton.classList.add('disabled'); 
 				// 	}
 				// }
-				console.error('Form submission error:', error);
 			}).finally(() => {
 				$('#overlay').hide();
 			});
@@ -2743,10 +2802,10 @@ try {
 
 	function addVIN() {
 		var selectedVIN = $("#vin_multiple").val();
-		if (selectedVIN != '' && selectedVIN.length > 0) {
+		if (selectedVIN != '' && selectedVIN.length > 0 && Array.isArray(vins) && vins.length > 0) {
 			for (var j = 0; j < selectedVIN.length; j++) {
 				for (var i = 0; i < vins.length; i++) {
-					if (vins[i].vin != null && vins[i].vin == selectedVIN[j]) {
+					if (vins[i] && vins[i].vin != null && vins[i].vin == selectedVIN[j]) {
 						var data = {
 							id: '',
 							vehicle_id: vins[i]?.id ?? '',
