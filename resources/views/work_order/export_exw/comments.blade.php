@@ -88,7 +88,9 @@
     </div>
 </div>
 <script>
-    var workOrder = {!! json_encode($workOrder) !!};
+    // Use only the Work Order ID in JavaScript to avoid embedding the full object,
+    // which can be very large and cause DevTools inspector cache eviction.
+    var workOrderId = {{ $workOrder->id ?? 'null' }};
     const allowedFileTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf']; 
 
     document.getElementById('comment-files').addEventListener('change', function() {
@@ -186,9 +188,6 @@
             const commentId = $(this).closest('.comment').data('comment-id');
             initializeMentions(`#reply-input-${commentId}`);
         });
-        
-
-        const workOrderId = workOrder.id; 
         $.ajax({
             url: `/comments/${workOrderId}`, 
             type: 'GET',
@@ -955,7 +954,7 @@
         const formData = new FormData();
         formData.append('text', commentText.trim() === '' ? '' : commentText); 
         formData.append('parent_id', parentId ? parentId : '');
-        formData.append('work_order_id', workOrder.id);
+        formData.append('work_order_id', workOrderId);
         formData.append('mentions', JSON.stringify(mentionedUserIds)); 
 
         for (const file of filesInput) {
