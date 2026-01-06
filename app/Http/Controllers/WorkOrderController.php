@@ -1786,8 +1786,28 @@ class WorkOrderController extends Controller
             if (count($otherWo) > 0) {
                 $canDisableBatch = true;
             }
+            // Ensure vins is always a collection to prevent JSON encoding errors
+            if (!$vins || !is_iterable($vins)) {
+                $vins = collect([]);
+            }
+            
+            // Ensure customers is always a collection
+            if (!$customers || !is_iterable($customers)) {
+                $customers = collect([]);
+            }
+            
+            try {
+                $vinsJson = $vins->toJson(JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+            } catch (\Exception $e) {
+                Log::error('Failed to encode VINs to JSON in edit method', [
+                    'error' => $e->getMessage(),
+                    'vins_count' => is_countable($vins) ? count($vins) : 0
+                ]);
+                $vinsJson = '[]';
+            }
+            
             return view('work_order.export_exw.create', compact('canDisableBatch', 'previous', 'next', 'workOrder', 'customerCount', 'type', 'customers', 'airlines', 'vins', 'users', 'addons', 'charges', 'salesPersons'))->with([
-                'vinsJson' => $vins->toJson(), // Single encoding here
+                'vinsJson' => $vinsJson,
             ]);
         } catch (\Throwable $e) {
             Log::error('Error in WorkOrderController@edit', [
