@@ -196,6 +196,18 @@
 @include('layouts.formstyle')
 @section('content')
 @php
+// Helper function to escape strings for safe embedding in JavaScript/HTML attributes
+// Handles: quotes (single & double), backslashes, newlines, and other special characters
+function escapeForJs($value) {
+	if ($value === null) {
+		return '';
+	}
+	// Use json_encode which properly escapes everything for JavaScript strings
+	// Remove surrounding quotes since we're embedding into existing string
+	$encoded = json_encode((string)$value, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+	return substr($encoded, 1, -1); // Remove surrounding quotes
+}
+
 $canCreateOrEditWO = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo','create-lto-wo',
 'edit-all-export-exw-work-order','edit-current-user-export-exw-work-order','edit-current-user-export-cnf-work-order','edit-all-export-cnf-work-order',
 'edit-all-local-sale-work-order','edit-current-user-local-sale-work-order']);
@@ -1307,6 +1319,23 @@ try {
 	}
 </script>
 <script type="text/javascript">
+	// Global helper function to escape strings for safe embedding in HTML attributes
+	// Prevents JS syntax errors from quotes, backslashes, newlines, and other special characters
+	// This is critical to prevent "Invalid or unexpected token" errors when database values
+	// contain unexpected characters (like the Jetour addon that had a newline character)
+	function escapeHtmlAttr(str) {
+		if (str == null || str === undefined) return '';
+		return String(str)
+			.replace(/&/g, '&amp;')
+			.replace(/"/g, '&quot;')
+			.replace(/'/g, '&#x27;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/\r\n/g, ' ')
+			.replace(/\r/g, ' ')
+			.replace(/\n/g, ' ');
+	}
+
 	let commentIdCounter = 1;
 	var customerCount = $("#customerCount").val();
 	var type = $("#type").val();
@@ -3072,13 +3101,17 @@ try {
 
 		var addonQuantityCell = document.createElement('td');
 		addonQuantityCell.colSpan = 1;
-		addonQuantityCell.innerHTML = '<input class="child_addon_id_' + data.vehicle_id + '" type="hidden" name="vehicle[' + data.vehicle_id + '][addons][' + addonIndex + '][id]" value="' + (addonId ?? '') + '">' +
-			'<input type="hidden" class="child_addon_' + data.vehicle_id + '" name="vehicle[' + data.vehicle_id + '][addons][' + addonIndex + '][addon_code]" value="' + addonValue + '" id="addons_' + data.vehicle_id + '_' + addonIndex + '">' +
+		// Use global escapeHtmlAttr helper function to prevent JS syntax errors
+		var escapedAddonId = escapeHtmlAttr(addonId);
+		var escapedAddonValue = escapeHtmlAttr(addonValue);
+		var escapedAddonQuantity = escapeHtmlAttr(addonQuantity);
+		addonQuantityCell.innerHTML = '<input class="child_addon_id_' + data.vehicle_id + '" type="hidden" name="vehicle[' + data.vehicle_id + '][addons][' + addonIndex + '][id]" value="' + escapedAddonId + '">' +
+			'<input type="hidden" class="child_addon_' + data.vehicle_id + '" name="vehicle[' + data.vehicle_id + '][addons][' + addonIndex + '][addon_code]" value="' + escapedAddonValue + '" id="addons_' + data.vehicle_id + '_' + addonIndex + '">' +
 			'<div class="input-group">' +
 			'<div class="input-group-append">' +
 			'<span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span>' +
 			'</div>' +
-			'<input name="vehicle[' + data.vehicle_id + '][addons][' + addonIndex + '][addon_quantity]" style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity_' + data.vehicle_id + '_' + addonIndex + '" placeholder="Addon Quantity">' +
+			'<input name="vehicle[' + data.vehicle_id + '][addons][' + addonIndex + '][addon_quantity]" style="border:none;font-size:12px;" type="text" value="' + escapedAddonQuantity + '" class="form-control widthinput" id="addon_quantity_' + data.vehicle_id + '_' + addonIndex + '" placeholder="Addon Quantity">' +
 			'</div>';
 
 		var addonDescriptionCell = document.createElement('td');
@@ -3087,7 +3120,8 @@ try {
 		} else {
 			addonDescriptionCell.colSpan = 13;
 		}
-		addonDescriptionCell.innerHTML = '<input name="vehicle[' + data.vehicle_id + '][addons][' + addonIndex + '][addon_description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description_' + data.vehicle_id + '_' + addonIndex + '" placeholder="Enter Addon Custom Details">';
+		var escapedAddonDescription = escapeHtmlAttr(addonDescription);
+		addonDescriptionCell.innerHTML = '<input name="vehicle[' + data.vehicle_id + '][addons][' + addonIndex + '][addon_description]" style="border:none;font-size:12px;" type="text" value="' + escapedAddonDescription + '" class="form-control widthinput" id="addon_description_' + data.vehicle_id + '_' + addonIndex + '" placeholder="Enter Addon Custom Details">';
 
 		addonRow.appendChild(removeAddonCell);
 		addonRow.appendChild(serviceBreakdownLabelCell);
@@ -3181,17 +3215,36 @@ try {
 
 		var addonValueCell = document.createElement('td');
 		addonValueCell.colSpan = 2;
+		// IMPORTANT:
+		// When addon/charge names contain newlines, quotes, or backslashes from the database,
+		// directly embedding them into a JavaScript string literal can break parsing
+		// in the compiled "edit" page (production was throwing "Invalid or unexpected token").
+		// We use json_encode() to properly escape all special characters for safe embedding.
 		addonValueCell.innerHTML = '<select name="vehicle[' + dataId + '][addons][' + addonIndex + '][addon_code]" id="addons_' + dataId + '_' + addonIndex + '" class="child_addon_' + dataId + ' form-control widthinput dynamicselectaddon" data-parant="' + dataId + '" multiple="true">' +
-			'@foreach($addons as $addon)<option value="{{$addon->addon_code}} - {{$addon->addon_name}}">{{$addon->addon_code}} - {{$addon->addon_name}}</option>@endforeach' +
-			'@foreach($charges as $charge)<option value="{{$charge->addon_code}} - {{$charge->addon_name}}">{{$charge->addon_code}} - {{$charge->addon_name}}</option>@endforeach' +
+@foreach($addons as $addon)
+@php
+	$addonLabel = $addon->addon_code . ' - ' . $addon->addon_name;
+	$addonLabelEscaped = htmlspecialchars($addonLabel, ENT_QUOTES, 'UTF-8');
+@endphp
+			'<option value="{{ $addonLabelEscaped }}">{{ $addonLabelEscaped }}</option>' +
+@endforeach
+@foreach($charges as $charge)
+@php
+	$chargeLabel = $charge->addon_code . ' - ' . $charge->addon_name;
+	$chargeLabelEscaped = htmlspecialchars($chargeLabel, ENT_QUOTES, 'UTF-8');
+@endphp
+			'<option value="{{ $chargeLabelEscaped }}">{{ $chargeLabelEscaped }}</option>' +
+@endforeach
 			'</select>';
 		var addonQuantityCell = document.createElement('td');
 		addonQuantityCell.colSpan = 1;
+		// Use global escapeHtmlAttr helper function to prevent JS syntax errors
+		var escapedAddonQuantity = escapeHtmlAttr(addonQuantity);
 		addonQuantityCell.innerHTML = '<div class="input-group">' +
 			'<div class="input-group-append">' +
 			'<span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span>' +
 			'</div>' +
-			'<input name="vehicle[' + dataId + '][addons][' + addonIndex + '][addon_quantity]" style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity_' + dataId + '_' + addonIndex + '" placeholder="Addon Quantity">' +
+			'<input name="vehicle[' + dataId + '][addons][' + addonIndex + '][addon_quantity]" style="border:none;font-size:12px;" type="text" value="' + escapedAddonQuantity + '" class="form-control widthinput" id="addon_quantity_' + dataId + '_' + addonIndex + '" placeholder="Addon Quantity">' +
 			'</div>';
 
 		var addonDescriptionCell = document.createElement('td');
@@ -3200,7 +3253,8 @@ try {
 		} else {
 			addonDescriptionCell.colSpan = 14;
 		}
-		addonDescriptionCell.innerHTML = '<input name="vehicle[' + dataId + '][addons][' + addonIndex + '][addon_description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description_' + dataId + '_' + addonIndex + '" placeholder="Enter Addon Custom Details">';
+		var escapedAddonDescription = escapeHtmlAttr(addonDescription);
+		addonDescriptionCell.innerHTML = '<input name="vehicle[' + dataId + '][addons][' + addonIndex + '][addon_description]" style="border:none;font-size:12px;" type="text" value="' + escapedAddonDescription + '" class="form-control widthinput" id="addon_description_' + dataId + '_' + addonIndex + '" placeholder="Enter Addon Custom Details">';
 
 		addonRow.appendChild(removeAddonCell);
 		addonRow.appendChild(serviceBreakdownLabelCell);
