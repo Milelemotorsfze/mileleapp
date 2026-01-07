@@ -377,7 +377,12 @@ $formAction = isset($workOrder)
 							<label for="sales_person_id" class="col-form-label text-md-end">{{ __('Choose Sales Person') }}</label>
 							<select name="sales_person_id" id="sales_person_id" multiple="true" class="form-control widthinput" autofocus>
 								@foreach($salesPersons as $salesPerson)
-								<option value="{{ $salesPerson->id }}" {{ isset($workOrder) && $workOrder->sales_person_id == $salesPerson->id ? 'selected' : '' }}>{{ $salesPerson->name }}</option>
+								@php
+									// Safely escape salesperson names to prevent issues with spaces, newlines, quotes
+									$salesPersonName = str_replace(["\r\n", "\r", "\n"], ' ', $salesPerson->name ?? '');
+									$salesPersonNameEscaped = htmlspecialchars($salesPersonName, ENT_QUOTES, 'UTF-8');
+								@endphp
+								<option value="{{ $salesPerson->id }}" {{ isset($workOrder) && $workOrder->sales_person_id == $salesPerson->id ? 'selected' : '' }}>{{ $salesPersonNameEscaped }}</option>
 								@endforeach
 							</select>
 						</div>
@@ -403,10 +408,17 @@ $formAction = isset($workOrder)
 						<input hidden id="customer_reference_type" name="customer_reference_type" value="">
 						<select id="customer_name" name="existing_customer_name" class="form-control widthinput" multiple="true">
 							@foreach($customers as $customer)
+							@php
+								// Safely escape customer names to prevent issues with spaces, newlines, quotes
+								// e() helper already escapes, but we ensure newlines are handled
+								$customerName = str_replace(["\r\n", "\r", "\n"], ' ', $customer->customer_name ?? '');
+								$customerNameEscaped = e($customerName);
+								$customerDataId = e(($customer->email ?? '') . '_' . ($customer->phone ?? ''));
+							@endphp
 							<option
-								value="{{ e($customer->customer_name ?? '') }}"
-								data-id="{{ e(($customer->email ?? '') . '_' . ($customer->phone ?? '')) }}">
-								{{ e($customer->customer_name ?? '') }}
+								value="{{ $customerNameEscaped }}"
+								data-id="{{ $customerDataId }}">
+								{{ $customerNameEscaped }}
 							</option>
 							@endforeach
 
@@ -683,7 +695,13 @@ $formAction = isset($workOrder)
 						<label for="vin_multiple" class="col-form-label text-md-end">{{ __('VIN') }}</label>
 						<select id="vin_multiple" name="vin_multiple" class="form-control widthinput" multiple="true">
 							@foreach($vins as $vin)
-							<option value="{{$vin->vin ?? ''}}">{{$vin->vin ?? ''}} / {{$vin->variant->master_model_lines->brand->brand_name ?? ''}} / {{$vin->variant->master_model_lines->model_line ?? ''}}</option>
+							@php
+								// Safely escape all values to prevent issues with spaces, newlines, quotes in brand/model names
+								$vinValue = htmlspecialchars($vin->vin ?? '', ENT_QUOTES, 'UTF-8');
+								$brandName = htmlspecialchars($vin->variant->master_model_lines->brand->brand_name ?? '', ENT_QUOTES, 'UTF-8');
+								$modelLine = htmlspecialchars($vin->variant->master_model_lines->model_line ?? '', ENT_QUOTES, 'UTF-8');
+							@endphp
+							<option value="{{ $vinValue }}">{{ $vinValue }} / {{ $brandName }} / {{ $modelLine }}</option>
 							@endforeach
 						</select>
 					</div>
@@ -1447,16 +1465,19 @@ try {
 		}
 		if (workOrder !== null && workOrder.customer_reference_id === null && workOrder.customer_name !== null) {
 			checkValue();
-			$('#textInput').val(workOrder.customer_name);
+			// jQuery's .val() is safe, but ensure we handle null/undefined
+			$('#textInput').val(workOrder.customer_name || '');
 		} else if (workOrder !== null && (workOrder.customer_reference_id !== null || workOrder.customer_reference_id === 0) && workOrder.customer_name !== null) {
-			$("#customer_name").val(workOrder.customer_name).change();
+			// jQuery's .val() is safe, handles escaping automatically
+			$("#customer_name").val(workOrder.customer_name || '').change();
 		}
 		if (workOrder == null || workOrder.transport_type == null) {
 			hideDependentTransportType();
 		}
 		if (workOrder !== null) {
-			$('#customer_address').val(workOrder.customer_address);
-			$('#customer_email').val(workOrder.customer_email);
+			// jQuery's .val() method safely handles all special characters including newlines/quotes
+			$('#customer_address').val(workOrder.customer_address || '');
+			$('#customer_email').val(workOrder.customer_email || '');
 			var customer_company_numberFull = workOrder.customer_company_number ? workOrder.customer_company_number.replace(/\s+/g, '') : '';
 			iti.setNumber(customer_company_numberFull);
 			var customer_representative_contactFull = workOrder.customer_representative_contact ? workOrder.customer_representative_contact.replace(/\s+/g, '') : '';
@@ -1489,7 +1510,9 @@ try {
 			for (var i = 0; i < workOrder.vehicles.length; i++) {
 				drawTableRow(workOrder.vehicles[i]);
 
-				$("#vin_multiple").find('option[value="' + workOrder.vehicles[i].vin + '"]').prop('disabled', true);
+				// Escape VIN to prevent jQuery selector injection (quotes in VIN would break selector)
+				var escapedVin = escapeHtmlAttr(workOrder.vehicles[i].vin);
+				$("#vin_multiple").find('option[value="' + escapedVin + '"]').prop('disabled', true);
 
 				$("#vin_multiple").trigger('change.select2');
 
@@ -1526,7 +1549,9 @@ try {
 				$boeSelect.append(newBoeOption);
 
 				boeVins[boeNumber].forEach(function(vin) {
-					$boeSelect.find('option[value="' + vin + '"]').prop('selected', true);
+					// Escape VIN to prevent jQuery selector injection
+					var escapedVin = escapeHtmlAttr(vin);
+					$boeSelect.find('option[value="' + escapedVin + '"]').prop('selected', true);
 				});
 
 				$boeSelect.trigger('change');
@@ -1542,11 +1567,15 @@ try {
 
 				allVins.forEach(function(vin) {
 					if (selectedVins.indexOf(vin) === -1) {
-						$select.find('option[value="' + vin + '"]').prop('disabled', true);
+						// Escape VIN to prevent jQuery selector injection
+						var escapedVin = escapeHtmlAttr(vin);
+						$select.find('option[value="' + escapedVin + '"]').prop('disabled', true);
 					}
 				});
 				vinWithoutBoe.forEach(function(vin) {
-					$select.find('option[value="' + vin + '"]').prop('disabled', false);
+					// Escape VIN to prevent jQuery selector injection
+					var escapedVin = escapeHtmlAttr(vin);
+					$select.find('option[value="' + escapedVin + '"]').prop('disabled', false);
 				});
 				$select.trigger('change.select2');
 			});
@@ -1738,7 +1767,9 @@ try {
 			var selectedVINs = selectElement.val();
 			if (selectedVINs) {
 				selectedVINs.forEach(function(vin) {
-					$('select option[value="' + vin + '"]').prop('disabled', false);
+					// Escape VIN to prevent jQuery selector injection
+					var escapedVin = escapeHtmlAttr(vin);
+					$('select option[value="' + escapedVin + '"]').prop('disabled', false);
 				});
 			}
 
@@ -2620,16 +2651,28 @@ try {
 					if (response.charges && response.charges.length > 0) {
 						$("#addon-dynamic-div").show();
 						$.each(response.charges, function(index, charge) {
+							// Safely escape addon names to prevent JS/HTML injection
+							var chargeLabel = (charge.addon_code || '') + " - " + (charge.addon_name || '');
+							// Remove newlines and escape quotes for safe embedding
+							chargeLabel = chargeLabel.replace(/\r\n/g, ' ').replace(/\r/g, ' ').replace(/\n/g, ' ');
+							var chargeValue = escapeHtmlAttr(chargeLabel);
+							var chargeText = escapeHtmlAttr(chargeLabel);
 							$dropdown.append(
-								$('<option></option>').val(charge.addon_code + " - " + charge.addon_name).text(charge.addon_code + " - " + charge.addon_name)
+								$('<option></option>').val(chargeValue).text(chargeText)
 							);
 						});
 					}
 					if (response.addons && response.addons.length > 0) {
 						$("#addon-dynamic-div").show();
 						$.each(response.addons, function(index, addon) {
+							// Safely escape addon names to prevent JS/HTML injection
+							var addonLabel = (addon.addon_code || '') + " - " + (addon.addon_name || '');
+							// Remove newlines and escape quotes for safe embedding
+							addonLabel = addonLabel.replace(/\r\n/g, ' ').replace(/\r/g, ' ').replace(/\n/g, ' ');
+							var addonValue = escapeHtmlAttr(addonLabel);
+							var addonText = escapeHtmlAttr(addonLabel);
 							$dropdown.append(
-								$('<option></option>').val(addon.addon_code + " - " + addon.addon_name).text(addon.addon_code + " - " + addon.addon_name)
+								$('<option></option>').val(addonValue).text(addonText)
 							);
 						});
 					}
@@ -2899,26 +2942,31 @@ try {
 		var removeIconCell = createCellWithRemoveButton();
 
 		var vinCell = document.createElement('td');
-		vinCell.innerHTML = '<input type="hidden" name="vehicle[' + data.vehicle_id + '][id]" value="' + (data.id) + '">' +
-			'<input type="hidden" name="vehicle[' + data.vehicle_id + '][vehicle_id]" value="' + (data.vehicle_id) + '">' +
-			'<input type="hidden" name="vehicle[' + data.vehicle_id + '][vin]" value="' + (data.vin) + '">' +
-			(data.vin);
-		vinCell.dataset.vin = data.vin;
+		// Escape all values to prevent HTML/JS injection from malicious data
+		var escapedVehicleId = escapeHtmlAttr(data.vehicle_id);
+		var escapedId = escapeHtmlAttr(data.id);
+		var escapedVin = escapeHtmlAttr(data.vin);
+		vinCell.innerHTML = '<input type="hidden" name="vehicle[' + escapedVehicleId + '][id]" value="' + escapedId + '">' +
+			'<input type="hidden" name="vehicle[' + escapedVehicleId + '][vehicle_id]" value="' + escapedVehicleId + '">' +
+			'<input type="hidden" name="vehicle[' + escapedVehicleId + '][vin]" value="' + escapedVin + '">' +
+			escapedVin;
+		vinCell.dataset.vin = data.vin; // dataset is safe, doesn't need escaping
 
-		var brandCell = createEditableCell(data.brand, 'Enter Brand', 'vehicle[' + data.vehicle_id + '][brand]');
-		var variantCell = createEditableCell(data.variant, 'Enter Variant', 'vehicle[' + data.vehicle_id + '][variant]');
-		var engineCell = createEditableCell(data.engine, 'Enter Engine', 'vehicle[' + data.vehicle_id + '][engine]');
-		var modelDescriptionCell = createEditableCell(data.model_description, 'Enter Model Description', 'vehicle[' + data.vehicle_id + '][model_description]');
-		var modelYearCell = createEditableCell(data.model_year, 'Enter Model Year', 'vehicle[' + data.vehicle_id + '][model_year]');
-		var modelYearToMentionOnDocumentsCell = createEditableCell(data.model_year_to_mention_on_documents, 'Enter Model Year to mention on Documents', 'vehicle[' + data.vehicle_id + '][model_year_to_mention_on_documents]');
-		var steeringCell = createEditableCell(data.steering, 'Enter Steering', 'vehicle[' + data.vehicle_id + '][steering]');
-		var exteriorCell = createEditableCell(data.exterior_colour, 'Enter Exterior Colour', 'vehicle[' + data.vehicle_id + '][exterior_colour]');
-		var interiorColorCell = createEditableCell(data.interior_colour, 'Enter Interior Colour', 'vehicle[' + data.vehicle_id + '][interior_colour]');
-		var warehouseCell = createEditableCell(data.warehouse, 'Enter Warehouse', 'vehicle[' + data.vehicle_id + '][warehouse]');
-		var territoryCell = createEditableCell(data.territory, 'Enter Territory', 'vehicle[' + data.vehicle_id + '][territory]');
-		var preferredDestinationCell = createEditableCell(data.preferred_destination, 'Enter Preferred Destination', 'vehicle[' + data.vehicle_id + '][preferred_destination]');
-		var importTypeCell = createEditableCell(data.import_document_type, 'Enter Import Document Type', 'vehicle[' + data.vehicle_id + '][import_document_type]');
-		var ownershipCell = createEditableCell(data.ownership_name, 'Enter Ownership', 'vehicle[' + data.vehicle_id + '][ownership_name]');
+		// Use escaped vehicle_id for all name attributes to prevent injection
+		var brandCell = createEditableCell(data.brand, 'Enter Brand', 'vehicle[' + escapedVehicleId + '][brand]');
+		var variantCell = createEditableCell(data.variant, 'Enter Variant', 'vehicle[' + escapedVehicleId + '][variant]');
+		var engineCell = createEditableCell(data.engine, 'Enter Engine', 'vehicle[' + escapedVehicleId + '][engine]');
+		var modelDescriptionCell = createEditableCell(data.model_description, 'Enter Model Description', 'vehicle[' + escapedVehicleId + '][model_description]');
+		var modelYearCell = createEditableCell(data.model_year, 'Enter Model Year', 'vehicle[' + escapedVehicleId + '][model_year]');
+		var modelYearToMentionOnDocumentsCell = createEditableCell(data.model_year_to_mention_on_documents, 'Enter Model Year to mention on Documents', 'vehicle[' + escapedVehicleId + '][model_year_to_mention_on_documents]');
+		var steeringCell = createEditableCell(data.steering, 'Enter Steering', 'vehicle[' + escapedVehicleId + '][steering]');
+		var exteriorCell = createEditableCell(data.exterior_colour, 'Enter Exterior Colour', 'vehicle[' + escapedVehicleId + '][exterior_colour]');
+		var interiorColorCell = createEditableCell(data.interior_colour, 'Enter Interior Colour', 'vehicle[' + escapedVehicleId + '][interior_colour]');
+		var warehouseCell = createEditableCell(data.warehouse, 'Enter Warehouse', 'vehicle[' + escapedVehicleId + '][warehouse]');
+		var territoryCell = createEditableCell(data.territory, 'Enter Territory', 'vehicle[' + escapedVehicleId + '][territory]');
+		var preferredDestinationCell = createEditableCell(data.preferred_destination, 'Enter Preferred Destination', 'vehicle[' + escapedVehicleId + '][preferred_destination]');
+		var importTypeCell = createEditableCell(data.import_document_type, 'Enter Import Document Type', 'vehicle[' + escapedVehicleId + '][import_document_type]');
+		var ownershipCell = createEditableCell(data.ownership_name, 'Enter Ownership', 'vehicle[' + escapedVehicleId + '][ownership_name]');
 		var CertificationPerVINCell = createEditableSelect2Cell(data.vin, data.vehicle_id, data.certification_per_vin);
 		if (type == 'export_cnf') {
 			var shipmentCell = createEditableSelect2ShipmentCell(data.vin, data.vehicle_id, data.shipment);
@@ -3152,7 +3200,9 @@ try {
 				selectElement.find(`option[value='${vin}']`).prop('selected', false).remove();
 				selectElement.trigger('change');
 			});
-			$('select option[value="' + vin + '"]').prop('disabled', false);
+			// Escape VIN to prevent jQuery selector injection
+			var escapedVin = escapeHtmlAttr(vin);
+			$('select option[value="' + escapedVin + '"]').prop('disabled', false);
 		}
 		var rows = $(this).data('rows');
 		if (rows) {
@@ -3219,18 +3269,22 @@ try {
 		// When addon/charge names contain newlines, quotes, or backslashes from the database,
 		// directly embedding them into a JavaScript string literal can break parsing
 		// in the compiled "edit" page (production was throwing "Invalid or unexpected token").
-		// We use json_encode() to properly escape all special characters for safe embedding.
+		// CRITICAL: We MUST strip newlines FIRST, then escape quotes, to prevent JS syntax errors.
 		addonValueCell.innerHTML = '<select name="vehicle[' + dataId + '][addons][' + addonIndex + '][addon_code]" id="addons_' + dataId + '_' + addonIndex + '" class="child_addon_' + dataId + ' form-control widthinput dynamicselectaddon" data-parant="' + dataId + '" multiple="true">' +
 @foreach($addons as $addon)
 @php
-	$addonLabel = $addon->addon_code . ' - ' . $addon->addon_name;
+	// First: Remove all newlines and carriage returns (replace with space)
+	$addonLabel = str_replace(["\r\n", "\r", "\n"], ' ', $addon->addon_code . ' - ' . $addon->addon_name);
+	// Second: Escape quotes and HTML entities for safe embedding in JS string
 	$addonLabelEscaped = htmlspecialchars($addonLabel, ENT_QUOTES, 'UTF-8');
 @endphp
 			'<option value="{{ $addonLabelEscaped }}">{{ $addonLabelEscaped }}</option>' +
 @endforeach
 @foreach($charges as $charge)
 @php
-	$chargeLabel = $charge->addon_code . ' - ' . $charge->addon_name;
+	// First: Remove all newlines and carriage returns (replace with space)
+	$chargeLabel = str_replace(["\r\n", "\r", "\n"], ' ', $charge->addon_code . ' - ' . $charge->addon_name);
+	// Second: Escape quotes and HTML entities for safe embedding in JS string
 	$chargeLabelEscaped = htmlspecialchars($chargeLabel, ENT_QUOTES, 'UTF-8');
 @endphp
 			'<option value="{{ $chargeLabelEscaped }}">{{ $chargeLabelEscaped }}</option>' +
@@ -3366,8 +3420,10 @@ try {
 		var inputElement = document.createElement('input');
 		inputElement.type = 'text';
 		inputElement.placeholder = placeHolder;
+		// DOM API automatically escapes name and value, but we ensure value is safe
 		inputElement.name = name;
-		inputElement.value = value;
+		// DOM API's .value property is safe, but ensure we handle null/undefined
+		inputElement.value = value != null ? value : '';
 		inputElement.style.border = 'none';
 
 		var uniqueId = name.replace(/[\[\]]+/g, '_');
