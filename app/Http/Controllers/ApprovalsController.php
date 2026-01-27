@@ -1715,6 +1715,45 @@ public function submitGrn(Request $request)
 //         'message' => 'Netsuite GRN added successfully',
 //     ]);
 // }
+
+public function addGrn(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'vehicle_id' => 'required|exists:vehicles,id',
+        'grn' => 'required|string|max:255',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'errors' => $validator->errors(),
+        ], 422);
+    }
+
+    $vehicle = Vehicles::find($request->vehicle_id);
+
+    if (!$vehicle) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Vehicle not found',
+        ], 404);
+    }
+
+    $oldgrn = MovementGrn::where('id', $vehicle->movement_grn_id)->first();
+
+    $grnRecord = new Grn();
+    $grnRecord->grn_number = $request->grn;
+    $grnRecord->date = $oldgrn ? $oldgrn->date : null;
+    $grnRecord->save();
+
+    $vehicle->grn_id = $grnRecord->id;
+    $vehicle->save();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Netsuite GRN added successfully',
+    ]);
+}
 public function addingnetsuitegdn(Request $request)
 {
     $useractivities = new UserActivities();

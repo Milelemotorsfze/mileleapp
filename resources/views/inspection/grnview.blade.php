@@ -76,7 +76,8 @@
           </div>
           <input type="hidden" id="vehicleId">
           <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="submit" class="btn btn-primary">Update GRN</button>
+          <button type="button" class="btn btn-secondary" id="addNewGrnBtn">Add New GRN</button>
           </div>
         </form>
     </div>
@@ -209,7 +210,6 @@
 
             var vehicleId = $('#vehicleId').val();
             var grn = $('#grnInput').val();
-            var grn = $('#grnInput').val();
 
             $.ajax({
                 url: "{{ route('netsuitegrn.submit') }}",
@@ -226,6 +226,34 @@
                 },
                 error: function(response) {
                     alert(response.responseJSON.message);
+                }
+            });
+        });
+
+        $('#addNewGrnBtn').on('click', function() {
+            var vehicleId = $('#vehicleId').val();
+            var grn = $('#grnInput').val();
+
+            if (!grn) {
+                alert('Please enter a Netsuite GRN to add.');
+                return;
+            }
+
+            $.ajax({
+                url: "{{ route('netsuitegrn.add') }}",
+                method: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    vehicle_id: vehicleId,
+                    grn: grn
+                },
+                success: function(response) {
+                    $('#netsuiteModal').modal('hide');
+                    table1.ajax.reload();
+                    table2.ajax.reload();
+                },
+                error: function(response) {
+                    alert(response.responseJSON.message || 'An error occurred while adding GRN.');
                 }
             });
         });
