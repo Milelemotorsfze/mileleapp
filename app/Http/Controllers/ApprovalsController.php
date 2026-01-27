@@ -1749,6 +1749,16 @@ public function addGrn(Request $request)
     $vehicle->grn_id = $grnRecord->id;
     $vehicle->save();
 
+    // Also update the Movement GRN record so all existing logic and views (which use movement_grns.grn_number)
+    // reflect the newly added Netsuite GRN number.
+    if ($vehicle->movement_grn_id) {
+        $movementGrn = MovementGrn::find($vehicle->movement_grn_id);
+        if ($movementGrn) {
+            $movementGrn->grn_number = $request->grn;
+            $movementGrn->save();
+        }
+    }
+
     return response()->json([
         'success' => true,
         'message' => 'Netsuite GRN added successfully',
