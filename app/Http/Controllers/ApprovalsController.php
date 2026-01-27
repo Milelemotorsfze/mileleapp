@@ -1741,23 +1741,27 @@ public function addGrn(Request $request)
 
     $oldgrn = MovementGrn::where('id', $vehicle->movement_grn_id)->first();
 
+    // Optional: keep legacy GRN table in sync if it's used elsewhere
     $grnRecord = new Grn();
     $grnRecord->grn_number = $request->grn;
     $grnRecord->date = $oldgrn ? $oldgrn->date : null;
     $grnRecord->save();
 
     $vehicle->grn_id = $grnRecord->id;
-    $vehicle->save();
 
-    // Also update the Movement GRN record so all existing logic and views (which use movement_grns.grn_number)
-    // reflect the newly added Netsuite GRN number.
-    if ($vehicle->movement_grn_id) {
-        $movementGrn = MovementGrn::find($vehicle->movement_grn_id);
-        if ($movementGrn) {
-            $movementGrn->grn_number = $request->grn;
-            $movementGrn->save();
-        }
+    // Create a new Movement GRN record so this new GRN number applies only to this specific VIN
+    if ($oldgrn) {
+        $newMovementGrn = new MovementGrn();
+        $newMovementGrn->movement_reference_id = $oldgrn->movement_reference_id;
+        $newMovementGrn->purchase_order_id = $oldgrn->purchase_order_id ?? null;
+        $newMovementGrn->grn_number = $request->grn;
+        $newMovementGrn->save();
+
+        // Re-link only this vehicle to the new Movement GRN
+        $vehicle->movement_grn_id = $newMovementGrn->id;
     }
+
+    $vehicle->save();
 
     return response()->json([
         'success' => true,
