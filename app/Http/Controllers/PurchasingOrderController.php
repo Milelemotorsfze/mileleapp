@@ -5623,7 +5623,15 @@ class PurchasingOrderController extends Controller
                 $vendorPayment->status = 'Approved';
                 $vendorPayment->save();
             }
+            if (!$supplierAccountTransaction) {
+                DB::rollBack();
+                return response()->json(['success' => false, 'message' => 'Transaction not found'], 404);
+            }
             $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
+            if (!$purchasingOrder) {
+                DB::rollBack();
+                return response()->json(['success' => false, 'message' => 'Purchasing Order not found'], 404);
+            }
 
             $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
             $transactionCount = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->count();
@@ -5631,10 +5639,12 @@ class PurchasingOrderController extends Controller
                 $vehicleTransaction->status = 'Approved';
                 $vehicleTransaction->save();
                 $vehiclespaid = VehiclePurchasingCost::where('vehicles_id', $vehicleTransaction->vehicles_id)->first();
-                $vehiclespaid->total_paid_amount += $vehicleTransaction->amount;
-                $vehiclespaid->save();
+                if ($vehiclespaid) {
+                    $vehiclespaid->total_paid_amount += $vehicleTransaction->amount;
+                    $vehiclespaid->save();
+                }
                 // DP PO
-                if ($purchasingOrder->is_demand_planning_purchase_order) {
+                if ($purchasingOrder && $purchasingOrder->is_demand_planning_purchase_order) {
                     $pfiId = $purchasingOrder->PFIPurchasingOrder->pfi->id ?? '';
                     $pfiItemLatest = PfiItem::where('pfi_id', $pfiId)
                         ->where('is_parent', false)
@@ -5643,24 +5653,30 @@ class PurchasingOrderController extends Controller
                     if ($pfiItemLatest) {
                         // only toyota PFI have child , so if child exist it will be toyota PO
                         $vehicle = Vehicles::find($vehicleTransaction->vehicles_id);
-                        $masterModel = MasterModel::find($vehicle->model_id);
-                        $possibleModels = MasterModel::where('model', $masterModel->model)
-                            ->where('sfx',  $masterModel->sfx)
-                            ->pluck('id')->toArray();
-                        $pfiItem = PfiItemPurchaseOrder::where('purchase_order_id', $purchasingOrder->id)
-                            ->whereIn('master_model_id', $possibleModels)
-                            ->first();
-                        $loiItem = LetterOfIndentItem::whereHas('pfiItems', function ($query) use ($pfiItem) {
-                            $query->where('is_parent', false)
-                                ->where('pfi_id', $pfiItem->pfi_id)
-                                ->where('parent_pfi_item_id', $pfiItem->pfi_item_id);
-                        })
-                            ->first();
-                        if ($loiItem) {
-                            $latestUtilizedQuantity = $loiItem->utilized_quantity + 1;
-                            $loiItem->po_payment_initiated_quantity = $loiItem->po_payment_initiated_quantity - 1;
-                            $loiItem->utilized_quantity = $latestUtilizedQuantity;
-                            $loiItem->save();
+                        if ($vehicle && $vehicle->model_id) {
+                            $masterModel = MasterModel::find($vehicle->model_id);
+                            if ($masterModel) {
+                                $possibleModels = MasterModel::where('model', $masterModel->model)
+                                    ->where('sfx',  $masterModel->sfx)
+                                    ->pluck('id')->toArray();
+                                $pfiItem = PfiItemPurchaseOrder::where('purchase_order_id', $purchasingOrder->id)
+                                    ->whereIn('master_model_id', $possibleModels)
+                                    ->first();
+                                if ($pfiItem) {
+                                    $loiItem = LetterOfIndentItem::whereHas('pfiItems', function ($query) use ($pfiItem) {
+                                        $query->where('is_parent', false)
+                                            ->where('pfi_id', $pfiItem->pfi_id)
+                                            ->where('parent_pfi_item_id', $pfiItem->pfi_item_id);
+                                    })
+                                        ->first();
+                                    if ($loiItem) {
+                                        $latestUtilizedQuantity = $loiItem->utilized_quantity + 1;
+                                        $loiItem->po_payment_initiated_quantity = $loiItem->po_payment_initiated_quantity - 1;
+                                        $loiItem->utilized_quantity = $latestUtilizedQuantity;
+                                        $loiItem->save();
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -5678,11 +5694,11 @@ class PurchasingOrderController extends Controller
             $purchasingOrder->save();
 
             // if PO is Dp => Seal the PFI Document with milele seal
-            if ($purchasingOrder->is_demand_planning_purchase_order) {
+            if ($purchasingOrder && $purchasingOrder->is_demand_planning_purchase_order) {
                 $pdf = new Fpdi();
                 $pfiId = $purchasingOrder->PFIPurchasingOrder->pfi->id ?? '';
                 $pfi = PFI::find($pfiId);
-                if (!$pfi->pfi_document_with_sign) {
+                if ($pfi && !$pfi->pfi_document_with_sign) {
                     if ($pfi->new_pfi_document_without_sign) {
                         $destinationPath = 'New_PFI_document_without_sign/' . $pfi->new_pfi_document_without_sign;
                     } else {
@@ -5716,8 +5732,8 @@ class PurchasingOrderController extends Controller
             }
 
             $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
-            $currency = $supplierAccountTransaction->account_currency;
-            if ($purchasingOrder->is_demand_planning_po == 1) {
+            $currency = $supplierAccountTransaction ? $supplierAccountTransaction->account_currency : '';
+            if ($purchasingOrder && $purchasingOrder->is_demand_planning_po == 1) {
                 $recipients = [
                     config('mail.custom_recipients.dp'),
                     config('mail.custom_recipients.finance'),
@@ -5730,10 +5746,10 @@ class PurchasingOrderController extends Controller
                 ];
                 Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
             }
-            $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
-                "PFI Number: " . $purchasingOrder->pl_number . "\n" .
-                "Payment Amount: " . $supplierAccountTransaction->transaction_amount . "\n" .
-                "Total Amount: " . $purchasingOrder->totalcost . "\n" .
+            $detailText = "PO Number: " . ($purchasingOrder->po_number ?? '') . "\n" .
+                "PFI Number: " . ($purchasingOrder->pl_number ?? '') . "\n" .
+                "Payment Amount: " . ($supplierAccountTransaction->transaction_amount ?? '') . "\n" .
+                "Total Amount: " . ($purchasingOrder->totalcost ?? '') . "\n" .
                 "Stage: " . "Payment Released\n" .
                 "Number of Units: " . $transactionCount . " Vehicles\n" .
                 "Order URL: " . $orderUrl;
@@ -5742,7 +5758,7 @@ class PurchasingOrderController extends Controller
             $notification->type = 'Information';
             $notification->detail = $detailText;
             $notification->save();
-            if ($purchasingOrder->is_demand_planning_po == 1) {
+            if ($purchasingOrder && $purchasingOrder->is_demand_planning_po == 1) {
                 $dnaccess = new Dnaccess();
                 $dnaccess->master_departments_id = 4;
                 $dnaccess->department_notifications_id = $notification->id;
@@ -5771,9 +5787,9 @@ class PurchasingOrderController extends Controller
 
             return response()->json(['success' => true, 'transition_id' => $transitionId]);
         } catch (\Exception $e) {
-            info($e->getMessage());
+            DB::rollBack();
+            Log::error('Payment approval failed', ['error' => $e->getMessage(), 'transition_id' => $request->input('transition_id')]);
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-            // return response()->json(['success' => true, 'transition_id' => $transitionId]);
         }
     }
 
