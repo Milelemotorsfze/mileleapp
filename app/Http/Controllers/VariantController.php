@@ -534,7 +534,7 @@ public function store(Request $request)
 
             $model_details .= ' ' . $engine . $f . ' ' . $gearbox;
 
-            }
+        }
         $variant_details= $request->input('variant');
         if($variant_details == null)
         {
@@ -575,10 +575,12 @@ public function store(Request $request)
             $variant_details = $my . ',' . $steering . ',' . $model_line . ',' . $engine . ',' . $gearbox . ',' . $fuel_type . ',' . $gearbox . ',' . $coo . ',' . $drive_train . ',' . $upholestry;
         }
     $name = str_replace(' ', '', $name);
-    // valiadtaion chcek for variant name 
-    $isVariantNameExist = Varaint::where('name', $name)->first();
+    // validation check for variant name scoped by model description
+    $isVariantNameExist = Varaint::where('name', $name)
+        ->where('model_detail', $model_details)
+        ->first();
     if($isVariantNameExist) {
-          return redirect()->back()->with('error', 'Variant with the same Name( '. $name.' )already exists');
+          return redirect()->back()->with('error', 'Variant with the same Name and Model Description already exists ( '. $name.' )');
     }
     $variant = new Varaint();
     $variant->brands_id = $request->input('brands_id');
