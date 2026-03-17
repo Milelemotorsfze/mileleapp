@@ -1966,7 +1966,9 @@ try {
 
 		if (workOrder != null && workOrder.sales_support_data_confirmation_at != null) {
 			var hasEditConfirmedPermission = <?php echo json_encode(Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order'])); ?>;
-			var isDisabled = !hasEditConfirmedPermission;
+			var isFinanceUser = <?php echo json_encode(Auth::user()->hasPermissionForSelectedRole(['do-finance-approval'])); ?>;
+			var effectiveCanEditConfirmed = hasEditConfirmedPermission || isFinanceUser;
+			var isDisabled = !effectiveCanEditConfirmed;
 			if (isDisabled) {
 				var elements = document.querySelectorAll('#WOForm #submit');
 				elements.forEach(function(element) {
