@@ -339,7 +339,7 @@ public function store(Request $request)
                 else if($fuel_type == "Diesel") 
                 {
                     $f = "D";
-                }
+                } 
                 else if($fuel_type == "PHEV") 
                 {
                     $f = "PHEV";

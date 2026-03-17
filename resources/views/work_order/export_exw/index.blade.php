@@ -130,6 +130,9 @@
 			'edit-current-user-export-exw-work-order','edit-current-user-export-cnf-work-order','edit-all-export-cnf-work-order',
 			'edit-all-local-sale-work-order','edit-current-user-local-sale-work-order']);
 		$hasEditConfirmedPermission = Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order']);
+		// Finance approvers are also allowed to edit confirmed work orders
+		$isFinanceUser = Auth::user()->hasPermissionForSelectedRole(['do-finance-approval']);
+		$effectiveCanEditConfirmed = $hasEditConfirmedPermission || $isFinanceUser;
 		$canViewFinLog = Auth::user()->hasPermissionForSelectedRole(['view-finance-approval-history']);
 		$canViewCOOLog = Auth::user()->hasPermissionForSelectedRole(['view-coo-approval-history']);
 		$canChangeDocStatus = Auth::user()->hasPermissionForSelectedRole(['can-change-documentation-status']);

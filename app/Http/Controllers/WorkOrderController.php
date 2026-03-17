@@ -1797,8 +1797,12 @@ class WorkOrderController extends Controller
     {
         // Check if the user has permission to edit confirmed work orders
         $hasEditConfirmedPermission = Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order']);
-        // Check if the sales support data has been confirmed
-        if (!is_null($workOrder->sales_support_data_confirmation_at) && !$hasEditConfirmedPermission) {
+        // Finance can always edit, before and after approval
+        $isFinanceUser = Auth::user()->hasPermissionForSelectedRole(['do-finance-approval']);
+        // Check if finance has already approved this work order
+        $isFinanceApproved = $workOrder->finance_approval_status === 'Approved';
+        // For non‑finance users, keep existing restriction on editing confirmed work orders
+        if (!is_null($workOrder->sales_support_data_confirmation_at) && !$hasEditConfirmedPermission && !$isFinanceUser) {
             return response()->json(['success' => false, 'message' => "Can't edit the work order because the sales support confirmed the data."], 400);
         }
 
@@ -2849,7 +2853,18 @@ class WorkOrderController extends Controller
                 $this->sendVehicleUpdateEmail($workOrder, $newComment);
             }
             if ($canCreateFinanceApproval == true) {
-                if (!$hasEditConfirmedPermission) {
+                // Do not re‑initiate finance approval if finance user is editing an already finance‑approved work order
+                if ($isFinanceUser && $isFinanceApproved) {
+                    WORecordHistory::create([
+                        'work_order_id' => $workOrder->id,
+                        'user_id' => Auth::id(),
+                        'field_name' => 'finance_approval_status',
+                        'old_value' => 'Approved',
+                        'new_value' => 'Approved',
+                        'type' => 'Finance Edit - No Reapproval',
+                        'changed_at' => Carbon::now(),
+                    ]);
+                } elseif (!$hasEditConfirmedPermission) {
                     $financePendingApproval = WOApprovals::where('work_order_id', $workOrder->id)->where('type', 'finance')->where('status', 'pending')->first();
                     if ($financePendingApproval == null) {
                         WOApprovals::create([
