@@ -710,16 +710,16 @@
                         Bank For Payment :
                     </div>
                     <div class="col-sm-6">
-                    <select name="select_bank" class="form-control">
-                        <option value="rak-aed">RAK BANK AED</option>
-                        <option value="rak-usd">RAK BANK USD</option>
-                        <option value="rak-eur">RAK BANK EUR</option>
-                        <option value="rak-aud">RAK BANK AUD</option>
-                        <option value="rak-jpy">RAK BANK JPY</option>
-                        <option value="hbz-aed">HBZ BANK AED</option>
-                        <option value="hbz-usd">HBZ BANK USD</option>
-                        <option value="hbz-eur">HBZ BANK EUR</option>
-                        <option value="hbz-jpy">HBZ BANK JPY</option>
+                    <select name="select_bank" id="select_bank" class="form-control">
+                        <option value="rak-aed" {{ (($quotation_details?->selected_bank ?? '') === 'rak-aed') ? 'selected' : '' }}>RAK BANK AED</option>
+                        <option value="rak-usd" {{ (($quotation_details?->selected_bank ?? '') === 'rak-usd') ? 'selected' : '' }}>RAK BANK USD</option>
+                        <option value="rak-eur" {{ (($quotation_details?->selected_bank ?? '') === 'rak-eur') ? 'selected' : '' }}>RAK BANK EUR</option>
+                        <option value="rak-aud" {{ (($quotation_details?->selected_bank ?? '') === 'rak-aud') ? 'selected' : '' }}>RAK BANK AUD</option>
+                        <option value="rak-jpy" {{ (($quotation_details?->selected_bank ?? '') === 'rak-jpy') ? 'selected' : '' }}>RAK BANK JPY</option>
+                        <option value="hbz-aed" {{ (($quotation_details?->selected_bank ?? '') === 'hbz-aed') ? 'selected' : '' }}>HBZ BANK AED</option>
+                        <option value="hbz-usd" {{ (($quotation_details?->selected_bank ?? '') === 'hbz-usd') ? 'selected' : '' }}>HBZ BANK USD</option>
+                        <option value="hbz-eur" {{ (($quotation_details?->selected_bank ?? '') === 'hbz-eur') ? 'selected' : '' }}>HBZ BANK EUR</option>
+                        <option value="hbz-jpy" {{ (($quotation_details?->selected_bank ?? '') === 'hbz-jpy') ? 'selected' : '' }}>HBZ BANK JPY</option>
                     </select>
                     </div>
                 </div>
@@ -2244,6 +2244,16 @@ $('#shipping_port').select2();
 
         $('#currency').on('change', function() {
             var currency = $(this).val();
+            var $bankSelect = $('#select_bank');
+            if ($bankSelect.length) {
+                if (currency === 'USD') {
+                    $bankSelect.val('rak-usd');
+                } else if (currency === 'EUR') {
+                    $bankSelect.val('rak-eur');
+                } else if (currency === 'AED') {
+                    $bankSelect.val('rak-aed');
+                }
+            }
             showPriceInSelectedValue();
             var oldCurrecy = $('#old-currency-type').val();
             var PreviousCurrencyType = $('#current-currency-type').val();

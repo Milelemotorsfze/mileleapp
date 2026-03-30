@@ -673,7 +673,7 @@
                         Bank For Payment :
                     </div>
                     <div class="col-sm-6">
-                    <select name="select_bank" class="form-control">
+                    <select name="select_bank" id="select_bank" class="form-control">
                         <option value="rak-aed">RAK BANK AED</option>
                         <option value="rak-usd">RAK BANK USD</option>
                         <option value="rak-eur">RAK BANK EUR</option>
@@ -2059,6 +2059,16 @@ $('#shipping_port').select2();
 
         $('#currency').on('change', function() {
             var currency = $(this).val();
+            var $bankSelect = $('#select_bank');
+            if ($bankSelect.length) {
+                if (currency === 'USD') {
+                    $bankSelect.val('rak-usd');
+                } else if (currency === 'EUR') {
+                    $bankSelect.val('rak-eur');
+                } else if (currency === 'AED') {
+                    $bankSelect.val('rak-aed');
+                }
+            }
             showPriceInSelectedValue();
             var oldCurrecy = $('#old-currency-type').val();
             var PreviousCurrencyType = $('#current-currency-type').val();
