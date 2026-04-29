@@ -567,12 +567,12 @@ table.dataTable thead th select {
 </div>     
   @php
     $hasPricePermission = Auth::user()->hasPermissionForSelectedRole('selling-price-stock-report-view');
-    $hasManagementPermission = Auth::user()->hasPermissionForSelectedRole('cost-price-link-stock-report');
+    $canViewVehicleCost = Auth::id() === 17;
 @endphp
 
 <script>
     var hasPricePermission = @json($hasPricePermission);
-    var hasManagementPermission = @json($hasManagementPermission);
+    var canViewVehicleCost = @json($canViewVehicleCost);
 </script>
         <div class="card-body">
         @php
@@ -634,7 +634,7 @@ $hasEditEstimationDatePermission = Auth::user()->hasPermissionForSelectedRole('e
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  @if ($hasManagementPermission)
+                  @if ($canViewVehicleCost)
                   <th>Vehicle Cost</th>
                   @endif
                   @if ($hasPricePermission)
@@ -976,7 +976,7 @@ $hasEditEstimationDatePermission = Auth::user()->hasPermissionForSelectedRole('e
         { data: 'fd', name: 'countries.name' },
     ];
     if (hasPricePermission) {
-        if (hasManagementPermission) {
+        if (canViewVehicleCost) {
         columns3.push(
             {
     data: 'costprice',
@@ -984,7 +984,7 @@ $hasEditEstimationDatePermission = Auth::user()->hasPermissionForSelectedRole('e
     searchable: false,
     render: function(data, type, row) {
         if (data) {
-            if (row.netsuite_link && hasManagementPermission) {
+            if (row.netsuite_link && canViewVehicleCost) {
                 return `<a href="${row.netsuite_link}" target="_blank" style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">${data}</a>`;
             } else {
                 return `<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">${data}</span>`;
@@ -1135,7 +1135,7 @@ $hasEditEstimationDatePermission = Auth::user()->hasPermissionForSelectedRole('e
         35: 'countries.name',
     };
 // Extend columnMap based on permissions
-if (hasManagementPermission) {
+if (canViewVehicleCost) {
     columnMap[36] = 'costprice';
     columnMap[37] = 'vehicles.minimum_commission';
     columnMap[38] = 'vehicles.price';
