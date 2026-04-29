@@ -534,12 +534,12 @@ table.dataTable thead th select {
   </div>
   @php
     $hasPricePermission = Auth::user()->hasPermissionForSelectedRole('selling-price-stock-report-view');
-    $hasManagementPermission = Auth::user()->hasPermissionForSelectedRole('cost-price-link-stock-report');
+    $canViewVehicleCost = Auth::id() === 17;
 @endphp
 
 <script>
     var hasPricePermission = @json($hasPricePermission);
-    var hasManagementPermission = @json($hasManagementPermission);
+    var canViewVehicleCost = @json($canViewVehicleCost);
 </script>
     <div class="card-body">
     @php
@@ -601,7 +601,7 @@ table.dataTable thead th select {
             <th>Location</th>
             <th>Territory</th>
             <th>Preferred Destination</th>
-                  @if ($hasManagementPermission)
+                  @if ($canViewVehicleCost)
                   <th>Vehicle Cost</th>
                 @endif
                   @if ($hasPricePermission)
@@ -961,7 +961,7 @@ table.dataTable thead th select {
                 { data: 'fd', name: 'countries.name' },
     ];
                 if (hasPricePermission) {
-                    if (hasManagementPermission) {
+                    if (canViewVehicleCost) {
                     columns7.push(
                         {
     data: 'costprice',
@@ -969,7 +969,7 @@ table.dataTable thead th select {
     searchable: false,
     render: function(data, type, row) {
         if (data) {
-            if (row.netsuite_link && hasManagementPermission) {
+            if (row.netsuite_link && canViewVehicleCost) {
                 return `<a href="${row.netsuite_link}" target="_blank" style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">${data}</a>`;
             } else {
                 return `<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">${data}</span>`;
@@ -1119,7 +1119,7 @@ var columnMap = {
         36: 'countries.name',
     };
     // Extend columnMap based on permissions
-if (hasManagementPermission) {
+if (canViewVehicleCost) {
     columnMap[37] = 'costprice';
     columnMap[38] = 'vehicles.minimum_commission';
     columnMap[39] = 'vehicles.price';
