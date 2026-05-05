@@ -21,6 +21,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Carbon\CarbonTimeZone;
 use Illuminate\Support\Facades\Validator;
+use App\Support\VariantFuelTypeCodeSuffix;
 
 class VariantController extends Controller
 {
@@ -206,30 +207,7 @@ public function store(Request $request)
                 $master_model_lines_id = $request->input('master_model_lines_id');
                 $engine = $request->input('engine');
                 $fuel_type = $request->input('fuel_type');
-                if($fuel_type == "Petrol")
-                {
-                    $f = "P";
-                }
-                else if($fuel_type == "Diesel") 
-                {
-                    $f = "D";
-                }
-                else if($fuel_type == "PHEV") 
-                {
-                    $f = "PHEV";
-                }
-                else if($fuel_type == "MHEV") 
-                {
-                    $f = "MHEV";
-                }
-                else if($fuel_type == "PH") 
-                {
-                    $f = "PH";
-                }
-                else
-                {
-                    $f = "EV";
-                }
+                $f = $this->fuelTypeToVariantCodeSuffix($fuel_type);
 
                 $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
                 
@@ -332,30 +310,7 @@ public function store(Request $request)
             }
             $engine = $request->input('engine');
             $fuel_type = $request->input('fuel_type');
-            if($fuel_type == "Petrol")
-                {
-                    $f = "P";
-                }
-                else if($fuel_type == "Diesel") 
-                {
-                    $f = "D";
-                } 
-                else if($fuel_type == "PHEV") 
-                {
-                    $f = "PHEV";
-                }
-                else if($fuel_type == "MHEV") 
-                {
-                    $f = "MHEV";
-                }
-                else if($fuel_type == "PH") 
-                {
-                    $f = "PH";
-                }
-                else
-                {
-                    $f = "EV";
-                }
+            $f = $this->fuelTypeToVariantCodeSuffix($fuel_type);
             $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
             if ($maxVariant) {
                 $existingName = $maxVariant->name;
@@ -413,30 +368,7 @@ public function store(Request $request)
         }
         $engine = $request->input('engine');
         $fuel_type = $request->input('fuel_type');
-        if($fuel_type == "Petrol")
-            {
-                $f = "P";
-            }
-            else if($fuel_type == "Diesel") 
-            {
-                $f = "D";
-            }
-            else if($fuel_type == "PHEV") 
-            {
-                $f = "PHEV";
-            }
-            else if($fuel_type == "MHEV") 
-            {
-                $f = "MHEV";
-            }
-            else if($fuel_type == "PH") 
-            {
-                $f = "PH";
-            }
-            else
-            {
-                $f = "EV";
-            }
+        $f = $this->fuelTypeToVariantCodeSuffix($fuel_type);
         $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
         if ($maxVariant) {
         $existingName = $maxVariant->name;
@@ -493,30 +425,7 @@ public function store(Request $request)
         $engine = $request->input('engine');
         $gearbox = $request->input('gearbox');
         $fuel_type = $request->input('fuel_type');
-        if($fuel_type == "Petrol")
-            {
-                $f = "P";
-            }
-            else if($fuel_type == "Diesel") 
-            {
-                $f = "D";
-            }
-            else if($fuel_type == "PHEV") 
-            {
-                $f = "PHEV";
-            }
-            else if($fuel_type == "MHEV") 
-            {
-                $f = "MHEV";
-            }
-            else if($fuel_type == "PH") 
-            {
-                $f = "PH";
-            }
-            else
-            {
-                $f = "EV";
-            }
+        $f = $this->fuelTypeToVariantCodeSuffix($fuel_type);
             if($gearbox == "Auto")
             {
                 $gearbox = "AT";
@@ -548,30 +457,7 @@ public function store(Request $request)
             $drive_train = $request->input('drive_train');
             $upholestry = $request->input('upholestry');
             $fuel_type = $request->input('fuel_type');
-            if($fuel_type == "Petrol")
-            {
-                $f = "P";
-            }
-            else if($fuel_type == "Diesel") 
-            {
-                $f = "D";
-            }
-            else if($fuel_type == "PHEV") 
-            {
-                $f = "PHEV";
-            }
-            else if($fuel_type == "MHEV") 
-            {
-                $f = "MHEV";
-            }
-            else if($fuel_type == "PH") 
-            {
-                $f = "PH";
-            }
-            else
-            {
-                $f = "EV";
-            }
+            $f = $this->fuelTypeToVariantCodeSuffix($fuel_type);
             $variant_details = $my . ',' . $steering . ',' . $model_line . ',' . $engine . ',' . $gearbox . ',' . $fuel_type . ',' . $gearbox . ',' . $coo . ',' . $drive_train . ',' . $upholestry;
         }
     $name = str_replace(' ', '', $name);
@@ -1141,19 +1027,7 @@ public function store(Request $request)
                 $engine = $request->input('engine');
                 $gearbox = $request->input('gearbox');
                 $fuel_type = $request->input('fuel_type');
-                if ($fuel_type == "Petrol") {
-                    $f = "P";
-                } else if ($fuel_type == "Diesel") {
-                    $f = "D";
-                } else if ($fuel_type == "PHEV") {
-                    $f = "PHEV";
-                } else if ($fuel_type == "MHEV") {
-                    $f = "MHEV";
-                } else if ($fuel_type == "PH") {
-                    $f = "PH";
-                } else {
-                    $f = "EV";
-                }
+                $f = $this->fuelTypeToVariantCodeSuffix($fuel_type);
                 if ($gearbox == "Auto") {
                     $gearbox = "AT";
                 }
@@ -1174,19 +1048,7 @@ public function store(Request $request)
                 $drive_train = $request->input('drive_train');
                 $upholestry = $request->input('upholestry');
                 $fuel_type = $request->input('fuel_type');
-                if ($fuel_type == "Petrol") {
-                    $f = "P";
-                } else if ($fuel_type == "Diesel") {
-                    $f = "D";
-                } else if ($fuel_type == "PHEV") {
-                    $f = "PHEV";
-                } else if ($fuel_type == "MHEV") {
-                    $f = "MHEV";
-                } else if ($fuel_type == "PH") {
-                    $f = "PH";
-                } else {
-                    $f = "EV";
-                }
+                $f = $this->fuelTypeToVariantCodeSuffix($fuel_type);
                 $variant_details = $my . ',' . $steering . ',' . $model_line . ',' . $engine . ',' . $gearbox . ',' . $fuel_type . ',' . $gearbox . ',' . $coo . ',' . $drive_train . ',' . $upholestry;
             }
 
@@ -1229,6 +1091,15 @@ public function store(Request $request)
             return redirect()->back()->with('error', 'Failed to update variant: ' . $e->getMessage());
         }
     }
+
+    /**
+     * @see VariantFuelTypeCodeSuffix
+     */
+    protected function fuelTypeToVariantCodeSuffix(?string $fuel_type): string
+    {
+        return VariantFuelTypeCodeSuffix::toSuffix($fuel_type);
+    }
+
     function fetchModelSpecificationOptions(Request $request)
     {
 

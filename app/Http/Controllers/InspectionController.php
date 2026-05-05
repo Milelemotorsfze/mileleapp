@@ -32,6 +32,7 @@ use App\Models\ModelSpecificationOption;
 use App\Models\VariantItems;
 use App\Models\Variantlog;
 use Illuminate\Support\Facades\Log;
+use App\Support\VariantFuelTypeCodeSuffix;
 
 class InspectionController extends Controller
 {
@@ -1354,26 +1355,7 @@ class InspectionController extends Controller
                     }
                     $engine = $variantsdf->engine;
                     $fuel_type = $variantsdf->fuel_type;
-                    if($fuel_type == "Petrol")
-                    {
-                        $f = "P";
-                    }
-                    else if($fuel_type == "Diesel") 
-                    {
-                        $f = "D";
-                    }
-                    else if($fuel_type == "PHEV") 
-                    {
-                        $f = "P";
-                    }
-                    else if($fuel_type == "MHEV") 
-                    {
-                        $f = "M";
-                    }
-                    else
-                    {
-                        $f = "E";
-                    }
+                    $f = VariantFuelTypeCodeSuffix::toSuffix($fuel_type);
                     $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
                     if ($maxVariant) {
                     $existingName = $maxVariant->name;
@@ -1411,26 +1393,7 @@ class InspectionController extends Controller
     $engine = $variantsdf->engine;
     $gearbox = $variantsdf->gearbox;
     $fuel_type = $variantsdf->fuel_type;
-    if($fuel_type == "Petrol")
-    {
-        $f = "P";
-    }
-    else if($fuel_type == "Diesel") 
-    {
-        $f = "D";
-    }
-    else if($fuel_type == "PHEV") 
-    {
-        $f = "P";
-    }
-    else if($fuel_type == "MHEV") 
-    {
-        $f = "M";
-    }
-    else
-    {
-        $f = "E";
-    }
+    $f = VariantFuelTypeCodeSuffix::toSuffix($fuel_type);
     if($gearbox == "Auto")
         {
             $gearbox = "AT";
@@ -1454,26 +1417,7 @@ class InspectionController extends Controller
         $drive_train = $variantsdf->drive_train;
         $upholestry = $variantsdf->upholestry;
         $fuel_type = $variantsdf->fuel_type;
-        if($fuel_type == "Petrol")
-        {
-            $f = "P";
-        }
-        else if($fuel_type == "Diesel") 
-        {
-            $f = "D";
-        }
-        else if($fuel_type == "PHEV") 
-        {
-            $f = "P";
-        }
-        else if($fuel_type == "MHEV") 
-        {
-            $f = "M";
-        }
-        else
-        {
-            $f = "E";
-        }
+        $f = VariantFuelTypeCodeSuffix::toSuffix($fuel_type);
         $variant_details = $my . ',' . $steering . ',' . $model_line . ',' . $engine . ',' . $gearbox . ',' . $fuel_type . ',' . $gearbox . ',' . $coo . ',' . $drive_train . ',' . $upholestry;
     }
             $isVariantNameExist = Varaint::where('name', $name)->first();

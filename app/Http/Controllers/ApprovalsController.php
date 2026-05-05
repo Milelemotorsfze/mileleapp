@@ -38,6 +38,7 @@ use App\Models\Variantlog;
 use App\Models\VehicleVariantHistories;
 use App\Models\Grn;
 use App\Models\Gdn;
+use App\Support\VariantFuelTypeCodeSuffix;
 use App\Models\MovementGrn;
 use App\Models\PurchasingOrder;
 use App\Mail\QCUpdateNotification;
@@ -909,26 +910,7 @@ class ApprovalsController extends Controller
             $master_model_lines_id = $request->input('master_model_lines_id');
             $engine = $request->input('engine');
             $fuel_type = $request->input('fuel_type');
-            if($fuel_type == "Petrol")
-            {
-                $f = "P";
-            }
-            else if($fuel_type == "Diesel") 
-            {
-                $f = "D";
-            }
-            else if($fuel_type == "PHEV") 
-            {
-                $f = "PH";
-            }
-            else if($fuel_type == "MHEV") 
-            {
-                $f = "MH";
-            }
-            else
-            {
-                $f = "E";
-            }
+            $f = VariantFuelTypeCodeSuffix::toSuffix($fuel_type);
             $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
             $existingName = $existingspecifications->name;
             $parts = explode('_', $existingName);
@@ -977,26 +959,7 @@ class ApprovalsController extends Controller
         }
         $engine = $request->input('engine');
         $fuel_type = $request->input('fuel_type');
-        if($fuel_type == "Petrol")
-        {
-            $f = "P";
-        }
-        else if($fuel_type == "Diesel") 
-        {
-            $f = "D";
-        }
-        else if($fuel_type == "PHEV") 
-        {
-            $f = "PH";
-        }
-        else if($fuel_type == "MHEV") 
-        {
-            $f = "MH";
-        }
-        else
-        {
-            $f = "E";
-        }
+        $f = VariantFuelTypeCodeSuffix::toSuffix($fuel_type);
         $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
         if ($maxVariant) {
         $existingName = $maxVariant->name;
@@ -1036,26 +999,7 @@ class ApprovalsController extends Controller
         $engine = $request->input('engine');
         $gearbox = $request->input('gearbox');
         $fuel_type = $request->input('fuel_type');
-        if($fuel_type == "Petrol")
-        {
-            $f = "P";
-        }
-        else if($fuel_type == "Diesel") 
-        {
-            $f = "D";
-        }
-        else if($fuel_type == "PHEV") 
-        {
-            $f = "PH";
-        }
-        else if($fuel_type == "MHEV") 
-        {
-            $f = "MH";
-        }
-        else
-        {
-            $f = "E";
-        }
+        $f = VariantFuelTypeCodeSuffix::toSuffix($fuel_type);
         if($gearbox == "Auto")
         {
             $gearbox = "AT";
@@ -1079,26 +1023,7 @@ class ApprovalsController extends Controller
             $drive_train = $request->input('drive_train');
             $upholestry = $request->input('upholestry');
             $fuel_type = $request->input('fuel_type');
-            if($fuel_type == "Petrol")
-            {
-                $f = "P";
-            }
-            else if($fuel_type == "Diesel") 
-            {
-                $f = "D";
-            }
-            else if($fuel_type == "PHEV") 
-            {
-                $f = "PH";
-            }
-            else if($fuel_type == "MHEV") 
-            {
-                $f = "MH";
-            }
-            else
-            {
-                $f = "E";
-            }
+            $f = VariantFuelTypeCodeSuffix::toSuffix($fuel_type);
             $variant_details = $my . ',' . $steering . ',' . $model_line . ',' . $engine . ',' . $gearbox . ',' . $fuel_type . ',' . $gearbox . ',' . $coo . ',' . $drive_train . ',' . $upholestry;
         }
 

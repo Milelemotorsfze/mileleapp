@@ -94,9 +94,9 @@ $grades = $oldModelId ? \App\Models\MasterGrades::where('model_line_id', $oldMod
                         <option value="Diesel Hybrid" {{ old('fuel_type', $modelDescription->fuel_type) == 'Diesel Hybrid' ? 'selected' : '' }}>Diesel Hybrid</option>
                         <option value="Petrol MHEV" {{ old('fuel_type', $modelDescription->fuel_type) == 'Petrol MHEV' ? 'selected' : '' }}>Petrol MHEV</option>
                         <option value="Diesel MHEV" {{ old('fuel_type', $modelDescription->fuel_type) == 'Diesel MHEV' ? 'selected' : '' }}>Diesel MHEV</option>
-                        <option value="Diesel PHEV" {{ old('fuel_type', $modelDescription->fuel_type) == 'Diesel PHEV' ? 'selected' : '' }}>Diesel PHEV</option>
+                        {{-- <option value="Diesel PHEV" {{ old('fuel_type', $modelDescription->fuel_type) == 'Diesel PHEV' ? 'selected' : '' }}>Diesel PHEV</option> --}}
                         <option value="PH" {{ old('fuel_type', $modelDescription->fuel_type) == 'PH' ? 'selected' : '' }}>P HEV (Petrol hybrid electrical)</option>
-                        <option value="P HEV" {{ old('fuel_type', $modelDescription->fuel_type) == 'P HEV' ? 'selected' : '' }}>PHEV (Plug in electrical hybrid)</option>
+                        <option value="PHEV" {{ old('fuel_type', $modelDescription->fuel_type) == 'PHEV' ? 'selected' : '' }}>PHEV (Plug in electrical hybrid)</option>
                         <option value="M HEV" {{ old('fuel_type', $modelDescription->fuel_type) == 'M HEV' ? 'selected' : '' }}>M HEV</option>
                         <option value="EV" {{ old('fuel_type', $modelDescription->fuel_type) == 'EV' ? 'selected' : '' }}>EV</option>
                     </select>
@@ -173,7 +173,17 @@ $grades = $oldModelId ? \App\Models\MasterGrades::where('model_line_id', $oldMod
         } else if (fuel === 'Diesel') {
             fuel = 'D';
         } else if (fuel === 'PH') {
-            fuel = 'P HEV';
+            fuel = 'PH';
+        } else if (fuel === 'Diesel Hybrid') {
+            fuel = 'DH';
+        } else if (fuel === 'Petrol MHEV' || fuel === 'M HEV' || fuel === 'MHEV') {
+            fuel = 'PMHE';
+        } else if (fuel === 'Diesel MHEV') {
+            fuel = 'DMHE';
+        } else if (fuel === 'P HEV') {
+            fuel = 'PH';
+        } else if (fuel === 'PHEV') {
+            fuel = 'PHEV';
         }
         var gear = $('#gear').val() ? $('#gear').val() : '';
         var driveTrain = $('#drive_train').val() ? $('#drive_train').val() : '';
