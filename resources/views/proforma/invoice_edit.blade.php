@@ -317,16 +317,20 @@
                         Nature of Deal : <span class="text-danger">*</span></label>
                     </div>
                     <div class="col-sm-6">
+                        @php
+                            // Ensure edit screens always have a deterministic selection even if legacy rows have NULL.
+                            $natureOfDeal = old('nature_of_deal', $quotation->nature_of_deal ?? 'regular_deal');
+                        @endphp
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="nature_of_deal" id="regular_deal"
                                 value="regular_deal" required
-                                {{ (old('nature_of_deal', $quotation->nature_of_deal ?? '') == 'regular_deal') ? 'checked' : '' }}>
+                                {{ ($natureOfDeal == 'regular_deal') ? 'checked' : '' }}>
                             <label class="form-check-label" for="regular_deal">Regular deal</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="nature_of_deal" id="letter_of_credit"
                                 value="letter_of_credit" required
-                                {{ (old('nature_of_deal', $quotation->nature_of_deal ?? '') == 'letter_of_credit') ? 'checked' : '' }}>
+                                {{ ($natureOfDeal == 'letter_of_credit') ? 'checked' : '' }}>
                             <label class="form-check-label" for="letter_of_credit">Letter of credit</label>
                         </div>
                     </div>
@@ -1463,6 +1467,18 @@
  <input type="hidden" name="is_shipping_charge_added" value="0" id="is-shipping-charge-added">
 @endsection
 @push('scripts')
+<script src="{{ asset('js/form-draft-autosave.js') }}"></script>
+<script>
+    // Draft autosave (no backend changes)
+    document.addEventListener('DOMContentLoaded', function () {
+        if (window.initDraftAutosave) {
+            window.initDraftAutosave({
+                form: '#form-create',
+                key: 'draft:quotation:edit:{{ $quotation->id }}',
+            });
+        }
+    });
+</script>
 <script>
 function validateVehicleQuantity(input, model_type, quotation_id, additionalData) {
     var csrfToken = $('meta[name="csrf-token"]').attr('content');
@@ -3091,9 +3107,22 @@ $('#shipping_port').select2();
         rowData['button_type'] = buttonType;
         rowData['model_type'] = buttonType;
         rowData['index'] = index;
-        row.find('td').each(function() {
-            rowData.push($(this).html());
-        });
+        // For Shipping/Docs/Cert/Other, use text() so name/description always carry through
+        // (html() can include hidden markup and can end up blank in the description concatenation).
+        var $cells = row.find('td');
+        if (buttonType == 'Shipping-Document' || buttonType == 'Certification' || buttonType == 'Other') {
+            // Expected columns: S.No, Code, Name, Description, Price, Action
+            rowData.push($cells.eq(0).text().trim());
+            rowData.push($cells.eq(1).text().trim()); // code
+            rowData.push($cells.eq(2).text().trim()); // name
+            rowData.push($cells.eq(3).text().trim()); // description
+            rowData.push($cells.eq(4).text().trim()); // price
+            rowData.push(''); // action placeholder
+        } else {
+            row.find('td').each(function() {
+                rowData.push($(this).html());
+            });
+        }
         var secondTable = $('#dtBasicExample2').DataTable();
 
         rowData['brand_id'] = "";
