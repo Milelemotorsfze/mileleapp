@@ -306,14 +306,14 @@ table.dataTable thead th select {
   <!-- Modal -->
  @if($countType == 'Sales Order')
  <div class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="fileModalLabel">File Viewer</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <iframe id="fileViewer" width="100%" height="500" frameborder="0"></iframe>
+                <iframe id="fileViewer" style="width: 100%; height: 75vh; min-height: 560px;" frameborder="0"></iframe>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -507,7 +507,7 @@ $('#fileModal').on('hidden.bs.modal', function () {
 @endsection
 @else
 <div class="modal fade" id="fileModal" tabindex="-1" role="dialog" aria-labelledby="fileModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="fileModalLabel">File Viewer</h5>
@@ -515,7 +515,7 @@ $('#fileModal').on('hidden.bs.modal', function () {
             </div>
             <div class="modal-body">
                 <!-- File will be loaded here -->
-                <iframe id="fileViewer" src="" style="width:100%; height:500px;" frameborder="0"></iframe>
+                <iframe id="fileViewer" src="" style="width: 100%; height: 75vh; min-height: 560px;" frameborder="0"></iframe>
             </div>
         </div>
     </div>
