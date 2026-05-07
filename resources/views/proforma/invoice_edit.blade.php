@@ -4358,40 +4358,51 @@ function updateSecondTable(RowId, savedVins) {
         row['rowId'] = "";
         if(existings.addon_type === null)
         {
-        if (existings.reference_type.length === 18) {
+        // Non-addon items (Vehicles, Shipping, Documents, Certifications, etc.)
+        // reference_type can be null for free-text rows, so guard it.
+        const refType = existings.reference_type ?? '';
+        row['table_type'] = 'vehicle-table';
+
+        if (refType === 'App\\\\Models\\\\Varaint') {
             row['model_type'] = 'Vehicle';
-            row['table_type'] = 'vehicle-table';
-            code = existings.varaint?.name ?? ''; 
+            code = existings.varaint?.name ?? '';
         }
-        else if(existings.reference_type.length === 16)
-        {
+        else if (refType === 'App\\\\Models\\\\Brand') {
             row['model_type'] = 'Brand';
-            row['table_type'] = 'vehicle-table';
-            code = existings.varaint?.name ?? '';  
-            addon = existings.varaint?.name ?? ''; 
+            code = existings.varaint?.name ?? '';
+            addon = existings.varaint?.name ?? '';
         }
-        else if(existings.reference_type.length === 27){
+        else if (refType === 'App\\\\Models\\\\MasterModelLines') {
             row['model_type'] = 'ModelLine';
-            row['table_type'] = 'vehicle-table';
-            code = existings.varaint?.name ?? ''; 
-            addon = existings.varaint?.name ?? ''; 
+            code = existings.varaint?.name ?? '';
+            addon = existings.varaint?.name ?? '';
         }
-        else 
-        {
-            if(existings.shippingdocuments != null)
-        {
-            code = existings.shippingdocuments.code;
+        else if (refType === 'App\\\\Models\\\\Shipping') {
+            row['model_type'] = 'Shipping';
+            code = existings.shipping?.code ?? '';
         }
-        else if (existings.otherlogisticscharges != null)
-        {
-            code = existings.otherlogisticscharges.code;
+        else if (refType === 'App\\\\Models\\\\ShippingDocuments') {
+            row['model_type'] = 'Shipping-Document';
+            code = existings.shippingdocuments?.code ?? '';
         }
-        else if (existings.shippingcertification != null)
-        {
-            code = existings.shippingcertification.code;
+        else if (refType === 'App\\\\Models\\\\ShippingCertification') {
+            row['model_type'] = 'Certification';
+            code = existings.shippingcertification?.code ?? '';
         }
-            row['model_type'] = 'Other'; 
+        else if (refType === 'App\\\\Models\\\\OtherLogisticsCharges') {
+            row['model_type'] = 'Other';
+            code = existings.otherlogisticscharges?.code ?? '';
         }
+        else {
+            // Free-text rows (no reference_type/reference_id). Treat vehicles as "Vehicle" with reference_id "Other"
+            // so backend keeps them.
+            row['model_type'] = existings.is_addon ? 'Addon' : 'Vehicle';
+            code = '';
+        }
+
+        // Always provide a reference id for non-addon items so they persist on update.
+        // For free-text items reference_id is null => use "Other".
+        row['id'] = existings.reference_id ?? 'Other';
         if (existings.quotation_vins && Array.isArray(existings.quotation_vins)) {
             var vins = [];
             existings.quotation_vins.forEach(function(quotationVin) {
@@ -4408,29 +4419,33 @@ function updateSecondTable(RowId, savedVins) {
         }
         else
         {
+        // Addons (Accessories / SpareParts / Kits)
+        // Note: "Other" addon rows may have no reference_id/reference_type (free text),
+        // but still must be loaded on edit to avoid getting deleted on re-submit.
+        const isOtherAddonRow = (!existings.reference_type && !existings.reference_id);
         if(existings.addon_type === "P")
         {
         row['table_type'] = 'accessories-table';
-        code = existings.addon.addon_code;
-        row['model_type'] = 'Accessory';
+        code = existings.addon?.addon_code ?? '';
+        row['model_type'] = isOtherAddonRow ? 'Addon' : 'Accessory';
         }
         if(existings.addon_type === "SP")
         {
         row['table_type'] = 'spare-part-table';
-        code = existings.addon.addon_code;
-        row['model_type'] = 'SparePart';
+        code = existings.addon?.addon_code ?? '';
+        row['model_type'] = isOtherAddonRow ? 'Addon' : 'SparePart';
         }
         if(existings.addon_type === "K")
         {
         row['table_type'] = 'kit-table';
-        code = existings.addon.addon_code;
-        row['model_type'] = 'Kit';
+        code = existings.addon?.addon_code ?? '';
+        row['model_type'] = isOtherAddonRow ? 'Addon' : 'Kit';
         }
         }
         row['modallineidad'] = existings.model_line_id;
         row['brand_id'] = existings.brand_id;
         row['model_line_id'] = existings.model_line_id;
-        row['id'] =  existings.brand_id;
+        row['id'] =  existings.reference_id ?? (existings.addon_type ? 'Other' : 'Other');
         row['addon_type'] = existings.addon_type;
         row['model_description_id'] = existings.model_description_id;
         row['qty'] = existings.quantity;
