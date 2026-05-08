@@ -2846,6 +2846,32 @@ $('#shipping_port').select2();
             hasError = true;
         }
 
+        // Normalize repeated fragments in descriptions (prevents "duplicating by quantity" effect)
+        // without changing any backend logic.
+        function normalizeDescription(str) {
+            if (!str) return '';
+            const tokens = String(str)
+                .split(',')
+                .map(t => t.trim())
+                .filter(Boolean);
+            const seen = new Set();
+            const out = [];
+            for (const t of tokens) {
+                const key = t.toLowerCase();
+                if (seen.has(key)) continue;
+                seen.add(key);
+                out.push(t);
+            }
+            return out.join(', ');
+        }
+        $('#form-create').find('[name="descriptions[]"]').each(function () {
+            const v = $(this).val();
+            const normalized = normalizeDescription(v);
+            if (normalized && normalized !== v) {
+                $(this).val(normalized);
+            }
+        });
+
         var selectedData = [];
         secondTable.rows().every(function() {
         var data = this.data();
