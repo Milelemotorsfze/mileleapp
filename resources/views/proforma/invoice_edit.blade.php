@@ -317,16 +317,20 @@
                         Nature of Deal : <span class="text-danger">*</span></label>
                     </div>
                     <div class="col-sm-6">
+                        @php
+                            // Ensure edit screens always have a deterministic selection even if legacy rows have NULL.
+                            $natureOfDeal = old('nature_of_deal', $quotation->nature_of_deal ?? 'regular_deal');
+                        @endphp
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="nature_of_deal" id="regular_deal"
                                 value="regular_deal" required
-                                {{ (old('nature_of_deal', $quotation->nature_of_deal ?? '') == 'regular_deal') ? 'checked' : '' }}>
+                                {{ ($natureOfDeal == 'regular_deal') ? 'checked' : '' }}>
                             <label class="form-check-label" for="regular_deal">Regular deal</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="nature_of_deal" id="letter_of_credit"
                                 value="letter_of_credit" required
-                                {{ (old('nature_of_deal', $quotation->nature_of_deal ?? '') == 'letter_of_credit') ? 'checked' : '' }}>
+                                {{ ($natureOfDeal == 'letter_of_credit') ? 'checked' : '' }}>
                             <label class="form-check-label" for="letter_of_credit">Letter of credit</label>
                         </div>
                     </div>
@@ -1463,6 +1467,18 @@
  <input type="hidden" name="is_shipping_charge_added" value="0" id="is-shipping-charge-added">
 @endsection
 @push('scripts')
+<script src="{{ asset('js/form-draft-autosave.js') }}"></script>
+<script>
+    // Draft autosave (no backend changes)
+    document.addEventListener('DOMContentLoaded', function () {
+        if (window.initDraftAutosave) {
+            window.initDraftAutosave({
+                form: '#form-create',
+                key: 'draft:quotation:edit:{{ $quotation->id }}',
+            });
+        }
+    });
+</script>
 <script>
 function validateVehicleQuantity(input, model_type, quotation_id, additionalData) {
     var csrfToken = $('meta[name="csrf-token"]').attr('content');
@@ -2830,6 +2846,32 @@ $('#shipping_port').select2();
             hasError = true;
         }
 
+        // Normalize repeated fragments in descriptions (prevents "duplicating by quantity" effect)
+        // without changing any backend logic.
+        function normalizeDescription(str) {
+            if (!str) return '';
+            const tokens = String(str)
+                .split(',')
+                .map(t => t.trim())
+                .filter(Boolean);
+            const seen = new Set();
+            const out = [];
+            for (const t of tokens) {
+                const key = t.toLowerCase();
+                if (seen.has(key)) continue;
+                seen.add(key);
+                out.push(t);
+            }
+            return out.join(', ');
+        }
+        $('#form-create').find('[name="descriptions[]"]').each(function () {
+            const v = $(this).val();
+            const normalized = normalizeDescription(v);
+            if (normalized && normalized !== v) {
+                $(this).val(normalized);
+            }
+        });
+
         var selectedData = [];
         secondTable.rows().every(function() {
         var data = this.data();
@@ -3091,9 +3133,22 @@ $('#shipping_port').select2();
         rowData['button_type'] = buttonType;
         rowData['model_type'] = buttonType;
         rowData['index'] = index;
-        row.find('td').each(function() {
-            rowData.push($(this).html());
-        });
+        // For Shipping/Docs/Cert/Other, use text() so name/description always carry through
+        // (html() can include hidden markup and can end up blank in the description concatenation).
+        var $cells = row.find('td');
+        if (buttonType == 'Shipping-Document' || buttonType == 'Certification' || buttonType == 'Other') {
+            // Expected columns: S.No, Code, Name, Description, Price, Action
+            rowData.push($cells.eq(0).text().trim());
+            rowData.push($cells.eq(1).text().trim()); // code
+            rowData.push($cells.eq(2).text().trim()); // name
+            rowData.push($cells.eq(3).text().trim()); // description
+            rowData.push($cells.eq(4).text().trim()); // price
+            rowData.push(''); // action placeholder
+        } else {
+            row.find('td').each(function() {
+                rowData.push($(this).html());
+            });
+        }
         var secondTable = $('#dtBasicExample2').DataTable();
 
         rowData['brand_id'] = "";
@@ -4329,40 +4384,51 @@ function updateSecondTable(RowId, savedVins) {
         row['rowId'] = "";
         if(existings.addon_type === null)
         {
-        if (existings.reference_type.length === 18) {
+        // Non-addon items (Vehicles, Shipping, Documents, Certifications, etc.)
+        // reference_type can be null for free-text rows, so guard it.
+        const refType = existings.reference_type ?? '';
+        row['table_type'] = 'vehicle-table';
+
+        if (refType === 'App\\\\Models\\\\Varaint') {
             row['model_type'] = 'Vehicle';
-            row['table_type'] = 'vehicle-table';
-            code = existings.varaint?.name ?? ''; 
+            code = existings.varaint?.name ?? '';
         }
-        else if(existings.reference_type.length === 16)
-        {
+        else if (refType === 'App\\\\Models\\\\Brand') {
             row['model_type'] = 'Brand';
-            row['table_type'] = 'vehicle-table';
-            code = existings.varaint?.name ?? '';  
-            addon = existings.varaint?.name ?? ''; 
+            code = existings.varaint?.name ?? '';
+            addon = existings.varaint?.name ?? '';
         }
-        else if(existings.reference_type.length === 27){
+        else if (refType === 'App\\\\Models\\\\MasterModelLines') {
             row['model_type'] = 'ModelLine';
-            row['table_type'] = 'vehicle-table';
-            code = existings.varaint?.name ?? ''; 
-            addon = existings.varaint?.name ?? ''; 
+            code = existings.varaint?.name ?? '';
+            addon = existings.varaint?.name ?? '';
         }
-        else 
-        {
-            if(existings.shippingdocuments != null)
-        {
-            code = existings.shippingdocuments.code;
+        else if (refType === 'App\\\\Models\\\\Shipping') {
+            row['model_type'] = 'Shipping';
+            code = existings.shipping?.code ?? '';
         }
-        else if (existings.otherlogisticscharges != null)
-        {
-            code = existings.otherlogisticscharges.code;
+        else if (refType === 'App\\\\Models\\\\ShippingDocuments') {
+            row['model_type'] = 'Shipping-Document';
+            code = existings.shippingdocuments?.code ?? '';
         }
-        else if (existings.shippingcertification != null)
-        {
-            code = existings.shippingcertification.code;
+        else if (refType === 'App\\\\Models\\\\ShippingCertification') {
+            row['model_type'] = 'Certification';
+            code = existings.shippingcertification?.code ?? '';
         }
-            row['model_type'] = 'Other'; 
+        else if (refType === 'App\\\\Models\\\\OtherLogisticsCharges') {
+            row['model_type'] = 'Other';
+            code = existings.otherlogisticscharges?.code ?? '';
         }
+        else {
+            // Free-text rows (no reference_type/reference_id). Treat vehicles as "Vehicle" with reference_id "Other"
+            // so backend keeps them.
+            row['model_type'] = existings.is_addon ? 'Addon' : 'Vehicle';
+            code = '';
+        }
+
+        // Always provide a reference id for non-addon items so they persist on update.
+        // For free-text items reference_id is null => use "Other".
+        row['id'] = existings.reference_id ?? 'Other';
         if (existings.quotation_vins && Array.isArray(existings.quotation_vins)) {
             var vins = [];
             existings.quotation_vins.forEach(function(quotationVin) {
@@ -4379,29 +4445,33 @@ function updateSecondTable(RowId, savedVins) {
         }
         else
         {
+        // Addons (Accessories / SpareParts / Kits)
+        // Note: "Other" addon rows may have no reference_id/reference_type (free text),
+        // but still must be loaded on edit to avoid getting deleted on re-submit.
+        const isOtherAddonRow = (!existings.reference_type && !existings.reference_id);
         if(existings.addon_type === "P")
         {
         row['table_type'] = 'accessories-table';
-        code = existings.addon.addon_code;
-        row['model_type'] = 'Accessory';
+        code = existings.addon?.addon_code ?? '';
+        row['model_type'] = isOtherAddonRow ? 'Addon' : 'Accessory';
         }
         if(existings.addon_type === "SP")
         {
         row['table_type'] = 'spare-part-table';
-        code = existings.addon.addon_code;
-        row['model_type'] = 'SparePart';
+        code = existings.addon?.addon_code ?? '';
+        row['model_type'] = isOtherAddonRow ? 'Addon' : 'SparePart';
         }
         if(existings.addon_type === "K")
         {
         row['table_type'] = 'kit-table';
-        code = existings.addon.addon_code;
-        row['model_type'] = 'Kit';
+        code = existings.addon?.addon_code ?? '';
+        row['model_type'] = isOtherAddonRow ? 'Addon' : 'Kit';
         }
         }
         row['modallineidad'] = existings.model_line_id;
         row['brand_id'] = existings.brand_id;
         row['model_line_id'] = existings.model_line_id;
-        row['id'] =  existings.brand_id;
+        row['id'] =  existings.reference_id ?? (existings.addon_type ? 'Other' : 'Other');
         row['addon_type'] = existings.addon_type;
         row['model_description_id'] = existings.model_description_id;
         row['qty'] = existings.quantity;

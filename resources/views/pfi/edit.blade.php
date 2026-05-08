@@ -333,7 +333,19 @@
         <input type="hidden" value="0" name="is_pfi_edited">
 @endsection
 @push('scripts')
-   
+    <script src="{{ asset('js/form-draft-autosave.js') }}"></script>
+    <script>
+        // Draft autosave (no backend changes)
+        document.addEventListener('DOMContentLoaded', function () {
+            if (window.initDraftAutosave) {
+                window.initDraftAutosave({
+                    form: '#form-update',
+                    key: 'draft:pfi:edit:{{ $pfi->id }}',
+                });
+            }
+        });
+    </script>
+
     <script type="text/javascript">
          let ParentPfiCount = "{{ $parentPfiItems->count() }}";
         let pfiDocument = "{{ $pfi->pfi_document_without_sign }}";

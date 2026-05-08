@@ -43,6 +43,11 @@
 </head>
 <body>
     <div class="content">
+        @php
+            $currency = strtoupper(trim($quotation->currency ?? 'AED'));
+            $isProformaInvoice = ($quotation->document_type ?? '') === 'Proforma Invoice';
+            $advanceAmount = (float) ($quotationDetail->advance_amount ?? 0);
+        @endphp
         <div class="header">
             <table style="width: 100%;">
                 <tr>
@@ -581,23 +586,23 @@
         </td>
         <td style="vertical-align: top;width: 30%;">
             <table style="width: 100%;">
-                @if($quotation->currency == "AED")
+                @if($currency === "AED")
                 <tr>
                         <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
                             Net Total In AED:
                         </td>
                         <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
-                            {{ $quotation->currency . " " . number_format($quotation->deal_value, 2) }}
+                            {{ "AED " . number_format($quotation->deal_value, 2) }}
                         </td>
                     </tr>
                 @endif
-                @if($quotation->currency == "USD")
+                @if($currency === "USD")
                 <tr>
                     <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
                         Net Total In USD:
                     </td>
                     <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
-                        {{ $quotation->currency . " " . number_format($quotation->deal_value, 2) }}
+                        {{ "USD " . number_format($quotation->deal_value, 2) }}
                     </td>
                 </tr>
                 <tr>
@@ -605,17 +610,17 @@
                         Net Total In AED:
                     </td>
                     <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
-                        {{ "AED " . number_format($quotation->deal_value * 3.675, 2) }}
+                        {{ "AED " . number_format($quotation->deal_value * (float) ($aed_to_usd_rate->value ?? 3.675), 2) }}
                     </td>
                 </tr>
                 @endif
-                @if($quotation->currency == "EUR")
+                @if($currency === "EUR")
                 <tr>
                     <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
                         Net Total In EUR:
                     </td>
                     <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
-                        {{ $quotation->currency . " " . number_format($quotation->deal_value, 2) }}
+                        {{ "EUR " . number_format($quotation->deal_value, 2) }}
                     </td>
                 </tr>
                 <tr>
@@ -623,40 +628,37 @@
                         Net Total In AED:
                     </td>
                     <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
-                        {{ "AED " . number_format($quotation->deal_value * 4, 2) }}
+                        {{ "AED " . number_format($quotation->deal_value * (float) ($aed_to_eru_rate->value ?? 4), 2) }}
                     </td>
                 </tr>
                 @endif
-                @if($quotation->document_type == 'Proforma Invoice')
+                @if($isProformaInvoice)
                 <tr>
                     <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px;">
                         Advance Paid:
                     </td>
                     <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px;">
-                       
-                        {{ $quotation->currency ." ". number_format($quotationDetail->advance_amount, 2) }}
+                        {{ $currency ." ". number_format($advanceAmount, 2) }}
                     </td>
                 </tr>
                 <tr>
                     <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px;">
-                        Remaining Amount({{ $quotation->currency }}):
+                        Remaining Amount({{ $currency }}):
                     </td>
                     <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px;">
-                       
-                        {{ $quotation->currency ." ". number_format($quotation->deal_value - $quotationDetail->advance_amount) }}
+                        {{ $currency ." ". number_format(((float)$quotation->deal_value) - $advanceAmount, 2) }}
                     </td>
                 </tr>
-                @if($quotation->currency != 'AED' && $quotation->shippingDocument == 'EXW')
+                @if($currency !== 'AED' && ($quotation->shipping_method ?? '') === 'EXW')
                 <tr>
                     <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px;">
                         Remaining Amount(AED):
                     </td>
                     <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px;">
-                      
-                        @if($quotation->currency == 'USD')
-                        {{ $quotation->currency ." ". number_format(($quotation->deal_value - $quotationDetail->advance_amount)  * $aed_to_usd_rate->value, 2) }}
-                        @elseif($quotation->currency == 'EUR')
-                        {{ $quotation->currency ." ". number_format(($quotation->deal_value - $quotationDetail->advance_amount)  * $aed_to_eru_rate->value, 2) }}
+                        @if($currency === 'USD')
+                            {{ "AED " . number_format((((float)$quotation->deal_value) - $advanceAmount) * (float) ($aed_to_usd_rate->value ?? 3.675), 2) }}
+                        @elseif($currency === 'EUR')
+                            {{ "AED " . number_format((((float)$quotation->deal_value) - $advanceAmount) * (float) ($aed_to_eru_rate->value ?? 4), 2) }}
                         @endif
                     </td>
                 </tr>
@@ -671,8 +673,8 @@
         </td>
     </tr>
 </table>
-        @if($quotation->document_type == 'Proforma Invoice')
-        @if($quotationDetail->advance_amount)
+        @if($isProformaInvoice)
+        @if($advanceAmount > 0)
         <br>
         <table>
                     <tr style="font-size: 12px;">
@@ -682,7 +684,7 @@
                     <tr>
                         <td colspan="4">Deposit</td>
                         <td> 
-                            {{ $quotation->currency ." ". number_format($quotationDetail->advance_amount, 2) }}
+                            {{ $currency ." ". number_format($advanceAmount, 2) }}
                         </td>
                     </tr>
                     </table>
@@ -714,7 +716,7 @@
                 @endif
 
 
-        @if($quotation->document_type == 'Proforma Invoice')
+        @if($isProformaInvoice)
         @php
         $due_date = $quotationDetail->due_date;
         $formatted_due_date = date("j F Y", strtotime($due_date));

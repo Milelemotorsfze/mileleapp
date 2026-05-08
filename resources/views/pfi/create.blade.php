@@ -265,6 +265,18 @@
         <div class="overlay"></div>
 @endsection
 @push('scripts')
+    <script src="{{ asset('js/form-draft-autosave.js') }}"></script>
+    <script>
+        // Draft autosave (no backend changes)
+        document.addEventListener('DOMContentLoaded', function () {
+            if (window.initDraftAutosave) {
+                window.initDraftAutosave({
+                    form: '#form-create',
+                    key: 'draft:pfi:create',
+                });
+            }
+        });
+    </script>
     <script type="text/javascript">
 
         const fileInputLicense = document.querySelector("#file");
