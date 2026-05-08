@@ -8,11 +8,11 @@ namespace App\Support;
  * Final mapping (value → suffix):
  * - Petrol → P
  * - Diesel → D
- * - PH (P HEV Petrol Hybrid Electric Vehicle) → PH
+ * - Petrol Hybrid → PH
  * - Diesel Hybrid → DH
- * - Petrol MHEV / M HEV → PMHE
- * - Diesel MHEV → DMHE
- * - PHEV / P HEV → PHEV
+ * - Petrol Mild Hybrid → PMHE
+ * - Diesel Mild Hybrid → DMHE
+ * - PHEV → PHEV
  * - EV → EV
  *
  * Diesel PHEV is intentionally not used for now (commented in dropdowns and not mapped here).
@@ -33,14 +33,11 @@ final class VariantFuelTypeCodeSuffix
         static $exact = [
             'petrol' => 'P',
             'diesel' => 'D',
-            'ph' => 'PH',
+            'petrol hybrid' => 'PH',
             'diesel hybrid' => 'DH',
-            'petrol mhev' => 'PMHE',
-            'm hev' => 'PMHE',
-            'diesel mhev' => 'DMHE',
-            'p hev' => 'PH',
+            'petrol mild hybrid' => 'PMHE',
+            'diesel mild hybrid' => 'DMHE',
             'phev' => 'PHEV',
-            'mhev' => 'PMHE',
             'ev' => 'EV',
         ];
 
