@@ -142,7 +142,7 @@
                     <option value="Petrol" @if($variant_request->fuel_type == 'Petrol') selected @endif>Petrol</option>
                     <option value="Diesel" @if($variant_request->fuel_type == 'Diesel') selected @endif>Diesel</option>
                     <option value="PHEV" @if($variant_request->fuel_type == 'PHEV') selected @endif>PHEV</option>
-                    <option value="MHEV" @if($variant_request->fuel_type == 'MHEV') selected @endif>MHEV</option>
+                    {{-- <option value="MHEV" @if($variant_request->fuel_type == 'MHEV') selected @endif>MHEV</option> --}}
                     <option value="EV" @if($variant_request->fuel_type == 'EV') selected @endif>EV</option>
                  </select>
                 </td>

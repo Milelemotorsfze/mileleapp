@@ -206,7 +206,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
                                         <option value="Diesel" {{ old('fuel_type') == 'Diesel' ? 'selected' : '' }}>Diesel</option>
                                         <option value="PH" {{ old('fuel_type') == 'PH' ? 'selected' : '' }}>PH</option>
                                         <option value="PHEV" {{ old('fuel_type') == 'PHEV' ? 'selected' : '' }}>PHEV</option>
-                                        <option value="MHEV" {{ old('fuel_type') == 'MHEV' ? 'selected' : '' }}>MHEV</option>
+                                        {{-- <option value="MHEV" {{ old('fuel_type') == 'MHEV' ? 'selected' : '' }}>MHEV</option> --}}
                                         <option value="EV" {{ old('fuel_type') == 'EV' ? 'selected' : '' }}>EV</option>
                                     </select>
                                 </div>

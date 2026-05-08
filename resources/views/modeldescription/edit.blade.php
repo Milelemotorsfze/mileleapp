@@ -92,12 +92,12 @@ $grades = $oldModelId ? \App\Models\MasterGrades::where('model_line_id', $oldMod
                         <option value="Petrol" {{ old('fuel_type', $modelDescription->fuel_type) == 'Petrol' ? 'selected' : '' }}>Petrol</option>
                         <option value="Diesel" {{ old('fuel_type', $modelDescription->fuel_type) == 'Diesel' ? 'selected' : '' }}>Diesel</option>
                         <option value="Diesel Hybrid" {{ old('fuel_type', $modelDescription->fuel_type) == 'Diesel Hybrid' ? 'selected' : '' }}>Diesel Hybrid</option>
-                        <option value="Petrol MHEV" {{ old('fuel_type', $modelDescription->fuel_type) == 'Petrol MHEV' ? 'selected' : '' }}>Petrol MHEV</option>
-                        <option value="Diesel MHEV" {{ old('fuel_type', $modelDescription->fuel_type) == 'Diesel MHEV' ? 'selected' : '' }}>Diesel MHEV</option>
+                        <option value="Petrol Mild Hybrid" {{ old('fuel_type', $modelDescription->fuel_type) == 'Petrol Mild Hybrid' ? 'selected' : '' }}>Petrol Mild Hybrid</option>
+                        <option value="Diesel Mild Hybrid" {{ old('fuel_type', $modelDescription->fuel_type) == 'Diesel Mild Hybrid' ? 'selected' : '' }}>Diesel Mild Hybrid</option>
                         {{-- <option value="Diesel PHEV" {{ old('fuel_type', $modelDescription->fuel_type) == 'Diesel PHEV' ? 'selected' : '' }}>Diesel PHEV</option> --}}
-                        <option value="PH" {{ old('fuel_type', $modelDescription->fuel_type) == 'PH' ? 'selected' : '' }}>P HEV (Petrol hybrid electrical)</option>
-                        <option value="PHEV" {{ old('fuel_type', $modelDescription->fuel_type) == 'PHEV' ? 'selected' : '' }}>PHEV (Plug in electrical hybrid)</option>
-                        <option value="M HEV" {{ old('fuel_type', $modelDescription->fuel_type) == 'M HEV' ? 'selected' : '' }}>M HEV</option>
+                        <option value="Petrol Hybrid" {{ old('fuel_type', $modelDescription->fuel_type) == 'Petrol Hybrid' ? 'selected' : '' }}>Petrol Hybrid</option>
+                        <option value="PHEV" {{ old('fuel_type', $modelDescription->fuel_type) == 'PHEV' ? 'selected' : '' }}>PHEV (Plug-in Hybrid Electric Vehicle)</option>
+                        {{-- <option value="M HEV" {{ old('fuel_type', $modelDescription->fuel_type) == 'M HEV' ? 'selected' : '' }}>M HEV</option> --}}
                         <option value="EV" {{ old('fuel_type', $modelDescription->fuel_type) == 'EV' ? 'selected' : '' }}>EV</option>
                     </select>
                 </div>
@@ -174,14 +174,14 @@ $grades = $oldModelId ? \App\Models\MasterGrades::where('model_line_id', $oldMod
             fuel = 'D';
         } else if (fuel === 'PH') {
             fuel = 'PH';
+        } else if (fuel === 'Petrol Hybrid') {
+            fuel = 'PH';
         } else if (fuel === 'Diesel Hybrid') {
             fuel = 'DH';
-        } else if (fuel === 'Petrol MHEV' || fuel === 'M HEV' || fuel === 'MHEV') {
+        } else if (fuel === 'Petrol Mild Hybrid') {
             fuel = 'PMHE';
-        } else if (fuel === 'Diesel MHEV') {
+        } else if (fuel === 'Diesel Mild Hybrid') {
             fuel = 'DMHE';
-        } else if (fuel === 'P HEV') {
-            fuel = 'PH';
         } else if (fuel === 'PHEV') {
             fuel = 'PHEV';
         }
