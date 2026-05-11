@@ -2753,86 +2753,105 @@ class VehiclesController extends Controller
     }
     public function statuswise(Request $request)
     {
-        $useractivities = new UserActivities();
-        $useractivities->activity = "View the Stock Status Wise";
-        $useractivities->users_id = Auth::id();
-        $useractivities->save();
-        // Variant detail computation
-        $sales_persons = ModelHasRoles::join('users', 'model_has_roles.model_id', '=', 'users.id')
-            ->where('users.status', 'active')
-            ->where(function ($query) {
-                $query->where('model_has_roles.role_id', 7)
-                    ->orWhere('model_has_roles.model_id', 17);
-            })
-            ->orwhere('users.id', 40)
-            ->orderBy('users.name', 'asc')
-            ->get();
-        $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
-            ->orderBy('id', 'DESC')
-            ->whereNot('category', 'Modified')
-            ->get();
-        $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
-        $normalizationMap = [
-            'COO' => 'COO',
-            'SFX' => 'SFX',
-            'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
-            'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
-            'HeadLamp Type' => 'HeadLamp Type',
-            'infotainment type' => 'infotainment type',
-            'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
-            'Speakers' => 'Speakers',
-            'sunroof' => 'sunroof'
-        ];
-        foreach ($variants as $variant) {
-            if ($variant->category != 'Modified') {
-                $details = [];
-                $otherDetails = [];
-                foreach ($variant->variantItems as $item) {
-                    $modelSpecification = $item->model_specification;
-                    $modelSpecificationOption = $item->model_specification_option;
-                    if ($modelSpecification && $modelSpecificationOption) {
-                        $name = $modelSpecification->name;
-                        $optionName = $modelSpecificationOption->name;
-                        $normalized = null;
-                        foreach ($normalizationMap as $key => $values) {
-                            if (is_array($values)) {
-                                if (in_array($name, $values)) {
+        if (!$request->ajax()) {
+            $useractivities = new UserActivities();
+            $useractivities->activity = "View the Stock Status Wise";
+            $useractivities->users_id = Auth::id();
+            $useractivities->save();
+            // Variant detail computation (full page load only — skip on DataTables XHR)
+            $sales_persons = ModelHasRoles::join('users', 'model_has_roles.model_id', '=', 'users.id')
+                ->where('users.status', 'active')
+                ->where(function ($query) {
+                    $query->where('model_has_roles.role_id', 7)
+                        ->orWhere('model_has_roles.model_id', 17);
+                })
+                ->orwhere('users.id', 40)
+                ->orderBy('users.name', 'asc')
+                ->get();
+            $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
+                ->orderBy('id', 'DESC')
+                ->whereNot('category', 'Modified')
+                ->get();
+            $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
+            $normalizationMap = [
+                'COO' => 'COO',
+                'SFX' => 'SFX',
+                'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
+                'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
+                'HeadLamp Type' => 'HeadLamp Type',
+                'infotainment type' => 'infotainment type',
+                'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
+                'Speakers' => 'Speakers',
+                'sunroof' => 'sunroof'
+            ];
+            foreach ($variants as $variant) {
+                if ($variant->category != 'Modified') {
+                    $details = [];
+                    $otherDetails = [];
+                    foreach ($variant->variantItems as $item) {
+                        $modelSpecification = $item->model_specification;
+                        $modelSpecificationOption = $item->model_specification_option;
+                        if ($modelSpecification && $modelSpecificationOption) {
+                            $name = $modelSpecification->name;
+                            $optionName = $modelSpecificationOption->name;
+                            $normalized = null;
+                            foreach ($normalizationMap as $key => $values) {
+                                if (is_array($values)) {
+                                    if (in_array($name, $values)) {
+                                        $normalized = $key;
+                                        break;
+                                    }
+                                } elseif ($name === $values) {
                                     $normalized = $key;
                                     break;
                                 }
-                            } elseif ($name === $values) {
-                                $normalized = $key;
-                                break;
                             }
-                        }
 
-                        if ($normalized) {
-                            $name = $normalized;
-                        }
-                        if (in_array(strtolower($optionName), ['yes', 'no'])) {
-                            if (strtolower($optionName) === 'yes') {
-                                $optionName = $name;
-                            } else {
-                                continue;
+                            if ($normalized) {
+                                $name = $normalized;
                             }
-                        }
-                        if (in_array($name, $sequence)) {
-                            $index = array_search($name, $sequence);
-                            $details[$index] = $optionName;
-                        } else {
-                            $otherDetails[] = $optionName;
+                            if (in_array(strtolower($optionName), ['yes', 'no'])) {
+                                if (strtolower($optionName) === 'yes') {
+                                    $optionName = $name;
+                                } else {
+                                    continue;
+                                }
+                            }
+                            if (in_array($name, $sequence)) {
+                                $index = array_search($name, $sequence);
+                                $details[$index] = $optionName;
+                            } else {
+                                $otherDetails[] = $optionName;
+                            }
                         }
                     }
+                    ksort($details);
+                    $variant->detail = implode(', ', array_merge($details, $otherDetails));
+                    $variant->save();
                 }
-                ksort($details);
-                $variant->detail = implode(', ', array_merge($details, $otherDetails));
-                $variant->save();
             }
         }
         $canViewVehicleCost = Auth::id() === 17;
         if ($request->ajax()) {
+            $data = null;
             $status = $request->input('status');
-            $filters = $request->input('filters', []);
+            $filtersRaw = $request->input('filters', []);
+            $filters = [];
+            foreach ($filtersRaw as $columnName => $values) {
+                if (!is_string($columnName) || $columnName === '') {
+                    continue;
+                }
+                if (!is_array($values)) {
+                    if ($values === null || $values === '') {
+                        continue;
+                    }
+                    $values = [$values];
+                }
+                if (count($values) === 0) {
+                    continue;
+                }
+                $filters[$columnName] = $values;
+            }
             if ($status === "allstock") {
                 $data = Vehicles::select([
                     'vehicles.id',
@@ -2885,7 +2904,7 @@ class VehiclesController extends Controller
                     'bp.name as bpn',
                     'sp.name as spn',
                     DB::raw("DATE_FORMAT(work_orders.date, '%Y-%m-%d') as work_order_date"),
-                    DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
+                    DB::raw('MAX(COALESCE(sm.message_count, 0)) as message_count'),
                     'so.so_date',
                     'movements_reference.date',
                     'gdn.date as gdndate',
@@ -2925,14 +2944,21 @@ class VehiclesController extends Controller
                         $join->on('vehicles.id', '=', 'inspection_pdi.vehicle_id')
                             ->where('inspection_pdi.stage', '=', 'PDI');
                     })
+                    ->leftJoinSub(
+                        DB::table('stock_message')
+                            ->select('vehicle_id', DB::raw('COUNT(*) as message_count'))
+                            ->groupBy('vehicle_id'),
+                        'sm',
+                        'vehicles.id',
+                        '=',
+                        'sm.vehicle_id'
+                    )
                     ->where('vehicles.status', 'Approved');
-                
 
-                
                 foreach ($filters as $columnName => $values) {
-                    if (in_array('__NULL__', $values)) {
+                    if (in_array('__NULL__', $values, true)) {
                         $data->whereNull($columnName); // Filter for NULL values
-                    } elseif (in_array('__Not EMPTY__', $values)) {
+                    } elseif (in_array('__Not EMPTY__', $values, true)) {
                         $data->whereNotNull($columnName); // Filter for non-empty values
                     } else {
                         $data->whereIn($columnName, $values); // Regular filtering for selected values
@@ -2943,6 +2969,13 @@ class VehiclesController extends Controller
             if ($data) {
                 return DataTables::of($data)->toJson();
             }
+
+            return response()->json([
+                'draw' => (int) $request->input('draw', 0),
+                'recordsTotal' => 0,
+                'recordsFiltered' => 0,
+                'data' => [],
+            ]);
         }
         return view('vehicles.stock', ['salesperson' => $sales_persons]);
     }
@@ -3690,7 +3723,6 @@ class VehiclesController extends Controller
         if ($request->ajax()) {
             $status = $request->input('status');
             $filters = $request->input('filters', []);
-            \Log::info("Received Filters: ", $filters);
             if ($status === "Available Stock") {
                 $data = Vehicles::select([
                     'vehicles.id as id',

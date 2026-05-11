@@ -713,7 +713,11 @@ table.dataTable thead th select {
         data: null,
         name: 'serial_number',
         render: function (data, type, row, meta) {
-            return meta.row + 1;  // This will calculate the serial number based on the row index (meta.row) + 1
+            if (type === 'display' || type === 'filter') {
+                var api = new $.fn.dataTable.Api(meta.settings);
+                return api.page.info().start + meta.row + 1;
+            }
+            return meta.row + 1;
         },
         orderable: false,  // Disable ordering for this column
         searchable: false  // Disable searching for this column
@@ -1141,10 +1145,12 @@ if (canViewVehicleCost) {
           processing: true,
             serverSide: true,
             columns: columns7,
+            order: [[1, 'asc']],
             ajax: {
         url: "{{ route('vehicles.statuswise', ['status' => 'allstock']) }}",
         type: "POST",
         data: function (d) {
+                d.status = 'allstock';
                 d.filters = {};  // Initialize an empty filters object
 
 
@@ -1168,8 +1174,8 @@ if (canViewVehicleCost) {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     },
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-            pageLength: -1,
+            lengthMenu: [[25, 50, 100, 200, 500], [25, 50, 100, 200, 500]],
+            pageLength: 50,
             columnDefs: [
         {
             targets: 1,
@@ -1192,7 +1198,6 @@ if (canViewVehicleCost) {
             }
         }
     ],
-    pageLength: -1,
             colReorder: true,
             initComplete: function () {
     var api = this.api();
