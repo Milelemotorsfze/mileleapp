@@ -27,6 +27,7 @@ class BankAccountsController extends Controller
         'AED' => 1,
         'PHP' => 0.063,
         'SAR' => 0.98,
+        'ZAR' => 0.22,
     ];
     $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
         return $carry + ($account->current_balance * $exchangeRates[$account->currency]);

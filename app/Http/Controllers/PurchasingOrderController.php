@@ -89,6 +89,7 @@ class PurchasingOrderController extends Controller
             'AED' => 1,
             'PHP' => 0.063,
             'SAR' => 0.98,
+            'ZAR' => 0.22,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -198,6 +199,7 @@ class PurchasingOrderController extends Controller
             'AED' => 1,
             'PHP' => 0.063,
             'SAR' => 0.98,
+            'ZAR' => 0.22,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -229,6 +231,7 @@ class PurchasingOrderController extends Controller
             'AED' => 1,
             'PHP' => 0.063,
             'SAR' => 0.98,
+            'ZAR' => 0.22,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -260,6 +263,7 @@ class PurchasingOrderController extends Controller
             'AED' => 1,
             'PHP' => 0.063,
             'SAR' => 0.98,
+            'ZAR' => 0.22,
 
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
@@ -326,6 +330,7 @@ class PurchasingOrderController extends Controller
             'AED' => 1,
             'PHP' => 0.063,
             'SAR' => 0.98,
+            'ZAR' => 0.22,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -405,6 +410,7 @@ class PurchasingOrderController extends Controller
             'AED' => 1,
             'PHP' => 0.063,
             'SAR' => 0.98,
+            'ZAR' => 0.22,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -472,6 +478,7 @@ class PurchasingOrderController extends Controller
             'AED' => 1,
             'PHP' => 0.063,
             'SAR' => 0.98,
+            'ZAR' => 0.22,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -521,6 +528,7 @@ class PurchasingOrderController extends Controller
             'AED' => 1,
             'PHP' => 0.063,
             'SAR' => 0.98,
+            'ZAR' => 0.22,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -570,6 +578,7 @@ class PurchasingOrderController extends Controller
             'AED' => 1,
             'PHP' => 0.063,
             'SAR' => 0.98,
+            'ZAR' => 0.22,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -623,6 +632,7 @@ class PurchasingOrderController extends Controller
             'AED' => 1,
             'PHP' => 0.063,
             'SAR' => 0.98,
+            'ZAR' => 0.22,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -676,6 +686,7 @@ class PurchasingOrderController extends Controller
             'AED' => 1,
             'PHP' => 0.063,
             'SAR' => 0.98,
+            'ZAR' => 0.22,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -729,6 +740,7 @@ class PurchasingOrderController extends Controller
             'AED' => 1,
             'PHP' => 0.063,
             'SAR' => 0.98,
+            'ZAR' => 0.22,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -779,6 +791,7 @@ class PurchasingOrderController extends Controller
             'AED' => 1,
             'PHP' => 0.063,
             'SAR' => 0.98,
+            'ZAR' => 0.22,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -841,6 +854,7 @@ class PurchasingOrderController extends Controller
             'AED' => 1,
             'PHP' => 0.063,
             'SAR' => 0.98,
+            'ZAR' => 0.22,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -901,6 +915,7 @@ class PurchasingOrderController extends Controller
             'AED' => 1,
             'PHP' => 0.063,
             'SAR' => 0.98,
+            'ZAR' => 0.22,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -3712,6 +3727,9 @@ class PurchasingOrderController extends Controller
                     case "SAR":
                         $totalcostconverted = $totalcost * 0.98;
                         break;
+                    case "ZAR":
+                        $totalcostconverted = $totalcost * 0.22;
+                        break;
                     default:
                         $totalcostconverted = $totalcost;
                 }
@@ -4140,7 +4158,8 @@ class PurchasingOrderController extends Controller
             'CAD' => 2.89,
             'AED' => 1,
             'PHP' => 0.063,
-            'SAR' => 0.98
+            'SAR' => 0.98,
+            'ZAR' => 0.22,
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
@@ -4457,6 +4476,7 @@ class PurchasingOrderController extends Controller
                 'CAD' => 2.69,
                 "PHP" => 0.063,
                 'SAR' => 0.98,
+                'ZAR' => 0.22,
             ];
 
             $totalDifference = 0;
@@ -5509,6 +5529,7 @@ class PurchasingOrderController extends Controller
                             "CAD" => 2.68,
                             "PHP" => 0.063,
                             'SAR' => 0.98,
+                            'ZAR' => 0.22,
                         ];
                         // Check if the currencies are different
                         if ($purchasingOrder->currency != $supplierAccount->currency) {
@@ -5819,6 +5840,7 @@ class PurchasingOrderController extends Controller
                         "CAD" => 2.68,
                         "PHP" => 0.063,
                         'SAR' => 0.98,
+                        'ZAR' => 0.22,
                     ];
                     // Check if the currencies are different
                     if ($purchasingOrder->currency != $supplierAccount->currency) {
@@ -5890,6 +5912,7 @@ class PurchasingOrderController extends Controller
                         "CAD" => 2.68,
                         "PHP" => 0.063,
                         'SAR' => 0.98,
+                        'ZAR' => 0.22,
                     ];
                     if ($supplierAccountTransaction->transaction_type == 'Released') {
 
@@ -6040,6 +6063,7 @@ class PurchasingOrderController extends Controller
                             "CAD" => 2.68,
                             "PHP" => 0.063,
                             "SAR" => 0.98,
+                            "ZAR" => 0.22,
                         ];
                         // Check if the currencies are different
                         if ($purchasingOrder->currency != $supplierAccount->currency) {

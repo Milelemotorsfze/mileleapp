@@ -149,6 +149,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details')
                 <option value="AUD">AUD</option>
                 <option value="PHP">PHP</option>
                 <option value="SAR">SAR</option>
+                <option value="ZAR">ZAR</option>
             </select>
         </div>
         <div class="col-lg-2 col-md-6">

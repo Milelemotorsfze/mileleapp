@@ -975,6 +975,7 @@ return [$color->id => $formattedName];
                                             <option value="CAD" {{ $purchasingOrder->currency === 'CAD' ? 'selected' : '' }}>CAD</option>
                                             <option value="PHP" {{ $purchasingOrder->currency === 'PHP' ? 'selected' : '' }}>PHP</option>
                                             <option value="SAR" {{ $purchasingOrder->currency === 'SAR' ? 'selected' : '' }}>SAR</option>
+                                            <option value="ZAR" {{ $purchasingOrder->currency === 'ZAR' ? 'selected' : '' }}>ZAR (South African Rand)</option>
                                         </select>
                                     </div>
                                     @endif
