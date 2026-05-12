@@ -49,9 +49,21 @@ class ProformaInvoiceController extends Controller {
         $kitsDesc = AddonDescription::whereHas('Addon', function($q) {
             $q->where('addon_type','K');
         })->get();
-        $sales_persons = User::where('pfi_access', 1)->where('status','active')
+        // Match edit screen: PF-access users plus the call’s assigned salesperson (covers customer-direct
+        // and other flows where the rep may not have pfi_access flag).
+        $sales_persons = User::where(function ($query) use ($callDetails) {
+            $query->where(function ($q) {
+                $q->where('pfi_access', 1)
+                  ->where('status', 'active');
+            });
+            if ($callDetails && $callDetails->sales_person) {
+                $query->orWhere('id', $callDetails->sales_person);
+            }
+        })
         ->orderBy('name', 'asc')
-        ->get();
+        ->get()
+        ->unique('id')
+        ->values();
         $countries = Country::all();
         $shippingPorts = MasterShippingPorts::all();
         $shippings = ShippingMedium::all();

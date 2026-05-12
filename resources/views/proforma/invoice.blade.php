@@ -289,12 +289,12 @@
                     </div>
                     <div class="col-sm-8">
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input shipping_method @error('shipping_method') is-invalid @enderror" type="checkbox"
+                            <input class="form-check-input shipping_method @error('shipping_method') is-invalid @enderror" type="radio"
                                    name="shipping_method" id="CNF" value="CNF" >
                             <label class="form-check-label" for="CNF">Local</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input shipping_method @error('shipping_method') is-invalid @enderror" type="checkbox"
+                            <input class="form-check-input shipping_method @error('shipping_method') is-invalid @enderror" type="radio"
                                    name="shipping_method" id="EXW" value="EXW" checked>
                             <label class="form-check-label" for="EXW">Export</label>
                         </div>
@@ -313,11 +313,12 @@
                     </div>
                     <div class="col-sm-6">
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="nature_of_deal" id="regular_deal" value="regular_deal" required {{ old('nature_of_deal') == 'regular_deal' ? 'checked' : '' }}>
+                            @php $natureOfDeal = old('nature_of_deal', 'regular_deal'); @endphp
+                            <input class="form-check-input" type="radio" name="nature_of_deal" id="regular_deal" value="regular_deal" required {{ $natureOfDeal == 'regular_deal' ? 'checked' : '' }}>
                             <label class="form-check-label" for="regular_deal">Regular deal</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="nature_of_deal" id="letter_of_credit" value="letter_of_credit" required {{ old('nature_of_deal') == 'letter_of_credit' ? 'checked' : '' }}>
+                            <input class="form-check-input" type="radio" name="nature_of_deal" id="letter_of_credit" value="letter_of_credit" required {{ $natureOfDeal == 'letter_of_credit' ? 'checked' : '' }}>
                             <label class="form-check-label" for="letter_of_credit">Letter of credit</label>
                         </div>
                     </div>
@@ -1425,6 +1426,17 @@
  <input type="hidden" name="is_shipping_charge_added" value="0" id="is-shipping-charge-added">
 @endsection
 @push('scripts')
+<script src="{{ asset('js/form-draft-autosave.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (window.initDraftAutosave) {
+            window.initDraftAutosave({
+                form: '#form-create',
+                key: 'draft:quotation:create:{{ $callDetails->id }}',
+            });
+        }
+    });
+</script>
 <script>
      function addAgentModal() {
         $('#addAgentModal').modal('show');
@@ -2883,10 +2895,20 @@ $('#shipping_port').select2();
         rowData['button_type'] = buttonType;
         rowData['model_type'] = buttonType;
         rowData['index'] = index;
-        row.find('td').each(function() {
-            rowData.push($(this).html());
-        });
-        var secondTable = $('#dtBasicExample2').DataTable();
+        // Same as invoice_edit: plain text cells for docs/cert/other so descriptions post correctly
+        var $cells = row.find('td');
+        if (buttonType == 'Shipping-Document' || buttonType == 'Certification' || buttonType == 'Other') {
+            rowData.push($cells.eq(0).text().trim());
+            rowData.push($cells.eq(1).text().trim());
+            rowData.push($cells.eq(2).text().trim());
+            rowData.push($cells.eq(3).text().trim());
+            rowData.push($cells.eq(4).text().trim());
+            rowData.push('');
+        } else {
+            row.find('td').each(function() {
+                rowData.push($(this).html());
+            });
+        }
 
         rowData['brand_id'] = "";
         rowData['model_line_id'] = "";

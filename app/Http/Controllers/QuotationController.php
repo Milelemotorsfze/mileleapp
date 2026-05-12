@@ -352,8 +352,11 @@ class QuotationController extends Controller
             }
             $quotationItem->save();
             if($isVehicle == 1){
-                if ($request->uuids[$key]) {
-                    $vinArray = explode(',', $request->vinnumbers[$key]);
+                // Always register vehicle/brand/model-line parents so QuotationSubItem rows are created
+                // for accessories sharing the same uuid. Previously this only ran when uuid was truthy,
+                // so first-save PDFs could omit linked addons/parts.
+                if (!empty($request->uuids[$key])) {
+                    $vinArray = explode(',', $request->vinnumbers[$key] ?? '');
                     foreach ($vinArray as $vin) {
                         if ($vin !== "undefined" && $vin !== null && !empty($vin)) {
                     $vinupdate = New QuotationVins();
@@ -376,8 +379,8 @@ class QuotationController extends Controller
                     }
                     }
                 }
-                   array_push($quotationItemIds, $quotationItem->id);
                 }
+                array_push($quotationItemIds, $quotationItem->id);
             }
             $isVehicle = 0; 
             $quotationItemsArray[] = $quotationItem;
@@ -939,9 +942,11 @@ class QuotationController extends Controller
                 $quotationItem->reference()->associate($item);
             }
             $quotationItem->save();
-            if($isVehicle == 1){ 
-                if ($request->uuids[$key]) {
-                    $vinArray = explode(',', $request->vinnumbers[$key]);
+            if($isVehicle == 1){
+                // Always register vehicle/brand/model-line parents so QuotationSubItem sync runs for addons
+                // sharing uuid (fixes first PDF missing accessories/parts when uuid was empty on first post).
+                if (!empty($request->uuids[$key])) {
+                    $vinArray = explode(',', $request->vinnumbers[$key] ?? '');
                     QuotationVins::where('quotation_items_id', $quotationItem->id)->delete();
                     foreach ($vinArray as $vin) {
                     if ($vin !== "undefined" && $vin !== null && !empty($vin)) {
@@ -968,8 +973,8 @@ class QuotationController extends Controller
                 }
                 }
                 }
-                   array_push($quotationItemIds, $quotationItem->id);
                 }
+                array_push($quotationItemIds, $quotationItem->id);
             }
             $isVehicle = 0;
             $quotationItemsArray[] = $quotationItem;
