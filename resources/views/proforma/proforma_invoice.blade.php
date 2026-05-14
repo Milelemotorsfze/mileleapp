@@ -248,6 +248,29 @@
     </div>
 @endif
         <table id="details">
+            @php
+                $vehicles = $vehicles ?? collect();
+                $otherVehicles = $otherVehicles ?? collect();
+                $vehicleWithBrands = $vehicleWithBrands ?? collect();
+                $shippingCharges = $shippingCharges ?? collect();
+                $shippingDocuments = $shippingDocuments ?? collect();
+                $addons = $addons ?? collect();
+                $OtherAddons = $OtherAddons ?? collect();
+                $directlyAddedAddons = $directlyAddedAddons ?? collect();
+                $shippingCertifications = $shippingCertifications ?? collect();
+                $otherDocuments = $otherDocuments ?? collect();
+                $hasQuotationLineItems = $vehicles->isNotEmpty()
+                    || $otherVehicles->isNotEmpty()
+                    || $vehicleWithBrands->isNotEmpty()
+                    || $shippingCharges->isNotEmpty()
+                    || $shippingDocuments->isNotEmpty()
+                    || $addons->isNotEmpty()
+                    || $OtherAddons->isNotEmpty()
+                    || $directlyAddedAddons->isNotEmpty()
+                    || $shippingCertifications->isNotEmpty()
+                    || $otherDocuments->isNotEmpty();
+            @endphp
+            @if($hasQuotationLineItems)
             @if($vehicles->count() > 0  || $otherVehicles->count() || $vehicleWithBrands->count() > 0)
                 <tr style="font-size: 12px;background-color: #bbbbbd;">
                     <th>VEHICLE</th>
@@ -406,7 +429,8 @@
                 @endforeach
             @endif
 
-            @if($addons->count() > 0 )
+            {{-- Show addons block if any catalogue addon, model-line-linked addon, or custom/other addon exists. --}}
+            @if($addons->isNotEmpty() || $directlyAddedAddons->isNotEmpty() || $OtherAddons->isNotEmpty())
                 <tr style="font-size: 12px;">
                     <th colspan="5"> ADDONS AND EXTRA ITEM </th>
 {{--                    <th>SYSTEM CODE</th>--}}
@@ -425,18 +449,20 @@
                         <td>{{ $quotation->currency ." ". number_format($addon->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
-{{--                @foreach($directlyAddedAddons as $key => $directlyAddedAddon)--}}
-{{--                    <tr>--}}
-{{--                        <td><span style="font-weight: bold;margin-right: 5px;" > {{ $addons->count() + $key+1 }}. </span> {{ $directlyAddedAddon->description }}</td>--}}
-{{--                        <td> {{ $directlyAddedAddon->system_code_currency ."". $directlyAddedAddon->system_code_amount }}</td>--}}
-{{--                        <td>{{ $directlyAddedAddon->quantity }}</td>--}}
-{{--                        <td>{{ $quotation->currency ." ". number_format($directlyAddedAddon->unit_price, 2) }}</td>--}}
-{{--                        <td>{{ $quotation->currency ." ". number_format($directlyAddedAddon->total_amount, 2) }}</td>--}}
-{{--                    </tr>--}}
-{{--                @endforeach--}}
+                @foreach($directlyAddedAddons as $key => $directlyAddedAddon)
+                    <tr>
+                        <td><span style="font-weight: bold;margin-right: 5px;" > {{ $addons->count() + $key + 1 }}. </span> {{ $directlyAddedAddon->description }}</td>
+                        @if($quotationDetail->cb_name)
+                        <td> {{ $directlyAddedAddon->system_code_currency ."". $directlyAddedAddon->system_code_amount }}</td>
+                        @endif
+                        <td>{{ $directlyAddedAddon->quantity }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($directlyAddedAddon->unit_price, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($directlyAddedAddon->total_amount, 2) }}</td>
+                    </tr>
+                @endforeach
                     @foreach($OtherAddons as $key => $OtherAddon)
                         <tr>
-                            <td><span style="font-weight: bold;margin-right: 5px;" > {{ $addons->count() + $key+1 }}. </span> {{ $OtherAddon->description }}</td>
+                            <td><span style="font-weight: bold;margin-right: 5px;" > {{ $addons->count() + $directlyAddedAddons->count() + $key + 1 }}. </span> {{ $OtherAddon->description }}</td>
                             @if($quotationDetail->cb_name)
                             <td> {{$OtherAddon->system_code_currency ."". $OtherAddon->system_code_amount }}</td>
                             @endif
@@ -483,6 +509,11 @@
                         <td>{{ $quotation->currency ." ". number_format($otherDocument->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
+            @endif
+            @else
+                <tr>
+                    <td colspan="5" style="padding: 12px; color: #555;">No quotation line items.</td>
+                </tr>
             @endif
         </table>
         
