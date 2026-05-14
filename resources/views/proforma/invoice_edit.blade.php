@@ -2315,7 +2315,54 @@ $('#shipping_port').select2();
 
             calculateTotalSum();
         });
+        /** Whole-number unit prices (after FX math where applicable). */
+        function formatQuotationMoney(n) {
+            var x = parseFloat(n);
+            if (isNaN(x) || x < 0) {
+                return '';
+            }
+            return String(Math.round(x));
+        }
+        /** Line totals and header totals — whole numbers. */
+        function formatQuotationLineAmount(n) {
+            var x = parseFloat(n);
+            if (isNaN(x)) {
+                return '';
+            }
+            return String(Math.round(x));
+        }
+        function roundAllQuotationLineAmounts() {
+            var tbl = $('#dtBasicExample2').DataTable();
+            var count = tbl.data().length;
+            for (var i = 1; i <= count; i++) {
+                var $p = $('#price-' + i);
+                if (!$p.length) {
+                    continue;
+                }
+                var raw = parseFloat($p.val());
+                var unitStr = formatQuotationMoney(raw);
+                if (unitStr === '') {
+                    continue;
+                }
+                $p.val(unitStr);
+                var unit = parseFloat(unitStr);
+                var q = parseFloat($('#quantity-' + i).val());
+                if (isNaN(q) || q <= 0) {
+                    q = 1;
+                }
+                $('#total-amount-' + i).val(formatQuotationLineAmount(unit * q));
+            }
+            calculateTotalSum();
+        }
+        $('#form-create').on('submit', function () {
+            if (typeof roundAllQuotationLineAmounts === 'function') {
+                roundAllQuotationLineAmounts();
+            }
+        });
         function ConvertRequestedPrice(value,operand) {
+            if (value === undefined || value === null || isNaN(parseFloat(value)) || !operand) {
+                return;
+            }
             var count = secondTable.data().length;
             value = parseFloat(value);
             for (var i = 1; i <= count; i++) {
@@ -2326,9 +2373,13 @@ $('#shipping_port').select2();
                 }else if(operand == 'Multiply') {
                     var convertedPrice = parseFloat(price) * value;
                 }
-                $('#price-' + i).val(convertedPrice.toFixed(3));
-                var amount = parseFloat(convertedPrice) * parseFloat(quantity);
-                $('#total-amount-' + i).val(amount.toFixed(3));
+                var priceRounded = formatQuotationMoney(convertedPrice);
+                if (priceRounded === '') {
+                    continue;
+                }
+                $('#price-' + i).val(priceRounded);
+                var amount = parseFloat(priceRounded) * parseFloat(quantity);
+                $('#total-amount-' + i).val(formatQuotationLineAmount(amount));
             }
         }
         $('#brand').on('change', function() {
@@ -2589,9 +2640,9 @@ $('#shipping_port').select2();
                     {
                     var price = row[8];
                     }
-                    // calculate
+                    // calculate — initial line total only (whole number in amount field)
                     var quantityValue = row.qty ? row.qty : 1;
-                    var amount = price * quantityValue;
+                    var amount = Math.round(parseFloat(price) * parseFloat(quantityValue)) || 0;
                     if(row['table_type'] == 'vehicle-table') {
                         var uuid = row['number'];
                         // $('#checkbox-'+ row['index']).prop('disabled', true);
@@ -2752,15 +2803,17 @@ $('#shipping_port').select2();
                     var price = row[8];
                     }
                     var currency = $('#currency').val();
-
-                    if(currency == 'USD') {
-                        var value = '{{ $aed_to_usd_rate->value }}';
-                        var price = price;
-                    }else if(currency == 'ERU') {
-                        var value = '{{ $aed_to_eru_rate->value }}';
-                        var price = price;
+                    var priceNum = parseFloat(price);
+                    if (isNaN(priceNum)) {
+                        priceNum = 0;
                     }
-                    return '<input type="number" min="0" name="prices[]" required class="price-editable form-control" id="price-'+ row['index'] +'" value="' + price + '"/>' +
+                    if (currency == 'USD') {
+                        priceNum = priceNum / parseFloat('{{ $aed_to_usd_rate->value }}');
+                    } else if (currency == 'EUR' || currency == 'ERU') {
+                        priceNum = priceNum / parseFloat('{{ $aed_to_eru_rate->value }}');
+                    }
+                    var priceStr = String(Math.round(priceNum));
+                    return '<input type="number" min="0" step="1" name="prices[]" required class="price-editable form-control" id="price-'+ row['index'] +'" value="' + priceStr + '"/>' +
                         '    <span id="priceError' +  row['index'] +'" class="price-error invalid-feedback"></span>';
                 }
             }
@@ -2837,6 +2890,10 @@ $('#shipping_port').select2();
             alert('Please select a salesperson.');
             e.preventDefault();
             return false;
+        }
+
+        if (typeof roundAllQuotationLineAmounts === 'function') {
+            roundAllQuotationLineAmounts();
         }
 
         $('.text-danger').hide();
@@ -3237,6 +3294,23 @@ $('#shipping_port').select2();
             CalculateTotalAmount(index);
             calculateTotalSum();
 
+        });
+
+        $('#dtBasicExample2 tbody').on('blur', '.price-editable', function() {
+            var id = $(this).attr('id');
+            if (!id || id.indexOf('price-') !== 0) {
+                return;
+            }
+            var index = parseInt(id.replace('price-', ''), 10);
+            if (isNaN(index)) {
+                return;
+            }
+            var r = formatQuotationMoney($(this).val());
+            if (r !== '') {
+                $(this).val(r);
+            }
+            CalculateTotalAmount(index);
+            calculateTotalSum();
         });
 
         $('#dtBasicExample2 tbody').on('input', '.qty-editable', function(e) {
@@ -4308,7 +4382,13 @@ function updateSecondTable(RowId, savedVins) {
                 var unitPrice = $('#price-'+index).val();
                 var quantity = $('#quantity-'+index).val();
                 var totalAmount = parseFloat(unitPrice) * parseFloat(quantity);
-                $('#total-amount-'+index).val(totalAmount.toFixed(3));
+                if (isNaN(totalAmount)) {
+                    $('#total-amount-'+index).val('');
+                } else if (typeof formatQuotationLineAmount === 'function') {
+                    $('#total-amount-'+index).val(formatQuotationLineAmount(totalAmount));
+                } else {
+                    $('#total-amount-'+index).val(String(Math.round(totalAmount)));
+                }
 
             }
             function calculateTotalSum(){
@@ -4323,18 +4403,18 @@ function updateSecondTable(RowId, savedVins) {
                 }
 
                 if(currency == 'AED') {
-                    $('#total').val(totalAmount.toFixed(3));
+                    $('#total').val(isNaN(totalAmount) ? '' : (typeof formatQuotationLineAmount === 'function' ? formatQuotationLineAmount(totalAmount) : String(Math.round(totalAmount))));
 
                 }
-                $('#total_in_selected_currency').val(totalAmount.toFixed(3));
+                $('#total_in_selected_currency').val(isNaN(totalAmount) ? '' : (typeof formatQuotationLineAmount === 'function' ? formatQuotationLineAmount(totalAmount) : String(Math.round(totalAmount))));
                 if(currency == 'USD') {
                     var value = '{{ $aed_to_usd_rate->value }}';
                     var total = parseFloat(totalAmount) * value;
-                    $('#total').val(total.toFixed(3));
+                    $('#total').val(isNaN(total) ? '' : (typeof formatQuotationLineAmount === 'function' ? formatQuotationLineAmount(total) : String(Math.round(total))));
                 }else if(currency == 'EUR') {
                     var value = '{{ $aed_to_eru_rate->value }}';
                     var total = parseFloat(totalAmount) * value;
-                    $('#total').val(total.toFixed(3));
+                    $('#total').val(isNaN(total) ? '' : (typeof formatQuotationLineAmount === 'function' ? formatQuotationLineAmount(total) : String(Math.round(total))));
                 }
                 enableOrDisableSubmit();
             }
