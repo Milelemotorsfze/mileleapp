@@ -380,8 +380,8 @@ table.dataTable thead th select {
                         <label for="user_id">Sales Person</label>
                         <select class="form-control" id="salesperson" name="salesperson" required>
                         <option value="" disabled selected>Select the Sales Person</option>
-                        @foreach($salesperson as $salesperson)
-                                <option value="{{ $salesperson->id }}">{{ $salesperson->name }}</option>
+                        @foreach($salesperson as $sp)
+                                <option value="{{ $sp->id }}">{{ $sp->name }}</option>
                             @endforeach
                            
                         </select>
@@ -591,6 +591,7 @@ $hasEditEstimationDatePermission = Auth::user()->hasPermissionForSelectedRole('e
     <i class="bi bi-upload"></i> Upload ETA CSV
 </button>
 @endif
+@include('vehicles.partials.stock-advanced-filter-bar', ['stockFilterBarTableId' => 'dtBasicExample3'])
 <div class="table-responsive" style="height: 80vh;">
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
@@ -1161,6 +1162,8 @@ if (canViewVehicleCost) {
         type: "POST",
         data: function (d) {
                 d.filters = {};  // Initialize an empty filters object
+                d.bar_filters = (window.stockBarCommitted && window.stockBarCommitted['dtBasicExample3'])
+                    ? window.stockBarCommitted['dtBasicExample3'] : {};
                 $('#dtBasicExample3 thead select').each(function () {
                     var columnIndex = $(this).parent().index(); // Get the column index
                     var columnName = columnMap[columnIndex]; // Map index to column name
@@ -1182,6 +1185,8 @@ if (canViewVehicleCost) {
     columns: columns3,
     lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
     pageLength: -1,
+    dom: '<"row align-items-center mb-2"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rtip',
+    searchDelay: 450,
     columnDefs: [
         {
             targets: 1,
@@ -1207,6 +1212,13 @@ if (canViewVehicleCost) {
     colReorder: true,
     initComplete: function () {
     var api = this.api();
+    $(api.table().container()).find('.dataTables_filter input')
+        .addClass('form-control form-control-sm')
+        .attr('placeholder', 'Search PO, VIN, brand, model, status, SO, GRN…');
+
+    if (window.stockBarBindTableSummary) {
+        window.stockBarBindTableSummary('dtBasicExample3');
+    }
 
     // For each column in the table, create a dropdown filter
     api.columns().every(function (index) {

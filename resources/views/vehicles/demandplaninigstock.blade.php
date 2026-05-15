@@ -357,8 +357,8 @@ table.dataTable thead th select {
                         <label for="user_id">Sales Person</label>
                         <select class="form-control" id="salesperson" name="salesperson" required>
                         <option value="" disabled selected>Select the Sales Person</option>
-                        @foreach($salesperson as $salesperson)
-                                <option value="{{ $salesperson->id }}">{{ $salesperson->name }}</option>
+                        @foreach($salesperson as $sp)
+                                <option value="{{ $sp->id }}">{{ $sp->name }}</option>
                             @endforeach
                            
                         </select>
@@ -526,6 +526,7 @@ table.dataTable thead th select {
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
 @endif
+@include('vehicles.partials.stock-advanced-filter-bar', ['stockFilterBarTableId' => 'dtBasicExample8'])
 <div class="table-responsive" style="height: 80vh;">
             <table id="dtBasicExample8" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
@@ -982,6 +983,8 @@ if (hasPricePermission) {
         type: "POST",
         data: function (d) {
                 d.filters = {};  // Initialize an empty filters object
+                d.bar_filters = (window.stockBarCommitted && window.stockBarCommitted['dtBasicExample8'])
+                    ? window.stockBarCommitted['dtBasicExample8'] : {};
 
                 $('#dtBasicExample8 thead select').each(function () {
                     var columnIndex = $(this).parent().index(); // Get the column index
@@ -1026,9 +1029,17 @@ if (hasPricePermission) {
         }
     ],
     pageLength: -1,
+    dom: '<"row align-items-center mb-2"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rtip',
+    searchDelay: 450,
     colReorder: true,
     initComplete: function () {
     var api = this.api();
+    $(api.table().container()).find('.dataTables_filter input')
+        .addClass('form-control form-control-sm')
+        .attr('placeholder', 'Search PO, VIN, brand, model, status, SO, GRN…');
+    if (window.stockBarBindTableSummary) {
+        window.stockBarBindTableSummary('dtBasicExample8');
+    }
     // For each column in the table, create a dropdown filter
     api.columns().every(function (index) {
         var column = this;
