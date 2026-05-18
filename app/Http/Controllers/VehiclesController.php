@@ -2751,88 +2751,519 @@ class VehiclesController extends Controller
         $vehicle->salespersonname = $salespersonName;
         return response()->json($vehicle);
     }
+
+    /**
+     * Global text search for stock report DataTables (OR across key columns).
+     * Used with Yajra filter(..., false) so default global search does not run on grouped/joined queries.
+     */
+    protected function applyStockReportGlobalSearchToQuery($query, ?string $keyword, string $mode): void
+    {
+        if ($keyword === null) {
+            return;
+        }
+        $keyword = trim($keyword);
+        if ($keyword === '') {
+            return;
+        }
+
+        $pattern = '%'.addcslashes($keyword, '%_\\').'%';
+
+        $columns = [
+            'purchasing_order.po_number',
+            'movement_grns.grn_number',
+            'gdn.gdn_number',
+            'so.so_number',
+            'vehicles.vin',
+            'vehicles.sales_remarks',
+            'vehicles.engine',
+            'vehicles.vehicle_document_status',
+            'vehicles.custom_inspection_number',
+            'vehicles.custom_inspection_status',
+            'vehicles.grn_remark',
+            'brands.brand_name',
+            'master_model_lines.model_line',
+            'varaints.name',
+            'varaints.detail',
+            'varaints.steering',
+            'varaints.my',
+            'varaints.fuel_type',
+            'varaints.gearbox',
+            'varaints.upholestry',
+            'int_color.name',
+            'ex_color.name',
+            'warehouse.name',
+            'countries.name',
+            'documents.import_type',
+            'documents.owership',
+            'documents.document_with',
+            'so.so_date',
+            'movements_reference.date',
+            'gdn.date',
+        ];
+
+        if ($mode === 'delivered' || $mode === 'dpvehicles') {
+            $columns[] = 'users.name';
+        } else {
+            $columns[] = 'sp.name';
+            $columns[] = 'bp.name';
+        }
+
+        $statusCaseMode = $mode === 'available' ? 'available' : 'allstock';
+        $statusCaseSql = $this->sqlStockReportComputedStatusCase($statusCaseMode);
+
+        $query->where(function ($q) use ($columns, $pattern, $statusCaseSql) {
+            $q->whereRaw('CAST(vehicles.id AS CHAR) LIKE ?', [$pattern]);
+            foreach ($columns as $col) {
+                $q->orWhere($col, 'LIKE', $pattern);
+            }
+            $q->orWhereRaw('('.$statusCaseSql.') LIKE ?', [$pattern]);
+        });
+    }
+
+    /**
+     * @return array<string, \Illuminate\Support\Collection>
+     */
+    protected function loadStockReportFilterOptions(): array
+    {
+        return [
+            'stockFilterBrands' => Brand::orderBy('brand_name')->get(['id', 'brand_name']),
+            'stockFilterModelLines' => MasterModelLines::orderBy('model_line')->get(['id', 'model_line', 'brand_id']),
+            'stockFilterVariants' => Varaint::whereNotNull('master_model_lines_id')
+                ->orderBy('name')
+                ->get(['id', 'name', 'master_model_lines_id']),
+            'stockFilterWarehouses' => Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])
+                ->orderBy('name')
+                ->get(['id', 'name']),
+        ];
+    }
+
+    /**
+     * @param  mixed  $value
+     */
+    protected function splitStockFilterTokens($value): array
+    {
+        if ($value === null || $value === '') {
+            return [];
+        }
+        if (is_array($value)) {
+            $out = [];
+            foreach ($value as $v) {
+                if ($v === null || $v === '') {
+                    continue;
+                }
+                foreach (preg_split('/[\s,;]+/', (string) $v, -1, PREG_SPLIT_NO_EMPTY) as $p) {
+                    $t = trim($p);
+                    if ($t !== '') {
+                        $out[] = $t;
+                    }
+                }
+            }
+
+            return array_values(array_unique($out));
+        }
+        $parts = preg_split('/[\r\n,;]+/', (string) $value, -1, PREG_SPLIT_NO_EMPTY);
+
+        return array_values(array_unique(array_filter(array_map('trim', $parts))));
+    }
+
+    protected function normalizeStockBarPriceScalar(mixed $v): string
+    {
+        $s = trim((string) ($v ?? ''));
+        if ($s === '') {
+            return '';
+        }
+        if (! is_numeric($s)) {
+            return '';
+        }
+        $n = 0 + $s;
+        if ($n < 0) {
+            return '';
+        }
+
+        return (string) $n;
+    }
+
+    /**
+     * @param  array<string, mixed>  $raw
+     * @return array<string, mixed>
+     */
+    protected function normalizeStockBarFilters(array $raw): array
+    {
+        $toIntList = function ($v): array {
+            if (! is_array($v)) {
+                return [];
+            }
+            $ids = [];
+            foreach ($v as $id) {
+                $i = (int) $id;
+                if ($i > 0) {
+                    $ids[] = $i;
+                }
+            }
+
+            return array_values(array_unique($ids));
+        };
+
+        $allowedStatuses = ['Incoming', 'Pending Inspection', 'Available Stock', 'Booked', 'Sold', 'Delivered'];
+        $statuses = [];
+        if (isset($raw['stock_statuses']) && is_array($raw['stock_statuses'])) {
+            foreach ($raw['stock_statuses'] as $s) {
+                $label = trim((string) $s);
+                if (in_array($label, $allowedStatuses, true)) {
+                    $statuses[] = $label;
+                }
+            }
+        }
+        $statuses = array_values(array_unique($statuses));
+
+        return [
+            'po_numbers' => $this->splitStockFilterTokens($raw['po_numbers'] ?? []),
+            'so_numbers' => $this->splitStockFilterTokens($raw['so_numbers'] ?? []),
+            'grn_numbers' => $this->splitStockFilterTokens($raw['grn_numbers'] ?? []),
+            'vins' => $this->splitStockFilterTokens($raw['vins'] ?? []),
+            'brand_ids' => $toIntList($raw['brand_ids'] ?? []),
+            'model_line_ids' => $toIntList($raw['model_line_ids'] ?? []),
+            'variant_ids' => $toIntList($raw['variant_ids'] ?? []),
+            'location_ids' => $toIntList($raw['location_ids'] ?? []),
+            'sales_person_ids' => $toIntList($raw['sales_person_ids'] ?? []),
+            'stock_statuses' => $statuses,
+            'po_date_from' => isset($raw['po_date_from']) ? trim((string) $raw['po_date_from']) : '',
+            'po_date_to' => isset($raw['po_date_to']) ? trim((string) $raw['po_date_to']) : '',
+            'grn_date_from' => isset($raw['grn_date_from']) ? trim((string) $raw['grn_date_from']) : '',
+            'grn_date_to' => isset($raw['grn_date_to']) ? trim((string) $raw['grn_date_to']) : '',
+            'so_date_from' => isset($raw['so_date_from']) ? trim((string) $raw['so_date_from']) : '',
+            'so_date_to' => isset($raw['so_date_to']) ? trim((string) $raw['so_date_to']) : '',
+            'price_min' => $this->normalizeStockBarPriceScalar($raw['price_min'] ?? ''),
+            'price_max' => $this->normalizeStockBarPriceScalar($raw['price_max'] ?? ''),
+        ];
+    }
+
+    /**
+     * SQL expression for the stock "Status" column (must match Blade/DataTables render order).
+     * $reportMode: allstock | dpvehicles | delivered — same rules; available — Available Stock page rules.
+     */
+    protected function sqlStockReportComputedStatusCase(string $reportMode): string
+    {
+        if ($reportMode === 'available') {
+            return <<<'SQL'
+CASE
+  WHEN inspection_grn.id IS NULL AND vehicles.inspection_date IS NULL AND vehicles.gdn_id IS NULL AND vehicles.movement_grn_id IS NULL THEN 'Incoming'
+  WHEN inspection_grn.id IS NULL AND vehicles.inspection_date IS NULL AND vehicles.gdn_id IS NULL AND vehicles.movement_grn_id IS NOT NULL THEN 'Pending Inspection'
+  WHEN vehicles.inspection_date IS NOT NULL AND vehicles.so_id IS NULL AND (vehicles.reservation_end_date IS NULL OR vehicles.reservation_end_date < NOW()) THEN 'Available Stock'
+  WHEN vehicles.gdn_id IS NULL AND vehicles.so_id IS NULL AND vehicles.reservation_end_date IS NOT NULL AND vehicles.reservation_end_date >= NOW() THEN 'Booked'
+  WHEN vehicles.inspection_date IS NOT NULL AND vehicles.gdn_id IS NULL AND vehicles.so_id IS NOT NULL AND vehicles.movement_grn_id IS NOT NULL THEN 'Sold'
+  WHEN vehicles.inspection_date IS NOT NULL AND vehicles.gdn_id IS NOT NULL AND vehicles.movement_grn_id IS NOT NULL THEN 'Delivered'
+  ELSE ''
+END
+SQL;
+        }
+
+        return <<<'SQL'
+CASE
+  WHEN inspection_grn.id IS NULL AND vehicles.inspection_date IS NULL AND vehicles.gdn_id IS NULL AND vehicles.movement_grn_id IS NULL THEN 'Incoming'
+  WHEN inspection_grn.id IS NULL AND vehicles.inspection_date IS NULL AND vehicles.gdn_id IS NULL AND vehicles.movement_grn_id IS NOT NULL THEN 'Pending Inspection'
+  WHEN vehicles.inspection_date IS NOT NULL AND vehicles.gdn_id IS NULL AND vehicles.so_id IS NULL AND vehicles.movement_grn_id IS NOT NULL AND (vehicles.reservation_end_date IS NULL OR vehicles.reservation_end_date < NOW()) THEN 'Available Stock'
+  WHEN vehicles.gdn_id IS NULL AND vehicles.so_id IS NULL AND vehicles.reservation_end_date IS NOT NULL AND vehicles.reservation_end_date >= NOW() THEN 'Booked'
+  WHEN vehicles.inspection_date IS NOT NULL AND vehicles.gdn_id IS NULL AND vehicles.so_id IS NOT NULL AND vehicles.movement_grn_id IS NOT NULL THEN 'Sold'
+  WHEN vehicles.inspection_date IS NOT NULL AND vehicles.gdn_id IS NOT NULL AND vehicles.movement_grn_id IS NOT NULL THEN 'Delivered'
+  ELSE ''
+END
+SQL;
+    }
+
+    /**
+     * AND logic across all non-empty bar filter groups.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  array<string, mixed>  $bar
+     */
+    protected function applyStockBarFiltersToQuery($query, array $bar, string $stockReportMode = 'allstock'): void
+    {
+        if (count($bar['po_numbers'] ?? []) > 0) {
+            $query->whereIn('purchasing_order.po_number', $bar['po_numbers']);
+        }
+        if (count($bar['so_numbers'] ?? []) > 0) {
+            $query->whereIn('so.so_number', $bar['so_numbers']);
+        }
+        if (count($bar['grn_numbers'] ?? []) > 0) {
+            $query->whereIn('movement_grns.grn_number', $bar['grn_numbers']);
+        }
+        if (count($bar['vins'] ?? []) > 0) {
+            $query->whereIn('vehicles.vin', $bar['vins']);
+        }
+        if (count($bar['brand_ids'] ?? []) > 0) {
+            $query->whereIn('brands.id', $bar['brand_ids']);
+        }
+        if (count($bar['model_line_ids'] ?? []) > 0) {
+            $query->whereIn('master_model_lines.id', $bar['model_line_ids']);
+        }
+        if (count($bar['variant_ids'] ?? []) > 0) {
+            $query->whereIn('varaints.id', $bar['variant_ids']);
+        }
+        if (count($bar['location_ids'] ?? []) > 0) {
+            $query->whereIn('vehicles.latest_location', $bar['location_ids']);
+        }
+        if (count($bar['sales_person_ids'] ?? []) > 0) {
+            $query->whereIn('so.sales_person_id', $bar['sales_person_ids']);
+        }
+        $priceMin = $bar['price_min'] ?? '';
+        $priceMax = $bar['price_max'] ?? '';
+        if ($priceMin !== '') {
+            $query->where('vehicles.price', '>=', (float) $priceMin);
+        }
+        if ($priceMax !== '') {
+            $query->where('vehicles.price', '<=', (float) $priceMax);
+        }
+        $statusLabels = $bar['stock_statuses'] ?? [];
+        if (count($statusLabels) > 0) {
+            $caseMode = $stockReportMode === 'available' ? 'available' : 'allstock';
+            $caseSql = $this->sqlStockReportComputedStatusCase($caseMode);
+            $marks = implode(',', array_fill(0, count($statusLabels), '?'));
+            $query->whereRaw('('.$caseSql.') IN ('.$marks.')', $statusLabels);
+        }
+
+        foreach (['po_date' => 'purchasing_order.po_date', 'grn_date' => 'movements_reference.date', 'so_date' => 'so.so_date'] as $prefix => $column) {
+            $fromKey = $prefix === 'po_date' ? 'po_date_from' : ($prefix === 'grn_date' ? 'grn_date_from' : 'so_date_from');
+            $toKey = $prefix === 'po_date' ? 'po_date_to' : ($prefix === 'grn_date' ? 'grn_date_to' : 'so_date_to');
+            $from = $bar[$fromKey] ?? '';
+            $to = $bar[$toKey] ?? '';
+            if ($from !== '') {
+                try {
+                    $d = Carbon::parse($from)->startOfDay();
+                    $query->whereDate($column, '>=', $d);
+                } catch (\Throwable $e) {
+                }
+            }
+            if ($to !== '') {
+                try {
+                    $d = Carbon::parse($to)->endOfDay();
+                    $query->whereDate($column, '<=', $d);
+                } catch (\Throwable $e) {
+                }
+            }
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>|string|null  $input
+     * @return array<string, mixed>
+     */
+    protected function parseStockBarFiltersFromRequest($input): array
+    {
+        if ($input === null || $input === '') {
+            return $this->normalizeStockBarFilters([]);
+        }
+        if (is_string($input)) {
+            $decoded = json_decode($input, true);
+
+            return $this->normalizeStockBarFilters(is_array($decoded) ? $decoded : []);
+        }
+        if (! is_array($input)) {
+            return $this->normalizeStockBarFilters([]);
+        }
+
+        return $this->normalizeStockBarFilters($input);
+    }
+
+    /**
+     * COUNT(DISTINCT vehicles.id) on a stock-report style query (joins may duplicate rows).
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder  $query
+     */
+    protected function countDistinctStockVehicleIds($query): int
+    {
+        try {
+            $base = $query instanceof \Illuminate\Database\Eloquent\Builder ? $query->toBase() : $query;
+            $v = (clone $base)->selectRaw('COUNT(DISTINCT vehicles.id) as stock_diag_ct')->value('stock_diag_ct');
+
+            return (int) ($v ?? 0);
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+
+    /**
+     * When a multi-select bar filter has 2+ values, report which selections have zero rows
+     * vs which match, assuming all other bar filters stay the same (each value tested alone in that dimension).
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $baseQuery  After legacy column filters; before bar filters and groupBy.
+     * @return array<string, mixed>|null
+     */
+    protected function computeStockBarMultiSelectDiagnostics($baseQuery, array $bar, string $stockReportMode): ?array
+    {
+        $dims = [];
+        if (count($bar['model_line_ids'] ?? []) >= 2) {
+            $dims['model_lines'] = 'model_line_ids';
+        }
+        if (count($bar['variant_ids'] ?? []) >= 2) {
+            $dims['variants'] = 'variant_ids';
+        }
+        if (count($bar['brand_ids'] ?? []) >= 2) {
+            $dims['brands'] = 'brand_ids';
+        }
+        if (count($bar['location_ids'] ?? []) >= 2) {
+            $dims['locations'] = 'location_ids';
+        }
+        if (count($bar['sales_person_ids'] ?? []) >= 2) {
+            $dims['sales_persons'] = 'sales_person_ids';
+        }
+        if (count($bar['stock_statuses'] ?? []) >= 2) {
+            $dims['statuses'] = 'stock_statuses';
+        }
+
+        if ($dims === []) {
+            return null;
+        }
+
+        $mlNames = MasterModelLines::whereIn('id', $bar['model_line_ids'] ?? [])->pluck('model_line', 'id');
+        $variantNames = Varaint::whereIn('id', $bar['variant_ids'] ?? [])->pluck('name', 'id');
+        $brandNames = Brand::whereIn('id', $bar['brand_ids'] ?? [])->pluck('brand_name', 'id');
+        $whNames = Warehouse::whereIn('id', $bar['location_ids'] ?? [])->pluck('name', 'id');
+        $spNames = User::whereIn('id', $bar['sales_person_ids'] ?? [])->pluck('name', 'id');
+
+        $out = [];
+        foreach ($dims as $label => $barKey) {
+            $ids = $bar[$barKey] ?? [];
+            if (! is_array($ids) || count($ids) < 2) {
+                continue;
+            }
+            $rows = [];
+            foreach ($ids as $rawId) {
+                $partial = $bar;
+                if ($barKey === 'stock_statuses') {
+                    $partial[$barKey] = [trim((string) $rawId)];
+                } else {
+                    $partial[$barKey] = [(int) $rawId];
+                }
+                $q = clone $baseQuery;
+                $this->applyStockBarFiltersToQuery($q, $partial, $stockReportMode);
+                $n = $this->countDistinctStockVehicleIds($q);
+
+                $idOut = $barKey === 'stock_statuses' ? trim((string) $rawId) : (int) $rawId;
+                $nameOut = match ($label) {
+                    'model_lines' => (string) ($mlNames[$idOut] ?? $mlNames[(string) $idOut] ?? ('#'.$idOut)),
+                    'variants' => (string) ($variantNames[$idOut] ?? $variantNames[(string) $idOut] ?? ('#'.$idOut)),
+                    'brands' => (string) ($brandNames[$idOut] ?? $brandNames[(string) $idOut] ?? ('#'.$idOut)),
+                    'locations' => (string) ($whNames[$idOut] ?? $whNames[(string) $idOut] ?? ('#'.$idOut)),
+                    'sales_persons' => (string) ($spNames[$idOut] ?? $spNames[(string) $idOut] ?? ('#'.$idOut)),
+                    'statuses' => (string) $idOut,
+                };
+
+                $rows[] = [
+                    'id' => $idOut,
+                    'name' => $nameOut,
+                    'matches' => $n > 0,
+                    'count' => $n,
+                ];
+            }
+            $out[$label] = $rows;
+        }
+
+        return $out === [] ? null : $out;
+    }
+
     public function statuswise(Request $request)
     {
-        $useractivities = new UserActivities();
-        $useractivities->activity = "View the Stock Status Wise";
-        $useractivities->users_id = Auth::id();
-        $useractivities->save();
-        // Variant detail computation
-        $sales_persons = ModelHasRoles::join('users', 'model_has_roles.model_id', '=', 'users.id')
-            ->where('users.status', 'active')
-            ->where(function ($query) {
-                $query->where('model_has_roles.role_id', 7)
-                    ->orWhere('model_has_roles.model_id', 17);
-            })
-            ->orwhere('users.id', 40)
-            ->orderBy('users.name', 'asc')
-            ->get();
-        $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
-            ->orderBy('id', 'DESC')
-            ->whereNot('category', 'Modified')
-            ->get();
-        $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
-        $normalizationMap = [
-            'COO' => 'COO',
-            'SFX' => 'SFX',
-            'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
-            'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
-            'HeadLamp Type' => 'HeadLamp Type',
-            'infotainment type' => 'infotainment type',
-            'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
-            'Speakers' => 'Speakers',
-            'sunroof' => 'sunroof'
-        ];
-        foreach ($variants as $variant) {
-            if ($variant->category != 'Modified') {
-                $details = [];
-                $otherDetails = [];
-                foreach ($variant->variantItems as $item) {
-                    $modelSpecification = $item->model_specification;
-                    $modelSpecificationOption = $item->model_specification_option;
-                    if ($modelSpecification && $modelSpecificationOption) {
-                        $name = $modelSpecification->name;
-                        $optionName = $modelSpecificationOption->name;
-                        $normalized = null;
-                        foreach ($normalizationMap as $key => $values) {
-                            if (is_array($values)) {
-                                if (in_array($name, $values)) {
+        if (!$request->ajax()) {
+            $useractivities = new UserActivities();
+            $useractivities->activity = "View the Stock Status Wise";
+            $useractivities->users_id = Auth::id();
+            $useractivities->save();
+            // Variant detail computation (full page load only — skip on DataTables XHR)
+            $sales_persons = ModelHasRoles::join('users', 'model_has_roles.model_id', '=', 'users.id')
+                ->where('users.status', 'active')
+                ->where(function ($query) {
+                    $query->where('model_has_roles.role_id', 7)
+                        ->orWhere('model_has_roles.model_id', 17);
+                })
+                ->orwhere('users.id', 40)
+                ->orderBy('users.name', 'asc')
+                ->get();
+            $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
+                ->orderBy('id', 'DESC')
+                ->whereNot('category', 'Modified')
+                ->get();
+            $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
+            $normalizationMap = [
+                'COO' => 'COO',
+                'SFX' => 'SFX',
+                'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
+                'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
+                'HeadLamp Type' => 'HeadLamp Type',
+                'infotainment type' => 'infotainment type',
+                'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
+                'Speakers' => 'Speakers',
+                'sunroof' => 'sunroof'
+            ];
+            foreach ($variants as $variant) {
+                if ($variant->category != 'Modified') {
+                    $details = [];
+                    $otherDetails = [];
+                    foreach ($variant->variantItems as $item) {
+                        $modelSpecification = $item->model_specification;
+                        $modelSpecificationOption = $item->model_specification_option;
+                        if ($modelSpecification && $modelSpecificationOption) {
+                            $name = $modelSpecification->name;
+                            $optionName = $modelSpecificationOption->name;
+                            $normalized = null;
+                            foreach ($normalizationMap as $key => $values) {
+                                if (is_array($values)) {
+                                    if (in_array($name, $values)) {
+                                        $normalized = $key;
+                                        break;
+                                    }
+                                } elseif ($name === $values) {
                                     $normalized = $key;
                                     break;
                                 }
-                            } elseif ($name === $values) {
-                                $normalized = $key;
-                                break;
                             }
-                        }
 
-                        if ($normalized) {
-                            $name = $normalized;
-                        }
-                        if (in_array(strtolower($optionName), ['yes', 'no'])) {
-                            if (strtolower($optionName) === 'yes') {
-                                $optionName = $name;
-                            } else {
-                                continue;
+                            if ($normalized) {
+                                $name = $normalized;
                             }
-                        }
-                        if (in_array($name, $sequence)) {
-                            $index = array_search($name, $sequence);
-                            $details[$index] = $optionName;
-                        } else {
-                            $otherDetails[] = $optionName;
+                            if (in_array(strtolower($optionName), ['yes', 'no'])) {
+                                if (strtolower($optionName) === 'yes') {
+                                    $optionName = $name;
+                                } else {
+                                    continue;
+                                }
+                            }
+                            if (in_array($name, $sequence)) {
+                                $index = array_search($name, $sequence);
+                                $details[$index] = $optionName;
+                            } else {
+                                $otherDetails[] = $optionName;
+                            }
                         }
                     }
+                    ksort($details);
+                    $variant->detail = implode(', ', array_merge($details, $otherDetails));
+                    $variant->save();
                 }
-                ksort($details);
-                $variant->detail = implode(', ', array_merge($details, $otherDetails));
-                $variant->save();
             }
         }
         $canViewVehicleCost = Auth::id() === 17;
         if ($request->ajax()) {
+            $data = null;
+            $stockBarDiag = null;
             $status = $request->input('status');
-            $filters = $request->input('filters', []);
+            $filtersRaw = $request->input('filters', []);
+            $filters = [];
+            foreach ($filtersRaw as $columnName => $values) {
+                if (!is_string($columnName) || $columnName === '') {
+                    continue;
+                }
+                if (!is_array($values)) {
+                    if ($values === null || $values === '') {
+                        continue;
+                    }
+                    $values = [$values];
+                }
+                if (count($values) === 0) {
+                    continue;
+                }
+                $filters[$columnName] = $values;
+            }
             if ($status === "allstock") {
                 $data = Vehicles::select([
                     'vehicles.id',
@@ -2885,7 +3316,7 @@ class VehiclesController extends Controller
                     'bp.name as bpn',
                     'sp.name as spn',
                     DB::raw("DATE_FORMAT(work_orders.date, '%Y-%m-%d') as work_order_date"),
-                    DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
+                    DB::raw('MAX(COALESCE(sm.message_count, 0)) as message_count'),
                     'so.so_date',
                     'movements_reference.date',
                     'gdn.date as gdndate',
@@ -2925,26 +3356,54 @@ class VehiclesController extends Controller
                         $join->on('vehicles.id', '=', 'inspection_pdi.vehicle_id')
                             ->where('inspection_pdi.stage', '=', 'PDI');
                     })
+                    ->leftJoinSub(
+                        DB::table('stock_message')
+                            ->select('vehicle_id', DB::raw('COUNT(*) as message_count'))
+                            ->groupBy('vehicle_id'),
+                        'sm',
+                        'vehicles.id',
+                        '=',
+                        'sm.vehicle_id'
+                    )
                     ->where('vehicles.status', 'Approved');
-                
 
-                
                 foreach ($filters as $columnName => $values) {
-                    if (in_array('__NULL__', $values)) {
+                    if (in_array('__NULL__', $values, true)) {
                         $data->whereNull($columnName); // Filter for NULL values
-                    } elseif (in_array('__Not EMPTY__', $values)) {
+                    } elseif (in_array('__Not EMPTY__', $values, true)) {
                         $data->whereNotNull($columnName); // Filter for non-empty values
                     } else {
                         $data->whereIn($columnName, $values); // Regular filtering for selected values
                     }
                 }
+                $barParsed = $this->parseStockBarFiltersFromRequest($request->input('bar_filters'));
+                $stockBarDiag = $this->computeStockBarMultiSelectDiagnostics($data, $barParsed, 'allstock');
+                $this->applyStockBarFiltersToQuery($data, $barParsed, 'allstock');
                 $data = $data->groupBy('vehicles.id');
             }
             if ($data) {
-                return DataTables::of($data)->toJson();
+                return DataTables::of($data)
+                    ->filter(function ($query) use ($request) {
+                        $this->applyStockReportGlobalSearchToQuery($query, $request->input('search.value'), 'allstock');
+                    }, false)
+                    ->with('stock_bar_diagnostics', $stockBarDiag)
+                    ->toJson();
             }
+
+            return response()->json([
+                'draw' => (int) $request->input('draw', 0),
+                'recordsTotal' => 0,
+                'recordsFiltered' => 0,
+                'data' => [],
+            ]);
         }
-        return view('vehicles.stock', ['salesperson' => $sales_persons]);
+        return view('vehicles.stock', array_merge(
+            [
+                'salesperson' => $sales_persons,
+                'stockFilterSalespeople' => $sales_persons,
+            ],
+            $this->loadStockReportFilterOptions()
+        ));
     }
     public function generategrnPDF(Request $request)
     {
@@ -3688,9 +4147,10 @@ class VehiclesController extends Controller
         }
         $canViewVehicleCost = Auth::id() === 17;
         if ($request->ajax()) {
+            $data = null;
+            $stockBarDiag = null;
             $status = $request->input('status');
             $filters = $request->input('filters', []);
-            \Log::info("Received Filters: ", $filters);
             if ($status === "Available Stock") {
                 $data = Vehicles::select([
                     'vehicles.id as id',
@@ -3789,13 +4249,27 @@ class VehiclesController extends Controller
                         $data->whereIn($columnName, $values); // Regular filtering for selected values
                     }
                 }
+                $barParsed = $this->parseStockBarFiltersFromRequest($request->input('bar_filters'));
+                $stockBarDiag = $this->computeStockBarMultiSelectDiagnostics($data, $barParsed, 'available');
+                $this->applyStockBarFiltersToQuery($data, $barParsed, 'available');
                 $data = $data->groupBy('vehicles.id');
             }
             if ($data) {
-                return DataTables::of($data)->toJson();
+                return DataTables::of($data)
+                    ->filter(function ($query) use ($request) {
+                        $this->applyStockReportGlobalSearchToQuery($query, $request->input('search.value'), 'available');
+                    }, false)
+                    ->with('stock_bar_diagnostics', $stockBarDiag)
+                    ->toJson();
             }
         }
-        return view('vehicles.available', ['salesperson' => $sales_persons]);
+        return view('vehicles.available', array_merge(
+            [
+                'salesperson' => $sales_persons,
+                'stockFilterSalespeople' => $sales_persons,
+            ],
+            $this->loadStockReportFilterOptions()
+        ));
     }
     public function deliveredvehicles(Request $request)
     {
@@ -3878,6 +4352,8 @@ class VehiclesController extends Controller
         }
         $canViewVehicleCost = Auth::id() === 17;
         if ($request->ajax()) {
+            $data = null;
+            $stockBarDiag = null;
             $status = $request->input('status');
             $filters = $request->input('filters', []);
             if ($status === "Delivered") {
@@ -3978,13 +4454,27 @@ class VehiclesController extends Controller
                         $data->whereIn($columnName, $values); // Regular filtering for selected values
                     }
                 }
+                $barParsed = $this->parseStockBarFiltersFromRequest($request->input('bar_filters'));
+                $stockBarDiag = $this->computeStockBarMultiSelectDiagnostics($data, $barParsed, 'delivered');
+                $this->applyStockBarFiltersToQuery($data, $barParsed, 'delivered');
                 $data = $data->groupBy('vehicles.id');
             }
             if ($data) {
-                return DataTables::of($data)->toJson();
+                return DataTables::of($data)
+                    ->filter(function ($query) use ($request) {
+                        $this->applyStockReportGlobalSearchToQuery($query, $request->input('search.value'), 'delivered');
+                    }, false)
+                    ->with('stock_bar_diagnostics', $stockBarDiag)
+                    ->toJson();
             }
         }
-        return view('vehicles.delivered', ['salesperson' => $sales_persons]);
+        return view('vehicles.delivered', array_merge(
+            [
+                'salesperson' => $sales_persons,
+                'stockFilterSalespeople' => $sales_persons,
+            ],
+            $this->loadStockReportFilterOptions()
+        ));
     }
     public function dpvehicles(Request $request)
     {
@@ -4065,6 +4555,8 @@ class VehiclesController extends Controller
         }
         $canViewVehicleCost = Auth::id() === 17;
         if ($request->ajax()) {
+            $data = null;
+            $stockBarDiag = null;
             $status = $request->input('status');
             $filters = $request->input('filters', []);
             if ($status === "dpvehicles") {
@@ -4166,13 +4658,27 @@ class VehiclesController extends Controller
                         $data->whereIn($columnName, $values); // Regular filtering for selected values
                     }
                 }
+                $barParsed = $this->parseStockBarFiltersFromRequest($request->input('bar_filters'));
+                $stockBarDiag = $this->computeStockBarMultiSelectDiagnostics($data, $barParsed, 'dpvehicles');
+                $this->applyStockBarFiltersToQuery($data, $barParsed, 'dpvehicles');
                 $data = $data->groupBy('vehicles.id');
             }
             if ($data) {
-                return DataTables::of($data)->toJson();
+                return DataTables::of($data)
+                    ->filter(function ($query) use ($request) {
+                        $this->applyStockReportGlobalSearchToQuery($query, $request->input('search.value'), 'dpvehicles');
+                    }, false)
+                    ->with('stock_bar_diagnostics', $stockBarDiag)
+                    ->toJson();
             }
         }
-        return view('vehicles.demandplaninigstock', ['salesperson' => $sales_persons]);
+        return view('vehicles.demandplaninigstock', array_merge(
+            [
+                'salesperson' => $sales_persons,
+                'stockFilterSalespeople' => $sales_persons,
+            ],
+            $this->loadStockReportFilterOptions()
+        ));
     }
     public function savesalesremarks(Request $request)
     {

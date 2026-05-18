@@ -357,8 +357,8 @@ table.dataTable thead th select {
                         <label for="user_id">Sales Person</label>
                         <select class="form-control" id="salesperson" name="salesperson" required>
                         <option value="" disabled selected>Select the Sales Person</option>
-                        @foreach($salesperson as $salesperson)
-                                <option value="{{ $salesperson->id }}">{{ $salesperson->name }}</option>
+                        @foreach($salesperson as $sp)
+                                <option value="{{ $sp->id }}">{{ $sp->name }}</option>
                             @endforeach
 
                         </select>
@@ -558,6 +558,7 @@ table.dataTable thead th select {
         <i class="bi bi-upload"></i> Upload ETA CSV
     </button>
     @endif
+@include('vehicles.partials.stock-advanced-filter-bar', ['stockFilterBarTableId' => 'dtBasicExample7'])
 <div class="table-responsive" style="height: 80vh;">
             <table id="dtBasicExample7" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
@@ -713,7 +714,11 @@ table.dataTable thead th select {
         data: null,
         name: 'serial_number',
         render: function (data, type, row, meta) {
-            return meta.row + 1;  // This will calculate the serial number based on the row index (meta.row) + 1
+            if (type === 'display' || type === 'filter') {
+                var api = new $.fn.dataTable.Api(meta.settings);
+                return api.page.info().start + meta.row + 1;
+            }
+            return meta.row + 1;
         },
         orderable: false,  // Disable ordering for this column
         searchable: false  // Disable searching for this column
@@ -1141,12 +1146,15 @@ if (canViewVehicleCost) {
           processing: true,
             serverSide: true,
             columns: columns7,
+            order: [[1, 'asc']],
             ajax: {
         url: "{{ route('vehicles.statuswise', ['status' => 'allstock']) }}",
         type: "POST",
         data: function (d) {
+                d.status = 'allstock';
                 d.filters = {};  // Initialize an empty filters object
-
+                d.bar_filters = (window.stockBarCommitted && window.stockBarCommitted['dtBasicExample7'])
+                    ? window.stockBarCommitted['dtBasicExample7'] : {};
 
 
                 $('#dtBasicExample7 thead select').each(function () {
@@ -1168,8 +1176,10 @@ if (canViewVehicleCost) {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     },
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-            pageLength: -1,
+            lengthMenu: [[25, 50, 100, 200, 500], [25, 50, 100, 200, 500]],
+            pageLength: 50,
+            dom: '<"row align-items-center mb-2"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rtip',
+            searchDelay: 450,
             columnDefs: [
         {
             targets: 1,
@@ -1192,10 +1202,15 @@ if (canViewVehicleCost) {
             }
         }
     ],
-    pageLength: -1,
             colReorder: true,
             initComplete: function () {
     var api = this.api();
+    $(api.table().container()).find('.dataTables_filter input')
+        .addClass('form-control form-control-sm')
+        .attr('placeholder', 'Search PO, VIN, brand, model, status, SO, GRN…');
+    if (window.stockBarBindTableSummary) {
+        window.stockBarBindTableSummary('dtBasicExample7');
+    }
     // For each column in the table, create a dropdown filter
     api.columns().every(function (index) {
         var column = this;
