@@ -1314,10 +1314,18 @@ class SalesOrderController extends Controller
 
     public function updatesalesorder($id)
     {
+        $calls = Calls::findOrFail($id);
         $quotation = Quotation::where('calls_id', $id)->first();
-        $calls = Calls::find($id);
+
+        if (!$quotation) {
+            return redirect()->route('salesorder.index')->with('error', 'Quotation not found for this lead.');
+        }
 
         $sodetails = So::where('quotation_id', $quotation->id)->first();
+
+        if (!$sodetails) {
+            return redirect()->route('salesorder.index')->with('error', 'Sales order not found for this quotation.');
+        }
 
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access')
             || Auth::user()->hasPermissionForSelectedRole('sales-view');
@@ -1431,7 +1439,7 @@ class SalesOrderController extends Controller
         $totalVehicles = $quotationItems->sum('quantity');
         $variants = Varaint::select('id', 'name')->get();
         // return $quotationItems;
-        return view('salesorder.update', compact('vehicles', 'variants', 'totalVehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails', 'so', 'soitems', 'empProfile', 'saleperson'));
+        return view('salesorder.update', compact('vehicles', 'variants', 'totalVehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails', 'sodetails', 'soitems', 'empProfile', 'saleperson'));
     }
 
     public function storesalesorderupdate(Request $request, $quotationId)

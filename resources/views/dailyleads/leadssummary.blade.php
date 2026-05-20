@@ -417,8 +417,12 @@ table.dataTable thead th select {
                 data: 'calls_id',
                 name: 'quotations.calls_id',
                 searchable: false,
+                orderable: false,
                 render: function (data, type, row) {
-                    const updatesaleorder = `{{ url('salesorder/update') }}/${data}`;
+                    if (!data || !row.soid) {
+                        return '';
+                    }
+                    const updatesaleorder = `{{ route('salesorder.updatesalesorder', ':id') }}`.replace(':id', data);
                     return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
                 }
             },
