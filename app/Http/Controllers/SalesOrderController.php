@@ -143,16 +143,12 @@ class SalesOrderController extends Controller
     public function viewQuotations($id)
     {
         try {
-            $so = SO::findOrFail($id);
+            $so = So::findOrFail($id);
             $quotation = Quotation::findOrFail($so->quotation_id);
             $quotationVersionFiles = QuotationFile::where('quotation_id', $so->quotation_id)->get();
             $quotationDetail = QuotationDetail::with(['country', 'shippingPort', 'shippingPortOfLoad', 'paymentterms'])
                 ->where('quotation_id', $quotation->id)
                 ->first();
-            
-            if (!$quotationDetail) {
-                return redirect()->back()->with('error', 'Quotation details not found.');
-            }
 
             $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first();
             $call = Calls::findOrFail($quotation->calls_id);
@@ -167,7 +163,7 @@ class SalesOrderController extends Controller
             ));
         } catch (\Exception $e) {
             \Log::error('Error in viewQuotations: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'An error occurred while loading the quotation versions.');
+            return redirect()->route('salesorder.index')->with('error', 'Could not load quotation versions for this sales order.');
         }
     }
 
@@ -1314,17 +1310,27 @@ class SalesOrderController extends Controller
 
     public function updatesalesorder($id)
     {
-        $calls = Calls::findOrFail($id);
-        $quotation = Quotation::where('calls_id', $id)->first();
+        // $id is the SO id from the listing (legacy URLs may still pass calls_id)
+        $sodetails = So::find($id);
 
-        if (!$quotation) {
-            return redirect()->route('salesorder.index')->with('error', 'Quotation not found for this lead.');
-        }
+        if ($sodetails) {
+            $quotation = Quotation::findOrFail($sodetails->quotation_id);
+            $calls = Calls::findOrFail($quotation->calls_id);
+        } else {
+            $calls = Calls::findOrFail($id);
+            $quotation = Quotation::where('calls_id', $id)
+                ->whereIn('id', So::whereNotNull('quotation_id')->pluck('quotation_id'))
+                ->first();
 
-        $sodetails = So::where('quotation_id', $quotation->id)->first();
+            if (!$quotation) {
+                return redirect()->route('salesorder.index')->with('error', 'Quotation not found for this lead.');
+            }
 
-        if (!$sodetails) {
-            return redirect()->route('salesorder.index')->with('error', 'Sales order not found for this quotation.');
+            $sodetails = So::where('quotation_id', $quotation->id)->first();
+
+            if (!$sodetails) {
+                return redirect()->route('salesorder.index')->with('error', 'Sales order not found for this quotation.');
+            }
         }
 
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access')
