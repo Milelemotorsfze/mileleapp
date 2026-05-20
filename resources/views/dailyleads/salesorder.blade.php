@@ -411,6 +411,7 @@ table.dataTable thead th select {
     var dataTable8 = $('#dtBasicExample3').DataTable({
         processing: true,
         serverSide: true,
+        order: [[1, 'desc']],
         ajax: "{{ route('salesorder.index', ['status' => 'SalesOrder']) }}",
         columns: [
             { data: 'so_number', name: 'so.so_number' },
