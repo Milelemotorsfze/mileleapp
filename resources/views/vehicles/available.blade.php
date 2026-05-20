@@ -1184,8 +1184,8 @@ if (canViewVehicleCost) {
     },
     columns: columns3,
     order: window.stockReportOrderByPoDate(columns3),
-    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-    pageLength: -1,
+    lengthMenu: [[25, 50, 100, 200, 500], [25, 50, 100, 200, 500]],
+    pageLength: 50,
     dom: '<"row align-items-center mb-2"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rtip',
     searchDelay: 450,
     columnDefs: [

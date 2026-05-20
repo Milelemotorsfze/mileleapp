@@ -1006,7 +1006,7 @@ if (hasPricePermission) {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     },
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            lengthMenu: [[25, 50, 100, 200, 500], [25, 50, 100, 200, 500]],
             columnDefs: [
         {
             targets: 1,
@@ -1029,7 +1029,7 @@ if (hasPricePermission) {
             }
         }
     ],
-    pageLength: -1,
+    pageLength: 50,
     dom: '<"row align-items-center mb-2"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rtip',
     searchDelay: 450,
     colReorder: true,
