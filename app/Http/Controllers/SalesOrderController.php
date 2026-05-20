@@ -84,7 +84,11 @@ class SalesOrderController extends Controller
                     ->groupBy('so.id');
 
                 if (!$hasPermission) {
-                    $query->where('calls.sales_person', $id);
+                    // SO ownership is on so.sales_person_id (from quotation), not calls.sales_person
+                    $query->where(function ($q) use ($id) {
+                        $q->where('so.sales_person_id', $id)
+                            ->orWhere('quotations.created_by', $id);
+                    });
                 }
 
                 // Handle dynamic sorting
@@ -101,13 +105,14 @@ class SalesOrderController extends Controller
                 ];
 
                 $orderColumnIndex = $request->input('order.0.column'); // Column index from request
-                $orderDirection = $request->input('order.0.dir', 'asc'); // Sort direction (asc/desc)
+                $orderDirection = $request->input('order.0.dir', 'desc'); // Sort direction (asc/desc)
 
                 // Default to sorting by `so.so_date` if index is invalid
                 $orderColumn = $columns[$orderColumnIndex] ?? 'so.so_date';
 
-                // Apply the sorting dynamically
-                $query->orderBy($orderColumn, $orderDirection);
+                // Apply the sorting dynamically (newest SOs first by default)
+                $query->orderBy($orderColumn, $orderDirection)
+                    ->orderBy('so.id', 'desc');
 
                 return DataTables::of($query)->toJson();
             }
