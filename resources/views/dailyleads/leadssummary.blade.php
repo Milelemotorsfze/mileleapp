@@ -419,10 +419,10 @@ table.dataTable thead th select {
                 searchable: false,
                 orderable: false,
                 render: function (data, type, row) {
-                    if (!data || !row.soid) {
+                    if (!row.soid) {
                         return '';
                     }
-                    const updatesaleorder = `{{ route('salesorder.updatesalesorder', ':id') }}`.replace(':id', data);
+                    const updatesaleorder = `{{ route('salesorder.updatesalesorder', ':id') }}`.replace(':id', row.soid);
                     return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
                 }
             },
