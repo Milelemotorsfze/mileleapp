@@ -2753,6 +2753,20 @@ class VehiclesController extends Controller
     }
 
     /**
+     * Shared Yajra DataTable JSON for stock report pages (same filter/diagnostics as before refactor).
+     * Default PO-date sort is set client-side via DataTables `order` + column name.
+     */
+    protected function makeStockReportDataTable($query, Request $request, ?array $stockBarDiag, string $reportKey)
+    {
+        return DataTables::of($query)
+            ->filter(function ($q) use ($request, $reportKey) {
+                $this->applyStockReportGlobalSearchToQuery($q, $request->input('search.value'), $reportKey);
+            }, false)
+            ->with('stock_bar_diagnostics', $stockBarDiag)
+            ->toJson();
+    }
+
+    /**
      * Global text search for stock report DataTables (OR across key columns).
      * Used with Yajra filter(..., false) so default global search does not run on grouped/joined queries.
      */
@@ -3382,12 +3396,7 @@ SQL;
                 $data = $data->groupBy('vehicles.id');
             }
             if ($data) {
-                return DataTables::of($data)
-                    ->filter(function ($query) use ($request) {
-                        $this->applyStockReportGlobalSearchToQuery($query, $request->input('search.value'), 'allstock');
-                    }, false)
-                    ->with('stock_bar_diagnostics', $stockBarDiag)
-                    ->toJson();
+                return $this->makeStockReportDataTable($data, $request, $stockBarDiag, 'allstock');
             }
 
             return response()->json([
@@ -4255,12 +4264,7 @@ SQL;
                 $data = $data->groupBy('vehicles.id');
             }
             if ($data) {
-                return DataTables::of($data)
-                    ->filter(function ($query) use ($request) {
-                        $this->applyStockReportGlobalSearchToQuery($query, $request->input('search.value'), 'available');
-                    }, false)
-                    ->with('stock_bar_diagnostics', $stockBarDiag)
-                    ->toJson();
+                return $this->makeStockReportDataTable($data, $request, $stockBarDiag, 'available');
             }
         }
         return view('vehicles.available', array_merge(
@@ -4460,12 +4464,7 @@ SQL;
                 $data = $data->groupBy('vehicles.id');
             }
             if ($data) {
-                return DataTables::of($data)
-                    ->filter(function ($query) use ($request) {
-                        $this->applyStockReportGlobalSearchToQuery($query, $request->input('search.value'), 'delivered');
-                    }, false)
-                    ->with('stock_bar_diagnostics', $stockBarDiag)
-                    ->toJson();
+                return $this->makeStockReportDataTable($data, $request, $stockBarDiag, 'delivered');
             }
         }
         return view('vehicles.delivered', array_merge(
@@ -4664,12 +4663,7 @@ SQL;
                 $data = $data->groupBy('vehicles.id');
             }
             if ($data) {
-                return DataTables::of($data)
-                    ->filter(function ($query) use ($request) {
-                        $this->applyStockReportGlobalSearchToQuery($query, $request->input('search.value'), 'dpvehicles');
-                    }, false)
-                    ->with('stock_bar_diagnostics', $stockBarDiag)
-                    ->toJson();
+                return $this->makeStockReportDataTable($data, $request, $stockBarDiag, 'dpvehicles');
             }
         }
         return view('vehicles.demandplaninigstock', array_merge(

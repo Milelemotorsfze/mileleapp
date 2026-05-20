@@ -978,6 +978,7 @@ if (hasPricePermission) {
           processing: true,
             serverSide: true,
             columns: columns9,
+            order: window.stockReportOrderByPoDate(columns9),
             ajax: {
         url: "{{ route('vehicles.dpvehicles', ['status' => 'dpvehicles']) }}",
         type: "POST",
