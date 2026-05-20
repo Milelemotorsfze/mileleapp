@@ -203,8 +203,7 @@ class DailyleadsController extends Controller
                     'calls.location',
                     'calls.language',
                     'calls.csr_price',
-                    'master_model_lines.model_line',
-                    'brands.brand_name',
+                    DB::raw("GROUP_CONCAT(DISTINCT CONCAT(IFNULL(brands.brand_name, ''), ' - ', IFNULL(master_model_lines.model_line, '')) SEPARATOR ', ') as model_line"),
                     'calls.created_at',
                     DB::raw("sales_person_user.name as sales_person_name"),
                     DB::raw("created_by_user.name as created_by_name")
@@ -240,9 +239,11 @@ class DailyleadsController extends Controller
                     });
                 }
             
-                $activelead = $activelead->groupBy('calls.id');
-            
-                return DataTables::of($activelead)->toJson(); 
+                $activelead = $activelead->groupBy('calls.id')
+                    ->orderBy('calls.created_at', 'desc')
+                    ->orderBy('calls.id', 'desc');
+
+                return DataTables::of($activelead->get())->toJson();
             }
             
             else if($status === "bulkleads")
@@ -259,15 +260,14 @@ class DailyleadsController extends Controller
                     'calls.location',
                     'calls.created_by',
                     'calls.sales_person',
-                    'users.name as createdby',
                     'calls.language',
                     'calls.csr_price',
-                    'master_model_lines.model_line',
-                    'brands.brand_name',
+                    DB::raw("GROUP_CONCAT(DISTINCT CONCAT(IFNULL(brands.brand_name, ''), ' - ', IFNULL(master_model_lines.model_line, '')) SEPARATOR ', ') as model_line"),
+                    DB::raw('created_by_user.name as createdby'),
                     'calls.created_at',
                 ])
                 ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
-                ->leftJoin('users', 'calls.sales_person', '=', 'users.id')
+                ->leftJoin('users as created_by_user', 'calls.created_by', '=', 'created_by_user.id')
                 ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
                 ->whereNotNull('calls.leadtype');
@@ -302,14 +302,16 @@ class DailyleadsController extends Controller
                             ->orWhere('calls.remarks', 'LIKE', "%$searchValue%")
                             ->orWhere('calls.type', 'LIKE', "%$searchValue%")
                             ->orWhere('brands.brand_name', 'LIKE', "%$searchValue%")
-                            ->orWhere('users.name', 'LIKE', "%$searchValue%")
+                            ->orWhere('created_by_user.name', 'LIKE', "%$searchValue%")
                             ->orWhere('master_model_lines.model_line', 'LIKE', "%$searchValue%");
                     });
                 }
                         
-                $bulkleads = $bulkleads->groupBy('calls.id');
-            
-                return DataTables::of($bulkleads)->toJson();   
+                $bulkleads = $bulkleads->groupBy('calls.id')
+                    ->orderBy('calls.created_at', 'desc')
+                    ->orderBy('calls.id', 'desc');
+
+                return DataTables::of($bulkleads->get())->toJson();
             }
             
             else
@@ -317,7 +319,7 @@ class DailyleadsController extends Controller
             $searchValue = $request->input('search.value');
             $data = Calls::select([
                 'calls.id',
-                DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d') as created_at"),
+                'calls.created_at',
                 'calls.type',
                 'calls.name',
                 'calls.phone',
@@ -326,18 +328,20 @@ class DailyleadsController extends Controller
                 'calls.created_by',
                 'calls.location',
                 'calls.language',
-                'calls.remarks'
+                'calls.remarks',
+                'calls.csr_price',
+                'calls.csr_currency',
             ]);            
             if($status === "Prospecting")
             {
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
                 if($hasPermission)
                 {
-                    $data->whereIn('calls.status', ['Prospecting', 'New Demand'])->orderBy('created_at', 'desc');
+                    $data->whereIn('calls.status', ['Prospecting', 'New Demand']);
                 }
                 else
                 {
-                    $data->whereIn('calls.status', ['Prospecting', 'New Demand'])->where('sales_person', $id)->orderBy('created_at', 'desc');
+                    $data->whereIn('calls.status', ['Prospecting', 'New Demand'])->where('sales_person', $id);
                 }
             }
             else
@@ -345,12 +349,12 @@ class DailyleadsController extends Controller
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
                 if($hasPermission)
                 {
-                    $data->where('calls.status', $status)->orderBy('created_at', 'desc');
+                    $data->where('calls.status', $status);
                 
                 }
                 else
                 {
-                    $data->where('calls.status', $status)->whereNull('calls.leadtype')->where('sales_person', $id)->orderBy('created_at', 'desc');
+                    $data->where('calls.status', $status)->whereNull('calls.leadtype')->where('sales_person', $id);
                 }
             }
             // $data->addSelect(DB::raw('(SELECT GROUP_CONCAT(CONCAT(brands.brand_name, " - ", master_model_lines.model_line) SEPARATOR ", ") FROM calls_requirement
@@ -630,10 +634,13 @@ class DailyleadsController extends Controller
 
             
             }
-            $data->groupBy('calls.id');
-            $results = $data->get();
+            $data->groupBy('calls.id')
+                ->orderBy('calls.created_at', 'desc')
+                ->orderBy('calls.id', 'desc');
 
             try {
+                $results = $data->get();
+
                 return DataTables::of($results)
                     ->addColumn('models_brands', function ($row) {
                         return $row->models_brands ?? '';
@@ -1447,4 +1454,5 @@ public function tasksupdateStatus(Request $request)
             return response()->json(['success' => false, 'message' => 'Failed to update status.']);
         }
     }
+
 }
