@@ -2042,15 +2042,9 @@ function saveRejection() {
         const val = $(this).val().filter(Boolean); 
         let safePattern;
       if (['created_at', 'qdate', 'date', 'ddate', 'rdate', 'cdate', 'ndate', 'date_formatted'].includes(colKey)) {
-          safePattern = val
-            .map(v => v.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'))
-            .join('|');
-          column.search(safePattern, true, false).draw();
+          column.search(val.join('|'), false, false).draw();
         } else {
-          safePattern = val
-            .map(v => '^' + v.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '$')
-            .join('|');
-          column.search(safePattern, true, false).draw();
+          column.search(val.join('|'), false, false).draw();
         }
       });
 
@@ -2207,15 +2201,17 @@ function formatRemarks(rawData, limit = 20, csrPrice = null, csrCurrency = 'AED'
 
 <script>
 let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
+    const leadsTableDefaultOrder = [[0, 'desc']];
     $(document).ready(function () {
         dataTable2 = $('#dtBasicExample2').DataTable({
             processing: true,
             serverSide: true,
+            order: leadsTableDefaultOrder,
             ajax: "{{ route('dailyleads.index', ['status' => 'Prospecting']) }}",
             columns: [
               {
             data: 'created_at',
-            name: 'created_at',
+            name: 'calls.created_at',
              render: function (data, type, row) {
         if (type === 'display' || type === 'filter') {
             if (!data || !moment(data).isValid()) {
@@ -2394,11 +2390,12 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         dataTable3 = $('#dtBasicExample3').DataTable({
             processing: true,
             serverSide: true,
+            order: leadsTableDefaultOrder,
             ajax: "{{ route('dailyleads.index', ['status' => 'New Demand']) }}",
             columns: [
               {
             data: 'created_at',
-            name: 'created_at',
+            name: 'calls.created_at',
              render: function (data, type, row) {
         if (type === 'display' || type === 'filter') {
             if (!data || !moment(data).isValid()) {
@@ -2541,11 +2538,12 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
        const dataTable4 = $('#dtBasicExample4').DataTable({
             processing: true,
             serverSide: true,
+            order: leadsTableDefaultOrder,
             ajax: "{{ route('dailyleads.index', ['status' => 'Quoted']) }}",
             columns: [
               {
                 data: 'created_at',
-                name: 'created_at',
+                name: 'calls.created_at',
                 render: function (data, type, row) {
                   if (type === 'display' || type === 'filter') {
                     if (!data || !moment(data).isValid()) {
@@ -2775,11 +2773,12 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
        dataTable5 =  $('#dtBasicExample5').DataTable({
             processing: true,
             serverSide: true,
+            order: leadsTableDefaultOrder,
             ajax: "{{ route('dailyleads.index', ['status' => 'Negotiation']) }}",
             columns: [
               {
             data: 'created_at',
-            name: 'created_at',
+            name: 'calls.created_at',
              render: function (data, type, row) {
         if (type === 'display' || type === 'filter') {
             if (!data || !moment(data).isValid()) {
@@ -3017,11 +3016,12 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
        const dataTable7 = $('#dtBasicExample7').DataTable({
         processing: true,
         serverSide: true,
+        order: leadsTableDefaultOrder,
         ajax: "{{ route('dailyleads.index', ['status' => 'Rejected']) }}",
         columns: [
           {
           data: 'created_at',
-          name: 'created_at',
+                name: 'calls.created_at',
           render: function (data, type, row) {
         if (type === 'display' || type === 'filter') {
             if (!data || !moment(data).isValid()) {
@@ -3245,6 +3245,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
        const dataTable8 = $('#dtBasicExample8').DataTable({
         processing: true,
         serverSide: true,
+        order: leadsTableDefaultOrder,
         ajax: "{{ route('dailyleads.index', ['status' => 'Preorder']) }}",
         columns: [
         { data: 'quotationsid', name: 'quotations.id' },
@@ -3288,6 +3289,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
     dataTable9 = $('#dtBasicExample9').DataTable({
     processing: true,
     serverSide: true,
+    order: leadsTableDefaultOrder,
     ajax: "{{ route('dailyleads.index', ['status' => 'followup']) }}",
     columns: [
       {
@@ -3385,6 +3387,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
       dataTable11 = $('#dtBasicExample11').DataTable({
       processing: true,
       serverSide: true,
+      order: [[1, 'desc']],
       ajax: "{{ route('dailyleads.index', ['status' => 'activelead']) }}",
       columns: [
         {
@@ -3527,9 +3530,10 @@ $('#my-table_filter').hide();
           if ($.fn.DataTable.isDataTable('#dtBasicExample10')) {
         $('#dtBasicExample10').DataTable().clear().destroy();
       }
-      const dataTable9 = $('#dtBasicExample10').DataTable({
+      const dataTableBulk = $('#dtBasicExample10').DataTable({
       processing: true,
       serverSide: true,
+      order: leadsTableDefaultOrder,
       ajax: "{{ route('dailyleads.index', ['status' => 'bulkleads']) }}",
       columns: [
         {
