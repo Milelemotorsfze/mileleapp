@@ -334,7 +334,7 @@ class DailyleadsController extends Controller
                 'calls.created_by',
                 'calls.location',
                 'calls.language',
-                'calls.remarks',
+                DB::raw("IFNULL(calls.remarks, '') as remarks"),
                 'calls.csr_price',
                 'calls.csr_currency',
             ]);            
@@ -422,7 +422,6 @@ class DailyleadsController extends Controller
                 $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
                 $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
                 $data->addSelect([
-                    DB::raw("IFNULL(calls.remarks, '') as remarks"),              
                     DB::raw("DATE_FORMAT(quotations.date, '%Y-%m-%d') as qdate"),
                     DB::raw("IFNULL(quotations.sales_notes, '') as qsalesnotes"),                    
                     DB::raw("IFNULL(quotations.file_path, '') as file_path"),
@@ -551,7 +550,6 @@ class DailyleadsController extends Controller
 
             } elseif ($status === 'Rejected') {
                 $data->addSelect([
-                    DB::raw("IFNULL(calls.remarks, '') as remarks"),                    
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%Y-%m-%d'), '') as date"),
                     DB::raw("IFNULL(prospectings.salesnotes, '') as salesnotes"),
                     DB::raw("created_by_user.name as created_by_name"),
