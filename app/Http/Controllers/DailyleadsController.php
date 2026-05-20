@@ -216,8 +216,11 @@ class DailyleadsController extends Controller
                 ->whereIn('calls.status', ['contacted', 'working', 'qualify', 'converted', 'Follow Up', 'Prospecting']);
             
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
-                if(!$hasPermission) {
-                    $activelead->where('calls.sales_person', $id);
+                if (!$hasPermission) {
+                    $activelead->where(function ($q) use ($id) {
+                        $q->where('calls.sales_person', $id)
+                            ->orWhere('calls.created_by', $id);
+                    });
                 }
             
                 if (!empty($searchValue)) {
@@ -243,7 +246,7 @@ class DailyleadsController extends Controller
                     ->orderBy('calls.created_at', 'desc')
                     ->orderBy('calls.id', 'desc');
 
-                return DataTables::of($activelead->get())->toJson();
+                return DataTables::of($activelead)->toJson();
             }
             
             else if($status === "bulkleads")
@@ -272,8 +275,11 @@ class DailyleadsController extends Controller
                 ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
                 ->whereNotNull('calls.leadtype');
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
-                if(!$hasPermission) {
-                    $bulkleads->where('calls.sales_person', $id);
+                if (!$hasPermission) {
+                    $bulkleads->where(function ($q) use ($id) {
+                        $q->where('calls.sales_person', $id)
+                            ->orWhere('calls.created_by', $id);
+                    });
                 }
 
                 $columns = $request->input('columns', []);
@@ -311,7 +317,7 @@ class DailyleadsController extends Controller
                     ->orderBy('calls.created_at', 'desc')
                     ->orderBy('calls.id', 'desc');
 
-                return DataTables::of($bulkleads->get())->toJson();
+                return DataTables::of($bulkleads)->toJson();
             }
             
             else
@@ -332,29 +338,15 @@ class DailyleadsController extends Controller
                 'calls.csr_price',
                 'calls.csr_currency',
             ]);            
-            if($status === "Prospecting")
-            {
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
-                if($hasPermission)
-                {
-                    $data->whereIn('calls.status', ['Prospecting', 'New Demand']);
-                }
-                else
-                {
-                    $data->whereIn('calls.status', ['Prospecting', 'New Demand'])->where('sales_person', $id);
-                }
-            }
-            else
-            {
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
-                if($hasPermission)
-                {
-                    $data->where('calls.status', $status);
-                
-                }
-                else
-                {
-                    $data->where('calls.status', $status)->whereNull('calls.leadtype')->where('sales_person', $id);
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access')
+                || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
+
+            if ($status === "Prospecting") {
+                $data->whereIn('calls.status', ['Prospecting', 'New Demand']);
+            } else {
+                $data->where('calls.status', $status);
+                if (!$hasPermission) {
+                    $data->whereNull('calls.leadtype');
                 }
             }
             // $data->addSelect(DB::raw('(SELECT GROUP_CONCAT(CONCAT(brands.brand_name, " - ", master_model_lines.model_line) SEPARATOR ", ") FROM calls_requirement
@@ -634,14 +626,23 @@ class DailyleadsController extends Controller
 
             
             }
+
+            if (!$hasPermission) {
+                $data->where(function ($q) use ($id, $status) {
+                    $q->where('calls.sales_person', $id)
+                        ->orWhere('calls.created_by', $id);
+                    if (in_array($status, ['Quoted', 'Negotiation', 'Rejected', 'Closed'], true)) {
+                        $q->orWhere('quotations.created_by', $id);
+                    }
+                });
+            }
+
             $data->groupBy('calls.id')
                 ->orderBy('calls.created_at', 'desc')
                 ->orderBy('calls.id', 'desc');
 
             try {
-                $results = $data->get();
-
-                return DataTables::of($results)
+                return DataTables::of($data)
                     ->addColumn('models_brands', function ($row) {
                         return $row->models_brands ?? '';
                     })
