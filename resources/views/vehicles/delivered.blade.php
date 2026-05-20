@@ -998,6 +998,7 @@ if (canViewVehicleCost) {
           processing: true,
             serverSide: true,
             columns: columns6,
+            order: window.stockReportOrderByPoDate(columns6),
             ajax: {
         url: "{{ route('vehicles.deliveredvehicles', ['status' => 'Delivered']) }}",
         type: "POST",

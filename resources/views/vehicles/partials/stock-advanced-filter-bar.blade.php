@@ -329,6 +329,21 @@ return [
 </div>
 
 <script>
+    if (typeof window.stockReportOrderByPoDate !== 'function') {
+        /** Default list sort: PO date newest first. Resolves column by `name` (not index) so colReorder stays safe. */
+        window.stockReportOrderByPoDate = function (columns) {
+            if (!columns || !columns.length) {
+                return [];
+            }
+            for (var i = 0; i < columns.length; i++) {
+                if (columns[i] && columns[i].name === 'purchasing_order.po_date') {
+                    return [[i, 'desc']];
+                }
+            }
+            return [];
+        };
+    }
+
     (function() {
         var tableId = @json($barUid);
         window.stockBarCommitted = window.stockBarCommitted || {};
