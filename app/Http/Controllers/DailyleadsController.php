@@ -547,11 +547,7 @@ class DailyleadsController extends Controller
                     DB::raw('created_by_user.name as created_by_name'),
                     DB::raw('sales_person_user.name as sales_person_name'),
                     DB::raw("IFNULL(DATE_FORMAT(demand.date, '%Y-%m-%d'), '') as ddate"),
-                    DB::raw("IFNULL(demand.salesnotes, '') as dsalesnotes")
-                );
-                $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
-                $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
-                $data->addSelect([
+                    DB::raw("IFNULL(demand.salesnotes, '') as dsalesnotes"),
                     DB::raw("DATE_FORMAT(quotations.date, '%Y-%m-%d') as qdate"),
                     DB::raw("IFNULL(quotations.sales_notes, '') as qsalesnotes"),
                     DB::raw("IFNULL(quotations.file_path, '') as file_path"),
