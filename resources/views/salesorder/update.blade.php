@@ -381,6 +381,7 @@
                                     <div class="col-md-12 mt-3" id="so-vehicles">
                                         @foreach($quotationItems as $key => $quotationItem)
                                             <div class="so-variant-add-section " id="variant-section-{{ $key + 1 }}">
+                                                <input type="hidden" name="variants[{{$key+1}}][quotation_item_id]" value="{{ $quotationItem->id }}">
                                                 <div class="row">
                                                     <div class="mb-2 col-sm-12 col-md-3 col-lg-3 col-xxl-3">
                                                         <label class="form-label font-size-13">Choose Variant</label>
@@ -731,7 +732,8 @@
                         var index = +i + +1;
                         $(this).find('.variant-descriptions').attr('index', index); 
                         $(this).find('.variant-descriptions').attr('id', 'variant-description-'+index); 
-                        $(this).find('.variant-descriptions').attr('name', 'variants[+index+][description]'); 
+                        $(this).find('.variant-descriptions').attr('name', 'variants['+index+'][description]');
+                        $(this).find('input[name*="quotation_item_id"]').attr('name', 'variants['+index+'][quotation_item_id]');
                         $(this).attr('id', 'variant-section-'+index);
                         $(this).find('.variants').attr('index', index);
                         $(this).find('.variants').attr('id', 'variant-'+index);
@@ -744,7 +746,7 @@
                         $(this).find('.variant-quantities').attr('name', 'variants['+index+'][quantity]');
                         $(this).find('.vins').attr('index', index);
                         $(this).find('.vins').attr('id', 'vin-'+index);
-                        $(this).find('.vins').attr('name', 'variants['+index+'][vin][]');
+                        $(this).find('.vins').attr('name', 'variants['+index+'][vins][]');
                     
                         $(this).find('.removeVariantButton').attr('index', index);
 
