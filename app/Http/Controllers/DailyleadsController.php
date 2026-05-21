@@ -62,7 +62,7 @@ class DailyleadsController extends Controller
     }
 
     /**
-     * Latest non-deleted quotation per call (Proforma / Quoted tab must use one consistent quotation row).
+     * Latest non-deleted quotation per call (Rejected tab / default proforma edit only — not Quoted listing).
      */
     protected function subqueryLatestQuotationIdsPerCall(): \Illuminate\Database\Query\Builder
     {
@@ -111,6 +111,38 @@ class DailyleadsController extends Controller
             $join->on('calls.id', '=', 'latest_quotation.calls_id');
         });
         $query->leftJoin('quotations', 'quotations.id', '=', 'latest_quotation.id');
+
+        $query->leftJoinSub($this->subqueryCallsModelsBrands(), 'models_brands_sq', function ($join) {
+            $join->on('calls.id', '=', 'models_brands_sq.calls_id');
+        });
+
+        $query->leftJoin('users as quoted_by_user', 'quotations.created_by', '=', 'quoted_by_user.id');
+        $query->leftJoin('users as created_by_user', 'calls.created_by', '=', 'created_by_user.id');
+        $query->leftJoin('users as sales_person_user', 'calls.sales_person', '=', 'sales_person_user.id');
+    }
+
+    /**
+     * Quoted tab: one grid row per active quotation (multiple PFIs per lead are all visible).
+     * Prospect/demand stay latest-per-call so lead context does not duplicate inconsistently.
+     */
+    protected function applyDailyLeadsQuotedListingJoins($query): void
+    {
+        $query->leftJoinSub($this->subqueryLatestChildRowIdsPerCall('prospectings'), 'latest_prospecting', function ($join) {
+            $join->on('calls.id', '=', 'latest_prospecting.calls_id');
+        });
+        $query->leftJoin('prospectings', 'prospectings.id', '=', 'latest_prospecting.id');
+
+        $query->leftJoinSub($this->subqueryLatestChildRowIdsPerCall('demand'), 'latest_demand', function ($join) {
+            $join->on('calls.id', '=', 'latest_demand.calls_id');
+        });
+        $query->leftJoin('demand', 'demand.id', '=', 'latest_demand.id');
+
+        $query->leftJoin('quotations', function ($join) {
+            $join->on('calls.id', '=', 'quotations.calls_id');
+            if (Schema::hasColumn('quotations', 'deleted_at')) {
+                $join->whereNull('quotations.deleted_at');
+            }
+        });
 
         $query->leftJoinSub($this->subqueryCallsModelsBrands(), 'models_brands_sq', function ($join) {
             $join->on('calls.id', '=', 'models_brands_sq.calls_id');
@@ -558,7 +590,8 @@ class DailyleadsController extends Controller
                     'quoted_by_user.name as quoted_by_name',
                     'quotations.id as quotation_id',
                 ]);
-                $this->applyDailyLeadsLatestStageJoins($data);
+                $this->applyDailyLeadsQuotedListingJoins($data);
+                $data->whereNotNull('quotations.id');
 
                 if (!empty($searchValue)) {
                     $searchValueWithoutCommas = str_replace(',', '', $searchValue);
@@ -708,7 +741,7 @@ class DailyleadsController extends Controller
 
             }
 
-            // Quoted/Rejected use latest-row subqueries (one row per call); other tabs may aggregate via GROUP BY.
+            // Quoted: one row per quotation; Rejected: one row per call via subqueries; other tabs: GROUP BY call.
             if (! in_array($status, ['Quoted', 'Rejected'], true)) {
                 $data->groupBy('calls.id');
             }
@@ -722,19 +755,30 @@ class DailyleadsController extends Controller
                 });
             }
 
-            $data->groupBy('calls.id')
-                ->orderBy('calls.created_at', 'desc')
-                ->orderBy('calls.id', 'desc');
+            if ($status === 'Quoted') {
+                $data->orderBy('quotations.date', 'desc')
+                    ->orderBy('quotations.id', 'desc');
+            } else {
+                $data->orderBy('calls.created_at', 'desc')
+                    ->orderBy('calls.id', 'desc');
+            }
 
             try {
-                return DataTables::of($data)
+                $datatable = DataTables::of($data)
                     ->addColumn('models_brands', function ($row) {
                         return $row->models_brands ?? '';
                     })
                     ->editColumn('remarks', function ($row) {
                         return $row->remarks ?? '';
-                    })
-                    ->toJson();
+                    });
+
+                if ($status === 'Quoted') {
+                    $datatable->setRowId(function ($row) {
+                        return 'q'.(string) ($row->quotation_id ?? $row->id);
+                    });
+                }
+
+                return $datatable->toJson();
             } catch (\Exception $e) {
                 return response()->json([
                     'error' => true,

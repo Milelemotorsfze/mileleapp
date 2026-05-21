@@ -496,9 +496,19 @@ class ProformaInvoiceController extends Controller {
     }
     }
     }
-    public function proforma_invoice_edit($callId) {
-
-        $quotation = Quotation::latestForCall((int) $callId);
+    public function proforma_invoice_edit($callId, $quotationId = null) {
+        $callId = (int) $callId;
+        $quotation = null;
+        if ($quotationId !== null && $quotationId !== '') {
+            $quotation = Quotation::query()
+                ->forCall($callId)
+                ->active()
+                ->where('id', (int) $quotationId)
+                ->first();
+        }
+        if (! $quotation) {
+            $quotation = Quotation::latestForCall($callId);
+        }
         if (! $quotation) {
             return redirect()->back()->with('error', 'No active quotation found for this lead.');
         }

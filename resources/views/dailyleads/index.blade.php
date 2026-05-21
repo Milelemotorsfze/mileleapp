@@ -2538,7 +2538,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
        const dataTable4 = $('#dtBasicExample4').DataTable({
             processing: true,
             serverSide: true,
-            order: leadsTableDefaultOrder,
+            order: [[14, 'desc'], [0, 'desc']],
             ajax: "{{ route('dailyleads.index', ['status' => 'Quoted']) }}",
             columns: [
               {
@@ -2673,7 +2673,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
     searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
-        const uniqueId = 'qsalesnotes_' + row.id;
+        const uniqueId = 'qsalesnotes_' + (row.quotation_id || row.id);
 
         if (!data) {
             return `<span class="remarks-text"></span>`;
@@ -2727,7 +2727,9 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 name: 'id',
                 render: function (data, type, row) {
                     const bookingUrl = `{{ url('booking/create') }}/${data}`;
-                    const quotationUrlEdit = `{{ url('/proforma_invoice_edit/') }}/${data}`;
+                    const quotationUrlEdit = row.quotation_id
+                        ? `{{ url('/proforma_invoice_edit/') }}/${data}/${row.quotation_id}`
+                        : `{{ url('/proforma_invoice_edit/') }}/${data}`;
                     const soUrl = `{{ url('/saleorder/') }}/${data}`;
                     const preorderUrl = `{{ url('/preorder/') }}/${data}`;
                     let salesOrderOption = '';

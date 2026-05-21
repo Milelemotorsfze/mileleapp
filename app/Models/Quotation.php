@@ -55,7 +55,7 @@ class Quotation extends Model
     }
 
     /**
-     * Latest quotation for a call (MAX id), used by Quoted tab and proforma edit — keeps PDF/fields aligned.
+     * Latest quotation for a call (MAX id). Used when opening proforma edit without a specific quotation id.
      */
     public static function latestForCall(int $callId): ?self
     {
