@@ -1482,30 +1482,22 @@ class SalesOrderController extends Controller
             Soitems::where('so_id', $so->id)->delete();
             Vehicles::where('so_id', $so->id)->update(['so_id' => null]);
             \Log::info('Unassign SO id - Case 3-' . $so->id);
-            // Process the selected VINs
-            $vins = $request->input('vehicle_vin');
-            $selectedVinsWithNull = [];
-            $selectedVinsWithoutNull = [];
 
-            // Separate VINs with null and without null
-            foreach ($vins as $quotationItemId => $selectedVins) {
-                foreach ($selectedVins as $selectedVin) {
-                    if (empty($selectedVin)) {
-                        $selectedVinsWithNull[$quotationItemId][] = $selectedVin;
-                    } else {
-                        $selectedVinsWithoutNull[$quotationItemId][] = $selectedVin;
-                    }
-                }
-            }
+            $quotation = Quotation::find($so->quotation_id);
+            $callsId = $quotation?->calls_id;
+            // Only create booking requests when the lead still exists (FK on booking_requests.calls_id)
+            $validCallsId = ($callsId && Calls::where('id', $callsId)->exists()) ? $callsId : null;
 
-            // Update the vehicles with the Sales Order ID
+            $selectedVinsWithoutNull = $this->collectSelectedVinsFromUpdateRequest($request);
+
             $allVinsWithoutNull = [];
             foreach ($selectedVinsWithoutNull as $selectedVins) {
                 $allVinsWithoutNull = array_merge($allVinsWithoutNull, $selectedVins);
             }
-            Vehicles::whereIn('id', $allVinsWithoutNull)->update(['so_id' => $so->id]);
+            if (!empty($allVinsWithoutNull)) {
+                Vehicles::whereIn('id', $allVinsWithoutNull)->update(['so_id' => $so->id]);
+            }
 
-            // Insert new Soitems records with the selected VINs
             foreach ($selectedVinsWithoutNull as $quotationItemId => $selectedVins) {
                 foreach ($selectedVins as $selectedVin) {
                     $vehicle = Vehicles::where('id', $selectedVin)->firstOrFail();
@@ -1516,8 +1508,6 @@ class SalesOrderController extends Controller
                     ]);
                     $soVinRelationship->save();
 
-                    // Handle BookingRequest updates
-                    // chcek for booking request existing for vin => if yes update days 10 
                     $existingBookingPending = BookingRequest::where('quotation_items_id', $quotationItemId)
                         ->where('status', "New")->first();
                     $existingBookingApproved = BookingRequest::where('quotation_items_id', $quotationItemId)
@@ -1538,19 +1528,19 @@ class SalesOrderController extends Controller
                             $updateBooking->save();
                             $vehicle->reservation_end_date = Carbon::now()->addDays(10);
                             $vehicle->save();
-                        } else {
+                        } elseif ($validCallsId) {
                             $booking = new BookingRequest();
                             $booking->vehicle_id = $vehicle->id;
-                            $booking->calls_id = $so->calls_id;
+                            $booking->calls_id = $validCallsId;
                             $booking->created_by = Auth::id();
                             $booking->status = "New";
                             $booking->days = "10";
                             $booking->save();
                         }
-                    } else {
+                    } elseif ($validCallsId) {
                         $booking = new BookingRequest();
                         $booking->vehicle_id = $vehicle->id;
-                        $booking->calls_id = $so->calls_id;
+                        $booking->calls_id = $validCallsId;
                         $booking->created_by = Auth::id();
                         $booking->status = "New";
                         $booking->days = "10";
@@ -2069,6 +2059,55 @@ class SalesOrderController extends Controller
             'message' => 'Sales Order ' . $status . ' successfully.',
             'redirect' => route('salesorder.index')
         ]);
+    }
+
+    /**
+     * Collect selected vehicle IDs from the sales order update form.
+     */
+    private function collectSelectedVinsFromUpdateRequest(Request $request): array
+    {
+        $selectedVinsWithoutNull = [];
+        $variants = $request->input('variants', []);
+
+        if (is_array($variants)) {
+            foreach ($variants as $variant) {
+                if (!is_array($variant)) {
+                    continue;
+                }
+
+                $quotationItemId = $variant['quotation_item_id'] ?? null;
+                if (!$quotationItemId) {
+                    continue;
+                }
+
+                $vins = $variant['vins'] ?? $variant['vin'] ?? $variant['vehicles'] ?? [];
+                if (!is_array($vins)) {
+                    $vins = ($vins !== null && $vins !== '') ? [$vins] : [];
+                }
+
+                foreach ($vins as $selectedVin) {
+                    if (!empty($selectedVin)) {
+                        $selectedVinsWithoutNull[$quotationItemId][] = $selectedVin;
+                    }
+                }
+            }
+        }
+
+        $legacyVins = $request->input('vehicle_vin');
+        if (is_array($legacyVins)) {
+            foreach ($legacyVins as $quotationItemId => $selectedVins) {
+                if (!is_array($selectedVins)) {
+                    continue;
+                }
+                foreach ($selectedVins as $selectedVin) {
+                    if (!empty($selectedVin)) {
+                        $selectedVinsWithoutNull[$quotationItemId][] = $selectedVin;
+                    }
+                }
+            }
+        }
+
+        return $selectedVinsWithoutNull;
     }
 
     /**
