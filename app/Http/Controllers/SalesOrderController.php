@@ -170,11 +170,14 @@ class SalesOrderController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Builder $builder, Request $request, $id)
+    public function edit(Builder $builder, Request $request, So $salesorder)
     {
-        $so = SO::findorFail($id);
-        $quotation = Quotation::findOrFail($so->quotation_id);
-        $call = Calls::findOrFail($quotation->calls_id);
+        $so = $salesorder;
+        $quotation = Quotation::find($so->quotation_id);
+        if (!$quotation) {
+            return redirect()->route('salesorder.index')->with('error', 'Quotation not found for this sales order.');
+        }
+        $call = $this->resolveCallForQuotation($quotation);
 
         // $sodetails = So::where('quotation_id', $so->quotation_id)->first();
 
@@ -182,7 +185,7 @@ class SalesOrderController extends Controller
             || Auth::user()->hasPermissionForSelectedRole('sales-view');
 
         $customerdetails = QuotationDetail::with('country', 'shippingPort', 'shippingPortOfLoad', 'paymentterms')->where('quotation_id', $quotation->id)->first();
-        $soVariants = SoVariant::where('so_id', $id)->get();
+        $soVariants = SoVariant::where('so_id', $so->id)->get();
 
         // if ($so->quotation_id) {
         //     $quotationItems = QuotationItem::where('quotation_id', $so->quotation_id)
@@ -314,12 +317,12 @@ class SalesOrderController extends Controller
 
         $totalVehicles = $soVariants->sum('quantity');
         $variants = Varaint::select('id', 'name')->get();
-        $salesOrderHistories = SalesOrderHistoryDetail::whereHas('salesOrderHistory', function ($query) use ($id) {
-            $query->where('so_id', $id);
+        $salesOrderHistories = SalesOrderHistoryDetail::whereHas('salesOrderHistory', function ($query) use ($so) {
+            $query->where('so_id', $so->id);
         })
             ->orderBy('id', 'DESC')
             ->with([
-                'salesOrderHistory' => function ($query) use ($id) {
+                'salesOrderHistory' => function ($query) use ($so) {
                     $query->select('*');
                 },
                 'SoVariant'  => function ($query) {
@@ -342,8 +345,8 @@ class SalesOrderController extends Controller
                 ->addColumn('created_by', function ($query) {
                     return $query->salesOrderHistory->user->name ?? '';
                 })
-                ->addColumn('version', function ($query) use ($id) {
-                    $historyIds = SalesOrderHistory::where('so_id', $id)
+                ->addColumn('version', function ($query) use ($so) {
+                    $historyIds = SalesOrderHistory::where('so_id', $so->id)
                         ->orderBy('id', 'ASC')
                         ->pluck('id')
                         ->toArray();
@@ -422,12 +425,9 @@ class SalesOrderController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, So $salesorder)
     {
-        $so = SO::find($id);
-        if (!$so) {
-            return redirect()->back()->withErrors('Sales Order not found.');
-        }
+        $so = $salesorder;
         DB::beginTransaction();
         try {
             $logEntries = [];
@@ -797,9 +797,9 @@ class SalesOrderController extends Controller
     public function generateLatestQuotation($id)
     {
 
-        $so = SO::findOrFail($id);
+        $so = So::findOrFail($id);
         $quotation = Quotation::findOrFail($so->quotation_id);
-        $call = Calls::findOrFail($quotation->calls_id);
+        $call = $this->resolveCallForQuotation($quotation);
        
         $existingQuotationItemIds = QuotationItem::where('reference_type', 'App\Models\Varaint')->where('quotation_id', $so->quotation_id)->pluck('id')->toArray();
         $latestQuotationItemsExistingIds = SoVariant::where('so_id', $id)->pluck('quotation_item_id')->toArray();
@@ -1314,10 +1314,13 @@ class SalesOrderController extends Controller
         $sodetails = So::find($id);
 
         if ($sodetails) {
-            $quotation = Quotation::findOrFail($sodetails->quotation_id);
-            $calls = Calls::findOrFail($quotation->calls_id);
+            $quotation = Quotation::find($sodetails->quotation_id);
+            if (!$quotation) {
+                return redirect()->route('salesorder.index')->with('error', 'Quotation not found for this sales order.');
+            }
+            $calls = $this->resolveCallForQuotation($quotation);
         } else {
-            $calls = Calls::findOrFail($id);
+            $calls = Calls::find($id);
             $quotation = Quotation::where('calls_id', $id)
                 ->whereIn('id', So::whereNotNull('quotation_id')->pluck('quotation_id'))
                 ->first();
@@ -1330,6 +1333,10 @@ class SalesOrderController extends Controller
 
             if (!$sodetails) {
                 return redirect()->route('salesorder.index')->with('error', 'Sales order not found for this quotation.');
+            }
+
+            if (!$calls) {
+                $calls = $this->resolveCallForQuotation($quotation);
             }
         }
 
@@ -2062,5 +2069,30 @@ class SalesOrderController extends Controller
             'message' => 'Sales Order ' . $status . ' successfully.',
             'redirect' => route('salesorder.index')
         ]);
+    }
+
+    /**
+     * Resolve lead for a quotation. Returns a placeholder when the calls row was deleted.
+     */
+    private function resolveCallForQuotation(?Quotation $quotation): ?Calls
+    {
+        if (!$quotation || !$quotation->calls_id) {
+            return null;
+        }
+
+        $call = Calls::find($quotation->calls_id);
+        if ($call) {
+            return $call;
+        }
+
+        $call = new Calls();
+        $call->id = $quotation->calls_id;
+        $call->name = '';
+        $call->company_name = '';
+        $call->phone = '';
+        $call->email = '';
+        $call->address = '';
+
+        return $call;
     }
 }
