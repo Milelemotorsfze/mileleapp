@@ -411,6 +411,7 @@ table.dataTable thead th select {
     var dataTable8 = $('#dtBasicExample3').DataTable({
         processing: true,
         serverSide: true,
+        order: [[1, 'desc']],
         ajax: "{{ route('salesorder.index', ['status' => 'SalesOrder']) }}",
         columns: [
             { data: 'so_number', name: 'so.so_number' },
@@ -478,28 +479,26 @@ table.dataTable thead th select {
                 data: 'calls_id',
                 name: 'quotations.calls_id',
                 searchable: false,
+                orderable: false,
                 render: function (data, type, row) {
-                    if (row.calls_id !== null) {
-                    // const updatesaleorder = `{{ url('salesorder/update') }}/${data}`;
-                    let so_id = row.soid; // Check if quotation_id is not null
-                    const updatesaleorder = `{{ route('salesorder.edit', ':id') }}`.replace(':id', so_id);
-
+                    if (!row.soid) {
+                        return '';
+                    }
+                    const updatesaleorder = `{{ route('salesorder.updatesalesorder', ':id') }}`.replace(':id', row.soid);
                     return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
                 }
-                return ''; 
-                }
             },
-             {
-                data: 'calls_id',
-                name: 'quotations.calls_id',
+            {
+                data: 'soid',
+                name: 'so.id',
                 searchable: false,
+                orderable: false,
                 render: function (data, type, row) {
-                    if (row.calls_id !== null) { 
-                     let so_id = row.soid;
-                    const showSQuotations = `{{ route('so.quotation-versions', ':id') }}`.replace(':id', so_id);
-                    return `<a class="btn btn-sm btn-primary" href="${showSQuotations}" title="show Quotations"><i class="fa fa-eye" aria-hidden="true"></i></a>`;
-                }
-                return ''; 
+                    if (!data || !row.calls_id) {
+                        return '';
+                    }
+                    const showSQuotations = `{{ route('so.quotation-versions', ':id') }}`.replace(':id', data);
+                    return `<a class="btn btn-sm btn-primary" href="${showSQuotations}" title="Show Quotation Versions"><i class="fa fa-eye" aria-hidden="true"></i></a>`;
                 }
             },
             {
@@ -531,8 +530,8 @@ table.dataTable thead th select {
         initComplete: function () {
             // Apply dropdown filters to each column
             this.api().columns().every(function (index) {
-                if (index === 10 || index === 11) {
-    return; // Skip adding a filter for these columns
+                if (index >= 10) {
+    return; // Skip filters for action columns (quotation file, update, versions, cancel)
 }
                 var column = this;
                 var select = $('<select multiple="multiple" style="width: 100%"><option value="">All</option></select>')
@@ -550,8 +549,8 @@ table.dataTable thead th select {
 
                 // Populate the select options dynamically, handling date formatting
                 column.data().unique().sort().each(function (d, j) {
-                    if (index === 10 || index === 11) {
-    return; // Skip adding a filter for these columns
+                    if (index >= 10) {
+    return; // Skip filters for action columns (quotation file, update, versions, cancel)
 }
                     if (index === 1 || index === 6) { // Assuming date columns are 3 and 8
                         if (d) {

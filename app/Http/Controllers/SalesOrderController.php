@@ -84,7 +84,11 @@ class SalesOrderController extends Controller
                     ->groupBy('so.id');
 
                 if (!$hasPermission) {
-                    $query->where('calls.sales_person', $id);
+                    // SO ownership is on so.sales_person_id (from quotation), not calls.sales_person
+                    $query->where(function ($q) use ($id) {
+                        $q->where('so.sales_person_id', $id)
+                            ->orWhere('quotations.created_by', $id);
+                    });
                 }
 
                 // Handle dynamic sorting
@@ -101,13 +105,14 @@ class SalesOrderController extends Controller
                 ];
 
                 $orderColumnIndex = $request->input('order.0.column'); // Column index from request
-                $orderDirection = $request->input('order.0.dir', 'asc'); // Sort direction (asc/desc)
+                $orderDirection = $request->input('order.0.dir', 'desc'); // Sort direction (asc/desc)
 
                 // Default to sorting by `so.so_date` if index is invalid
                 $orderColumn = $columns[$orderColumnIndex] ?? 'so.so_date';
 
-                // Apply the sorting dynamically
-                $query->orderBy($orderColumn, $orderDirection);
+                // Apply the sorting dynamically (newest SOs first by default)
+                $query->orderBy($orderColumn, $orderDirection)
+                    ->orderBy('so.id', 'desc');
 
                 return DataTables::of($query)->toJson();
             }
@@ -138,16 +143,12 @@ class SalesOrderController extends Controller
     public function viewQuotations($id)
     {
         try {
-            $so = SO::findOrFail($id);
+            $so = So::findOrFail($id);
             $quotation = Quotation::findOrFail($so->quotation_id);
             $quotationVersionFiles = QuotationFile::where('quotation_id', $so->quotation_id)->get();
             $quotationDetail = QuotationDetail::with(['country', 'shippingPort', 'shippingPortOfLoad', 'paymentterms'])
                 ->where('quotation_id', $quotation->id)
                 ->first();
-            
-            if (!$quotationDetail) {
-                return redirect()->back()->with('error', 'Quotation details not found.');
-            }
 
             $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first();
             $call = Calls::findOrFail($quotation->calls_id);
@@ -162,7 +163,7 @@ class SalesOrderController extends Controller
             ));
         } catch (\Exception $e) {
             \Log::error('Error in viewQuotations: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'An error occurred while loading the quotation versions.');
+            return redirect()->route('salesorder.index')->with('error', 'Could not load quotation versions for this sales order.');
         }
     }
 
@@ -1309,10 +1310,28 @@ class SalesOrderController extends Controller
 
     public function updatesalesorder($id)
     {
-        $quotation = Quotation::where('calls_id', $id)->first();
-        $calls = Calls::find($id);
+        // $id is the SO id from the listing (legacy URLs may still pass calls_id)
+        $sodetails = So::find($id);
 
-        $sodetails = So::where('quotation_id', $quotation->id)->first();
+        if ($sodetails) {
+            $quotation = Quotation::findOrFail($sodetails->quotation_id);
+            $calls = Calls::findOrFail($quotation->calls_id);
+        } else {
+            $calls = Calls::findOrFail($id);
+            $quotation = Quotation::where('calls_id', $id)
+                ->whereIn('id', So::whereNotNull('quotation_id')->pluck('quotation_id'))
+                ->first();
+
+            if (!$quotation) {
+                return redirect()->route('salesorder.index')->with('error', 'Quotation not found for this lead.');
+            }
+
+            $sodetails = So::where('quotation_id', $quotation->id)->first();
+
+            if (!$sodetails) {
+                return redirect()->route('salesorder.index')->with('error', 'Sales order not found for this quotation.');
+            }
+        }
 
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access')
             || Auth::user()->hasPermissionForSelectedRole('sales-view');
@@ -1426,7 +1445,7 @@ class SalesOrderController extends Controller
         $totalVehicles = $quotationItems->sum('quantity');
         $variants = Varaint::select('id', 'name')->get();
         // return $quotationItems;
-        return view('salesorder.update', compact('vehicles', 'variants', 'totalVehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails', 'so', 'soitems', 'empProfile', 'saleperson'));
+        return view('salesorder.update', compact('vehicles', 'variants', 'totalVehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails', 'sodetails', 'soitems', 'empProfile', 'saleperson'));
     }
 
     public function storesalesorderupdate(Request $request, $quotationId)

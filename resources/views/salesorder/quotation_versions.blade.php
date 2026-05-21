@@ -1,10 +1,11 @@
 @extends('layouts.table')
 @section('content')
-@can('edit-so')
-    @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
-    @endphp
-    @if ($hasPermission)
+@php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access')
+        || Auth::user()->hasPermissionForSelectedRole('sales-view')
+        || Auth::user()->hasPermissionForSelectedRole('edit-so');
+@endphp
+@if ($hasPermission)
     <div class="card">
         <div class="card-header">
             <h4 class="card-title">
@@ -24,6 +25,9 @@
                     {{ session('success') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
+            @endif
+            @if(!$quotationDetail)
+                <div class="alert alert-info">Quotation detail record is not available. File versions are listed below.</div>
             @endif
             <div class="row gy-3">
                     <div class="col-lg-3 col-md-6 col-sm-12">
@@ -135,7 +139,7 @@
                                     <div class="row mb-2">
                                         <div class="col-sm-6"><strong>Document Validity:</strong></div>
                                         <div class="col-sm-6">
-                                            <label class="form-check-label">{{$quotationDetail->document_validity}}</label>
+                                            <label class="form-check-label">{{ $quotationDetail?->document_validity ?? '' }}</label>
                                         </div>
                                     </div>
                                     <div class="row mb-2">
@@ -168,8 +172,8 @@
                                         <div class="col-sm-6"><strong>Final Destination:</strong></div>
                                         <div class="col-sm-6">
                                             <label class="form-check-label">
-                                                @if ($quotationDetail->country_id)
-                                                {{ $quotationDetail->country->name }}
+                                                @if ($quotationDetail?->country_id)
+                                                {{ $quotationDetail->country->name ?? '' }}
                                                 @endif
                                             </label>
                                         </div>
@@ -177,15 +181,15 @@
                                     <div class="row mb-2">
                                         <div class="col-sm-6"><strong>Incoterm:</strong></div>
                                         <div class="col-sm-6">
-                                            <label class="form-check-label">{{$quotationDetail->incoterm}}</label>
+                                            <label class="form-check-label">{{ $quotationDetail?->incoterm ?? '' }}</label>
                                         </div>
                                     </div>
                                     <div class="row mb-2">
                                         <div class="col-sm-6"><strong>Port of Discharge:</strong></div>
                                         <div class="col-sm-6">
                                             <label class="form-check-label">
-                                                @if ($quotationDetail->shippingPort)
-                                                {{$quotationDetail->shippingPort->name ?? ''}}
+                                                @if ($quotationDetail?->shippingPort)
+                                                {{ $quotationDetail->shippingPort->name ?? '' }}
                                                 @endif
                                             </label>
                                         </div>
@@ -194,8 +198,8 @@
                                         <div class="col-sm-6"><strong>Port of Loading:</strong></div>
                                         <div class="col-sm-6">
                                             <label class="form-check-label">
-                                                @if ($quotationDetail->shippingPortOfLoad)
-                                                {{$quotationDetail->shippingPortOfLoad->name ?? ''}}
+                                                @if ($quotationDetail?->shippingPortOfLoad)
+                                                {{ $quotationDetail->shippingPortOfLoad->name ?? '' }}
                                                 @endif
                                             </label>
                                         </div>
@@ -218,8 +222,8 @@
                                         <div class="col-sm-6"><strong>Payment Terms:</strong></div>
                                         <div class="col-sm-6">
                                             <label class="form-check-label">
-                                                @if ($quotationDetail->paymentterms)
-                                                {{$quotationDetail->paymentterms->name}}
+                                                @if ($quotationDetail?->paymentterms)
+                                                {{ $quotationDetail->paymentterms->name ?? '' }}
                                                 @endif
                                             </label>
                                         </div>
@@ -227,7 +231,7 @@
                                     <div class="row mb-2" id="advance-amount-div" hidden>
                                         <div class="col-sm-6"><strong>Advance Amount:</strong></div>
                                         <div class="col-sm-6">
-                                            <label class="form-check-label">{{$quotationDetail->advance_amount}}</label>
+                                            <label class="form-check-label">{{ $quotationDetail?->advance_amount ?? '' }}</label>
                                         </div>
                                     </div>
                                 </div>
@@ -243,13 +247,13 @@
                                     <div class="row mb-2">
                                         <div class="col-sm-6"><strong>Rep Name:</strong></div>
                                         <div class="col-sm-6">
-                                            <label class="form-check-label">{{$quotationDetail->representative_name}}</label>
+                                            <label class="form-check-label">{{ $quotationDetail?->representative_name ?? '' }}</label>
                                         </div>
                                     </div>
                                     <div class="row mb-2">
                                         <div class="col-sm-6"><strong>Rep No:</strong></div>
                                         <div class="col-sm-6">
-                                            <label class="form-check-label">{{$quotationDetail->representative_number}}</label>
+                                            <label class="form-check-label">{{ $quotationDetail?->representative_number ?? '' }}</label>
                                         </div>
                                     </div>
                                 </div>
@@ -289,6 +293,7 @@
                 @endif
             </div>
         </div>
-    @endif
-@endcan
+@else
+    <div class="alert alert-warning m-3">You do not have permission to view quotation versions.</div>
+@endif
 @endsection
