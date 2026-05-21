@@ -3080,6 +3080,50 @@ SQL;
     }
 
     /**
+     * Normalize DataTables column header filters (may arrive as array, JSON string, or malformed string on export XHR).
+     *
+     * @return array<string, array<int, mixed>>
+     */
+    protected function parseStockColumnFiltersFromRequest($input): array
+    {
+        if ($input === null || $input === '') {
+            return [];
+        }
+        if (is_string($input)) {
+            if ($input === '[object Object]') {
+                return [];
+            }
+            $decoded = json_decode($input, true);
+            if (! is_array($decoded)) {
+                return [];
+            }
+            $input = $decoded;
+        }
+        if (! is_array($input)) {
+            return [];
+        }
+
+        $filters = [];
+        foreach ($input as $columnName => $values) {
+            if (! is_string($columnName) || $columnName === '') {
+                continue;
+            }
+            if (! is_array($values)) {
+                if ($values === null || $values === '') {
+                    continue;
+                }
+                $values = [$values];
+            }
+            if (count($values) === 0) {
+                continue;
+            }
+            $filters[$columnName] = $values;
+        }
+
+        return $filters;
+    }
+
+    /**
      * COUNT(DISTINCT vehicles.id) on a stock-report style query (joins may duplicate rows).
      *
      * @param  \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder  $query
@@ -3103,6 +3147,18 @@ SQL;
      * @param  \Illuminate\Database\Eloquent\Builder  $baseQuery  After legacy column filters; before bar filters and groupBy.
      * @return array<string, mixed>|null
      */
+    /**
+     * Skip expensive per-value bar diagnostics during CSV export (stock_export=1).
+     */
+    protected function resolveStockBarDiagnostics($baseQuery, array $bar, string $stockReportMode, Request $request): ?array
+    {
+        if ($request->boolean('stock_export')) {
+            return null;
+        }
+
+        return $this->computeStockBarMultiSelectDiagnostics($baseQuery, $bar, $stockReportMode);
+    }
+
     protected function computeStockBarMultiSelectDiagnostics($baseQuery, array $bar, string $stockReportMode): ?array
     {
         $dims = [];
@@ -3261,23 +3317,7 @@ SQL;
             $data = null;
             $stockBarDiag = null;
             $status = $request->input('status');
-            $filtersRaw = $request->input('filters', []);
-            $filters = [];
-            foreach ($filtersRaw as $columnName => $values) {
-                if (!is_string($columnName) || $columnName === '') {
-                    continue;
-                }
-                if (!is_array($values)) {
-                    if ($values === null || $values === '') {
-                        continue;
-                    }
-                    $values = [$values];
-                }
-                if (count($values) === 0) {
-                    continue;
-                }
-                $filters[$columnName] = $values;
-            }
+            $filters = $this->parseStockColumnFiltersFromRequest($request->input('filters'));
             if ($status === "allstock") {
                 $data = Vehicles::select([
                     'vehicles.id',
@@ -3391,7 +3431,7 @@ SQL;
                     }
                 }
                 $barParsed = $this->parseStockBarFiltersFromRequest($request->input('bar_filters'));
-                $stockBarDiag = $this->computeStockBarMultiSelectDiagnostics($data, $barParsed, 'allstock');
+                $stockBarDiag = $this->resolveStockBarDiagnostics($data, $barParsed, 'allstock', $request);
                 $this->applyStockBarFiltersToQuery($data, $barParsed, 'allstock');
                 $data = $data->groupBy('vehicles.id');
             }
@@ -4159,7 +4199,7 @@ SQL;
             $data = null;
             $stockBarDiag = null;
             $status = $request->input('status');
-            $filters = $request->input('filters', []);
+            $filters = $this->parseStockColumnFiltersFromRequest($request->input('filters'));
             if ($status === "Available Stock") {
                 $data = Vehicles::select([
                     'vehicles.id as id',
@@ -4259,7 +4299,7 @@ SQL;
                     }
                 }
                 $barParsed = $this->parseStockBarFiltersFromRequest($request->input('bar_filters'));
-                $stockBarDiag = $this->computeStockBarMultiSelectDiagnostics($data, $barParsed, 'available');
+                $stockBarDiag = $this->resolveStockBarDiagnostics($data, $barParsed, 'available', $request);
                 $this->applyStockBarFiltersToQuery($data, $barParsed, 'available');
                 $data = $data->groupBy('vehicles.id');
             }
@@ -4359,7 +4399,7 @@ SQL;
             $data = null;
             $stockBarDiag = null;
             $status = $request->input('status');
-            $filters = $request->input('filters', []);
+            $filters = $this->parseStockColumnFiltersFromRequest($request->input('filters'));
             if ($status === "Delivered") {
                 $data = Vehicles::select([
                     'vehicles.id',
@@ -4459,7 +4499,7 @@ SQL;
                     }
                 }
                 $barParsed = $this->parseStockBarFiltersFromRequest($request->input('bar_filters'));
-                $stockBarDiag = $this->computeStockBarMultiSelectDiagnostics($data, $barParsed, 'delivered');
+                $stockBarDiag = $this->resolveStockBarDiagnostics($data, $barParsed, 'delivered', $request);
                 $this->applyStockBarFiltersToQuery($data, $barParsed, 'delivered');
                 $data = $data->groupBy('vehicles.id');
             }
@@ -4557,7 +4597,7 @@ SQL;
             $data = null;
             $stockBarDiag = null;
             $status = $request->input('status');
-            $filters = $request->input('filters', []);
+            $filters = $this->parseStockColumnFiltersFromRequest($request->input('filters'));
             if ($status === "dpvehicles") {
                 $data = Vehicles::select([
                     'vehicles.id',
@@ -4658,7 +4698,7 @@ SQL;
                     }
                 }
                 $barParsed = $this->parseStockBarFiltersFromRequest($request->input('bar_filters'));
-                $stockBarDiag = $this->computeStockBarMultiSelectDiagnostics($data, $barParsed, 'dpvehicles');
+                $stockBarDiag = $this->resolveStockBarDiagnostics($data, $barParsed, 'dpvehicles', $request);
                 $this->applyStockBarFiltersToQuery($data, $barParsed, 'dpvehicles');
                 $data = $data->groupBy('vehicles.id');
             }
