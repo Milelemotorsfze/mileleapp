@@ -43,12 +43,147 @@ use App\Models\MasterModelLines;
 use Monarobase\CountryList\CountryListFacade;
 use App\Models\Logs;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Str;
 
 class DailyleadsController extends Controller
 {
+    /**
+     * Latest row id per call for one-to-many child tables (avoids join row explosion + GROUP BY picking wrong fields).
+     */
+    protected function subqueryLatestChildRowIdsPerCall(string $table, string $callIdColumn = 'calls_id'): \Illuminate\Database\Query\Builder
+    {
+        return DB::table($table)
+            ->select($callIdColumn, DB::raw('MAX(id) as id'))
+            ->whereNotNull($callIdColumn)
+            ->groupBy($callIdColumn);
+    }
+
+    /**
+     * Latest non-deleted quotation per call (Proforma / Quoted tab must use one consistent quotation row).
+     */
+    protected function subqueryLatestQuotationIdsPerCall(): \Illuminate\Database\Query\Builder
+    {
+        $query = DB::table('quotations')
+            ->select('calls_id', DB::raw('MAX(id) as id'))
+            ->whereNotNull('calls_id');
+
+        if (Schema::hasColumn('quotations', 'deleted_at')) {
+            $query->whereNull('deleted_at');
+        }
+
+        return $query->groupBy('calls_id');
+    }
+
+    /**
+     * Aggregated brand/model lines per call without joining requirements into the main row set.
+     */
+    protected function subqueryCallsModelsBrands(): \Illuminate\Database\Query\Builder
+    {
+        return DB::table('calls_requirement')
+            ->select(
+                'calls_requirement.lead_id as calls_id',
+                DB::raw("GROUP_CONCAT(DISTINCT CONCAT(brands.brand_name, ' - ', master_model_lines.model_line) ORDER BY brands.brand_name, master_model_lines.model_line SEPARATOR ', ') as models_brands")
+            )
+            ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+            ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+            ->groupBy('calls_requirement.lead_id');
+    }
+
+    /**
+     * Join latest prospecting, demand, and quotation so quotation PDF/notes/salesperson stay on the same record.
+     */
+    protected function applyDailyLeadsLatestStageJoins($query): void
+    {
+        $query->leftJoinSub($this->subqueryLatestChildRowIdsPerCall('prospectings'), 'latest_prospecting', function ($join) {
+            $join->on('calls.id', '=', 'latest_prospecting.calls_id');
+        });
+        $query->leftJoin('prospectings', 'prospectings.id', '=', 'latest_prospecting.id');
+
+        $query->leftJoinSub($this->subqueryLatestChildRowIdsPerCall('demand'), 'latest_demand', function ($join) {
+            $join->on('calls.id', '=', 'latest_demand.calls_id');
+        });
+        $query->leftJoin('demand', 'demand.id', '=', 'latest_demand.id');
+
+        $query->leftJoinSub($this->subqueryLatestQuotationIdsPerCall(), 'latest_quotation', function ($join) {
+            $join->on('calls.id', '=', 'latest_quotation.calls_id');
+        });
+        $query->leftJoin('quotations', 'quotations.id', '=', 'latest_quotation.id');
+
+        $query->leftJoinSub($this->subqueryCallsModelsBrands(), 'models_brands_sq', function ($join) {
+            $join->on('calls.id', '=', 'models_brands_sq.calls_id');
+        });
+
+        $query->leftJoin('users as quoted_by_user', 'quotations.created_by', '=', 'quoted_by_user.id');
+        $query->leftJoin('users as created_by_user', 'calls.created_by', '=', 'created_by_user.id');
+        $query->leftJoin('users as sales_person_user', 'calls.sales_person', '=', 'sales_person_user.id');
+    }
+
+    /**
+     * Latest lead_rejection row per call (`call_id` FK).
+     */
+    protected function subqueryLatestLeadRejectionIdsPerCall(): \Illuminate\Database\Query\Builder
+    {
+        return DB::table('lead_rejection')
+            ->select('call_id', DB::raw('MAX(id) as id'))
+            ->whereNotNull('call_id')
+            ->groupBy('call_id');
+    }
+
+    /**
+     * Rejected tab: latest stage rows + aggregated models (same integrity rules as Quoted).
+     */
+    protected function applyDailyLeadsRejectedStageJoins($query): void
+    {
+        $this->applyDailyLeadsLatestStageJoins($query);
+
+        $query->leftJoinSub($this->subqueryLatestChildRowIdsPerCall('negotiations'), 'latest_negotiation', function ($join) {
+            $join->on('calls.id', '=', 'latest_negotiation.calls_id');
+        });
+        $query->leftJoin('negotiations', 'negotiations.id', '=', 'latest_negotiation.id');
+
+        $query->leftJoinSub($this->subqueryLatestLeadRejectionIdsPerCall(), 'latest_rejection', function ($join) {
+            $join->on('calls.id', '=', 'latest_rejection.call_id');
+        });
+        $query->leftJoin('lead_rejection', 'lead_rejection.id', '=', 'latest_rejection.id');
+    }
+
+    /**
+     * Global search: match any non-deleted quotation on the call (not only the latest row shown in the grid).
+     */
+    protected function orWhereCallMatchesAnyQuotationSearch($query, string $searchValue, ?string $searchValueWithoutCommas = null): void
+    {
+        $query->orWhereExists(function ($sub) use ($searchValue, $searchValueWithoutCommas) {
+            $sub->select(DB::raw(1))
+                ->from('quotations as q_all')
+                ->whereColumn('q_all.calls_id', 'calls.id');
+            if (Schema::hasColumn('quotations', 'deleted_at')) {
+                $sub->whereNull('q_all.deleted_at');
+            }
+            $sub->where(function ($q) use ($searchValue, $searchValueWithoutCommas) {
+                $q->where('q_all.sales_notes', 'like', "%$searchValue%")
+                    ->orWhere('q_all.currency', 'LIKE', "%$searchValue%")
+                    ->orWhere(DB::raw("DATE_FORMAT(q_all.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%");
+                if ($searchValueWithoutCommas !== null && $searchValueWithoutCommas !== '') {
+                    $q->orWhere('q_all.deal_value', 'LIKE', "%$searchValueWithoutCommas%")
+                        ->orWhere(DB::raw("REPLACE(FORMAT(q_all.deal_value, 0), ',', '')"), 'LIKE', "%$searchValueWithoutCommas%")
+                        ->orWhere(DB::raw("CONCAT(FORMAT(q_all.deal_value, 0), ' ', q_all.currency)"), 'LIKE', "%$searchValue%");
+                }
+                if (strtolower($searchValue) === 'not signed') {
+                    $q->orWhere(function ($sig) {
+                        $sig->whereNull('q_all.signature_status')->orWhere('q_all.signature_status', '');
+                    });
+                } elseif (strtolower($searchValue) === 'signed') {
+                    $q->orWhere('q_all.signature_status', 'Signed');
+                } else {
+                    $q->orWhere('q_all.signature_status', 'like', "%$searchValue%");
+                }
+            });
+        });
+    }
+
     public function index(Request $request)
     {
         $useractivities =  New UserActivities();
@@ -407,85 +542,53 @@ class DailyleadsController extends Controller
                     $data->leftJoin('users as sales_person_user', 'calls.sales_person', '=', 'sales_person_user.id');
 
                 } elseif ($status === 'Quoted') {
-                $data->addSelect(
+                $data->addSelect([
+                    'calls.csr_price',
+                    'calls.csr_currency',
+                    DB::raw('models_brands_sq.models_brands as models_brands'),
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%Y-%m-%d'), '') as date"),
                     DB::raw("IFNULL(prospectings.salesnotes, '') as salesnotes"),
-                    DB::raw("created_by_user.name as created_by_name"),
-                    DB::raw("sales_person_user.name as sales_person_name")
-                );
-                $data->addSelect(
-                    DB::raw("GROUP_CONCAT(CONCAT(brands.brand_name, ' - ', master_model_lines.model_line) SEPARATOR ', ') as models_brands")
-                );
-                $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
-                $data->leftJoin('users as created_by_user', 'calls.created_by', '=', 'created_by_user.id');
-                $data->leftJoin('users as sales_person_user', 'calls.sales_person', '=', 'sales_person_user.id');
-                $data->addSelect(
+                    DB::raw('created_by_user.name as created_by_name'),
+                    DB::raw('sales_person_user.name as sales_person_name'),
                     DB::raw("IFNULL(DATE_FORMAT(demand.date, '%Y-%m-%d'), '') as ddate"),
-                    DB::raw("IFNULL(demand.salesnotes, '') as dsalesnotes")
-                );
-                $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
-                $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
-                $data->addSelect([
-                    DB::raw("IFNULL(calls.remarks, '') as remarks"),              
+                    DB::raw("IFNULL(demand.salesnotes, '') as dsalesnotes"),
                     DB::raw("DATE_FORMAT(quotations.date, '%Y-%m-%d') as qdate"),
-                    DB::raw("IFNULL(quotations.sales_notes, '') as qsalesnotes"),                    
+                    DB::raw("IFNULL(quotations.sales_notes, '') as qsalesnotes"),
                     DB::raw("IFNULL(quotations.file_path, '') as file_path"),
-                    // DB::raw("CONCAT(IFNULL(FORMAT(quotations.deal_value, 0), ''), ' ', IFNULL(quotations.currency, '')) as ddealvalues"),
                     'quotations.deal_value as raw_deal_value',
                     'quotations.currency',
-                    DB::raw("CONCAT(FORMAT(quotations.deal_value, 0), ' ', quotations.currency) as deal_value"),                    
+                    DB::raw("CONCAT(FORMAT(quotations.deal_value, 0), ' ', quotations.currency) as deal_value"),
                     DB::raw("IFNULL(quotations.signature_status, '') as signature_status"),
-                    'users.name as salespersonname',
+                    'quoted_by_user.name as quoted_by_name',
+                    'quotations.id as quotation_id',
                 ]);
-                $data->leftJoin('users as quoted_by_user', 'quotations.created_by', '=', 'quoted_by_user.id');
-                $data->addSelect('quoted_by_user.name as quoted_by_name');
-
-                $data->leftJoin('users', 'quotations.created_by', '=', 'users.id');
-                $data->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id');
-                $data->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id');
-                $data->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id');
+                $this->applyDailyLeadsLatestStageJoins($data);
 
                 if (!empty($searchValue)) {
-                $searchValueWithoutCommas = str_replace(',', '', $searchValue);
-                $data->where(function ($query) use ($searchValue, $searchValueWithoutCommas) {
-                    $query->where('calls.created_at', 'LIKE', "%$searchValue%")
-                        ->orWhere('calls.name', 'LIKE', "%$searchValue%")
-                        ->orWhere('calls.phone', 'LIKE', "%$searchValue%")
-                        ->orWhere('calls.email', 'LIKE', "%$searchValue%")
-                        ->orWhere('calls.language', 'LIKE', "%$searchValue%")
-                        ->orWhere('calls.location', 'LIKE', "%$searchValue%")
-                        ->orWhere('calls.type', 'LIKE', "%$searchValue%")
-                        ->orWhere(DB::raw("CONCAT(brands.brand_name, ' - ', master_model_lines.model_line)"), 'LIKE', "%$searchValue%")
-                        ->orWhere('calls.custom_brand_model', 'LIKE', "%$searchValue%")
-                        ->orWhere('master_model_lines.model_line', 'LIKE', "%$searchValue%")
-                        ->orWhere('calls.remarks', 'LIKE', "%$searchValue%")
-                        ->orWhere('quotations.currency', 'LIKE', "%$searchValue%")
-                        ->orWhere('quotations.sales_notes', 'like', "%$searchValue%")
-                        ->orWhere('prospectings.salesnotes', 'LIKE', "%$searchValue%")
-                        ->orWhere('demand.salesnotes', 'LIKE', "%$searchValue%")
-                        ->orWhere('users.name', 'like', "%$searchValue%")
-                        ->orWhere(DB::raw("DATE_FORMAT(quotations.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
-                        ->orWhere(DB::raw("DATE_FORMAT(prospectings.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
-                        ->orWhere(DB::raw("DATE_FORMAT(demand.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
-                        ->orWhere(DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
-                        ->orWhere(function ($q) use ($searchValue, $searchValueWithoutCommas) {
-                            $q->where('quotations.deal_value', 'LIKE', "%$searchValueWithoutCommas%")
-                                ->orWhere(DB::raw("REPLACE(FORMAT(quotations.deal_value, 0), ',', '')"), 'LIKE', "%$searchValueWithoutCommas%")
-                                ->orWhere(DB::raw("CONCAT(FORMAT(quotations.deal_value, 0), ' ', quotations.currency)"), 'LIKE', "%$searchValue%");
-                        })
-                        ->orWhere(function ($q) use ($searchValue) {
-                            if (strtolower($searchValue) === 'not signed') {
-                                $q->whereNull('quotations.signature_status')
-                                ->orWhere('quotations.signature_status', '');
-                            } elseif (strtolower($searchValue) === 'signed') {
-                                $q->where('quotations.signature_status', 'Signed');
-                            } else {
-                                $q->where('quotations.signature_status', 'like', "%$searchValue%");
-                            }
-                        });
+                    $searchValueWithoutCommas = str_replace(',', '', $searchValue);
+                    $data->where(function ($query) use ($searchValue, $searchValueWithoutCommas) {
+                        $query->where('calls.created_at', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.name', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.phone', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.email', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.language', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.location', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.type', 'LIKE', "%$searchValue%")
+                            ->orWhere('models_brands_sq.models_brands', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.custom_brand_model', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.remarks', 'LIKE', "%$searchValue%")
+                            ->orWhere('prospectings.salesnotes', 'LIKE', "%$searchValue%")
+                            ->orWhere('demand.salesnotes', 'LIKE', "%$searchValue%")
+                            ->orWhere('quoted_by_user.name', 'like', "%$searchValue%")
+                            ->orWhere('sales_person_user.name', 'like', "%$searchValue%")
+                            ->orWhere('created_by_user.name', 'like', "%$searchValue%")
+                            ->orWhere(DB::raw("DATE_FORMAT(prospectings.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
+                            ->orWhere(DB::raw("DATE_FORMAT(demand.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
+                            ->orWhere(DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d')"), 'LIKE', "%$searchValue%");
+                        $this->orWhereCallMatchesAnyQuotationSearch($query, $searchValue, $searchValueWithoutCommas);
                     });
-            }
-                
+                }
+
             } elseif ($status === 'Negotiation') {
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%Y-%m-%d'), '') as date"),
@@ -555,86 +658,67 @@ class DailyleadsController extends Controller
 
             } elseif ($status === 'Rejected') {
                 $data->addSelect([
-                    DB::raw("IFNULL(calls.remarks, '') as remarks"),                    
+                    'calls.csr_price',
+                    'calls.csr_currency',
+                    DB::raw('models_brands_sq.models_brands as models_brands'),
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%Y-%m-%d'), '') as date"),
                     DB::raw("IFNULL(prospectings.salesnotes, '') as salesnotes"),
-                    DB::raw("created_by_user.name as created_by_name"),
-                    DB::raw("sales_person_user.name as sales_person_name")
-                ]);
-                $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
-                $data->addSelect(
+                    DB::raw('created_by_user.name as created_by_name'),
+                    DB::raw('sales_person_user.name as sales_person_name'),
                     DB::raw("IFNULL(DATE_FORMAT(demand.date, '%Y-%m-%d'), '') as ddate"),
-                    DB::raw("IFNULL(demand.salesnotes, '') as dsalesnotes")
-                );
-                $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
-                $data->addSelect(
+                    DB::raw("IFNULL(demand.salesnotes, '') as dsalesnotes"),
                     DB::raw("IFNULL(DATE_FORMAT(quotations.date, '%Y-%m-%d'), '') as qdate"),
                     DB::raw("IFNULL(quotations.sales_notes, '') as qsalesnotes"),
                     DB::raw("IFNULL(quotations.file_path, '') as file_path"),
-                    
-                    DB::raw("CONCAT(FORMAT(quotations.deal_value, 0), ' ', IFNULL(quotations.currency, '')) as deal_value")
-                );
-                $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
-                $data->addSelect(
+                    DB::raw("CONCAT(FORMAT(quotations.deal_value, 0), ' ', IFNULL(quotations.currency, '')) as deal_value"),
                     DB::raw("IFNULL(DATE_FORMAT(negotiations.date, '%Y-%m-%d'), '') as ndate"),
                     DB::raw("IFNULL(negotiations.sales_notes, '') as nsalesnotes"),
                     DB::raw("IFNULL(negotiations.file_path, '') as nfile_path"),
                     DB::raw("CONCAT(IFNULL(negotiations.dealvalues, ''), ' ', IFNULL(negotiations.currency, '')) as ndealvalues"),
-                );
-                $data->leftJoin('negotiations', 'calls.id', '=', 'negotiations.calls_id');
-                $data->addSelect(DB::raw("DATE_FORMAT(lead_rejection.date, '%Y-%m-%d') as rdate"), 'lead_rejection.sales_notes as rsalesnotes', 'lead_rejection.Reason as reason');
-                $data->leftJoin('lead_rejection', 'calls.id', '=', 'lead_rejection.call_id');
-                $data->leftJoin('users as created_by_user', 'calls.created_by', '=', 'created_by_user.id');
-                $data->leftJoin('users as sales_person_user', 'calls.sales_person', '=', 'sales_person_user.id');
-                $data->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id');
-                $data->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id');
-                $data->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id');
-            
-                $data->addSelect(DB::raw("GROUP_CONCAT(CONCAT(brands.brand_name, ' - ', master_model_lines.model_line) SEPARATOR ', ') as models_brands"));
+                    DB::raw("DATE_FORMAT(lead_rejection.date, '%Y-%m-%d') as rdate"),
+                    'lead_rejection.sales_notes as rsalesnotes',
+                    'lead_rejection.Reason as reason',
+                ]);
+                $this->applyDailyLeadsRejectedStageJoins($data);
 
                 if (!empty($searchValue)) {
-                $searchValueWithoutCommas = str_replace(',', '', $searchValue);
+                    $searchValueWithoutCommas = str_replace(',', '', $searchValue);
 
-                $data->where(function ($query) use ($searchValue, $searchValueWithoutCommas) {
-                    $query->where('calls.type', 'LIKE', "%$searchValue%")
-                        ->orWhere('calls.name', 'LIKE', "%$searchValue%")
-                        ->orWhere('calls.phone', 'LIKE', "%$searchValue%")
-                        ->orWhere('calls.email', 'LIKE', "%$searchValue%")
-                        ->orWhere('calls.location', 'LIKE', "%$searchValue%")
-                        ->orWhere('calls.language', 'LIKE', "%$searchValue%")
-                        ->orWhere('calls.remarks', 'LIKE', "%$searchValue%")
-                        ->orWhere(DB::raw("CONCAT(brands.brand_name, ' - ', master_model_lines.model_line)"), 'LIKE', "%$searchValue%")
-                        ->orWhere('calls.custom_brand_model', 'LIKE', "%$searchValue%")
-                        ->orWhere('master_model_lines.model_line', 'LIKE', "%$searchValue%")
-                        ->orWhere('created_by_user.name', 'LIKE', "%$searchValue%")
-                        ->orWhere('sales_person_user.name', 'LIKE', "%$searchValue%")
-                        ->orWhere('lead_rejection.sales_notes', 'LIKE', "%$searchValue%")
-                        ->orWhere('lead_rejection.Reason', 'LIKE', "%$searchValue%")
-                        ->orWhere('prospectings.salesnotes', 'LIKE', "%$searchValue%")
-                        ->orWhere('demand.salesnotes', 'LIKE', "%$searchValue%")
-                        ->orWhere('quotations.sales_notes', 'LIKE', "%$searchValue%")
-                        ->orWhere(DB::raw("DATE_FORMAT(lead_rejection.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
-                        ->orWhere(DB::raw("DATE_FORMAT(quotations.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
-                        ->orWhere(DB::raw("DATE_FORMAT(prospectings.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
-                        ->orWhere(DB::raw("DATE_FORMAT(demand.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
-                        ->orWhere(DB::raw("DATE_FORMAT(negotiations.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
-                        ->orWhere(DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
-                        ->orWhere(function ($q) use ($searchValue, $searchValueWithoutCommas) {
-                            $q->where('quotations.deal_value', 'LIKE', "%$searchValueWithoutCommas%")
-                                ->orWhere(DB::raw("REPLACE(FORMAT(quotations.deal_value, 0), ',', '')"), 'LIKE', "%$searchValueWithoutCommas%")
-                                ->orWhere(DB::raw("CONCAT(FORMAT(quotations.deal_value, 0), ' ', quotations.currency)"), 'LIKE', "%$searchValue%");
-                        })
-                        ->orWhere('negotiations.sales_notes', 'LIKE', "%$searchValue%");
+                    $data->where(function ($query) use ($searchValue, $searchValueWithoutCommas) {
+                        $query->where('calls.type', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.name', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.phone', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.email', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.location', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.language', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.remarks', 'LIKE', "%$searchValue%")
+                            ->orWhere('models_brands_sq.models_brands', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.custom_brand_model', 'LIKE', "%$searchValue%")
+                            ->orWhere('created_by_user.name', 'LIKE', "%$searchValue%")
+                            ->orWhere('sales_person_user.name', 'LIKE', "%$searchValue%")
+                            ->orWhere('lead_rejection.sales_notes', 'LIKE', "%$searchValue%")
+                            ->orWhere('lead_rejection.Reason', 'LIKE', "%$searchValue%")
+                            ->orWhere('prospectings.salesnotes', 'LIKE', "%$searchValue%")
+                            ->orWhere('demand.salesnotes', 'LIKE', "%$searchValue%")
+                            ->orWhere(DB::raw("DATE_FORMAT(lead_rejection.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
+                            ->orWhere(DB::raw("DATE_FORMAT(prospectings.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
+                            ->orWhere(DB::raw("DATE_FORMAT(demand.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
+                            ->orWhere(DB::raw("DATE_FORMAT(negotiations.date, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
+                            ->orWhere(DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d')"), 'LIKE', "%$searchValue%")
+                            ->orWhere('negotiations.sales_notes', 'LIKE', "%$searchValue%");
+                        $this->orWhereCallMatchesAnyQuotationSearch($query, $searchValue, $searchValueWithoutCommas);
                     });
                 }
 
-            
             }
-            $data->groupBy('calls.id');
-            $results = $data->get();
+
+            // Quoted/Rejected use latest-row subqueries (one row per call); other tabs may aggregate via GROUP BY.
+            if (! in_array($status, ['Quoted', 'Rejected'], true)) {
+                $data->groupBy('calls.id');
+            }
 
             try {
-                return DataTables::of($results)
+                return DataTables::of($data)
                     ->addColumn('models_brands', function ($row) {
                         return $row->models_brands ?? '';
                     })

@@ -498,7 +498,10 @@ class ProformaInvoiceController extends Controller {
     }
     public function proforma_invoice_edit($callId) {
 
-        $quotation = Quotation::where('calls_id', $callId)->first();
+        $quotation = Quotation::latestForCall((int) $callId);
+        if (! $quotation) {
+            return redirect()->back()->with('error', 'No active quotation found for this lead.');
+        }
         $salespersoncalls = Calls::where('id', $callId)->first();
         $currentUser = Auth::user();
         $hasPermission = $currentUser->hasPermissionForSelectedRole('all-quotation-access');
