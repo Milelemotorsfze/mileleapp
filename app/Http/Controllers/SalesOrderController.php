@@ -151,7 +151,7 @@ class SalesOrderController extends Controller
                 ->first();
 
             $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first();
-            $call = Calls::findOrFail($quotation->calls_id);
+            $call = $this->resolveCallForQuotation($quotation);
 
             return view('salesorder.quotation_versions', compact(
                 'quotationVersionFiles',
