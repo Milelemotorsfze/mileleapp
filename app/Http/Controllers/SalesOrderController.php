@@ -59,23 +59,25 @@ class SalesOrderController extends Controller
 
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
                 $query = So::select([
-                    'calls.name as customername',
-                    'calls.email',
-                    'calls.phone',
-                    'quotations.created_at',
-                    'quotations.deal_value',
-                    'quotations.sales_notes',
-                    'quotations.file_path',
-                    'users.name',
-                    'so.so_number',
+                    DB::raw('MAX(COALESCE(calls.name, clients.name)) as customername'),
+                    DB::raw('MAX(COALESCE(calls.email, clients.email)) as email'),
+                    DB::raw('MAX(COALESCE(calls.phone, clients.phone)) as phone'),
+                    DB::raw('MAX(quotations.created_at) as created_at'),
+                    DB::raw('MAX(quotations.deal_value) as deal_value'),
+                    DB::raw('MAX(quotations.sales_notes) as sales_notes'),
+                    DB::raw('MAX(quotations.file_path) as file_path'),
+                    DB::raw('MAX(users.name) as name'),
+                    DB::raw('MAX(so.so_number) as so_number'),
                     'so.id as soid',
-                    'so.so_date',
-                    'so.status',
-                    'quotations.calls_id',
+                    DB::raw('MAX(so.so_date) as so_date'),
+                    DB::raw('MAX(so.status) as status'),
+                    DB::raw('MAX(quotations.calls_id) as calls_id'),
                 ])
                     ->leftJoin('quotations', 'so.quotation_id', '=', 'quotations.id')
                     ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
                     ->leftJoin('calls', 'quotations.calls_id', '=', 'calls.id')
+                    ->leftJoin('client_leads', 'quotations.calls_id', '=', 'client_leads.calls_id')
+                    ->leftJoin('clients', 'client_leads.clients_id', '=', 'clients.id')
                    ->where(function ($query) {
                         $query->where('so.status', '!=', 'Cancelled')
                             ->orWhereNull('so.status');
@@ -96,9 +98,9 @@ class SalesOrderController extends Controller
                     0 => 'so.so_number',
                     1 => 'so.so_date',
                     2 => 'users.name',
-                    3 => 'calls.name',
-                    4 => 'calls.phone',
-                    5 => 'calls.email',
+                    3 => 'customername',
+                    4 => 'phone',
+                    5 => 'email',
                     6 => 'quotations.created_at',
                     7 => 'quotations.deal_value',
                     8 => 'quotations.sales_notes'
@@ -2131,6 +2133,28 @@ class SalesOrderController extends Controller
         $call->phone = '';
         $call->email = '';
         $call->address = '';
+
+        $client = DB::table('client_leads')
+            ->join('clients', 'client_leads.clients_id', '=', 'clients.id')
+            ->where('client_leads.calls_id', $quotation->calls_id)
+            ->select(
+                'clients.name',
+                'clients.phone',
+                'clients.email',
+                'clients.address',
+                'clients.customertype'
+            )
+            ->first();
+
+        if ($client) {
+            $call->name = $client->name ?? '';
+            $call->phone = $client->phone ?? '';
+            $call->email = $client->email ?? '';
+            $call->address = $client->address ?? '';
+            if (($client->customertype ?? '') === 'Company') {
+                $call->company_name = $client->name ?? '';
+            }
+        }
 
         return $call;
     }
