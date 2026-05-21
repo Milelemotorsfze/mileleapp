@@ -108,8 +108,11 @@ class PreOrderController extends Controller
         //
     }
     public function createpreorder($callId) {
-    $quotation = Quotation::where('calls_id', $callId)->first();
-    $calls = Quotation::where('calls_id', $callId)->first();
+    $quotation = Quotation::latestForCall((int) $callId);
+    if (! $quotation) {
+        return redirect()->back()->with('error', 'No active quotation found for this lead.');
+    }
+    $calls = $quotation;
     $quotationItems = QuotationItem::where('quotation_id', $quotation->id)->get();
     $variants = collect();
     foreach ($quotationItems as $item) {
