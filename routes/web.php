@@ -296,7 +296,7 @@ Route::get('/d', function () {
       //Profoma Invoice
       Route::controller(ProformaInvoiceController::class)->group(function(){
         Route::get('/proforma_invoice/{callId}', 'proforma_invoice')->name('qoutation.proforma_invoice');
-        Route::get('/proforma_invoice_edit/{callId}', 'proforma_invoice_edit')->name('qoutation.proforma_invoice_edit');
+        Route::get('/proforma_invoice_edit/{callId}/{quotationId?}', 'proforma_invoice_edit')->name('qoutation.proforma_invoice_edit');
         Route::get('/get-model-lines/addon-booking/{brandId}/{type}', 'getaddonModels')->name('quotation.getaddonmodel');
         Route::get('/get-model-descriptions/addon-booking/{modelLineId}/{type}', 'getaddonModelDescriptions')->name('quotation.getmodeldescription');
         Route::get('/get-booking-accessories/{addonId}/{brandId}/{modelLineId}', 'getbookingAccessories')->name('booking.getbookingAccessories');
