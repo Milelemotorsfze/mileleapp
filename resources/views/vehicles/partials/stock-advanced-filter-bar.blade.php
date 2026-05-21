@@ -344,6 +344,347 @@ return [
         };
     }
 
+    if (typeof window.stockReportEscapeCsv !== 'function') {
+        window.stockReportEscapeCsv = function (val) {
+            if (val === null || val === undefined) {
+                val = '';
+            }
+            return '"' + String(val).replace(/"/g, '""') + '"';
+        };
+
+        window.stockReportGetRowField = function (row, src) {
+            if (src === null || src === undefined) {
+                return null;
+            }
+            if (typeof src === 'string') {
+                return row[src] !== undefined ? row[src] : null;
+            }
+            if ($.fn.dataTable && $.fn.dataTable.util && typeof $.fn.dataTable.util.get === 'function') {
+                return $.fn.dataTable.util.get(row, src);
+            }
+            if (typeof src === 'function') {
+                return src(row, 'export', null);
+            }
+            return null;
+        };
+
+        window.stockReportStripHtml = function (html) {
+            if (html === null || html === undefined) {
+                return '';
+            }
+            if (typeof html !== 'string' && typeof html !== 'number') {
+                return String(html);
+            }
+            var str = String(html);
+            if (str.indexOf('<') === -1) {
+                return str.trim();
+            }
+            var tmp = document.createElement('div');
+            tmp.innerHTML = str;
+            var full = tmp.querySelector('.full-text');
+            if (full) {
+                return full.textContent.trim();
+            }
+            return (tmp.textContent || tmp.innerText || '').trim();
+        };
+
+        /**
+         * Resolve export cell text from server-side row data (respects column/columnDefs render).
+         */
+        window.stockReportRenderCell = function (dt, row, colIdx, rowIdx) {
+            var settings = dt.settings()[0];
+            var col = settings.aoColumns[colIdx];
+            if (!col) {
+                return '';
+            }
+            if (col.name === 'serial_number') {
+                return String(rowIdx + 1);
+            }
+            if (col.name === 'chat') {
+                return row.message_count != null ? String(row.message_count) : '';
+            }
+            if (col.name === 'varaints.detail' && row.variant_detail != null) {
+                return String(row.variant_detail);
+            }
+            if (col.name === 'vehicles.sales_remarks' && row.sales_remarks != null) {
+                return String(row.sales_remarks);
+            }
+            if (col.name === 'vehicles.vin' && row.vin) {
+                return String(row.vin);
+            }
+            if (col.name === 'varaints.name' && row.variant != null) {
+                return String(row.variant);
+            }
+            if (col.name === 'vehicles.engine' && row.engine != null) {
+                return String(row.engine);
+            }
+
+            var data = window.stockReportGetRowField(row, col.mData);
+            var meta = { row: rowIdx, col: colIdx, settings: settings };
+            var rendered = data;
+            var defRender = null;
+            var defs = settings.aoColumnDefs || [];
+            var d;
+            for (d = 0; d < defs.length; d++) {
+                var def = defs[d];
+                if (!def.render) {
+                    continue;
+                }
+                var targets = def.targets;
+                var match = false;
+                if ($.isArray(targets)) {
+                    match = $.inArray(colIdx, targets) !== -1;
+                } else if (typeof targets === 'number') {
+                    match = targets === colIdx;
+                } else if (targets === '_all') {
+                    match = true;
+                }
+                if (match) {
+                    defRender = def.render;
+                    break;
+                }
+            }
+            if (defRender) {
+                rendered = defRender(data, 'export', row, meta);
+                if (rendered === undefined || rendered === null) {
+                    rendered = defRender(data, 'display', row, meta);
+                }
+            } else if (col.render) {
+                rendered = col.render(data, 'export', row, meta);
+                if (rendered === undefined || rendered === null) {
+                    rendered = col.render(data, 'display', row, meta);
+                }
+            } else if (col.mRender) {
+                rendered = col.mRender(data, 'export', row, meta);
+                if (rendered === undefined || rendered === null) {
+                    rendered = col.mRender(data, 'display', row, meta);
+                }
+            }
+            return window.stockReportStripHtml(rendered);
+        };
+
+        window.stockReportBuildCsvFromDataTable = function (dt, rows) {
+            var settings = dt.settings()[0];
+            var colIndexes = dt.columns(':visible').indexes().toArray();
+            var lines = [];
+            var headerLine = colIndexes.map(function (idx) {
+                var col = settings.aoColumns[idx];
+                return window.stockReportEscapeCsv(col.sTitle || '');
+            }).join(',');
+            lines.push(headerLine);
+
+            rows.forEach(function (row, rowIdx) {
+                var line = colIndexes.map(function (colIdx) {
+                    return window.stockReportEscapeCsv(
+                        window.stockReportRenderCell(dt, row, colIdx, rowIdx)
+                    );
+                }).join(',');
+                lines.push(line);
+            });
+            return lines.join('\n');
+        };
+
+        window.stockReportDownloadCsv = function (csvContent, filename) {
+            var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            if (navigator.msSaveBlob) {
+                navigator.msSaveBlob(blob, filename);
+                return;
+            }
+            var link = document.createElement('a');
+            if (link.download !== undefined) {
+                var url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+        };
+
+        /**
+         * Build AJAX payload matching the stock DataTable (filters, search, sort) plus export flag.
+         */
+        window.stockReportGetExportParams = function (dt, overrides) {
+            overrides = overrides || {};
+            var settings = dt.settings()[0];
+            var params = null;
+
+            try {
+                if (dt.ajax && typeof dt.ajax.params === 'function') {
+                    params = dt.ajax.params();
+                }
+            } catch (e) {
+                params = null;
+            }
+
+            if (!params || typeof params !== 'object') {
+                params = {
+                    draw: 1,
+                    start: 0,
+                    length: 50,
+                    search: { value: dt.search() || '', regex: false },
+                    columns: [],
+                    order: []
+                };
+                dt.columns().every(function (idx) {
+                    var col = settings.aoColumns[idx];
+                    var dataKey = '';
+                    if (col.mData !== null && col.mData !== undefined && typeof col.mData !== 'function') {
+                        dataKey = col.mData;
+                    }
+                    params.columns.push({
+                        data: dataKey,
+                        name: col.name || '',
+                        searchable: col.bSearchable !== false,
+                        orderable: col.bSortable !== false,
+                        search: { value: '', regex: false }
+                    });
+                });
+                var ord = dt.order();
+                for (var oi = 0; oi < ord.length; oi++) {
+                    params.order.push({ column: ord[oi][0], dir: ord[oi][1] });
+                }
+            }
+
+            var ajaxConf = settings.ajax;
+            if (typeof ajaxConf === 'object' && typeof ajaxConf.data === 'function') {
+                ajaxConf.data(params);
+            }
+
+            params.stock_export = 1;
+            return $.extend(true, {}, params, overrides);
+        };
+
+        /**
+         * Export all rows matching current filters/search (chunked; ignores page length).
+         */
+        window.exportStockReportToCsv = function (tableId, filename) {
+            filename = filename || 'stock-report-export.csv';
+            var CHUNK_SIZE = 500;
+
+            if (!$.fn.DataTable || !$.fn.DataTable.isDataTable('#' + tableId)) {
+                if (typeof alertify !== 'undefined') {
+                    alertify.error('Table is not ready for export.');
+                } else {
+                    alert('Table is not ready for export.');
+                }
+                return;
+            }
+
+            var dt = $('#' + tableId).DataTable();
+            var settings = dt.settings()[0];
+            var ajaxConf = settings.ajax;
+            var url = typeof ajaxConf === 'string' ? ajaxConf : (ajaxConf && ajaxConf.url);
+            var method = (typeof ajaxConf === 'object' && ajaxConf.type) ? ajaxConf.type : 'POST';
+            var headers = (typeof ajaxConf === 'object' && ajaxConf.headers) ? ajaxConf.headers : {};
+
+            if (!url) {
+                if (typeof alertify !== 'undefined') {
+                    alertify.error('Export URL is not configured.');
+                }
+                return;
+            }
+
+            if (window.stockReportExportInProgress) {
+                if (typeof alertify !== 'undefined') {
+                    alertify.warning('Export is already in progress.');
+                }
+                return;
+            }
+            window.stockReportExportInProgress = true;
+
+            var params = window.stockReportGetExportParams(dt, { start: 0, length: CHUNK_SIZE });
+            var allRows = [];
+            var chunkRequests = 0;
+            var maxChunkRequests = 200;
+            var $wrapper = $(settings.nTableWrapper);
+            var $processing = $wrapper.find('.dataTables_processing');
+
+            function finishExport() {
+                window.stockReportExportInProgress = false;
+                $processing.hide();
+            }
+
+            function failExport(message) {
+                finishExport();
+                if (typeof alertify !== 'undefined') {
+                    alertify.error(message);
+                } else {
+                    alert(message);
+                }
+            }
+
+            function fetchNextChunk() {
+                chunkRequests += 1;
+                if (chunkRequests > maxChunkRequests) {
+                    failExport('Export is too large to complete in one request. Apply more filters and try again.');
+                    return;
+                }
+
+                $.ajax({
+                    url: url,
+                    type: method,
+                    data: params,
+                    headers: headers,
+                    dataType: 'json',
+                    timeout: 180000,
+                    success: function (json) {
+                        if (!json || !Array.isArray(json.data)) {
+                            failExport('Invalid export response from server.');
+                            return;
+                        }
+
+                        var chunk = json.data;
+                        var filteredTotal = json.recordsFiltered != null
+                            ? parseInt(json.recordsFiltered, 10)
+                            : chunk.length;
+
+                        if (chunk.length === 0) {
+                            filteredTotal = allRows.length;
+                        }
+
+                        allRows = allRows.concat(chunk);
+
+                        if (chunk.length > 0 && allRows.length < filteredTotal) {
+                            params.start = allRows.length;
+                            params.draw = (parseInt(params.draw, 10) || 1) + 1;
+                            fetchNextChunk();
+                            return;
+                        }
+
+                        try {
+                            var csv = window.stockReportBuildCsvFromDataTable(dt, allRows);
+                            window.stockReportDownloadCsv(csv, filename);
+                            if (typeof alertify !== 'undefined') {
+                                alertify.success('Exported ' + allRows.length + ' record(s).');
+                            }
+                        } catch (buildErr) {
+                            failExport('Could not build export file.');
+                            return;
+                        }
+                        finishExport();
+                    },
+                    error: function (xhr, status) {
+                        var message = 'Export failed. Please try again.';
+                        if (status === 'timeout') {
+                            message = 'Export timed out. Try narrowing filters and export again.';
+                        } else if (xhr && xhr.status === 419) {
+                            message = 'Session expired. Refresh the page and try again.';
+                        } else if (xhr && xhr.status >= 500) {
+                            message = 'Server error during export. Try again or contact support.';
+                        }
+                        failExport(message);
+                    }
+                });
+            }
+
+            $processing.show();
+            fetchNextChunk();
+        };
+    }
+
     (function() {
         var tableId = @json($barUid);
         window.stockBarCommitted = window.stockBarCommitted || {};
