@@ -454,20 +454,15 @@ Route::get('/d', function () {
      // Employee Overtime Application
      Route::resource('separation-handover', SeparationController::class);
 
-    // Work Order Module
-    Route::resource('work-order', WorkOrderController::class)->only([
-        'show','store','edit','update','create'
-    ]);
-    Route::get('/export-work-orders', [WorkOrderExportController::class, 'export']);
-    // Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments']);
-    Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments'])->name('comments.get');
-    Route::delete('/workorder/{id}', [WorkOrderController::class, 'destroy'])->name('workorder.destroy');
-    Route::post('/is-exist-in-sales-order', [WorkOrderController::class, 'isExistInSalesOrder'])->name('work-order.is-exist-in-sales-ordder');
+    // Work Order Module (static routes must be registered before work-order/{work_order} resource)
     Route::controller(WorkOrderController::class)->group(function(){
+        Route::get('work-order/search-vins', 'searchWorkOrderVins')->name('work-order.search-vins');
+        Route::get('work-order/search-customers', 'searchWorkOrderCustomers')->name('work-order.search-customers');
+        Route::post('work-order/vin-details', 'getWorkOrderVinDetails')->name('work-order.vin-details');
         Route::get('work-order-create/{type}', 'workOrderCreate')->name('work-order-create.create');
         Route::get('work-order-info/{type}', 'index')->name('work-order.index');
-        Route::post('/fetch-addons', [WorkOrderController::class, 'fetchAddons'])->name('fetch-addons');
-        Route::post('/comments', [WorkOrderController::class, 'storeComments'])->name('comments.store');
+        Route::post('/fetch-addons', 'fetchAddons')->name('fetch-addons');
+        Route::post('/comments', 'storeComments')->name('comments.store');
         Route::post('work-order/so-unique-check', 'uniqueSO')->name('work-order.uniqueSO');
         Route::post('work-order/wo-unique-check', 'uniqueWO')->name('work-order.uniqueWO');
         Route::get('work-order-vehicle/data-history/{id}','vehicleDataHistory')->name('wo-vehicles.data-history');
@@ -481,6 +476,13 @@ Route::get('/d', function () {
         Route::post('/update-created-at', 'updateCreatedAt')->name('work-order.updateCreatedAt');
         Route::post('/update-date', 'updateDate')->name('work-order.updateDate');
     });
+    Route::resource('work-order', WorkOrderController::class)->only([
+        'show','store','edit','update','create'
+    ]);
+    Route::get('/export-work-orders', [WorkOrderExportController::class, 'export']);
+    Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments'])->name('comments.get');
+    Route::delete('/workorder/{id}', [WorkOrderController::class, 'destroy'])->name('workorder.destroy');
+    Route::post('/is-exist-in-sales-order', [WorkOrderController::class, 'isExistInSalesOrder'])->name('work-order.is-exist-in-sales-ordder');
     Route::controller(WoDocsStatusController::class)->group(function(){
         Route::post('/update-wo-doc-status', 'updateDocStatus')->name('wo.updateDocStatus');
         Route::get('/wo-doc-status-history/{id}', 'docStatusHistory')->name('docStatusHistory');

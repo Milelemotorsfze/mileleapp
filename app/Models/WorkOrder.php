@@ -137,19 +137,15 @@ class WorkOrder extends Model
 
 
     public function getStatusAttribute() {
-        $status = '';
-        
-        // Fetch the most recent record for the current work order
+        if ($this->relationLoaded('latestStatus') && $this->latestStatus) {
+            return $this->latestStatus->status;
+        }
+
         $data = WoStatus::where('wo_id', $this->id)
             ->orderBy('status_changed_at', 'DESC')
             ->first();
-        
-        // If data exists, update the status to the latest one
-        if ($data) {
-            $status = $data->status;
-        }
-    
-        return $status;
+
+        return $data ? $data->status : '';
     }
     public function getSalesSupportDataConfirmationAttribute() {
         $status = '';
@@ -171,10 +167,12 @@ class WorkOrder extends Model
     }
     public function getFinanceApprovalStatusAttribute()
     {
-        $data = WOApprovals::where('work_order_id', $this->id)
-                            ->where('type', 'finance')
-                            ->orderBy('updated_at', 'DESC')
-                            ->first();
+        $data = $this->relationLoaded('latestFinance')
+            ? $this->latestFinance
+            : WOApprovals::where('work_order_id', $this->id)
+                ->where('type', 'finance')
+                ->orderBy('updated_at', 'DESC')
+                ->first();
 
         if (!$data) {
             return '';
@@ -211,10 +209,13 @@ class WorkOrder extends Model
     }
     public function getCooApprovalStatusAttribute()
     {
-        $data = WOApprovals::where('work_order_id', $this->id)
-                            ->where('type', 'coo')
-                            ->orderBy('updated_at', 'DESC')
-                            ->first();
+        $data = $this->relationLoaded('latestCOO')
+            ? $this->latestCOO
+            : WOApprovals::where('work_order_id', $this->id)
+                ->where('type', 'coo')
+                ->orderBy('updated_at', 'DESC')
+                ->first();
+
         if (!$data || $this->can_show_coo_approval !== 'yes') {
             return '';
         }
@@ -251,41 +252,42 @@ class WorkOrder extends Model
     }
     public function getDocsStatusAttribute()
     {
-        $status = 'Blank';  // Default status if conditions are not met
+        $status = 'Blank';
 
-        if ($this->sales_support_data_confirmation_at && 
-            $this->coo_approval_status === 'Approved' && 
+        if ($this->sales_support_data_confirmation_at &&
+            $this->coo_approval_status === 'Approved' &&
             $this->finance_approval_status === 'Approved') {
             $status = 'Not Initiated';
         }
 
-        // Fetch the most recent record for the current work order
-        $data = WoDocsStatus::where('wo_id', $this->id)
-                            ->orderBy('doc_status_changed_at', 'DESC')
-                            ->first();
+        $data = $this->relationLoaded('latestDocsStatus')
+            ? $this->latestDocsStatus
+            : WoDocsStatus::where('wo_id', $this->id)
+                ->orderBy('doc_status_changed_at', 'DESC')
+                ->first();
 
-        // If data exists, update the status to the latest one
         if ($data) {
             $status = $data->is_docs_ready;
         }
 
         return $status;
     }
+
     public function getTotalNumberOfBOEAttribute() {
-        $uniqueBoeCount = '';
-        $uniqueBoeCount = WOVehicles::where('work_order_id', $this->id)
-        ->whereNull('deleted_at')
-        ->distinct()
-        ->count('boe_number');
-        return $uniqueBoeCount;
-    }
-    public function getVehicleCountAttribute() {
-        // Count the vehicles related to this work order and not deleted
-        $vehicleCount = WOVehicles::where('work_order_id', $this->id)
+        return WOVehicles::where('work_order_id', $this->id)
             ->whereNull('deleted_at')
-            ->count(); // This will return the number of records
-    
-        return $vehicleCount;
+            ->distinct()
+            ->count('boe_number');
+    }
+
+    public function getVehicleCountAttribute() {
+        if ($this->relationLoaded('vehicles')) {
+            return $this->vehicles->whereNull('deleted_at')->count();
+        }
+
+        return WOVehicles::where('work_order_id', $this->id)
+            ->whereNull('deleted_at')
+            ->count();
     }
     public function getTypeNameAttribute() {
         $typeName = '';
@@ -331,8 +333,9 @@ class WorkOrder extends Model
         $initiatedCount = $this->vehicles_initiated_count;
         $notInitiatedCount = $this->vehicles_not_initiated_count;
     
-        // Get the total number of vehicles related to the work order
-        $totalVehiclesCount = $this->vehicles()->count();
+        $totalVehiclesCount = $this->relationLoaded('vehicles')
+            ? $this->vehicles->whereNull('deleted_at')->count()
+            : $this->vehicles()->count();
     
         // Special case: if all vehicles have no modifications
         if ($noModificationsCount == $totalVehiclesCount) {
