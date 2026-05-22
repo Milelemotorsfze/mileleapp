@@ -407,21 +407,13 @@ $formAction = isset($workOrder)
 						<input hidden id="customer_reference_id" name="customer_reference_id" value="">
 						<input hidden id="customer_reference_type" name="customer_reference_type" value="">
 						<select id="customer_name" name="existing_customer_name" class="form-control widthinput" multiple="true">
-							@foreach($customers as $customer)
+							@if(isset($workOrder) && $workOrder->customer_name)
 							@php
-								// Safely escape customer names to prevent issues with spaces, newlines, quotes
-								// e() helper already escapes, but we ensure newlines are handled
-								$customerName = str_replace(["\r\n", "\r", "\n"], ' ', $customer->customer_name ?? '');
+								$customerName = str_replace(["\r\n", "\r", "\n"], ' ', $workOrder->customer_name ?? '');
 								$customerNameEscaped = e($customerName);
-								$customerDataId = e(($customer->email ?? '') . '_' . ($customer->phone ?? ''));
 							@endphp
-							<option
-								value="{{ $customerNameEscaped }}"
-								data-id="{{ $customerDataId }}">
-								{{ $customerNameEscaped }}
-							</option>
-							@endforeach
-
+							<option value="{{ $customerNameEscaped }}" selected>{{ $customerNameEscaped }}</option>
+							@endif
 						</select>
 						<input type="text" id="textInput" placeholder="Enter Customer Name" name="new_customer_name"
 							class="form-control widthinput @error('customer_name') is-invalid @enderror" onkeyup="sanitizeInput(this)">
@@ -694,15 +686,11 @@ $formAction = isset($workOrder)
 					<div class="col-xxl-12 col-lg-12 col-md-12">
 						<label for="vin_multiple" class="col-form-label text-md-end">{{ __('VIN') }}</label>
 						<select id="vin_multiple" name="vin_multiple" class="form-control widthinput" multiple="true">
-							@foreach($vins as $vin)
-							@php
-								// Safely escape all values to prevent issues with spaces, newlines, quotes in brand/model names
-								$vinValue = htmlspecialchars($vin->vin ?? '', ENT_QUOTES, 'UTF-8');
-								$brandName = htmlspecialchars($vin->variant->master_model_lines->brand->brand_name ?? '', ENT_QUOTES, 'UTF-8');
-								$modelLine = htmlspecialchars($vin->variant->master_model_lines->model_line ?? '', ENT_QUOTES, 'UTF-8');
-							@endphp
-							<option value="{{ $vinValue }}">{{ $vinValue }} / {{ $brandName }} / {{ $modelLine }}</option>
-							@endforeach
+							@if(isset($editVinOptions) && count($editVinOptions) > 0)
+								@foreach($editVinOptions as $editVin)
+								<option value="{{ e($editVin['vin'] ?? '') }}">{{ e($editVin['label'] ?? '') }}</option>
+								@endforeach
+							@endif
 						</select>
 					</div>
 				</div>
@@ -1246,95 +1234,9 @@ $formAction = isset($workOrder)
 	</div>
 </div>
 @endif
-{{-- Customers --}}
-<script id="customers-json" type="application/json">
-@php
-try {
-    $customersJson = json_encode($customers, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
-    if ($customersJson === false) {
-        $customersJson = json_encode([], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
-    }
-} catch (\Exception $e) {
-    $customersJson = json_encode([], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
-}
-@endphp
-{!! $customersJson !!}
-</script>
-
-{{-- VINs --}}
-<script id="vins-json" type="application/json">
-@php
-try {
-    $vinsJson = json_encode($vins, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
-    if ($vinsJson === false) {
-        $vinsJson = json_encode([], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
-    }
-} catch (\Exception $e) {
-    $vinsJson = json_encode([], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
-}
-@endphp
-{!! $vinsJson !!}
-</script>
-
-{{-- JS block to parse safely --}}
 <script>
 	let customers = [];
 	let vins = [];
-	let dataLoadError = false;
-
-	try {
-		const customersElement = document.getElementById('customers-json');
-		const vinsElement = document.getElementById('vins-json');
-		
-		if (customersElement) {
-			const customersText = customersElement.textContent.trim();
-			if (customersText) {
-				customers = JSON.parse(customersText);
-				// Ensure it's an array
-				if (!Array.isArray(customers)) {
-					console.warn("Customers data is not an array, converting to array");
-					customers = [];
-				}
-			}
-		} else {
-			console.warn("Customers JSON element not found");
-		}
-		
-		if (vinsElement) {
-			const vinsText = vinsElement.textContent.trim();
-			if (vinsText) {
-				vins = JSON.parse(vinsText);
-				// Ensure it's an array
-				if (!Array.isArray(vins)) {
-					console.warn("VINs data is not an array, converting to array");
-					vins = [];
-				}
-			}
-		} else {
-			console.warn("VINs JSON element not found");
-		}
-		
-		console.log("Customers & VINs loaded successfully", {
-			customersCount: customers.length,
-			vinsCount: vins.length
-		});
-	} catch (e) {
-		dataLoadError = true;
-		console.error("JSON parse failed:", e);
-		console.error("Error details:", {
-			message: e.message,
-			name: e.name,
-			stack: e.stack
-		});
-		// Ensure arrays are initialized even on error
-		customers = Array.isArray(customers) ? customers : [];
-		vins = Array.isArray(vins) ? vins : [];
-		
-		// Show user-friendly error if critical
-		if (typeof window !== 'undefined' && window.console) {
-			console.error("⚠️ Data loading error: Some features may not work correctly. Please refresh the page.");
-		}
-	}
 </script>
 <script type="text/javascript">
 	// Global helper function to escape strings for safe embedding in HTML attributes
@@ -1369,7 +1271,9 @@ try {
 	var onChangeSelectedVins = [];
 	var vinWithoutBoe = [];
 	var authUserPermission = @json($allfieldPermission ? 'true' : 'false');
-	@if(isset($workOrder))
+	@if(isset($workOrderJson))
+	var workOrder = @json($workOrderJson);
+	@elseif(isset($workOrder))
 	var workOrder = @json($workOrder);
 	@else
 	var workOrder = null;
@@ -1421,7 +1325,6 @@ try {
 				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 			}
 		});
-		console.log('Is vins an array:', Array.isArray(vins));
 		document.getElementById('submit-from-top').addEventListener('click', function() {
 			document.getElementById('submit').click();
 		});
@@ -1433,7 +1336,24 @@ try {
 		$('#customer_name').select2({
 			allowClear: true,
 			maximumSelectionLength: 1,
-			placeholder: "Choose Customer Name",
+			placeholder: "Type at least 2 characters to search customer",
+			minimumInputLength: 2,
+			ajax: {
+				url: @json(url(route('work-order.search-customers'))),
+				dataType: 'json',
+				delay: 300,
+				headers: {
+					'X-Requested-With': 'XMLHttpRequest',
+					'Accept': 'application/json'
+				},
+				data: function(params) {
+					return { q: params.term };
+				},
+				processResults: function(data) {
+					return { results: data.results || [] };
+				},
+				cache: true
+			}
 		});
 
 
@@ -1610,7 +1530,24 @@ try {
 
 		$('#vin_multiple').select2({
 			allowClear: true,
-			placeholder: "VIN",
+			placeholder: "Type at least 2 characters to search VIN",
+			minimumInputLength: 2,
+			ajax: {
+				url: @json(url(route('work-order.search-vins'))),
+				dataType: 'json',
+				delay: 300,
+				headers: {
+					'X-Requested-With': 'XMLHttpRequest',
+					'Accept': 'application/json'
+				},
+				data: function(params) {
+					return { q: params.term };
+				},
+				processResults: function(data) {
+					return { results: data.results || [] };
+				},
+				cache: true
+			}
 		});
 		$('#vin').select2({
 			allowClear: true,
@@ -1623,26 +1560,23 @@ try {
 			placeholder: "Select User",
 		});
 
-		function setCustomerRelations(selectedCustomerUniqueId) {
+		function setCustomerRelations(customerData) {
 			$('#customer_address').val('');
 			$('#customer_email').val('');
 			$('#customer_company_number').val('');
-			if (selectedCustomerUniqueId != null && Array.isArray(customers) && customers.length > 0) {
-				for (var i = 0; i < customerCount && i < customers.length; i++) {
-					if (customers[i] && customers[i].unique_id == selectedCustomerUniqueId) {
-						if (customers[i].customer_address != null) {
-							$('#customer_address').val(customers[i]?.customer_address);
-						}
-						if (customers[i].customer_email != null) {
-							$('#customer_email').val(customers[i]?.customer_email);
-						}
-						if (customers[i].customer_company_number != null) {
-							var fullPhoneNumber = customers[i].customer_company_number ? customers[i].customer_company_number.replace(/\s+/g, '') : '';
-							iti.setNumber(fullPhoneNumber);
-							sanitizeNumberInput(input);
-						}
-					}
-				}
+			if (!customerData) {
+				return;
+			}
+			if (customerData.customer_address != null) {
+				$('#customer_address').val(customerData.customer_address);
+			}
+			if (customerData.customer_email != null) {
+				$('#customer_email').val(customerData.customer_email);
+			}
+			if (customerData.customer_company_number != null) {
+				var fullPhoneNumber = customerData.customer_company_number ? customerData.customer_company_number.replace(/\s+/g, '') : '';
+				iti.setNumber(fullPhoneNumber);
+				sanitizeNumberInput(input);
 			}
 		}
 		$('.transport_type').click(function() {
@@ -1705,8 +1639,10 @@ try {
 			$("#transportation-company-details-div").show();
 		}
 		$('#customer_name').on('change', function() {
-			var selectedCustomerUniqueId = $('#customer_name option:selected').data('id');
-			setCustomerRelations(selectedCustomerUniqueId);
+			var selectedData = $('#customer_name').select2('data');
+			if (selectedData && selectedData.length > 0) {
+				setCustomerRelations(selectedData[0]);
+			}
 		});
 		$('.deposit_received_as').click(function() {
 			selectedDepositReceivedValue = $('input[name="deposit_received_as"]:checked').val();
@@ -2876,58 +2812,49 @@ try {
 
 	function addVIN() {
 		var selectedVIN = $("#vin_multiple").val();
-		if (selectedVIN != '' && selectedVIN.length > 0 && Array.isArray(vins) && vins.length > 0) {
-			for (var j = 0; j < selectedVIN.length; j++) {
-				for (var i = 0; i < vins.length; i++) {
-					if (vins[i] && vins[i].vin != null && vins[i].vin == selectedVIN[j]) {
-						var data = {
-							id: '',
-							vehicle_id: vins[i]?.id ?? '',
-							vin: vins[i].vin ?? '',
-							brand: vins[i]?.variant?.master_model_lines?.brand?.brand_name ?? '',
-							variant: vins[i]?.variant?.name ?? '',
-							engine: vins[i]?.engine ?? '',
-							model_description: vins[i]?.variant?.model_detail ?? '',
-							model_year: vins[i]?.variant?.my ?? '',
-							model_year_to_mention_on_documents: vins[i]?.variant?.my ?? '',
-							steering: vins[i]?.variant?.steering ?? '',
-							exterior_colour: vins[i]?.exterior?.name ?? '',
-							interior_colour: vins[i]?.interior?.name ?? '',
-							warehouse: vins[i]?.warehouse_location?.name ?? '',
-							territory: vins[i]?.territory ?? '',
-							preferred_destination: '',
-							import_document_type: vins[i]?.document?.import_type ?? '',
-							ownership_name: vins[i]?.document?.ownership ?? '',
-							certification_per_vin: '',
-							modification_or_jobs_to_perform_per_vin: '',
-							special_request_or_remarks: '',
-							shipment: '',
-						};
-						drawTableRow(data);
-					}
-				}
-			}
-			var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
-			if (index > 0) {
-				$(".dynamicselect2").each(function() {
-					var selectElement = $(this);
-					selectedVIN.forEach(function(vin) {
-						if (selectElement.find(`option[value='${vin}']`).length === 0) {
-							selectElement.append(`<option value="${vin}">${vin}</option>`);
-						}
-					});
-				});
-			}
+		if (!selectedVIN || selectedVIN.length === 0) {
+			return;
 		}
-		$('#vin_multiple').val(null).trigger('change');
-		$('#vin_multiple option').each(function() {
-			if (selectedVIN.includes($(this).val())) {
-				$(this).prop('disabled', true);
+
+		$.ajax({
+			url: @json(url(route('work-order.vin-details'))),
+			type: 'POST',
+			data: {
+				_token: $('meta[name="csrf-token"]').attr('content'),
+				vins: selectedVIN
+			},
+			success: function(response) {
+				var vinRows = response.vins || [];
+				vinRows.forEach(function(data) {
+					drawTableRow(data);
+				});
+
+				var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
+				if (index > 0) {
+					$(".dynamicselect2").each(function() {
+						var selectElement = $(this);
+						selectedVIN.forEach(function(vin) {
+							if (selectElement.find(`option[value='${vin}']`).length === 0) {
+								selectElement.append(`<option value="${vin}">${vin}</option>`);
+							}
+						});
+					});
+				}
+
+				$('#vin_multiple').val(null).trigger('change');
+				$('#vin_multiple option').each(function() {
+					if (selectedVIN.includes($(this).val())) {
+						$(this).prop('disabled', true);
+					}
+				});
+				findAllVINs();
+				$('.addon_input_outer_row').each(function() {
+					$(this).remove();
+				});
+			},
+			error: function() {
+				alert('Unable to load vehicle details. Please try again.');
 			}
-		});
-		findAllVINs();
-		$('.addon_input_outer_row').each(function() {
-			$(this).remove();
 		});
 	}
 

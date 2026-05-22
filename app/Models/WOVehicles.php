@@ -71,45 +71,50 @@ class WOVehicles extends Model
     }
     public function getModificationStatusAttribute()
     {
-        $status = 'Not Initiated';  // Default status
+        $status = 'Not Initiated';
 
-        // If no modification jobs and no addons, set to 'No Modifications'
-        if (is_null($this->modification_or_jobs_to_perform_per_vin) && $this->addons()->count() == 0) {
+        $addonCount = $this->addons_count ?? ($this->relationLoaded('addons') ? $this->addons->count() : null);
+        if (is_null($this->modification_or_jobs_to_perform_per_vin) && ($addonCount === 0 || ($addonCount === null && $this->addons()->count() == 0))) {
             return 'No Modifications';
         }
 
-        // Fetch the latest modification status from the database
-        $data = WOVehicleStatus::where('w_o_vehicle_id', $this->id)
-                                ->orderBy('created_at', 'DESC')
-                                ->first();
-
-        // If status data exists, return the latest status
-        if ($data) {
-            return $data->status;
+        if ($this->relationLoaded('latestModificationStatus')) {
+            return $this->latestModificationStatus?->status ?? $status;
         }
 
-        return $status;
+        $data = WOVehicleStatus::where('w_o_vehicle_id', $this->id)
+            ->orderBy('created_at', 'DESC')
+            ->first();
+
+        return $data ? $data->status : $status;
     }
+
     public function getPDIStatusAttribute()
     {
-        $status = 'Not Initiated';  // Default status
+        $status = 'Not Initiated';
 
-        // Get the latest PDI status from the database
+        if ($this->relationLoaded('latestPdiStatus')) {
+            return $this->latestPdiStatus?->status ?? $status;
+        }
+
         $data = WOVehiclePDIStatus::where('w_o_vehicle_id', $this->id)
-                                    ->latest('created_at')
-                                    ->first();
+            ->latest('created_at')
+            ->first();
 
         return $data ? $data->status : $status;
     }
 
     public function getDeliveryStatusAttribute()
     {
-        $status = 'On Hold';  // Default status
+        $status = 'On Hold';
 
-        // Get the latest delivery status from the database
+        if ($this->relationLoaded('latestDeliveryStatus')) {
+            return $this->latestDeliveryStatus?->status ?? $status;
+        }
+
         $data = WOVehicleDeliveryStatus::where('w_o_vehicle_id', $this->id)
-                                    ->latest('created_at')
-                                    ->first();
+            ->latest('created_at')
+            ->first();
 
         return $data ? $data->status : $status;
     }
