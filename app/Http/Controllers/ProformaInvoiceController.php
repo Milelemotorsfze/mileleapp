@@ -32,14 +32,32 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Addon;
 use App\Models\User;
 class ProformaInvoiceController extends Controller {
+    /**
+     * Match Daily Leads visibility: assigned rep, lead creator, quotation creator, or all-quotation-access.
+     */
+    private function userCanAccessProforma(Calls $call, ?Quotation $quotation = null): bool
+    {
+        $user = Auth::user();
+        if ($user->hasPermissionForSelectedRole('all-quotation-access')) {
+            return true;
+        }
+        $userId = (int) $user->id;
+        if ((int) $call->sales_person === $userId || (int) $call->created_by === $userId) {
+            return true;
+        }
+        if ($quotation && (int) $quotation->created_by === $userId) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function proforma_invoice($callId) {
         $brands = Brand::all();
         $callDetails = Calls::where('id', $callId)->first();
-        $currentUser = Auth::user();
-        $hasPermission = $currentUser->hasPermissionForSelectedRole('all-quotation-access');
-        if ($callDetails->sales_person !== $currentUser->id && !$hasPermission) {
-        return redirect()->route('not_access_page');
-         }
+        if (! $callDetails || ! $this->userCanAccessProforma($callDetails)) {
+            return redirect()->route('not_access_page');
+        }
         $assessoriesDesc = AddonDescription::whereHas('Addon', function($q) {
             $q->where('addon_type','P');
         })->get();
@@ -513,11 +531,9 @@ class ProformaInvoiceController extends Controller {
             return redirect()->back()->with('error', 'No active quotation found for this lead.');
         }
         $salespersoncalls = Calls::where('id', $callId)->first();
-        $currentUser = Auth::user();
-        $hasPermission = $currentUser->hasPermissionForSelectedRole('all-quotation-access');
-        if ($salespersoncalls->sales_person !== $currentUser->id && !$hasPermission) {
-        return redirect()->route('not_access_page');
-         }
+        if (! $salespersoncalls || ! $this->userCanAccessProforma($salespersoncalls, $quotation)) {
+            return redirect()->route('not_access_page');
+        }
         $quotation_details = QuotationDetail::where('quotation_id', $quotation->id)->first();
         $quotationitems = QuotationItem::with(['varaint', 'addon', 'quotationVins', 'shippingdocuments', 'shippingcertification', 'otherlogisticscharges'])
             ->where('quotation_id', $quotation->id)
