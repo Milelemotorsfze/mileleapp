@@ -2337,8 +2337,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-{ data: 'created_by_name', name: 'created_by_name' },
-{ data: 'sales_person_name', name: 'sales_person_name' },
+{ data: 'created_by_name', name: 'created_by_user.name' },
+{ data: 'sales_person_name', name: 'sales_person_user.name' },
                 // {
                 //     data: 'id',
                 //     name: 'id',
@@ -2498,8 +2498,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-{ data: 'created_by_name', name: 'created_by_name' },
-{ data: 'sales_person_name', name: 'sales_person_name' },
+{ data: 'created_by_name', name: 'created_by_user.name' },
+{ data: 'sales_person_name', name: 'sales_person_user.name' },
                 // {
                 //     data: 'id',
                 //     name: 'id',
@@ -2558,7 +2558,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'name', name: 'name' },
                 { data: 'phone', name: 'phone' },
                 { data: 'email', name: 'email' },
-                { data: 'models_brands', name: 'models_brands' },
+                { data: 'models_brands', name: 'models_brands_sq.models_brands' },
                 { data: 'custom_brand_model', name: 'custom_brand_model' },
                 { data: 'language', name: 'language' },
                 { data: 'location', name: 'location' },
@@ -2578,7 +2578,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 },
                 {
                     data: 'date',
-                    name: 'date',
+                    name: 'prospectings.date',
                     render: function (data, type, row) {
                       if (type === 'display' || type === 'filter') {
                         if (!data || !moment(data).isValid()) {
@@ -2592,7 +2592,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 },
                 {
     data: 'salesnotes',
-    name: 'salesnotes',
+    name: 'prospectings.salesnotes',
     searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
@@ -2612,7 +2612,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 },
 {
             data: 'ddate',
-            name: 'ddate',
+            name: 'demand.date',
              render: function (data, type, row) {
         if (type === 'display' || type === 'filter') {
             if (!data || !moment(data).isValid()) {
@@ -2626,7 +2626,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         },
                 {
     data: 'dsalesnotes',
-    name: 'dsalesnotes',
+    name: 'demand.salesnotes',
     searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
@@ -2646,7 +2646,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 },
 {
             data: 'qdate',
-            name: 'qdate',
+            name: 'quotations.date',
              render: function (data, type, row) {
         if (type === 'display' || type === 'filter') {
             if (!data || !moment(data).isValid()) {
@@ -2662,14 +2662,14 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 
       {
         data: 'deal_value',
-        name: 'deal_value',
+        name: 'quotations.deal_value',
         render: function(data, type, row) {
           return data || '';
         }
       },
       {
     data: 'qsalesnotes',
-    name: 'qsalesnotes',
+    name: 'quotations.sales_notes',
     searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
@@ -2716,8 +2716,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                     }
                 }
             },
-            { data: 'created_by_name', name: 'created_by_name' },
-            { data: 'sales_person_name', name: 'sales_person_name' },
+            { data: 'created_by_name', name: 'created_by_user.name' },
+            { data: 'sales_person_name', name: 'sales_person_user.name' },
             @php
             $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
             @endphp
@@ -3039,7 +3039,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'name', name: 'name'},
                 { data: 'phone', name: 'phone'},
                 { data: 'email', name: 'email'},
-                { data: 'models_brands', name: 'models_brands'},
+                { data: 'models_brands', name: 'models_brands_sq.models_brands'},
                 { data: 'custom_brand_model', name: 'custom_brand_model'},
                 { data: 'location', name: 'location'},
                 { data: 'language', name: 'language'},
@@ -3060,7 +3060,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 
           {
             data: 'date',
-            name: 'date',
+            name: 'prospectings.date',
              render: function (data, type, row) {
         if (type === 'display' || type === 'filter') {
             if (!data || !moment(data).isValid()) {
@@ -3074,7 +3074,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         },
                 {
     data: 'salesnotes',
-    name: 'salesnotes',
+    name: 'prospectings.salesnotes',
     searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
@@ -3094,7 +3094,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 },
 {
             data: 'ddate',
-            name: 'ddate',
+            name: 'demand.date',
              render: function (data, type, row) {
         if (type === 'display' || type === 'filter') {
             if (!data || !moment(data).isValid()) {
@@ -3108,7 +3108,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         },
                 {
     data: 'dsalesnotes',
-    name: 'dsalesnotes',
+    name: 'demand.salesnotes',
     searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
@@ -3128,7 +3128,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 },
 {
             data: 'qdate',
-            name: 'qdate',
+            name: 'quotations.date',
              render: function (data, type, row) {
         if (type === 'display' || type === 'filter') {
             if (!data || !moment(data).isValid()) {
@@ -3143,7 +3143,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 
       {
         data: 'deal_value',
-        name: 'deal_value',
+        name: 'quotations.deal_value',
         render: function(data) {
             return data || '';
         }
@@ -3151,7 +3151,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 
     {
     data: 'qsalesnotes',
-    name: 'qsalesnotes',
+    name: 'quotations.sales_notes',
     searchable: true,
     render: function (data, type, row) {
         const maxLength = 20;
@@ -3183,11 +3183,11 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-{ data: 'created_by_name', name: 'created_by_name' },
-{ data: 'sales_person_name', name: 'sales_person_name' },
+{ data: 'created_by_name', name: 'created_by_user.name' },
+{ data: 'sales_person_name', name: 'sales_person_user.name' },
 {
             data: 'rdate',
-            name: 'rdate',
+            name: 'lead_rejection.date',
              render: function (data, type, row) {
         if (type === 'display' || type === 'filter') {
             if (!data || !moment(data).isValid()) {
@@ -3199,7 +3199,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         return data;
     }
         },
-                { data: 'reason', name: 'reason', searchable: true },
+                { data: 'reason', name: 'lead_rejection.Reason', searchable: true },
                 {
                   data: 'rsalesnotes',
                   name: 'rsalesnotes',
@@ -3368,7 +3368,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         //                     </div>`;
         //           }
         //         }, 
-                { data: 'sales_person_name', name: 'sales_person_name' },   
+                { data: 'sales_person_name', name: 'sales_person_user.name' },   
     ]
     });
     $('#my-table_filter').hide();
