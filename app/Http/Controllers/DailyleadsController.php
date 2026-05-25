@@ -216,6 +216,136 @@ class DailyleadsController extends Controller
         });
     }
 
+    /**
+     * Per-column DataTables search (pipe-separated values from header dropdowns).
+     */
+    protected function applyDailyLeadsPipeLikeSearch($query, string $column, string $keyword): void
+    {
+        $terms = array_values(array_filter(array_map('trim', explode('|', $keyword))));
+        if ($terms === []) {
+            return;
+        }
+
+        $query->where(function ($q) use ($column, $terms) {
+            foreach ($terms as $term) {
+                $q->orWhere($column, 'like', '%'.$term.'%');
+            }
+        });
+    }
+
+    /**
+     * Date column filters: dropdown values are usually YYYY-MM-DD from full-data preload.
+     */
+    protected function applyDailyLeadsDateColumnPipeSearch($query, string $column, string $keyword): void
+    {
+        $terms = array_values(array_filter(array_map('trim', explode('|', $keyword))));
+        if ($terms === []) {
+            return;
+        }
+
+        $query->where(function ($q) use ($column, $terms) {
+            foreach ($terms as $term) {
+                if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $term)) {
+                    $q->orWhereDate($column, $term);
+                } else {
+                    $q->orWhereRaw("DATE_FORMAT({$column}, '%Y-%m-%d') LIKE ?", ['%'.$term.'%']);
+                }
+            }
+        });
+    }
+
+    /**
+     * Map display/alias column names to real SQL for server-side column search only.
+     * Does not change SELECT aliases, JSON keys, addColumn, or global search handlers.
+     */
+    protected function applyDailyLeadsDatatableColumnFilters($datatable, string $status): void
+    {
+        if (! method_exists($datatable, 'filterColumn')) {
+            return;
+        }
+
+        if (in_array($status, ['Prospecting', 'New Demand', 'Quoted', 'Rejected'], true)) {
+            foreach (['created_by_user.name', 'created_by_name'] as $column) {
+                $datatable->filterColumn($column, function ($query, $keyword) {
+                    $this->applyDailyLeadsPipeLikeSearch($query, 'created_by_user.name', $keyword);
+                });
+            }
+            foreach (['sales_person_user.name', 'sales_person_name'] as $column) {
+                $datatable->filterColumn($column, function ($query, $keyword) {
+                    $this->applyDailyLeadsPipeLikeSearch($query, 'sales_person_user.name', $keyword);
+                });
+            }
+        }
+
+        if (! in_array($status, ['Quoted', 'Rejected'], true)) {
+            return;
+        }
+
+        foreach (['models_brands_sq.models_brands', 'models_brands'] as $column) {
+            $datatable->filterColumn($column, function ($query, $keyword) {
+                $this->applyDailyLeadsPipeLikeSearch($query, 'models_brands_sq.models_brands', $keyword);
+            });
+        }
+
+        $datatable->filterColumn('quotations.deal_value', function ($query, $keyword) {
+            $terms = array_values(array_filter(array_map('trim', explode('|', $keyword))));
+            if ($terms === []) {
+                return;
+            }
+
+            $query->where(function ($q) use ($terms) {
+                foreach ($terms as $term) {
+                    $numeric = preg_replace('/[^0-9.]/', '', $term);
+                    $q->orWhere(function ($inner) use ($term, $numeric) {
+                        $inner->where('quotations.deal_value', 'like', "%{$term}%")
+                            ->orWhere('quotations.currency', 'like', "%{$term}%")
+                            ->orWhere(DB::raw("CONCAT(FORMAT(quotations.deal_value, 0), ' ', quotations.currency)"), 'like', "%{$term}%");
+                        if ($numeric !== '') {
+                            $inner->orWhere('quotations.deal_value', 'like', "%{$numeric}%")
+                                ->orWhere(DB::raw("REPLACE(FORMAT(quotations.deal_value, 0), ',', '')"), 'like', "%{$numeric}%");
+                        }
+                    });
+                }
+            });
+        });
+
+        $dateColumns = [
+            'date' => 'prospectings.date',
+            'prospectings.date' => 'prospectings.date',
+            'ddate' => 'demand.date',
+            'demand.date' => 'demand.date',
+            'qdate' => 'quotations.date',
+            'quotations.date' => 'quotations.date',
+            'rdate' => 'lead_rejection.date',
+            'lead_rejection.date' => 'lead_rejection.date',
+        ];
+        foreach ($dateColumns as $requestColumn => $sqlColumn) {
+            $datatable->filterColumn($requestColumn, function ($query, $keyword) use ($sqlColumn) {
+                $this->applyDailyLeadsDateColumnPipeSearch($query, $sqlColumn, $keyword);
+            });
+        }
+
+        $noteColumns = [
+            'salesnotes' => 'prospectings.salesnotes',
+            'prospectings.salesnotes' => 'prospectings.salesnotes',
+            'dsalesnotes' => 'demand.salesnotes',
+            'demand.salesnotes' => 'demand.salesnotes',
+            'qsalesnotes' => 'quotations.sales_notes',
+            'quotations.sales_notes' => 'quotations.sales_notes',
+        ];
+        foreach ($noteColumns as $requestColumn => $sqlColumn) {
+            $datatable->filterColumn($requestColumn, function ($query, $keyword) use ($sqlColumn) {
+                $this->applyDailyLeadsPipeLikeSearch($query, $sqlColumn, $keyword);
+            });
+        }
+
+        foreach (['reason', 'lead_rejection.Reason'] as $column) {
+            $datatable->filterColumn($column, function ($query, $keyword) {
+                $this->applyDailyLeadsPipeLikeSearch($query, 'lead_rejection.Reason', $keyword);
+            });
+        }
+    }
+
     public function index(Request $request)
     {
         $useractivities =  New UserActivities();
@@ -349,9 +479,16 @@ class DailyleadsController extends Controller
                 ->where('calls.sales_person', $id)
                 ->orderBy('fellow_up.date')
                 ->orderBy('fellow_up.time')
-                ->groupby('calls.id')
-                ->get();
-                return DataTables::of($fellowup)->toJson();  
+                ->groupby('calls.id');
+
+                return DataTables::of($fellowup)
+                    ->filterColumn('sales_person_user.name', function ($query, $keyword) {
+                        $this->applyDailyLeadsPipeLikeSearch($query, 'sales_person_user.name', $keyword);
+                    })
+                    ->filterColumn('sales_person_name', function ($query, $keyword) {
+                        $this->applyDailyLeadsPipeLikeSearch($query, 'sales_person_user.name', $keyword);
+                    })
+                    ->toJson();
             }
             else if($status === "activelead") {
                 $searchValue = $request->input('search.value');
@@ -777,6 +914,8 @@ class DailyleadsController extends Controller
                         return 'q'.(string) ($row->quotation_id ?? $row->id);
                     });
                 }
+
+                $this->applyDailyLeadsDatatableColumnFilters($datatable, $status);
 
                 return $datatable->toJson();
             } catch (\Exception $e) {
