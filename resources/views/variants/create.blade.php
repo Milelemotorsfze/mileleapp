@@ -533,19 +533,36 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
     });
 </script>
 <script>
+    function syncSelectedSpecifications() {
+        var selectedSpecifications = [];
+        $('#specification-details-container select[data-specification-id]').each(function() {
+            var value = $(this).val();
+            var specificationId = $(this).data('specification-id');
+            if (value && specificationId) {
+                selectedSpecifications.push({
+                    specification_id: specificationId,
+                    value: value
+                });
+            }
+        });
+        $('#selected_specifications').val(JSON.stringify(selectedSpecifications));
+    }
+
     $(document).ready(function() {
         $('#coo, #my, #ex, #int, #Upholstery').hide();
+        $('#form-create').on('submit', function() {
+            syncSelectedSpecifications();
+        });
         $('#model').on('change', function() {
             $('#fuel, #coo, #steering, #gear, #drive_train, #my, #ex, #int, #engine, #Upholstery').show();
             var selectedModelLineId = $(this).val();
-            selectedSpecifications = [];
+            $('#selected_specifications').val('');
             $.ajax({
                 type: 'GET',
                 url: '/getSpecificationDetails/' + selectedModelLineId,
                 success: function(response) {
                     var data = response.data;
                     $('#specification-details-container').empty();
-                    var selectedSpecifications = [];
                     data.forEach(function(item) {
                         var specification = item.specification;
                         var options = item.options;
@@ -563,12 +580,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
                         var selectContainer = $('<div class="d-flex align-items-center"></div>');
                         selectContainer.append(select).append(addButton);
                         select.on('change', function() {
-                            var selectedValue = $(this).val();
-                            selectedSpecifications.push({
-                                specification_id: specification.id,
-                                value: selectedValue
-                            });
-                            $('#selected_specifications').val(JSON.stringify(selectedSpecifications));
+                            syncSelectedSpecifications();
                         });
 
                         var specificationColumn = $('<div class="col-lg-4 mb-3">');

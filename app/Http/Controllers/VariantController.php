@@ -119,10 +119,17 @@ public function store(Request $request)
 
     try {
     $selectedSpecifications = json_decode(request('selected_specifications'), true);
-    if (is_array($selectedSpecifications)) {
-        ksort($selectedSpecifications);
-    } else {
+    if (!is_array($selectedSpecifications)) {
         $selectedSpecifications = [];
+    }
+    // Deduplicate by specification_id (frontend may append duplicates on each change)
+    $selectedSpecifications = collect($selectedSpecifications)
+        ->filter(fn ($item) => !empty($item['specification_id']) && !empty($item['value']))
+        ->unique('specification_id')
+        ->values()
+        ->all();
+    if (!empty($selectedSpecifications)) {
+        ksort($selectedSpecifications);
     }
 
     $gradeValue = null;
@@ -143,7 +150,7 @@ public function store(Request $request)
     $totalSpecifications = count($selectedSpecifications);
     // Removed the first validation check that was causing issues when only year is changed
     // The second validation check below handles the proper duplicate detection
-    $existingspecifications = Varaint::with('VariantItems')
+    $existingspecificationsQuery = Varaint::with('variantItems')
         ->where('brands_id', $request->input('brands_id'))
         ->where('master_model_lines_id', $request->input('master_model_lines_id'))
         ->where('coo', $request->input('coo'))
@@ -151,13 +158,16 @@ public function store(Request $request)
         ->where('drive_train', $request->input('drive_train'))
         ->where('gearbox', $request->input('gearbox'))
         ->where('steering', $request->input('steering'))
-        ->where('upholestry', $request->input('upholestry'))
-        ->whereHas('variantItems', function ($q) use ($selectedSpecifications) {
-            $q->whereIn('model_specification_id', array_column($selectedSpecifications, 'specification_id'))
-            ->whereIn('model_specification_options_id', array_column($selectedSpecifications, 'value'));
-        })
-        ->orderBy('created_at', 'desc')
-        ->first();
+        ->where('upholestry', $request->input('upholestry'));
+    if ($totalSpecifications > 0) {
+        foreach ($selectedSpecifications as $specificationData) {
+            $existingspecificationsQuery->whereHas('variantItems', function ($q) use ($specificationData) {
+                $q->where('model_specification_id', $specificationData['specification_id'])
+                    ->where('model_specification_options_id', $specificationData['value']);
+            });
+        }
+    }
+    $existingspecifications = $existingspecificationsQuery->orderBy('created_at', 'desc')->first();
         if ($existingspecifications) {
             $sematchedSpecifications = 0;
             foreach ($selectedSpecifications as $specificationData) {
@@ -170,18 +180,23 @@ public function store(Request $request)
                 $sematchedSpecifications++;
             }
         }
-        if ($sematchedSpecifications == $totalSpecifications) {
-            // Check if the year (my field) is different - if so, allow the duplicate
+        $existingItemCount = $existingspecifications->variantItems->count();
+        if ($sematchedSpecifications == $totalSpecifications && $existingItemCount == $totalSpecifications) {
             $requestYear = $request->input('my');
             $existingYear = $existingspecifications->my;
-            
-            // Check if the model description is different
-            $requestModelDetail = $request->input('model_detail');
-            $existingModelDetail = $existingspecifications->model_detail;
-            
-            // Allow duplicate if either year OR model description is different
-            $yearDifferent = ($requestYear && $existingYear && $requestYear != $existingYear);
-            $modelDetailDifferent = ($requestModelDetail && $existingModelDetail && $requestModelDetail != $existingModelDetail);
+            $requestModelDetailId = $request->input('model_detail');
+            $existingModelDetailId = $existingspecifications->master_model_descriptions_id;
+
+            $yearDifferent = (string) ($requestYear ?? '') !== (string) ($existingYear ?? '');
+            if ($requestModelDetailId && $existingModelDetailId) {
+                $modelDetailDifferent = (int) $requestModelDetailId !== (int) $existingModelDetailId;
+            } elseif ($requestModelDetailId && $existingspecifications->model_detail) {
+                $requestDescription = MasterModelDescription::find($requestModelDetailId);
+                $modelDetailDifferent = $requestDescription
+                    && trim($requestDescription->model_description) !== trim((string) $existingspecifications->model_detail);
+            } else {
+                $modelDetailDifferent = (bool) $requestModelDetailId !== (bool) $existingModelDetailId;
+            }
             
             if ($yearDifferent || $modelDetailDifferent) {
                 // Either year or model description is different, allow the duplicate to proceed
@@ -193,8 +208,8 @@ public function store(Request $request)
                     'modelDetailDifferent' => $modelDetailDifferent,
                     'requestYear' => $requestYear,
                     'existingYear' => $existingYear,
-                    'requestModelDetail' => $requestModelDetail,
-                    'existingModelDetail' => $existingModelDetail
+                    'requestModelDetailId' => $requestModelDetailId,
+                    'existingModelDetailId' => $existingModelDetailId
                 ]);
                 
                 $steering = $request->input('steering');
@@ -460,12 +475,7 @@ public function store(Request $request)
             $f = $this->fuelTypeToVariantCodeSuffix($fuel_type);
             $variant_details = $my . ',' . $steering . ',' . $model_line . ',' . $engine . ',' . $gearbox . ',' . $fuel_type . ',' . $gearbox . ',' . $coo . ',' . $drive_train . ',' . $upholestry;
         }
-    $name = str_replace(' ', '', $name);
-    // valiadtaion chcek for variant name 
-    $isVariantNameExist = Varaint::where('name', $name)->first();
-    if($isVariantNameExist) {
-          return redirect()->back()->with('error', 'Variant with the same Name( '. $name.' )already exists');
-    }
+    $name = $this->resolveUniqueVariantName(str_replace(' ', '', $name ?? ''));
     $variant = new Varaint();
     $variant->brands_id = $request->input('brands_id');
     $variant->netsuite_name = $request->input('netsuite_name');
@@ -1098,6 +1108,32 @@ public function store(Request $request)
     protected function fuelTypeToVariantCodeSuffix(?string $fuel_type): string
     {
         return VariantFuelTypeCodeSuffix::toSuffix($fuel_type);
+    }
+
+    protected function resolveUniqueVariantName(string $name): string
+    {
+        $name = str_replace(' ', '', $name);
+        if ($name === '' || !Varaint::where('name', $name)->exists()) {
+            return $name;
+        }
+
+        $parts = explode('_', $name);
+        $counter = 1;
+        $base = $name;
+
+        if (count($parts) > 1 && is_numeric(end($parts))) {
+            $counter = (int) array_pop($parts) + 1;
+            $base = implode('_', $parts);
+        }
+
+        while (Varaint::where('name', $base . '_' . $counter)->exists()) {
+            $counter++;
+            if ($counter > 9999) {
+                return $base . '_' . time();
+            }
+        }
+
+        return $base . '_' . $counter;
     }
 
     function fetchModelSpecificationOptions(Request $request)
