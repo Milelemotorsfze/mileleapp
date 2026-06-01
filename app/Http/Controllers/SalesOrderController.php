@@ -1584,12 +1584,14 @@ class SalesOrderController extends Controller
 
             // Get related quotation and call and change status of quotation to show the relevent quottaion to list in quotaions
             $quotation = Quotation::where('id', $so->quotation_id)->first();
-            if($quotation){
-                $call = Calls::find($quotation->calls_id);
-                $call->status = 'Quoted';
-                $call->save();
+            $calls = null;
+            if ($quotation && $quotation->calls_id) {
+                $calls = Calls::find($quotation->calls_id);
+                if ($calls) {
+                    $calls->status = 'Quoted';
+                    $calls->save();
+                }
             }
-            $calls = $quotation ? Calls::find($quotation->calls_id) : null;
 
             // 1. Unassign vehicles
             Vehicles::where('so_id', $so->id)->update([
