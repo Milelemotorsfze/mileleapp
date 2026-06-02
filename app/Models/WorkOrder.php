@@ -137,8 +137,9 @@ class WorkOrder extends Model
 
 
     public function getStatusAttribute() {
-        if ($this->relationLoaded('latestStatus') && $this->latestStatus) {
-            return $this->latestStatus->status;
+        // If `latestStatus` was eager loaded, don't run an extra query per WorkOrder.
+        if ($this->relationLoaded('latestStatus')) {
+            return $this->latestStatus ? $this->latestStatus->status : '';
         }
 
         $data = WoStatus::where('wo_id', $this->id)
@@ -189,14 +190,19 @@ class WorkOrder extends Model
     public function getCanShowFinApprovalAttribute()
     {
         $canShowFinApproval = 'yes';
-        $current = WOApprovals::where('work_order_id', $this->id)
-                            ->where('type', 'finance')
-                            ->orderBy('id', 'DESC')
-                            ->first();
-        $first = WOApprovals::where('work_order_id', $this->id)
-                            ->where('type', 'finance')
-                            ->orderBy('id', 'ASC')
-                            ->first();
+        $current = $this->relationLoaded('currentFinanceApproval')
+            ? $this->currentFinanceApproval
+            : WOApprovals::where('work_order_id', $this->id)
+                ->where('type', 'finance')
+                ->orderBy('id', 'DESC')
+                ->first();
+
+        $first = $this->relationLoaded('firstFinanceApproval')
+            ? $this->firstFinanceApproval
+            : WOApprovals::where('work_order_id', $this->id)
+                ->where('type', 'finance')
+                ->orderBy('id', 'ASC')
+                ->first();
 
         // Finance approval can only be shown if COO approval is approved
         if (isset($current) && isset($first) && $current->id == $first->id 
@@ -232,14 +238,19 @@ class WorkOrder extends Model
     public function getCanShowCOOApprovalAttribute()
     {
         $canShowCOOApproval = 'yes';
-        $current = WOApprovals::where('work_order_id', $this->id)
-                            ->where('type', 'coo')
-                            ->orderBy('id', 'DESC')
-                            ->first();
-        $first = WOApprovals::where('work_order_id', $this->id)
-                            ->where('type', 'coo')
-                            ->orderBy('id', 'ASC')
-                            ->first();
+        $current = $this->relationLoaded('currentCooApproval')
+            ? $this->currentCooApproval
+            : WOApprovals::where('work_order_id', $this->id)
+                ->where('type', 'coo')
+                ->orderBy('id', 'DESC')
+                ->first();
+
+        $first = $this->relationLoaded('firstCooApproval')
+            ? $this->firstCooApproval
+            : WOApprovals::where('work_order_id', $this->id)
+                ->where('type', 'coo')
+                ->orderBy('id', 'ASC')
+                ->first();
 
         // COO approval can only be shown if sales support data is confirmed
         if (isset($current) && isset($first) && $current->id == $first->id 
@@ -274,6 +285,15 @@ class WorkOrder extends Model
     }
 
     public function getTotalNumberOfBOEAttribute() {
+        // Avoid N+1 queries when the list view already eager-loaded vehicles.
+        if ($this->relationLoaded('vehicles')) {
+            return $this->vehicles
+                ->whereNull('deleted_at')
+                ->pluck('boe_number')
+                ->unique()
+                ->count();
+        }
+
         return WOVehicles::where('work_order_id', $this->id)
             ->whereNull('deleted_at')
             ->distinct()
@@ -606,6 +626,36 @@ class WorkOrder extends Model
         return $this->hasOne(WOApprovals::class)
                     ->where('type', 'coo')  // Filter for coo type
                     ->orderBy('updated_at', 'DESC');  // Get the latest based on updated_at
+    }
+
+    // Used by getCanShowFinApprovalAttribute() / getCanShowCOOApprovalAttribute()
+    // to avoid per-row WOApproval queries in WO list pages.
+    public function currentFinanceApproval()
+    {
+        return $this->hasOne(WOApprovals::class)
+            ->where('type', 'finance')
+            ->orderBy('id', 'DESC');
+    }
+
+    public function firstFinanceApproval()
+    {
+        return $this->hasOne(WOApprovals::class)
+            ->where('type', 'finance')
+            ->orderBy('id', 'ASC');
+    }
+
+    public function currentCooApproval()
+    {
+        return $this->hasOne(WOApprovals::class)
+            ->where('type', 'coo')
+            ->orderBy('id', 'DESC');
+    }
+
+    public function firstCooApproval()
+    {
+        return $this->hasOne(WOApprovals::class)
+            ->where('type', 'coo')
+            ->orderBy('id', 'ASC');
     }
     public function latestCooPendingApproval()
     {
