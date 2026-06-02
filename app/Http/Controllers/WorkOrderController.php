@@ -95,21 +95,127 @@ class WorkOrderController extends Controller
         $savedFilters = WOUserFilterInputs::where('user_id', $authId)->first();
         $filters = $savedFilters ? json_decode($savedFilters->filters, true) : [];
         $statuses = WoStatus::distinct()->orderBy('status', 'asc')->pluck('status');
-        $workOrders = WorkOrder::all();
-        $salesSupportDataConfirmations = $workOrders->pluck('sales_support_data_confirmation')->unique()->sort()->values();
-        $financeApprovalStatuses = $workOrders->pluck('finance_approval_status')->filter(function ($value) {
-            return $value !== ''; // Exclude empty strings
-        })->unique()->sort()->values();
+
+        // Dropdown options must be computed, but avoid loading ALL records into memory.
+        $salesSupportDataConfirmations = collect();
+        if (WorkOrder::whereNull('sales_support_data_confirmation_at')->exists()) {
+            $salesSupportDataConfirmations->push('Not Confirmed');
+        }
+        if (WorkOrder::whereNotNull('sales_support_data_confirmation_at')->exists()) {
+            $salesSupportDataConfirmations->push('Confirmed');
+        }
+        $salesSupportDataConfirmations = $salesSupportDataConfirmations->unique()->sort()->values();
+
+        // Latest finance/coo status per work order (matches WorkOrder accessors which use latest by updated_at).
+        $latestFinanceSub = DB::table('w_o_approvals as wa')
+            ->joinSub(
+                DB::table('w_o_approvals')
+                    ->select('work_order_id', DB::raw('MAX(updated_at) as max_updated_at'))
+                    ->where('type', 'finance')
+                    ->groupBy('work_order_id'),
+                'm',
+                function ($join) {
+                    $join->on('wa.work_order_id', '=', 'm.work_order_id')
+                        ->on('wa.updated_at', '=', 'm.max_updated_at');
+                }
+            )
+            ->where('wa.type', 'finance')
+            ->select('wa.work_order_id', 'wa.status');
+
+        $latestCooSub = DB::table('w_o_approvals as wa')
+            ->joinSub(
+                DB::table('w_o_approvals')
+                    ->select('work_order_id', DB::raw('MAX(updated_at) as max_updated_at'))
+                    ->where('type', 'coo')
+                    ->groupBy('work_order_id'),
+                'm',
+                function ($join) {
+                    $join->on('wa.work_order_id', '=', 'm.work_order_id')
+                        ->on('wa.updated_at', '=', 'm.max_updated_at');
+                }
+            )
+            ->where('wa.type', 'coo')
+            ->select('wa.work_order_id', 'wa.status');
+
+        $financeApprovalStatuses = $latestFinanceSub
+            ->distinct()
+            ->pluck('status')
+            ->map(function ($status) {
+                return match ($status) {
+                    'pending' => 'Pending',
+                    'approved' => 'Approved',
+                    'rejected' => 'Rejected',
+                    default => null,
+                };
+            })
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
+
         $financeApprovalStatuses = $financeApprovalStatuses->push('Blank')->sort()->values();
-        $cooApprovalStatuses = $workOrders->pluck('coo_approval_status')->filter(function ($value) {
-            return $value !== ''; // Exclude empty strings
-        })->unique()->sort()->values();
+
+        $cooApprovalStatuses = $latestCooSub
+            ->distinct()
+            ->pluck('status')
+            ->map(function ($status) {
+                return match ($status) {
+                    'pending' => 'Pending',
+                    'approved' => 'Approved',
+                    'rejected' => 'Rejected',
+                    default => null,
+                };
+            })
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
+
         $cooApprovalStatuses = $cooApprovalStatuses->push('Blank')->sort()->values();
-        $docsStatuses = $workOrders->pluck('docs_status')->unique()->sort()->values();
-        // $docsStatuses = $docsStatuses->push('Blank')->sort()->values();
-        $vehiclesModificationSummary = WOVehicles::all()->pluck('modification_status')->unique()->sort()->values();
-        $pdiSummary = WOVehicles::all()->pluck('pdi_status')->unique()->sort()->values();
-        $deliverySummary = WOVehicles::all()->pluck('delivery_status')->unique()->sort()->values();
+
+        // Docs status options: emulate WorkOrder::docs_status accessor (override to "Not Initiated").
+        $latestDocsSub = DB::table('wo_docs_status as d')
+            ->joinSub(
+                DB::table('wo_docs_status')
+                    ->select('wo_id', DB::raw('MAX(doc_status_changed_at) as max_doc_status_changed_at'))
+                    ->groupBy('wo_id'),
+                'm',
+                function ($join) {
+                    $join->on('d.wo_id', '=', 'm.wo_id')
+                        ->on('d.doc_status_changed_at', '=', 'm.max_doc_status_changed_at');
+                }
+            )
+            ->select('d.wo_id', 'd.is_docs_ready');
+
+        $docsStatuses = DB::table('work_orders as wo')
+            ->leftJoinSub($latestFinanceSub, 'fin', function ($join) {
+                $join->on('wo.id', '=', 'fin.work_order_id');
+            })
+            ->leftJoinSub($latestCooSub, 'coo', function ($join) {
+                $join->on('wo.id', '=', 'coo.work_order_id');
+            })
+            ->leftJoinSub($latestDocsSub, 'docs', function ($join) {
+                $join->on('wo.id', '=', 'docs.wo_id');
+            })
+            ->selectRaw("
+                CASE
+                    WHEN wo.sales_support_data_confirmation_at IS NOT NULL
+                         AND fin.status = 'approved'
+                         AND coo.status = 'approved'
+                    THEN 'Not Initiated'
+                    ELSE COALESCE(docs.is_docs_ready, 'Blank')
+                END as docs_status
+            ")
+            ->distinct()
+            ->orderBy('docs_status', 'asc')
+            ->pluck('docs_status');
+
+        // These are used for UI legends/tooltips (not the heavy list dataset).
+        // Not used by the current export list UI (see export_exw/index.blade.php).
+        // Keeping these empty avoids querying non-existent DB columns (they're computed accessors).
+        $vehiclesModificationSummary = collect();
+        $pdiSummary = collect();
+        $deliverySummary = collect();
         $columns = [
             'all' => [
                 'id',
@@ -411,7 +517,36 @@ class WorkOrderController extends Controller
                 });
             }
         };
-        $datas = WorkOrder::with(['salesPerson', 'CreatedBy', 'UpdatedBy', 'latestFinance', 'latestCOO', 'latestDocs', 'boe', 'vehicles'])
+        $needsInMemoryPostFilters = !empty($filters['finance_approval_filter'])
+            || !empty($filters['coo_approval_filter'])
+            || !empty($filters['docs_status_filter']);
+        $isExcelExport = $request->export == 'EXCEL';
+
+        $baseQuery = WorkOrder::with([
+            'salesPerson',
+            'CreatedBy',
+            'UpdatedBy',
+            'latestFinance',
+            'latestCOO',
+            'currentFinanceApproval',
+            'firstFinanceApproval',
+            'currentCooApproval',
+            'firstCooApproval',
+            'latestStatus',
+            'latestDocsStatus',
+            // Only load vehicle fields required for list summaries/counts.
+            'vehicles' => function ($q) {
+                // modification_status/pdi_status/delivery_status are computed accessors,
+                // so we only select real columns needed by those accessors.
+                $q->select('id', 'work_order_id', 'boe_number', 'modification_or_jobs_to_perform_per_vin', 'deleted_at')
+                    ->with([
+                        'addons',
+                        'latestModificationStatus',
+                        'latestPdiStatus',
+                        'latestDeliveryStatus',
+                    ]);
+            },
+        ])
             ->when(array_key_exists($type, $columns), function ($query) use ($type, $search, $columns, $applySelectAndSearch) {
                 $applySelectAndSearch($query, $search, $columns[$type]);
             })
@@ -448,8 +583,33 @@ class WorkOrderController extends Controller
                 $query->whereBetween('date', [$request->start_date, $request->end_date]);
             })
             ->latest()
-            ->get();
+            ;
 
+        // Fast path: no finance/coo/docs in-memory post-filtering and not exporting Excel.
+        if (!$isExcelExport && !$needsInMemoryPostFilters) {
+            $page = request()->get('page', 1);
+            $perPage = 100;
+
+            $datas = $baseQuery->paginate($perPage, ['*'], 'page', $page);
+            $datas->appends(request()->query());
+
+            return view('work_order.export_exw.index', compact(
+                'type',
+                'datas',
+                'filters',
+                'statuses',
+                'salesSupportDataConfirmations',
+                'search',
+                'financeApprovalStatuses',
+                'cooApprovalStatuses',
+                'docsStatuses',
+                'vehiclesModificationSummary',
+                'pdiSummary',
+                'deliverySummary'
+            ));
+        }
+
+        $datas = $baseQuery->get();
         $filteredDatas = $datas;
         if (isset($filters['finance_approval_filter']) && !empty($filters['finance_approval_filter'])) {
             $normalizedFinanceApprovalFilter = array_map('strtolower', $filters['finance_approval_filter']);
@@ -962,49 +1122,69 @@ class WorkOrderController extends Controller
 
             $woVehiclesByVin = WOVehicles::where('work_order_id', $workOrder->id)->get()->keyBy('vin');
             $postVehicleHistoryBulk = [];
+            $now = Carbon::now();
 
-            if (isset($request->boe) && count($request->boe) > 0) {
+            // BOE assignment: bulk update instead of per‑VIN save()
+            if (isset($request->boe) && is_array($request->boe) && count($request->boe) > 0) {
+                $boeGroups = [];
                 foreach ($request->boe as $boeNumber => $boe) {
-                    if (isset($boe['vin']) && count($boe['vin']) > 0) {
-                        foreach ($boe['vin'] as $vin) {
-                            $vinUpdate = $woVehiclesByVin->get($vin);
-                            if ($vinUpdate) {
-                                $vinUpdate->boe_number = $boeNumber;
-                                $vinUpdate->save();
-                                $postVehicleHistoryBulk[] = [
-                                    'w_o_vehicle_id' => $vinUpdate->id,
-                                    'field_name' => 'boe_number',
-                                    'old_value' => null,
-                                    'new_value' => $boeNumber,
-                                    'type' => 'Set',
-                                    'user_id' => $authId,
-                                    'changed_at' => Carbon::now(),
-                                ];
-                            }
+                    if (!isset($boe['vin']) || !is_array($boe['vin']) || count($boe['vin']) === 0) {
+                        continue;
+                    }
+                    foreach ($boe['vin'] as $vin) {
+                        $vinUpdate = $woVehiclesByVin->get($vin);
+                        if (!$vinUpdate) {
+                            continue;
                         }
+                        $boeGroups[(string) $boeNumber][] = $vin;
+                        $postVehicleHistoryBulk[] = [
+                            'w_o_vehicle_id' => $vinUpdate->id,
+                            'field_name' => 'boe_number',
+                            'old_value' => null,
+                            'new_value' => $boeNumber,
+                            'type' => 'Set',
+                            'user_id' => $authId,
+                            'changed_at' => $now,
+                        ];
+                    }
+                }
+                foreach ($boeGroups as $boeNumber => $vins) {
+                    $vins = array_values(array_unique(array_filter($vins)));
+                    if (!empty($vins)) {
+                        WOVehicles::where('work_order_id', $workOrder->id)
+                            ->whereIn('vin', $vins)
+                            ->update(['boe_number' => $boeNumber]);
                     }
                 }
             }
 
+            // Deposit received flags: bulk update instead of per‑VIN save()
             if (isset($request->deposit_received_as) && $request->deposit_received_as === 'custom_deposit') {
-                if (isset($request->deposit_aganist_vehicle) && is_array($request->deposit_aganist_vehicle) && count($request->deposit_aganist_vehicle) > 0) {
-                    foreach ($request->deposit_aganist_vehicle as $vin) {
+                $depositVins = (isset($request->deposit_aganist_vehicle) && is_array($request->deposit_aganist_vehicle))
+                    ? array_values(array_unique(array_filter($request->deposit_aganist_vehicle)))
+                    : [];
+
+                if (!empty($depositVins)) {
+                    WOVehicles::where('work_order_id', $workOrder->id)
+                        ->whereIn('vin', $depositVins)
+                        ->update(['deposit_received' => 'yes']);
+
+                    foreach ($depositVins as $vin) {
                         $vinUpdate = $woVehiclesByVin->get($vin);
-                        if ($vinUpdate) {
-                            $vinUpdate->deposit_received = 'yes';
-                            $vinUpdate->save();
-                            $postVehicleHistoryBulk[] = [
-                                'w_o_vehicle_id' => $vinUpdate->id,
-                                'field_name' => 'deposit_received',
-                                'old_value' => null,
-                                'new_value' => 'yes',
-                                'type' => 'Set',
-                                'user_id' => $authId,
-                                'changed_at' => Carbon::now(),
-                            ];
-                            $canCreateFinanceApproval = true;
+                        if (!$vinUpdate) {
+                            continue;
                         }
+                        $postVehicleHistoryBulk[] = [
+                            'w_o_vehicle_id' => $vinUpdate->id,
+                            'field_name' => 'deposit_received',
+                            'old_value' => null,
+                            'new_value' => 'yes',
+                            'type' => 'Set',
+                            'user_id' => $authId,
+                            'changed_at' => $now,
+                        ];
                     }
+                    $canCreateFinanceApproval = true;
                 }
             }
 
@@ -2289,127 +2469,161 @@ class WorkOrderController extends Controller
 
             $woVehiclesByVin = WOVehicles::where('work_order_id', $workOrder->id)->get()->keyBy('vin');
 
-            if (isset($request->boe) && count($request->boe) > 0) {
-                $requestVins = [];
-                foreach ($request->boe as $boe) {
-                    if (isset($boe['vin']) && count($boe['vin']) > 0) {
-                        foreach ($boe['vin'] as $vin) {
-                            $requestVins[] = $vin;
-                        }
+            if (isset($request->boe) && is_array($request->boe) && count($request->boe) > 0) {
+                $now = Carbon::now();
+
+                // Build desired BOE mapping for vins
+                $desiredBoeByVin = [];
+                foreach ($request->boe as $boeNumber => $boe) {
+                    if (!isset($boe['vin']) || !is_array($boe['vin']) || count($boe['vin']) === 0) {
+                        continue;
+                    }
+                    foreach ($boe['vin'] as $vin) {
+                        $desiredBoeByVin[$vin] = $boeNumber;
                     }
                 }
 
+                $unsetVins = [];
+                $setGroups = [];
+
                 foreach ($woVehiclesByVin as $woVehicle) {
-                    if (!in_array($woVehicle->vin, $requestVins, true)) {
-                        $oldBoeNumber = $woVehicle->boe_number;
-                        if ($oldBoeNumber !== null) {
-                            $woVehicle->boe_number = null;
-                            $woVehicle->save();
+                    $vin = $woVehicle->vin;
+                    $current = $woVehicle->boe_number;
+                    $desired = array_key_exists($vin, $desiredBoeByVin) ? $desiredBoeByVin[$vin] : null;
+
+                    if ($desired === null) {
+                        if ($current !== null) {
+                            $unsetVins[] = $vin;
                             $updateVehicleHistoryBulk[] = [
                                 'w_o_vehicle_id' => $woVehicle->id,
                                 'field_name' => 'boe_number',
-                                'old_value' => $oldBoeNumber,
+                                'old_value' => $current,
                                 'new_value' => null,
                                 'type' => 'Unset',
                                 'user_id' => $authId,
-                                'changed_at' => Carbon::now(),
+                                'changed_at' => $now,
                             ];
                             $canDeleteComment = false;
                         }
+                        continue;
+                    }
+
+                    if ((string) $current !== (string) $desired) {
+                        $changeType = is_null($current) ? 'Set' : 'Change';
+                        $setGroups[(string) $desired][] = $vin;
+                        $updateVehicleHistoryBulk[] = [
+                            'w_o_vehicle_id' => $woVehicle->id,
+                            'field_name' => 'boe_number',
+                            'old_value' => $current,
+                            'new_value' => $desired,
+                            'type' => $changeType,
+                            'user_id' => $authId,
+                            'changed_at' => $now,
+                        ];
+                        $canDeleteComment = false;
                     }
                 }
 
-                foreach ($request->boe as $boeNumber => $boe) {
-                    if (isset($boe['vin']) && count($boe['vin']) > 0) {
-                        foreach ($boe['vin'] as $vin) {
-                            $vinUpdate = $woVehiclesByVin->get($vin);
-                            if ($vinUpdate && $vinUpdate->boe_number != $boeNumber) {
-                                $oldBoeNumber = $vinUpdate->boe_number;
-                                $vinUpdate->boe_number = $boeNumber;
-                                $vinUpdate->save();
-                                $changeType = 'Change';
-                                if (is_null($oldBoeNumber) && !is_null($boeNumber)) {
-                                    $changeType = 'Set';
-                                } elseif (!is_null($oldBoeNumber) && is_null($boeNumber)) {
-                                    $changeType = 'Unset';
-                                }
-                                $updateVehicleHistoryBulk[] = [
-                                    'w_o_vehicle_id' => $vinUpdate->id,
-                                    'field_name' => 'boe_number',
-                                    'old_value' => $oldBoeNumber,
-                                    'new_value' => $boeNumber,
-                                    'type' => $changeType,
-                                    'user_id' => $authId,
-                                    'changed_at' => Carbon::now(),
-                                ];
-                                $canDeleteComment = false;
-                            }
-                        }
+                $unsetVins = array_values(array_unique(array_filter($unsetVins)));
+                if (!empty($unsetVins)) {
+                    WOVehicles::where('work_order_id', $workOrder->id)
+                        ->whereIn('vin', $unsetVins)
+                        ->update(['boe_number' => null]);
+                }
+
+                foreach ($setGroups as $boeNumber => $vins) {
+                    $vins = array_values(array_unique(array_filter($vins)));
+                    if (!empty($vins)) {
+                        WOVehicles::where('work_order_id', $workOrder->id)
+                            ->whereIn('vin', $vins)
+                            ->update(['boe_number' => $boeNumber]);
                     }
                 }
             }
 
             if (isset($request->deposit_received_as) && $request->deposit_received_as === 'custom_deposit') {
-                $depositRequestVins = isset($request->deposit_aganist_vehicle) && is_array($request->deposit_aganist_vehicle)
-                    ? $request->deposit_aganist_vehicle
+                $now = $now ?? Carbon::now();
+                $depositRequestVins = (isset($request->deposit_aganist_vehicle) && is_array($request->deposit_aganist_vehicle))
+                    ? array_values(array_unique(array_filter($request->deposit_aganist_vehicle)))
                     : [];
 
+                $setYesVins = [];
+                $setNoVins = [];
+
                 foreach ($woVehiclesByVin as $woVehicle) {
-                    if (!in_array($woVehicle->vin, $depositRequestVins, true)) {
-                        if ($woVehicle->deposit_received != 'no') {
-                            $oldDepositReceived = $woVehicle->deposit_received;
-                            $woVehicle->deposit_received = 'no';
-                            $woVehicle->save();
-                            $updateVehicleHistoryBulk[] = [
-                                'w_o_vehicle_id' => $woVehicle->id,
-                                'field_name' => 'deposit_received',
-                                'old_value' => $oldDepositReceived,
-                                'new_value' => 'no',
-                                'type' => 'Change',
-                                'user_id' => $authId,
-                                'changed_at' => Carbon::now(),
-                            ];
-                            $canDeleteComment = false;
-                            $canCreateFinanceApproval = true;
-                        }
-                    } elseif ($woVehicle->deposit_received != 'yes') {
-                        $oldDepositReceived = $woVehicle->deposit_received;
-                        $woVehicle->deposit_received = 'yes';
-                        $woVehicle->save();
+                    $vin = $woVehicle->vin;
+                    $desiredYes = in_array($vin, $depositRequestVins, true);
+                    $current = $woVehicle->deposit_received;
+
+                    if ($desiredYes && $current != 'yes') {
+                        $setYesVins[] = $vin;
                         $updateVehicleHistoryBulk[] = [
                             'w_o_vehicle_id' => $woVehicle->id,
                             'field_name' => 'deposit_received',
-                            'old_value' => $oldDepositReceived,
+                            'old_value' => $current,
                             'new_value' => 'yes',
                             'type' => 'Change',
                             'user_id' => $authId,
-                            'changed_at' => Carbon::now(),
+                            'changed_at' => $now,
+                        ];
+                        $canDeleteComment = false;
+                        $canCreateFinanceApproval = true;
+                    } elseif (!$desiredYes && $current != 'no') {
+                        $setNoVins[] = $vin;
+                        $updateVehicleHistoryBulk[] = [
+                            'w_o_vehicle_id' => $woVehicle->id,
+                            'field_name' => 'deposit_received',
+                            'old_value' => $current,
+                            'new_value' => 'no',
+                            'type' => 'Change',
+                            'user_id' => $authId,
+                            'changed_at' => $now,
                         ];
                         $canDeleteComment = false;
                         $canCreateFinanceApproval = true;
                     }
                 }
-            } elseif ((isset($request->deposit_received_as) && $request->deposit_received_as === 'custom_deposit') ||
+
+                $setYesVins = array_values(array_unique(array_filter($setYesVins)));
+                if (!empty($setYesVins)) {
+                    WOVehicles::where('work_order_id', $workOrder->id)
+                        ->whereIn('vin', $setYesVins)
+                        ->update(['deposit_received' => 'yes']);
+                }
+                $setNoVins = array_values(array_unique(array_filter($setNoVins)));
+                if (!empty($setNoVins)) {
+                    WOVehicles::where('work_order_id', $workOrder->id)
+                        ->whereIn('vin', $setNoVins)
+                        ->update(['deposit_received' => 'no']);
+                }
+            } elseif (
                 (isset($request->deposit_received_as) && $request->deposit_received_as === null) ||
                 !isset($request->deposit_received_as)
             ) {
+                $now = $now ?? Carbon::now();
+
+                $yesVins = [];
                 foreach ($woVehiclesByVin as $woVehicle) {
                     if ($woVehicle->deposit_received == 'yes') {
-                        $oldDepositReceived = $woVehicle->deposit_received;
+                        $yesVins[] = $woVehicle->vin;
                         $updateVehicleHistoryBulk[] = [
                             'w_o_vehicle_id' => $woVehicle->id,
                             'field_name' => 'deposit_received',
-                            'old_value' => $oldDepositReceived,
+                            'old_value' => 'yes',
                             'new_value' => 'no',
                             'type' => 'Change',
                             'user_id' => $authId,
-                            'changed_at' => Carbon::now(),
+                            'changed_at' => $now,
                         ];
                         $canDeleteComment = false;
                         $canCreateFinanceApproval = true;
                     }
-                    $woVehicle->deposit_received = 'no';
-                    $woVehicle->save();
+                }
+                $yesVins = array_values(array_unique(array_filter($yesVins)));
+                if (!empty($yesVins)) {
+                    WOVehicles::where('work_order_id', $workOrder->id)
+                        ->whereIn('vin', $yesVins)
+                        ->update(['deposit_received' => 'no']);
                 }
             }
 
