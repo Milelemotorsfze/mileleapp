@@ -5,11 +5,13 @@ $brands = isset($stockFilterBrands) ? $stockFilterBrands : collect();
 $modelLines = isset($stockFilterModelLines) ? $stockFilterModelLines : collect();
 $variants = isset($stockFilterVariants) ? $stockFilterVariants : collect();
 $warehouses = isset($stockFilterWarehouses) ? $stockFilterWarehouses : collect();
+$territories = isset($stockFilterTerritories) ? collect($stockFilterTerritories) : collect();
 $stockVariantMeta = $variants->map(function ($v) {
 return [
 'id' => (string) $v->id,
 'name' => (string) $v->name,
 'model_line_id' => (int) $v->master_model_lines_id,
+'model_detail' => (string) ($v->model_detail ?? ''),
 ];
 })->values();
 @endphp
@@ -73,11 +75,6 @@ return [
         font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         font-size: 0.8rem;
         line-height: 1.45;
-    }
-    @media (min-width: 992px) {
-        #stock-adv-bar-wrap-{{ $barUid }} .stock-adv-vin-textarea {
-            min-height: 100%;
-        }
     }
     #stock-adv-bar-wrap-{{ $barUid }} .stock-adv-select-wrap {
         position: relative;
@@ -162,19 +159,27 @@ return [
                 <section class="stock-adv-section">
                     <div class="stock-adv-section-title">Documents &amp; location</div>
                     <div class="row g-2">
-                        <div class="col-6 col-md-3 stock-adv-field">
+                        <div class="col-12 col-md-4 stock-adv-field">
                             <label class="form-label mb-0">PO number(s)</label>
-                            <input type="text" class="form-control form-control-sm stock-adv-inp" data-field="po_numbers" placeholder="Comma or line">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">PO-</span>
+                                <input type="text" class="form-control stock-adv-inp" data-field="po_numbers" placeholder="Enter PO numbers (comma/space)">
+                            </div>
                         </div>
-                        <div class="col-6 col-md-3 stock-adv-field">
+                        <div class="col-12 col-md-4 stock-adv-field">
                             <label class="form-label mb-0">SO number(s)</label>
-                            <input type="text" class="form-control form-control-sm stock-adv-inp" data-field="so_numbers" placeholder="SO numbers">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">SO-</span>
+                                <input type="text" class="form-control stock-adv-inp" data-field="so_numbers" placeholder="Enter SO numbers (comma/space)">
+                            </div>
                         </div>
-                        <div class="col-6 col-md-3 stock-adv-field">
+                        <div class="col-12 col-md-4 stock-adv-field">
                             <label class="form-label mb-0">GRN number(s)</label>
                             <input type="text" class="form-control form-control-sm stock-adv-inp" data-field="grn_numbers" placeholder="GRN numbers">
                         </div>
-                        <div class="col-6 col-md-3 stock-adv-field">
+                    </div>
+                    <div class="row g-2 mt-0">
+                        <div class="col-12 col-md-4 stock-adv-field">
                             <label class="form-label mb-0">Location</label>
                             <div class="stock-adv-select-wrap">
                                 <select class="form-select form-select-sm stock-adv-select" data-field="location_ids" multiple>
@@ -184,6 +189,17 @@ return [
                                 </select>
                             </div>
                         </div>
+                        <div class="col-12 col-md-4 stock-adv-field">
+                            <label class="form-label mb-0">Territory</label>
+                            <div class="stock-adv-select-wrap">
+                                <select class="form-select form-select-sm stock-adv-select" data-field="territories" multiple>
+                                    @foreach ($territories as $t)
+                                    <option value="{{ $t }}">{{ $t }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="d-none d-md-block col-md-4"></div>
                     </div>
                 </section>
 
@@ -211,12 +227,35 @@ return [
                             </div>
                         </div>
                         <div class="col-12 col-md-4 stock-adv-field">
+                            <label class="form-label mb-0">Model description</label>
+                            <div class="stock-adv-select-wrap">
+                                <select class="form-select form-select-sm stock-adv-select" data-field="model_details" multiple disabled>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-2 mt-0">
+                        <div class="col-12 col-md-4 stock-adv-field">
                             <label class="form-label mb-0">Variant</label>
                             <div class="stock-adv-select-wrap">
                                 <select class="form-select form-select-sm stock-adv-select" data-field="variant_ids" multiple disabled>
                                 </select>
                             </div>
                         </div>
+                        <div class="col-12 col-md-4 stock-adv-field">
+                            <label class="form-label mb-0">Status</label>
+                            <div class="stock-adv-select-wrap">
+                                <select class="form-select form-select-sm stock-adv-select" data-field="stock_statuses" multiple>
+                                    <option value="Incoming">Incoming</option>
+                                    <option value="Pending Inspection">Pending Inspection</option>
+                                    <option value="Available Stock">Available Stock</option>
+                                    <option value="Booked">Booked</option>
+                                    <option value="Sold">Sold</option>
+                                    <option value="Delivered">Delivered</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="d-none d-md-block col-md-4"></div>
                     </div>
                 </section>
 
@@ -234,26 +273,13 @@ return [
                             </div>
                         </div>
                         <div class="col-12 col-md-4 stock-adv-field">
-                            <label class="form-label mb-0">Status</label>
-                            <div class="stock-adv-select-wrap">
-                                <select class="form-select form-select-sm stock-adv-select" data-field="stock_statuses" multiple>
-                                    <option value="Incoming">Incoming</option>
-                                    <option value="Pending Inspection">Pending Inspection</option>
-                                    <option value="Available Stock">Available Stock</option>
-                                    <option value="Booked">Booked</option>
-                                    <option value="Sold">Sold</option>
-                                    <option value="Delivered">Delivered</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-4 stock-adv-field">
                             <div class="stock-adv-range-box d-flex gap-2">
                                 <div class="flex-fill">
-                                    <label class="form-label mb-0">Price min</label>
+                                    <label class="form-label mb-0">Selling price min</label>
                                     <input type="number" class="form-control form-control-sm stock-adv-inp" data-field="price_min" placeholder="Min" step="any" min="0" inputmode="decimal">
                                 </div>
                                 <div class="flex-fill">
-                                    <label class="form-label mb-0">Price max</label>
+                                    <label class="form-label mb-0">Selling price max</label>
                                     <input type="number" class="form-control form-control-sm stock-adv-inp" data-field="price_max" placeholder="Max" step="any" min="0" inputmode="decimal">
                                 </div>
                             </div>
@@ -732,14 +758,17 @@ return [
             var $w = $('#stock-adv-bar-wrap-' + tableId);
             clampStockBarPriceInputs($w);
             var payload = {
+                // User types numeric part (prefix is shown via input-group). Backend does smart matching.
                 po_numbers: splitTokens($w.find('[data-field="po_numbers"]').val()),
                 so_numbers: splitTokens($w.find('[data-field="so_numbers"]').val()),
                 grn_numbers: splitTokens($w.find('[data-field="grn_numbers"]').val()),
                 vins: splitLines($w.find('[data-field="vins"]').val()),
                 brand_ids: $w.find('[data-field="brand_ids"]').val() || [],
                 model_line_ids: $w.find('[data-field="model_line_ids"]').val() || [],
+                model_details: $w.find('[data-field="model_details"]').val() || [],
                 variant_ids: $w.find('[data-field="variant_ids"]').val() || [],
                 location_ids: $w.find('[data-field="location_ids"]').val() || [],
+                territories: $w.find('[data-field="territories"]').val() || [],
                 sales_person_ids: $w.find('[data-field="sales_person_ids"]').val() || [],
                 stock_statuses: $w.find('[data-field="stock_statuses"]').val() || [],
                 po_date_from: $w.find('[data-field="po_date_from"]').val() || '',
@@ -762,8 +791,10 @@ return [
                 (p.vins && p.vins.length) ||
                 (p.brand_ids && p.brand_ids.length) ||
                 (p.model_line_ids && p.model_line_ids.length) ||
+                (p.model_details && p.model_details.length) ||
                 (p.variant_ids && p.variant_ids.length) ||
                 (p.location_ids && p.location_ids.length) ||
+                (p.territories && p.territories.length) ||
                 (p.sales_person_ids && p.sales_person_ids.length) ||
                 (p.stock_statuses && p.stock_statuses.length) ||
                 (p.po_date_from || p.po_date_to || p.grn_date_from || p.grn_date_to || p.so_date_from || p.so_date_to) ||
@@ -851,6 +882,7 @@ return [
                 });
             }
             rebuildVariantOptions();
+            rebuildModelDescriptionOptions();
         }
 
         function rebuildVariantOptions() {
@@ -913,6 +945,74 @@ return [
             }
         }
 
+        function rebuildModelDescriptionOptions() {
+            var $w = $('#stock-adv-bar-wrap-' + tableId);
+            var all = window.stockBarVariantsByTable[tableId] || [];
+            var mlSel = parseIdList($w.find('[data-field="model_line_ids"]'));
+            var $md = $w.find('[data-field="model_details"]');
+            var prev = $md.val() || [];
+
+            if ($md.data('select2')) {
+                $md.select2('destroy');
+            }
+            $md.empty();
+
+            if (mlSel.length === 0) {
+                $md.prop('disabled', true);
+                $md.append($('<option>', {
+                    value: '',
+                    text: 'Select model line(s) first',
+                    disabled: true
+                }));
+                $md.val(null);
+            } else {
+                $md.prop('disabled', false);
+                var uniq = {};
+                all.forEach(function(v) {
+                    if (mlSel.indexOf(v.model_line_id) === -1) {
+                        return;
+                    }
+                    var md = v.model_detail != null ? String(v.model_detail).trim() : '';
+                    if (!md) {
+                        return;
+                    }
+                    uniq[md] = true;
+                });
+                var keys = Object.keys(uniq).sort(function(a, b) {
+                    return a.localeCompare(b);
+                });
+                if (!keys.length) {
+                    $md.append($('<option>', {
+                        value: '',
+                        text: 'No model descriptions for selected model line(s)',
+                        disabled: true
+                    }));
+                } else {
+                    keys.forEach(function(md) {
+                        $md.append($('<option>', { value: md, text: md }));
+                    });
+                }
+                var validMd = prev.filter(function(x) {
+                    return $md.find('option').filter(function() {
+                        return String($(this).val()) === String(x);
+                    }).length > 0;
+                });
+                $md.val(validMd.length ? validMd : null);
+            }
+
+            if (typeof $.fn.select2 === 'function') {
+                $md.select2({
+                    width: '100%',
+                    placeholder: mlSel.length ? 'Model description' : 'Select model line first',
+                    allowClear: true,
+                    closeOnSelect: false,
+                    minimumResultsForSearch: 0,
+                    dropdownParent: $md.closest('.stock-adv-select-wrap'),
+                    dropdownAutoWidth: false
+                });
+            }
+        }
+
         function parseIdList($select) {
             return ($select.val() || []).map(function(x) {
                 return parseInt(x, 10);
@@ -926,7 +1026,7 @@ return [
             if (typeof $.fn.select2 !== 'function') {
                 return;
             }
-            $w.find('[data-field="brand_ids"], [data-field="location_ids"], [data-field="sales_person_ids"], [data-field="stock_statuses"]').each(function() {
+            $w.find('[data-field="brand_ids"], [data-field="location_ids"], [data-field="territories"], [data-field="sales_person_ids"], [data-field="stock_statuses"]').each(function() {
                 if ($(this).data('select2')) {
                     return;
                 }
@@ -947,6 +1047,7 @@ return [
             captureModelLineMetaOnce();
             initSelect2BrandSalesOnly();
             rebuildModelLineOptions();
+            rebuildModelDescriptionOptions();
 
             $w.on('select2:open', '.stock-adv-select', function() {
                 var $sel = $(this);
@@ -975,6 +1076,7 @@ return [
 
             $w.on('change', '[data-field="model_line_ids"]', function() {
                 rebuildVariantOptions();
+                rebuildModelDescriptionOptions();
             });
 
             $w.on('blur change', '[data-field="price_min"], [data-field="price_max"]', function() {
@@ -993,7 +1095,7 @@ return [
                 window.stockBarCommitted[tableId] = {};
                 window.stockBarPendingApplyAlert[tableId] = true;
                 $w.find('.stock-adv-inp').val('');
-                $w.find('[data-field="brand_ids"], [data-field="sales_person_ids"], [data-field="stock_statuses"], [data-field="location_ids"]').each(function() {
+                $w.find('[data-field="brand_ids"], [data-field="sales_person_ids"], [data-field="stock_statuses"], [data-field="location_ids"], [data-field="territories"]').each(function() {
                     $(this).val(null).trigger('change');
                 });
                 var $mlClear = $w.find('[data-field="model_line_ids"]');
@@ -1002,6 +1104,12 @@ return [
                 }
                 $mlClear.val(null);
                 rebuildModelLineOptions();
+                var $mdClear = $w.find('[data-field="model_details"]');
+                if ($mdClear.data('select2')) {
+                    $mdClear.select2('destroy');
+                }
+                $mdClear.val(null);
+                rebuildModelDescriptionOptions();
                 var $varClear = $w.find('[data-field="variant_ids"]');
                 if ($varClear.data('select2')) {
                     $varClear.select2('destroy');
@@ -1128,6 +1236,12 @@ return [
                     value: mn.join(', ')
                 });
             }
+            if (p.model_details && p.model_details.length) {
+                rows.push({
+                    label: 'Model description(s)',
+                    value: p.model_details.join(', ')
+                });
+            }
             if (p.variant_ids && p.variant_ids.length) {
                 var vn = (p.variant_ids || []).map(function(id) {
                     return optionTextByValue($w, 'variant_ids', id) || ('#' + id);
@@ -1144,6 +1258,12 @@ return [
                 rows.push({
                     label: 'Location(s)',
                     value: loc.join(', ')
+                });
+            }
+            if (p.territories && p.territories.length) {
+                rows.push({
+                    label: 'Territory',
+                    value: p.territories.join(', ')
                 });
             }
             if (p.sales_person_ids && p.sales_person_ids.length) {
@@ -1181,7 +1301,7 @@ return [
             }
             if (p.price_min && String(p.price_min).trim() !== '' || p.price_max && String(p.price_max).trim() !== '') {
                 rows.push({
-                    label: 'Price range',
+                    label: 'Selling price range',
                     value: (p.price_min && String(p.price_min).trim() !== '' ? String(p.price_min).trim() : '…') +
                         ' → ' +
                         (p.price_max && String(p.price_max).trim() !== '' ? String(p.price_max).trim() : '…')
