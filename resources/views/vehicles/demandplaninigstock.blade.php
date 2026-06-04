@@ -1216,6 +1216,10 @@ handleModalShow('#noImageModal');
 handleModalShow('#variantview'); // Already existing modal
 });
 function exportToExcel(tableId) {
+    if (typeof window.exportStockReportToCsv === 'function') {
+        window.exportStockReportToCsv(tableId, 'demand-planning-stock-export.csv');
+        return;
+    }
     var table = document.getElementById(tableId);
     var theadRows = table.querySelectorAll("thead tr"); // Get header rows
     var tbodyRows = table.querySelectorAll("tbody tr"); // Get data rows
