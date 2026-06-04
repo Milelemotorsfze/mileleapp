@@ -2767,6 +2767,234 @@ class VehiclesController extends Controller
     }
 
     /**
+     * DataTables JSON for on-screen listing, or one-shot streamed CSV when stock_export_file=1.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     */
+    protected function respondStockReportOrExport($query, Request $request, ?array $stockBarDiag, string $reportKey, string $downloadFilename)
+    {
+        if ($request->boolean('stock_export_file')) {
+            $this->applyStockReportGlobalSearchToQuery($query, $request->input('search.value'), $reportKey);
+            $this->applyStockReportExportOrder($query, $request);
+
+            return $this->streamStockReportCsvExport($query, $request, $reportKey, $downloadFilename);
+        }
+
+        return $this->makeStockReportDataTable($query, $request, $stockBarDiag, $reportKey);
+    }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     */
+    protected function applyStockReportExportOrder($query, Request $request): void
+    {
+        $order = $request->input('order');
+        $columns = $request->input('columns');
+        if (! is_array($order) || ! is_array($columns) || count($order) === 0) {
+            $query->orderByDesc('purchasing_order.po_date');
+
+            return;
+        }
+        $colIdx = (int) ($order[0]['column'] ?? 0);
+        $dir = strtolower((string) ($order[0]['dir'] ?? 'asc')) === 'desc' ? 'desc' : 'asc';
+        $colName = trim((string) ($columns[$colIdx]['name'] ?? ''));
+        if ($colName !== '' && preg_match('/^[a-zA-Z0-9_.]+$/', $colName)) {
+            $query->orderBy($colName, $dir);
+
+            return;
+        }
+        $query->orderByDesc('purchasing_order.po_date');
+    }
+
+    /**
+     * @return array<int, array{title: string, data: string, name: string}>
+     */
+    protected function parseStockExportColumnsFromRequest(Request $request): array
+    {
+        $raw = $request->input('export_columns');
+        if (is_string($raw) && $raw !== '') {
+            $decoded = json_decode($raw, true);
+            if (is_array($decoded)) {
+                $out = [];
+                foreach ($decoded as $col) {
+                    if (! is_array($col)) {
+                        continue;
+                    }
+                    $title = trim((string) ($col['title'] ?? ''));
+                    if ($title === '') {
+                        continue;
+                    }
+                    $out[] = [
+                        'title' => $title,
+                        'data' => trim((string) ($col['data'] ?? '')),
+                        'name' => trim((string) ($col['name'] ?? '')),
+                    ];
+                }
+                if ($out !== []) {
+                    return $out;
+                }
+            }
+        }
+
+        return [
+            ['title' => 'VIN', 'data' => 'vin', 'name' => 'vehicles.vin'],
+            ['title' => 'PO', 'data' => 'po_number', 'name' => 'purchasing_order.po_number'],
+            ['title' => 'PO Date', 'data' => 'po_date', 'name' => 'purchasing_order.po_date'],
+        ];
+    }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     */
+    protected function streamStockReportCsvExport($query, Request $request, string $reportKey, string $downloadFilename): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $columns = $this->parseStockExportColumnsFromRequest($request);
+        $headers = array_column($columns, 'title');
+
+        return response()->streamDownload(function () use ($query, $columns, $headers, $reportKey) {
+            set_time_limit(600);
+            $out = fopen('php://output', 'w');
+            if ($out === false) {
+                return;
+            }
+            fwrite($out, "\xEF\xBB\xBF");
+            fputcsv($out, $headers);
+
+            $seenVin = [];
+            $serial = 0;
+
+            foreach ($query->cursor() as $model) {
+                $row = $model instanceof \Illuminate\Database\Eloquent\Model ? $model->toArray() : (array) $model;
+                $vinKey = $this->stockExportVinDedupeKey($row);
+                if (isset($seenVin[$vinKey])) {
+                    continue;
+                }
+                $seenVin[$vinKey] = true;
+                $serial++;
+                $line = [];
+                foreach ($columns as $colDef) {
+                    $line[] = $this->stockExportCellValue($row, $colDef, $reportKey, $serial);
+                }
+                fputcsv($out, $line);
+            }
+            fclose($out);
+        }, $downloadFilename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Cache-Control' => 'no-store, no-cache, must-revalidate',
+        ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $row
+     */
+    protected function stockExportVinDedupeKey(array $row): string
+    {
+        $vin = trim((string) ($row['vin'] ?? ''));
+        if ($vin !== '') {
+            return strtoupper($vin);
+        }
+
+        return '__id__'.($row['id'] ?? '');
+    }
+
+    /**
+     * @param  array<string, mixed>  $row
+     * @param  array{title: string, data: string, name: string}  $colDef
+     */
+    protected function stockExportCellValue(array $row, array $colDef, string $reportKey, int $serial): string
+    {
+        $title = $colDef['title'];
+        if ($title === 'Ser No' || $title === 'S.No' || strcasecmp($title, 'Serial') === 0) {
+            return (string) $serial;
+        }
+        if ($title === 'Status') {
+            return $this->computeStockReportStatusLabelForExport($row, $reportKey);
+        }
+        if ($title === 'Comments' || $title === 'Chat') {
+            return isset($row['message_count']) ? (string) $row['message_count'] : '';
+        }
+
+        $dataKey = $colDef['data'];
+        $val = null;
+        if ($dataKey !== '' && array_key_exists($dataKey, $row)) {
+            $val = $row[$dataKey];
+        } elseif ($colDef['name'] !== '') {
+            $alias = str_contains($colDef['name'], '.') ? substr($colDef['name'], strrpos($colDef['name'], '.') + 1) : $colDef['name'];
+            if (array_key_exists($alias, $row)) {
+                $val = $row[$alias];
+            }
+        }
+
+        if ($val === null || $val === '') {
+            return '';
+        }
+
+        if (is_numeric($val) && in_array($title, ['Price', 'Selling Price', 'Minimum Commission', 'Vehicle Cost'], true)) {
+            return (string) (0 + $val);
+        }
+
+        if (preg_match('/date|arrival|year/i', $title) && is_string($val) && preg_match('/^\d{4}-\d{2}-\d{2}/', $val)) {
+            try {
+                return \Carbon\Carbon::parse($val)->format('d-M-Y');
+            } catch (\Throwable $e) {
+                return (string) $val;
+            }
+        }
+
+        return strip_tags((string) $val);
+    }
+
+    /**
+     * @param  array<string, mixed>  $row
+     */
+    protected function computeStockReportStatusLabelForExport(array $row, string $reportKey): string
+    {
+        $grnInsp = $row['grn_inspectionid'] ?? $row['inspection_id'] ?? null;
+        $inspectionDate = $row['inspection_date'] ?? null;
+        $gdnId = $row['gdn_id'] ?? null;
+        $movementGrnId = $row['movement_grn_id'] ?? null;
+        $soId = $row['so_id'] ?? null;
+        $resEnd = $row['reservation_end_date'] ?? null;
+        $resActive = false;
+        if ($resEnd) {
+            try {
+                $resActive = \Carbon\Carbon::parse($resEnd)->isFuture();
+            } catch (\Throwable $e) {
+                $resActive = false;
+            }
+        }
+
+        if (empty($grnInsp) && empty($inspectionDate) && empty($gdnId) && empty($movementGrnId)) {
+            return 'Incoming';
+        }
+        if (empty($grnInsp) && empty($inspectionDate) && empty($gdnId) && ! empty($movementGrnId)) {
+            return 'Pending Inspection';
+        }
+
+        if ($reportKey === 'available') {
+            if (! empty($inspectionDate) && empty($soId) && ! $resActive) {
+                return 'Available Stock';
+            }
+        } else {
+            if (! empty($inspectionDate) && empty($gdnId) && empty($soId) && ! empty($movementGrnId) && ! $resActive) {
+                return 'Available Stock';
+            }
+        }
+
+        if (empty($gdnId) && empty($soId) && $resActive) {
+            return 'Booked';
+        }
+        if (! empty($inspectionDate) && empty($gdnId) && ! empty($soId) && ! empty($movementGrnId)) {
+            return 'Sold';
+        }
+        if (! empty($inspectionDate) && ! empty($gdnId) && ! empty($movementGrnId)) {
+            return 'Delivered';
+        }
+
+        return '';
+    }
+
+    /**
      * Global text search for stock report DataTables (OR across key columns).
      * Used with Yajra filter(..., false) so default global search does not run on grouped/joined queries.
      */
@@ -3506,7 +3734,7 @@ SQL;
                 $data = $data->groupBy('vehicles.id');
             }
             if ($data) {
-                return $this->makeStockReportDataTable($data, $request, $stockBarDiag, 'allstock');
+                return $this->respondStockReportOrExport($data, $request, $stockBarDiag, 'allstock', 'stock-report-export.csv');
             }
 
             return response()->json([
@@ -4374,7 +4602,7 @@ SQL;
                 $data = $data->groupBy('vehicles.id');
             }
             if ($data) {
-                return $this->makeStockReportDataTable($data, $request, $stockBarDiag, 'available');
+                return $this->respondStockReportOrExport($data, $request, $stockBarDiag, 'available', 'available-stock-export.csv');
             }
         }
         return view('vehicles.available', array_merge(
@@ -4574,7 +4802,7 @@ SQL;
                 $data = $data->groupBy('vehicles.id');
             }
             if ($data) {
-                return $this->makeStockReportDataTable($data, $request, $stockBarDiag, 'delivered');
+                return $this->respondStockReportOrExport($data, $request, $stockBarDiag, 'delivered', 'delivered-stock-export.csv');
             }
         }
         return view('vehicles.delivered', array_merge(
@@ -4773,7 +5001,7 @@ SQL;
                 $data = $data->groupBy('vehicles.id');
             }
             if ($data) {
-                return $this->makeStockReportDataTable($data, $request, $stockBarDiag, 'dpvehicles');
+                return $this->respondStockReportOrExport($data, $request, $stockBarDiag, 'dpvehicles', 'demand-planning-stock-export.csv');
             }
         }
         return view('vehicles.demandplaninigstock', array_merge(

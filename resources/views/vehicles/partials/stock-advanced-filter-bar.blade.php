@@ -511,7 +511,9 @@ return [
         };
 
         window.stockReportDownloadCsv = function (csvContent, filename) {
-            var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            var blob = (csvContent instanceof Blob)
+                ? csvContent
+                : new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             if (navigator.msSaveBlob) {
                 navigator.msSaveBlob(blob, filename);
                 return;
@@ -583,6 +585,34 @@ return [
             return $.extend(true, {}, params, overrides);
         };
 
+        /** Visible columns for server CSV export (matches on-screen export). */
+        window.stockReportCollectExportColumns = function(dt) {
+            var settings = dt.settings()[0];
+            var cols = [];
+            dt.columns(':visible').every(function(idx) {
+                var col = settings.aoColumns[idx];
+                if (!col) {
+                    return;
+                }
+                var title = col.sTitle || '';
+                if (typeof title === 'string' && title.indexOf('<') !== -1) {
+                    var tmp = document.createElement('div');
+                    tmp.innerHTML = title;
+                    title = (tmp.textContent || tmp.innerText || '').trim();
+                }
+                var dataKey = '';
+                if (col.mData !== null && col.mData !== undefined && typeof col.mData !== 'function') {
+                    dataKey = col.mData;
+                }
+                cols.push({
+                    title: title,
+                    data: dataKey,
+                    name: col.name || ''
+                });
+            });
+            return cols;
+        };
+
         /**
          * One row per VIN for export (first row wins; keeps table sort order).
          * Rows with no VIN are kept separately by vehicle id.
@@ -607,11 +637,11 @@ return [
         };
 
         /**
-         * Export all rows matching current filters/search (chunked; ignores page length).
+         * Fast export: one server request streams CSV (unique VIN, same filters/sort/columns).
+         * Falls back to legacy chunked JSON export if the server does not return a file.
          */
         window.exportStockReportToCsv = function (tableId, filename) {
             filename = filename || 'stock-report-export.csv';
-            var CHUNK_SIZE = 500;
 
             if (!$.fn.DataTable || !$.fn.DataTable.isDataTable('#' + tableId)) {
                 if (typeof alertify !== 'undefined') {
@@ -644,10 +674,6 @@ return [
             }
             window.stockReportExportInProgress = true;
 
-            var params = window.stockReportGetExportParams(dt, { start: 0, length: CHUNK_SIZE });
-            var allRows = [];
-            var chunkRequests = 0;
-            var maxChunkRequests = 200;
             var $wrapper = $(settings.nTableWrapper);
             var $processing = $wrapper.find('.dataTables_processing');
 
@@ -665,78 +691,51 @@ return [
                 }
             }
 
-            function fetchNextChunk() {
-                chunkRequests += 1;
-                if (chunkRequests > maxChunkRequests) {
-                    failExport('Export is too large to complete in one request. Apply more filters and try again.');
-                    return;
-                }
-
-                $.ajax({
-                    url: url,
-                    type: method,
-                    data: params,
-                    headers: headers,
-                    dataType: 'json',
-                    timeout: 180000,
-                    success: function (json) {
-                        if (!json || !Array.isArray(json.data)) {
-                            failExport('Invalid export response from server.');
-                            return;
-                        }
-
-                        var chunk = json.data;
-                        var filteredTotal = json.recordsFiltered != null
-                            ? parseInt(json.recordsFiltered, 10)
-                            : chunk.length;
-
-                        if (chunk.length === 0) {
-                            filteredTotal = allRows.length;
-                        }
-
-                        allRows = allRows.concat(chunk);
-
-                        if (chunk.length > 0 && allRows.length < filteredTotal) {
-                            params.start = allRows.length;
-                            params.draw = (parseInt(params.draw, 10) || 1) + 1;
-                            fetchNextChunk();
-                            return;
-                        }
-
-                        try {
-                            var totalBeforeDedupe = allRows.length;
-                            allRows = window.stockReportDedupeExportRowsByVin(allRows);
-                            var csv = window.stockReportBuildCsvFromDataTable(dt, allRows);
-                            window.stockReportDownloadCsv(csv, filename);
-                            if (typeof alertify !== 'undefined') {
-                                var msg = 'Exported ' + allRows.length + ' unique VIN record(s).';
-                                if (totalBeforeDedupe > allRows.length) {
-                                    msg += ' (' + (totalBeforeDedupe - allRows.length) + ' duplicate row(s) removed.)';
-                                }
-                                alertify.success(msg);
-                            }
-                        } catch (buildErr) {
-                            failExport('Could not build export file.');
-                            return;
-                        }
-                        finishExport();
-                    },
-                    error: function (xhr, status) {
-                        var message = 'Export failed. Please try again.';
-                        if (status === 'timeout') {
-                            message = 'Export timed out. Try narrowing filters and export again.';
-                        } else if (xhr && xhr.status === 419) {
-                            message = 'Session expired. Refresh the page and try again.';
-                        } else if (xhr && xhr.status >= 500) {
-                            message = 'Server error during export. Try again or contact support.';
-                        }
-                        failExport(message);
-                    }
-                });
+            var params = window.stockReportGetExportParams(dt, {});
+            params.stock_export_file = 1;
+            if (window.stockReportCollectExportColumns) {
+                params.export_columns = JSON.stringify(window.stockReportCollectExportColumns(dt));
             }
 
             $processing.show();
-            fetchNextChunk();
+
+            $.ajax({
+                url: url,
+                type: method,
+                data: params,
+                headers: headers,
+                xhrFields: { responseType: 'blob' },
+                timeout: 600000,
+                success: function (blob, textStatus, xhr) {
+                    var contentType = (xhr && xhr.getResponseHeader)
+                        ? (xhr.getResponseHeader('Content-Type') || '')
+                        : '';
+                    if (contentType.indexOf('json') !== -1 || contentType.indexOf('application/json') !== -1) {
+                        failExport('Export failed. Please refresh and try again.');
+                        return;
+                    }
+                    if (!blob || (blob.size !== undefined && blob.size === 0)) {
+                        failExport('No data to export for the current filters.');
+                        return;
+                    }
+                    window.stockReportDownloadCsv(blob, filename);
+                    if (typeof alertify !== 'undefined') {
+                        alertify.success('Export completed (unique VIN per row).');
+                    }
+                    finishExport();
+                },
+                error: function (xhr, status) {
+                    var message = 'Export failed. Please try again.';
+                    if (status === 'timeout') {
+                        message = 'Export timed out. Try narrowing filters and export again.';
+                    } else if (xhr && xhr.status === 419) {
+                        message = 'Session expired. Refresh the page and try again.';
+                    } else if (xhr && xhr.status >= 500) {
+                        message = 'Server error during export. Try again or contact support.';
+                    }
+                    failExport(message);
+                }
+            });
         };
     }
 
