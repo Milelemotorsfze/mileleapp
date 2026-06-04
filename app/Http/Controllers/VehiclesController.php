@@ -2844,10 +2844,16 @@ class VehiclesController extends Controller
             'stockFilterModelLines' => MasterModelLines::orderBy('model_line')->get(['id', 'model_line', 'brand_id']),
             'stockFilterVariants' => Varaint::whereNotNull('master_model_lines_id')
                 ->orderBy('name')
-                ->get(['id', 'name', 'master_model_lines_id']),
+                ->get(['id', 'name', 'master_model_lines_id', 'model_detail']),
             'stockFilterWarehouses' => Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])
                 ->orderBy('name')
                 ->get(['id', 'name']),
+            'stockFilterTerritories' => Vehicles::query()
+                ->whereNotNull('territory')
+                ->where('territory', '!=', '')
+                ->distinct()
+                ->orderBy('territory')
+                ->pluck('territory'),
         ];
     }
 
@@ -2918,6 +2924,20 @@ class VehiclesController extends Controller
             return array_values(array_unique($ids));
         };
 
+        $toStringList = function ($v): array {
+            if (! is_array($v)) {
+                return [];
+            }
+            $out = [];
+            foreach ($v as $s) {
+                $t = trim((string) $s);
+                if ($t !== '') {
+                    $out[] = $t;
+                }
+            }
+            return array_values(array_unique($out));
+        };
+
         $allowedStatuses = ['Incoming', 'Pending Inspection', 'Available Stock', 'Booked', 'Sold', 'Delivered'];
         $statuses = [];
         if (isset($raw['stock_statuses']) && is_array($raw['stock_statuses'])) {
@@ -2940,6 +2960,8 @@ class VehiclesController extends Controller
             'variant_ids' => $toIntList($raw['variant_ids'] ?? []),
             'location_ids' => $toIntList($raw['location_ids'] ?? []),
             'sales_person_ids' => $toIntList($raw['sales_person_ids'] ?? []),
+            'territories' => $toStringList($raw['territories'] ?? []),
+            'model_details' => $toStringList($raw['model_details'] ?? []),
             'stock_statuses' => $statuses,
             'po_date_from' => isset($raw['po_date_from']) ? trim((string) $raw['po_date_from']) : '',
             'po_date_to' => isset($raw['po_date_to']) ? trim((string) $raw['po_date_to']) : '',
@@ -2993,11 +3015,53 @@ SQL;
      */
     protected function applyStockBarFiltersToQuery($query, array $bar, string $stockReportMode = 'allstock'): void
     {
+        // PO/SO smart matching:
+        // - UI shows fixed "PO-" / "SO-" prefix, users type numeric part (often without leading zeros)
+        // - DB stores values like "PO-012345" or "SO-008617"
+        // We match either exact token OR by comparing numeric portion with leading zeros stripped.
         if (count($bar['po_numbers'] ?? []) > 0) {
-            $query->whereIn('purchasing_order.po_number', $bar['po_numbers']);
+            $tokens = array_values(array_filter(array_map(static function ($t) {
+                $s = trim((string) $t);
+                return $s === '' ? null : $s;
+            }, (array) $bar['po_numbers'])));
+            $query->where(function ($q) use ($tokens) {
+                foreach ($tokens as $t) {
+                    $raw = $t;
+                    $numeric = preg_replace('/^po-/i', '', $raw);
+                    $numeric = ltrim((string) $numeric, '0');
+                    if ($numeric === '') {
+                        $numeric = '0';
+                    }
+
+                    $q->orWhere('purchasing_order.po_number', $raw);
+                    $q->orWhereRaw(
+                        "TRIM(LEADING '0' FROM SUBSTRING(purchasing_order.po_number, 4)) = ?",
+                        [$numeric]
+                    );
+                }
+            });
         }
         if (count($bar['so_numbers'] ?? []) > 0) {
-            $query->whereIn('so.so_number', $bar['so_numbers']);
+            $tokens = array_values(array_filter(array_map(static function ($t) {
+                $s = trim((string) $t);
+                return $s === '' ? null : $s;
+            }, (array) $bar['so_numbers'])));
+            $query->where(function ($q) use ($tokens) {
+                foreach ($tokens as $t) {
+                    $raw = $t;
+                    $numeric = preg_replace('/^so-/i', '', $raw);
+                    $numeric = ltrim((string) $numeric, '0');
+                    if ($numeric === '') {
+                        $numeric = '0';
+                    }
+
+                    $q->orWhere('so.so_number', $raw);
+                    $q->orWhereRaw(
+                        "TRIM(LEADING '0' FROM SUBSTRING(so.so_number, 4)) = ?",
+                        [$numeric]
+                    );
+                }
+            });
         }
         if (count($bar['grn_numbers'] ?? []) > 0) {
             $query->whereIn('movement_grns.grn_number', $bar['grn_numbers']);
@@ -3019,6 +3083,12 @@ SQL;
         }
         if (count($bar['sales_person_ids'] ?? []) > 0) {
             $query->whereIn('so.sales_person_id', $bar['sales_person_ids']);
+        }
+        if (count($bar['territories'] ?? []) > 0) {
+            $query->whereIn('vehicles.territory', $bar['territories']);
+        }
+        if (count($bar['model_details'] ?? []) > 0) {
+            $query->whereIn('varaints.model_detail', $bar['model_details']);
         }
         $priceMin = $bar['price_min'] ?? '';
         $priceMax = $bar['price_max'] ?? '';

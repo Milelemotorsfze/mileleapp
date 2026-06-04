@@ -641,7 +641,7 @@ $hasEditEstimationDatePermission = Auth::user()->hasPermissionForSelectedRole('e
                   @if ($hasPricePermission)
                      <th>Minimum Commission</th>
                      <!-- <th>GP %</th> -->
-                    <th>Price</th>
+                    <th>Selling Price</th>
                 @endif
                   <th>Document Owership</th>
                   <th>Custom Inspection Number</th>
@@ -1270,7 +1270,7 @@ if (canViewVehicleCost) {
                         month: 'long'
                     });
                     select.append('<option value="' + d + '">' + formattedDate + '</option>');
-                } else if (columnHeader === 'Price' || columnHeader === 'Minimum Commission') {
+                } else if (columnHeader === 'Selling Price' || columnHeader === 'Minimum Commission') {
                     var formattedValue = parseFloat(d).toLocaleString('en-US', {
                         minimumFractionDigits: 0,
                         maximumFractionDigits: 0

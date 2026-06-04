@@ -601,7 +601,7 @@ table.dataTable thead th select {
                   @if ($hasPricePermission)
                   <th>Minimum Commission</th>
                   <!-- <th>GP %</th> -->
-                    <th>Price</th>
+                    <th>Selling Price</th>
                 @endif
                   <th>Document Owership</th>
                   <th>Custom Inspection Number</th>
@@ -1091,7 +1091,7 @@ if (canViewVehicleCost) {
                     });
                     select.append('<option value="' + d + '">' + formattedDate + '</option>');
                 }
-                else if (columnHeader === 'Price') {
+                else if (columnHeader === 'Selling Price') {
                     var formattedPrice = parseFloat(d).toLocaleString('en-US', {
                         minimumFractionDigits: 0,
                         maximumFractionDigits: 0
