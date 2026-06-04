@@ -584,6 +584,29 @@ return [
         };
 
         /**
+         * One row per VIN for export (first row wins; keeps table sort order).
+         * Rows with no VIN are kept separately by vehicle id.
+         */
+        window.stockReportDedupeExportRowsByVin = function (rows) {
+            if (!rows || !rows.length) {
+                return [];
+            }
+            var seen = Object.create(null);
+            var out = [];
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                var rawVin = row.vin != null ? String(row.vin).trim() : '';
+                var key = rawVin !== '' ? rawVin.toUpperCase() : ('__id__' + (row.id != null ? row.id : i));
+                if (seen[key]) {
+                    continue;
+                }
+                seen[key] = true;
+                out.push(row);
+            }
+            return out;
+        };
+
+        /**
          * Export all rows matching current filters/search (chunked; ignores page length).
          */
         window.exportStockReportToCsv = function (tableId, filename) {
@@ -681,10 +704,16 @@ return [
                         }
 
                         try {
+                            var totalBeforeDedupe = allRows.length;
+                            allRows = window.stockReportDedupeExportRowsByVin(allRows);
                             var csv = window.stockReportBuildCsvFromDataTable(dt, allRows);
                             window.stockReportDownloadCsv(csv, filename);
                             if (typeof alertify !== 'undefined') {
-                                alertify.success('Exported ' + allRows.length + ' record(s).');
+                                var msg = 'Exported ' + allRows.length + ' unique VIN record(s).';
+                                if (totalBeforeDedupe > allRows.length) {
+                                    msg += ' (' + (totalBeforeDedupe - allRows.length) + ' duplicate row(s) removed.)';
+                                }
+                                alertify.success(msg);
                             }
                         } catch (buildErr) {
                             failExport('Could not build export file.');
