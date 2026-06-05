@@ -2913,6 +2913,26 @@ class VehiclesController extends Controller
         if ($title === 'Comments' || $title === 'Chat') {
             return isset($row['message_count']) ? (string) $row['message_count'] : '';
         }
+        if ($title === 'GRN Report') {
+            return ! empty($row['grn_inspectionid']) ? 'Generate PDF' : 'Not Available';
+        }
+        if ($title === 'PDI Report') {
+            return ! empty($row['pdi_inspectionid']) ? 'Generate PDF' : 'Not Available';
+        }
+        if ($title === 'Aging') {
+            $grnDate = $row['date'] ?? null;
+            if ($grnDate === null || $grnDate === '') {
+                return '';
+            }
+            try {
+                $daysDiff = (int) \Carbon\Carbon::parse($grnDate)->startOfDay()
+                    ->diffInDays(\Carbon\Carbon::now()->startOfDay());
+
+                return $daysDiff.' days';
+            } catch (\Throwable $e) {
+                return '';
+            }
+        }
 
         $dataKey = $colDef['data'];
         $val = null;
