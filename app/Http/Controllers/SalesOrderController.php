@@ -1438,14 +1438,54 @@ class SalesOrderController extends Controller
         }
         $saleperson = User::find($quotation->created_by);
         $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first();
+        $soVariantsForSo = SoVariant::where('so_id', $sodetails->id)->with('so_items')->get();
+        $soVariantsByQuotationItem = $soVariantsForSo->keyBy('quotation_item_id');
+        $soVariantsByVariantId = $soVariantsForSo->groupBy('variant_id');
+
         foreach ($quotationItems as $quotationItem) {
-            $selectedVehicleIds = $quotationItem->soItems->pluck('vehicles_id')->toArray();
+            $selectedVehicleIds = Soitems::where('quotation_items_id', $quotationItem->id)
+                ->where('so_id', $sodetails->id)
+                ->pluck('vehicles_id')
+                ->toArray();
+
+            $soVariant = $soVariantsByQuotationItem->get($quotationItem->id);
+            if ($soVariant) {
+                $selectedVehicleIds = array_values(array_unique(array_merge(
+                    $selectedVehicleIds,
+                    $soVariant->so_items->pluck('vehicles_id')->toArray()
+                )));
+            } elseif ($quotationItem->reference_type === 'App\Models\Varaint') {
+                foreach ($soVariantsByVariantId->get($quotationItem->reference_id, collect()) as $variantRecord) {
+                    $selectedVehicleIds = array_values(array_unique(array_merge(
+                        $selectedVehicleIds,
+                        $variantRecord->so_items->pluck('vehicles_id')->toArray()
+                    )));
+                }
+            }
+
             $quotationItem->selectedVehicleIds = $selectedVehicleIds;
-            // check the quotation referenceid
+
+            if (!empty($selectedVehicleIds)) {
+                $existingVehicleIds = collect($vehicles[$quotationItem->id] ?? [])
+                    ->pluck('id')
+                    ->map(fn ($id) => (int) $id)
+                    ->toArray();
+                $missingSelectedIds = array_diff($selectedVehicleIds, $existingVehicleIds);
+                if (!empty($missingSelectedIds)) {
+                    $selectedVehicles = DB::table('vehicles')
+                        ->whereIn('id', $missingSelectedIds)
+                        ->whereNotNull('vin')
+                        ->select('id', 'vin', 'gdn_id')
+                        ->get()
+                        ->toArray();
+                    $vehicles[$quotationItem->id] = array_merge($vehicles[$quotationItem->id] ?? [], $selectedVehicles);
+                }
+            }
+
             $quotationItem->isgdnExist = 0;
-            foreach ($selectedVehicleIds as $eachVehicle) {
-                $eachVehicle = Vehicles::find($eachVehicle);
-                if ($eachVehicle->gdn_id) {
+            foreach ($selectedVehicleIds as $eachVehicleId) {
+                $eachVehicle = Vehicles::find($eachVehicleId);
+                if ($eachVehicle && $eachVehicle->gdn_id) {
                     $quotationItem->isgdnExist = 1;
                     break;
                 }
