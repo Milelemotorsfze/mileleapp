@@ -68,6 +68,7 @@ use Illuminate\Support\Facades\Crypt;
 use setasign\Fpdi\PdfReader\Page;
 use setasign\Fpdi\Tcpdf\Fpdi;
 use Illuminate\Support\Str;
+use App\Support\OrderStockType;
 use File;
 use Exception;
 use App\Rules\ValidVin;
@@ -1017,6 +1018,7 @@ class PurchasingOrderController extends Controller
         $this->validate($request, [
             'payment_term_id' => 'required',
             'po_type' => 'required',
+            'stock_type' => OrderStockType::validationRules(),
             'vendors_id' => 'required'
         ]);
 
@@ -1032,6 +1034,7 @@ class PurchasingOrderController extends Controller
         $purchasingOrder->po_date = $poDate;
         $purchasingOrder->vendors_id = $vendors_id;
         $purchasingOrder->po_type = $po_type;
+        $purchasingOrder->stock_type = $request->input('stock_type');
         $purchasingOrder->payment_term_id = $request->input('payment_term_id');
         $purchasingOrder->currency = $request->input('currency');
         $purchasingOrder->shippingmethod = $request->input('shippingmethod');
@@ -3981,6 +3984,9 @@ class PurchasingOrderController extends Controller
     {
 
         info("update basci details");
+        $request->validate([
+            'stock_type' => OrderStockType::validationRules(),
+        ]);
         $purchasingOrder = PurchasingOrder::find($request->input('purchasing_order_id'));
         if (!$purchasingOrder) {
             return response()->json(['error' => 'Purchasing order not found'], 404);
@@ -3998,6 +4004,7 @@ class PurchasingOrderController extends Controller
             'fd',
             'pl_number',
             'po_number',
+            'stock_type',
         ];
         // Store old values
         $oldValues = $purchasingOrder->only($fieldsToUpdate);

@@ -137,6 +137,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details')
             </select>
         </div>
         <div class="col-lg-1 col-md-6">
+            @include('partials.order-stock-type-select', [
+                'stockTypeLabel' => 'Stock Type',
+                'selectedStockType' => old('stock_type'),
+                'labelSuffix' => ': ',
+                'requiredMarkerClass' => 'error',
+            ])
+        </div>
+        <div class="col-lg-1 col-md-6">
             <span class="error">* </span>
             <label for="basicpill-firstname-input" class="form-label">Currency: </label>
             <select class="form-control" autofocus name="currency" required>
