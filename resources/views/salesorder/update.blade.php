@@ -352,15 +352,6 @@
                                     <span id="error_message" class="text-danger"></span>
                                 </div>
 
-                                <div class="col-lg-3 col-md-6 col-sm-6">
-                                    @include('partials.order-stock-type-select', [
-                                        'stockTypeLabel' => 'SO Type',
-                                        'selectedStockType' => $sodetails->stock_type ?? null,
-                                        'labelClass' => '',
-                                        'useStrongLabel' => true,
-                                    ])
-                                </div>
-
                                 <div class="col-lg-6 col-md-6 col-sm-6">
                                     <label for="text_area"><strong>Sales Notes</strong></label>
                                     <textarea class="form-control" id="notes" name="notes">{{$sodetails->notes}}</textarea>

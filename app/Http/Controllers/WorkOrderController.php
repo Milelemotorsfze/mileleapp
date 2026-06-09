@@ -45,7 +45,6 @@ use App\Models\WOBOE;
 use App\Mail\WOBOEStatusMail;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Rap2hpoutre\FastExcel\FastExcel;
-use App\Support\OrderStockType;
 
 class WorkOrderController extends Controller
 {
@@ -1760,10 +1759,6 @@ class WorkOrderController extends Controller
         if (!is_null($workOrder->sales_support_data_confirmation_at) && !$hasEditConfirmedPermission && !$isFinanceUser) {
             return response()->json(['success' => false, 'message' => "Can't edit the work order because the sales support confirmed the data."], 400);
         }
-
-        $request->validate([
-            'stock_type' => OrderStockType::validationRules(),
-        ]);
 
         DB::beginTransaction();
         try {

@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\So;
-use App\Support\OrderStockType;
 
 class StoreWorkOrderRequest extends FormRequest
 {
@@ -25,7 +24,6 @@ class StoreWorkOrderRequest extends FormRequest
     {
         return [
             'type' => 'required|string',
-            'stock_type' => OrderStockType::validationRules(),
             'so_number' => [
                 'required',
                 'string',
