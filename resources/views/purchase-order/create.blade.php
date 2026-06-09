@@ -122,6 +122,7 @@
                                 'selectedStockType' => old('stock_type'),
                                 'labelSuffix' => ': ',
                                 'requiredMarkerClass' => 'error',
+                                'labelFor' => 'basicpill-firstname-input',
                             ])
                         </div>
                         <div class="col-lg-1 col-md-6 col-sm-12">

@@ -7,17 +7,19 @@
     $requiredMarkerClass = $requiredMarkerClass ?? 'text-danger';
     $labelSuffix = $labelSuffix ?? '';
     $useStrongLabel = $useStrongLabel ?? false;
+    $labelFor = $labelFor ?? $stockTypeName;
+    $autofocus = $autofocus ?? false;
     $selectedStockType = \App\Support\OrderStockType::normalize(old($stockTypeName, $selectedStockType ?? null));
 @endphp
 @if (!$hideLabel)
 <span class="{{ $requiredMarkerClass }}">* </span>
 @if ($useStrongLabel)
-<label for="{{ $stockTypeName }}"><strong>{{ $stockTypeLabel }}{{ $labelSuffix }}</strong></label>
+<label for="{{ $labelFor }}"><strong>{{ $stockTypeLabel }}{{ $labelSuffix }}</strong></label>
 @else
-<label for="{{ $stockTypeName }}" class="{{ $labelClass }}">{{ $stockTypeLabel }}{{ $labelSuffix }}</label>
+<label for="{{ $labelFor }}" class="{{ $labelClass }}">{{ $stockTypeLabel }}{{ $labelSuffix }}</label>
 @endif
 @endif
-<select class="{{ $inputClass }}" id="{{ $stockTypeName }}" name="{{ $stockTypeName }}" required>
+<select class="{{ $inputClass }}" id="{{ $stockTypeName }}" name="{{ $stockTypeName }}" required @if($autofocus) autofocus @endif>
     <option value="" disabled {{ empty($selectedStockType) ? 'selected' : '' }}>Select {{ $stockTypeLabel }}</option>
     @foreach (\App\Support\OrderStockType::options() as $option)
         <option value="{{ $option }}" @selected($selectedStockType === $option)>{{ $option }}</option>
