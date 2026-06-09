@@ -13,6 +13,7 @@ class WorkOrder extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'type',
+        'stock_type',
         'date',
         'so_number',
         'temporary_exit',

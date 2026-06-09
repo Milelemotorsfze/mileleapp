@@ -2752,6 +2752,11 @@ class VehiclesController extends Controller
         return response()->json($vehicle);
     }
 
+    protected function stockReportTypeSelectExpression(): \Illuminate\Database\Query\Expression
+    {
+        return DB::raw('COALESCE(so.stock_type, work_orders.stock_type, purchasing_order.stock_type) as stock_type');
+    }
+
     /**
      * Shared Yajra DataTable JSON for stock report pages (same filter/diagnostics as before refactor).
      * Default PO-date sort is set client-side via DataTables `order` + column name.
@@ -3032,6 +3037,9 @@ class VehiclesController extends Controller
 
         $columns = [
             'purchasing_order.po_number',
+            'so.stock_type',
+            'work_orders.stock_type',
+            'purchasing_order.stock_type',
             'movement_grns.grn_number',
             'gdn.gdn_number',
             'so.so_number',
@@ -3656,6 +3664,7 @@ SQL;
                     'vehicles.vehicle_document_status',
                     'warehouse.name as location',
                     'purchasing_order.po_date',
+                    $this->stockReportTypeSelectExpression(),
                     'vehicles.ppmmyyy',
                     'vehicles.vin as vin',
                     'inspection_grn.id as grn_inspectionid',
@@ -4523,6 +4532,7 @@ SQL;
                     'vehicles.id as id',
                     'warehouse.name as location',
                     'purchasing_order.po_date',
+                    $this->stockReportTypeSelectExpression(),
                     'vehicles.estimation_date',
                     'vehicles.sales_remarks',
                     'vehicles.ppmmyyy',

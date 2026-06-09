@@ -569,6 +569,7 @@ table.dataTable thead th select {
             <th>Status</th>
             <th>PO</th>
             <th>PO Date</th>
+            <th>Type</th>
             <th>Estimated Arrival</th>
             <th>GRN</th>
             <th>GRN Date</th>
@@ -740,6 +741,7 @@ table.dataTable thead th select {
         return ''; // If no date, return empty
     }
 },
+        { data: 'stock_type', name: 'stock_type' },
 {
     data: 'estimation_date',
     name: 'vehicles.estimation_date',
@@ -1091,56 +1093,57 @@ var columnMap = {
         1: 'vehicles.id',
         2: 'purchasing_order.po_number',
         3: 'purchasing_order.po_date',
-        4: 'vehicles.estimation_date',
-        5: 'movement_grns.grn_number',
-        6: 'movements_reference.date',
-        9: 'so.so_date',
-        10: 'so.so_number',
-        11: 'sp.name',
-        12: 'vehicles.sales_remarks',
-        13: 'reservation_end_date',
-        14: 'bp.name',
-        15: 'gdn.gdn_number',
-        16: 'gdn.date',
-        17: 'vehicles.vehicle_document_status',
-        18: 'pdi_inspectionid',
-        19: 'brands.brand_name',
-        20: 'master_model_lines.model_line',
-        21: 'varaints.model_detail',
-        22: 'varaints.name',
-        23: 'varaints.detail',
-        24: 'vehicles.vin',
-        25: 'varaints.engine',
-        26: 'varaints.my',
-        27: 'varaints.steering',
-        28: 'varaints.fuel_type',
-        29: 'varaints.gearbox',
-        30: 'ex_color.name',
-        31: 'int_color.name',
-        32: 'varaints.upholestry',
-        33: 'vehicles.ppmmyyy',
-        34: 'warehouse.name',
-        35: 'vehicles.territory',
-        36: 'countries.name',
+        4: 'stock_type',
+        5: 'vehicles.estimation_date',
+        6: 'movement_grns.grn_number',
+        7: 'movements_reference.date',
+        10: 'so.so_date',
+        11: 'so.so_number',
+        12: 'sp.name',
+        13: 'vehicles.sales_remarks',
+        14: 'reservation_end_date',
+        15: 'bp.name',
+        16: 'gdn.gdn_number',
+        17: 'gdn.date',
+        18: 'vehicles.vehicle_document_status',
+        19: 'pdi_inspectionid',
+        20: 'brands.brand_name',
+        21: 'master_model_lines.model_line',
+        22: 'varaints.model_detail',
+        23: 'varaints.name',
+        24: 'varaints.detail',
+        25: 'vehicles.vin',
+        26: 'varaints.engine',
+        27: 'varaints.my',
+        28: 'varaints.steering',
+        29: 'varaints.fuel_type',
+        30: 'varaints.gearbox',
+        31: 'ex_color.name',
+        32: 'int_color.name',
+        33: 'varaints.upholestry',
+        34: 'vehicles.ppmmyyy',
+        35: 'warehouse.name',
+        36: 'vehicles.territory',
+        37: 'countries.name',
     };
     // Extend columnMap based on permissions
 if (canViewVehicleCost) {
-    columnMap[37] = 'costprice';
+    columnMap[38] = 'costprice';
+    columnMap[39] = 'vehicles.minimum_commission';
+    columnMap[40] = 'vehicles.price';
+    columnMap[41] = 'vehicles.ownership_type';
+    columnMap[42] = 'vehicles.custom_inspection_number';
+    columnMap[43] = 'vehicles.custom_inspection_status';
+} else if (hasPricePermission) {
     columnMap[38] = 'vehicles.minimum_commission';
     columnMap[39] = 'vehicles.price';
     columnMap[40] = 'vehicles.ownership_type';
     columnMap[41] = 'vehicles.custom_inspection_number';
     columnMap[42] = 'vehicles.custom_inspection_status';
-} else if (hasPricePermission) {
-    columnMap[37] = 'vehicles.minimum_commission';
-    columnMap[38] = 'vehicles.price';
-    columnMap[39] = 'vehicles.ownership_type';
-    columnMap[40] = 'vehicles.custom_inspection_number';
-    columnMap[41] = 'vehicles.custom_inspection_status';
 } else {
-    columnMap[37] = 'vehicles.ownership_type';
-    columnMap[38] = 'vehicles.custom_inspection_number';
-    columnMap[39] = 'vehicles.custom_inspection_status';
+    columnMap[38] = 'vehicles.ownership_type';
+    columnMap[39] = 'vehicles.custom_inspection_number';
+    columnMap[40] = 'vehicles.custom_inspection_status';
 }
         var table7 = $('#dtBasicExample7').DataTable({
           processing: true,

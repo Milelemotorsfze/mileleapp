@@ -344,6 +344,14 @@ $formAction = isset($workOrder)
 						<input id="so_number" name="so_number" type="text" class="form-control widthinput @error('so_number') is-invalid @enderror" placeholder="Enter SO Number"
 							value="{{ isset($workOrder) ? $workOrder->so_number : 'SO-00' }}" autocomplete="so_number" onkeyup="isSOExist()">
 					</div>
+					<div class="col-xxl-{{ $hasAllSalesPermission ? '2' : '3' }} col-lg-6 col-md-6">
+						@include('partials.order-stock-type-select', [
+							'stockTypeLabel' => 'WO Type',
+							'selectedStockType' => isset($workOrder) ? ($workOrder->stock_type ?? null) : null,
+							'labelClass' => 'col-form-label text-md-end',
+							'inputClass' => 'form-control widthinput',
+						])
+					</div>
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
 					<div class="col-xxl-1 col-lg-2 col-md-2">
 						<label for="is_batch" class="col-form-label text-md-end">Is Batch ?</label></br>

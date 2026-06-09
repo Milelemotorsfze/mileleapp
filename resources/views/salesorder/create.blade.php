@@ -374,7 +374,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                     <input type="text" class="form-control" placeholder="Enter SO Number" id="so_number" name="so_number" aria-label="Enter SO Number">
                 </div>
             </div>
-            <div class="col-md-8 mb-3">
+            <div class="col-md-2 mb-3">
+                @include('partials.order-stock-type-select', [
+                    'stockTypeLabel' => 'SO Type',
+                    'selectedStockType' => old('stock_type'),
+                ])
+            </div>
+            <div class="col-md-6 mb-3">
                 <label for="text_area">Sales Notes</label>
                 <textarea class="form-control" id="notes" name="notes"></textarea>
             </div>
