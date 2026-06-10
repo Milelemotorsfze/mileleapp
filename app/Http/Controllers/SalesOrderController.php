@@ -39,7 +39,6 @@ use App\Models\QuotationFile;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Html\Builder;
 use Illuminate\Support\Str;
-use App\Support\OrderStockType;
 
 class SalesOrderController extends Controller
 {
@@ -1118,7 +1117,6 @@ class SalesOrderController extends Controller
 
         $request->validate([
             'so_number' => 'required',
-            'stock_type' => OrderStockType::validationRules(),
         ]);
 
         DB::beginTransaction();
@@ -1131,7 +1129,6 @@ class SalesOrderController extends Controller
             $so_number = $request->input('so_number'); // Get the input value
             $so->so_number = 'SO-' . $so_number;    // Concatenate "SO-00" with the input value
             $so->so_date = $request->input('so_date');
-            $so->stock_type = $request->input('stock_type');
             $so->notes = $request->input('notes');
             $so->total = $request->input('total_payment');
             $so->receiving = $request->input('receiving_payment');
@@ -1502,9 +1499,6 @@ class SalesOrderController extends Controller
 
     public function storesalesorderupdate(Request $request, $quotationId)
     {
-        $request->validate([
-            'stock_type' => OrderStockType::validationRules(),
-        ]);
 
         DB::beginTransaction();
         try {
@@ -1515,7 +1509,6 @@ class SalesOrderController extends Controller
             $so_number = $request->input('so_number'); // Get the input value
             $so->so_number = 'SO-' . $so_number;
             $so->so_date = $request->input('so_date');
-            $so->stock_type = $request->input('stock_type');
             $so->notes = $request->input('notes');
             $so->total = $request->input('total_payment');
             $so->receiving = $request->input('receiving_payment');

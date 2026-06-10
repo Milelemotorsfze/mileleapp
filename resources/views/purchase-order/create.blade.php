@@ -116,15 +116,6 @@
                                 <option value="Payment Adjustment">Payment Adjustment</option>
                             </select>
                         </div>
-                        <div class="col-lg-2 col-md-6">
-                            @include('partials.order-stock-type-select', [
-                                'stockTypeLabel' => 'Stock Type',
-                                'selectedStockType' => old('stock_type'),
-                                'labelSuffix' => ': ',
-                                'requiredMarkerClass' => 'error',
-                                'labelFor' => 'basicpill-firstname-input',
-                            ])
-                        </div>
                         <div class="col-lg-1 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label font-size-13 "> Territory </label>
