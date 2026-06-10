@@ -459,6 +459,7 @@ Route::get('/d', function () {
         Route::get('work-order/search-vins', 'searchWorkOrderVins')->name('work-order.search-vins');
         Route::get('work-order/search-customers', 'searchWorkOrderCustomers')->name('work-order.search-customers');
         Route::post('work-order/vin-details', 'getWorkOrderVinDetails')->name('work-order.vin-details');
+        Route::post('work-order/fetch-so-details', 'fetchSoDetailsForWorkOrder')->name('work-order.fetch-so-details');
         Route::get('work-order-create/{type}', 'workOrderCreate')->name('work-order-create.create');
         Route::get('work-order-info/{type}', 'index')->name('work-order.index');
         Route::post('/fetch-addons', 'fetchAddons')->name('fetch-addons');
