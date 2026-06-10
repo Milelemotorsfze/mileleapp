@@ -14,7 +14,7 @@ class QuotationDetail extends Model
     }
     public function shippingPort()
     {
-        return $this->belongsTo(MasterShippingPorts::class);
+        return $this->belongsTo(MasterShippingPorts::class, 'shipping_port_id', 'id');
     }
     public function shippingPortOfLoad()
     {

@@ -72,6 +72,22 @@
 		display: none;
 	}
 
+	#soAutoFillSummaryModal .modal-content {
+		border: none;
+		box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.2);
+	}
+
+	#soAutoFillSummaryModal .list-group-item {
+		font-size: 13px;
+	}
+
+	#soAutoFillSummaryModal .so-autofill-value {
+		max-width: 60%;
+		word-break: break-word;
+		text-align: right;
+		color: #495057;
+	}
+
 	.addon_btn_round {
 		width: 20px !important;
 		height: 14px !important;
@@ -682,9 +698,9 @@ $formAction = isset($workOrder)
 				</h4>
 			</div>
 			<div class="card-body">
-				<div class="row">
-					<div class="col-xxl-12 col-lg-12 col-md-12">
-						<label for="vin_multiple" class="col-form-label text-md-end">{{ __('VIN') }}</label>
+				<div class="row align-items-end g-2 mb-3">
+					<div class="col-lg-8 col-md-12">
+						<label for="vin_multiple" class="col-form-label">{{ __('VIN') }}</label>
 						<select id="vin_multiple" name="vin_multiple" class="form-control widthinput" multiple="true">
 							@if(isset($editVinOptions) && count($editVinOptions) > 0)
 								@foreach($editVinOptions as $editVin)
@@ -693,26 +709,22 @@ $formAction = isset($workOrder)
 							@endif
 						</select>
 					</div>
-				</div>
-
-				<div class="row">
-					<div class="col-xxl-12 col-lg-12 col-md-12 addon_outer" id="addon-dynamic-div">
-					</div>
-					<div class="col-xxl-12 col-lg-12 col-md-12">
-						<a title="Add VIN" style="margin-top:38px;float:right;"
-							class="btn btn-sm btn-info modal-button add-addon-btn"><i class="fa fa-plus" aria-hidden="true"></i> Addon</a>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xxl-12 col-lg-12 col-md-12">
-						<a title="Add VIN" style="margin-top:38px; float:left;"
-							class="btn btn-sm btn-info modal-button add-vehicle-btn"><i class="fa fa-plus" aria-hidden="true"></i> add Vehicle</a>
+					<div class="col-lg-4 col-md-12 d-flex flex-wrap gap-2 justify-content-lg-end">
+						<a title="Add Vehicle" class="btn btn-sm btn-info modal-button add-vehicle-btn">
+							<i class="fa fa-plus" aria-hidden="true"></i> Add Vehicle
+						</a>
+						<a title="Add Addon" class="btn btn-sm btn-info modal-button add-addon-btn">
+							<i class="fa fa-plus" aria-hidden="true"></i> Addon
+						</a>
 					</div>
 				</div>
-				</br>
+				<div class="row mb-3">
+					<div class="col-12 addon_outer" id="addon-dynamic-div"></div>
+				</div>
 				<div class="row">
 					<div class="table-responsive">
 						<table id="myTable" class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
+							<thead>
 							<tr style="border-bottom:1px solid #b3b3b3;">
 								<th>Action</th>
 								<th>VIN</th>
@@ -735,6 +747,8 @@ $formAction = isset($workOrder)
 								<th>Shipment</th>
 								@endif
 							</tr>
+							</thead>
+							<tbody></tbody>
 						</table>
 					</div>
 				</div>
@@ -1216,6 +1230,25 @@ $formAction = isset($workOrder)
 	@endif
 </div>
 <br>
+<div class="modal fade" id="soAutoFillSummaryModal" tabindex="-1" aria-labelledby="soAutoFillSummaryModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="soAutoFillSummaryModalLabel">SO Auto-Fill Summary</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<p class="mb-3">The following data was loaded from <strong id="soAutoFillSoNumber"></strong>. Please verify on the form before continuing.</p>
+				<div class="mb-3">
+					<h6 class="fw-semibold mb-2">Vehicles</h6>
+					<div id="soAutoFillVinsSummary" class="alert alert-info py-2 px-3 mb-0"></div>
+				</div>
+				<h6 class="fw-semibold mb-2">Auto-Filled Fields</h6>
+				<ul id="soAutoFillFieldsList" class="list-group list-group-flush border rounded mb-0"></ul>
+			</div>
+		</div>
+	</div>
+</div>
 <div id="overlay">
 	<div id="overlay-content">
 		<h2>Submitting, please wait...</h2>
@@ -1260,6 +1293,10 @@ $formAction = isset($workOrder)
 	var customerCount = $("#customerCount").val();
 	var type = $("#type").val();
 	var addedVins = [];
+	var initialWoSoNumber = null;
+	var soAutoFillAppliedFor = null;
+	var soDetailsRequestSeq = 0;
+	var isPopulatingFromSo = false;
 	var selectedDepositReceivedValue = '';
 	var newCustomerEmail = '';
 	var newCustomerContact = '';
@@ -1282,6 +1319,10 @@ $formAction = isset($workOrder)
 		document.getElementById("delivery_date").setAttribute("min", today);
 	});
 	@endif
+	if (workOrder != null && workOrder.so_number) {
+		initialWoSoNumber = workOrder.so_number;
+		soAutoFillAppliedFor = workOrder.so_number;
+	}
 
 	const mentions = ["@Alice", "@Bob", "@Charlie"];
 	var input = document.querySelector("#customer_company_number");
@@ -1639,6 +1680,9 @@ $formAction = isset($workOrder)
 			$("#transportation-company-details-div").show();
 		}
 		$('#customer_name').on('change', function() {
+			if (isPopulatingFromSo) {
+				return;
+			}
 			var selectedData = $('#customer_name').select2('data');
 			if (selectedData && selectedData.length > 0) {
 				setCustomerRelations(selectedData[0]);
@@ -2859,7 +2903,10 @@ $formAction = isset($workOrder)
 	}
 
 	function drawTableRow(data) {
-		var tableBody = document.querySelector('#myTable tbody');
+		var tableBody = getMyTableBody();
+		if (!tableBody) {
+			throw new Error('Vehicle table is not available.');
+		}
 
 		var firstRow = document.createElement('tr');
 		firstRow.style.borderTop = '2px solid #a6a6a6';
@@ -2946,7 +2993,7 @@ $formAction = isset($workOrder)
 		modificationInputElement.value = data.modification_or_jobs_to_perform_per_vin;
 		modificationInputCell.appendChild(modificationInputElement);
 
-		$(modificationInputElement).rules('add', {
+		safeAddValidationRules($(modificationInputElement), {
 			noSpaces: true,
 			messages: {
 				noSpaces: "No leading or trailing spaces allowed."
@@ -2979,7 +3026,7 @@ $formAction = isset($workOrder)
 		specialRequestInputElement.style.width = '100%';
 		specialRequestInputElement.value = data.special_request_or_remarks;
 		specialRequestInputCell.appendChild(specialRequestInputElement);
-		$(specialRequestInputCell).rules('add', {
+		safeAddValidationRules($(specialRequestInputCell), {
 			noSpaces: true,
 			messages: {
 				noSpaces: "No leading or trailing spaces allowed."
@@ -3601,20 +3648,503 @@ $formAction = isset($workOrder)
 		}
 	}
 
+	function isWorkOrderFieldEmpty(selector) {
+		var $el = $(selector);
+		if (!$el.length) {
+			return true;
+		}
+		if ($el.is(':checkbox') || $el.is(':radio')) {
+			return !$el.is(':checked');
+		}
+		if ($el.is('select')) {
+			var val = $el.val();
+			return val === null || val === '' || (Array.isArray(val) && val.length === 0);
+		}
+		return String($el.val() || '').trim() === '';
+	}
+
+	function isCustomerNameEmpty() {
+		if ($('#customer_type').val() === 'new') {
+			return isWorkOrderFieldEmpty('#textInput');
+		}
+		return isWorkOrderFieldEmpty('#customer_name');
+	}
+
+	function isSalesPersonEmpty() {
+		var $salesPerson = $('#sales_person_id');
+		if (!$salesPerson.length || !$salesPerson.is('select')) {
+			return true;
+		}
+		return isWorkOrderFieldEmpty('#sales_person_id');
+	}
+
+	function getPhoneDigitCount(itiInstance, fullFieldSelector, mainSelector) {
+		var digits = '';
+		var stored = $(fullFieldSelector).val();
+		if (stored) {
+			digits = String(stored).replace(/\D/g, '');
+		}
+		if ((!digits || digits.length < 8) && typeof itiInstance !== 'undefined' && itiInstance.getNumber) {
+			var e164 = itiInstance.getNumber();
+			if (e164) {
+				digits = String(e164).replace(/\D/g, '');
+			}
+		}
+		if ((!digits || digits.length < 8) && mainSelector) {
+			var mainVal = $(mainSelector).val();
+			if (mainVal) {
+				digits = String(mainVal).replace(/\D/g, '');
+			}
+		}
+		return digits.length;
+	}
+
+	function isPhoneFieldEmpty(itiInstance, fullFieldSelector, mainSelector) {
+		return getPhoneDigitCount(itiInstance, fullFieldSelector, mainSelector) < 8;
+	}
+
+	function shouldAutoFillFromSo(soNumber) {
+		if (!soNumber || soNumber === 'SO-00' || !/^SO-\d{6}$/.test(soNumber)) {
+			return false;
+		}
+		// Edit: keep saved WO data when SO number is unchanged.
+		if (initialWoSoNumber && soNumber === initialWoSoNumber) {
+			return false;
+		}
+		// Skip if this SO was already applied in this session.
+		if (soAutoFillAppliedFor && soNumber === soAutoFillAppliedFor) {
+			return false;
+		}
+		return true;
+	}
+
+	function clearSoCustomerFields() {
+		$('#customer_email').val('');
+		$('#customer_address').val('');
+		$('#customer_company_number').val('');
+		$('#customer_company_number_full').val('');
+	}
+
+	function pushSoAutoFillItem(items, label, value) {
+		if (value === null || value === undefined || String(value).trim() === '') {
+			return;
+		}
+		items.push({
+			label: label,
+			value: String(value).trim()
+		});
+	}
+
+	function applySoCustomerFields(data, forceReplace) {
+		var filled = [];
+		if (!data) {
+			return filled;
+		}
+
+		isPopulatingFromSo = true;
+		try {
+			if (forceReplace) {
+				clearSoCustomerFields();
+			}
+
+			if (data.customer_name && (forceReplace || isCustomerNameEmpty())) {
+				$('#customer_type').val('existing');
+				$('#textInput').hide();
+				$('#Other').show();
+				$('#switchToDropdown').hide();
+				$('#customer_name').next('.select2-container').show();
+				$('#customer_name').empty();
+				var customerOption = new Option(data.customer_name, data.customer_name, true, true);
+				$('#customer_name').append(customerOption).trigger('change');
+				pushSoAutoFillItem(filled, 'Customer Name', data.customer_name);
+			}
+
+			if (data.customer_email && (forceReplace || isWorkOrderFieldEmpty('#customer_email'))) {
+				$('#customer_email').val(data.customer_email);
+				pushSoAutoFillItem(filled, 'Customer Email', data.customer_email);
+			}
+			if (data.customer_address && (forceReplace || isWorkOrderFieldEmpty('#customer_address'))) {
+				$('#customer_address').val(data.customer_address);
+				pushSoAutoFillItem(filled, 'Customer Address', data.customer_address);
+			}
+			if (data.customer_company_number && (forceReplace || isPhoneFieldEmpty(iti, '#customer_company_number_full', '#customer_company_number'))) {
+				var fullPhoneNumber = String(data.customer_company_number).replace(/\s+/g, '');
+				iti.setNumber(fullPhoneNumber);
+				var appliedPhone = iti.getNumber();
+				$('#customer_company_number_full').val(appliedPhone);
+				if (typeof sanitizeNumberInput === 'function') {
+					sanitizeNumberInput(input);
+				}
+				pushSoAutoFillItem(filled, 'Customer Contact Number', appliedPhone || data.customer_company_number);
+			}
+		} finally {
+			isPopulatingFromSo = false;
+		}
+
+		return filled;
+	}
+
+	function applySoPortFields(data, forceReplace) {
+		var filled = [];
+		if (!data) {
+			return filled;
+		}
+
+		var portFields = [{
+				selector: '#port_of_loading',
+				label: 'Port of Loading',
+				value: data.port_of_loading
+			},
+			{
+				selector: '#port_of_discharge',
+				label: 'Port of Discharge',
+				value: data.port_of_discharge
+			},
+			{
+				selector: '#final_destination',
+				label: 'Final Destination',
+				value: data.final_destination
+			},
+			{
+				selector: '#delivery_location',
+				label: 'Delivery Location',
+				value: data.delivery_location
+			}
+		];
+
+		portFields.forEach(function(field) {
+			if (!field.value || !$(field.selector).length) {
+				return;
+			}
+			if (!forceReplace && !isWorkOrderFieldEmpty(field.selector)) {
+				return;
+			}
+			$(field.selector).val(field.value);
+			pushSoAutoFillItem(filled, field.label, field.value);
+		});
+
+		return filled;
+	}
+
+	function buildSoAutoFillSummary(filledFields, soData) {
+		var summary = filledFields.slice();
+		if (!soData) {
+			return summary;
+		}
+
+		var soOnlyFields = [{
+				label: 'Port of Loading',
+				value: soData.port_of_loading
+			},
+			{
+				label: 'Port of Discharge',
+				value: soData.port_of_discharge
+			},
+			{
+				label: 'Final Destination',
+				value: soData.final_destination
+			},
+			{
+				label: 'Delivery Location',
+				value: soData.delivery_location
+			}
+		];
+
+		soOnlyFields.forEach(function(field) {
+			if (!field.value) {
+				return;
+			}
+			var alreadyListed = summary.some(function(item) {
+				return item.label === field.label;
+			});
+			if (!alreadyListed) {
+				pushSoAutoFillItem(summary, field.label, field.value);
+			}
+		});
+
+		return summary;
+	}
+
+	function getMyTableBody() {
+		var table = document.getElementById('myTable');
+		if (!table) {
+			return null;
+		}
+		var tbody = table.querySelector('tbody');
+		if (!tbody) {
+			tbody = document.createElement('tbody');
+			table.appendChild(tbody);
+		}
+		return tbody;
+	}
+
+	function safeAddValidationRules($element, rules) {
+		try {
+			if ($element && $element.length && typeof $element.rules === 'function' && $('#WOForm').data('validator')) {
+				$element.rules('add', rules);
+			}
+		} catch (error) {
+			console.warn('Could not add validation rules for dynamic field.', error);
+		}
+	}
+
+	function setWorkOrderFieldValue(selector, value, forceReplace) {
+		if (value === null || value === undefined || value === '') {
+			return false;
+		}
+		if (!forceReplace && !isWorkOrderFieldEmpty(selector)) {
+			return false;
+		}
+		$(selector).val(value);
+		return true;
+	}
+
+	function setWorkOrderPhoneValue(itiInstance, fullFieldSelector, value, forceReplace, mainSelector) {
+		if (!value || typeof itiInstance === 'undefined') {
+			return false;
+		}
+		if (!forceReplace && !isPhoneFieldEmpty(itiInstance, fullFieldSelector, mainSelector)) {
+			return false;
+		}
+		itiInstance.setNumber(String(value).replace(/\s+/g, ''));
+		var appliedPhone = itiInstance.getNumber();
+		$(fullFieldSelector).val(appliedPhone);
+		if (typeof sanitizeNumberInput === 'function' && mainSelector) {
+			sanitizeNumberInput(document.querySelector(mainSelector));
+		}
+		return true;
+	}
+
+	function showSoAutoFillSummaryModal(soNumber, filledFields, vinResult) {
+		$('#soAutoFillSoNumber').text(soNumber);
+
+		var $list = $('#soAutoFillFieldsList').empty();
+		if (!filledFields.length) {
+			$list.append('<li class="list-group-item text-muted">No form fields were updated.</li>');
+		} else {
+			filledFields.forEach(function(item) {
+				var displayValue = item.value.length > 100 ? item.value.substring(0, 100) + '...' : item.value;
+				$list.append(
+					'<li class="list-group-item d-flex justify-content-between align-items-start">' +
+					'<span class="fw-semibold">' + escapeHtmlAttr(item.label) + '</span>' +
+					'<span class="so-autofill-value" title="' + escapeHtmlAttr(item.value) + '">' + escapeHtmlAttr(displayValue) + '</span>' +
+					'</li>'
+				);
+			});
+		}
+
+		var $vinSummary = $('#soAutoFillVinsSummary');
+		if (vinResult.added > 0) {
+			$vinSummary.removeClass('alert-warning').addClass('alert-info');
+			$vinSummary.html(
+				'<strong>' + vinResult.added + ' vehicle(s) added</strong>' +
+				(vinResult.vins.length ? ': ' + escapeHtmlAttr(vinResult.vins.join(', ')) : '')
+			);
+		} else if (vinResult.requested > 0) {
+			$vinSummary.removeClass('alert-info').addClass('alert-warning');
+			$vinSummary.html('<strong>0 vehicles added.</strong> ' + vinResult.requested + ' vehicle(s) found on SO but were already on the form or could not be loaded.');
+		} else {
+			$vinSummary.removeClass('alert-warning').addClass('alert-info');
+			$vinSummary.html('<strong>0 vehicles added.</strong> No VINs were returned from this SO.');
+		}
+
+		var modalEl = document.getElementById('soAutoFillSummaryModal');
+		if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+			bootstrap.Modal.getOrCreateInstance(modalEl).show();
+		} else {
+			$('#soAutoFillSummaryModal').modal('show');
+		}
+	}
+
+	function clearWorkOrderVehiclesForSoReload() {
+		$('#myTable tbody').empty();
+		$('#vin_multiple option').prop('disabled', false);
+		addedVins = [];
+		findAllVINs();
+	}
+
+	function populateSoVehicles(vinRows) {
+		var result = {
+			requested: vinRows ? vinRows.length : 0,
+			added: 0,
+			vins: []
+		};
+
+		if (!vinRows || vinRows.length === 0) {
+			return result;
+		}
+
+		var existingVins = new Set(addedVins);
+		var newRows = vinRows.filter(function(row) {
+			return row.vin && !existingVins.has(row.vin);
+		});
+
+		if (newRows.length === 0) {
+			return result;
+		}
+
+		newRows.forEach(function(data) {
+			try {
+				drawTableRow(data);
+				result.added++;
+				result.vins.push(data.vin);
+			} catch (error) {
+				console.error('Failed to add SO vehicle row:', data.vin, error);
+			}
+		});
+
+		newRows.forEach(function(data) {
+			if ($('#vin_multiple option').filter(function() { return $(this).val() === data.vin; }).length === 0) {
+				$('#vin_multiple').append(new Option(data.vin, data.vin, false, false));
+			}
+			$('#vin_multiple option').filter(function() { return $(this).val() === data.vin; }).prop('disabled', true);
+		});
+		$('#vin_multiple').trigger('change.select2');
+		findAllVINs();
+		return result;
+	}
+
+	function populateWorkOrderFromSo(data, forceReplace) {
+		var filled = [];
+		if (!data) {
+			return filled;
+		}
+		forceReplace = !!forceReplace;
+
+		if ($('#stock_type').length && data.stock_type && (forceReplace || isWorkOrderFieldEmpty('#stock_type'))) {
+			$('#stock_type').val(data.stock_type);
+			pushSoAutoFillItem(filled, 'WO Type', data.stock_type);
+		}
+
+		if (data.sales_person_id) {
+			var $salesPerson = $('#sales_person_id');
+			if ($salesPerson.length && $salesPerson.is('select') && (forceReplace || isSalesPersonEmpty())) {
+				var salesPersonId = String(data.sales_person_id);
+				var salesPersonLabel = data.sales_person_name || ('Sales Person #' + salesPersonId);
+				if ($salesPerson.find('option').filter(function() { return $(this).val() === salesPersonId; }).length === 0) {
+					$salesPerson.append(new Option(salesPersonLabel, salesPersonId, true, true));
+				}
+				$salesPerson.val([salesPersonId]).trigger('change');
+				pushSoAutoFillItem(filled, 'Sales Person', salesPersonLabel);
+			}
+		}
+
+		filled = filled.concat(applySoCustomerFields(data, forceReplace));
+
+		if (setWorkOrderFieldValue('#customer_representative_name', data.customer_representative_name, forceReplace)) {
+			pushSoAutoFillItem(filled, 'Representative Name', data.customer_representative_name);
+		}
+		if (setWorkOrderPhoneValue(customer_representative_contact, '#customer_representative_contact_full', data.customer_representative_contact, forceReplace, '#customer_representative_contact')) {
+			pushSoAutoFillItem(filled, 'Representative Contact', data.customer_representative_contact);
+		}
+
+		filled = filled.concat(applySoPortFields(data, forceReplace));
+
+		if ($('#cross_trade').length && (forceReplace || !$('#cross_trade').is(':checked'))) {
+			$('#cross_trade').prop('checked', !!data.cross_trade);
+			if (data.cross_trade) {
+				pushSoAutoFillItem(filled, 'Cross Trade', 'Yes');
+			}
+		}
+
+		if ($('#consignee').length) {
+			var consigneeText = data.consignee || data.customer_name || '';
+			if (data.customer_address) {
+				consigneeText = consigneeText ? (consigneeText + '\n' + data.customer_address) : data.customer_address;
+			}
+			if ((forceReplace || isWorkOrderFieldEmpty('#consignee')) && consigneeText) {
+				$('#consignee').val(consigneeText);
+				pushSoAutoFillItem(filled, 'Consignee', consigneeText);
+			}
+		}
+		if (data.currency && (forceReplace || isWorkOrderFieldEmpty('#currency'))) {
+			$('#currency').val(data.currency).trigger('change');
+			pushSoAutoFillItem(filled, 'Currency', data.currency);
+		}
+		if (data.so_total_amount !== null && data.so_total_amount !== undefined && data.so_total_amount !== '') {
+			if (setWorkOrderFieldValue('#so_total_amount', data.so_total_amount, forceReplace)) {
+				pushSoAutoFillItem(filled, 'SO Total Amount', data.so_total_amount);
+			}
+		}
+		if (data.so_vehicle_quantity !== null && data.so_vehicle_quantity !== undefined && data.so_vehicle_quantity !== '') {
+			if (setWorkOrderFieldValue('#so_vehicle_quantity', data.so_vehicle_quantity, forceReplace)) {
+				pushSoAutoFillItem(filled, 'SO Vehicle Quantity', data.so_vehicle_quantity);
+			}
+		}
+		if (data.amount_received !== null && data.amount_received !== undefined && data.amount_received !== '' &&
+			(forceReplace || !selectedDepositReceivedValue)) {
+			$('#total_deposit').prop('checked', true);
+			selectedDepositReceivedValue = 'total_deposit';
+			$('#amount-received-div').show();
+			$('#balance-amount-div').show();
+			$('#deposit-aganist-vehicle-div').hide();
+			if (setWorkOrderFieldValue('#amount_received', data.amount_received, forceReplace)) {
+				pushSoAutoFillItem(filled, 'Amount Received', data.amount_received);
+			}
+		}
+		if (data.balance_amount !== null && data.balance_amount !== undefined && data.balance_amount !== '') {
+			if (setWorkOrderFieldValue('#balance_amount', data.balance_amount, forceReplace)) {
+				pushSoAutoFillItem(filled, 'Balance Amount', data.balance_amount);
+			}
+		} else if (forceReplace || isWorkOrderFieldEmpty('#balance_amount')) {
+			setDepositBalance();
+		}
+
+		return filled;
+	}
+
+	function fetchAndPopulateSoDetails(soNumber) {
+		if (!soNumber || !shouldAutoFillFromSo(soNumber)) {
+			return;
+		}
+
+		var replaceExisting = soAutoFillAppliedFor !== null && soNumber !== soAutoFillAppliedFor;
+		var requestSeq = ++soDetailsRequestSeq;
+
+		$.ajax({
+			url: @json(route('work-order.fetch-so-details')),
+			method: 'POST',
+			data: {
+				_token: $('meta[name="csrf-token"]').attr('content'),
+				so_number: soNumber
+			},
+			success: function(response) {
+				if (requestSeq !== soDetailsRequestSeq) {
+					return;
+				}
+				if (!response.success || !response.data) {
+					return;
+				}
+
+				var vinRows = response.data.vins || [];
+				if (replaceExisting) {
+					clearWorkOrderVehiclesForSoReload();
+				}
+
+				var filledFields = populateWorkOrderFromSo(response.data, replaceExisting);
+				var vinResult = populateSoVehicles(vinRows);
+				soAutoFillAppliedFor = soNumber;
+				showSoAutoFillSummaryModal(soNumber, buildSoAutoFillSummary(filledFields, response.data), vinResult);
+			},
+			error: function(xhr) {
+				if (requestSeq !== soDetailsRequestSeq) {
+					return;
+				}
+				console.error('Unable to load SO details:', xhr.responseText);
+			}
+		});
+	}
+
 	function isSOExist() {
-		console.log('inside isSOExist');
 		var SONumber = $('#so_number').val().trim();
 		var editWoId = '';
 		if (workOrder != null) {
 			editWoId = workOrder.id;
 		}
-		console.log("isEdit is - " + editWoId);
 		// Ensure the SO Number is valid (including custom validation isExistInSalesOrder)
 		if (!$('#so_number').valid()) {
-			console.log("SO number validation failed.");
-			return; // Stop execution if validation fails
+			return;
 		}
-		console.log("SO number validation passed. Proceeding with the AJAX call.");
 		var selectedBatch = '';
 		if ($('#batch').length && (type == 'export_exw' || type == 'export_cnf')) {
 			selectedBatch = $('#batch').val();
@@ -3659,6 +4189,9 @@ $formAction = isset($workOrder)
 					setWo();
 					document.getElementById('is_batch').disabled = false;
 					document.getElementById('batch').disabled = false;
+				}
+				if (shouldAutoFillFromSo(SONumber)) {
+					fetchAndPopulateSoDetails(SONumber);
 				}
 			},
 			error: function(xhr) {

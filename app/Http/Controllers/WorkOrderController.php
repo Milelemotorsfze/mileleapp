@@ -45,6 +45,8 @@ use App\Models\WOBOE;
 use App\Mail\WOBOEStatusMail;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Rap2hpoutre\FastExcel\FastExcel;
+use App\Support\OrderStockType;
+use App\Services\WorkOrderSoDataService;
 
 class WorkOrderController extends Controller
 {
@@ -3637,9 +3639,27 @@ class WorkOrderController extends Controller
     public function isExistInSalesOrder(Request $request)
     {
         $soNumber = $request->input('so_number');
-        // Check if the so_number exists in the So model
-        $exists = So::where('so_number', $soNumber)->exists();
+        $exists = app(WorkOrderSoDataService::class)->findActiveSoByNumber($soNumber) !== null;
+
         return response()->json(['valid' => $exists]);
+    }
+
+    public function fetchSoDetailsForWorkOrder(Request $request, WorkOrderSoDataService $soDataService)
+    {
+        $soNumber = trim((string) $request->input('so_number', ''));
+        if ($soNumber === '') {
+            return response()->json(['success' => false, 'message' => 'SO number is required.'], 422);
+        }
+
+        $so = $soDataService->findActiveSoByNumber($soNumber);
+        if (!$so) {
+            return response()->json(['success' => false, 'message' => 'Sales order not found or has been cancelled.'], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $soDataService->buildWorkOrderPayload($so),
+        ]);
     }
     function formatPhoneForExcel($number)
     {
