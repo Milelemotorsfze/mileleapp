@@ -1762,6 +1762,10 @@ class WorkOrderController extends Controller
             return response()->json(['success' => false, 'message' => "Can't edit the work order because the sales support confirmed the data."], 400);
         }
 
+        $request->validate([
+            'stock_type' => OrderStockType::validationRules(),
+        ]);
+
         DB::beginTransaction();
         try {
             $canCreateFinanceApproval = false;

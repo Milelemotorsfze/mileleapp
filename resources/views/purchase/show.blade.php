@@ -992,6 +992,17 @@ return [$color->id => $formattedName];
                                     </div>
 
                                     <div class="col-md-4 p-3">
+                                        <label for="stock_type" class="form-label font-size-13 text-center"><span class="text-danger">* </span>Stock Type:</label>
+                                    </div>
+                                    <div class="col-md-8 p-3">
+                                        @include('partials.order-stock-type-select', [
+                                            'stockTypeLabel' => 'Stock Type',
+                                            'selectedStockType' => $purchasingOrder->stock_type ?? null,
+                                            'hideLabel' => true,
+                                        ])
+                                    </div>
+
+                                    <div class="col-md-4 p-3">
                                         <label for="shippingMethod" class="form-label font-size-13 text-center">Shipping Method:</label>
                                     </div>
                                     <div class="col-md-8 p-3">
@@ -1082,6 +1093,14 @@ return [$color->id => $formattedName];
                     </div>
                     <div class="col-lg-6 col-md-9 col-sm-12">
                         <span>{{ $purchasingOrder->po_type }}</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-md-3 col-sm-12">
+                        <label for="choices-single-default" class="form-label"><strong>Stock Type</strong></label>
+                    </div>
+                    <div class="col-lg-6 col-md-9 col-sm-12">
+                        <span>{{ $purchasingOrder->stock_type ?? '' }}</span>
                     </div>
                 </div>
                 <div class="row">
