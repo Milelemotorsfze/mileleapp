@@ -20,7 +20,6 @@ class So extends Model
         'created_at',
         'updated_at',
         'sales_type',
-        'stock_type',
         'total',
         'receiving',
         'paidinso',
