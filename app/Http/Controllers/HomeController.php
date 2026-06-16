@@ -287,7 +287,7 @@ class HomeController extends Controller
                 ->groupBy('so.sales_person_id', 'users.name')
                 ->get();
             foreach ($commissons as $item) {
-                $totalSales = $item->total_rate_in_aed;
+                $totalSales = $item->total_rate_in_aed ?? 0;
                 $commissionSlot = DB::table('commission_slots')
                     ->where('min_sales', '<=', $totalSales)
                     ->where(function($query) use ($totalSales) {
