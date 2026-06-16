@@ -51,8 +51,6 @@ use App\Models\PurchasedOrderPaidAmounts;
 use App\Models\VendorPaymentAdjustments;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\UploadedFile;
 use App\Models\SupplierAccountTransaction;
 use App\Models\PurchasedOrderPriceChanges;
 use App\Models\PurchasedOrderMessages;
@@ -6052,8 +6050,13 @@ class PurchasingOrderController extends Controller
                 return response()->json(['success' => false, 'message' => 'Swift copy can only be uploaded for released payments'], 422);
             }
 
+            $swiftCopyDir = public_path('storage/swift_copies');
+            if (!is_dir($swiftCopyDir)) {
+                mkdir($swiftCopyDir, 0755, true);
+            }
+
             $fileNameToStore = time() . '_' . $file->getClientOriginalName();
-            $swiftCopyFilePath = $this->storeSwiftCopyFile($file, $fileNameToStore);
+            $file->move($swiftCopyDir, $fileNameToStore);
 
             $vehicleCount = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->count();
             $latestBatch = DB::table('purchasing_order_swift_copies')
@@ -6068,7 +6071,7 @@ class PurchasingOrderController extends Controller
             $swiftcopy->number_of_vehicles = $vehicleCount;
             $swiftcopy->batch_no = $batchNo;
             $swiftcopy->sat_id = $transitionId;
-            $swiftcopy->file_path = $swiftCopyFilePath;
+            $swiftcopy->file_path = 'storage/swift_copies/' . $fileNameToStore;
             $swiftcopy->save();
 
             $supplierAccountTransaction->transaction_type = 'Debit';
@@ -6148,47 +6151,6 @@ class PurchasingOrderController extends Controller
                 'message' => 'Error submitting payment',
                 'error' => $e->getMessage(),
             ], 500);
-        }
-    }
-
-    private function storeSwiftCopyFile(UploadedFile $file, string $fileNameToStore): string
-    {
-        Storage::disk('public')->makeDirectory('swift_copies');
-
-        $storedPath = Storage::disk('public')->putFileAs('swift_copies', $file, $fileNameToStore);
-        if (!$storedPath) {
-            throw new \RuntimeException('Failed to store swift copy file.');
-        }
-
-        $this->mirrorFileToPublicStorage($storedPath);
-
-        return 'storage/' . str_replace('\\', '/', $storedPath);
-    }
-
-    private function mirrorFileToPublicStorage(string $relativePath): void
-    {
-        $relativePath = str_replace('\\', '/', $relativePath);
-        $source = storage_path('app/public/' . $relativePath);
-        $destination = public_path('storage/' . $relativePath);
-
-        if (!is_file($source)) {
-            return;
-        }
-
-        $publicStorage = realpath(public_path('storage'));
-        $storagePublic = realpath(storage_path('app/public'));
-
-        if ($publicStorage && $storagePublic && $publicStorage === $storagePublic) {
-            return;
-        }
-
-        $destinationDir = dirname($destination);
-        if (!is_dir($destinationDir)) {
-            File::makeDirectory($destinationDir, 0755, true);
-        }
-
-        if (!is_file($destination)) {
-            copy($source, $destination);
         }
     }
 
