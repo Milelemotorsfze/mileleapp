@@ -1118,6 +1118,7 @@ Route::get('/check-trashed-gdn', function () {
     Route::post('/save-dn-numbers', [PurchasingOrderController::class, 'saveDnNumbers'])->name('save.dnNumbers');
     Route::get('/getVehiclesdn/{purchaseOrderId}', [PurchasingOrderController::class, 'getVehiclesdn']);
     Route::post('/saleorderstoreupdate/{QuotationId}', [SalesOrderController::class, 'storesalesorderupdate'])->name('salesorder.storesalesorderupdate');
+    Route::post('/salesorder/remove-variant', [SalesOrderController::class, 'removeSalesOrderVariant'])->name('salesorder.removeVariant');
     Route::get('/not-access', [AccessController::class, 'notAccessPage'])->name('not_access_page');
 
     Route::resource('vehiclenetsuitecost', VehicleNetsuiteCostController::class);

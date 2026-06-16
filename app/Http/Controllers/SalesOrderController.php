@@ -1525,6 +1525,12 @@ class SalesOrderController extends Controller
             $so->updated_at = Carbon::now();
             $so->save();
 
+            $newVariantQuotationItemIds = $this->syncVariantsFromUpdateRequest($request, $so);
+            $this->removeUnsubmittedQuotationItems(
+                $so,
+                $this->getSubmittedQuotationItemIds($request, $newVariantQuotationItemIds)
+            );
+
             // Delete existing Soitems records related to the Sales Order ID
             \Log::info('SO items deleted - Case 3-' . $so->id);
             Soitems::where('so_id', $so->id)->update(['deleted_by' => Auth::id()]);
@@ -1537,7 +1543,11 @@ class SalesOrderController extends Controller
             // Only create booking requests when the lead still exists (FK on booking_requests.calls_id)
             $validCallsId = ($callsId && Calls::where('id', $callsId)->exists()) ? $callsId : null;
 
-            $selectedVinsWithoutNull = $this->collectSelectedVinsFromUpdateRequest($request);
+            $selectedVinsWithoutNull = $this->collectSelectedVinsFromUpdateRequest($request, $newVariantQuotationItemIds);
+            $soVariantsByQuotationItem = SoVariant::where('so_id', $so->id)
+                ->whereIn('quotation_item_id', array_keys($selectedVinsWithoutNull))
+                ->get()
+                ->keyBy('quotation_item_id');
 
             $allVinsWithoutNull = [];
             foreach ($selectedVinsWithoutNull as $selectedVins) {
@@ -1550,10 +1560,12 @@ class SalesOrderController extends Controller
             foreach ($selectedVinsWithoutNull as $quotationItemId => $selectedVins) {
                 foreach ($selectedVins as $selectedVin) {
                     $vehicle = Vehicles::where('id', $selectedVin)->firstOrFail();
+                    $soVariantRecord = $soVariantsByQuotationItem->get($quotationItemId);
                     $soVinRelationship = new Soitems([
                         'so_id' => $so->id,
                         'quotation_items_id' => $quotationItemId,
-                        'vehicles_id' => $vehicle->id
+                        'vehicles_id' => $vehicle->id,
+                        'so_variant_id' => $soVariantRecord?->id,
                     ]);
                     $soVinRelationship->save();
 
@@ -2112,21 +2124,312 @@ class SalesOrderController extends Controller
         ]);
     }
 
+    public function removeSalesOrderVariant(Request $request)
+    {
+        $request->validate([
+            'so_id' => 'required|integer',
+            'quotation_item_id' => 'required|integer',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $soId = (int) $request->input('so_id');
+            $quotationItemId = (int) $request->input('quotation_item_id');
+            $so = So::findOrFail($soId);
+            $quotationItem = QuotationItem::findOrFail($quotationItemId);
+
+            if ((int) $quotationItem->quotation_id !== (int) $so->quotation_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid quotation item for this sales order.',
+                ], 422);
+            }
+
+            $remainingCount = QuotationItem::where('quotation_id', $so->quotation_id)
+                ->whereIn('reference_type', [
+                    'App\Models\Varaint',
+                    'App\Models\MasterModelLines',
+                    'App\Models\Brand',
+                ])
+                ->where('id', '!=', $quotationItemId)
+                ->count();
+
+            if ($remainingCount < 1) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'At least one variant is required.',
+                ], 422);
+            }
+
+            $this->removeQuotationItemFromSalesOrder($quotationItemId, $soId);
+
+            $solog = new Solog();
+            $solog->time = now()->format('H:i:s');
+            $solog->date = now()->format('Y-m-d');
+            $solog->status = 'SO Updated';
+            $solog->created_by = Auth::id();
+            $solog->so_id = $soId;
+            $solog->role = Auth::user()->selectedRole;
+            $solog->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Variant removed successfully.',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Sales order variant removal failed', ['error' => $e->getMessage()]);
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage() ?: 'Failed to remove variant.',
+            ], 422);
+        }
+    }
+
+    /**
+     * Create or update quotation items and SO variants from the sales order update form.
+     * Returns a map of variant form index => quotation_item_id for newly created items.
+     */
+    private function syncVariantsFromUpdateRequest(Request $request, So $so): array
+    {
+        $newVariantQuotationItemIds = [];
+        $variants = $request->input('variants', []);
+
+        if (!is_array($variants)) {
+            return $newVariantQuotationItemIds;
+        }
+
+        foreach ($variants as $index => $soVariant) {
+            if (!is_array($soVariant)) {
+                continue;
+            }
+
+            $variantId = $this->normalizeVariantId($soVariant['variant_id'] ?? null);
+            if (!$variantId) {
+                continue;
+            }
+
+            $quotationItemId = $soVariant['quotation_item_id'] ?? null;
+
+            if ($quotationItemId) {
+                $this->updateQuotationItemForSoVariant((int) $quotationItemId, $soVariant, $variantId);
+                $this->syncSoVariantRecord($so, (int) $quotationItemId, $soVariant, $variantId);
+                continue;
+            }
+
+            $quotationItem = $this->createQuotationItemForSoVariant($so, $soVariant, $variantId);
+            $this->syncSoVariantRecord($so, $quotationItem->id, $soVariant, $variantId);
+            $newVariantQuotationItemIds[$index] = $quotationItem->id;
+        }
+
+        return $newVariantQuotationItemIds;
+    }
+
+    private function normalizeVariantId($variantId): ?int
+    {
+        if (is_array($variantId)) {
+            $variantId = $variantId[0] ?? null;
+        }
+
+        return $variantId ? (int) $variantId : null;
+    }
+
+    private function createQuotationItemForSoVariant(So $so, array $soVariant, int $variantId): QuotationItem
+    {
+        $variant = Varaint::with(['master_model_lines', 'brand'])->find($variantId);
+        $quantity = (int) ($soVariant['quantity'] ?? 1);
+        $price = $soVariant['price'] ?? 0;
+
+        $quotationItem = new QuotationItem();
+        $quotationItem->quotation_id = $so->quotation_id;
+        $quotationItem->reference_type = 'App\Models\Varaint';
+        $quotationItem->reference_id = $variantId;
+
+        if ($variant?->master_model_lines?->id) {
+            $quotationItem->model_line_id = $variant->master_model_lines->id;
+        }
+        if ($variant?->brand?->id) {
+            $quotationItem->brand_id = $variant->brand->id;
+        }
+
+        $quotationItem->description = $soVariant['description'] ?? '';
+        $quotationItem->unit_price = $price;
+        $quotationItem->quantity = $quantity;
+        $quotationItem->is_addon = 0;
+        $quotationItem->is_enable = 1;
+        $quotationItem->total_amount = $quantity * $price;
+        $quotationItem->save();
+
+        return $quotationItem;
+    }
+
+    private function updateQuotationItemForSoVariant(int $quotationItemId, array $soVariant, int $variantId): void
+    {
+        $variant = Varaint::with(['master_model_lines', 'brand'])->find($variantId);
+        $quantity = (int) ($soVariant['quantity'] ?? 1);
+        $price = $soVariant['price'] ?? 0;
+
+        $updateData = [
+            'reference_id' => $variantId,
+            'description' => $soVariant['description'] ?? '',
+            'unit_price' => $price,
+            'quantity' => $quantity,
+            'is_addon' => 0,
+            'is_enable' => 1,
+            'total_amount' => $quantity * $price,
+        ];
+
+        if ($variant?->master_model_lines?->id) {
+            $updateData['model_line_id'] = $variant->master_model_lines->id;
+        }
+        if ($variant?->brand?->id) {
+            $updateData['brand_id'] = $variant->brand->id;
+        }
+
+        QuotationItem::where('id', $quotationItemId)->update($updateData);
+    }
+
+    private function syncSoVariantRecord(So $so, int $quotationItemId, array $soVariant, int $variantId): SoVariant
+    {
+        $soVariantRecord = SoVariant::where('so_id', $so->id)
+            ->where('quotation_item_id', $quotationItemId)
+            ->first();
+
+        if (!$soVariantRecord) {
+            $soVariantRecord = new SoVariant();
+            $soVariantRecord->so_id = $so->id;
+            $soVariantRecord->quotation_item_id = $quotationItemId;
+        }
+
+        $soVariantRecord->variant_id = $variantId;
+        $soVariantRecord->description = $soVariant['description'] ?? '';
+        $soVariantRecord->price = $soVariant['price'] ?? 0;
+        $soVariantRecord->quantity = $soVariant['quantity'] ?? 1;
+        $soVariantRecord->save();
+
+        return $soVariantRecord;
+    }
+
+    private function getSubmittedQuotationItemIds(Request $request, array $newVariantQuotationItemIds): array
+    {
+        $submittedIds = [];
+        $variants = $request->input('variants', []);
+
+        if (!is_array($variants)) {
+            return $submittedIds;
+        }
+
+        foreach ($variants as $index => $soVariant) {
+            if (!is_array($soVariant)) {
+                continue;
+            }
+
+            $quotationItemId = $soVariant['quotation_item_id']
+                ?? $newVariantQuotationItemIds[$index]
+                ?? null;
+
+            if ($quotationItemId) {
+                $submittedIds[] = (int) $quotationItemId;
+            }
+        }
+
+        return array_values(array_unique($submittedIds));
+    }
+
+    private function removeUnsubmittedQuotationItems(So $so, array $submittedQuotationItemIds): void
+    {
+        $existingIds = QuotationItem::where('quotation_id', $so->quotation_id)
+            ->whereIn('reference_type', [
+                'App\Models\Varaint',
+                'App\Models\MasterModelLines',
+                'App\Models\Brand',
+            ])
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->toArray();
+
+        $removedIds = array_diff($existingIds, $submittedQuotationItemIds);
+
+        foreach ($removedIds as $quotationItemId) {
+            $this->removeQuotationItemFromSalesOrder((int) $quotationItemId, $so->id);
+        }
+    }
+
+    private function removeQuotationItemFromSalesOrder(int $quotationItemId, int $soId): void
+    {
+        $soVariant = SoVariant::where('so_id', $soId)
+            ->where('quotation_item_id', $quotationItemId)
+            ->first();
+
+        $vehicleIds = Soitems::where('so_id', $soId)
+            ->where('quotation_items_id', $quotationItemId)
+            ->pluck('vehicles_id')
+            ->toArray();
+
+        if ($soVariant) {
+            $vehicleIds = array_values(array_unique(array_merge(
+                $vehicleIds,
+                Soitems::where('so_variant_id', $soVariant->id)->pluck('vehicles_id')->toArray()
+            )));
+        }
+
+        if (!empty($vehicleIds) && Vehicles::whereIn('id', $vehicleIds)->whereNotNull('gdn_id')->exists()) {
+            throw new \Exception('This variant cannot be removed because it has a GDN assigned vehicle.');
+        }
+
+        Soitems::where('so_id', $soId)
+            ->where('quotation_items_id', $quotationItemId)
+            ->update(['deleted_by' => Auth::id()]);
+        Soitems::where('so_id', $soId)
+            ->where('quotation_items_id', $quotationItemId)
+            ->delete();
+
+        if ($soVariant) {
+            Soitems::where('so_variant_id', $soVariant->id)
+                ->update(['deleted_by' => Auth::id()]);
+            Soitems::where('so_variant_id', $soVariant->id)->delete();
+            $soVariant->delete();
+        }
+
+        if (!empty($vehicleIds)) {
+            Vehicles::whereIn('id', $vehicleIds)->update(['so_id' => null]);
+        }
+
+        QuotationVins::where('quotation_items_id', $quotationItemId)->delete();
+        BookingRequest::where('quotation_items_id', $quotationItemId)->delete();
+
+        $quotationSubItems = QuotationSubItem::where('quotation_item_parent_id', $quotationItemId)
+            ->pluck('quotation_item_id')
+            ->toArray();
+
+        if (!empty($quotationSubItems)) {
+            QuotationItem::whereIn('id', $quotationSubItems)->delete();
+        }
+
+        QuotationSubItem::where('quotation_item_parent_id', $quotationItemId)->delete();
+        QuotationItem::where('id', $quotationItemId)->delete();
+    }
+
     /**
      * Collect selected vehicle IDs from the sales order update form.
      */
-    private function collectSelectedVinsFromUpdateRequest(Request $request): array
+    private function collectSelectedVinsFromUpdateRequest(Request $request, array $newVariantQuotationItemIds = []): array
     {
         $selectedVinsWithoutNull = [];
         $variants = $request->input('variants', []);
 
         if (is_array($variants)) {
-            foreach ($variants as $variant) {
+            foreach ($variants as $index => $variant) {
                 if (!is_array($variant)) {
                     continue;
                 }
 
-                $quotationItemId = $variant['quotation_item_id'] ?? null;
+                $quotationItemId = $variant['quotation_item_id']
+                    ?? $newVariantQuotationItemIds[$index]
+                    ?? null;
                 if (!$quotationItemId) {
                     continue;
                 }

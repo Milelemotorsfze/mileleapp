@@ -721,65 +721,110 @@
         $(document.body).on('click', ".removeVariantButton", function (e) {
             var rowCount = $("#so-vehicles").find(".so-variant-add-section").length;
             var indexNumber = $(this).attr('index');
+            var $section = $(this).closest('.so-variant-add-section');
+            var quotationItemId = $section.find('input[name*="quotation_item_id"]').val();
+
             if(rowCount > 1) {
                 var isGdn = $('#variant-'+indexNumber).attr('data-is-gdn');
                 if (isGdn == 1) {
                     e.preventDefault(); 
                     alertify.confirm('This Variant cannot be removed because it has a GDN assigned vehicles.').set({title: "Can't Remove this Variant"});
                 }else{
-                   
-                    var variantText  = $('#variant-'+indexNumber).text();
-                    var variant = $('#variant-'+indexNumber).val();
-                
-                    if(variantText) {
-                        appendVariant(indexNumber, variant[0], variantText);
+                    var removeVariantFromDom = function() {
+                        var variantText  = $('#variant-'+indexNumber).text();
+                        var variant = $('#variant-'+indexNumber).val();
+
+                        if(variantText && variant) {
+                            appendVariant(indexNumber, variant[0], variantText);
+                        }
+
+                        $section.remove();
+                        reindexVariantSections();
+                    };
+
+                    if (quotationItemId) {
+                        e.preventDefault();
+                        var selectedVins = $('#vin-' + indexNumber).val();
+                        var removeFromServer = function() {
+                            $('.overlay').show();
+                            $.ajax({
+                                type: 'POST',
+                                url: '{{ route('salesorder.removeVariant') }}',
+                                dataType: 'json',
+                                data: {
+                                    _token: '{{ csrf_token() }}',
+                                    so_id: soId,
+                                    quotation_item_id: quotationItemId
+                                },
+                                success: function(response) {
+                                    $('.overlay').hide();
+                                    if (response.success) {
+                                        removeVariantFromDom();
+                                    } else {
+                                        alertify.error(response.message || 'Failed to remove variant.');
+                                    }
+                                },
+                                error: function(xhr) {
+                                    $('.overlay').hide();
+                                    var message = xhr.responseJSON?.message || 'Failed to remove variant.';
+                                    alertify.error(message);
+                                }
+                            });
+                        };
+
+                        if (Array.isArray(selectedVins) && selectedVins.length > 0) {
+                            alertify.confirm('Are you sure to remove this? You\'ll lose all the selected VINs.',
+                                function () {
+                                    removeFromServer();
+                                }
+                            ).set({title: "VINs are Selected"});
+                        } else {
+                            removeFromServer();
+                        }
+                    } else {
+                        removeVariantFromDom();
                     }
-                
-                    $(this).closest('#variant-section-'+indexNumber).remove();
-
-                    $('.so-variant-add-section').each(function(i){
-                        var index = +i + +1;
-                        $(this).find('.variant-descriptions').attr('index', index); 
-                        $(this).find('.variant-descriptions').attr('id', 'variant-description-'+index); 
-                        $(this).find('.variant-descriptions').attr('name', 'variants['+index+'][description]');
-                        $(this).find('input[name*="quotation_item_id"]').attr('name', 'variants['+index+'][quotation_item_id]');
-                        $(this).attr('id', 'variant-section-'+index);
-                        $(this).find('.variants').attr('index', index);
-                        $(this).find('.variants').attr('id', 'variant-'+index);
-                        $(this).find('.variants').attr('name', 'variants['+index+'][variant_id]');
-                        $(this).find('.variant-prices').attr('index', index);
-                        $(this).find('.variant-prices').attr('id', 'price-'+index);
-                        $(this).find('.variant-prices').attr('name', 'variants['+index+'][price]');
-                        $(this).find('.variant-quantities').attr('index', index);
-                        $(this).find('.variant-quantities').attr('id', 'quantity-'+index);
-                        $(this).find('.variant-quantities').attr('name', 'variants['+index+'][quantity]');
-                        $(this).find('.vins').attr('index', index);
-                        $(this).find('.vins').attr('id', 'vin-'+index);
-                        $(this).find('.vins').attr('name', 'variants['+index+'][vins][]');
-                    
-                        $(this).find('.removeVariantButton').attr('index', index);
-
-                        $('#variant-'+index).select2
-                        ({
-                            placeholder: 'Select Variant',
-                            maximumSelectionLength:1,
-                            allowClear: true
-                        });
-                        $('#vin-'+index).select2
-                        ({
-                            placeholder: 'Select Vin',
-                        });
-                    
-                    });
                 }
-               
-              
             }else{
                 var confirm = alertify.confirm('You are not able to remove this row, Atleast one Variant is Required',function (e) {
                 }).set({title:"Can't Remove Variant"})
 
             }
         });
+
+        function reindexVariantSections() {
+            $('.so-variant-add-section').each(function(i){
+                var index = +i + +1;
+                $(this).find('.variant-descriptions').attr('index', index); 
+                $(this).find('.variant-descriptions').attr('id', 'variant-description-'+index); 
+                $(this).find('.variant-descriptions').attr('name', 'variants['+index+'][description]');
+                $(this).find('input[name*="quotation_item_id"]').attr('name', 'variants['+index+'][quotation_item_id]');
+                $(this).attr('id', 'variant-section-'+index);
+                $(this).find('.variants').attr('index', index);
+                $(this).find('.variants').attr('id', 'variant-'+index);
+                $(this).find('.variants').attr('name', 'variants['+index+'][variant_id]');
+                $(this).find('.variant-prices').attr('index', index);
+                $(this).find('.variant-prices').attr('id', 'price-'+index);
+                $(this).find('.variant-prices').attr('name', 'variants['+index+'][price]');
+                $(this).find('.variant-quantities').attr('index', index);
+                $(this).find('.variant-quantities').attr('id', 'quantity-'+index);
+                $(this).find('.variant-quantities').attr('name', 'variants['+index+'][quantity]');
+                $(this).find('.vins').attr('index', index);
+                $(this).find('.vins').attr('id', 'vin-'+index);
+                $(this).find('.vins').attr('name', 'variants['+index+'][vins][]');
+
+                $(this).find('.removeVariantButton').attr('index', index);
+
+                $('#variant-'+index).select2({
+                    placeholder: 'Select Variant',
+                    maximumSelectionLength:1,
+                    allowClear: true
+                });
+                $('#vin-'+index).select2({
+                    placeholder: 'Select Vin',
+                });
+            });
+        }
        
         function hideVariant(index) {
            
