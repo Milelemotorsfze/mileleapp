@@ -441,7 +441,13 @@
             <div class="modal-body">
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="savePricesBtn">Update Prices</button>
+                <button type="button" class="btn btn-primary" id="savePricesBtn">
+                    <span id="savePricesBtnText">Update Prices</span>
+                    <span id="savePricesLoader" class="d-none">
+                        <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                        Updating...
+                    </span>
+                </button>
             </div>
         </div>
     </div>
@@ -4344,6 +4350,14 @@ return [$color->id => $formattedName];
             // end //
 
             $('#savePricesBtn').click(function() {
+                var $btn = $(this);
+                var $btnText = $('#savePricesBtnText');
+                var $loader = $('#savePricesLoader');
+
+                $btn.prop('disabled', true);
+                $btnText.addClass('d-none');
+                $loader.removeClass('d-none');
+
                 var newPrices = [];
                 $('.new-price').each(function() {
                     var vehicleId = $(this).data('vehicle-id');
@@ -4355,7 +4369,7 @@ return [$color->id => $formattedName];
                 });
 
                 var totalPrice = $('#totalPrice').text();
-                var purchasingOrderId = $('#vehicleModal').data('purchasingOrderId'); // Retrieve the stored id
+                var purchasingOrderId = $('#vehicleModal').data('purchasingOrderId');
 
                 $.ajax({
                     url: '{{ route("vehicles.updatePrices") }}',
@@ -4364,7 +4378,7 @@ return [$color->id => $formattedName];
                         _token: '{{ csrf_token() }}',
                         prices: newPrices,
                         total_price: totalPrice,
-                        purchasing_order_id: purchasingOrderId // Pass the purchasing order ID
+                        purchasing_order_id: purchasingOrderId
                     },
                     success: function(response) {
                         alert('Prices updated successfully!');
@@ -4374,6 +4388,9 @@ return [$color->id => $formattedName];
                     },
                     error: function(xhr) {
                         console.log(xhr.responseText);
+                        $btn.prop('disabled', false);
+                        $btnText.removeClass('d-none');
+                        $loader.addClass('d-none');
                     }
                 });
             });
