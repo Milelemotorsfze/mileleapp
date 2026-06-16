@@ -51,8 +51,6 @@ use App\Models\PurchasedOrderPaidAmounts;
 use App\Models\VendorPaymentAdjustments;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\UploadedFile;
 use App\Models\SupplierAccountTransaction;
 use App\Models\PurchasedOrderPriceChanges;
 use App\Models\PurchasedOrderMessages;
@@ -1335,8 +1333,8 @@ class PurchasingOrderController extends Controller
         } else {
             $vendorDisplay = 'Account Not Existing';
         }
-        $previousId = $id ? PurchasingOrder::where('id', '<', $id)->max('id') : null;
-        $nextId = $id ? PurchasingOrder::where('id', '>', $id)->min('id') : null;
+        $previousId = PurchasingOrder::where('id', '<', $id)->max('id');
+        $nextId = PurchasingOrder::where('id', '>', $id)->min('id');
 
         $vendors = Supplier::whereHas('vendorCategories', function ($query) {
             $query->where('category', 'Vehicles');
@@ -6025,170 +6023,90 @@ class PurchasingOrderController extends Controller
     }
     public function uploadSwiftFile(Request $request)
     {
+        // Validate the request
         $request->validate([
             'swiftFile' => 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx',
-            'transition_id' => 'required|integer|exists:supplier_account_transaction,id',
+            'transition_id' => 'required|integer'
         ]);
 
-        $transitionId = (int) $request->input('transition_id');
-        $file = $request->file('swiftFile');
-
         try {
-            DB::beginTransaction();
+            $transitionId = $request->input('transition_id');
+            $file = $request->file('swiftFile');
 
-            $supplierAccountTransaction = SupplierAccountTransaction::find($transitionId);
-            if (!$supplierAccountTransaction) {
-                DB::rollBack();
-                return response()->json(['success' => false, 'message' => 'Invalid transition ID'], 422);
-            }
+            // Check if the file and transaction exist
+            if ($file && $supplierAccountTransaction = SupplierAccountTransaction::find($transitionId)) {
+                $fileNameToStore = time() . '_' . $file->getClientOriginalName();
+                $path = $file->move(public_path('storage/swift_copies'), $fileNameToStore);
+                $vehicleCount = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->count();
+                $latestBatch = DB::table('purchasing_order_swift_copies')
+                    ->where('purchasing_order_id', $supplierAccountTransaction->purchasing_order_id)
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+                $batchNo = $latestBatch ? $latestBatch->batch_no + 1 : 1;
+                $swiftcopy = new PurchasingOrderSwiftCopies();
+                $swiftcopy->purchasing_order_id = $supplierAccountTransaction->purchasing_order_id;
+                $swiftcopy->uploaded_by = auth()->user()->id;
+                $swiftcopy->number_of_vehicles = $vehicleCount;
+                $swiftcopy->batch_no = $batchNo;
+                $swiftcopy->sat_id = $transitionId;
+                $swiftcopy->file_path = 'storage/swift_copies/' . $fileNameToStore;
+                $swiftcopy->save();
+                $supplierAccountTransaction->transaction_type = 'Debit';
+                $supplierAccountTransaction->status = 'Paid';
+                $supplierAccountTransaction->save();
+                $supplierAccount = SupplierAccount::find($supplierAccountTransaction->supplier_account_id);
+                if ($supplierAccount) {
+                    $purchasingOrder = PurchasingOrder::find($supplierAccountTransaction->purchasing_order_id);
+                    if ($purchasingOrder) {
+                        $currency = $purchasingOrder->currency;
+                        $transactionAmount = $supplierAccountTransaction->transaction_amount;
+                        $conversionRates = [
+                            "USD" => 3.67,
+                            "EUR" => 3.94,
+                            "GBP" => 4.67,
+                            "JPY" => 0.023,
+                            "AED" => 1,
+                            "AUD" => 2.29,
+                            "CAD" => 2.68,
+                            "PHP" => 0.063,
+                            "SAR" => 0.98,
+                            "ZAR" => 0.22,
+                        ];
+                        // Check if the currencies are different
+                        if ($purchasingOrder->currency != $supplierAccount->currency) {
+                            // Convert the transactionAmount to the SupplierAccount currency
+                            $purchasingOrderConversionRate = $conversionRates[$purchasingOrder->currency] ?? 1;
+                            $supplierAccountConversionRate = $conversionRates[$supplierAccount->currency] ?? 1;
 
-            if (!$supplierAccountTransaction->purchasing_order_id) {
-                DB::rollBack();
-                return response()->json(['success' => false, 'message' => 'Transaction is not linked to a purchasing order'], 422);
-            }
+                            // Convert the transaction amount from the purchasing order currency to the supplier account currency
+                            $transactionAmountInAED = $supplierAccountTransaction->transaction_amount * $purchasingOrderConversionRate; // Convert to base currency (e.g. AED)
+                            $totalCostConverted = $transactionAmountInAED / $supplierAccountConversionRate; // Convert from AED to supplier account currency
+                        } else {
+                            // If the currencies are the same, no conversion is needed
+                            $totalCostConverted = $supplierAccountTransaction->transaction_amount;
+                        }
 
-            if ($supplierAccountTransaction->transaction_type !== 'Released') {
-                DB::rollBack();
-                return response()->json(['success' => false, 'message' => 'Swift copy can only be uploaded for released payments'], 422);
-            }
-
-            $fileNameToStore = time() . '_' . $file->getClientOriginalName();
-            $swiftCopyFilePath = $this->storeSwiftCopyFile($file, $fileNameToStore);
-
-            $vehicleCount = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->count();
-            $latestBatch = DB::table('purchasing_order_swift_copies')
-                ->where('purchasing_order_id', $supplierAccountTransaction->purchasing_order_id)
-                ->orderBy('created_at', 'desc')
-                ->first();
-            $batchNo = $latestBatch ? ((int) $latestBatch->batch_no + 1) : 1;
-
-            $swiftcopy = new PurchasingOrderSwiftCopies();
-            $swiftcopy->purchasing_order_id = $supplierAccountTransaction->purchasing_order_id;
-            $swiftcopy->uploaded_by = auth()->id();
-            $swiftcopy->number_of_vehicles = $vehicleCount;
-            $swiftcopy->batch_no = $batchNo;
-            $swiftcopy->sat_id = $transitionId;
-            $swiftcopy->file_path = $swiftCopyFilePath;
-            $swiftcopy->save();
-
-            $supplierAccountTransaction->transaction_type = 'Debit';
-            $supplierAccountTransaction->status = 'Paid';
-            $supplierAccountTransaction->save();
-
-            $supplierAccount = SupplierAccount::find($supplierAccountTransaction->supplier_account_id);
-            $purchasingOrder = PurchasingOrder::find($supplierAccountTransaction->purchasing_order_id);
-
-            if ($supplierAccount && $purchasingOrder) {
-                $conversionRates = [
-                    'USD' => 3.67,
-                    'EUR' => 3.94,
-                    'GBP' => 4.67,
-                    'JPY' => 0.023,
-                    'AED' => 1,
-                    'AUD' => 2.29,
-                    'CAD' => 2.68,
-                    'PHP' => 0.063,
-                    'SAR' => 0.98,
-                    'ZAR' => 0.22,
-                ];
-
-                if ($purchasingOrder->currency != $supplierAccount->currency) {
-                    $purchasingOrderConversionRate = $conversionRates[$purchasingOrder->currency] ?? 1;
-                    $supplierAccountConversionRate = $conversionRates[$supplierAccount->currency] ?? 1;
-                    $transactionAmountInAED = $supplierAccountTransaction->transaction_amount * $purchasingOrderConversionRate;
-                    $totalCostConverted = $supplierAccountConversionRate != 0
-                        ? $transactionAmountInAED / $supplierAccountConversionRate
-                        : $transactionAmountInAED;
-                } else {
-                    $totalCostConverted = $supplierAccountTransaction->transaction_amount;
+                        // Update the supplier account balance
+                        $account_balance = $supplierAccount->current_balance - $totalCostConverted;
+                        $supplierAccount->current_balance = $account_balance <= 0 ? 0 : $account_balance;
+                        $supplierAccount->save();
+                    }
                 }
+                $this->updateRelatedStatuses($transitionId);
 
-                $accountBalance = $supplierAccount->current_balance - $totalCostConverted;
-                $supplierAccount->current_balance = $accountBalance <= 0 ? 0 : $accountBalance;
-                $supplierAccount->save();
+                return response()->json(['success' => true, 'message' => 'Payment submitted successfully']);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Invalid transition ID or file'], 422);
             }
-
-            $this->updateRelatedStatuses($transitionId);
-
-            if ($purchasingOrder) {
-                $purchaseOrderQty = (int) PurchasingOrderItems::where('purchasing_order_id', $purchasingOrder->id)->sum('qty');
-                $paidVehicleCount = DB::table('vehicles_supplier_account_transaction')
-                    ->join('supplier_account_transaction', 'vehicles_supplier_account_transaction.sat_id', '=', 'supplier_account_transaction.id')
-                    ->where('supplier_account_transaction.purchasing_order_id', $purchasingOrder->id)
-                    ->where('supplier_account_transaction.status', 'Paid')
-                    ->count();
-
-                $purchasingOrder->payment_status = ($purchaseOrderQty > 0 && $paidVehicleCount >= $purchaseOrderQty)
-                    ? PurchasingOrder::PAYMENT_STATUS_PAID
-                    : PurchasingOrder::PAYMENT_STATUS_PARTIALY_PAID;
-                $purchasingOrder->save();
-
-                $purchasingordereventsLog = new PurchasingOrderEventsLog();
-                $purchasingordereventsLog->event_type = 'Payment Confirmed';
-                $purchasingordereventsLog->created_by = auth()->id();
-                $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
-                $purchasingordereventsLog->description = 'Finance Department Update the Swift Copy';
-                $purchasingordereventsLog->save();
-            }
-
-            DB::commit();
-
-            return response()->json(['success' => true, 'message' => 'Payment submitted successfully']);
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            Log::error('Swift copy upload failed', [
-                'error' => $e->getMessage(),
-                'transition_id' => $transitionId,
-                'user_id' => auth()->id(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Error submitting payment',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    private function storeSwiftCopyFile(UploadedFile $file, string $fileNameToStore): string
-    {
-        Storage::disk('public')->makeDirectory('swift_copies');
-
-        $storedPath = Storage::disk('public')->putFileAs('swift_copies', $file, $fileNameToStore);
-        if (!$storedPath) {
-            throw new \RuntimeException('Failed to store swift copy file.');
-        }
-
-        $this->mirrorFileToPublicStorage($storedPath);
-
-        return 'storage/' . str_replace('\\', '/', $storedPath);
-    }
-
-    private function mirrorFileToPublicStorage(string $relativePath): void
-    {
-        $relativePath = str_replace('\\', '/', $relativePath);
-        $source = storage_path('app/public/' . $relativePath);
-        $destination = public_path('storage/' . $relativePath);
-
-        if (!is_file($source)) {
-            return;
-        }
-
-        $publicStorage = realpath(public_path('storage'));
-        $storagePublic = realpath(storage_path('app/public'));
-
-        if ($publicStorage && $storagePublic && $publicStorage === $storagePublic) {
-            return;
-        }
-
-        $destinationDir = dirname($destination);
-        if (!is_dir($destinationDir)) {
-            File::makeDirectory($destinationDir, 0755, true);
-        }
-
-        if (!is_file($destination)) {
-            copy($source, $destination);
+            $purchasingordereventsLog = new PurchasingOrderEventsLog();
+            $purchasingordereventsLog->event_type = "Payment Confirmed";
+            $purchasingordereventsLog->created_by = auth()->user()->id;
+            $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+            $purchasingordereventsLog->description = "Finance Department Update the Swift Copy";
+            $purchasingordereventsLog->save();
+        } catch (\Exception $e) {
+            Log::error('Payment submission failed', ['error' => $e->getMessage()]);
+            return response()->json(['success' => false, 'message' => 'Error submitting payment', 'error' => $e->getMessage()], 500);
         }
     }
 
@@ -6628,55 +6546,36 @@ class PurchasingOrderController extends Controller
     }
     public function sendSwiftCopy(Request $request)
     {
+        $purchasingOrder = PurchasingOrder::find($request->purchasing_order_id);
+        $supplierAccountTransaction = SupplierAccountTransaction::select('id', 'transaction_amount')
+            ->where('id', $request->transition_id)->first();
+
+        if (!$purchasingOrder->supplier->email) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email sending failed',
+                'error' => "Supplier email not Found! Please update it!"
+            ], 500);
+        }
+        $transitionSwifyCopy = PurchasingOrderSwiftCopies::select('sat_id', 'purchasing_order_id', 'file_path')
+            ->where('sat_id', $request->transition_id)
+            ->where('purchasing_order_id', $request->purchasing_order_id)->first();
+
+        if (!$transitionSwifyCopy->file_path) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email sending failed',
+                'error' => "Swift copy file is not found! Please contact admin!"
+            ], 500);
+        }
+        if (!$purchasingOrder->pl_number) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email sending failed',
+                'error' => "Invoice number(PFI number) is not added! Please contact procurement!"
+            ], 500);
+        }
         try {
-            $purchasingOrder = PurchasingOrder::find($request->purchasing_order_id);
-            if (!$purchasingOrder) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Email sending failed',
-                    'error' => 'Purchasing order not found',
-                ], 404);
-            }
-
-            $supplierAccountTransaction = SupplierAccountTransaction::select('id', 'transaction_amount')
-                ->where('id', $request->transition_id)->first();
-
-            if (!$supplierAccountTransaction) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Email sending failed',
-                    'error' => 'Payment transition not found',
-                ], 404);
-            }
-
-            if (!$purchasingOrder->supplier || !$purchasingOrder->supplier->email) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Email sending failed',
-                    'error' => "Supplier email not Found! Please update it!"
-                ], 500);
-            }
-
-            $transitionSwifyCopy = PurchasingOrderSwiftCopies::select('sat_id', 'purchasing_order_id', 'file_path')
-                ->where('sat_id', $request->transition_id)
-                ->where('purchasing_order_id', $request->purchasing_order_id)->first();
-
-            if (!$transitionSwifyCopy || !$transitionSwifyCopy->file_path) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Email sending failed',
-                    'error' => "Swift copy file is not found! Please contact admin!"
-                ], 500);
-            }
-
-            if (!$purchasingOrder->pl_number) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Email sending failed',
-                    'error' => "Invoice number(PFI number) is not added! Please contact procurement!"
-                ], 500);
-            }
-
             $Torecipient = $purchasingOrder->supplier->email;
             $recipients = config('mail.custom_recipients.procurement');
             Mail::to($Torecipient)->cc($recipients)->send(new SwiftCopyEmail(
@@ -6695,7 +6594,7 @@ class PurchasingOrderController extends Controller
             $purchasingordereventsLog->description = 'The Email was sent to ' . $purchasingOrder->supplier->supplier . ' at ' . $Torecipient;
             $purchasingordereventsLog->save();
             return response()->json(['success' => true, 'message' => 'The Email was sent to ' . $purchasingOrder->supplier->supplier . ' at ' . $Torecipient . ' successfully.']);
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             Log::error('Email sending failed', ['error' => $e->getMessage()]);
             return response()->json([
                 'success' => false,
