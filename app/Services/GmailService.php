@@ -13,15 +13,14 @@ class GmailService
     public function __construct()
     {
         $this->client = new Google_Client();
-        $this->client->setClientId(env('GOOGLE_CLIENT_ID'));
-        $this->client->setClientSecret(env('GOOGLE_CLIENT_SECRET'));
-        $this->client->setRedirectUri(env('GOOGLE_REDIRECT_URI'));
+        $this->client->setClientId(config('services.google.client_id'));
+        $this->client->setClientSecret(config('services.google.client_secret'));
+        $this->client->setRedirectUri(config('services.google.redirect'));
         $this->client->setAccessType('offline');
         $this->client->setPrompt('select_account consent');
         $this->client->addScope(Google_Service_Gmail::GMAIL_SEND);
 
-        // Manually set the access token if it's already available
-        $this->client->refreshToken(env('GOOGLE_REFRESH_TOKEN'));
+        $this->client->refreshToken(config('services.google.refresh_token'));
 
         $this->gmail = new Google_Service_Gmail($this->client);
     }

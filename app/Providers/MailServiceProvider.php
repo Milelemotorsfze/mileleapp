@@ -19,13 +19,13 @@ class MailServiceProvider extends ServiceProvider
     {
         Mail::extend('gmail', function () {
             $client = new Google_Client();
-            $client->setClientId(env('GOOGLE_CLIENT_ID'));
-            $client->setClientSecret(env('GOOGLE_CLIENT_SECRET'));
-            $client->setRedirectUri(env('GOOGLE_REDIRECT_URI'));
+            $client->setClientId(config('services.google.client_id'));
+            $client->setClientSecret(config('services.google.client_secret'));
+            $client->setRedirectUri(config('services.google.redirect'));
             $client->setAccessType('offline');
             $client->setPrompt('consent');
             $client->addScope(Google_Service_Gmail::MAIL_GOOGLE_COM);
-            $client->refreshToken(env('GOOGLE_REFRESH_TOKEN'));
+            $client->refreshToken(config('services.google.refresh_token'));
 
             return new GmailTransport($client);
         });

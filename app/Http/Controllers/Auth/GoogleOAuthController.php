@@ -11,9 +11,9 @@ class GoogleOAuthController extends Controller
     public function redirectToGoogle()
     {
         $client = new Google_Client();
-        $client->setClientId(env('GOOGLE_CLIENT_ID'));
-        $client->setClientSecret(env('GOOGLE_CLIENT_SECRET'));
-        $client->setRedirectUri(env('GOOGLE_REDIRECT_URI'));
+        $client->setClientId(config('services.google.client_id'));
+        $client->setClientSecret(config('services.google.client_secret'));
+        $client->setRedirectUri(config('services.google.redirect'));
         $client->addScope('https://www.googleapis.com/auth/gmail.send');
         $client->setAccessType('offline');
         $client->setPrompt('consent');
@@ -25,9 +25,9 @@ class GoogleOAuthController extends Controller
     public function handleGoogleCallback(Request $request)
     {
         $client = new Google_Client();
-        $client->setClientId(env('GOOGLE_CLIENT_ID'));
-        $client->setClientSecret(env('GOOGLE_CLIENT_SECRET'));
-        $client->setRedirectUri(env('GOOGLE_REDIRECT_URI'));
+        $client->setClientId(config('services.google.client_id'));
+        $client->setClientSecret(config('services.google.client_secret'));
+        $client->setRedirectUri(config('services.google.redirect'));
 
         $code = $request->get('code');
         $token = $client->fetchAccessTokenWithAuthCode($code);
