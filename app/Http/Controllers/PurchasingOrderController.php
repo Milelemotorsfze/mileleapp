@@ -4549,7 +4549,7 @@ class PurchasingOrderController extends Controller
                     $priceChanges[] = [
                         'vehicle_reference' => $vehicle->id,
                         'Vin' => $vehicle->vin,
-                        'variant_name' => $vehicle->variant->name,
+                        'variant_name' => $vehicle->variant?->name ?? 'N/A',
                         'old_price' => $oldPrice,
                         'new_price' => $newPrice,
                         'changed_by' => auth()->user()->name,
@@ -4628,7 +4628,11 @@ class PurchasingOrderController extends Controller
                         $dnaccess->department_notifications_id = $notification->id;
                         $dnaccess->save();
                     }
-                    Mail::to($recipients)->send(new PriceChangeNotification($purchasingOrder->po_number, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged, $orderUrl));
+                    try {
+                        Mail::to($recipients)->send(new PriceChangeNotification($purchasingOrder->po_number, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged, $orderUrl));
+                    } catch (\Exception $mailException) {
+                        \Log::error('PriceChangeNotification email failed: ' . $mailException->getMessage());
+                    }
                 }
             }
 
