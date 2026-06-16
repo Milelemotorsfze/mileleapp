@@ -3153,6 +3153,7 @@ class PurchasingOrderController extends Controller
         if ($request->hasFile('paymentFile')) {
             $file = $request->file('paymentFile');
             $fileNameToStore = time() . '_' . $file->getClientOriginalName();
+            \File::ensureDirectoryExists(public_path('storage/swift_copies'));
             $path = $file->move(public_path('storage/swift_copies'), $fileNameToStore);
             $latestBatch = DB::table('purchasing_order_swift_copies')
                 ->where('purchasing_order_id', $vehicle->purchasing_order_id)
@@ -3775,6 +3776,7 @@ class PurchasingOrderController extends Controller
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $fileNameToStore = time() . '_' . $file->getClientOriginalName();
+            \File::ensureDirectoryExists(public_path('storage/swift_copies'));
             $path = $file->move(public_path('storage/swift_copies'), $fileNameToStore);
             $latestBatch = DB::table('purchasing_order_swift_copies')
                 ->where('purchasing_order_id', $id)
@@ -4969,6 +4971,7 @@ class PurchasingOrderController extends Controller
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $fileNameToStore = time() . '_' . $file->getClientOriginalName();
+            \File::ensureDirectoryExists(public_path('storage/swift_copies'));
             $path = $file->move(public_path('storage/swift_copies'), $fileNameToStore);
             $latestBatch = DB::table('purchasing_order_swift_copies')
                 ->where('purchasing_order_id', $id)
@@ -6040,6 +6043,7 @@ class PurchasingOrderController extends Controller
             // Check if the file and transaction exist
             if ($file && $supplierAccountTransaction = SupplierAccountTransaction::find($transitionId)) {
                 $fileNameToStore = time() . '_' . $file->getClientOriginalName();
+                \File::ensureDirectoryExists(public_path('storage/swift_copies'));
                 $path = $file->move(public_path('storage/swift_copies'), $fileNameToStore);
                 $vehicleCount = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->count();
                 $latestBatch = DB::table('purchasing_order_swift_copies')
