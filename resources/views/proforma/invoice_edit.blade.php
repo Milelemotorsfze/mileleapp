@@ -2234,6 +2234,51 @@ $('#shipping_port').select2();
             calculateTotalSum();
         });
 
+        // CIF insurance: auto-add the existing "Insurance" Other-charges line into the items
+        // section when incoterm is CIF, and remove it when it is not. Reuses the existing add /
+        // remove buttons so the amount flows through the normal quotation-item path (live totals,
+        // stored line item, PDF and edit are all handled by the existing item mechanism).
+        function rowHasInsurance(row) {
+            // Include input/textarea values: in the items table the description is an <input
+            // value="...">, which jQuery .text() does not return.
+            var text = $(row).text();
+            $(row).find('input, textarea').each(function() {
+                text += ' ' + ($(this).val() || '');
+            });
+            return /insurance/i.test(text);
+        }
+        function findInsuranceRow($rows) {
+            return $rows.filter(function() {
+                return rowHasInsurance(this);
+            }).first();
+        }
+        var prevIncoterm = $('#incoterm').val();
+        $('#incoterm').on('change', function() {
+            var val = $(this).val();
+            var $inItems = findInsuranceRow($('#dtBasicExample2 tbody tr'));
+            var changed = false;
+            if (val === 'CIF') {
+                if (!$inItems.length) {
+                    findInsuranceRow($('#other-document-table tbody tr'))
+                        .find('.add-button[data-button-type="Other"]').trigger('click');
+                    changed = true;
+                }
+            } else if (prevIncoterm === 'CIF' && $inItems.length) {
+                // Only remove the insurance line that CIF added; never touch a manually added
+                // line when switching between two non-CIF incoterms.
+                $inItems.find('.remove-button').trigger('click');
+                changed = true;
+            }
+            prevIncoterm = val;
+            // Adding/removing a row redraws the items table, which can re-sort rows (the table
+            // has ordering enabled). Realign the price-/quantity-/total-amount- ids with the new
+            // DOM order so the index-based qty/price math stays correct, then recompute.
+            if (changed) {
+                if (typeof resetIndex === 'function') { resetIndex(); }
+                if (typeof calculateTotalSum === 'function') { calculateTotalSum(); }
+            }
+        });
+
         function showPriceInSelectedValue() {
             var count = secondTable.data().length;
             // alert(count);
@@ -2807,10 +2852,15 @@ $('#shipping_port').select2();
                     if (isNaN(priceNum)) {
                         priceNum = 0;
                     }
-                    if (currency == 'USD') {
-                        priceNum = priceNum / parseFloat('{{ $aed_to_usd_rate->value }}');
-                    } else if (currency == 'EUR' || currency == 'ERU') {
-                        priceNum = priceNum / parseFloat('{{ $aed_to_eru_rate->value }}');
+                    // Existing items already store unit_price in the quotation's currency, so they
+                    // must be shown as-is. Only newly added items (whose source price is in AED)
+                    // get converted to the selected currency, matching the create form.
+                    if (row['edit_page'] != 'editpage') {
+                        if (currency == 'USD') {
+                            priceNum = priceNum / parseFloat('{{ $aed_to_usd_rate->value }}');
+                        } else if (currency == 'EUR' || currency == 'ERU') {
+                            priceNum = priceNum / parseFloat('{{ $aed_to_eru_rate->value }}');
+                        }
                     }
                     var priceStr = String(Math.round(priceNum));
                     return '<input type="number" min="0" step="1" name="prices[]" required class="price-editable form-control" id="price-'+ row['index'] +'" value="' + priceStr + '"/>' +
