@@ -1446,10 +1446,12 @@ public function uploadingQuotation(Request $request)
     ]);
 
     $file = $request->file('quotationFile');
-    $callId = $request->input('callId');
+    $quotationId = $request->input('callId');
 
-    // Fetching the Quotation based on call ID
-    $quotation = Quotation::where('calls_id', $callId)->first();
+    // Fetching the specific Quotation by its own id. The Quoted tab shows one row
+    // per quotation, so a lookup by calls_id would update the wrong PFI when a
+    // lead has multiple quotations.
+    $quotation = Quotation::find($quotationId);
 
     if (!$quotation) {
         return response()->json(['error' => 'Quotation not found'], 404);

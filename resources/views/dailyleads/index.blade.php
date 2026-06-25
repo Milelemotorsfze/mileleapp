@@ -1323,6 +1323,11 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
     success: function (data) {
       alert('File uploaded successfully.');
       $('#uploadingquotation').modal('hide');
+      // Refresh the Quoted table in place; pass false to keep the current page
+      // so the user stays on the same quotation row they just uploaded for.
+      if ($.fn.DataTable.isDataTable('#dtBasicExample4')) {
+        $('#dtBasicExample4').DataTable().ajax.reload(null, false);
+      }
     },
     error: function (xhr, status, error) {
       alert('Error: ' + error.message);
@@ -2745,7 +2750,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                         preorder = `<li><a class="dropdown-item" href="${preorderUrl}">Pre Order</a></li>`;
                     } else {
                         signedlink = `<li><a class="dropdown-item" href="#" onclick="opensignaturelink(${data})">Signature Link</a></li>`;
-                        uploadedfile = `<li><a class="dropdown-item" href="#" onclick="uploadingsignedquotation(${data})">Upload Signed Quotation</a></li>`;
+                        uploadedfile = `<li><a class="dropdown-item" href="#" onclick="uploadingsignedquotation(${row.quotation_id})">Upload Signed Quotation</a></li>`;
                     }
                     return `
                         <div class="dropdown">
