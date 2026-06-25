@@ -118,6 +118,7 @@ class QuotationController extends Controller
         $isVehicle = 0;
         $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
+        $aed_to_php_rate = Setting::where('key', 'aed_to_php_convertion_rate')->first();
         DB::beginTransaction();
         $call = Calls::find($request->calls_id);
         if($request->shipping_method == "CNF")
@@ -506,7 +507,7 @@ class QuotationController extends Controller
         }
         $quotationid = $quotation->id;
         $multiplecp = MuitlpleAgents::where('quotations_id', $quotationid)->where('agents_id', '!=', $quotationDetail->agents_id)->get();
-        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('multiplecp','quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
+        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('multiplecp','quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate','aed_to_php_rate',
             'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','directlyAddedAddons','addonsTotalAmount',
         'otherVehicles','vehicleWithBrands','OtherAddons','shippingChargeDistriAmount'));
         $filename = 'quotation_'.$quotation->id.'.pdf';
@@ -615,6 +616,7 @@ class QuotationController extends Controller
     $isVehicle = 0;
     $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
     $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
+    $aed_to_php_rate = Setting::where('key', 'aed_to_php_convertion_rate')->first();
     DB::beginTransaction();
     $call = Calls::find($request->calls_id);
     $call->status = 'Quoted';
@@ -1104,7 +1106,7 @@ class QuotationController extends Controller
         }
         $quotationid = $quotation->id;
         $multiplecp = MuitlpleAgents::where('quotations_id', $quotationid)->where('agents_id', '!=', $quotationDetail->agents_id)->get();
-        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('multiplecp','quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
+        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('multiplecp','quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate','aed_to_php_rate',
             'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','directlyAddedAddons','addonsTotalAmount',
         'otherVehicles','vehicleWithBrands','OtherAddons','shippingChargeDistriAmount'));
         $filename = 'quotation_'.$quotation->id.'.pdf';

@@ -159,6 +159,7 @@
                                                     <select class="form-control widthinput" name="currency" id="currency" >
                                                         <option value="USD">USD</option>
                                                         <option value="EUR">EUR</option>
+                                                        <option value="PHP">PHP</option>
                                                     </select>
                                                 </div>
                                             </div>

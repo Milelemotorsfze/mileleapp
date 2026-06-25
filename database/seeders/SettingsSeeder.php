@@ -37,6 +37,13 @@ class SettingsSeeder extends Seeder
                 'value' => '1.06907',
                 'created_at' => Carbon::now(),
             ],
+            [
+                'id' => 4,
+                'name' => 'AED-PHP / PHP-AED Convertion rate',
+                'key' => 'aed_to_php_convertion_rate',
+                'value' => '0.060',
+                'created_at' => Carbon::now(),
+            ],
         ]);
 
 

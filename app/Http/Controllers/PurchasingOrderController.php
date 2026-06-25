@@ -88,7 +88,7 @@ class PurchasingOrderController extends Controller
             'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1,
-            'PHP' => 0.063,
+            'PHP' => 0.060,
             'SAR' => 0.98,
             'ZAR' => 0.22,
         ];
@@ -198,7 +198,7 @@ class PurchasingOrderController extends Controller
             'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1,
-            'PHP' => 0.063,
+            'PHP' => 0.060,
             'SAR' => 0.98,
             'ZAR' => 0.22,
         ];
@@ -230,7 +230,7 @@ class PurchasingOrderController extends Controller
             'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1,
-            'PHP' => 0.063,
+            'PHP' => 0.060,
             'SAR' => 0.98,
             'ZAR' => 0.22,
         ];
@@ -262,7 +262,7 @@ class PurchasingOrderController extends Controller
             'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1,
-            'PHP' => 0.063,
+            'PHP' => 0.060,
             'SAR' => 0.98,
             'ZAR' => 0.22,
 
@@ -329,7 +329,7 @@ class PurchasingOrderController extends Controller
             'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1,
-            'PHP' => 0.063,
+            'PHP' => 0.060,
             'SAR' => 0.98,
             'ZAR' => 0.22,
         ];
@@ -409,7 +409,7 @@ class PurchasingOrderController extends Controller
             'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1,
-            'PHP' => 0.063,
+            'PHP' => 0.060,
             'SAR' => 0.98,
             'ZAR' => 0.22,
         ];
@@ -477,7 +477,7 @@ class PurchasingOrderController extends Controller
             'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1,
-            'PHP' => 0.063,
+            'PHP' => 0.060,
             'SAR' => 0.98,
             'ZAR' => 0.22,
         ];
@@ -527,7 +527,7 @@ class PurchasingOrderController extends Controller
             'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1,
-            'PHP' => 0.063,
+            'PHP' => 0.060,
             'SAR' => 0.98,
             'ZAR' => 0.22,
         ];
@@ -577,7 +577,7 @@ class PurchasingOrderController extends Controller
             'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1,
-            'PHP' => 0.063,
+            'PHP' => 0.060,
             'SAR' => 0.98,
             'ZAR' => 0.22,
         ];
@@ -631,7 +631,7 @@ class PurchasingOrderController extends Controller
             'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1,
-            'PHP' => 0.063,
+            'PHP' => 0.060,
             'SAR' => 0.98,
             'ZAR' => 0.22,
         ];
@@ -685,7 +685,7 @@ class PurchasingOrderController extends Controller
             'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1,
-            'PHP' => 0.063,
+            'PHP' => 0.060,
             'SAR' => 0.98,
             'ZAR' => 0.22,
         ];
@@ -739,7 +739,7 @@ class PurchasingOrderController extends Controller
             'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1,
-            'PHP' => 0.063,
+            'PHP' => 0.060,
             'SAR' => 0.98,
             'ZAR' => 0.22,
         ];
@@ -790,7 +790,7 @@ class PurchasingOrderController extends Controller
             'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1,
-            'PHP' => 0.063,
+            'PHP' => 0.060,
             'SAR' => 0.98,
             'ZAR' => 0.22,
         ];
@@ -853,7 +853,7 @@ class PurchasingOrderController extends Controller
             'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1,
-            'PHP' => 0.063,
+            'PHP' => 0.060,
             'SAR' => 0.98,
             'ZAR' => 0.22,
         ];
@@ -914,7 +914,7 @@ class PurchasingOrderController extends Controller
             'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1,
-            'PHP' => 0.063,
+            'PHP' => 0.060,
             'SAR' => 0.98,
             'ZAR' => 0.22,
         ];
@@ -3726,7 +3726,7 @@ class PurchasingOrderController extends Controller
                         $totalcostconverted = $totalcost * 2.68;
                         break;
                     case "PHP":
-                        $totalcostconverted = $totalcost * 0.063;
+                        $totalcostconverted = $totalcost * 0.060;
                         break;
                     case "SAR":
                         $totalcostconverted = $totalcost * 0.98;
@@ -4166,7 +4166,7 @@ class PurchasingOrderController extends Controller
             'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1,
-            'PHP' => 0.063,
+            'PHP' => 0.060,
             'SAR' => 0.98,
             'ZAR' => 0.22,
         ];
@@ -4483,7 +4483,7 @@ class PurchasingOrderController extends Controller
                 'GBP' => 4.66,
                 'JPY' => 0.023,
                 'CAD' => 2.69,
-                "PHP" => 0.063,
+                "PHP" => 0.060,
                 'SAR' => 0.98,
                 'ZAR' => 0.22,
             ];
@@ -5541,7 +5541,7 @@ class PurchasingOrderController extends Controller
                             "AUD" => 2.29,
                             "AED" => 1,
                             "CAD" => 2.68,
-                            "PHP" => 0.063,
+                            "PHP" => 0.060,
                             'SAR' => 0.98,
                             'ZAR' => 0.22,
                         ];
@@ -5852,7 +5852,7 @@ class PurchasingOrderController extends Controller
                         "AUD" => 2.29,
                         "AED" => 1,
                         "CAD" => 2.68,
-                        "PHP" => 0.063,
+                        "PHP" => 0.060,
                         'SAR' => 0.98,
                         'ZAR' => 0.22,
                     ];
@@ -5924,7 +5924,7 @@ class PurchasingOrderController extends Controller
                         "AUD" => 2.29,
                         "AED" => 1,
                         "CAD" => 2.68,
-                        "PHP" => 0.063,
+                        "PHP" => 0.060,
                         'SAR' => 0.98,
                         'ZAR' => 0.22,
                     ];
@@ -6076,7 +6076,7 @@ class PurchasingOrderController extends Controller
                             "AED" => 1,
                             "AUD" => 2.29,
                             "CAD" => 2.68,
-                            "PHP" => 0.063,
+                            "PHP" => 0.060,
                             "SAR" => 0.98,
                             "ZAR" => 0.22,
                         ];

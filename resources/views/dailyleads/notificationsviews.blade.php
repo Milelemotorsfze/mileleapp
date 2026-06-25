@@ -241,6 +241,7 @@
               <option value="AED">AED</option>
               <option value="USD">USD</option>
               <option value="EURO">EURO</option>
+              <option value="PHP">PHP</option>
             </select>
                 <input type="number" class="form-control" id="deal-value-input-closed" aria-label="Deal Value">
                 <span class="input-group-text">.00</span>
@@ -289,6 +290,7 @@
                   <option value="AED">AED</option>
                   <option value="USD">USD</option>
                   <option value="EURO">EURO</option>
+                  <option value="PHP">PHP</option>
                 </select>
                 <input type="number" class="form-control" id="deal-value-input-negotiation" aria-label="Deal Value">
                 <span class="input-group-text">.00</span>
@@ -345,6 +347,7 @@
               <option value="AED">AED</option>
               <option value="USD">USD</option>
               <option value="EURO">EURO</option>
+              <option value="PHP">PHP</option>
             </select>
     <input type="number" class="form-control" id="deal-value-input-qoutation" aria-label="Deal Value">
     <span class="input-group-text">.00</span>

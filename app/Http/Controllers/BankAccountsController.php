@@ -25,7 +25,7 @@ class BankAccountsController extends Controller
         'JPY' => 0.034,
         'CAD' => 2.89,
         'AED' => 1,
-        'PHP' => 0.063,
+        'PHP' => 0.060,
         'SAR' => 0.98,
         'ZAR' => 0.22,
     ];

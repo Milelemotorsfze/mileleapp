@@ -978,6 +978,7 @@ class SalesOrderController extends Controller
         
         $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
+        $aed_to_php_rate = Setting::where('key', 'aed_to_php_convertion_rate')->first();
         $multiplecp = MuitlpleAgents::where('quotations_id', $quotation->id)->where('agents_id', '!=', $quotationDetail->agents_id)->get();
 
         $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact(
@@ -987,6 +988,7 @@ class SalesOrderController extends Controller
             'quotationDetail',
             'aed_to_usd_rate',
             'aed_to_eru_rate',
+            'aed_to_php_rate',
             'vehicles',
             'addons',
             'shippingCharges',
