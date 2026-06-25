@@ -347,6 +347,7 @@
                         <option <?php echo ($quotation->currency == 'AED') ? 'selected' : ''; ?>>AED</option>
                         <option <?php echo ($quotation->currency == 'USD') ? 'selected' : ''; ?>>USD</option>
                         <option <?php echo ($quotation->currency == 'EUR') ? 'selected' : ''; ?>>EUR</option>
+                        <option <?php echo ($quotation->currency == 'PHP') ? 'selected' : ''; ?>>PHP</option>
                     </select>
                 </div>
                 </div>
@@ -2326,6 +2327,11 @@ $('#shipping_port').select2();
 
             $('#current-currency-type').val(currency);
             var oldCurrecyType = $('#old-currency-type').val();
+            // Numeric rates (AED per 1 unit of the foreign currency). PHP rates for
+            // USD/EUR are derived through AED, e.g. USD->PHP = (AED per USD) / (AED per PHP).
+            var aedToUsd = parseFloat('{{ $aed_to_usd_rate->value }}');
+            var aedToEur = parseFloat('{{ $aed_to_eru_rate->value }}');
+            var aedToPhp = parseFloat('{{ optional($aed_to_php_rate)->value ?? 0.060 }}');
             if(oldCurrecyType == 'AED') {
                 if(currency == 'USD') {
                     var value = '{{ $aed_to_usd_rate->value }}';
@@ -2333,6 +2339,9 @@ $('#shipping_port').select2();
 
                 }else if(currency == 'EUR') {
                     var value = '{{ $aed_to_eru_rate->value }}';
+                    var operand = 'Divide';
+                }else if(currency == 'PHP') {
+                    var value = aedToPhp;
                     var operand = 'Divide';
                 }
             }else if(oldCurrecyType == 'USD') {
@@ -2344,6 +2353,9 @@ $('#shipping_port').select2();
                     var value = '{{ $usd_to_eru_rate->value }}';
                     var operand = 'Divide';
 
+                }else if(currency == 'PHP') {
+                    var value = aedToUsd / aedToPhp;
+                    var operand = 'Multiply';
                 }
             }
             else if(oldCurrecyType == 'EUR') {
@@ -2353,6 +2365,21 @@ $('#shipping_port').select2();
 
                 }else if(currency == 'USD') {
                     var value = '{{ $usd_to_eru_rate->value }}';
+                    var operand = 'Multiply';
+                }else if(currency == 'PHP') {
+                    var value = aedToEur / aedToPhp;
+                    var operand = 'Multiply';
+                }
+            }
+            else if(oldCurrecyType == 'PHP') {
+                if(currency == 'AED') {
+                    var value = aedToPhp;
+                    var operand = 'Multiply';
+                }else if(currency == 'USD') {
+                    var value = aedToPhp / aedToUsd;
+                    var operand = 'Multiply';
+                }else if(currency == 'EUR') {
+                    var value = aedToPhp / aedToEur;
                     var operand = 'Multiply';
                 }
             }
@@ -2860,6 +2887,8 @@ $('#shipping_port').select2();
                             priceNum = priceNum / parseFloat('{{ $aed_to_usd_rate->value }}');
                         } else if (currency == 'EUR' || currency == 'ERU') {
                             priceNum = priceNum / parseFloat('{{ $aed_to_eru_rate->value }}');
+                        } else if (currency == 'PHP') {
+                            priceNum = priceNum / parseFloat('{{ optional($aed_to_php_rate)->value ?? 0.060 }}');
                         }
                     }
                     var priceStr = String(Math.round(priceNum));
@@ -4463,6 +4492,10 @@ function updateSecondTable(RowId, savedVins) {
                     $('#total').val(isNaN(total) ? '' : (typeof formatQuotationLineAmount === 'function' ? formatQuotationLineAmount(total) : String(Math.round(total))));
                 }else if(currency == 'EUR') {
                     var value = '{{ $aed_to_eru_rate->value }}';
+                    var total = parseFloat(totalAmount) * value;
+                    $('#total').val(isNaN(total) ? '' : (typeof formatQuotationLineAmount === 'function' ? formatQuotationLineAmount(total) : String(Math.round(total))));
+                }else if(currency == 'PHP') {
+                    var value = parseFloat('{{ optional($aed_to_php_rate)->value ?? 0.060 }}');
                     var total = parseFloat(totalAmount) * value;
                     $('#total').val(isNaN(total) ? '' : (typeof formatQuotationLineAmount === 'function' ? formatQuotationLineAmount(total) : String(Math.round(total))));
                 }

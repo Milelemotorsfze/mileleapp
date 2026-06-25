@@ -91,10 +91,11 @@ class ProformaInvoiceController extends Controller {
         $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
         $usd_to_eru_rate = Setting::where('key', 'usd_to_euro_convertion_rate')->first();
+        $aed_to_php_rate = Setting::where('key', 'aed_to_php_convertion_rate')->first();
 
         return view('proforma.invoice', compact('callDetails', 'brands','assessoriesDesc',
             'sparePartsDesc','kitsDesc','shippings','certifications','countries','shippingPorts',
-           'otherDocuments', 'shippingDocuments','aed_to_eru_rate','aed_to_usd_rate','usd_to_eru_rate', 'sales_persons'));
+           'otherDocuments', 'shippingDocuments','aed_to_eru_rate','aed_to_usd_rate','usd_to_eru_rate', 'aed_to_php_rate', 'sales_persons'));
     }
     public function getaddonModels(Request $request, $brandId, $type) {
         $modelLines = MasterModelLines::where('brand_id', $brandId)
@@ -562,6 +563,7 @@ class ProformaInvoiceController extends Controller {
         $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
         $usd_to_eru_rate = Setting::where('key', 'usd_to_euro_convertion_rate')->first();
+        $aed_to_php_rate = Setting::where('key', 'aed_to_php_convertion_rate')->first();
         $sales_persons = User::where(function ($query) use ($quotation) {
             $query->where(function ($q) {
                 $q->where('pfi_access', 1)
@@ -580,7 +582,7 @@ class ProformaInvoiceController extends Controller {
         $existingItemsJson = json_encode($quotationitems);
         return view('proforma.invoice_edit', compact('callDetails', 'brands','assessoriesDesc',
             'sparePartsDesc','kitsDesc','shippings','certifications','countries','shippingPorts',
-           'otherDocuments', 'shippingDocuments','aed_to_eru_rate','aed_to_usd_rate','usd_to_eru_rate', 'quotation_details', 'quotation_vins', 'quotation', 'quotationitems', 'existingItemsJson', 'callId', 'sales_persons'));
+           'otherDocuments', 'shippingDocuments','aed_to_eru_rate','aed_to_usd_rate','usd_to_eru_rate', 'aed_to_php_rate', 'quotation_details', 'quotation_vins', 'quotation', 'quotationitems', 'existingItemsJson', 'callId', 'sales_persons'));
     }
     public function getNeighbors($id)
 {

@@ -342,6 +342,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         <option value="AED" {{ old('csr_currency', 'AED') == 'AED' ? 'selected' : '' }}>AED</option>
                         <option value="USD" {{ old('csr_currency') == 'USD' ? 'selected' : '' }}>USD</option>
                         <option value="EUR" {{ old('csr_currency') == 'EUR' ? 'selected' : '' }}>EUR</option>
+                        <option value="PHP" {{ old('csr_currency') == 'PHP' ? 'selected' : '' }}>PHP</option>
                     </select>
                 </div>
                 <div class="col-md-12 remarks-single-div-container">

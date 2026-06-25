@@ -663,6 +663,24 @@
                     </td>
                 </tr>
                 @endif
+                @if($currency === "PHP")
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
+                        Net Total In PHP:
+                    </td>
+                    <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
+                        {{ "PHP " . number_format($quotation->deal_value, 2) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
+                        Net Total In AED:
+                    </td>
+                    <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
+                        {{ "AED " . number_format($quotation->deal_value * (float) (optional($aed_to_php_rate)->value ?? 0.060), 2) }}
+                    </td>
+                </tr>
+                @endif
                 @if($isProformaInvoice)
                 <tr>
                     <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px;">
@@ -690,6 +708,8 @@
                             {{ "AED " . number_format((((float)$quotation->deal_value) - $advanceAmount) * (float) ($aed_to_usd_rate->value ?? 3.675), 2) }}
                         @elseif($currency === 'EUR')
                             {{ "AED " . number_format((((float)$quotation->deal_value) - $advanceAmount) * (float) ($aed_to_eru_rate->value ?? 4), 2) }}
+                        @elseif($currency === 'PHP')
+                            {{ "AED " . number_format((((float)$quotation->deal_value) - $advanceAmount) * (float) (optional($aed_to_php_rate)->value ?? 0.060), 2) }}
                         @endif
                     </td>
                 </tr>

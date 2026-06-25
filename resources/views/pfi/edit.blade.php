@@ -165,6 +165,7 @@
                                                     <select class="form-control" name="currency" id="currency" >
                                                         <option value="USD" {{ $pfi->currency == 'USD' ? 'selected' : ''}}>USD</option>
                                                         <option value="EUR" {{ $pfi->currency == 'EUR' ? 'selected' : ''}}>EUR</option>
+                                                        <option value="PHP" {{ $pfi->currency == 'PHP' ? 'selected' : ''}}>PHP</option>
                                                     </select>
                                                 </div>
                                             </div>
