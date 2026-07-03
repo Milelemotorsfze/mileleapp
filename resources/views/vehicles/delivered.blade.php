@@ -539,7 +539,9 @@ table.dataTable thead th select {
   </div>
   @php
     $hasPricePermission = Auth::user()->hasPermissionForSelectedRole('selling-price-stock-report-view');
-    $canViewVehicleCost = Auth::id() === 17;
+    $canViewVehicleCost = Auth::user()->hasPermissionForSelectedRole('price-view')
+        || $hasPricePermission
+        || Auth::user()->hasPermissionForSelectedRole('view-netsuite-price');
 @endphp
 
 <script>
