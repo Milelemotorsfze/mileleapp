@@ -3638,7 +3638,9 @@ SQL;
                 }
             }
         }
-        $canViewVehicleCost = Auth::id() === 17;
+        $canViewVehicleCost = Auth::user()->hasPermissionForSelectedRole('price-view')
+            || Auth::user()->hasPermissionForSelectedRole('selling-price-stock-report-view')
+            || Auth::user()->hasPermissionForSelectedRole('view-netsuite-price');
         if ($request->ajax()) {
             $data = null;
             $stockBarDiag = null;
@@ -4521,7 +4523,9 @@ SQL;
                 $variant->save();
             }
         }
-        $canViewVehicleCost = Auth::id() === 17;
+        $canViewVehicleCost = Auth::user()->hasPermissionForSelectedRole('price-view')
+            || Auth::user()->hasPermissionForSelectedRole('selling-price-stock-report-view')
+            || Auth::user()->hasPermissionForSelectedRole('view-netsuite-price');
         if ($request->ajax()) {
             $data = null;
             $stockBarDiag = null;
@@ -4722,7 +4726,9 @@ SQL;
                 $variant->save();
             }
         }
-        $canViewVehicleCost = Auth::id() === 17;
+        $canViewVehicleCost = Auth::user()->hasPermissionForSelectedRole('price-view')
+            || Auth::user()->hasPermissionForSelectedRole('selling-price-stock-report-view')
+            || Auth::user()->hasPermissionForSelectedRole('view-netsuite-price');
         if ($request->ajax()) {
             $data = null;
             $stockBarDiag = null;
@@ -4920,7 +4926,9 @@ SQL;
                 $variant->save();
             }
         }
-        $canViewVehicleCost = Auth::id() === 17;
+        $canViewVehicleCost = Auth::user()->hasPermissionForSelectedRole('price-view')
+            || Auth::user()->hasPermissionForSelectedRole('selling-price-stock-report-view')
+            || Auth::user()->hasPermissionForSelectedRole('view-netsuite-price');
         if ($request->ajax()) {
             $data = null;
             $stockBarDiag = null;
