@@ -3638,9 +3638,7 @@ SQL;
                 }
             }
         }
-        $canViewVehicleCost = Auth::user()->hasPermissionForSelectedRole('price-view')
-            || Auth::user()->hasPermissionForSelectedRole('selling-price-stock-report-view')
-            || Auth::user()->hasPermissionForSelectedRole('view-netsuite-price');
+        $canViewVehicleCost = Auth::user()->hasPermissionForSelectedRole('price-view');
         if ($request->ajax()) {
             $data = null;
             $stockBarDiag = null;
