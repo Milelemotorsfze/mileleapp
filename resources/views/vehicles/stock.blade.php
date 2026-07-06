@@ -607,6 +607,7 @@ table.dataTable thead th select {
             <th>Preferred Destination</th>
                   @if ($canViewVehicleCost)
                   <th>Vehicle Cost</th>
+                  <th>Currency</th>
                 @endif
                   @if ($hasPricePermission)
                   <th>Minimum Commission</th>
@@ -986,7 +987,16 @@ table.dataTable thead th select {
         }
         return ''; // Return an empty string if there's no price
     }
-});
+},
+                        {
+                            data: 'costcurrency',
+                            name: 'costcurrency',
+                            searchable: false,
+                            render: function(data, type, row) {
+                                return data ? data : '';
+                            }
+                        }
+                    );
     }
 
     columns7.push(

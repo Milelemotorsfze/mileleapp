@@ -3707,8 +3707,12 @@ SQL;
                             (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
                             ''
                         ) as costprice,
+                        COALESCE(
+                            (SELECT currency FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
+                            ''
+                        ) as costcurrency,
                         (SELECT netsuite_link FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1) as netsuite_link
-                    ") : DB::raw("'' as costprice, NULL as netsuite_link")
+                    ") : DB::raw("'' as costprice, '' as costcurrency, NULL as netsuite_link")
 
                 ])
                     ->leftJoin('w_o_vehicles', 'vehicles.id', '=', 'w_o_vehicles.vehicle_id')
@@ -4587,8 +4591,12 @@ SQL;
                             (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
                             ''
                         ) as costprice,
+                        COALESCE(
+                            (SELECT currency FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
+                            ''
+                        ) as costcurrency,
                         (SELECT netsuite_link FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1) as netsuite_link
-                    ") : DB::raw("'' as costprice, NULL as netsuite_link")
+                    ") : DB::raw("'' as costprice, '' as costcurrency, NULL as netsuite_link")
 
                 ])
                     ->leftJoin('w_o_vehicles', 'vehicles.id', '=', 'w_o_vehicles.vehicle_id')
@@ -4787,8 +4795,12 @@ SQL;
                         (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
                         ''
                     ) as costprice,
+                    COALESCE(
+                        (SELECT currency FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
+                        ''
+                    ) as costcurrency,
                     (SELECT netsuite_link FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1) as netsuite_link
-                    ") : DB::raw("'' as costprice, NULL as netsuite_link")
+                    ") : DB::raw("'' as costprice, '' as costcurrency, NULL as netsuite_link")
 
                 ])
                     ->leftJoin('w_o_vehicles', 'vehicles.id', '=', 'w_o_vehicles.vehicle_id')
@@ -4990,8 +5002,12 @@ SQL;
                         (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
                         ''
                     ) as costprice,
+                    COALESCE(
+                        (SELECT currency FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
+                        ''
+                    ) as costcurrency,
                     (SELECT netsuite_link FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1) as netsuite_link
-                    ") : DB::raw("'' as costprice, NULL as netsuite_link")
+                    ") : DB::raw("'' as costprice, '' as costcurrency, NULL as netsuite_link")
 
                 ])
                     ->leftJoin('w_o_vehicles', 'vehicles.id', '=', 'w_o_vehicles.vehicle_id')

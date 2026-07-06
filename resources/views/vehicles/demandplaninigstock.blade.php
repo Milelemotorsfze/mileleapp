@@ -572,6 +572,7 @@ table.dataTable thead th select {
                   <th>Preferred Destination</th>
                   @if ($canViewVehicleCost)
                   <th>Vehicle Cost</th>
+                  <th>Currency</th>
                 @endif
                   @if ($hasPricePermission)
                   <th>Minimum Commission</th>
@@ -834,7 +835,16 @@ if (hasPricePermission) {
         }
         return ''; // Return an empty string if there's no price
     }
-});
+},
+        {
+            data: 'costcurrency',
+            name: 'costcurrency',
+            searchable: false,
+            render: function(data, type, row) {
+                return data ? data : '';
+            }
+        }
+    );
     }
 
     columns9.push(
@@ -960,11 +970,12 @@ if (hasPricePermission) {
     };   
     if (canViewVehicleCost) {
     columnMap[33] = 'costprice';
-    columnMap[34] = 'vehicles.minimum_commission';
-    columnMap[35] = 'vehicles.price';
-    columnMap[36] = 'vehicles.ownership_type';
-    columnMap[37] = 'vehicles.custom_inspection_number';
-    columnMap[38] = 'vehicles.custom_inspection_status';
+    columnMap[34] = 'costcurrency';
+    columnMap[35] = 'vehicles.minimum_commission';
+    columnMap[36] = 'vehicles.price';
+    columnMap[37] = 'vehicles.ownership_type';
+    columnMap[38] = 'vehicles.custom_inspection_number';
+    columnMap[39] = 'vehicles.custom_inspection_status';
 } else if (hasPricePermission) {
     columnMap[33] = 'vehicles.minimum_commission';
     columnMap[34] = 'vehicles.price';
