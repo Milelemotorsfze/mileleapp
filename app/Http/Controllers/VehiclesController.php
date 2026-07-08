@@ -3661,6 +3661,9 @@ SQL;
                     'vehicles.so_id',
                     'vehicles.minimum_commission',
                     'vehicles.reservation_end_date',
+                    // Reserved salesperson: prefer the PO-side sales_person_id, fall back to the vehicle booking person
+                    DB::raw('COALESCE(purchasing_order.sales_person_id, vehicles.booking_person_id) as booking_person_id'),
+                    'vehicles.purchasing_order_id',
                     'vehicles.vehicle_document_status',
                     'warehouse.name as location',
                     'purchasing_order.po_date',
@@ -3694,7 +3697,7 @@ SQL;
                     'documents.document_with',
                     'movement_grns.grn_number',
                     'gdn.gdn_number',
-                    'bp.name as bpn',
+                    DB::raw('COALESCE(posp.name, bp.name) as bpn'),
                     'sp.name as spn',
                     DB::raw("DATE_FORMAT(work_orders.date, '%Y-%m-%d') as work_order_date"),
                     DB::raw('MAX(COALESCE(sm.message_count, 0)) as message_count'),
@@ -3750,6 +3753,7 @@ SQL;
                         '=',
                         'sm.vehicle_id'
                     )
+                    ->leftJoin('users as posp', 'purchasing_order.sales_person_id', '=', 'posp.id') // Join for PO reserved salesperson
                     ->where('vehicles.status', 'Approved');
 
                 foreach ($filters as $columnName => $values) {

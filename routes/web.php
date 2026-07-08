@@ -758,6 +758,11 @@ Route::get('/d', function () {
         Route::post('/{id}/update', [LetterRequestController::class, 'update'])->name('employeeRelation.letterRequest.update');
     });
     //WareHouse
+    // Reservation salesperson management (declared before the resource so the
+    // static "salespersons" path is not shadowed by purchasing-order/{id} show route)
+    Route::get('purchasing-order/salespersons', [PurchasingOrderController::class, 'getSalesPersons'])->name('purchasing-order.salespersons');
+    Route::post('purchasing-order/{id}/change-reservation-salesperson', [PurchasingOrderController::class, 'changeReservationSalesperson'])->name('purchasing-order.changeReservationSalesperson');
+    Route::post('purchasing-order/{id}/remove-reservation-salesperson', [PurchasingOrderController::class, 'removeReservationSalesperson'])->name('purchasing-order.removeReservationSalesperson');
     Route::resource('purchasing-order', PurchasingOrderController::class);
     Route::resource('Vehicles', VehiclesController::class);
     Route::get('vehicles/filter', [VehiclesController::class, 'index'])->name('vehicles.filter');

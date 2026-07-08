@@ -998,7 +998,18 @@ class PurchasingOrderController extends Controller
             ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')
             ->get();
         $payments = PaymentTerms::get();
-        return view('warehouse.create', compact('variants', 'vendors', 'payments', 'countries', 'ports'));
+        $sales_persons = ModelHasRoles::join('users', 'model_has_roles.model_id', '=', 'users.id')
+            ->where(function ($query) {
+                $query->where('users.status', 'active')
+                    ->where(function ($query) {
+                        $query->where('model_has_roles.role_id', 7)
+                            ->orWhere('model_has_roles.model_id', 17);
+                    });
+            })
+            ->orWhere('users.id', 40)
+            ->orderBy('users.name', 'asc')
+            ->get(['users.id', 'users.name']);
+        return view('warehouse.create', compact('variants', 'vendors', 'payments', 'countries', 'ports', 'sales_persons'));
     }
     public function getBrandsAndModelLines(Request $request)
     {
@@ -1019,7 +1030,8 @@ class PurchasingOrderController extends Controller
             'payment_term_id' => 'required',
             'po_type' => 'required',
             'stock_type' => OrderStockType::validationRules(),
-            'vendors_id' => 'required'
+            'vendors_id' => 'required',
+            'salesperson' => 'nullable|integer|exists:users,id',
         ]);
 
         DB::beginTransaction();
@@ -1041,6 +1053,7 @@ class PurchasingOrderController extends Controller
         if ($request->po_from != 'DEMAND_PLANNING') {
             $purchasingOrder->shippingcost = $request->input('shippingcost');
         }
+        $purchasingOrder->sales_person_id = $request->input('salesperson');
         $purchasingOrder->totalcost = $request->input('totalcost');
         $purchasingOrder->pol = $request->input('pol');
         $purchasingOrder->pod = $request->input('pod');
@@ -1067,6 +1080,14 @@ class PurchasingOrderController extends Controller
         $purchasingOrder->pl_number = $request->input('pl_number');
         $purchasingOrder->save();
         $purchasingOrderId = $purchasingOrder->id;
+        $salesPersonId = $request->input('salesperson');
+        $bookingStartDate = null;
+        $bookingEndDate = null;
+        if ($salesPersonId) {
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $bookingStartDate = Carbon::now($dubaiTimeZone)->toDateString();
+            $bookingEndDate = Carbon::now($dubaiTimeZone)->addDays(14)->toDateString();
+        }
         $variantNames = $request->input('variant_id');
         $variantsQuantity = null;
         if ($variantNames != null) {
@@ -1119,6 +1140,11 @@ class PurchasingOrderController extends Controller
                 }
                 $vehicle->purchasing_order_id = $purchasingOrderId;
                 $vehicle->status = "Not Approved";
+                if ($salesPersonId) {
+                    $vehicle->booking_person_id = $salesPersonId;
+                    $vehicle->reservation_start_date = $bookingStartDate;
+                    $vehicle->reservation_end_date = $bookingEndDate;
+                }
                 // payment status need to update
 
                 $vehicle->save();
@@ -6462,6 +6488,120 @@ class PurchasingOrderController extends Controller
             ->with(['variant.brand', 'variant.master_model_lines', 'vehiclePurchasingCost'])
             ->get();
         return response()->json($vehicles);
+    }
+
+    /**
+     * Return list of available salespersons (for modal dropdown)
+     */
+    public function getSalesPersons()
+    {
+        $sales_persons = ModelHasRoles::join('users', 'model_has_roles.model_id', '=', 'users.id')
+            ->where(function ($query) {
+                $query->where('users.status', 'active')
+                    ->where(function ($query) {
+                        $query->where('model_has_roles.role_id', 7)
+                            ->orWhere('model_has_roles.model_id', 17);
+                    });
+            })
+            ->orWhere('users.id', 40)
+            ->orderBy('users.name', 'asc')
+            ->get(['users.id', 'users.name']);
+
+        return response()->json($sales_persons);
+    }
+
+    /**
+     * Change reservation salesperson for a PO (only current booking person can perform)
+     */
+    public function changeReservationSalesperson(Request $request, $id)
+    {
+        $request->validate([
+            'current_booking_person_id' => 'required|integer|exists:users,id',
+            'new_salesperson_id' => 'required|integer|exists:users,id',
+        ]);
+
+        $currentBookingId = $request->input('current_booking_person_id');
+        $newSalesId = $request->input('new_salesperson_id');
+
+        if (Auth::id() != $currentBookingId) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $po = PurchasingOrder::findOrFail($id);
+        $po->sales_person_id = $newSalesId;
+        $po->save();
+
+        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+        $startDate = Carbon::now($dubaiTimeZone)->toDateString();
+        $endDate = Carbon::now($dubaiTimeZone)->addDays(14)->toDateString();
+
+        $vehicles = Vehicles::where('purchasing_order_id', $id)
+            ->where('booking_person_id', $currentBookingId)
+            ->get();
+
+        foreach ($vehicles as $vehicle) {
+            $vehicle->booking_person_id = $newSalesId;
+            $vehicle->reservation_start_date = $startDate;
+            $vehicle->reservation_end_date = $endDate;
+            $vehicle->save();
+        }
+
+        // return updated reserved names for UI refresh
+        $reservedIds = Vehicles::where('purchasing_order_id', $id)->pluck('booking_person_id')->filter()->unique()->toArray();
+        $reservedNames = [];
+        if (!empty($reservedIds)) {
+            $reservedNames = User::whereIn('id', $reservedIds)->pluck('name')->toArray();
+        }
+
+        return response()->json([
+            'success' => true,
+            'reserved_names' => $reservedNames,
+            'reservation_end_date' => $endDate,
+        ]);
+    }
+
+    /**
+     * Remove reservation salesperson (only current booking person can perform)
+     */
+    public function removeReservationSalesperson(Request $request, $id)
+    {
+        $request->validate([
+            'current_booking_person_id' => 'required|integer|exists:users,id',
+        ]);
+
+        $currentBookingId = $request->input('current_booking_person_id');
+
+        if (Auth::id() != $currentBookingId) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $po = PurchasingOrder::findOrFail($id);
+        if ($po->sales_person_id == $currentBookingId) {
+            $po->sales_person_id = null;
+            $po->save();
+        }
+
+        $vehicles = Vehicles::where('purchasing_order_id', $id)
+            ->where('booking_person_id', $currentBookingId)
+            ->get();
+
+        foreach ($vehicles as $vehicle) {
+            $vehicle->booking_person_id = null;
+            $vehicle->reservation_start_date = null;
+            $vehicle->reservation_end_date = null;
+            $vehicle->save();
+        }
+
+        $reservedIds = Vehicles::where('purchasing_order_id', $id)->pluck('booking_person_id')->filter()->unique()->toArray();
+        $reservedNames = [];
+        if (!empty($reservedIds)) {
+            $reservedNames = User::whereIn('id', $reservedIds)->pluck('name')->toArray();
+        }
+
+        return response()->json([
+            'success' => true,
+            'reserved_names' => $reservedNames,
+        ]);
     }
     public function checkPoNumberedit(Request $request)
     {

@@ -73,6 +73,32 @@ table.dataTable thead th select {
     position: inherit !important;
 }
 
+.reservation-countdown {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 12px;
+    background-color: #ffdede; /* very light red */
+    color: #821515;
+    font-weight: 600;
+    min-width: 100px;
+}
+
+.reservation-countdown.near-expiry {
+    background-color: #ff4d4d; /* proper red */
+    color: #ffffff;
+}
+
+.reserved-salesperson {
+    cursor: pointer;
+    text-decoration: none;
+    color: #0d6efd;
+}
+
+.reserved-salesperson.reserved-salesperson-self {
+    text-decoration: underline;
+    font-weight: 600;
+}
+
 /* Ensure proper spacing between dropdown options */
 .select2-container--default .select2-selection--multiple .select2-selection__choice {
     background-color: #007bff;
@@ -376,7 +402,44 @@ table.dataTable thead th select {
         </div>
     </div>
 </div>
-    <div class="modal fade" id="enhancementModal" tabindex="-1" role="dialog" aria-labelledby="enhancementModalLabel" aria-hidden="true">
+    <!-- Reservation salesperson modal -->
+<div class="modal fade" id="reservationSalespersonModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Manage Reservation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="reservationModalAlert" style="display:none;" class="alert alert-danger"></div>
+                <input type="hidden" id="reservationPoId">
+                <input type="hidden" id="reservationBookingId">
+                <div class="mb-3">
+                    <label class="form-label">Current reserved salesperson</label>
+                    <div id="currentReservedName" class="fw-bold"></div>
+                </div>
+                <div class="mb-3" id="changeSalespersonWrapper">
+                    <label class="form-label">Change to</label>
+                    <select id="changeSalespersonSelect" class="form-control" style="width:100%">
+                        <option value="" disabled selected>Select the Sales Person</option>
+                        @foreach($salesperson as $sp)
+                            <option value="{{ $sp->id }}">{{ $sp->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <p id="reservationReadonlyNote" class="text-muted" style="display:none;">
+                    Only the reserved salesperson can change or remove this reservation.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="removeReservationBtn" class="btn btn-danger">Remove Reservation</button>
+                <button type="button" id="changeReservationBtn" class="btn btn-primary">Change Salesperson</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="enhancementModal" tabindex="-1" role="dialog" aria-labelledby="enhancementModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form id="enhancementForm" method="POST" action="{{ route('enhancement.save') }}">
@@ -709,6 +772,7 @@ table.dataTable thead th select {
         });
         
         var now = new Date();
+        var currentUserId = {{ auth()->id() }};
         @php
         $hasEditEstimationDatePermission = Auth::user()->hasPermissionForSelectedRole('edit-estimation-date');
         @endphp
@@ -727,7 +791,24 @@ table.dataTable thead th select {
         orderable: false,  // Disable ordering for this column
         searchable: false  // Disable searching for this column
     },
-              { data: 'id', name: 'vehicles.id' },
+              { 
+                data: 'status',
+                name: 'vehicles.status',
+                render: function(data, type, row) {
+                    // If reservation salesperson is set, mark as Booked
+                    if (row.booking_person_id) {
+                        return '<span class="badge bg-warning text-dark">Booked</span>';
+                    }
+                    // Fallbacks for common states
+                    if (row.so_id) {
+                        return '<span class="badge bg-success">Sold</span>';
+                    }
+                    if (row.gdn_id) {
+                        return '<span class="badge bg-secondary">Delivered</span>';
+                    }
+                    return data ? data : '';
+                }
+              },
               { data: 'po_number', name: 'purchasing_order.po_number' },
                 {
     data: 'po_date',
@@ -843,17 +924,26 @@ table.dataTable thead th select {
     name: 'vehicles.reservation_end_date',
     render: function(data, type, row) {
         if (data) {
-            // Assuming data is in Y-m-d format (default SQL date format)
-            var dateObj = new Date(data);
-            var formattedDate = dateObj.toLocaleDateString('en-GB', {
-                day: '2-digit', month: 'short', year: 'numeric'
-            });
-            return formattedDate;
+            var endTimestamp = new Date(data).getTime();
+            return '<span class="reservation-countdown" data-end="' + endTimestamp + '">' + formatReservationCountdown(endTimestamp) + '</span>';
         }
         return ''; // If no date, return empty
     }
 },
-        { data: 'bpn', name: 'bp.name' },
+        {
+            data: 'bpn',
+            name: 'bp.name',
+            render: function(data, type, row) {
+                if (!data || !row.booking_person_id) {
+                    return data ? data : '';
+                }
+                var isSelf = (currentUserId == row.booking_person_id);
+                return '<a href="#" class="reserved-salesperson' + (isSelf ? ' reserved-salesperson-self' : '') + '"' +
+                    ' data-user-id="' + row.booking_person_id + '"' +
+                    ' data-po-id="' + row.purchasing_order_id + '"' +
+                    ' data-name="' + data + '">' + data + '</a>';
+            }
+        },
                 { data: 'gdn_number', name: 'gdn.gdn_number' },
                 {
     data: 'gdndate',
@@ -1157,6 +1247,38 @@ if (canViewVehicleCost) {
     columnMap[39] = 'vehicles.custom_inspection_number';
     columnMap[40] = 'vehicles.custom_inspection_status';
 }
+        function formatReservationCountdown(endTimestamp) {
+            var now = Date.now();
+            var distance = endTimestamp - now;
+            if (distance <= 0) {
+                return 'Expired';
+            }
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            return days + 'd ' + String(hours).padStart(2, '0') + 'h ' + String(minutes).padStart(2, '0') + 'm ' + String(seconds).padStart(2, '0') + 's';
+        }
+
+        function updateReservationCountdowns() {
+            $('.reservation-countdown').each(function() {
+                var endTimestamp = parseInt($(this).data('end'), 10);
+                if (!isNaN(endTimestamp)) {
+                    var now = Date.now();
+                    var distance = endTimestamp - now;
+                    $(this).text(formatReservationCountdown(endTimestamp));
+                    if (distance <= 0) {
+                        $(this).removeClass('near-expiry');
+                        $(this).text('Expired');
+                    } else if (distance <= 2 * 24 * 60 * 60 * 1000) {
+                        $(this).addClass('near-expiry');
+                    } else {
+                        $(this).removeClass('near-expiry');
+                    }
+                }
+            });
+        }
+
         var table7 = $('#dtBasicExample7').DataTable({
           processing: true,
             serverSide: true,
@@ -1226,6 +1348,9 @@ if (canViewVehicleCost) {
     if (window.stockBarBindTableSummary) {
         window.stockBarBindTableSummary('dtBasicExample7');
     }
+    updateReservationCountdowns();
+    setInterval(updateReservationCountdowns, 1000);
+    table7.on('draw', updateReservationCountdowns);
     // For each column in the table, create a dropdown filter
     api.columns().every(function (index) {
         var column = this;
@@ -1846,6 +1971,77 @@ function displayGallery(imageUrls) {
         carouselImages.appendChild(div);
     });
 }
+
+// Reservation salesperson management (stocks page)
+$(function () {
+    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+    // Open modal when a reserved salesperson name is clicked
+    $(document).on('click', '.reserved-salesperson', function (e) {
+        e.preventDefault();
+        var bookedId = $(this).data('user-id');
+        var poId = $(this).data('po-id');
+        var bookedName = $(this).data('name');
+
+        $('#reservationModalAlert').hide().text('');
+        $('#reservationBookingId').val(bookedId);
+        $('#reservationPoId').val(poId);
+        $('#currentReservedName').text(bookedName);
+        $('#changeSalespersonSelect').val('');
+
+        // Only the reserved salesperson themselves may change/remove
+        if (currentUserId == bookedId) {
+            $('#changeSalespersonWrapper').show();
+            $('#reservationReadonlyNote').hide();
+            $('#removeReservationBtn').show();
+            $('#changeReservationBtn').show();
+        } else {
+            $('#changeSalespersonWrapper').hide();
+            $('#reservationReadonlyNote').show();
+            $('#removeReservationBtn').hide();
+            $('#changeReservationBtn').hide();
+        }
+
+        $('#reservationSalespersonModal').modal('show');
+    });
+
+    // Change salesperson -> resets the reservation timer (14 days)
+    $(document).on('click', '#changeReservationBtn', function () {
+        var poId = $('#reservationPoId').val();
+        var bookingId = $('#reservationBookingId').val();
+        var newId = $('#changeSalespersonSelect').val();
+        if (!newId) {
+            $('#reservationModalAlert').text('Please select a salesperson').show();
+            return;
+        }
+        $.post('/purchasing-order/' + poId + '/change-reservation-salesperson', {
+            _token: csrfToken,
+            current_booking_person_id: bookingId,
+            new_salesperson_id: newId
+        }).done(function () {
+            $('#reservationSalespersonModal').modal('hide');
+            $('#dtBasicExample7').DataTable().ajax.reload(null, false);
+        }).fail(function (xhr) {
+            $('#reservationModalAlert').text((xhr.responseJSON && xhr.responseJSON.message) || 'Error changing salesperson').show();
+        });
+    });
+
+    // Remove reservation -> clears salesperson and reservation end date
+    $(document).on('click', '#removeReservationBtn', function () {
+        var poId = $('#reservationPoId').val();
+        var bookingId = $('#reservationBookingId').val();
+        if (!confirm('Remove your reservation? This will clear the reservation timer.')) return;
+        $.post('/purchasing-order/' + poId + '/remove-reservation-salesperson', {
+            _token: csrfToken,
+            current_booking_person_id: bookingId
+        }).done(function () {
+            $('#reservationSalespersonModal').modal('hide');
+            $('#dtBasicExample7').DataTable().ajax.reload(null, false);
+        }).fail(function (xhr) {
+            $('#reservationModalAlert').text((xhr.responseJSON && xhr.responseJSON.message) || 'Error removing reservation').show();
+        });
+    });
+});
 </script>
 <script>
         function openremarksModal(vehicleId) {

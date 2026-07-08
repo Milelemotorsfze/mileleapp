@@ -60,6 +60,70 @@
     .error-text {
         color: #FF0000;
     }
+
+    .submit-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 1050;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        color: #fff;
+        font-size: 1.1rem;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .submit-overlay.hidden {
+        display: none;
+    }
+
+    .submit-overlay .loader {
+        border: 5px solid rgba(255, 255, 255, 0.2);
+        border-top: 5px solid #fff;
+        border-radius: 50%;
+        width: 55px;
+        height: 55px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .popup-message {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 320px;
+        background: #f8d7da;
+        border: 1px solid #f5c2c7;
+        color: #842029;
+        padding: 15px 18px;
+        border-radius: 5px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        z-index: 1060;
+        display: none;
+    }
+
+    .popup-message.show {
+        display: block;
+    }
+
+    .popup-message .close-popup {
+        position: absolute;
+        top: 8px;
+        right: 10px;
+        cursor: pointer;
+        color: #842029;
+        font-weight: 700;
+    }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')
@@ -78,6 +142,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details')
     <div class="col-lg-12">
         <div id="flashMessage"></div>
     </div>
+    <div id="popupError" class="popup-message">
+        <span class="close-popup">&times;</span>
+        <div id="popupErrorContent"></div>
+    </div>
+    <div id="submitOverlay" class="submit-overlay hidden">
+        <div class="loader"></div>
+        <div>Submitting your PO, please wait...</div>
+    </div>
     @if (count($errors) > 0)
     <div class="alert alert-danger">
         <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -87,6 +159,25 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details')
             @endforeach
         </ul>
     </div>
+    <script>
+        window.onload = function() {
+            var errors = @json($errors->all());
+            var html = '<strong>Please fix the following errors:</strong>';
+            html += '<ul style="margin:0; padding-left:18px;">';
+            errors.forEach(function(error) {
+                html += '<li>' + error + '</li>';
+            });
+            html += '</ul>';
+            document.addEventListener('DOMContentLoaded', function() {
+                var popup = document.getElementById('popupErrorContent');
+                var popupBox = document.getElementById('popupError');
+                if (popup && popupBox) {
+                    popup.innerHTML = html;
+                    popupBox.classList.add('show');
+                }
+            });
+        };
+    </script>
     @endif
     {!! Form::open(array('route' => 'purchasing-order.store','method'=>'POST', 'id' => 'purchasing-order', 'enctype' => 'multipart/form-data')) !!}
     <div class="row">
@@ -246,8 +337,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details')
     </div>
     <div class="bar">Shipping</div>
     <div class="row">
-        <div class="col-lg-1 col-md-6">
-            <label for="Incoterm" class="form-label">Shipping Method:</label>
+        <div class="col-lg-2 col-md-6">
+            <label for="shippingmethod" class="form-label">Shipping Method:</label>
             <select class="form-control" id="shippingmethod" name="shippingmethod">
                 <option value="EXW">EXW</option>
                 <option value="CNF">CNF</option>
@@ -257,11 +348,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details')
             </select>
         </div>
         <div class="col-lg-2 col-md-6">
-            <label for="Incoterm" class="form-label">Shipping Cost:</label>
+            <label for="shippingcost" class="form-label">Shipping Cost:</label>
             <input type="number" id="shippingcost" name="shippingcost" class="form-control" placeholder="Shipping Cost">
         </div>
-        <div class="col-lg-3 col-md-6">
-            <label for="Incoterm" class="form-label">Port of Loading:</label>
+        <div class="col-lg-2 col-md-6">
+            <label for="pol" class="form-label">Port of Loading:</label>
             <select name="pol" class="form-control" id="pol">
                 <option value="">Select the Port of Loading</option>
                 @foreach ($ports as $port)
@@ -269,8 +360,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details')
                 @endforeach
             </select>
         </div>
-        <div class="col-lg-3 col-md-6">
-            <label for="Incoterm" class="form-label">Port of Discharge:</label>
+        <div class="col-lg-2 col-md-6">
+            <label for="pod" class="form-label">Port of Discharge:</label>
             <select name="pod" class="form-control" id="pod">
                 <option value="">Select the Port of Discharge</option>
                 @foreach ($ports as $port)
@@ -278,8 +369,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details')
                 @endforeach
             </select>
         </div>
-        <div class="col-lg-3 col-md-6">
-            <label for="Incoterm" class="form-label">Preferred Destination:</label>
+        <div class="col-lg-2 col-md-6">
+            <label for="fd" class="form-label">Preferred Destination:</label>
             <select name="fd" class="form-control" id="fd">
                 <option value="">Select the Preferred Destination</option>
                 @foreach ($countries as $country)
@@ -287,8 +378,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details')
                 @endforeach
             </select>
         </div>
-        <div class="col-lg-3 col-md-6 mt-3">
-            <input type="checkbox" id="is_demand_planning_po" name="is_demand_planning_po" class="form-check-inline mr-1" checked>
+        <div class="col-lg-2 col-md-6">
+            <label for="salesperson" class="form-label">Reservation Sales Person:</label>
+            <select name="salesperson" class="form-control select2" id="salesperson">
+                <option value="" selected>None (optional)</option>
+                @foreach($sales_persons as $salesPerson)
+                <option value="{{ $salesPerson->id }}" {{ old('salesperson') == $salesPerson->id ? 'selected' : '' }}>{{ $salesPerson->name }}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+    <div class="row mt-3 align-items-center">
+        <div class="col-lg-4 col-md-6">
+            <input type="checkbox" id="is_demand_planning_po" name="is_demand_planning_po" class="form-check-input me-1" checked>
             <label for="is_demand_planning_po" class="form-label fw-bold">Is Demand Planning PO ?</label>
         </div>
     </div>
@@ -465,7 +567,7 @@ return [$color->id => $formattedName];
         var poInput = document.getElementById('po_number');
         var poError = document.getElementById('po_error_message');
         var form = document.getElementById('purchasing-order');
-        if(poInput && form) {
+        if (poInput && form) {
             poInput.addEventListener('input', function() {
                 var regex = /^\d{6}$/;
                 if (!regex.test(poInput.value)) {
@@ -477,42 +579,86 @@ return [$color->id => $formattedName];
                 }
             });
         }
-    });
 
-    var input = document.getElementById('variants_id');
-    var dataList = document.getElementById('variantslist');
-    input.addEventListener('input', function() {
-        var inputValue = input.value;
-        var options = dataList.getElementsByTagName('option');
-        var matchFound = false;
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
-
-            if (inputValue === option.value) {
-                matchFound = true;
-                break;
-            }
+        var input = document.getElementById('variants_id');
+        var dataList = document.getElementById('variantslist');
+        if (input && dataList) {
+            input.addEventListener('input', function() {
+                var inputValue = input.value;
+                var options = dataList.getElementsByTagName('option');
+                var matchFound = false;
+                for (var i = 0; i < options.length; i++) {
+                    var option = options[i];
+                    if (inputValue === option.value) {
+                        matchFound = true;
+                        break;
+                    }
+                }
+                if (!matchFound) {
+                    input.setCustomValidity('Please select a value from the list.');
+                } else {
+                    input.setCustomValidity('');
+                }
+            });
         }
-        if (!matchFound) {
-            input.setCustomValidity("Please select a value from the list.");
-        } else {
-            input.setCustomValidity('');
-        }
-    });
 
-    $(document).ready(function() {
-        $('#submit-button').click(function(e) {
-            var variantIds = $('input[name="variant_id[]"]').map(function() {
-                return $(this).val();
-            }).get();
-            if (variantIds.length === 0) {
-                e.preventDefault();
-                alert('Please select at least one variant');
-            }
+        if ($.fn.select2) {
+            $('#salesperson').select2({
+                placeholder: 'Search and select salesperson',
+                width: '100%',
+                allowClear: true
+            });
+            $('#fd').select2();
+            $('#pol').select2();
+            $('#pod').select2();
+        }
+
+        function showLoader() {
+            $('#submitOverlay').removeClass('hidden');
+        }
+
+        function hideLoader() {
+            $('#submitOverlay').addClass('hidden');
+        }
+
+        function showPopupMessage(message) {
+            $('#popupErrorContent').html(message);
+            $('#popupError').addClass('show');
+        }
+
+        function hidePopupMessage() {
+            $('#popupError').removeClass('show');
+        }
+
+        $('#popupError .close-popup').on('click', function() {
+            hidePopupMessage();
         });
-    });
 
-    $(document).ready(function() {
+        function checkPOUniqueness(callback) {
+            var rawPoNumber = $('#po_number').val().trim();
+            var poNumber = 'PO-' + rawPoNumber;
+            $.ajax({
+                url: "{{ route('purchasing-order.checkPONumber') }}",
+                type: 'POST',
+                data: {
+                    '_token': '{{ csrf_token() }}',
+                    'poNumber': poNumber
+                },
+                success: function(response) {
+                    $('#poNumberError').hide().text('');
+                    if (typeof callback === 'function') callback();
+                },
+                error: function(xhr) {
+                    hideLoader();
+                    if (xhr.status === 422) {
+                        showPopupMessage('PO Number already exists. Please use a different PO number.');
+                    } else {
+                        showPopupMessage('Unable to verify PO number. Please try again.');
+                    }
+                }
+            });
+        }
+
         function checkDuplicateVIN(submitCallback) {
             var vinValues = $('input[name="vin[]"]').map(function() {
                 return $(this).val();
@@ -523,7 +669,8 @@ return [$color->id => $formattedName];
             });
 
             if (duplicates.length > 0) {
-                alert('Duplicate VIN values found. Please ensure all VIN values are unique.');
+                hideLoader();
+                showPopupMessage('Duplicate VIN values found. Please ensure all VIN values are unique.');
                 return false;
             }
 
@@ -540,96 +687,88 @@ return [$color->id => $formattedName];
                     data: formData,
                     success: function(response) {
                         if (response === 'duplicate') {
-                            alert('Duplicate VIN values found in the database. Please ensure all VIN values are unique.');
+                            hideLoader();
+                            showPopupMessage('Duplicate VIN values found in the database. Please ensure all VIN values are unique.');
                             return false;
                         } else {
                             if (typeof submitCallback === 'function') submitCallback();
                         }
                     },
                     error: function() {
-                        alert('An error occurred while checking for VIN duplication. Please try again.');
+                        hideLoader();
+                        showPopupMessage('An error occurred while checking VIN duplication. Please try again.');
                         return false;
                     }
                 });
             }
             return false;
         }
-        function checkPOUniqueness(callback) {
-            var rawPoNumber = $('#po_number').val().trim();
-            var poNumber = 'PO-' + rawPoNumber;
-            $.ajax({
-                url: "{{ route('purchasing-order.checkPONumber') }}",
-                type: 'POST',
-                data: {
-                    '_token': '{{ csrf_token() }}',
-                    'poNumber': poNumber
-                },
-                success: function(response) {
-                    $('#poNumberError').hide().text('');
-                    if (typeof callback === 'function') callback();
-                },
-                error: function(xhr) {
-                    if (xhr.status === 422) {
-                        alert("PO Number Already Exists");
-                    }
-                }
-            });
-        }
 
-        $('#purchasing-order').submit(function(event) {
+        $('#purchasing-order').on('submit', function(event) {
             event.preventDefault();
+            hidePopupMessage();
+
+            var variantIds = $('input[name="variant_id[]"]').map(function() {
+                return $(this).val();
+            }).get();
+            if (variantIds.length === 0) {
+                showPopupMessage('Please select at least one variant.');
+                return;
+            }
+
+            showLoader();
+            var form = this;
+            var nativeSubmit = HTMLFormElement.prototype.submit;
+
             checkPOUniqueness(function() {
                 checkDuplicateVIN(function() {
-                    // Unbind the submit handler to avoid infinite loop, then submit
-                    $('#purchasing-order').off('submit');
-                    $('#purchasing-order').submit();
+                    $(form).off('submit');
+                    form.onsubmit = null;
+                    setTimeout(function() {
+                        try {
+                            nativeSubmit.call(form);
+                        } catch (submitError) {
+                            hideLoader();
+                            showPopupMessage('Unable to submit the form. Please try again.');
+                        }
+                    }, 10);
                 });
             });
         });
-    });
 
-    $(document).ready(function() {
-        $('#fd').select2();
-        $('#pol').select2();
-        $('#pod').select2();
-        
         // Auto-select "100% Advance" payment terms when CPS Middle East Automobiles Trading FZE is selected
         $('#vendors').on('change', function() {
             var selectedVendor = $(this).find('option:selected').text().trim();
             var cpsVendorName = 'CPS Middle East Automobiles Trading FZE';
-            
-            // Check if CPS vendor is selected (with flexible matching for spaces/variations)
-            if (selectedVendor === cpsVendorName || 
+
+            if (selectedVendor === cpsVendorName ||
                 selectedVendor.replace(/\s+/g, ' ').trim() === cpsVendorName ||
-                selectedVendor.toLowerCase().includes('cps') && selectedVendor.toLowerCase().includes('middle east')) {
-                
-                // Find and select "100% Advance" payment term
+                (selectedVendor.toLowerCase().includes('cps') && selectedVendor.toLowerCase().includes('middle east'))) {
+
                 var paymentTermSelect = $('#payment_term');
                 var advanceOption = paymentTermSelect.find('option').filter(function() {
                     var optionText = $(this).text().trim().toLowerCase();
                     return optionText.includes('100%') && optionText.includes('advance');
                 });
-                
+
                 if (advanceOption.length > 0) {
                     paymentTermSelect.val(advanceOption.val()).trigger('change');
                 } else {
-                    // If "100% Advance" doesn't exist, try to find similar terms
                     var similarOption = paymentTermSelect.find('option').filter(function() {
                         var optionText = $(this).text().trim().toLowerCase();
                         return optionText.includes('advance') || optionText.includes('100');
                     });
-                    
                     if (similarOption.length > 0) {
                         paymentTermSelect.val(similarOption.first().val()).trigger('change');
                     }
                 }
             }
         });
-        
-        // Trigger the change event on page load if CPS is already selected
+
         if ($('#vendors option:selected').text().trim() === 'CPS Middle East Automobiles Trading FZE') {
             $('#vendors').trigger('change');
         }
     });
+
 </script>
 @endpush
