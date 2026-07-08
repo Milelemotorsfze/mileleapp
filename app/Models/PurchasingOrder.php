@@ -30,6 +30,7 @@ class PurchasingOrder extends Model
         'currency',
         'shippingmethod',
         'shippingcost',
+        'sales_person_id',
         'totalcost',
         'pol',
         'pod',
