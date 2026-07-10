@@ -99,6 +99,13 @@ table.dataTable thead th select {
     font-weight: 600;
 }
 
+.reservation-po-badge {
+    font-size: 9px;
+    padding: 1px 4px;
+    vertical-align: middle;
+    letter-spacing: 0.5px;
+}
+
 /* Ensure proper spacing between dropdown options */
 .select2-container--default .select2-selection--multiple .select2-selection__choice {
     background-color: #007bff;
@@ -419,7 +426,7 @@ table.dataTable thead th select {
                     <div id="currentReservedName" class="fw-bold"></div>
                 </div>
                 <div class="mb-3" id="changeSalespersonWrapper">
-                    <label class="form-label">Change to</label>
+                    <label class="form-label">Assign another sales person</label>
                     <select id="changeSalespersonSelect" class="form-control" style="width:100%">
                         <option value="" disabled selected>Select the Sales Person</option>
                         @foreach($salesperson as $sp)
@@ -428,12 +435,12 @@ table.dataTable thead th select {
                     </select>
                 </div>
                 <p id="reservationReadonlyNote" class="text-muted" style="display:none;">
-                    Only the reserved salesperson can change or remove this reservation.
+                    Only the reserved salesperson can change or cancel this reservation.
                 </p>
             </div>
             <div class="modal-footer">
-                <button type="button" id="removeReservationBtn" class="btn btn-danger">Remove Reservation</button>
-                <button type="button" id="changeReservationBtn" class="btn btn-primary">Change Salesperson</button>
+                <button type="button" id="removeReservationBtn" class="btn btn-danger">Cancel Reservation</button>
+                <button type="button" id="changeReservationBtn" class="btn btn-primary">Assign Sales Person</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
@@ -772,7 +779,9 @@ table.dataTable thead th select {
         });
         
         var now = new Date();
-        var currentUserId = {{ auth()->id() }};
+        // Global (window) so both the column render and the modal click handler (separate script block) can read it
+        window.currentUserId = {{ auth()->id() }};
+        var currentUserId = window.currentUserId;
         @php
         $hasEditEstimationDatePermission = Auth::user()->hasPermissionForSelectedRole('edit-estimation-date');
         @endphp
@@ -791,24 +800,7 @@ table.dataTable thead th select {
         orderable: false,  // Disable ordering for this column
         searchable: false  // Disable searching for this column
     },
-              { 
-                data: 'status',
-                name: 'vehicles.status',
-                render: function(data, type, row) {
-                    // If reservation salesperson is set, mark as Booked
-                    if (row.booking_person_id) {
-                        return '<span class="badge bg-warning text-dark">Booked</span>';
-                    }
-                    // Fallbacks for common states
-                    if (row.so_id) {
-                        return '<span class="badge bg-success">Sold</span>';
-                    }
-                    if (row.gdn_id) {
-                        return '<span class="badge bg-secondary">Delivered</span>';
-                    }
-                    return data ? data : '';
-                }
-              },
+              { data: 'id', name: 'vehicles.id' },
               { data: 'po_number', name: 'purchasing_order.po_number' },
                 {
     data: 'po_date',
@@ -937,11 +929,24 @@ table.dataTable thead th select {
                 if (!data || !row.booking_person_id) {
                     return data ? data : '';
                 }
+                // Expired reservation -> auto-expiry: hide the salesperson (stock becomes available).
+                // The backend command persists this (nulls the fields); this keeps the view in sync immediately.
+                if (row.reservation_end_date && new Date(row.reservation_end_date).getTime() <= Date.now()) {
+                    return '';
+                }
+                // A reservation originates from the PO side when the PO's sales_person_id
+                // matches the vehicle's booking_person_id. Only those are managed by this modal;
+                // booking-module reservations are shown as plain text (handled by the booking feature).
+                var isPoReservation = row.po_sales_person_id && (row.po_sales_person_id == row.booking_person_id);
+                if (!isPoReservation) {
+                    return data;
+                }
                 var isSelf = (currentUserId == row.booking_person_id);
                 return '<a href="#" class="reserved-salesperson' + (isSelf ? ' reserved-salesperson-self' : '') + '"' +
                     ' data-user-id="' + row.booking_person_id + '"' +
                     ' data-po-id="' + row.purchasing_order_id + '"' +
-                    ' data-name="' + data + '">' + data + '</a>';
+                    ' data-name="' + data + '">' + data + '</a>' +
+                    ' <span class="badge bg-info reservation-po-badge" title="Reserved from Purchase Order">PO</span>';
             }
         },
                 { data: 'gdn_number', name: 'gdn.gdn_number' },
@@ -1253,14 +1258,15 @@ if (canViewVehicleCost) {
             if (distance <= 0) {
                 return 'Expired';
             }
-            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-            return days + 'd ' + String(hours).padStart(2, '0') + 'h ' + String(minutes).padStart(2, '0') + 'm ' + String(seconds).padStart(2, '0') + 's';
+            // Show whole days only (rounded up so the last partial day still counts).
+            var days = Math.ceil(distance / (1000 * 60 * 60 * 24));
+            return days + (days === 1 ? ' day' : ' days');
         }
 
+        var handledExpiredEnds = {};   // reservation end timestamps already handled (avoids reload loops)
+        var countdownInitialized = false;
         function updateReservationCountdowns() {
+            var newlyExpired = false;
             $('.reservation-countdown').each(function() {
                 var endTimestamp = parseInt($(this).data('end'), 10);
                 if (!isNaN(endTimestamp)) {
@@ -1270,6 +1276,14 @@ if (canViewVehicleCost) {
                     if (distance <= 0) {
                         $(this).removeClass('near-expiry');
                         $(this).text('Expired');
+                        // The instant a timer reaches 0, refresh once so the row reflects auto-expiry
+                        // (salesperson removed, status back to Available). Guarded so it fires only on transition.
+                        if (!handledExpiredEnds[endTimestamp]) {
+                            handledExpiredEnds[endTimestamp] = true;
+                            if (countdownInitialized) {
+                                newlyExpired = true;
+                            }
+                        }
                     } else if (distance <= 2 * 24 * 60 * 60 * 1000) {
                         $(this).addClass('near-expiry');
                     } else {
@@ -1277,6 +1291,10 @@ if (canViewVehicleCost) {
                     }
                 }
             });
+            countdownInitialized = true;
+            if (newlyExpired && $.fn.dataTable.isDataTable('#dtBasicExample7')) {
+                $('#dtBasicExample7').DataTable().ajax.reload(null, false);
+            }
         }
 
         var table7 = $('#dtBasicExample7').DataTable({
@@ -1321,6 +1339,7 @@ if (canViewVehicleCost) {
         {
             targets: 1,
             render: function (data, type, row) {
+                var now = new Date(); // fresh each render so expired reservations flip to Available
                 if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.movement_grn_id == null) {
                     return 'Incoming';
                 } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.movement_grn_id != null) {
@@ -1989,15 +2008,15 @@ $(function () {
         $('#currentReservedName').text(bookedName);
         $('#changeSalespersonSelect').val('');
 
-        // Only the reserved salesperson themselves may change/remove
-        if (currentUserId == bookedId) {
+        // Only the currently assigned reservation salesperson may change/cancel
+        if (window.currentUserId == bookedId) {
             $('#changeSalespersonWrapper').show();
             $('#reservationReadonlyNote').hide();
             $('#removeReservationBtn').show();
             $('#changeReservationBtn').show();
         } else {
             $('#changeSalespersonWrapper').hide();
-            $('#reservationReadonlyNote').show();
+            $('#reservationReadonlyNote').text('Only ' + bookedName + ' can cancel or change this reservation.').show();
             $('#removeReservationBtn').hide();
             $('#changeReservationBtn').hide();
         }
@@ -2030,7 +2049,7 @@ $(function () {
     $(document).on('click', '#removeReservationBtn', function () {
         var poId = $('#reservationPoId').val();
         var bookingId = $('#reservationBookingId').val();
-        if (!confirm('Remove your reservation? This will clear the reservation timer.')) return;
+        if (!confirm('Cancel this reservation? This will remove the sales person and clear the reservation timer.')) return;
         $.post('/purchasing-order/' + poId + '/remove-reservation-salesperson', {
             _token: csrfToken,
             current_booking_person_id: bookingId

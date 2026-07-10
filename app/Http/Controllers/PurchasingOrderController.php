@@ -61,6 +61,9 @@ use App\Models\DepartmentNotifications;
 use App\Mail\EmailNotificationrequest;
 use App\Mail\VINEmailNotification;
 use App\Mail\PurchaseOrderUpdated;
+use App\Mail\ReservationCreatedNotification;
+use App\Mail\ReservationCancelledNotification;
+use App\Mail\ReservationReassignedNotification;
 use App\Mail\ChangeVariantNotification;
 use App\Models\Dnaccess;
 use App\Models\VehicleDn;
@@ -1287,8 +1290,127 @@ class PurchasingOrderController extends Controller
             $supplier_created->save();
         }
         DB::commit();
+
+        // Notify the reservation salesperson that a PO has been reserved under their name.
+        if ($salesPersonId) {
+            $this->sendReservationCreatedEmail($purchasingOrderId, $salesPersonId);
+        }
+
         return redirect()->route('purchasing-order.index')->with('success', 'PO Created successfully!');
     }
+
+    /**
+     * Variant + quantity rows for a PO (used in reservation emails).
+     */
+    private function getPoReservationItems($purchasingOrderId)
+    {
+        return DB::table('purchasing_order_items')
+            ->join('varaints', 'purchasing_order_items.variant_id', '=', 'varaints.id')
+            ->where('purchasing_order_items.purchasing_order_id', $purchasingOrderId)
+            ->select('varaints.name as variant', 'purchasing_order_items.qty as qty')
+            ->get();
+    }
+
+    /**
+     * Defer the actual SMTP send until after the HTTP response is sent, so the request
+     * (PO save / reservation change) returns immediately instead of blocking on the mail
+     * server. Works with QUEUE_CONNECTION=sync (no queue worker required).
+     */
+    private function deferMail($to, $mailable)
+    {
+        app()->terminating(function () use ($to, $mailable) {
+            try {
+                Mail::to($to)->send($mailable);
+            } catch (\Throwable $e) {
+                \Log::error('Deferred reservation mail failed', ['to' => $to, 'error' => $e->getMessage()]);
+            }
+        });
+    }
+
+    /**
+     * Email the reservation salesperson that a PO has been reserved under their name
+     * (used on PO creation and on re-assignment). Never interrupts the request flow.
+     */
+    private function sendReservationCreatedEmail($purchasingOrderId, $salesPersonId)
+    {
+        try {
+            $salesperson = User::find($salesPersonId);
+            if (!$salesperson || !$salesperson->email) {
+                \Log::warning('Reservation created email skipped: salesperson missing or has no email', [
+                    'purchasing_order_id' => $purchasingOrderId,
+                    'sales_person_id' => $salesPersonId,
+                ]);
+                return;
+            }
+            $po = PurchasingOrder::find($purchasingOrderId);
+            $items = $this->getPoReservationItems($purchasingOrderId);
+            $this->deferMail(
+                $salesperson->email,
+                new ReservationCreatedNotification($po->po_number, $salesperson->name, $items)
+            );
+        } catch (\Throwable $e) {
+            \Log::error('Failed to prepare reservation created email', [
+                'purchasing_order_id' => $purchasingOrderId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Email the previous reservation salesperson that they have handed the reservation
+     * over to a newly assigned salesperson.
+     */
+    private function sendReservationReassignedEmail($purchasingOrderId, $previousSalesPersonId, $newSalesPersonId)
+    {
+        try {
+            $previous = User::find($previousSalesPersonId);
+            if (!$previous || !$previous->email) {
+                return;
+            }
+            $new = User::find($newSalesPersonId);
+            $po = PurchasingOrder::find($purchasingOrderId);
+            $items = $this->getPoReservationItems($purchasingOrderId);
+            $this->deferMail(
+                $previous->email,
+                new ReservationReassignedNotification(
+                    $po->po_number,
+                    $previous->name,
+                    $new ? $new->name : 'another salesperson',
+                    $items
+                )
+            );
+        } catch (\Throwable $e) {
+            \Log::error('Failed to prepare reservation reassigned email', [
+                'purchasing_order_id' => $purchasingOrderId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Email the (former) reservation salesperson that their PO reservation was cancelled.
+     */
+    private function sendReservationCancelledEmail($purchasingOrderId, $salesPersonId)
+    {
+        try {
+            $salesperson = User::find($salesPersonId);
+            if (!$salesperson || !$salesperson->email) {
+                return;
+            }
+            $po = PurchasingOrder::find($purchasingOrderId);
+            $items = $this->getPoReservationItems($purchasingOrderId);
+            $this->deferMail(
+                $salesperson->email,
+                new ReservationCancelledNotification($po->po_number, $salesperson->name, $items)
+            );
+        } catch (\Throwable $e) {
+            \Log::error('Failed to prepare reservation cancelled email', [
+                'purchasing_order_id' => $purchasingOrderId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
     /**
      * Display the specified resource.
      */
@@ -6516,18 +6638,20 @@ class PurchasingOrderController extends Controller
     public function changeReservationSalesperson(Request $request, $id)
     {
         $request->validate([
-            'current_booking_person_id' => 'required|integer|exists:users,id',
             'new_salesperson_id' => 'required|integer|exists:users,id',
         ]);
 
-        $currentBookingId = $request->input('current_booking_person_id');
-        $newSalesId = $request->input('new_salesperson_id');
+        $po = PurchasingOrder::findOrFail($id);
+        $assignedId = $po->sales_person_id;
 
-        if (Auth::id() != $currentBookingId) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        // Only the currently assigned reservation salesperson may change the reservation.
+        if (!$assignedId || Auth::id() != $assignedId) {
+            $assigned = $assignedId ? User::find($assignedId) : null;
+            $name = $assigned ? $assigned->name : 'the assigned salesperson';
+            return response()->json(['message' => "Only {$name} can cancel or change this reservation."], 403);
         }
 
-        $po = PurchasingOrder::findOrFail($id);
+        $newSalesId = $request->input('new_salesperson_id');
         $po->sales_person_id = $newSalesId;
         $po->save();
 
@@ -6536,7 +6660,7 @@ class PurchasingOrderController extends Controller
         $endDate = Carbon::now($dubaiTimeZone)->addDays(14)->toDateString();
 
         $vehicles = Vehicles::where('purchasing_order_id', $id)
-            ->where('booking_person_id', $currentBookingId)
+            ->where('booking_person_id', $assignedId)
             ->get();
 
         foreach ($vehicles as $vehicle) {
@@ -6545,6 +6669,11 @@ class PurchasingOrderController extends Controller
             $vehicle->reservation_end_date = $endDate;
             $vehicle->save();
         }
+
+        // Notify the newly assigned reservation salesperson, and let the previous one know
+        // they have handed the reservation over (both deferred, non-blocking).
+        $this->sendReservationCreatedEmail($id, $newSalesId);
+        $this->sendReservationReassignedEmail($id, $assignedId, $newSalesId);
 
         // return updated reserved names for UI refresh
         $reservedIds = Vehicles::where('purchasing_order_id', $id)->pluck('booking_person_id')->filter()->unique()->toArray();
@@ -6565,24 +6694,21 @@ class PurchasingOrderController extends Controller
      */
     public function removeReservationSalesperson(Request $request, $id)
     {
-        $request->validate([
-            'current_booking_person_id' => 'required|integer|exists:users,id',
-        ]);
-
-        $currentBookingId = $request->input('current_booking_person_id');
-
-        if (Auth::id() != $currentBookingId) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
         $po = PurchasingOrder::findOrFail($id);
-        if ($po->sales_person_id == $currentBookingId) {
-            $po->sales_person_id = null;
-            $po->save();
+        $assignedId = $po->sales_person_id;
+
+        // Only the currently assigned reservation salesperson may cancel the reservation.
+        if (!$assignedId || Auth::id() != $assignedId) {
+            $assigned = $assignedId ? User::find($assignedId) : null;
+            $name = $assigned ? $assigned->name : 'the assigned salesperson';
+            return response()->json(['message' => "Only {$name} can cancel or change this reservation."], 403);
         }
+
+        $po->sales_person_id = null;
+        $po->save();
 
         $vehicles = Vehicles::where('purchasing_order_id', $id)
-            ->where('booking_person_id', $currentBookingId)
+            ->where('booking_person_id', $assignedId)
             ->get();
 
         foreach ($vehicles as $vehicle) {
@@ -6591,6 +6717,9 @@ class PurchasingOrderController extends Controller
             $vehicle->reservation_end_date = null;
             $vehicle->save();
         }
+
+        // Notify the (former) reservation salesperson that the reservation was cancelled (deferred).
+        $this->sendReservationCancelledEmail($id, $assignedId);
 
         $reservedIds = Vehicles::where('purchasing_order_id', $id)->pluck('booking_person_id')->filter()->unique()->toArray();
         $reservedNames = [];

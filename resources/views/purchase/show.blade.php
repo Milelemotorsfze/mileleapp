@@ -181,13 +181,6 @@
     #vehicleSectionTable th {
         min-width: 150px !important;
     }
-    .reserved-salesperson {
-        cursor: pointer;
-        margin-right: 8px;
-    }
-    .reserved-salesperson-self {
-        text-decoration: underline;
-    }
 </style>
 @section('content')
 <!-- Modal Structure -->
@@ -1318,40 +1311,12 @@ return [$color->id => $formattedName];
                                         <div class="col-lg-6 col-md-9 col-sm-12">
                                                 @if(!empty($reservedMap))
                                                     @foreach($reservedMap as $rid => $rname)
-                                                        <span class="reserved-salesperson {{ $currentUserId == $rid ? 'reserved-salesperson-self' : '' }}" data-user-id="{{ $rid }}">{{ $rname }}</span>
+                                                        <span>{{ $rname }}</span>@if(!$loop->last), @endif
                                                     @endforeach
                                                 @else
                                                     <span>N/A</span>
                                                 @endif
                                         </div>
-                                </div>
-
-                                <!-- Reservation salesperson modal -->
-                                <div class="modal fade" id="reservationSalespersonModal" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Manage Reservation</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div id="reservationModalAlert" style="display:none;" class="alert alert-danger"></div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">Current reserved salesperson</label>
-                                                    <div id="currentReservedName"></div>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">Change to</label>
-                                                    <select id="changeSalespersonSelect" class="form-control" style="width:100%"></select>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" id="removeReservationBtn" class="btn btn-danger">Remove Reservation</button>
-                                                <button type="button" id="changeReservationBtn" class="btn btn-primary">Change Salesperson</button>
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                 @php
                 $statuses = [
@@ -4479,75 +4444,6 @@ return [$color->id => $formattedName];
                         scrollToBottom();
                     });
                 }
-
-            // Reservation salesperson modal handlers
-            $(function() {
-                const poId = {{ $purchasingOrder->id }};
-                const currentUserId = {{ auth()->id() }};
-
-                function fetchSalespersons() {
-                    return $.get('{{ route('purchasing-order.salespersons') }}');
-                }
-
-                $(document).on('click', '.reserved-salesperson', function() {
-                    const bookedId = $(this).data('user-id');
-                    const bookedName = $(this).text();
-                    $('#currentReservedName').text(bookedName);
-                    $('#reservationModalAlert').hide();
-                    $('#changeSalespersonSelect').empty();
-
-                    fetchSalespersons().done(function(list) {
-                        $('#changeSalespersonSelect').append('<option></option>');
-                        list.forEach(function(u) {
-                            $('#changeSalespersonSelect').append('<option value="' + u.id + '">' + u.name + '</option>');
-                        });
-                        $('#changeSalespersonSelect').select2({ dropdownParent: $('#reservationSalespersonModal') });
-
-                        if (currentUserId == bookedId) {
-                            $('#removeReservationBtn').show().data('booking-id', bookedId);
-                            $('#changeReservationBtn').show().data('booking-id', bookedId);
-                        } else {
-                            $('#removeReservationBtn').hide();
-                            $('#changeReservationBtn').hide();
-                        }
-
-                        $('#reservationSalespersonModal').modal('show');
-                    }).fail(function() {
-                        alert('Could not load salespersons');
-                    });
-                });
-
-                $('#changeReservationBtn').on('click', function() {
-                    const bookingId = $(this).data('booking-id');
-                    const newId = $('#changeSalespersonSelect').val();
-                    if (!newId) {
-                        $('#reservationModalAlert').text('Please select a salesperson').show();
-                        return;
-                    }
-                    $.post('/purchasing-order/' + poId + '/change-reservation-salesperson', {
-                        _token: $('meta[name="csrf-token"]').attr('content'),
-                        current_booking_person_id: bookingId,
-                        new_salesperson_id: newId
-                    }).done(function(resp) {
-                        location.reload();
-                    }).fail(function(xhr) {
-                        alert(xhr.responseJSON?.message || 'Error changing salesperson');
-                    });
-                });
-
-                $('#removeReservationBtn').on('click', function() {
-                    const bookingId = $(this).data('booking-id');
-                    if (!confirm('Remove your reservation?')) return;
-                    $.post('/purchasing-order/' + poId + '/remove-reservation-salesperson', {
-                        _token: $('meta[name="csrf-token"]').attr('content'),
-                        current_booking_person_id: bookingId
-                    }).done(function(resp) {
-                        location.reload();
-                    }).fail(function(xhr) {
-                        alert(xhr.responseJSON?.message || 'Error removing reservation');
-                    });
-                });
-            });
 
             function scrollToBottom() {
                 $('#messages').scrollTop($('#messages')[0].scrollHeight);

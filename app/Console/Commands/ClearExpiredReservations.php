@@ -29,10 +29,29 @@ class ClearExpiredReservations extends Command
      */
     public function handle()
     {
-        // Get the current date
+        // Get the current date/time
         $now = Carbon::now();
 
-        // Update rows where reservation_end_date is passed
+        // 1. Clear the PO-side reservation salesperson for Purchase Orders whose reservation has expired.
+        //    A PO reservation is identified by purchasing_order.sales_person_id matching the vehicle's
+        //    booking_person_id; when those vehicles have passed reservation_end_date the PO reservation is over.
+        $expiredPoIds = DB::table('purchasing_order')
+            ->join('vehicles', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+            ->whereNotNull('purchasing_order.sales_person_id')
+            ->whereColumn('vehicles.booking_person_id', 'purchasing_order.sales_person_id')
+            ->whereNotNull('vehicles.reservation_end_date')
+            ->where('vehicles.reservation_end_date', '<', $now)
+            ->distinct()
+            ->pluck('purchasing_order.id');
+
+        if ($expiredPoIds->isNotEmpty()) {
+            DB::table('purchasing_order')
+                ->whereIn('id', $expiredPoIds)
+                ->update(['sales_person_id' => null]);
+        }
+
+        // 2. Clear expired reservation fields on vehicles. These columns are shared with the booking
+        //    module, so this also finalises expired bookings (existing behaviour, unchanged).
         DB::table('vehicles')
             ->where('reservation_end_date', '<', $now)
             ->update([
