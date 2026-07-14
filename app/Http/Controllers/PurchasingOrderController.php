@@ -1057,6 +1057,8 @@ class PurchasingOrderController extends Controller
             $purchasingOrder->shippingcost = $request->input('shippingcost');
         }
         $purchasingOrder->sales_person_id = $request->input('salesperson');
+        // Reservation-created email is not sent now; a morning command sends it next day.
+        $purchasingOrder->reservation_created_mail_pending = $request->input('salesperson') ? true : false;
         $purchasingOrder->totalcost = $request->input('totalcost');
         $purchasingOrder->pol = $request->input('pol');
         $purchasingOrder->pod = $request->input('pod');
@@ -1291,10 +1293,9 @@ class PurchasingOrderController extends Controller
         }
         DB::commit();
 
-        // Notify the reservation salesperson that a PO has been reserved under their name.
-        if ($salesPersonId) {
-            $this->sendReservationCreatedEmail($purchasingOrderId, $salesPersonId);
-        }
+        // The reservation-created email is intentionally NOT sent here. It is queued for the next
+        // morning via the `reservation_created_mail_pending` flag, sent by the scheduled command
+        // `reservations:send-created-mails`.
 
         return redirect()->route('purchasing-order.index')->with('success', 'PO Created successfully!');
     }
@@ -6653,6 +6654,8 @@ class PurchasingOrderController extends Controller
 
         $newSalesId = $request->input('new_salesperson_id');
         $po->sales_person_id = $newSalesId;
+        // Reassignment notifies the new person immediately below; cancel any pending morning "created" mail.
+        $po->reservation_created_mail_pending = false;
         $po->save();
 
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
@@ -6705,6 +6708,8 @@ class PurchasingOrderController extends Controller
         }
 
         $po->sales_person_id = null;
+        // Reservation cancelled; no morning "created" mail should go out.
+        $po->reservation_created_mail_pending = false;
         $po->save();
 
         $vehicles = Vehicles::where('purchasing_order_id', $id)

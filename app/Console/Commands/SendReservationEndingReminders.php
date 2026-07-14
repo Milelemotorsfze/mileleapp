@@ -29,6 +29,8 @@ class SendReservationEndingReminders extends Command
 
         // Active PO reservations (salesperson set + matching vehicle booking) ending within the next 4 days,
         // not yet moved to a Sales Order and not delivered. One reminder per PO.
+        // Skip the reminder entirely once a Sales Order has been created for the reservation:
+        // exclude any PO that already has an SO on ANY of its vehicles.
         $pos = DB::table('purchasing_order')
             ->join('vehicles', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
             ->whereNotNull('purchasing_order.sales_person_id')
@@ -38,6 +40,12 @@ class SendReservationEndingReminders extends Command
             ->whereNotNull('vehicles.reservation_end_date')
             ->whereDate('vehicles.reservation_end_date', '>', $today)
             ->whereDate('vehicles.reservation_end_date', '<=', $threshold)
+            ->whereNotExists(function ($q) {
+                $q->select(DB::raw(1))
+                    ->from('vehicles as v_so')
+                    ->whereColumn('v_so.purchasing_order_id', 'purchasing_order.id')
+                    ->whereNotNull('v_so.so_id');
+            })
             ->select(
                 'purchasing_order.id',
                 'purchasing_order.po_number',

@@ -14,6 +14,7 @@ class ReservationReassignedNotification extends Mailable
     public $salespersonName;      // the previous (removing) salesperson
     public $newSalespersonName;   // the newly assigned salesperson
     public $items;
+    public $ccList = ['sharjeel.arif@milele.com', 'team.salesupport@milele.com', 'aymen.bouderbala@milele.com'];
 
     public function __construct($poNumber, $salespersonName, $newSalespersonName, $items)
     {
@@ -34,7 +35,9 @@ class ReservationReassignedNotification extends Mailable
                 'items' => $this->items,
             ]);
 
-        $mail->cc(['aymen.bouderbala@milele.com', 'Abdul@milele.com']);
+        if (!empty($this->ccList)) {
+            $mail->cc($this->ccList);
+        }
 
         return $mail;
     }
