@@ -7,7 +7,7 @@
 <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; margin: 0; padding: 20px;">
     <p>Dear {{ $salespersonName }},</p>
 
-    <p>The following Purchase Order has been reserved under your name. Please proceed with creating the Sales Order as soon as possible.</p>
+    <p>The units below have been reserved under your name. Please complete the sales order booking before the reservation expires.</p>
 
     <table style="border-collapse: collapse; border: 1px solid #000; font-size: 14px;" cellpadding="8" cellspacing="0">
         <thead>

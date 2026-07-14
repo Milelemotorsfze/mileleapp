@@ -31,6 +31,7 @@ class PurchasingOrder extends Model
         'shippingmethod',
         'shippingcost',
         'sales_person_id',
+        'reservation_created_mail_pending',
         'totalcost',
         'pol',
         'pod',

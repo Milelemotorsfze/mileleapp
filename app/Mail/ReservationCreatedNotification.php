@@ -13,6 +13,7 @@ class ReservationCreatedNotification extends Mailable
     public $poNumber;
     public $salespersonName;
     public $items;
+    public $ccList = ['sharjeel.arif@milele.com', 'team.salesupport@milele.com', 'aymen.bouderbala@milele.com'];
 
     /**
      * @param  string  $poNumber         Final PO number (e.g. PO-000123)
@@ -36,7 +37,9 @@ class ReservationCreatedNotification extends Mailable
                 'items' => $this->items,
             ]);
 
-        $mail->cc(['aymen.bouderbala@milele.com', 'Abdul@milele.com']);
+        if (!empty($this->ccList)) {
+            $mail->cc($this->ccList);
+        }
 
         return $mail;
     }

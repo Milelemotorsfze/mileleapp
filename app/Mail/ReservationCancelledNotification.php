@@ -13,6 +13,7 @@ class ReservationCancelledNotification extends Mailable
     public $poNumber;
     public $salespersonName;
     public $items;
+    public $ccList = ['sharjeel.arif@milele.com', 'team.salesupport@milele.com', 'aymen.bouderbala@milele.com'];
 
     public function __construct($poNumber, $salespersonName, $items)
     {
@@ -31,7 +32,9 @@ class ReservationCancelledNotification extends Mailable
                 'items' => $this->items,
             ]);
 
-        $mail->cc(['aymen.bouderbala@milele.com', 'Abdul@milele.com']);
+        if (!empty($this->ccList)) {
+            $mail->cc($this->ccList);
+        }
 
         return $mail;
     }

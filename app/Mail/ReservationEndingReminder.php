@@ -14,6 +14,7 @@ class ReservationEndingReminder extends Mailable
     public $salespersonName;
     public $items;
     public $daysLeft;
+    public $ccList = ['sharjeel.arif@milele.com', 'team.salesupport@milele.com', 'aymen.bouderbala@milele.com'];
 
     public function __construct($poNumber, $salespersonName, $items, $daysLeft)
     {
@@ -34,7 +35,9 @@ class ReservationEndingReminder extends Mailable
                 'daysLeft' => $this->daysLeft,
             ]);
 
-        $mail->cc(['aymen.bouderbala@milele.com', 'Abdul@milele.com']);
+        if (!empty($this->ccList)) {
+            $mail->cc($this->ccList);
+        }
 
         return $mail;
     }
