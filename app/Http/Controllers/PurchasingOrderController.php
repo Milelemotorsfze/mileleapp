@@ -17,6 +17,7 @@ use App\Mail\TransferCopyEmail;
 use App\Mail\SwiftCopyEmail;
 use App\Mail\DPEmailNotification;
 use App\Mail\DPrealeasedEmailNotification;
+use App\Mail\PaymentReleasedProcurementNotification;
 use App\Mail\EmailNotificationInitiate;
 use App\Models\PurchasingOrderEventsLog;
 use App\Models\PurchasingOrder;
@@ -5929,6 +5930,31 @@ class PurchasingOrderController extends Controller
                     config('mail.custom_recipients.finance'),
                 ];
                 Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+            }
+            // "New Purchase" notification on payment release, sent as the logged-in releaser.
+            try {
+                $newPurchaseTo = [
+                    'team.warehouse@milele.com',
+                    'sharjeel.arif@milele.com',
+                    'team.dp@milele.com',
+                    'sameer.butt@milele.com',
+                    'zaid.ahmad@milele.com',
+                ];
+                $newPurchaseCc = [
+                    'team.logistics@milele.com',
+                    'team.sales@milele.com',
+                    'team.salesupport@milele.com',
+                    'team.qc@milele.com',
+                    'payables.finance@milele.com',
+                ];
+                $releaser = auth()->user();
+                $mail = Mail::to($newPurchaseTo);
+                if (!empty($newPurchaseCc)) {
+                    $mail->cc($newPurchaseCc);
+                }
+                $mail->send(new PaymentReleasedProcurementNotification($purchasingOrder->po_number, $releaser->name, $releaser->email));
+            } catch (\Exception $mailException) {
+                Log::error('New Purchase payment released email failed', ['error' => $mailException->getMessage(), 'transition_id' => $transitionId]);
             }
             $detailText = "PO Number: " . ($purchasingOrder->po_number ?? '') . "\n" .
                 "PFI Number: " . ($purchasingOrder->pl_number ?? '') . "\n" .
