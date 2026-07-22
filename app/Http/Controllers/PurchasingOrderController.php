@@ -131,6 +131,7 @@ class PurchasingOrderController extends Controller
                         $query->select(DB::raw(1))
                             ->from('vehicles')
                             ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                            ->whereNull('vehicles.deleted_at')
                             ->where('vehicles.gdn_id', '=', null);
                     })
                     ->whereHas('vehicles', function ($query) {
@@ -145,6 +146,7 @@ class PurchasingOrderController extends Controller
                         $query->select(DB::raw(1))
                             ->from('vehicles')
                             ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                            ->whereNull('vehicles.deleted_at')
                             ->where('vehicles.gdn_id', '=', null);
                     })
                     ->whereHas('vehicles', function ($query) {
@@ -167,6 +169,7 @@ class PurchasingOrderController extends Controller
                         $query->select(DB::raw(1))
                             ->from('vehicles')
                             ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                            ->whereNull('vehicles.deleted_at')
                             ->where('vehicles.gdn_id', '=', null);
                     })
                     ->whereHas('vehicles', function ($query) {
@@ -181,6 +184,7 @@ class PurchasingOrderController extends Controller
                         $query->select(DB::raw(1))
                             ->from('vehicles')
                             ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                            ->whereNull('vehicles.deleted_at')
                             ->where('vehicles.gdn_id', '=', null);
                     })
                     ->whereHas('vehicles', function ($query) {
@@ -296,6 +300,7 @@ class PurchasingOrderController extends Controller
                     $query->select(DB::raw(1))
                         ->from('vehicles')
                         ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                        ->whereNull('vehicles.deleted_at')
                         ->where('vehicles.status', 'Approved');
                 })
                 ->whereNotExists(function ($query) {
@@ -312,6 +317,7 @@ class PurchasingOrderController extends Controller
                     $query->select(DB::raw(1))
                         ->from('vehicles')
                         ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                        ->whereNull('vehicles.deleted_at')
                         ->where('vehicles.status', 'Approved');
                 })
                 ->whereNotExists(function ($query) {
@@ -365,6 +371,7 @@ class PurchasingOrderController extends Controller
                     $query->select(DB::raw(1))
                         ->from('vehicles')
                         ->whereColumn('vehicles.purchasing_order_id', 'purchasing_order.id')
+                        ->whereNull('vehicles.deleted_at')
                         ->where('vehicles.status', 'Approved')
                         ->whereExists(function ($query) {
                             $query->select(DB::raw(1))
@@ -388,6 +395,7 @@ class PurchasingOrderController extends Controller
                     $query->select(DB::raw(1))
                         ->from('vehicles')
                         ->whereColumn('vehicles.purchasing_order_id', 'purchasing_order.id')
+                        ->whereNull('vehicles.deleted_at')
                         ->where('vehicles.status', 'Approved')
                         ->whereExists(function ($query) {
                             $query->select(DB::raw(1))
@@ -442,6 +450,7 @@ class PurchasingOrderController extends Controller
                     $query->select(DB::raw(1))
                         ->from('vehicles')
                         ->whereColumn('purchasing_order.id', 'vehicles.purchasing_order_id')
+                        ->whereNull('vehicles.deleted_at')
                         ->where('status', 'Approved')
                         ->whereExists(function ($query) {
                             $query->select(DB::raw(1))
@@ -459,6 +468,7 @@ class PurchasingOrderController extends Controller
                     $query->select(DB::raw(1))
                         ->from('vehicles')
                         ->whereColumn('purchasing_order.id', 'vehicles.purchasing_order_id')
+                        ->whereNull('vehicles.deleted_at')
                         ->where('status', 'Approved')
                         ->whereExists(function ($query) {
                             $query->select(DB::raw(1))
@@ -886,6 +896,7 @@ class PurchasingOrderController extends Controller
                     $query->select(DB::raw(1))
                         ->from('vehicles')
                         ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                        ->whereNull('vehicles.deleted_at')
                         ->where(function ($query) {
                             $query->Where('payment_status', 'Vendor confirmed');
                         });
@@ -900,6 +911,7 @@ class PurchasingOrderController extends Controller
                     $query->select(DB::raw(1))
                         ->from('vehicles')
                         ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                        ->whereNull('vehicles.deleted_at')
                         ->where(function ($query) {
                             $query->Where('payment_status', 'Vendor confirmed');
                         });
@@ -947,6 +959,7 @@ class PurchasingOrderController extends Controller
                     $query->select(DB::raw(1))
                         ->from('vehicles')
                         ->whereColumn('vehicles.purchasing_order_id', 'purchasing_order.id')
+                        ->whereNull('vehicles.deleted_at')
                         ->where('vehicles.status', 'Approved')
                         ->whereExists(function ($query) {
                             $query->select(DB::raw(1))
@@ -967,6 +980,7 @@ class PurchasingOrderController extends Controller
                     $query->select(DB::raw(1))
                         ->from('vehicles')
                         ->whereColumn('vehicles.purchasing_order_id', 'purchasing_order.id')
+                        ->whereNull('vehicles.deleted_at')
                         ->where('vehicles.status', 'Approved')
                         ->whereExists(function ($query) {
                             $query->select(DB::raw(1))

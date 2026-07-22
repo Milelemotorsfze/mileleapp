@@ -881,12 +881,12 @@ class VehiclesController extends Controller
     }
     public function previousYearPurchased()
     {
-
         $currentYear = \Carbon\Carbon::now()->year;
         $previousYear = $currentYear - 1;
         $startDate = \Carbon\Carbon::createFromDate($previousYear, 1, 1);
         $endDate = \Carbon\Carbon::createFromDate($previousYear, 12, 31);
         $data = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereNull('vehicles.deleted_at')
             ->whereExists(function ($query) use ($startDate, $endDate) {
                 $query->select(DB::raw(1))
                     ->from('movement_grns')
@@ -901,11 +901,11 @@ class VehiclesController extends Controller
     }
     public function previousMonthPurchased()
     {
-
         $startDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->startOfMonth();
         $endDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->endOfMonth();
 
         $data = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereNull('vehicles.deleted_at')
             ->whereExists(function ($query) use ($startDateLastMonth, $endDateLastMonth) {
                 $query->select(DB::raw(1))
                     ->from('movement_grns')
@@ -919,9 +919,9 @@ class VehiclesController extends Controller
     }
     public function yesterdayPurchased()
     {
-
         $yesterday = Carbon::now()->subDay(1)->format('Y-m-d');
         $data = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereNull('vehicles.deleted_at')
             ->whereExists(function ($query) use ($yesterday) {
                 $query->select(DB::raw(1))
                     // ->from('grn')
@@ -943,6 +943,7 @@ class VehiclesController extends Controller
         $startDate = \Carbon\Carbon::createFromDate($previousYear, 1, 1);
         $endDate = \Carbon\Carbon::createFromDate($previousYear, 12, 31);
         $countPreviouseYearSold = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereNull('vehicles.deleted_at')
             ->whereExists(function ($query) use ($startDate, $endDate) {
                 $query->select(DB::raw(1))
                     ->from('gdn')
@@ -960,6 +961,7 @@ class VehiclesController extends Controller
         $startDate = \Carbon\Carbon::createFromDate($previousYear, 1, 1);
         $endDate = \Carbon\Carbon::createFromDate($previousYear, 12, 31);
         $countPreviouseYearBooked = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereNull('vehicles.deleted_at')
             ->whereExists(function ($query) use ($startDate, $endDate) {
                 $query->select(DB::raw(1))
                     ->from('so')
@@ -972,12 +974,12 @@ class VehiclesController extends Controller
     }
     public function previousYearAvailable()
     {
-
         $currentYear = \Carbon\Carbon::now()->year;
         $previousYear = $currentYear - 1;
         $startDate = \Carbon\Carbon::createFromDate($previousYear, 1, 1);
         $endDate = \Carbon\Carbon::createFromDate($previousYear, 12, 31);
         $countPreviouseYearAvailable = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereNull('vehicles.deleted_at')
             ->join('gdn', 'gdn.id', '=', 'vehicles.gdn_id')
             ->whereBetween('gdn.date', [$startDate, $endDate])
             ->paginate(100);
@@ -990,6 +992,7 @@ class VehiclesController extends Controller
         $endDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->endOfMonth();
 
         $countLastMonth = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereNull('vehicles.deleted_at')
             ->whereExists(function ($query) use ($startDateLastMonth, $endDateLastMonth) {
                 $query->select(DB::raw(1))
                     ->from('gdn')
@@ -1007,6 +1010,7 @@ class VehiclesController extends Controller
         $endDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->endOfMonth();
 
         $countLastMonth = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereNull('vehicles.deleted_at')
             ->whereExists(function ($query) use ($startDateLastMonth, $endDateLastMonth) {
                 $query->select(DB::raw(1))
                     ->from('so')
@@ -1024,6 +1028,7 @@ class VehiclesController extends Controller
         $endDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->endOfMonth();
 
         $countPreviousYearAvailable = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereNull('vehicles.deleted_at')
             ->join('gdn', 'gdn.id', '=', 'vehicles.gdn_id')
             ->join('so', 'so.id', '=', 'vehicles.so_id')
             ->whereBetween('gdn.date', [$startDateLastMonth, $endDateLastMonth])
@@ -1037,6 +1042,7 @@ class VehiclesController extends Controller
     {
         $yesterday = Carbon::now()->subDay(1)->format('Y-m-d');
         $countYesterdaySold = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereNull('vehicles.deleted_at')
             ->whereExists(function ($query) use ($yesterday) {
                 $query->select(DB::raw(1))
                     ->from('gdn')
@@ -1052,6 +1058,7 @@ class VehiclesController extends Controller
         $yesterday = Carbon::now()->subDay(1)->format('Y-m-d');
 
         $countYesterdayBooked = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereNull('vehicles.deleted_at')
             ->whereExists(function ($query) use ($yesterday) {
                 $query->select(DB::raw(1))
                     ->from('so')
@@ -1064,10 +1071,10 @@ class VehiclesController extends Controller
     }
     public function yesterdayAvailable()
     {
-
         $yesterday = Carbon::now()->subDay(1)->format('Y-m-d');
 
         $countYesterdayAvailable = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereNull('vehicles.deleted_at')
             ->join('gdn', 'gdn.id', '=', 'vehicles.gdn_id')
             ->join('so', 'so.id', '=', 'vehicles.so_id')
             ->whereDate('gdn.date', $yesterday)
