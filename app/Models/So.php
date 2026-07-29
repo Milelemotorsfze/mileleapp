@@ -27,9 +27,6 @@ class So extends Model
         'paidinperforma',
         'created_by',
         'updated_by',
-        'status',
-        'expiry_last_notified_date',
-        'expired_at',
     ];
     public $timestamps = false;
 

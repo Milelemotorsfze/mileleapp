@@ -35,13 +35,13 @@ class StoreWorkOrderRequest extends FormRequest
                     // Check if SO exists in sales order table and is not cancelled
                     $so = So::where('so_number', $value)
                         ->where(function ($query) {
-                            $query->whereNotIn('status', ['Cancelled', 'Expired'])
+                            $query->where('status', '!=', 'Cancelled')
                                 ->orWhereNull('status');
                         })
                         ->first();
-
+                    
                     if (!$so) {
-                        $fail('The selected sales order does not exist, or has been cancelled or expired.');
+                        $fail('The selected sales order does not exist or has been cancelled.');
                     }
                 }
             ],

@@ -24,7 +24,6 @@ class Kernel extends ConsoleKernel
         $schedule->command('notificationspendingpeospecting:send')->everyMinute();
         $schedule->command('loi_expiry:check')->daily();
         $schedule->command('vehicles:send-estimation-reminders')->dailyAt('09:00');
-        $schedule->command('so:process-gdn-expiry')->dailyAt('09:45');
         // $schedule->command('send:wo_boe_status')->dailyAt('09:00');
         // $schedule->command('claim_submission_reminder')->dailyAt('09:00');
         // $schedule->command('backup:run --only-db')->daily();
@@ -63,6 +62,5 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SendLeadsReminder::class,
         \App\Console\Commands\SendFridayLeadsReminder::class,
         \App\Console\Commands\SendDailyLeadsReport::class,
-        \App\Console\Commands\ProcessSoGdnExpiry::class,
     ];
 }
