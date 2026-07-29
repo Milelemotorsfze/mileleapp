@@ -17,9 +17,7 @@ class ProcessSoGdnExpiry extends Command
     /**
      * @var string
      */
-    protected $signature = 'so:process-gdn-expiry
-        {--dry-run : Report what would change without writing to the DB or sending any email}
-        {--no-mail : Apply the releases/expiry but send no emails (use for the one-time backlog backfill)}';
+    protected $signature = 'so:process-gdn-expiry';
 
     /**
      * @var string
@@ -49,21 +47,11 @@ class ProcessSoGdnExpiry extends Command
     public function handle(SalesOrderStockService $stock): int
     {
         $today = Carbon::today();
-        $dryRun = (bool) $this->option('dry-run');
-        // A dry run never mails; --no-mail also suppresses mail while still writing.
-        $noMail = $dryRun || (bool) $this->option('no-mail');
 
-        if ($dryRun) {
-            $this->warn('DRY RUN — no data will be written and no email will be sent.');
-        } elseif ($noMail) {
-            $this->warn('NO-MAIL — releases/expiry will be applied but no email will be sent.');
-        }
-
-        $reconciled = $this->reconcileTerminalSos($dryRun);
+        $reconciled = $this->reconcileTerminalSos();
 
         $reminded = 0;
         $expired = 0;
-        $releasedVehicles = 0;
 
         foreach ($this->unfulfilledSos() as $so) {
             try {
@@ -72,14 +60,6 @@ class ProcessSoGdnExpiry extends Command
                 if ($today->greaterThanOrEqualTo($expiryDate)) {
                     // Capture the vehicle list BEFORE releasing (release nulls so_id).
                     $vehicles = $this->undeliveredVehicles($so->id);
-                    $releasedVehicles += $vehicles->count();
-                    $expired++;
-
-                    if ($dryRun) {
-                        $this->line(sprintf(' would expire %s (SO date %s) → release %d vehicle(s)',
-                            $so->so_number, $so->so_date, $vehicles->count()));
-                        continue;
-                    }
 
                     DB::transaction(function () use ($so, $stock) {
                         $stock->releaseUndeliveredStock((int) $so->id, 'auto_expired_no_gdn');
@@ -89,9 +69,8 @@ class ProcessSoGdnExpiry extends Command
                         ]);
                     });
 
-                    if (!$noMail) {
-                        $this->notifyExpired($so, $vehicles);
-                    }
+                    $this->notifyExpired($so, $vehicles);
+                    $expired++;
                     continue;
                 }
 
@@ -99,17 +78,6 @@ class ProcessSoGdnExpiry extends Command
                 $daysLeft = $today->diffInDays($expiryDate);
                 if ($daysLeft <= self::REMINDER_LEAD_DAYS
                     && $so->expiry_last_notified_date !== $today->toDateString()) {
-                    if ($dryRun) {
-                        $this->line(sprintf(' would remind %s → %d day(s) left', $so->so_number, $daysLeft));
-                        $reminded++;
-                        continue;
-                    }
-
-                    // A no-mail run skips reminders entirely (nothing to send, no state change).
-                    if ($noMail) {
-                        continue;
-                    }
-
                     if ($this->sendReminder($so, $daysLeft, $expiryDate)) {
                         DB::table('so')->where('id', $so->id)->update([
                             'expiry_last_notified_date' => $today->toDateString(),
@@ -125,8 +93,7 @@ class ProcessSoGdnExpiry extends Command
             }
         }
 
-        $prefix = $dryRun ? 'DRY RUN — ' : '';
-        $this->info("{$prefix}SO GDN expiry — reminders: {$reminded}, expired SOs: {$expired} ({$releasedVehicles} vehicles), reconciled vehicles: {$reconciled}.");
+        $this->info("SO GDN expiry — reminders: {$reminded}, expired: {$expired}, reconciled vehicles: {$reconciled}.");
 
         return 0;
     }
@@ -135,7 +102,7 @@ class ProcessSoGdnExpiry extends Command
      * Release undelivered stock still linked to any terminal SO. Covers manual
      * cancel/reject and legacy rows that were never released.
      */
-    private function reconcileTerminalSos(bool $dryRun): int
+    private function reconcileTerminalSos(): int
     {
         $stuckIds = DB::table('vehicles')
             ->join('so', 'so.id', '=', 'vehicles.so_id')
@@ -149,8 +116,8 @@ class ProcessSoGdnExpiry extends Command
             })
             ->pluck('vehicles.id');
 
-        if ($stuckIds->isEmpty() || $dryRun) {
-            return $stuckIds->count();
+        if ($stuckIds->isEmpty()) {
+            return 0;
         }
 
         DB::table('vehicles')
