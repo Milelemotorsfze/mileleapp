@@ -27,7 +27,7 @@ class WorkOrderSoDataService
         return So::query()
             ->where('so_number', $soNumber)
             ->where(function ($query) {
-                $query->where('status', '!=', 'Cancelled')
+                $query->whereNotIn('status', ['Cancelled', 'Expired'])
                     ->orWhereNull('status');
             })
             ->first();
