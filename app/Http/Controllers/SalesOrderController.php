@@ -833,12 +833,12 @@ class SalesOrderController extends Controller
                 $quotationItem->reference_type = 'App\Models\Varaint';
                 $quotationItem->reference_id  = $soVariant->variant_id;
                 // Validate model_line_id exists before setting it
-                if ($soVariant->variant->master_model_lines && $soVariant->variant->master_model_lines->id) {
+                if ($soVariant->variant?->master_model_lines && $soVariant->variant->master_model_lines->id) {
                     $quotationItem->model_line_id = $soVariant->variant->master_model_lines->id;
                 }
                 
                 // Validate brand_id exists before setting it
-                if ($soVariant->variant->brand && $soVariant->variant->brand->id) {
+                if ($soVariant->variant?->brand && $soVariant->variant->brand->id) {
                     $quotationItem->brand_id = $soVariant->variant->brand->id;
                 }
                 $quotationItem->description =  $soVariant->description;
@@ -866,12 +866,12 @@ class SalesOrderController extends Controller
                 ];
                 
                 // Validate model_line_id exists before setting it
-                if ($soVariant->variant->master_model_lines && $soVariant->variant->master_model_lines->id) {
+                if ($soVariant->variant?->master_model_lines && $soVariant->variant->master_model_lines->id) {
                     $updateData['model_line_id'] = $soVariant->variant->master_model_lines->id;
                 }
                 
                 // Validate brand_id exists before setting it
-                if ($soVariant->variant->brand && $soVariant->variant->brand->id) {
+                if ($soVariant->variant?->brand && $soVariant->variant->brand->id) {
                     $updateData['brand_id'] = $soVariant->variant->brand->id;
                 }
                 
@@ -1230,9 +1230,23 @@ class SalesOrderController extends Controller
             if ($soVariants) {
                 foreach ($soVariants as $key => $soVariant) {
                     $quotationItem = QuotationItem::findOrFail($soVariant['quotation_item_id']);
+
+                    // The form sends variant_id = quotation_item->reference_id, which is only a
+                    // real varaints.id for Varaint lines. For ModelLine/Brand lines it is a
+                    // model-line/brand id and violates the so_variants.variant_id FK. Resolve a
+                    // valid variant: keep it if it is a real variant, else derive it from the
+                    // chosen VINs (each vehicle knows its own variant); otherwise leave null.
+                    $variantId = null;
+                    $submittedVariantId = $soVariant['variant_id'] ?? null;
+                    if ($submittedVariantId && Varaint::whereKey($submittedVariantId)->exists()) {
+                        $variantId = (int) $submittedVariantId;
+                    } elseif (!empty($soVariant['vehicles'])) {
+                        $variantId = Vehicles::whereIn('id', $soVariant['vehicles'])->value('varaints_id');
+                    }
+
                     $soVariantdata  = new SoVariant();
                     $soVariantdata->so_id = $so->id;
-                    $soVariantdata->variant_id = $soVariant['variant_id'];
+                    $soVariantdata->variant_id = $variantId;
                     $soVariantdata->quotation_item_id = $soVariant['quotation_item_id'];
                     $soVariantdata->price = $quotationItem ? $quotationItem->unit_price : 0;
                     $soVariantdata->description = $quotationItem ? $quotationItem->description : '';
