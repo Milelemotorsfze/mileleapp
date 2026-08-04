@@ -2431,6 +2431,7 @@ return [$color->id => $formattedName];
                                 </tr>
                             </thead>
                             <tbody>
+                                @php $newPurchaseControlShown = false; @endphp
                                 @foreach ($transitions as $transition)
                                 <tr data-transition-id="{{ $transition->id }}">
 
@@ -2470,6 +2471,20 @@ return [$color->id => $formattedName];
                                         @endif
                                         @endif
                                         @endcan
+                                        {{-- One-per-PO "New Purchase" email: button on the first Released row only, for finance releasers. --}}
+                                        @php
+                                        $hasReleaseApproval = Auth::user()->hasPermissionForSelectedRole('payment-release-approval');
+                                        @endphp
+                                        @if ($hasreleased && $hasReleaseApproval && !$newPurchaseControlShown)
+                                        @php $newPurchaseControlShown = true; @endphp
+                                        @if (is_null($purchasingOrder->new_purchase_email_sent_at))
+                                        <button class="btn btn-primary btn-sm mt-2" title="Send New Purchase email" onclick="sendNewPurchaseEmail()">
+                                            <i class="fa fa-envelope"></i> Send Email
+                                        </button>
+                                        @else
+                                        <badge class="btn btn-success btn-sm mt-2"> Email sent</badge>
+                                        @endif
+                                        @endif
                                         @endif
                                     </td>
                                     <!-- @php
@@ -5285,6 +5300,40 @@ return [$color->id => $formattedName];
                 }
             });
         });
+
+        function sendNewPurchaseEmail() {
+            alertify.confirm('Do you want to send the New Purchase email? This can only be sent once per PO.', function(e) {
+                if (e) {
+                    let purchasingOrderId = "{{ $purchasingOrder->id }}"
+                    $.ajax({
+                        url: "{{ route('send-new-purchase.email') }}",
+                        type: 'GET',
+                        data: {
+                            purchasing_order_id: purchasingOrderId
+                        },
+                        success: function(response) {
+                            // Show the "Email sent" confirmation and only reload after the user acknowledges it.
+                            alertify.alert(response.message, function() {
+                                location.reload();
+                            }).set({
+                                title: "Email sent"
+                            });
+                        },
+                        error: function(response) {
+                            var msg = (response.responseJSON && response.responseJSON.error)
+                                ? response.responseJSON.error
+                                : 'Something went wrong while sending the email.';
+                            alertify.alert(msg).set({
+                                title: "Opps..Error!"
+                            });
+                        }
+                    });
+                }
+            }).set({
+                title: "Are You Sure ?"
+            })
+
+        }
 
         function sendTransferCopyToSupplier(transitionId) {
             var confirm = alertify.confirm('Do you want to send payment transfer copy to vendor?', function(e) {
