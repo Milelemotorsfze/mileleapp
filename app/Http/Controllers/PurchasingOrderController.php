@@ -5945,31 +5945,9 @@ class PurchasingOrderController extends Controller
                 ];
                 Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
             }
-            // "New Purchase" notification on payment release, sent as the logged-in releaser.
-            try {
-                $newPurchaseTo = [
-                    'team.warehouse@milele.com',
-                    'sharjeel.arif@milele.com',
-                    'team.dp@milele.com',
-                    'sameer.butt@milele.com',
-                    'zaid.ahmad@milele.com',
-                ];
-                $newPurchaseCc = [
-                    'team.logistics@milele.com',
-                    'team.sales@milele.com',
-                    'team.salesupport@milele.com',
-                    'team.qc@milele.com',
-                    'payables.finance@milele.com',
-                ];
-                $releaser = auth()->user();
-                $mail = Mail::to($newPurchaseTo);
-                if (!empty($newPurchaseCc)) {
-                    $mail->cc($newPurchaseCc);
-                }
-                $mail->send(new PaymentReleasedProcurementNotification($purchasingOrder->po_number, $releaser->name, $releaser->email));
-            } catch (\Exception $mailException) {
-                Log::error('New Purchase payment released email failed', ['error' => $mailException->getMessage(), 'transition_id' => $transitionId]);
-            }
+            // "New Purchase" notification is no longer auto-sent here. It is now triggered
+            // manually (once per PO) by a finance releaser via the "Send Email" button on
+            // the PO page -> sendNewPurchaseEmail(). See that method below.
             $detailText = "PO Number: " . ($purchasingOrder->po_number ?? '') . "\n" .
                 "PFI Number: " . ($purchasingOrder->pl_number ?? '') . "\n" .
                 "Payment Amount: " . ($supplierAccountTransaction->transaction_amount ?? '') . "\n" .
@@ -6866,6 +6844,84 @@ class PurchasingOrderController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Manually send the one-per-PO "New Purchase" notification, triggered by a finance
+     * releaser from the PO page. Sends only once: the first successful send stamps
+     * new_purchase_email_sent_at, after which the button becomes an "Email sent" badge.
+     */
+    public function sendNewPurchaseEmail(Request $request)
+    {
+        if (!Auth::user()->hasPermissionForSelectedRole('payment-release-approval')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Not allowed',
+                'error' => 'You are not allowed to send this email.'
+            ], 403);
+        }
+
+        $purchasingOrder = PurchasingOrder::find($request->purchasing_order_id);
+        if (!$purchasingOrder) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email sending failed',
+                'error' => 'Purchase Order not found!'
+            ], 404);
+        }
+
+        // One mail per PO — never send twice, regardless of how many payment releases occur.
+        if (!is_null($purchasingOrder->new_purchase_email_sent_at)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email already sent',
+                'error' => 'The New Purchase email has already been sent for this PO.'
+            ], 409);
+        }
+
+        try {
+            $newPurchaseTo = [
+                'team.warehouse@milele.com',
+                'sharjeel.arif@milele.com',
+                'team.dp@milele.com',
+                'sameer.butt@milele.com',
+                'vehicleprocurement@milele.com',
+            ];
+            $newPurchaseCc = [
+                'team.logistics@milele.com',
+                'team.sales@milele.com',
+                'team.salesupport@milele.com',
+                'team.qc@milele.com',
+                'payables.finance@milele.com',
+            ];
+            $releaser = auth()->user();
+            $mail = Mail::to($newPurchaseTo);
+            if (!empty($newPurchaseCc)) {
+                $mail->cc($newPurchaseCc);
+            }
+            $mail->send(new PaymentReleasedProcurementNotification($purchasingOrder->po_number, $releaser->name, $releaser->email));
+
+            // Stamp only after a successful send so a failed attempt can be retried.
+            $purchasingOrder->new_purchase_email_sent_at = now();
+            $purchasingOrder->save();
+
+            $purchasingordereventsLog = new PurchasingOrderEventsLog();
+            $purchasingordereventsLog->event_type = "New Purchase Email Sent";
+            $purchasingordereventsLog->created_by = $releaser->id;
+            $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+            $purchasingordereventsLog->description = 'New Purchase email sent by ' . $releaser->name;
+            $purchasingordereventsLog->save();
+
+            return response()->json(['success' => true, 'message' => 'New Purchase email sent successfully.']);
+        } catch (\Exception $e) {
+            Log::error('New Purchase payment released email failed', ['error' => $e->getMessage(), 'po_id' => $purchasingOrder->id]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Email sending failed',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function sendSwiftCopy(Request $request)
     {
         $purchasingOrder = PurchasingOrder::find($request->purchasing_order_id);

@@ -1211,6 +1211,8 @@ Route::get('/check-trashed-gdn', function () {
     ->name('send-transfer-copy.email');
     Route::get('/swift_copy/send-email-to-supplier', [PurchasingOrderController::class, 'sendSwiftCopy'])
     ->name('send-swift-copy.email');
+    Route::get('/new-purchase/send-email', [PurchasingOrderController::class, 'sendNewPurchaseEmail'])
+    ->name('send-new-purchase.email');
     Route::post('/check-vehicle-quantity', [VehiclesController::class, 'checkVehicleQuantity'])->name('check.vehicle.quantity');
     Route::get('/salespersons/list', [SalesOrderController::class, 'getSalespersons'])->name('salespersons.list');
     Route::post('/salesorder/updateSalesperson', [SalesOrderController::class, 'updateSalesperson'])->name('salesorder.updateSalesperson');

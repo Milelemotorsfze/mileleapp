@@ -8,7 +8,7 @@
 
     <p>New Purchase against the subject PO.</p>
 
-    <p><span style="color: #0563c1;">@Demand Planning Team Members</span>, please provide vehicle details.</p>
+    <p><span style="color: #0563c1;">@Demand Planning Team Members</span> or <span style="color: #0563c1;">@Vehicle Procurement Team Members</span>, please provide vehicle details.</p>
 
     <p>Thanks, and Regards,</p>
 

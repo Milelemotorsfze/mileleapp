@@ -39,6 +39,11 @@ class PurchasingOrder extends Model
         'remarks',
         'pl_number',
         'pl_file_path',
+        'new_purchase_email_sent_at',
+    ];
+
+    protected $casts = [
+        'new_purchase_email_sent_at' => 'datetime',
     ];
 
     protected $appends = [
