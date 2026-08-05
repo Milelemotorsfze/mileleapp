@@ -2399,8 +2399,24 @@ return [$color->id => $formattedName];
             @endphp
             @if ($hasPermission)
             <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">PO Transitions</h4>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">PO Transitions</h4>
+                    {{-- One-per-PO "New Purchase" email. Anchored to payment_released_date (set once on
+                         release, never cleared by swift copy / debit / adjustment) + the PO-level sent
+                         flag, so it stays until the email is actually sent, regardless of other actions. --}}
+                    @php
+                        $poPaymentReleased = $transitions->contains(fn ($t) => !is_null($t->payment_released_date));
+                        $canSendNewPurchase = Auth::user()->hasPermissionForSelectedRole('payment-release-approval');
+                    @endphp
+                    @if ($poPaymentReleased && $canSendNewPurchase)
+                        @if (is_null($purchasingOrder->new_purchase_email_sent_at))
+                        <button class="btn btn-primary btn-sm" title="Send New Purchase email (once per PO)" onclick="sendNewPurchaseEmail()">
+                            <i class="fa fa-envelope"></i> Send New Purchase Email
+                        </button>
+                        @else
+                        <badge class="btn btn-success btn-sm"> Email sent</badge>
+                        @endif
+                    @endif
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -2431,7 +2447,6 @@ return [$color->id => $formattedName];
                                 </tr>
                             </thead>
                             <tbody>
-                                @php $newPurchaseControlShown = false; @endphp
                                 @foreach ($transitions as $transition)
                                 <tr data-transition-id="{{ $transition->id }}">
 
@@ -2471,20 +2486,6 @@ return [$color->id => $formattedName];
                                         @endif
                                         @endif
                                         @endcan
-                                        {{-- One-per-PO "New Purchase" email: button on the first Released row only, for finance releasers. --}}
-                                        @php
-                                        $hasReleaseApproval = Auth::user()->hasPermissionForSelectedRole('payment-release-approval');
-                                        @endphp
-                                        @if ($hasreleased && $hasReleaseApproval && !$newPurchaseControlShown)
-                                        @php $newPurchaseControlShown = true; @endphp
-                                        @if (is_null($purchasingOrder->new_purchase_email_sent_at))
-                                        <button class="btn btn-primary btn-sm mt-2" title="Send New Purchase email" onclick="sendNewPurchaseEmail()">
-                                            <i class="fa fa-envelope"></i> Send Email
-                                        </button>
-                                        @else
-                                        <badge class="btn btn-success btn-sm mt-2"> Email sent</badge>
-                                        @endif
-                                        @endif
                                         @endif
                                     </td>
                                     <!-- @php
