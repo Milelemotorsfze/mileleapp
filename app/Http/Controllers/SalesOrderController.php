@@ -1079,7 +1079,7 @@ class SalesOrderController extends Controller
                         }
                         break;
                     case 'App\Models\Brand':
-                        $variants = Varaint::where('brand_id', $item->reference_id)->get();
+                        $variants = Varaint::where('brands_id', $item->reference_id)->get();
                         foreach ($variants as $variant) {
                             $variantId = $variant->id;
                             $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
@@ -1426,7 +1426,7 @@ class SalesOrderController extends Controller
                         }
                         break;
                     case 'App\Models\Brand':
-                        $variants = Varaint::where('brand_id', $item->reference_id)->get();
+                        $variants = Varaint::where('brands_id', $item->reference_id)->get();
                         foreach ($variants as $variant) {
                             $variantId = $variant->id;
                             $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
