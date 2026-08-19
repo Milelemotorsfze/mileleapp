@@ -1613,6 +1613,12 @@
                                         <span data-key="t-extra-pages">Sales Order</span>
                                     </a>
                                 </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('lc-transactions.index') }}" id="topnav-more" role="button">
+                                        <i data-feather="file-text"></i>
+                                        <span data-key="t-extra-pages">LC Transactions</span>
+                                    </a>
+                                </li>
                                 @endif
                             @endif
                             @if ($hasFullAccess || $hasSalesView)

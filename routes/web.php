@@ -70,6 +70,7 @@ use App\Http\Controllers\MonthlyDemandsController;
 use App\Http\Controllers\SupplierInventoryController;
 use App\Http\Controllers\VariatnsPicturesController;
 use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\LcTransactionController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\HiringController;
 use App\Http\Controllers\LeadSourceController;
@@ -676,6 +677,9 @@ Route::get('/d', function () {
     Route::get('quotation-data/get-sub-model', [QuotationController::class,'getsubmodel'])->name('quotation.get-sub-model');
     Route::resource('quotation-items', QuotationController::class);
     Route::post('quotation-data/vehicles-insert', [QuotationController::class,'addvehicles'])->name('quotation.vehicles-insert');
+    // Letter of Credit transactions
+    Route::get('lc-transactions', [LcTransactionController::class, 'index'])->name('lc-transactions.index');
+    Route::get('lc-transactions/{quotationId}/shipment-clearance', [LcTransactionController::class, 'shipmentClearance'])->name('lc-transactions.shipment-clearance');
     Route::get('/quotation/shipping-port', [QuotationController::class,'getShippingPort'])->name('quotation.shipping_ports');
     Route::get('/quotation/shipping-charges', [QuotationController::class,'getShippingCharges'])->name('quotation.shipping_charges');
         Route::get('/get-vehicle-count/{userId}', function($userId) {

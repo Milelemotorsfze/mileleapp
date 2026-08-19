@@ -353,6 +353,10 @@
                 </div>
             </div>
         </div>
+        @include('proforma.partials.lc_details', [
+            'natureOfDeal' => $natureOfDeal,
+            'lcDetail' => $quotation->lcDetail,
+        ])
         <hr>
         <div class="row">
             <div class="col-sm-4">

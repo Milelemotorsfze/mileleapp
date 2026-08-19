@@ -27,6 +27,7 @@ use App\Models\Brand;
 use App\Models\QuotationClient;
 use App\Models\QuotationDetail;
 use App\Models\QuotationItem;
+use App\Models\QuotationLcDetail;
 use App\Models\QuotationFile;
 use App\Models\QuotationSubItem;
 use App\Models\Setting;
@@ -94,10 +95,10 @@ class QuotationController extends Controller
 
         $request->validate([
             'nature_of_deal' => 'required|in:regular_deal,letter_of_credit',
-        ], [
+        ] + $this->letterOfCreditRules(), [
             'nature_of_deal.required' => 'Please select the Nature of Deal.',
             'nature_of_deal.in' => 'Invalid selection for Nature of Deal.',
-        ]);      
+        ]);
 
         $agentsmuiltples = 0;
         $systemcode = $request->system_code_amount;
@@ -165,6 +166,7 @@ class QuotationController extends Controller
         }
         $quotation->shipping_method = $request->shipping_method;
         $quotation->save();
+        $this->syncLetterOfCreditDetails($request, $quotation);
         $agentsId = $request->agents_id;
             if (!isset($agentsId) || empty($agentsId)) {
                 // Handle the case where no agent ID is provided or it's empty
@@ -599,7 +601,8 @@ class QuotationController extends Controller
      */
     public function update(Request $request, quotation $quotation)
     {
-   
+    $request->validate($this->letterOfCreditRules());
+
     $qoutationid = request()->input('quotationid');
     $agentsmuiltples = 0;
     $systemcode = $request->system_code_amount;
@@ -658,6 +661,7 @@ class QuotationController extends Controller
     }
     $quotation->shipping_method = $request->shipping_method;
     $quotation->save();
+    $this->syncLetterOfCreditDetails($request, $quotation);
     $agentsId = $request->agents_id;
     $lastAgentId = null;
     if (!isset($agentsId) || empty($agentsId)) {
@@ -1489,5 +1493,61 @@ public function getAgentsByQuotationId($quotationId)
         $quotationdetails = QuotationDetail::where('quotation_id' , $quotationId)->first();
         $agents = MuitlpleAgents::with('agent')->where('quotations_id', $quotationId)->where('agents_id', '!=', $quotationdetails->agents_id)->get();
         return response()->json($agents);
+    }
+
+    /**
+     * Validation rules for the Letter of Credit block.
+     *
+     * Everything is optional on purpose: LC paperwork (BL, inspection certificate, ...)
+     * arrives after the quotation is raised. Completeness is enforced later, on the
+     * LC transaction view, before the shipment is allowed to proceed.
+     *
+     * @return array<string, string>
+     */
+    private function letterOfCreditRules(): array
+    {
+        $rules = [
+            'lc_number' => 'nullable|string|max:100',
+            'lc_issuing_bank' => 'nullable|string|max:150',
+            'lc_expiry_date' => 'nullable|date',
+            'lc_compliance_status' => 'nullable|in:'.implode(',', array_keys(QuotationLcDetail::COMPLIANCE_STATUSES)),
+            'lc_compliance_remarks' => 'nullable|string|max:1000',
+        ];
+
+        foreach (array_keys(QuotationLcDetail::DOCUMENTS) as $column) {
+            $rules['lc_'.$column] = 'nullable|boolean';
+        }
+
+        return $rules;
+    }
+
+    /**
+     * Persist the LC requirement matrix for a quotation.
+     * No-op for regular deals, so nothing about that flow changes.
+     */
+    private function syncLetterOfCreditDetails(Request $request, Quotation $quotation): void
+    {
+        if ($quotation->nature_of_deal !== 'letter_of_credit') {
+            return;
+        }
+
+        $values = [
+            'lc_number' => $request->input('lc_number'),
+            'issuing_bank' => $request->input('lc_issuing_bank'),
+            'lc_expiry_date' => $request->input('lc_expiry_date') ?: null,
+            'compliance_status' => $request->input('lc_compliance_status', 'pending') ?: 'pending',
+            'compliance_remarks' => $request->input('lc_compliance_remarks'),
+            'updated_by' => Auth::id(),
+        ];
+
+        foreach (array_keys(QuotationLcDetail::DOCUMENTS) as $column) {
+            $values[$column] = $request->boolean('lc_'.$column);
+        }
+
+        $lcDetail = QuotationLcDetail::firstOrNew(['quotation_id' => $quotation->id]);
+        if (! $lcDetail->exists) {
+            $values['created_by'] = Auth::id();
+        }
+        $lcDetail->fill($values)->save();
     }
 }
