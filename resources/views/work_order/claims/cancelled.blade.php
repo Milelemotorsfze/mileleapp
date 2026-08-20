@@ -35,6 +35,7 @@
                             <th>Claim Reference Number</th>
                             <th>Cancelled By</th>
                             <th>Cancelled At</th>
+                            <th>Shipping Details</th>
                         </tr>
                         @if(isset($datas) && count($datas) > 0)
                         <tr>
@@ -66,6 +67,7 @@
                                 </select>
                             </th>
                             <th></th>
+                            <th></th>
                         </tr>
                         @endif
                     </thead>
@@ -96,11 +98,18 @@
                                     <td>{{ $data->claim->claim_reference_number ?? '' }}</td>
                                     <td>{{ $data->claim->createdUser->name ?? '' }}</td>
                                     <td>@if($data->claim->created_at != ''){{ \Carbon\Carbon::parse($data->claim->created_at)->format('d M Y') }}@endif</td>
+                                    <td>
+                                        <a class="btn btn-sm btn-info" href="javascript:void(0);"
+                                            data-bs-toggle="modal" data-bs-target="#shippingDetailsModal_{{$data->id}}">
+                                            <i class="fa fa-eye" aria-hidden="true"></i> View Detail
+                                        </a>
+                                        @include('work_order.claims.partials._shipping_details_view_modal', ['data' => $data])
+                                    </td>
                                 </tr>
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="8" class="text-center">No data history available.</td>
+                                <td colspan="9" class="text-center">No data history available.</td>
                             </tr>
                         @endif
                     </tbody>
