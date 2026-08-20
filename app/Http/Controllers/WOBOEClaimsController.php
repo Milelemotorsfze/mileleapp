@@ -16,7 +16,27 @@ class WOBOEClaimsController extends Controller
 {
     public function getPendingClaims() { 
         try {
-            $boes = WOBOE::select('id', 'wo_id','boe', 'declaration_number','declaration_date')->with(['claim', 'workOrder', 'workOrder.vehicles', 'shippingDetails.finalDestinationCountry']) 
+            $boes = WOBOE::select('id', 'wo_id','boe', 'declaration_number','declaration_date')
+            ->with([
+                'claim',
+                'workOrder',
+                // Every relation the PHP filter below reads through an accessor.
+                // The accessors check relationLoaded(), so eager loading them
+                // turns thousands of per-row lookups into a handful of queries.
+                'workOrder.vehicles.latestDeliveryStatus',
+                'workOrder.latestFinance',
+                'workOrder.latestCOO',
+                'workOrder.currentCooApproval',
+                'workOrder.firstCooApproval',
+                'shippingDetails.finalDestinationCountry',
+            ])
+            // Cheap column checks pushed into SQL so rows that the filter would
+            // discard anyway are never hydrated. The PHP filter below is left
+            // intact and stays authoritative.
+            ->whereHas('workOrder', function($query) {
+                $query->where('has_claim', 'yes')
+                    ->whereNotNull('sales_support_data_confirmation_at');
+            })
             ->where(function($query) {
                 // Condition 1: No associated claim
                 $query->whereDoesntHave('claim')

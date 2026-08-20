@@ -20,6 +20,32 @@
     }
     /* Keep the dropdown above the modal backdrop. */
     .select2-container--open { z-index: 1060; }
+
+    /* Copy-to-all-VINs button, revealed once its cell has a value. */
+    .js-copy-cell > .js-copy-down {
+        flex: 0 0 auto;
+        margin-left: 4px;
+        padding: 0.1rem 0.35rem;
+        line-height: 1.2;
+    }
+    .js-copy-cell > .js-copy-source,
+    .js-copy-cell > .js-copy-select-wrap { min-width: 0; }
+    .js-copy-flash {
+        background-color: #d1e7dd !important;
+        transition: background-color 0.15s ease-in;
+    }
+
+    /* Blocks interaction with the modal while the claim is being submitted. */
+    .js-submitting-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.6);
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.3rem;
+    }
 </style>
 @php
     // Explicit flags so the payload can never terminate this <script> block,
@@ -84,6 +110,7 @@
 
         $(document).on('show.bs.modal', '.modal', function () {
             window.populateClaimCountrySelects(this);
+            window.refreshClaimCopyButtons(this);
         });
 
         // Bootstrap 5 traps focus inside the modal, which can stop the Select2
@@ -93,6 +120,114 @@
             if (field) {
                 field.focus();
             }
+        });
+
+        // ---- submit guard ----
+
+        // The form carries an inline onsubmit="return validateForm(id)". That
+        // handler runs first and calls preventDefault() when validation fails,
+        // so only show the loader once the submit is actually going through.
+        $(document).on('submit', 'form[id^="docStatusForm_"]', function (e) {
+            var $form = $(this);
+
+            if (e.isDefaultPrevented()) {
+                return; // validation rejected it - leave the button usable
+            }
+
+            if ($form.data('claim-submitting')) {
+                e.preventDefault(); // already on its way, swallow the extra click
+                return;
+            }
+            $form.data('claim-submitting', true);
+
+            var $btn = $form.find('button[type="submit"]');
+            $btn.data('original-html', $btn.html())
+                .prop('disabled', true)
+                .html('<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Saving...');
+
+            // Also block Close/dismiss so the modal cannot be torn down mid-post.
+            $form.closest('.modal-content')
+                .css('position', 'relative')
+                .append('<div class="js-submitting-overlay"></div>');
+            $form.find('[data-bs-dismiss="modal"]').prop('disabled', true);
+        });
+
+        // Restore the form if the browser returns to a cached copy of the page,
+        // otherwise the button would still be spinning after a Back navigation.
+        $(window).on('pageshow', function (event) {
+            if (!event.originalEvent || !event.originalEvent.persisted) {
+                return;
+            }
+            $('form[id^="docStatusForm_"]').each(function () {
+                var $form = $(this).removeData('claim-submitting');
+                var $btn = $form.find('button[type="submit"]');
+                if ($btn.data('original-html')) {
+                    $btn.prop('disabled', false).html($btn.data('original-html'));
+                }
+                $form.closest('.modal-content').find('.js-submitting-overlay').remove();
+                $form.find('[data-bs-dismiss="modal"]').prop('disabled', false);
+            });
+        });
+
+        // ---- copy a filled cell down its column ----
+
+        var COLUMN_SELECTORS = {
+            container: '.js-shipping-container',
+            bl: '.js-shipping-bl',
+            country: 'select.js-shipping-country'
+        };
+
+        // The button only makes sense once its own cell has something to copy.
+        function refreshCopyButton($source) {
+            var $btn = $source.closest('.js-copy-cell').find('.js-copy-down');
+            if ($btn.length === 0) {
+                return;
+            }
+            var value = $source.val();
+            var filled = value !== null && String(value).trim() !== '';
+            $btn.toggle(filled);
+        }
+
+        window.refreshClaimCopyButtons = function (container) {
+            $(container).find('.js-copy-cell .js-copy-source').each(function () {
+                refreshCopyButton($(this));
+            });
+        };
+
+        $(document).on('input change', '.js-copy-cell .js-copy-source', function () {
+            refreshCopyButton($(this));
+        });
+
+        $(document).on('click', '.js-copy-down', function () {
+            var $btn = $(this);
+            var $source = $btn.closest('.js-copy-cell').find('.js-copy-source');
+            var selector = COLUMN_SELECTORS[$btn.data('column')];
+            if (!selector) {
+                return;
+            }
+
+            var value = $source.val();
+            var $targets = $btn.closest('.js-shipping-section').find(selector).not($source);
+            if ($targets.length === 0) {
+                return;
+            }
+
+            $targets.each(function () {
+                var $t = $(this);
+                $t.val(value);
+                // Select2 mirrors the underlying select only on change.
+                if ($t.is('select')) {
+                    $t.trigger('change');
+                }
+                refreshCopyButton($t);
+
+                // Brief highlight so it is obvious which cells were filled.
+                var $flash = $t.is('select')
+                    ? $t.closest('.js-copy-select-wrap').find('.select2-selection')
+                    : $t;
+                $flash.addClass('js-copy-flash');
+                setTimeout(function () { $flash.removeClass('js-copy-flash'); }, 600);
+            });
         });
     })();
 </script>
