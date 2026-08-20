@@ -50,6 +50,7 @@
                             <th>BOE</th>
                             <th>Declaration Number</th>
                             <th>Declaration Date</th>
+                            <th>Shipping Details</th>
                         </tr>
                         @if(isset($datas) && count($datas) > 0)
                         <tr>
@@ -74,6 +75,7 @@
                                     <!-- Options will be dynamically added via JS -->
                                 </select>
                             </th>
+                            <th></th>
                             <th></th>
                         </tr>
                         @endif
@@ -156,7 +158,8 @@
                                                                     </div>
                                                                     <span id="claimStatus_Error_{{ $data->id }}" class="text-danger"></span>
                                                                 </div>
-                                                            </div></br>                                                                                                                                                             
+                                                            </div></br>
+                                                            @include('work_order.claims.partials._shipping_details_inputs', ['data' => $data])
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -172,11 +175,18 @@
                                     <td>{{ $data->boe ?? '' }}</td>
                                     <td>{{ $data->declaration_number ?? '' }}</td>
                                     <td>@if($data->declaration_date != ''){{\Carbon\Carbon::parse($data->declaration_date)->format('d M Y') ?? ''}}@endif</td>
+                                    <td>
+                                        <a class="btn btn-sm btn-info" href="javascript:void(0);"
+                                            data-bs-toggle="modal" data-bs-target="#shippingDetailsModal_{{$data->id}}">
+                                            <i class="fa fa-eye" aria-hidden="true"></i> View Detail
+                                        </a>
+                                        @include('work_order.claims.partials._shipping_details_view_modal', ['data' => $data])
+                                    </td>
                                 </tr>
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="6" class="text-center">No data history available.</td>
+                                <td colspan="7" class="text-center">No data history available.</td>
                             </tr>
                         @endif
                     </tbody>
@@ -184,6 +194,7 @@
             </div>
         </div>
     </div>
+    @include('work_order.claims.partials._shipping_details_scripts', ['countries' => $countries])
     <script type="text/javascript">
     $(document).ready(function() {
         @if(isset($datas) && count($datas) > 0)
@@ -264,7 +275,39 @@
             document.getElementById('claimStatus_Error_' + id).textContent = '';          
         }
 
+        if (!validateShippingDetails(id)) {
+            return false;
+        }
+
         return true; // Submit if all validations pass
+    }
+
+    // Per-VIN shipping details: length checks only, all three fields are optional.
+    function validateShippingDetails(id) {
+        var errorEl = document.getElementById('shippingDetailsError_' + id);
+        if (!errorEl) {
+            return true;
+        }
+        var form = document.getElementById('docStatusForm_' + id);
+        if (!form) {
+            return true;
+        }
+        var message = '';
+
+        $(form).find('.js-shipping-container, .js-shipping-bl').each(function () {
+            var value = $(this).val() || '';
+            if (value.trim() !== value) {
+                $(this).val(value.trim());
+                value = value.trim();
+            }
+            if (value.length > 100) {
+                message = 'Container Number and BL Number must be 100 characters or less.';
+                return false;
+            }
+        });
+
+        errorEl.textContent = message;
+        return message === '';
     }
 </script>
 </body>
