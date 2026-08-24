@@ -158,7 +158,10 @@
                     </div>
                 </div>
                 <div class="col-12 text-center">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-primary" id="submit-variant">
+                        <span class="spinner-border spinner-border-sm me-1 d-none" id="submit-variant-spinner" role="status" aria-hidden="true"></span>
+                        <span id="submit-variant-label">Submit</span>
+                    </button>
                 </div>
             </div>
         </form>
@@ -346,6 +349,33 @@
         $('#brand').on('change', function() {
             var selectedBrandId = $(this).val();
             fetchModelLines(selectedBrandId);
+        });
+    });
+</script>
+<script>
+    // Bound last so it runs after validation and the other submit handlers.
+    // Saving a variant can take a moment, so lock the button and show a
+    // spinner to stop repeated submits creating duplicate records.
+    $(function () {
+        $('#form-update').on('submit', function (e) {
+            if (e.isDefaultPrevented()) {
+                return; // validation blocked the submit, keep the button usable
+            }
+            if ($(this).data('submitting')) {
+                e.preventDefault();
+                return false;
+            }
+            $(this).data('submitting', true);
+            $('#submit-variant').prop('disabled', true);
+            $('#submit-variant-spinner').removeClass('d-none');
+            $('#submit-variant-label').text('Saving...');
+        });
+        // Reset when the page is restored from the back/forward cache.
+        $(window).on('pageshow', function () {
+            $('#form-update').data('submitting', false);
+            $('#submit-variant').prop('disabled', false);
+            $('#submit-variant-spinner').addClass('d-none');
+            $('#submit-variant-label').text('Submit');
         });
     });
 </script>

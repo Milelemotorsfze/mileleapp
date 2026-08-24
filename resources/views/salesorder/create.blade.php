@@ -510,6 +510,34 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                 });
             }
         }
+        // Selected VINs may never exceed the row quantity (mirrors the server-side guard).
+        // Re-evaluated from scratch on every call so a fixed row stops blocking submit.
+        function validateVinCounts() {
+            let isValid = true;
+            $('#form-create').find('.vin-error-message').remove();
+
+            $('.vins').each(function() {
+                let $select = $(this);
+                let quantity = parseInt($select.attr('data-quantity'), 10) || 0;
+                let selectedCount = $select.val()?.length || 0;
+
+                if (selectedCount > quantity) {
+                    isValid = false;
+                    $select.next('.select2').append(`
+                        <span class="vin-error-message" style="color: red; font-size: 14px; margin-top: 4px; display: block;">
+                            The chosen vin count exceeding the variant quantity (${quantity}).
+                        </span>
+                    `);
+                }
+            });
+
+            return isValid;
+        }
+
+        $(document.body).on('select2:select select2:unselect', '.vins', function() {
+            validateVinCounts();
+        });
+
         $.validator.addMethod("uniqueSO", function(value, element, param) {
             // Return if value is empty or not 6 digits
             if (!value || !/^\d{6}$/.test(value)) {
@@ -561,6 +589,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             onkeyup: false,
             onclick: false,
             submitHandler: function(form) {
+                if (!validateVinCounts()) {
+                    return false;
+                }
                 if ($(form).valid()) {
                     form.submit();
                 }

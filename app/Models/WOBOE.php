@@ -43,4 +43,8 @@ class WOBOE extends Model
     {
         return $this->hasOne(BOEPenalty::class,'wo_boe_id','id');
     }  
+    public function shippingDetails()
+    {
+        return $this->hasMany(WOBOEClaimShippingDetail::class,'wo_boe_id','id');
+    }
 }

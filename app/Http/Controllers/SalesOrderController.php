@@ -1123,6 +1123,10 @@ class SalesOrderController extends Controller
             'stock_type' => OrderStockType::validationRules(),
         ]);
 
+        if ($vinQuantityError = $this->findVinQuantityViolation($request)) {
+            return redirect()->back()->withInput()->withErrors($vinQuantityError);
+        }
+
         DB::beginTransaction();
         try {
 
@@ -1521,6 +1525,10 @@ class SalesOrderController extends Controller
         $request->validate([
             'stock_type' => OrderStockType::validationRules(),
         ]);
+
+        if ($vinQuantityError = $this->findVinQuantityViolation($request)) {
+            return redirect()->back()->withInput()->withErrors($vinQuantityError);
+        }
 
         DB::beginTransaction();
         try {
@@ -2427,6 +2435,60 @@ class SalesOrderController extends Controller
 
         QuotationSubItem::where('quotation_item_parent_id', $quotationItemId)->delete();
         QuotationItem::where('id', $quotationItemId)->delete();
+    }
+
+    /**
+     * Server-side guard for the create/update SO payloads: a variant row may never
+     * carry more VINs than its quantity. Returns the message for the first offending
+     * row, or null when the payload is valid.
+     */
+    private function findVinQuantityViolation(Request $request): ?string
+    {
+        $variants = $request->input('variants', []);
+        if (!is_array($variants)) {
+            return null;
+        }
+
+        foreach ($variants as $index => $variant) {
+            if (!is_array($variant)) {
+                continue;
+            }
+
+            // Update posts vins[], create posts vehicles[]; vin is the legacy key.
+            $vins = $variant['vins'] ?? $variant['vehicles'] ?? $variant['vin'] ?? [];
+            if (!is_array($vins)) {
+                $vins = ($vins !== null && $vins !== '') ? [$vins] : [];
+            }
+            $vinCount = count(array_filter($vins, fn ($vin) => !empty($vin)));
+            if ($vinCount === 0) {
+                continue;
+            }
+
+            // Update posts an editable quantity; create has none, so fall back to the quotation item.
+            $quotationItem = !empty($variant['quotation_item_id'])
+                ? QuotationItem::find($variant['quotation_item_id'])
+                : null;
+
+            if (isset($variant['quantity']) && $variant['quantity'] !== '') {
+                $quantity = (int) $variant['quantity'];
+            } elseif ($quotationItem) {
+                $quantity = (int) $quotationItem->quantity;
+            } else {
+                continue;
+            }
+
+            if ($vinCount <= $quantity) {
+                continue;
+            }
+
+            $label = $variant['description'] ?? $quotationItem?->description;
+            $rowName = !empty($label) ? '"' . $label . '"' : 'Row ' . $index;
+
+            return 'Variant ' . $rowName . ' has ' . $vinCount . ' VIN(s) selected but the quantity is '
+                . $quantity . '. The number of selected VINs cannot be greater than the quantity.';
+        }
+
+        return null;
     }
 
     /**

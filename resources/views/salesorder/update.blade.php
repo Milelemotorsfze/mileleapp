@@ -526,10 +526,14 @@
 
                 var $option = $(e.params.args.data.element);
                 if ($option.data('lock')) {
-                    e.preventDefault(); 
+                    e.preventDefault();
                     alertify.confirm('This vehicle cannot be removed because it has a GDN assigned.').set({title: "Can't Remove this VIN"});
                 }
             });
+
+            // Existing records may already hold more VINs than the quantity; flag it on load
+            // so the user knows what to correct instead of discovering it only on submit.
+            ValidateVinwithQty();
         });
 
         $("#form-update").validate({
@@ -820,9 +824,9 @@
                     maximumSelectionLength:1,
                     allowClear: true
                 });
-                $('#vin-'+index).select2({
-                    placeholder: 'Select Vin',
-                });
+                // Re-init through the helper so the row keeps its quantity cap;
+                // a plain select2() here would drop maximumSelectionLength entirely.
+                initializeSelect2(index);
             });
         }
        
@@ -887,25 +891,33 @@
 
         });
         function ValidateVinwithQty(){
+            // Re-evaluate from scratch every time, otherwise a single failure keeps
+            // isFormValid stuck at 1 and blocks submit even after the user fixes it.
+            isFormValid = 0;
+            $('#so-vehicles').find('.vin-error-message').remove();
+
             var totalIndex = $("#so-vehicles").find(".so-variant-add-section").length;
             for(let i=1; i<=totalIndex; i++)
             {
-                let qty = $('#quantity-'+i).val();
+                let qty = parseInt($('#quantity-'+i).val(), 10) || 0;
                 let selectedVinCount = $('#vin-' + i).val()?.length || 0;
                 if (selectedVinCount > qty) {
                     let select2Container = $('#vin-' + i).next('.select2');
-                    select2Container.find('.vin-error-message').remove();
                     isFormValid = 1;
                      select2Container.append(`
                             <span class="vin-error-message" style="color: red; font-size: 14px; margin-top: 4px; display: block;">
                                 The chosen vin count exceeding the variant quantity (${qty}).
                             </span>
                         `);
-                    return false;
-                } 
+                }
 
             };
         }
+
+        // Re-check as soon as VINs are added/removed so a stale error clears itself
+        $(document.body).on('select2:select select2:unselect', '.vins', function () {
+            ValidateVinwithQty();
+        });
 
         
     </script>

@@ -159,15 +159,35 @@ public function store(Request $request)
         ->where('gearbox', $request->input('gearbox'))
         ->where('steering', $request->input('steering'))
         ->where('upholestry', $request->input('upholestry'));
+    $hasSpecificationCandidates = true;
     if ($totalSpecifications > 0) {
-        foreach ($selectedSpecifications as $specificationData) {
-            $existingspecificationsQuery->whereHas('variantItems', function ($q) use ($specificationData) {
-                $q->where('model_specification_id', $specificationData['specification_id'])
-                    ->where('model_specification_options_id', $specificationData['value']);
-            });
+        // Resolve the variants carrying every selected specification/option pair in one
+        // aggregate query. Chaining a whereHas per pair builds one correlated EXISTS per
+        // specification, which the optimiser cannot plan once a model line has ~20+
+        // attributes - the request then hangs instead of returning.
+        $matchingVariantIds = VariantItems::query()
+            ->whereIn('model_specification_id', array_column($selectedSpecifications, 'specification_id'))
+            ->where(function ($q) use ($selectedSpecifications) {
+                foreach ($selectedSpecifications as $specificationData) {
+                    $q->orWhere(function ($pair) use ($specificationData) {
+                        $pair->where('model_specification_id', $specificationData['specification_id'])
+                            ->where('model_specification_options_id', $specificationData['value']);
+                    });
+                }
+            })
+            ->groupBy('varaint_id')
+            ->havingRaw('COUNT(DISTINCT model_specification_id) = ?', [$totalSpecifications])
+            ->pluck('varaint_id');
+
+        if ($matchingVariantIds->isEmpty()) {
+            $hasSpecificationCandidates = false;
+        } else {
+            $existingspecificationsQuery->whereIn('id', $matchingVariantIds);
         }
     }
-    $existingspecifications = $existingspecificationsQuery->orderBy('created_at', 'desc')->first();
+    $existingspecifications = $hasSpecificationCandidates
+        ? $existingspecificationsQuery->orderBy('created_at', 'desc')->first()
+        : null;
         if ($existingspecifications) {
             $sematchedSpecifications = 0;
             foreach ($selectedSpecifications as $specificationData) {
