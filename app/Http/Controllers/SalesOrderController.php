@@ -1047,6 +1047,9 @@ class SalesOrderController extends Controller
                     'App\Models\Brand'
                 ])->get();
             foreach ($quotationItems as $item) {
+                // Always seed the key so the view never hits an undefined array key when a
+                // model line / brand has no variants (or no vehicles) to build a list from.
+                $vehicles[$item->id] = $vehicles[$item->id] ?? [];
                 switch ($item->reference_type) {
                     case 'App\Models\Varaint':
                         $variantId = $item->reference_id;
@@ -1380,6 +1383,9 @@ class SalesOrderController extends Controller
                     'App\Models\Brand'
                 ])->get();
             foreach ($quotationItems as $item) {
+                // Always seed the key so the view never hits an undefined array key when a
+                // model line / brand has no variants (or no vehicles) to build a list from.
+                $vehicles[$item->id] = $vehicles[$item->id] ?? [];
                 switch ($item->reference_type) {
                     case 'App\Models\Varaint':
                         $variantId = $item->reference_id;
