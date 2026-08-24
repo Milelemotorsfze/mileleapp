@@ -397,7 +397,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
                     <div class="col-sm-12 col-md-11 col-lg-11 col-xxl-11 mb-4 ms-5">
                         <label class="form-label font-size-13">Choose VIN</label>
                         <select name="variants[{{$key+1}}][vehicles][]" data-quantity="{{$quotationItem->quantity}}" id="vin-{{ $key+1 }}" index="{{$key+1}}" class="vins form-control" multiple >
-                            @foreach($vehicles[$quotationItem->id] as $vehicle)
+                            @foreach($vehicles[$quotationItem->id] ?? [] as $vehicle)
                             <option value="{{ $vehicle->id }}"  >{{ $vehicle->vin ?? '' }}</option>
                             @endforeach
                         </select>
