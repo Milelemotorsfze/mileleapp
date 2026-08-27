@@ -66,8 +66,8 @@ class WoStatusController extends Controller
         $authUserName = auth()->user()->name;
 
         // Define a quick access link (adjust the route as needed)
-        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
-        $statusLogLink = env('BASE_URL') . '/wo-status-history/' . $workOrder->id;
+        $accessLink = route('work-order.show', $workOrder->id);
+        $statusLogLink = route('woStatusHistory', $workOrder->id);
 
         // Retrieve email addresses from the users table where can_send_wo_email is true
         $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function($email) {

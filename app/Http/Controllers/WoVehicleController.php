@@ -79,8 +79,8 @@ class WoVehicleController extends Controller
             // Retrieve the authenticated user's name
             $authUserName = auth()->user()->name;
             // Define quick access links
-            $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
-            $statusLogLink = env('BASE_URL') . '/vehicle-modification-status-log/' . $woVehicle->id;
+            $accessLink = route('work-order.show', $workOrder->id);
+            $statusLogLink = route('vehModiStatusHistory', $woVehicle->id);
             // Retrieve email addresses from the users table where can_send_wo_email is true
             $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function($email) {
                 return filter_var($email, FILTER_VALIDATE_EMAIL);

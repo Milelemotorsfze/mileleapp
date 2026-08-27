@@ -1263,16 +1263,18 @@ class WorkOrderController extends Controller
                     if (!empty($mentionedUserNames)) {
                         $mentionedUsers = User::whereIn('name', $mentionedUserNames)->get();
 
+                        // Resolve the link here (request context) so it stays correct on a queue worker too
+                        $accessLink = route('work-order.show', $workOrder->id);
+
                         foreach ($mentionedUsers as $user) {
                             // Queue email notifications for efficiency
-                            dispatch(function () use ($workOrder, $newCommentId, $user) {
+                            dispatch(function () use ($workOrder, $newCommentId, $user, $accessLink) {
                                 $template = [
                                     'from' => 'no-reply@milele.com',
                                     'from_name' => 'Milele Matrix'
                                 ];
                                 $customerName = $workOrder->customer_name ?? 'Unknown Customer';
                                 $subject = "You were mentioned in a comment - " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
-                                $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
                                 $accessLinkWithComment = $accessLink . '#comment-' . $newCommentId;
 
                                 // Retrieve the comment object from the database
@@ -1396,7 +1398,7 @@ class WorkOrderController extends Controller
         $vehicleCount = WOVehicles::where('work_order_id', $workOrderId)->whereNull('deleted_at')->count();
         $typeName = $this->getWorkOrderTypeName($workOrder->type);
         $subject = "New Work Order {$workOrder->wo_number} {$customerName} {$vehicleCount} Unit {$typeName}";
-        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+        $accessLink = route('work-order.show', $workOrder->id);
         $recipients = $this->getWorkOrderEmailRecipients();
 
         if (empty($recipients)) {
@@ -1437,7 +1439,7 @@ class WorkOrderController extends Controller
             $subject = "WO Deposit Update {$woLabel} {$customerName} {$vehicleCount} Unit {$typeName}";
         }
 
-        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+        $accessLink = route('work-order.show', $workOrder->id);
         $recipients = $this->getWorkOrderEmailRecipients();
         $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
         if ($createdByEmail) {
@@ -1489,7 +1491,7 @@ class WorkOrderController extends Controller
             $subject = "WO Deposit Update {$woLabel} {$customerName} {$vehicleCount} Unit {$typeName}";
         }
 
-        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+        $accessLink = route('work-order.show', $workOrder->id);
         $emailList = collect($this->getWorkOrderEmailRecipients());
 
         if ($emailList->isEmpty()) {
@@ -1537,7 +1539,7 @@ class WorkOrderController extends Controller
             $subject = "WO Vehicle Update {$woLabel} {$customerName} {$vehicleCount} Unit {$typeName}";
         }
 
-        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+        $accessLink = route('work-order.show', $workOrder->id);
         $managementEmails = $this->getWorkOrderEmailRecipients();
 
         if (empty($managementEmails)) {
@@ -2936,14 +2938,16 @@ class WorkOrderController extends Controller
         if (!empty($mentionedUserNames)) {
             $mentionedUsers = User::whereIn('name', $mentionedUserNames)->get();
 
+            // Resolve the link here (request context) so it stays correct on a queue worker too
+            $accessLink = $workOrder ? route('work-order.show', $workOrder->id) : '';
+
             foreach ($mentionedUsers as $user) {
                 // Queue email notifications for efficiency
-                dispatch(function () use ($workOrder, $comment, $user) {
+                dispatch(function () use ($workOrder, $comment, $user, $accessLink) {
                     $template['from'] = 'no-reply@milele.com';
                     $template['from_name'] = 'Milele Matrix';
                     $customerName = $workOrder->customer_name ?? 'Unknown Customer';
                     $subject = "You were mentioned in a comment - " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
-                    $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
                     $accessLinkWithComment = $accessLink . '#comment-' . $comment->id;
                     Mail::send('work_order.emails.mentioned_in_comment', [
                         'workOrder' => $workOrder,
@@ -3151,8 +3155,8 @@ class WorkOrderController extends Controller
         $subject = "WO Finance " . $statusName . " " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
 
         // Define a quick access link (adjust the route as needed)
-        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
-        $approvalHistoryLink = env('BASE_URL') . '/finance-approval-history/' . $workOrder->id;
+        $accessLink = route('work-order.show', $workOrder->id);
+        $approvalHistoryLink = route('fetchFinanceApprovalHistory', $workOrder->id);
         // Retrieve email addresses from the users table where can_send_wo_email is true
         $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function ($email) {
             return filter_var($email, FILTER_VALIDATE_EMAIL);
@@ -3268,8 +3272,8 @@ class WorkOrderController extends Controller
                             // Prepare email data
                             $subject = "COO approved the work order " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
                             // Define a quick access link (adjust the route as needed)
-                            $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
-                            $approvalHistoryLink = env('BASE_URL') . '/finance-approval-history/' . $workOrder->id;
+                            $accessLink = route('work-order.show', $workOrder->id);
+                            $approvalHistoryLink = route('fetchFinanceApprovalHistory', $workOrder->id);
 
                             $rolesWithPermission = Role::whereHas('permissions', function ($query) {
                                 $query->where('name', 'do-finance-approval');
@@ -3333,8 +3337,8 @@ class WorkOrderController extends Controller
         $subject = "WO COO Office " . $statusName . " " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
 
         // Define a quick access link (adjust the route as needed)
-        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
-        $approvalHistoryLink = env('BASE_URL') . '/coo-approval-history/' . $workOrder->id;
+        $accessLink = route('work-order.show', $workOrder->id);
+        $approvalHistoryLink = route('fetchCooApprovalHistory', $workOrder->id);
         // Retrieve email addresses from the users table where can_send_wo_email is true
         $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function ($email) {
             return filter_var($email, FILTER_VALIDATE_EMAIL);
@@ -3460,8 +3464,8 @@ class WorkOrderController extends Controller
                         $subject = "Sales support confirmed the work order " . $wo->wo_number . " " . $customerName . " " . $wo->vehicle_count . " Unit " . $wo->type_name;
 
                         // Define a quick access link (adjust the route as needed)
-                        $accessLink = env('BASE_URL') . '/work-order/' . $wo->id;
-                        $approvalHistoryLink = env('BASE_URL') . '/coo-approval-history/' . $wo->id;
+                        $accessLink = route('work-order.show', $wo->id);
+                        $approvalHistoryLink = route('fetchCooApprovalHistory', $wo->id);
 
                         $rolesWithPermission = Role::whereHas('permissions', function ($query) {
                             $query->where('name', 'do-coo-office-approval');
