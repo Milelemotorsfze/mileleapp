@@ -130,8 +130,8 @@ class WOVehicleDeliveryStatusController extends Controller
         $authUserName = auth()->user()->name;
 
         // Define quick access links
-        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
-        $statusLogLink = env('BASE_URL') . '/vehicle-delivery-status-log/' . $woVehicle->id;
+        $accessLink = route('work-order.show', $workOrder->id);
+        $statusLogLink = route('vehDeliveryStatusHistory', $woVehicle->id);
 
         try {
             Mail::send('work_order.emails.delivery_status_update', [
