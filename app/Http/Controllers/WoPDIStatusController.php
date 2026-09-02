@@ -81,8 +81,8 @@ class WoPDIStatusController extends Controller
             $authUserName = auth()->user()->name;
 
             // Define quick access links
-            $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
-            $statusLogLink = env('BASE_URL') . '/vehicle-pdi-status-log/' . $woVehicle->id;
+            $accessLink = route('work-order.show', $workOrder->id);
+            $statusLogLink = route('vehPdiStatusHistory', $woVehicle->id);
 
             // Retrieve and validate email addresses from .env
             $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';

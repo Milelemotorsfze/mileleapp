@@ -536,7 +536,7 @@ class SalesOrderController extends Controller
                         if (isset($soVariant['vehicles'])) {
                             $newVehicles = $soVariant['vehicles'];
                             foreach ($newVehicles as $vehicleId) {
-                                $soItem = Soitems::create(['vehicles_id' => $vehicleId, 'so_variant_id' => $soVariantdata->id]);
+                                $soItem = Soitems::create(['vehicles_id' => $vehicleId, 'so_variant_id' => $soVariantdata->id, 'so_id' => $so->id]);
                                 if (!$soItem) continue; // Null check added
                                 $logEntries[] = [
                                     'type' => 'Set',
@@ -590,7 +590,7 @@ class SalesOrderController extends Controller
                                 $removedVehicles = array_diff($currentVehicles, $newVehicles);
                                 // Add new vehicles
                                 foreach ($addedVehicles as $vehicleId) {
-                                    $soItem = Soitems::create(['vehicles_id' => $vehicleId, 'so_variant_id' => $existingVariant->id]);
+                                    $soItem = Soitems::create(['vehicles_id' => $vehicleId, 'so_variant_id' => $existingVariant->id, 'so_id' => $so->id]);
                                     if (!$soItem) continue; // Null check added
                                     $logEntries[] = [
                                         'type' => 'Set',
@@ -1047,6 +1047,9 @@ class SalesOrderController extends Controller
                     'App\Models\Brand'
                 ])->get();
             foreach ($quotationItems as $item) {
+                // Always seed the key so the view never hits an undefined array key when a
+                // model line / brand has no variants (or no vehicles) to build a list from.
+                $vehicles[$item->id] = $vehicles[$item->id] ?? [];
                 switch ($item->reference_type) {
                     case 'App\Models\Varaint':
                         $variantId = $item->reference_id;
@@ -1380,6 +1383,9 @@ class SalesOrderController extends Controller
                     'App\Models\Brand'
                 ])->get();
             foreach ($quotationItems as $item) {
+                // Always seed the key so the view never hits an undefined array key when a
+                // model line / brand has no variants (or no vehicles) to build a list from.
+                $vehicles[$item->id] = $vehicles[$item->id] ?? [];
                 switch ($item->reference_type) {
                     case 'App\Models\Varaint':
                         $variantId = $item->reference_id;
@@ -1555,10 +1561,23 @@ class SalesOrderController extends Controller
                 $this->getSubmittedQuotationItemIds($request, $newVariantQuotationItemIds)
             );
 
-            // Delete existing Soitems records related to the Sales Order ID
+            // Delete existing Soitems records related to the Sales Order ID.
+            // Rows are linked to an SO either by so_id or by so_variant_id (the create path
+            // only sets so_variant_id), so both links must be cleared - otherwise the rows
+            // missed here are merged back in on read and removed VINs reappear.
             \Log::info('SO items deleted - Case 3-' . $so->id);
-            Soitems::where('so_id', $so->id)->update(['deleted_by' => Auth::id()]);
-            Soitems::where('so_id', $so->id)->delete();
+            $soVariantIdsForSo = SoVariant::where('so_id', $so->id)->pluck('id');
+            $staleSoItems = Soitems::where(function ($query) use ($so, $soVariantIdsForSo) {
+                $query->where('so_id', $so->id)
+                    // Rows under this SO's variants that carry no owner yet. Rows stamped with a
+                    // different so_id are left alone - they belong to that SO, not this one.
+                    ->orWhere(function ($unowned) use ($soVariantIdsForSo) {
+                        $unowned->whereIn('so_variant_id', $soVariantIdsForSo)
+                            ->whereNull('so_id');
+                    });
+            });
+            (clone $staleSoItems)->update(['deleted_by' => Auth::id()]);
+            $staleSoItems->delete();
             Vehicles::where('so_id', $so->id)->update(['so_id' => null]);
             \Log::info('Unassign SO id - Case 3-' . $so->id);
 

@@ -117,8 +117,8 @@ class WoDocsStatusController extends Controller
             $authUserName = auth()->user()->name;
 
             // Define a quick access link (adjust the route as needed)
-            $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
-            $statusLogLink = env('BASE_URL') . '/wo-doc-status-history/' . $workOrder->id;
+            $accessLink = route('work-order.show', $workOrder->id);
+            $statusLogLink = route('docStatusHistory', $workOrder->id);
 
             // Retrieve and validate email addresses from .env
             $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
