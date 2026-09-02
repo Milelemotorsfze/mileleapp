@@ -32,6 +32,19 @@ class Quotation extends Model
     {
         return $this->belongsTo(Calls::class, 'calls_id');
     }
+
+    /**
+     * Letter of Credit requirements. Only populated when nature_of_deal is 'letter_of_credit'.
+     */
+    public function lcDetail()
+    {
+        return $this->hasOne(QuotationLcDetail::class, 'quotation_id');
+    }
+
+    public function isLetterOfCredit(): bool
+    {
+        return $this->nature_of_deal === 'letter_of_credit';
+    }
     public function createdBy()
     {
         return $this->belongsTo(User::class,'created_by','id');

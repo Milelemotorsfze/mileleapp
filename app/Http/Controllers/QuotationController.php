@@ -27,6 +27,7 @@ use App\Models\Brand;
 use App\Models\QuotationClient;
 use App\Models\QuotationDetail;
 use App\Models\QuotationItem;
+use App\Models\QuotationLcDetail;
 use App\Models\QuotationFile;
 use App\Models\QuotationSubItem;
 use App\Models\Setting;
@@ -94,10 +95,10 @@ class QuotationController extends Controller
 
         $request->validate([
             'nature_of_deal' => 'required|in:regular_deal,letter_of_credit',
-        ], [
+        ] + $this->letterOfCreditRules($request), [
             'nature_of_deal.required' => 'Please select the Nature of Deal.',
             'nature_of_deal.in' => 'Invalid selection for Nature of Deal.',
-        ]);      
+        ] + $this->letterOfCreditMessages());
 
         $agentsmuiltples = 0;
         $systemcode = $request->system_code_amount;
@@ -157,7 +158,7 @@ class QuotationController extends Controller
         $quotation->calls_id = $request->calls_id;
         $quotation->currency = $request->currency;
         $quotation->document_type = $request->document_type;
-        $quotation->nature_of_deal = $request->nature_of_deal;
+        $quotation->nature_of_deal = $this->resolveNatureOfDeal($request);
         $quotation->third_party_payment = $request->thirdpartypayment;
         $quotation->date = Carbon::now();
         if($request->document_type == 'Proforma') {
@@ -165,6 +166,7 @@ class QuotationController extends Controller
         }
         $quotation->shipping_method = $request->shipping_method;
         $quotation->save();
+        $this->syncLetterOfCreditDetails($request, $quotation);
         $agentsId = $request->agents_id;
             if (!isset($agentsId) || empty($agentsId)) {
                 // Handle the case where no agent ID is provided or it's empty
@@ -599,7 +601,8 @@ class QuotationController extends Controller
      */
     public function update(Request $request, quotation $quotation)
     {
-   
+    $request->validate($this->letterOfCreditRules($request), $this->letterOfCreditMessages());
+
     $qoutationid = request()->input('quotationid');
     $agentsmuiltples = 0;
     $systemcode = $request->system_code_amount;
@@ -650,7 +653,7 @@ class QuotationController extends Controller
     $quotation->calls_id = $request->calls_id;
     $quotation->currency = $request->currency;
     $quotation->document_type = $request->document_type;
-    $quotation->nature_of_deal = $request->nature_of_deal;
+    $quotation->nature_of_deal = $this->resolveNatureOfDeal($request);
     $quotation->third_party_payment = $request->thirdpartypayment;
     $quotation->date = Carbon::now();
     if($request->document_type == 'Proforma') {
@@ -658,6 +661,7 @@ class QuotationController extends Controller
     }
     $quotation->shipping_method = $request->shipping_method;
     $quotation->save();
+    $this->syncLetterOfCreditDetails($request, $quotation);
     $agentsId = $request->agents_id;
     $lastAgentId = null;
     if (!isset($agentsId) || empty($agentsId)) {
@@ -1489,5 +1493,111 @@ public function getAgentsByQuotationId($quotationId)
         $quotationdetails = QuotationDetail::where('quotation_id' , $quotationId)->first();
         $agents = MuitlpleAgents::with('agent')->where('quotations_id', $quotationId)->where('agents_id', '!=', $quotationdetails->agents_id)->get();
         return response()->json($agents);
+    }
+
+    /**
+     * Letter of credit is only offered on a Proforma Invoice, so anything else
+     * falls back to a regular deal. Mirrors the rule the form applies in the UI.
+     */
+    private function resolveNatureOfDeal(Request $request): string
+    {
+        $isProforma = in_array($request->input('document_type'), ['Proforma', 'Proforma Invoice'], true);
+
+        if (! $isProforma) {
+            return 'regular_deal';
+        }
+
+        return $request->input('nature_of_deal') === 'letter_of_credit'
+            ? 'letter_of_credit'
+            : 'regular_deal';
+    }
+
+    /**
+     * Validation rules for the Letter of Credit block.
+     *
+     * LC number and issuing bank are mandatory once the deal is a letter of credit.
+     * The rest stays optional on purpose: LC paperwork (BL, inspection certificate,
+     * ...) arrives after the quotation is raised, and the document checklist is
+     * advisory. Those gaps are reported on the LC transaction view instead.
+     *
+     * @return array<string, string>
+     */
+    private function letterOfCreditRules(Request $request): array
+    {
+        // resolveNatureOfDeal(), not the raw input: a letter of credit only exists
+        // on a Proforma Invoice, so nothing is demanded on a plain Quotation.
+        $isLetterOfCredit = $this->resolveNatureOfDeal($request) === 'letter_of_credit';
+        $requiredOrNullable = $isLetterOfCredit ? 'required' : 'nullable';
+
+        $rules = [
+            'lc_number' => $requiredOrNullable.'|string|max:100',
+            'lc_issuing_bank' => $requiredOrNullable.'|string|max:150',
+            'lc_expiry_date' => $requiredOrNullable.'|date',
+            'lc_compliance_status' => 'nullable|in:'.implode(',', array_keys(QuotationLcDetail::COMPLIANCE_STATUSES)),
+            'lc_compliance_remarks' => 'nullable|string|max:1000',
+            'lc_doc_others_details' => 'nullable|string|max:1000',
+        ];
+
+        foreach (array_keys(QuotationLcDetail::DOCUMENTS) as $column) {
+            $rules['lc_'.$column] = 'nullable|boolean';
+        }
+
+        return $rules;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function letterOfCreditMessages(): array
+    {
+        return [
+            'lc_number.required' => 'Please enter the LC Number.',
+            'lc_issuing_bank.required' => 'Please enter the Issuing Bank.',
+            'lc_expiry_date.required' => 'Please select the LC Expiry Date.',
+        ];
+    }
+
+    /**
+     * Persist the LC requirement matrix for a quotation.
+     * No-op for regular deals, so nothing about that flow changes.
+     */
+    private function syncLetterOfCreditDetails(Request $request, Quotation $quotation): void
+    {
+        if ($quotation->nature_of_deal !== 'letter_of_credit') {
+            return;
+        }
+
+        $values = [
+            'lc_number' => $request->input('lc_number'),
+            'issuing_bank' => $request->input('lc_issuing_bank'),
+            'lc_expiry_date' => $request->input('lc_expiry_date') ?: null,
+            'compliance_status' => $request->input('lc_compliance_status', 'pending') ?: 'pending',
+            'compliance_remarks' => $request->input('lc_compliance_remarks'),
+        ];
+
+        foreach (array_keys(QuotationLcDetail::DOCUMENTS) as $column) {
+            $values[$column] = $request->boolean('lc_'.$column);
+        }
+
+        // Free-text notes only belong to a ticked "Others" entry.
+        $values['doc_others_details'] = $values['doc_others']
+            ? $request->input('lc_doc_others_details')
+            : null;
+
+        $lcDetail = QuotationLcDetail::firstOrNew(['quotation_id' => $quotation->id]);
+        if (! $lcDetail->exists) {
+            $values['created_by'] = Auth::id();
+        }
+        $lcDetail->fill($values);
+
+        // Re-saving a quotation whose LC data is untouched should not write at all.
+        // updated_by is set only once something really changed, so it cannot make
+        // every save look dirty.
+        if ($lcDetail->exists && ! $lcDetail->isDirty()) {
+            return;
+        }
+
+        $lcDetail->updated_by = Auth::id();
+        $lcDetail->save();
     }
 }

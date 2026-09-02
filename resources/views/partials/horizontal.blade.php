@@ -1615,6 +1615,15 @@
                                 </li>
                                 @endif
                             @endif
+                            {{-- Visible to every role that can reach quotations or PFIs, not just sales. --}}
+                            @if (Auth::user()->canAccessLcTransactions())
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('lc-transactions.index') }}" id="topnav-more" role="button">
+                                        <i data-feather="file-text"></i>
+                                        <span data-key="t-extra-pages">LC Transactions</span>
+                                    </a>
+                                </li>
+                            @endif
                             @if ($hasFullAccess || $hasSalesView)
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('so_finalizations.index') }}" id="topnav-more" role="button">
