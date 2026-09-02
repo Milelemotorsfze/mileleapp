@@ -560,6 +560,52 @@ class User extends Authenticatable
         }
         return $canShowSummary;
     }
+    /**
+     * Permissions that grant sight of quotations or the customer proforma invoice.
+     * Holding any one of them is enough to open the LC Transactions list.
+     *
+     * Deliberately excludes PFI-list / PFI-create / pfi-edit / pfi-delete /
+     * export-pfi-items: those gate PFIController, the supplier-side proforma that
+     * sits with LOI under Demand Planning. It is a different document from the
+     * customer proforma invoice an LC is raised against.
+     */
+    public const QUOTATION_OR_PFI_PERMISSIONS = [
+        'all-quotation-access',
+        'sales-support-full-access',
+        'sales-view',
+        'daily-leads-list',
+        'daily-leads-view',
+        'leads-view-only',
+    ];
+
+    /**
+     * Anyone who can reach quotations or PFIs can reach the LC Transactions list.
+     * What they actually see there is scoped separately, by canViewAllQuotations().
+     */
+    public function canAccessLcTransactions(): bool
+    {
+        return (int) $this->pfi_access === 1
+            || $this->hasPermissionForSelectedRole(self::QUOTATION_OR_PFI_PERMISSIONS);
+    }
+
+    /**
+     * Who sees every LC transaction rather than only their own records.
+     *
+     * The app already has two unrestricted-view rules and they differ:
+     * the proforma screens use all-quotation-access, while Daily Leads uses
+     * sales-support-full-access or leads-view-only. The LC list honours the
+     * union, so a role that already sees all leads or all quotations elsewhere
+     * does not land on an empty LC list.
+     */
+    public function canViewAllLcTransactions(): bool
+    {
+        return $this->hasPermissionForSelectedRole([
+            'all-quotation-access',
+            'sales-support-full-access',
+            'leads-view-only',
+        ]);
+    }
+
     public function hasPermissionForSelectedRole($permissionName) {
         $selectedRole = $this->selected_role;
         if(is_array($permissionName)) {

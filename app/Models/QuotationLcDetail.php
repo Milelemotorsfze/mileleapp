@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Letter of Credit transaction requirements captured against a quotation.
@@ -26,6 +27,8 @@ class QuotationLcDetail extends Model
         'doc_packing_list',
         'doc_certificate_of_origin',
         'doc_inspection_certificate',
+        'doc_others',
+        'doc_others_details',
         'compliance_status',
         'compliance_remarks',
         'created_by',
@@ -39,10 +42,12 @@ class QuotationLcDetail extends Model
         'doc_packing_list' => 'boolean',
         'doc_certificate_of_origin' => 'boolean',
         'doc_inspection_certificate' => 'boolean',
+        'doc_others' => 'boolean',
     ];
 
     /**
      * Checklist column => label. Order drives the UI and the LC transaction view.
+     * The checklist is advisory: ticking it is optional and never blocks a shipment.
      */
     public const DOCUMENTS = [
         'doc_commercial_invoice' => 'Commercial Invoice',
@@ -50,14 +55,22 @@ class QuotationLcDetail extends Model
         'doc_packing_list' => 'Packing List',
         'doc_certificate_of_origin' => 'Certificate of Origin (COO)',
         'doc_inspection_certificate' => 'Inspection Certificate',
+        'doc_others' => 'Others',
     ];
 
     public const COMPLIANCE_STATUSES = [
         'pending' => 'Pending',
+        'in_progress' => 'In Progress',
+        'bank_processing' => 'Bank Processing',
         'under_review' => 'Under Review',
         'compliant' => 'Compliant',
         'discrepant' => 'Discrepant',
     ];
+
+    /**
+     * Value used by the issuing-bank dropdown when the bank is not on the list.
+     */
+    public const OTHER_BANK = '__other__';
 
     public function quotation()
     {
@@ -65,7 +78,35 @@ class QuotationLcDetail extends Model
     }
 
     /**
-     * Checklist entries that have not been received yet.
+     * Issuing banks offered in the dropdown: the bank master plus any issuing
+     * bank already captured on an LC, so the list grows with real usage. An LC
+     * can be issued by any overseas bank, so the form still allows a free-text
+     * entry through the "Other" option.
+     *
+     * @return array<int, string>
+     */
+    public static function issuingBankOptions(): array
+    {
+        $fromMaster = DB::table('bank_master')->pluck('bank_name');
+        $fromLcs = static::query()
+            ->whereNotNull('issuing_bank')
+            ->distinct()
+            ->pluck('issuing_bank');
+
+        return $fromMaster->merge($fromLcs)
+            ->map(fn ($name) => trim((string) $name))
+            ->filter()
+            ->unique(fn ($name) => mb_strtolower($name))
+            ->sort(SORT_NATURAL | SORT_FLAG_CASE)
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Checklist entries that have not been ticked yet.
+     *
+     * Advisory only: the checklist is optional, so these are reported for
+     * visibility and never prevent a shipment from being cleared.
      *
      * @return array<int, string> Document labels
      */
@@ -84,6 +125,11 @@ class QuotationLcDetail extends Model
     public function isDocumentationComplete(): bool
     {
         return $this->missingDocuments() === [];
+    }
+
+    public function receivedDocumentCount(): int
+    {
+        return count(self::DOCUMENTS) - count($this->missingDocuments());
     }
 
     /**
@@ -125,6 +171,10 @@ class QuotationLcDetail extends Model
     /**
      * Every reason the shipment must not be released yet.
      *
+     * The document checklist is deliberately excluded: it is optional, so an
+     * unticked document is surfaced through missingDocuments() as an advisory
+     * rather than held here as a hard blocker.
+     *
      * @return array<int, string>
      */
     public function shipmentBlockers(): array
@@ -133,10 +183,6 @@ class QuotationLcDetail extends Model
 
         foreach ($this->missingLcTerms() as $term) {
             $blockers[] = $term.' is not recorded';
-        }
-
-        foreach ($this->missingDocuments() as $document) {
-            $blockers[] = $document.' not received';
         }
 
         if ($this->isExpired()) {

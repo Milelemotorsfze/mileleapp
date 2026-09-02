@@ -19,8 +19,29 @@
         color: #0acf97;
     }
 
+    /* The checklist is optional, so an unticked document is neutral, not an error. */
     .lc-doc-missing {
-        color: #fa5c7c;
+        color: #98a6ad;
+    }
+
+    .lc-other-docs {
+        color: #6c757d;
+        text-align: left;
+        max-width: 160px;
+        white-space: normal;
+    }
+
+    .lc-doc-advisory {
+        color: #6c757d;
+        text-align: left;
+        white-space: normal;
+    }
+
+    /* Grouped PFI cells hold several real fields, so they read left-aligned. */
+    .lc-cell {
+        text-align: left !important;
+        white-space: normal;
+        min-width: 130px;
     }
 
     .lc-blockers {
@@ -41,8 +62,9 @@
     <div class="card-header">
         <h4 class="card-title">Letter of Credit Transactions</h4>
         <p class="text-muted mb-0">
-            Documentation matrix for every LC quotation. A transaction stays <strong>Blocked</strong> until the LC terms are
-            recorded, all five documents are received, the LC is unexpired and compliance is marked compliant.
+            Documentation matrix for every LC quotation. A transaction stays <strong>Blocked</strong> until the LC terms
+            are recorded, the LC is unexpired and compliance is marked compliant. The document checklist is optional and
+            is reported for visibility only — it never blocks a shipment on its own.
         </p>
     </div>
 
@@ -75,14 +97,16 @@
             <table id="lcTransactionsTable" class="table table-striped table-bordered">
                 <thead class="bg-soft-secondary">
                     <tr>
-                        <th>Quotation</th>
+                        <th>PFI</th>
                         <th>Client</th>
-                        <th>Deal Value</th>
+                        <th>Destination</th>
+                        <th>Value &amp; Terms</th>
+                        <th>Sales Person</th>
                         <th>LC Number</th>
                         <th>Issuing Bank</th>
-                        <th>Expiry Date</th>
+                        <th>LC Expiry</th>
                         @foreach ($documents as $label)
-                            <th>{{ $label }}</th>
+                            <th title="{{ $label }}">{{ $documentHeadings[$loop->index] ?? $label }}</th>
                         @endforeach
                         <th>Compliance</th>
                         <th>Shipment</th>
@@ -98,15 +122,62 @@
                             $days = $row['days_to_expiry'];
                         @endphp
                         <tr>
-                            <td>
-                                #{{ $quotation->id }}<br>
-                                <small class="text-muted">{{ $quotation->date ? \Carbon\Carbon::parse($quotation->date)->format('d-M-Y') : '-' }}</small>
+                            <td class="lc-cell">
+                                <strong>PFI #{{ $row['pfi_number'] }}</strong><br>
+                                <small class="text-muted">{{ $row['document_type'] ?? '-' }}</small><br>
+                                <small>{{ $row['document_date'] ? $row['document_date']->format('d-M-Y') : '-' }}</small>
+                                @if ($row['validity_days'] !== null)
+                                    <br>
+                                    <small class="text-muted">
+                                        Valid {{ $row['validity_days'] }}
+                                        {{ $row['validity_days'] == 1 ? 'day' : 'days' }}
+                                        @if ($row['valid_until'])
+                                            &rarr; {{ $row['valid_until']->format('d-M-Y') }}
+                                        @endif
+                                    </small>
+                                @endif
+                                @if ($row['sales_order'])
+                                    <br><span class="badge bg-dark">SO {{ $row['sales_order']->so_number }}</span>
+                                @endif
                             </td>
-                            <td>
-                                {{ $quotation->call->company_name ?? $quotation->call->name ?? '-' }}<br>
-                                <small class="text-muted">{{ $quotation->createdBy->name ?? '' }}</small>
+                            <td class="lc-cell">
+                                {{ $row['client_company'] ?: ($row['client_name'] ?: '-') }}
+                                @if ($row['client_company'] && $row['client_name'])
+                                    <br><small class="text-muted">{{ $row['client_name'] }}</small>
+                                @endif
+                                @if ($row['client_contact_person'])
+                                    <br><small class="text-muted">Attn: {{ $row['client_contact_person'] }}</small>
+                                @endif
+                                @if ($row['client_phone'])
+                                    <br><small class="text-muted">{{ $row['client_phone'] }}</small>
+                                @endif
                             </td>
-                            <td>{{ $quotation->currency }} {{ number_format((float) $quotation->deal_value, 2) }}</td>
+                            <td class="lc-cell">
+                                {{ $row['destination_country'] ?: '-' }}
+                                @if ($row['destination_port'])
+                                    <br><small class="text-muted">Port: {{ $row['destination_port'] }}</small>
+                                @endif
+                                @if ($row['port_of_loading'])
+                                    <br><small class="text-muted">Loading: {{ $row['port_of_loading'] }}</small>
+                                @endif
+                                <br>
+                                <small class="text-muted">
+                                    {{ $row['category'] }}@if ($row['incoterm']) &middot; {{ $row['incoterm'] }}@endif
+                                </small>
+                            </td>
+                            <td class="lc-cell">
+                                <strong>{{ $quotation->currency }} {{ number_format((float) $quotation->deal_value, 2) }}</strong>
+                                @if ($row['payment_terms'])
+                                    <br><small class="text-muted">{{ $row['payment_terms'] }}</small>
+                                @endif
+                                @if ($row['bank'])
+                                    <br><small class="text-muted">{{ $row['bank'] }}</small>
+                                @endif
+                                @if ($row['payment_due_date'])
+                                    <br><small class="text-muted">Due {{ $row['payment_due_date']->format('d-M-Y') }}</small>
+                                @endif
+                            </td>
+                            <td class="lc-cell">{{ $row['sales_person'] ?: '-' }}</td>
                             <td>
                                 @if (filled($lc->lc_number))
                                     {{ $lc->lc_number }}
@@ -136,9 +207,14 @@
                             @foreach ($documents as $column => $label)
                                 <td>
                                     @if ($lc->{$column})
-                                        <i class="fa fa-check lc-doc-ok" title="Received"></i>
+                                        <i class="fa fa-check lc-doc-ok" title="Ticked"></i>
                                     @else
-                                        <i class="fa fa-times lc-doc-missing" title="Not received"></i>
+                                        <i class="fa fa-minus lc-doc-missing" title="Not ticked (optional)"></i>
+                                    @endif
+                                    @if ($column === 'doc_others' && $lc->doc_others && filled($lc->doc_others_details))
+                                        <div class="lc-other-docs" title="{{ $lc->doc_others_details }}">
+                                            <small>{{ \Illuminate\Support\Str::limit($lc->doc_others_details, 60) }}</small>
+                                        </div>
                                     @endif
                                 </td>
                             @endforeach
@@ -148,6 +224,8 @@
                                         'compliant' => 'bg-success',
                                         'discrepant' => 'bg-danger',
                                         'under_review' => 'bg-info',
+                                        'bank_processing' => 'bg-primary',
+                                        'in_progress' => 'bg-warning text-dark',
                                         default => 'bg-secondary',
                                     };
                                 @endphp
@@ -170,6 +248,14 @@
                                 @else
                                     <span class="text-muted">-</span>
                                 @endif
+                                @if ($row['documents_not_ticked'])
+                                    <div class="lc-doc-advisory">
+                                        <small>
+                                            Docs {{ $row['documents_received'] }}/{{ count($documents) }} ticked
+                                            &middot; optional: {{ implode(', ', $row['documents_not_ticked']) }}
+                                        </small>
+                                    </div>
+                                @endif
                             </td>
                             <td>
                                 <a class="btn btn-info btn-sm"
@@ -181,7 +267,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ 10 + count($documents) }}" class="text-center text-muted">
+                            <td colspan="{{ 12 + count($documents) }}" class="text-center text-muted">
                                 No Letter of Credit transactions found.
                             </td>
                         </tr>

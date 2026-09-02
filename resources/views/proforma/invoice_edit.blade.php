@@ -320,6 +320,12 @@
                         @php
                             // Ensure edit screens always have a deterministic selection even if legacy rows have NULL.
                             $natureOfDeal = old('nature_of_deal', $quotation->nature_of_deal ?? 'regular_deal');
+                            $documentTypeSelected = old('document_type', $quotation->document_type);
+                            // Letter of credit is only offered on a Proforma Invoice.
+                            $lcAllowed = in_array($documentTypeSelected, ['Proforma', 'Proforma Invoice'], true);
+                            if (! $lcAllowed) {
+                                $natureOfDeal = 'regular_deal';
+                            }
                         @endphp
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="nature_of_deal" id="regular_deal"
@@ -327,11 +333,13 @@
                                 {{ ($natureOfDeal == 'regular_deal') ? 'checked' : '' }}>
                             <label class="form-check-label" for="regular_deal">Regular deal</label>
                         </div>
-                        <div class="form-check form-check-inline">
+                        <div class="form-check form-check-inline" id="letter-of-credit-option"
+                            style="{{ $lcAllowed ? '' : 'display: none;' }}">
                             <input class="form-check-input" type="radio" name="nature_of_deal" id="letter_of_credit"
                                 value="letter_of_credit" required
                                 {{ ($natureOfDeal == 'letter_of_credit') ? 'checked' : '' }}>
                             <label class="form-check-label" for="letter_of_credit">Letter of credit</label>
+                            <span id="lc-option-hint" class="badge bg-warning text-dark" style="display: none;">New</span>
                         </div>
                     </div>
                     <div id="nature-of-deal-error" class="text-danger" style="display: none;"></div>
