@@ -917,6 +917,11 @@ table.dataTable thead th select {
     render: function(data, type, row) {
         if (data) {
             var endTimestamp = new Date(data).getTime();
+            // Already expired: leave the cell empty. The row is back to Available Stock,
+            // so an "Expired" badge would only add noise.
+            if (endTimestamp - Date.now() <= 0) {
+                return '';
+            }
             return '<span class="reservation-countdown" data-end="' + endTimestamp + '">' + formatReservationCountdown(endTimestamp) + '</span>';
         }
         return ''; // If no date, return empty
@@ -1256,7 +1261,7 @@ if (canViewVehicleCost) {
             var now = Date.now();
             var distance = endTimestamp - now;
             if (distance <= 0) {
-                return 'Expired';
+                return '';
             }
             // Show whole days only (rounded up so the last partial day still counts).
             var days = Math.ceil(distance / (1000 * 60 * 60 * 24));
@@ -1274,8 +1279,8 @@ if (canViewVehicleCost) {
                     var distance = endTimestamp - now;
                     $(this).text(formatReservationCountdown(endTimestamp));
                     if (distance <= 0) {
-                        $(this).removeClass('near-expiry');
-                        $(this).text('Expired');
+                        // Expired: drop the badge entirely rather than label it "Expired".
+                        $(this).remove();
                         // The instant a timer reaches 0, refresh once so the row reflects auto-expiry
                         // (salesperson removed, status back to Available). Guarded so it fires only on transition.
                         if (!handledExpiredEnds[endTimestamp]) {
