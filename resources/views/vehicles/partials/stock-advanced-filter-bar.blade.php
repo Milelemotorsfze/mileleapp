@@ -6,6 +6,8 @@ $modelLines = isset($stockFilterModelLines) ? $stockFilterModelLines : collect()
 $variants = isset($stockFilterVariants) ? $stockFilterVariants : collect();
 $warehouses = isset($stockFilterWarehouses) ? $stockFilterWarehouses : collect();
 $territories = isset($stockFilterTerritories) ? collect($stockFilterTerritories) : collect();
+$modelYears = isset($stockFilterModelYears) ? collect($stockFilterModelYears) : collect();
+$fuelTypes = isset($stockFilterFuelTypes) ? collect($stockFilterFuelTypes) : collect();
 $stockVariantMeta = $variants->map(function ($v) {
 return [
 'id' => (string) $v->id,
@@ -255,7 +257,29 @@ return [
                                 </select>
                             </div>
                         </div>
-                        <div class="d-none d-md-block col-md-4"></div>
+                        <div class="col-12 col-md-4 stock-adv-field">
+                            <label class="form-label mb-0">Model year</label>
+                            <div class="stock-adv-select-wrap">
+                                <select class="form-select form-select-sm stock-adv-select" data-field="model_years" multiple>
+                                    @foreach ($modelYears as $my)
+                                    <option value="{{ $my }}">{{ $my }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-2 mt-0">
+                        <div class="col-12 col-md-4 stock-adv-field">
+                            <label class="form-label mb-0">Fuel type</label>
+                            <div class="stock-adv-select-wrap">
+                                <select class="form-select form-select-sm stock-adv-select" data-field="fuel_types" multiple>
+                                    @foreach ($fuelTypes as $ft)
+                                    <option value="{{ $ft }}">{{ $ft }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="d-none d-md-block col-md-8"></div>
                     </div>
                 </section>
 
@@ -794,6 +818,8 @@ return [
                 brand_ids: $w.find('[data-field="brand_ids"]').val() || [],
                 model_line_ids: $w.find('[data-field="model_line_ids"]').val() || [],
                 model_details: $w.find('[data-field="model_details"]').val() || [],
+                model_years: $w.find('[data-field="model_years"]').val() || [],
+                fuel_types: $w.find('[data-field="fuel_types"]').val() || [],
                 variant_ids: $w.find('[data-field="variant_ids"]').val() || [],
                 location_ids: $w.find('[data-field="location_ids"]').val() || [],
                 territories: $w.find('[data-field="territories"]').val() || [],
@@ -820,6 +846,8 @@ return [
                 (p.brand_ids && p.brand_ids.length) ||
                 (p.model_line_ids && p.model_line_ids.length) ||
                 (p.model_details && p.model_details.length) ||
+                (p.model_years && p.model_years.length) ||
+                (p.fuel_types && p.fuel_types.length) ||
                 (p.variant_ids && p.variant_ids.length) ||
                 (p.location_ids && p.location_ids.length) ||
                 (p.territories && p.territories.length) ||
@@ -1054,7 +1082,7 @@ return [
             if (typeof $.fn.select2 !== 'function') {
                 return;
             }
-            $w.find('[data-field="brand_ids"], [data-field="location_ids"], [data-field="territories"], [data-field="sales_person_ids"], [data-field="stock_statuses"]').each(function() {
+            $w.find('[data-field="brand_ids"], [data-field="location_ids"], [data-field="territories"], [data-field="sales_person_ids"], [data-field="stock_statuses"], [data-field="model_years"], [data-field="fuel_types"]').each(function() {
                 if ($(this).data('select2')) {
                     return;
                 }
@@ -1123,7 +1151,7 @@ return [
                 window.stockBarCommitted[tableId] = {};
                 window.stockBarPendingApplyAlert[tableId] = true;
                 $w.find('.stock-adv-inp').val('');
-                $w.find('[data-field="brand_ids"], [data-field="sales_person_ids"], [data-field="stock_statuses"], [data-field="location_ids"], [data-field="territories"]').each(function() {
+                $w.find('[data-field="brand_ids"], [data-field="sales_person_ids"], [data-field="stock_statuses"], [data-field="location_ids"], [data-field="territories"], [data-field="model_years"], [data-field="fuel_types"]').each(function() {
                     $(this).val(null).trigger('change');
                 });
                 var $mlClear = $w.find('[data-field="model_line_ids"]');
@@ -1173,7 +1201,9 @@ return [
                 brands: 'Brand',
                 locations: 'Location',
                 sales_persons: 'Sales person',
-                statuses: 'Status'
+                statuses: 'Status',
+                model_years: 'Model year',
+                fuel_types: 'Fuel type'
             };
             var chunks = [];
             Object.keys(titles).forEach(function(k) {
@@ -1268,6 +1298,18 @@ return [
                 rows.push({
                     label: 'Model description(s)',
                     value: p.model_details.join(', ')
+                });
+            }
+            if (p.model_years && p.model_years.length) {
+                rows.push({
+                    label: 'Model year(s)',
+                    value: p.model_years.join(', ')
+                });
+            }
+            if (p.fuel_types && p.fuel_types.length) {
+                rows.push({
+                    label: 'Fuel type(s)',
+                    value: p.fuel_types.join(', ')
                 });
             }
             if (p.variant_ids && p.variant_ids.length) {

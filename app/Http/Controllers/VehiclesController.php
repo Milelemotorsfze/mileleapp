@@ -3117,6 +3117,18 @@ class VehiclesController extends Controller
                 ->distinct()
                 ->orderBy('territory')
                 ->pluck('territory'),
+            'stockFilterModelYears' => Varaint::query()
+                ->whereNotNull('my')
+                ->where('my', '!=', '')
+                ->distinct()
+                ->orderBy('my', 'desc')
+                ->pluck('my'),
+            'stockFilterFuelTypes' => Varaint::query()
+                ->whereNotNull('fuel_type')
+                ->where('fuel_type', '!=', '')
+                ->distinct()
+                ->orderBy('fuel_type')
+                ->pluck('fuel_type'),
         ];
     }
 
@@ -3225,6 +3237,8 @@ class VehiclesController extends Controller
             'sales_person_ids' => $toIntList($raw['sales_person_ids'] ?? []),
             'territories' => $toStringList($raw['territories'] ?? []),
             'model_details' => $toStringList($raw['model_details'] ?? []),
+            'model_years' => $toStringList($raw['model_years'] ?? []),
+            'fuel_types' => $toStringList($raw['fuel_types'] ?? []),
             'stock_statuses' => $statuses,
             'po_date_from' => isset($raw['po_date_from']) ? trim((string) $raw['po_date_from']) : '',
             'po_date_to' => isset($raw['po_date_to']) ? trim((string) $raw['po_date_to']) : '',
@@ -3352,6 +3366,12 @@ SQL;
         }
         if (count($bar['model_details'] ?? []) > 0) {
             $query->whereIn('varaints.model_detail', $bar['model_details']);
+        }
+        if (count($bar['model_years'] ?? []) > 0) {
+            $query->whereIn('varaints.my', $bar['model_years']);
+        }
+        if (count($bar['fuel_types'] ?? []) > 0) {
+            $query->whereIn('varaints.fuel_type', $bar['fuel_types']);
         }
         $priceMin = $bar['price_min'] ?? '';
         $priceMax = $bar['price_max'] ?? '';
@@ -3513,6 +3533,12 @@ SQL;
         if (count($bar['stock_statuses'] ?? []) >= 2) {
             $dims['statuses'] = 'stock_statuses';
         }
+        if (count($bar['model_years'] ?? []) >= 2) {
+            $dims['model_years'] = 'model_years';
+        }
+        if (count($bar['fuel_types'] ?? []) >= 2) {
+            $dims['fuel_types'] = 'fuel_types';
+        }
 
         if ($dims === []) {
             return null;
@@ -3533,7 +3559,8 @@ SQL;
             $rows = [];
             foreach ($ids as $rawId) {
                 $partial = $bar;
-                if ($barKey === 'stock_statuses') {
+                $isTextDim = in_array($barKey, ['stock_statuses', 'model_years', 'fuel_types'], true);
+                if ($isTextDim) {
                     $partial[$barKey] = [trim((string) $rawId)];
                 } else {
                     $partial[$barKey] = [(int) $rawId];
@@ -3542,14 +3569,14 @@ SQL;
                 $this->applyStockBarFiltersToQuery($q, $partial, $stockReportMode);
                 $n = $this->countDistinctStockVehicleIds($q);
 
-                $idOut = $barKey === 'stock_statuses' ? trim((string) $rawId) : (int) $rawId;
+                $idOut = $isTextDim ? trim((string) $rawId) : (int) $rawId;
                 $nameOut = match ($label) {
                     'model_lines' => (string) ($mlNames[$idOut] ?? $mlNames[(string) $idOut] ?? ('#'.$idOut)),
                     'variants' => (string) ($variantNames[$idOut] ?? $variantNames[(string) $idOut] ?? ('#'.$idOut)),
                     'brands' => (string) ($brandNames[$idOut] ?? $brandNames[(string) $idOut] ?? ('#'.$idOut)),
                     'locations' => (string) ($whNames[$idOut] ?? $whNames[(string) $idOut] ?? ('#'.$idOut)),
                     'sales_persons' => (string) ($spNames[$idOut] ?? $spNames[(string) $idOut] ?? ('#'.$idOut)),
-                    'statuses' => (string) $idOut,
+                    'statuses', 'model_years', 'fuel_types' => (string) $idOut,
                 };
 
                 $rows[] = [
