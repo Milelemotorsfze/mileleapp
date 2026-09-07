@@ -158,6 +158,36 @@
                     <td>{{  $data['client_address']  }} </td>
                     </tr>
                     @endif
+                    @php
+                        // Letter of credit identifiers, so the buyer's bank can match the
+                        // credit against this document. Rows with no value are left out.
+                        $pdfLcDetail = ($quotation->nature_of_deal ?? null) === 'letter_of_credit'
+                            ? $quotation->lcDetail
+                            : null;
+                    @endphp
+                    @if($pdfLcDetail && (filled($pdfLcDetail->lc_number) || filled($pdfLcDetail->issuing_bank) || $pdfLcDetail->lc_expiry_date))
+                    <tr>
+                        <td colspan="2" style="font-weight: bold; background-color: #bbbbbd;">LC Details</td>
+                    </tr>
+                    @if(filled($pdfLcDetail->lc_number))
+                    <tr>
+                        <td style="font-weight: bold;">LC No :</td>
+                        <td>{{ $pdfLcDetail->lc_number }}</td>
+                    </tr>
+                    @endif
+                    @if(filled($pdfLcDetail->issuing_bank))
+                    <tr>
+                        <td style="font-weight: bold;">Issuing Bank :</td>
+                        <td>{{ $pdfLcDetail->issuing_bank }}</td>
+                    </tr>
+                    @endif
+                    @if($pdfLcDetail->lc_expiry_date)
+                    <tr>
+                        <td style="font-weight: bold;">LC Expiry :</td>
+                        <td>{{ $pdfLcDetail->lc_expiry_date->format('M d,Y') }}</td>
+                    </tr>
+                    @endif
+                    @endif
                 </table>
             </td>
             <td style="vertical-align: top;">
