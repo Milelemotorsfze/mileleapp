@@ -4264,16 +4264,23 @@ return [$color->id => $formattedName];
                         $('#vehicleModalvariant').modal('show');
 
                         // Initialize DataTables for the unique table ID
-                        $('#' + tableId).DataTable({
+                        var variantTable = $('#' + tableId).DataTable({
                             "paging": true,
                             "searching": true,
                             "ordering": true
                         });
                         $('#vehicleModalvariant').data('purchasingOrderId', id);
-                        // Initialize Select2 for the dropdowns with z-index adjustment
-                        $('.variant-select').select2({
-                            dropdownParent: $('#vehicleModalvariant')
-                        });
+                        $('#vehicleModalvariant').data('variantTable', variantTable);
+                        // Initialize Select2 for the dropdowns with z-index adjustment.
+                        // Rows on the other pages are not in the DOM yet, so re-run it
+                        // on every redraw for the dropdowns that are not initialized.
+                        function initVariantSelect2() {
+                            $('#' + tableId).find('.variant-select').not('.select2-hidden-accessible').select2({
+                                dropdownParent: $('#vehicleModalvariant')
+                            });
+                        }
+                        variantTable.on('draw', initVariantSelect2);
+                        initVariantSelect2();
 
                     },
                     error: function(xhr) {
@@ -4283,7 +4290,11 @@ return [$color->id => $formattedName];
             });
             $('#savevariantBtn').click(function() {
                 var selectedVariants = [];
-                $('.variant-select').each(function() {
+                var variantTable = $('#vehicleModalvariant').data('variantTable');
+                // Use the DataTables API so rows on the other pages are included
+                var $variantSelects = variantTable ? variantTable.$('.variant-select') :
+                    $('#vehicleModalvariant').find('.variant-select');
+                $variantSelects.each(function() {
                     var vehicleId = $(this).data('vehicle-id');
                     var selectedVariant = $(this).val();
                     selectedVariants.push({
