@@ -3664,9 +3664,12 @@ class WorkOrderController extends Controller
             return response()->json(['success' => false, 'message' => 'Sales order not found or has been cancelled.'], 404);
         }
 
+        $excludeWorkOrderId = $request->input('work_order_id');
+        $excludeWorkOrderId = is_numeric($excludeWorkOrderId) ? (int) $excludeWorkOrderId : null;
+
         return response()->json([
             'success' => true,
-            'data' => $soDataService->buildWorkOrderPayload($so),
+            'data' => $soDataService->buildWorkOrderPayload($so, $excludeWorkOrderId),
         ]);
     }
     function formatPhoneForExcel($number)

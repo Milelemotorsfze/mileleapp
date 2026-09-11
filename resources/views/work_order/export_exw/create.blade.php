@@ -3942,15 +3942,25 @@ $formAction = isset($workOrder)
 		}
 
 		var $vinSummary = $('#soAutoFillVinsSummary');
+		var alreadyUsed = vinResult.alreadyUsed || [];
+		var usedNote = alreadyUsed.length
+			? '<div class="mt-2"><strong>' + alreadyUsed.length + ' VIN(s) already used on earlier work order(s)/batch(es) for this SO</strong> and were skipped: ' +
+				escapeHtmlAttr(alreadyUsed.join(', ')) + '</div>'
+			: '';
+
 		if (vinResult.added > 0) {
 			$vinSummary.removeClass('alert-warning').addClass('alert-info');
 			$vinSummary.html(
 				'<strong>' + vinResult.added + ' vehicle(s) added</strong>' +
-				(vinResult.vins.length ? ': ' + escapeHtmlAttr(vinResult.vins.join(', ')) : '')
+				(vinResult.vins.length ? ': ' + escapeHtmlAttr(vinResult.vins.join(', ')) : '') +
+				usedNote
 			);
 		} else if (vinResult.requested > 0) {
 			$vinSummary.removeClass('alert-info').addClass('alert-warning');
-			$vinSummary.html('<strong>0 vehicles added.</strong> ' + vinResult.requested + ' vehicle(s) found on SO but were already on the form or could not be loaded.');
+			$vinSummary.html('<strong>0 vehicles added.</strong> ' + vinResult.requested + ' vehicle(s) found on SO but were already on the form or could not be loaded.' + usedNote);
+		} else if (alreadyUsed.length > 0) {
+			$vinSummary.removeClass('alert-info').addClass('alert-warning');
+			$vinSummary.html('<strong>0 vehicles added.</strong> Every VIN on this SO is already assigned to an existing work order/batch.' + usedNote);
 		} else {
 			$vinSummary.removeClass('alert-warning').addClass('alert-info');
 			$vinSummary.html('<strong>0 vehicles added.</strong> No VINs were returned from this SO.');
@@ -4114,7 +4124,8 @@ $formAction = isset($workOrder)
 			method: 'POST',
 			data: {
 				_token: $('meta[name="csrf-token"]').attr('content'),
-				so_number: soNumber
+				so_number: soNumber,
+				work_order_id: (workOrder != null && workOrder.id) ? workOrder.id : null
 			},
 			success: function(response) {
 				if (requestSeq !== soDetailsRequestSeq) {
@@ -4131,6 +4142,9 @@ $formAction = isset($workOrder)
 
 				var filledFields = populateWorkOrderFromSo(response.data, replaceExisting);
 				var vinResult = populateSoVehicles(vinRows);
+				// VINs consumed by earlier batches/work orders on this SO are reported separately.
+				vinResult.alreadyUsed = response.data.already_used_vins || [];
+				vinResult.soTotal = response.data.so_vin_count || 0;
 				soAutoFillAppliedFor = soNumber;
 				showSoAutoFillSummaryModal(soNumber, buildSoAutoFillSummary(filledFields, response.data), vinResult);
 			},
