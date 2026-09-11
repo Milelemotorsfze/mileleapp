@@ -11,6 +11,8 @@ use App\Models\User;
 use App\Models\Soitems;
 use App\Models\SoVariant;
 use App\Models\Vehicles;
+use App\Models\WorkOrder;
+use App\Models\WOVehicles;
 use App\Support\OrderStockType;
 use App\Support\QuotationLeadResolver;
 use Illuminate\Support\Collection;
@@ -33,7 +35,10 @@ class WorkOrderSoDataService
             ->first();
     }
 
-    public function buildWorkOrderPayload(So $so): array
+    /**
+     * @param  int|null  $excludeWorkOrderId  Work order being edited, so its own VINs are not treated as consumed.
+     */
+    public function buildWorkOrderPayload(So $so, ?int $excludeWorkOrderId = null): array
     {
         $so->loadMissing(['salesperson:id,name,email', 'quotation']);
 
@@ -84,6 +89,16 @@ class WorkOrderSoDataService
             $vehicleQuantity = (int) QuotationItem::where('quotation_id', $quotation->id)->sum('quantity');
         }
 
+        // VINs already taken by earlier work orders / batches on the same SO must not be offered again.
+        $consumedVins = $this->resolveConsumedVins($so, $excludeWorkOrderId);
+        $alreadyUsedVins = $vehicles
+            ->filter(fn (Vehicles $vehicle) => $consumedVins->contains($this->normalizeVin($vehicle->vin)))
+            ->pluck('vin')
+            ->values();
+        $availableVehicles = $vehicles
+            ->reject(fn (Vehicles $vehicle) => $consumedVins->contains($this->normalizeVin($vehicle->vin)))
+            ->values();
+
         return [
             'so_id' => $so->id,
             'so_number' => $so->so_number,
@@ -115,8 +130,48 @@ class WorkOrderSoDataService
             'payment_terms' => $quotationDetail?->paymentterms?->name,
             'quotation_document_type' => $quotation?->document_type,
             'consignee' => $customer['customer_name'],
-            'vins' => $vehicles->map(fn (Vehicles $vehicle) => $this->formatVehicleRow($vehicle))->values()->all(),
+            'vins' => $availableVehicles->map(fn (Vehicles $vehicle) => $this->formatVehicleRow($vehicle))->values()->all(),
+            'so_vin_count' => $vehicles->count(),
+            'available_vin_count' => $availableVehicles->count(),
+            'already_used_vins' => $alreadyUsedVins->all(),
         ];
+    }
+
+    /**
+     * VINs already attached to other (non-cancelled, non-deleted) work orders for the same SO number.
+     */
+    private function resolveConsumedVins(So $so, ?int $excludeWorkOrderId): Collection
+    {
+        $soNumber = trim((string) $so->so_number);
+        if ($soNumber === '') {
+            return collect();
+        }
+
+        $workOrderIds = WorkOrder::query()
+            ->select('id')
+            ->where('so_number', $soNumber)
+            ->when($excludeWorkOrderId, fn ($query) => $query->where('id', '!=', $excludeWorkOrderId))
+            ->with('latestStatus')
+            ->get()
+            ->reject(fn (WorkOrder $workOrder) => ($workOrder->latestStatus->status ?? '') === 'Cancelled')
+            ->pluck('id');
+
+        if ($workOrderIds->isEmpty()) {
+            return collect();
+        }
+
+        return WOVehicles::whereIn('work_order_id', $workOrderIds)
+            ->whereNotNull('vin')
+            ->pluck('vin')
+            ->map(fn ($vin) => $this->normalizeVin($vin))
+            ->filter()
+            ->unique()
+            ->values();
+    }
+
+    private function normalizeVin(?string $vin): string
+    {
+        return strtoupper(trim((string) $vin));
     }
 
     /**
