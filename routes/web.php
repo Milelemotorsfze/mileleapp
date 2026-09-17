@@ -234,6 +234,7 @@ Route::get('/d', function () {
     Route::get('getAddonlists', [AddonController::class,'getAddonlists'])->name('addon.getAddonlists');
     Route::post('getAddonCodeAndDropdown', [AddonController::class, 'getAddonCodeAndDropdown'])->name('addon.getAddonCodeAndDropdown');
     Route::get('addons/brandModels/{id}', [AddonController::class, 'brandModels'])->name('addon.brandModels');
+    Route::get('addons/export/{data}', [AddonController::class, 'export'])->name('addon.export');
     Route::get('addons/{data}', [AddonController::class,'index'])->name('addon.list');
     Route::post('getModelDescriptionDropdown', [AddonController::class, 'getModelDescriptionDropdown'])->name('addon.getModelDescriptionDropdown');
     Route::get('addon/kitItems/{id}', [AddonController::class, 'kitItems'])->name('addon.kitItems');

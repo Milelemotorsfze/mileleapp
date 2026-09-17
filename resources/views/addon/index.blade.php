@@ -140,6 +140,14 @@ body {font-family: Arial, Helvetica, sans-serif;}
     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['accessories-list','spare-parts-list','kit-list']);
     @endphp
     @if ($hasPermission)
+    @php
+    $exportPermissions = ['P' => ['accessories-list'], 'SP' => ['spare-parts-list'], 'K' => ['kit-list']][$data] ?? ['accessories-list','spare-parts-list','kit-list'];
+    @endphp
+    @if (Auth::user()->hasPermissionForSelectedRole($exportPermissions))
+    <a style="float: right; margin-right:5px;" class="btn btn-sm btn-primary" href="{{ route('addon.export', $data) }}">
+      <i class="fa fa-download" aria-hidden="true"></i> Export
+    </a>
+    @endif
     <a id="addonListTableButton" onclick="showAddonTable()" style="float: right; margin-right:5px;" class="btn btn-sm btn-info">
       <i class="fa fa-table" aria-hidden="true"></i>
     </a>
