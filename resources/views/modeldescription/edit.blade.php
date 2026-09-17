@@ -106,7 +106,7 @@ $grades = $oldModelId ? \App\Models\MasterGrades::where('model_line_id', $oldMod
                     <span class="error">* </span>
                     <select class="form-control select2" name="engine" id="engine" required>
                         <option value="" disabled>Select Engine</option>
-                        @php $engines = ['0.8','1.0','1.2','1.3','1.4','1.5','1.6','1.8','2.0','2.2','2.4','2.5','2.7','2.8','3.0','3.3','3.4','3.5','3.6','3.8','4.0','4.2','4.4','4.5','4.6','4.8','5.0','5.2','5.3','5.5','5.6','5.7','5.9','6.0','6.2','6.7']; @endphp
+                        @php $engines = ['0.8','1.0','1.2','1.3','1.4','1.5','1.6','1.8','2.0','2.2','2.4','2.5','2.7','2.8','3.0','3.3','3.4','3.5','3.6','3.8','4.0','4.2','4.4','4.5','4.6','4.8','5.0','5.2','5.3','5.5','5.6','5.7','5.9','6.0','6.2','6.5','6.7']; @endphp
                         @foreach($engines as $engine)
                         <option value="{{ $engine }}" {{ old('engine', $modelDescription->engine) == $engine ? 'selected' : '' }}>{{ $engine }}</option>
                         @endforeach

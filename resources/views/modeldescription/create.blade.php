@@ -185,6 +185,7 @@ $grades = $oldModelId ? \App\Models\MasterGrades::where('model_line_id', $oldMod
                         <option value="5.9" {{ old('engine') == '5.9' ? 'selected' : '' }}>5.9</option>
                         <option value="6.0" {{ old('engine') == '6.0' ? 'selected' : '' }}>6.0</option>
                         <option value="6.2" {{ old('engine') == '6.2' ? 'selected' : '' }}>6.2</option>
+                        <option value="6.5" {{ old('engine') == '6.5' ? 'selected' : '' }}>6.5</option>
                         <option value="6.7" {{ old('engine') == '6.7' ? 'selected' : '' }}>6.7</option>
                     </select>
                 </div>
