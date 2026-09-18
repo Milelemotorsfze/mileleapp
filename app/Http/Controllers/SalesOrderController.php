@@ -640,7 +640,7 @@ class SalesOrderController extends Controller
             }
 
             // Generate latest quotation
-            $file = $this->generateLatestQuotation($so->id);
+            $this->generateLatestQuotation($so->id);
 
             // Cleanup any orphaned SO items and vehicles
             $this->cleanupOrphanedSoItems($so->id);
@@ -1016,9 +1016,10 @@ class SalesOrderController extends Controller
         $quotationFile->quotation_id = $quotation->id;
         $quotationFile->file_name = $file;
         $quotationFile->save();
-        info($so->total);
-        info("total");
-      
+
+        // point the quotation at the latest generated pdf
+        $quotation->file_path = 'quotation_files/' . $file;
+        $quotation->save();
 
         return $file;
     }
@@ -1661,6 +1662,9 @@ class SalesOrderController extends Controller
             $solog->role = Auth::user()->selectedRole;
             $solog->save();
 
+            // Generate latest quotation pdf and add it to quotation files
+            $this->generateLatestQuotation($so->id);
+
             // Cleanup any orphaned SO items and vehicles
             $this->cleanupOrphanedSoItems($so->id);
 
@@ -2149,9 +2153,7 @@ class SalesOrderController extends Controller
         $quotation = Quotation::findOrFail($so->quotation_id);
         $status = $request->status;
         if ($status == 'Approved') {
-            $file = $this->generateLatestQuotation($so->id);
-            $quotation->file_path = 'quotation_files/' . $file;
-            $quotation->save();
+            $this->generateLatestQuotation($so->id);
             $so->status = 'Approved';
             $so->save();
         } else {
