@@ -1562,6 +1562,12 @@ class SalesOrderController extends Controller
                 $this->getSubmittedQuotationItemIds($request, $newVariantQuotationItemIds)
             );
 
+            // Total Payment is read-only on this form and never re-priced, so rebuild the SO total
+            // from the line amounts (qty x price), the same way the quotation total is built.
+            // generateLatestQuotation() copies it to the quotation's deal_value for the pdf totals.
+            $so->total = round((float) QuotationItem::where('quotation_id', $so->quotation_id)->sum('total_amount'), 2);
+            $so->save();
+
             // Delete existing Soitems records related to the Sales Order ID.
             // Rows are linked to an SO either by so_id or by so_variant_id (the create path
             // only sets so_variant_id), so both links must be cleared - otherwise the rows

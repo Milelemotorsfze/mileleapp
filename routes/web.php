@@ -629,6 +629,7 @@ Route::get('/d', function () {
     Route::get('callsdatacenter', [CallsController::class,'datacenter'])->name('calls.datacenter');
     Route::get('leadsexport', [CallsController::class,'leadsexport'])->name('calls.leadsexport');
     Route::post('exportsleadsform', [CallsController::class,'exportsleadsform'])->name('calls.exportsleadsform');
+    Route::get('leadsexport/all', [CallsController::class,'exportAllLeads'])->name('calls.exportallleads');
     Route::resource('sales_person_languages', SalesPersonLanguagesController::class);
     Route::resource('variant_pictures', VariatnsPicturesController::class);
     Route::get('/editreels/{id}', [VariatnsPicturesController::class, 'editreels'])->name('variant_pictures.editreels');
