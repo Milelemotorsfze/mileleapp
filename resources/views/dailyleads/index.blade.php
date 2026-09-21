@@ -224,6 +224,9 @@ input[type=number]::-webkit-outer-spin-button
                 <a class="btn btn-sm btn-info" href="{{ route('salescustomers.index') }}">
                     <i class="fa fa-users" aria-hidden="true"></i> Customers
                 </a>
+                <a class="btn btn-sm btn-dark ms-lg-1 d-none" id="export-active-leads" href="{{ route('calls.exportallleads', ['scope' => 'active']) }}">
+                    <i class="fa fa-download" aria-hidden="true"></i> Export Active Leads
+                </a>
             @endif
         </div>
     </div>
@@ -1986,6 +1989,13 @@ function saveRejection() {
     // Open the WhatsApp chat window
     window.open(whatsappURL, '_blank');
 }
+</script>
+
+<script>
+  // Only show the export button while the Active Leads tab is open
+  $(document).on('shown.bs.tab', 'a[data-bs-toggle="pill"]', function (e) {
+    $('#export-active-leads').toggleClass('d-none', $(e.target).attr('href') !== '#tab11');
+  });
 </script>
 
 <script>

@@ -4,8 +4,11 @@
   $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
   @endphp
   @if ($hasPermission)
-<div class="card-header">
-        <h4 class="card-title">Exports Leads</h4>
+<div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="card-title mb-0">Exports Leads</h4>
+        <a href="{{ route('calls.exportallleads') }}" class="btn btn-primary">
+            <i class="fa fa-download"></i> Export All Leads
+        </a>
     </div>
     <div class="card-body">
     <form action="{{ route('calls.exportsleadsform') }}" method="post" enctype="multipart/form-data">

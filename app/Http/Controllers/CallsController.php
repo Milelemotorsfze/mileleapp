@@ -7,6 +7,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use App\Models\UserActivities;
 use App\Models\User;
 use App\Exports\LeadsExport;
+use Rap2hpoutre\FastExcel\FastExcel;
 use Yajra\DataTables\DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -2327,34 +2328,7 @@ class CallsController extends Controller
 
         $parsedResults = [];
         foreach ($results as $row) {
-            // Parse remarks for additional fields
-            $parsed = [
-                'Car Interested In' => '',
-                'Purpose of Purchase' => '',
-                'End User' => '',
-                'Destination Country' => '',
-                'Planned Units' => '',
-                'Experience with UAE Sourcing' => '',
-                'Shipping Assistance Required' => '',
-                'Payment Method' => '',
-                'Previous Purchase History' => '',
-                'Purchase Timeline' => '',
-                'General Remark / Additional Notes' => '',
-            ];
-
-            if (!empty($row->remarks)) {
-                $lines = explode('###SEP###', $row->remarks);
-                foreach ($lines as $line) {
-                    foreach ($parsed as $key => $val) {
-                        if (stripos($line, $key) !== false) {
-                            $parts = explode(':', $line, 2);
-                            if (isset($parts[1])) {
-                                $parsed[$key] = trim($parts[1]);
-                            }
-                        }
-                    }
-                }
-            }
+            $parsed = $this->parseLeadRemarks($row->remarks);
 
             // Format phone number with country code and remove spaces
             $formattedPhone = '';
@@ -2405,6 +2379,196 @@ class CallsController extends Controller
             $parsedResults[] = $rowData;
         }
         return Excel::download(new LeadsExport($parsedResults, $headings), 'leads_export.xlsx');
+    }
+
+    /**
+     * Export leads with all of their fields. Rows are streamed so the full table
+     * doesn't have to fit in memory.
+     *
+     * ?scope=active exports the Daily Leads "Active Leads" tab, with the same visibility
+     * rules as that tab; otherwise every lead is exported (Calls-modified only).
+     */
+    public function exportAllLeads(Request $request)
+    {
+        $user = Auth::user();
+        $activeOnly = $request->input('scope') === 'active';
+
+        if (!$activeOnly && !$user->hasPermissionForSelectedRole('Calls-modified')) {
+            abort(403);
+        }
+
+        $useractivities = new UserActivities();
+        $useractivities->activity = $activeOnly ? "Export Active Leads Data" : "Export All Leads Data";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+
+        @set_time_limit(0);
+        DB::statement('SET SESSION group_concat_max_len = 65535');
+
+        $query = DB::table('calls as c')
+            ->leftJoin('users as sp', 'c.sales_person', '=', 'sp.id')
+            ->leftJoin('users as cb', 'c.created_by', '=', 'cb.id')
+            ->leftJoin('lead_source as ls', 'c.source', '=', 'ls.id')
+            ->leftJoin('strategies as st', 'c.strategies_id', '=', 'st.id')
+            ->select(
+                'c.id',
+                'c.name',
+                DB::raw('CAST(c.phone AS CHAR) as phone'),
+                DB::raw('CAST(c.secondary_phone_number AS CHAR) as secondary_phone_number'),
+                'c.email',
+                'c.company_name',
+                'c.client_contact_person',
+                'c.client_category',
+                'c.location',
+                'c.address',
+                'c.region',
+                'c.countryofexport',
+                'c.language',
+                'c.type',
+                'c.leadtype',
+                'c.customer_coming_type',
+                'c.priority',
+                'c.status',
+                'ls.source_name as lead_source_name',
+                'st.name as strategy_name',
+                'sp.name as sales_person_name',
+                'c.assign_time',
+                'cb.name as created_by_name',
+                'c.created_at',
+                'c.updated_at',
+                'c.custom_brand_model',
+                'c.remarks',
+                'c.old_remarks_data',
+                'c.sales_person_remarks',
+                'c.client_remarks',
+                'c.csr_price',
+                'c.csr_currency'
+            );
+
+        if ($activeOnly) {
+            // Same rules as the Daily Leads "Active Leads" tab (DailyleadsController@index, status=activelead)
+            $query->whereIn('c.status', ['contacted', 'working', 'qualify', 'converted', 'Follow Up', 'Prospecting']);
+
+            if (!$user->hasPermissionForSelectedRole('sales-support-full-access') && !$user->hasPermissionForSelectedRole('leads-view-only')) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('c.sales_person', $user->id)
+                        ->orWhere('c.created_by', $user->id);
+                });
+            }
+        }
+
+        // Excel caps a cell at 32,767 characters
+        $cell = fn ($value) => mb_substr(trim((string) ($value ?? '')), 0, 32000);
+
+        $rows = function () use ($query, $cell) {
+            $lastId = 0;
+            do {
+                $leads = (clone $query)->where('c.id', '>', $lastId)->orderBy('c.id')->limit(2000)->get();
+                if ($leads->isEmpty()) {
+                    break;
+                }
+                $lastId = $leads->last()->id;
+
+                $requirements = DB::table('calls_requirement as cr')
+                    ->leftJoin('master_model_lines as mml', 'cr.model_line_id', '=', 'mml.id')
+                    ->leftJoin('brands as b', 'mml.brand_id', '=', 'b.id')
+                    ->whereIn('cr.lead_id', $leads->pluck('id'))
+                    ->select(
+                        'cr.lead_id',
+                        DB::raw("GROUP_CONCAT(CONCAT_WS(' / ', b.brand_name, mml.model_line, NULLIF(cr.trim, ''), NULLIF(cr.variant, ''), CONCAT('Qty: ', cr.qty)) ORDER BY cr.id SEPARATOR '; ') as requirements")
+                    )
+                    ->groupBy('cr.lead_id')
+                    ->pluck('requirements', 'lead_id');
+
+                foreach ($leads as $row) {
+                    $parsed = $this->parseLeadRemarks($row->remarks);
+
+                    yield [
+                        'Lead ID' => $row->id,
+                        'Name' => $cell($row->name),
+                        'Phone' => $this->formatPhoneNumberForExport($row->phone),
+                        'Secondary Phone' => $this->formatPhoneNumberForExport($row->secondary_phone_number),
+                        'Email' => $cell($row->email),
+                        'Company Name' => $cell($row->company_name),
+                        'Contact Person' => $cell($row->client_contact_person),
+                        'Client Category' => $cell($row->client_category),
+                        'Location' => $cell($row->location),
+                        'Address' => $cell($row->address),
+                        'Region' => $cell($row->region),
+                        'Country of Export' => $cell($row->countryofexport),
+                        'Language' => $cell($row->language),
+                        'Type' => $cell($row->type),
+                        'Lead Type' => $cell($row->leadtype),
+                        'Customer Coming Type' => $cell($row->customer_coming_type),
+                        'Priority' => $cell($row->priority),
+                        'Status' => $cell($row->status),
+                        'Lead Source' => $cell($row->lead_source_name),
+                        'Strategy' => $row->strategy_name ?? 'No Strategy',
+                        'Sales Person' => $cell($row->sales_person_name),
+                        'Assign Time' => $cell($row->assign_time),
+                        'Created By' => $cell($row->created_by_name),
+                        'Created At' => $cell($row->created_at),
+                        'Updated At' => $cell($row->updated_at),
+                        'Custom Brand Model' => $cell($row->custom_brand_model),
+                        'Requirements (Brand / Model Line / Trim / Variant / Qty)' => $cell($requirements[$row->id] ?? ''),
+                        'Car Interested In' => $parsed['Car Interested In'],
+                        'Purpose of Purchase' => $parsed['Purpose of Purchase'],
+                        'End User' => $parsed['End User'],
+                        'Destination Country' => $parsed['Destination Country'],
+                        'Planned Units' => $parsed['Planned Units'],
+                        'Experience with UAE Sourcing' => $parsed['Experience with UAE Sourcing'],
+                        'Shipping Assistance Required' => $parsed['Shipping Assistance Required'],
+                        'Payment Method' => $parsed['Payment Method'],
+                        'Previous Purchase History' => $parsed['Previous Purchase History'],
+                        'Purchase Timeline' => $parsed['Purchase Timeline'],
+                        'General Remark / Additional Notes' => $parsed['General Remark / Additional Notes'],
+                        'Full Remarks' => $cell(str_replace('###SEP###', "\n", (string) $row->remarks)),
+                        'Old Remarks' => $cell($row->old_remarks_data),
+                        'Sales Person Remarks' => $cell($row->sales_person_remarks),
+                        'Client Remarks' => $cell($row->client_remarks),
+                        'CSR Price' => is_numeric($row->csr_price) && $row->csr_price > 0 ? number_format($row->csr_price, 2, '.', ',') : '',
+                        'CSR Currency' => !empty($row->csr_currency) ? $row->csr_currency : 'AED',
+                    ];
+                    }
+            } while ($leads->count() === 2000);
+        };
+
+        return (new FastExcel($rows()))->download(($activeOnly ? 'active_leads_' : 'all_leads_') . date('Y-m-d') . '.xlsx');
+    }
+
+    /**
+     * Pull the structured "Key: value" fields out of a lead's ###SEP###-separated remarks.
+     */
+    private function parseLeadRemarks($remarks)
+    {
+        $parsed = [
+            'Car Interested In' => '',
+            'Purpose of Purchase' => '',
+            'End User' => '',
+            'Destination Country' => '',
+            'Planned Units' => '',
+            'Experience with UAE Sourcing' => '',
+            'Shipping Assistance Required' => '',
+            'Payment Method' => '',
+            'Previous Purchase History' => '',
+            'Purchase Timeline' => '',
+            'General Remark / Additional Notes' => '',
+        ];
+
+        if (!empty($remarks)) {
+            foreach (explode('###SEP###', $remarks) as $line) {
+                foreach ($parsed as $key => $val) {
+                    if (stripos($line, $key) !== false) {
+                        $parts = explode(':', $line, 2);
+                        if (isset($parts[1])) {
+                            $parsed[$key] = trim($parts[1]);
+                        }
+                    }
+                }
+            }
+        }
+
+        return $parsed;
     }
 
     /**
