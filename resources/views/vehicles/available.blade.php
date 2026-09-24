@@ -555,7 +555,7 @@ table.dataTable thead th select {
         <h5 class="modal-title" id="noImageModalLabel">No Images Available</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" id="noImageModalBody">
         No images are available on the website for this vehicle.
       </div>
       <div class="modal-footer">
@@ -933,7 +933,9 @@ $hasEditEstimationDatePermission = Auth::user()->hasPermissionForSelectedRole('e
     name: 'vehicles.vin',
     render: function(data, type, row) {
         if (data) {
-            var url = 'https://milelemotors.sharepoint.com/:f:/r/sites/source/DMS/Warehouse%20%26%20Operations/VEHICLE%20PICTURES/' + data + '/GRN?csf=1&web=1&e=GPkael';
+            var url = 'https://milelemotors.sharepoint.com/sites/source/DMS/Forms/AllItems.aspx?id='
+                + encodeURIComponent('/sites/source/DMS/Warehouse & Operations/VEHICLE PICTURES/' + String(data).trim())
+                + '&viewid=b74ad905-4ccc-4a5e-8b75-94cbba72597b&viewpath=' + encodeURIComponent('/sites/source/DMS');
             return '<a href="' + url + '" target="_blank">' + data + '</a>';
         } else {
             return data;
@@ -941,7 +943,7 @@ $hasEditEstimationDatePermission = Auth::user()->hasPermissionForSelectedRole('e
     }
 },
         { data: 'engine', name: 'vehicles.engine', render: function(data, type, row) {
-            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
+            return '<a href="#" onclick="fetchVehicleData(' + row.id + '); return false;" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
         { data: 'my', name: 'varaints.my' },
         { data: 'steering', name: 'varaints.steering' },
@@ -1674,24 +1676,24 @@ function fetchVehicleData(vehicleId) {
             vehicle_id: vehicleId
         },
         success: function(response) {
-            if (response.gallery) {
+            if (response.gallery && response.gallery.length) {
                 displayGallery(response.gallery);
                 $('#imageModal').modal('show');
             } else {
-                alert('No post found');
+                showNoImagePopup();
             }
         },
         error: function(xhr) {
-            if (xhr.status === 404) {
-                showNoImagePopup();
-            } else {
-                console.error(xhr);
-            }
+            console.error(xhr);
+            showNoImagePopup(xhr.status === 404
+                ? 'No images are available on the website for this vehicle.'
+                : 'Pictures could not be loaded right now. Please try again later.');
         }
     });
 }
 
-function showNoImagePopup() {
+function showNoImagePopup(message) {
+    $('#noImageModalBody').text(message || 'No images are available on the website for this vehicle.');
     $('#noImageModal').modal('show');
 }
 function displayGallery(imageUrls) {

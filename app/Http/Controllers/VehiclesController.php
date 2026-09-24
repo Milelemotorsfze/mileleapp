@@ -3855,40 +3855,56 @@ SQL;
     {
         $vehicleId = $request->input('vehicle_id');
         $vehicle = Vehicles::with('variant', 'exterior')->findOrFail($vehicleId);
-        $variant = str_replace(' ', '', $vehicle->variant->name);
-        $post = $this->fetchPost($variant, $vehicle->exterior ? $vehicle->exterior->name : null);
-
-        if (!$post) {
-            // Remove the first letter of the variant name and try again
-            $variant = substr($variant, 1);
-            $post = $this->fetchPost($variant, $vehicle->exterior ? $vehicle->exterior->name : null);
+        if (!$vehicle->variant) {
+            return response()->json(['message' => 'No post found'], 404);
         }
+        $variant = str_replace(' ', '', $vehicle->variant->name);
+        $exteriorColor = $vehicle->exterior ? $vehicle->exterior->name : null;
 
-        if ($post) {
+        try {
+            $post = $this->fetchPost($variant, $exteriorColor);
+
+            if (!$post) {
+                // Remove the first letter of the variant name and try again
+                $variant = substr($variant, 1);
+                $post = $this->fetchPost($variant, $exteriorColor);
+            }
+
+            if (!$post) {
+                return response()->json(['message' => 'No post found'], 404);
+            }
+
             $galleryMeta = DB::connection('wordpress')->table('mm_postmeta')
                 ->where('post_id', $post->ID)
                 ->where('meta_key', 'gallery')
                 ->first();
 
-            $galleryIds = unserialize($galleryMeta->meta_value);
+            $galleryIds = $galleryMeta ? @unserialize($galleryMeta->meta_value) : [];
 
             $imageUrls = [];
-            foreach ($galleryIds as $id) {
-                $imagePost = DB::connection('wordpress')->table('mm_posts')
-                    ->where('ID', $id)
-                    ->first();
-
-                if ($imagePost) {
-                    $imageUrls[] = $imagePost->guid;
-                }
+            if (is_array($galleryIds) && !empty($galleryIds)) {
+                $guids = DB::connection('wordpress')->table('mm_posts')
+                    ->whereIn('ID', $galleryIds)
+                    ->pluck('guid', 'ID');
+                // Keep the gallery's own ordering
+                $imageUrls = collect($galleryIds)
+                    ->map(fn ($id) => $guids[$id] ?? null)
+                    ->filter()
+                    ->values()
+                    ->all();
             }
-
-            return response()->json([
-                'gallery' => $imageUrls
-            ]);
-        } else {
-            return response()->json(['message' => 'No post found'], 404);
+        } catch (\Throwable $e) {
+            Log::error('Vehicle gallery fetch failed', ['vehicle_id' => $vehicleId, 'error' => $e->getMessage()]);
+            return response()->json(['message' => 'Unable to load pictures right now'], 503);
         }
+
+        if (empty($imageUrls)) {
+            return response()->json(['message' => 'No pictures found'], 404);
+        }
+
+        return response()->json([
+            'gallery' => $imageUrls
+        ]);
     }
 
     private function fetchPost($variant, $exteriorColor)
