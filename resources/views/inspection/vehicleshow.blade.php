@@ -212,6 +212,7 @@
                                         <option value="6.0" {{ old('engine') == '6.0' ? 'selected' : '' }}>6.0</option>
                                         <option value="6.2" {{ old('engine') == '6.2' ? 'selected' : '' }}>6.2</option>
                                         <option value="6.7" {{ old('engine') == '6.7' ? 'selected' : '' }}>6.7</option>
+                                        <option value="8.0" {{ old('engine') == '8.0' ? 'selected' : '' }}>8.0</option>
                                     </select>
                                 </div>
                             </div>
