@@ -2455,7 +2455,7 @@ return [$color->id => $formattedName];
                                     <td>{{ $transition->transaction_type }}</td>
                                     <td>{{ number_format($transition->transaction_amount, 0, '', ',') }}</td>
                                     <td>{{ $transition->account_currency }}</td>
-                                    <td>{{ $transition->user->name }}</td>
+                                    <td>{{ $transition->user->name ?? '' }}</td>
                                     <td>{{ $transition->payment_relaesed_date ? \Illuminate\Support\Carbon::parse($transition->payment_relaesed_date)->format('d M Y') : ''}} </td>
                                     <td>{{ $transition->vehicle_count }}</td>
                                     <td>{{ $transition->remarks }}</td>
@@ -2703,7 +2703,7 @@ return [$color->id => $formattedName];
                                 <td>{{ date('d-M-Y', strtotime($vehicleslog->date)) }} {{$vehicleslog->time}}</td>
                                 <td>@php
                                     $change_by = DB::table('users')->where('id', $vehicleslog->created_by)->first();
-                                    $change_bys = $change_by->name;
+                                    $change_bys = $change_by->name ?? '';
                                     @endphp
                                     {{ ucfirst(strtolower($change_bys)) }}
                                 </td>
@@ -2744,7 +2744,7 @@ return [$color->id => $formattedName];
                             <tr>
                                 @php
                                 $username = DB::table('users')->where('id', $purchasedorderevents->created_by)->first();
-                                $usernames = $username->name;
+                                $usernames = $username->name ?? '';
                                 @endphp
                                 <td>{{ $purchasedorderevents->created_at->format('d-M-Y') }}</td>
                                 <td>{{$usernames }}</td>
