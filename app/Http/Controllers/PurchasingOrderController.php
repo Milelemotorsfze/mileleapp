@@ -4505,7 +4505,7 @@ class PurchasingOrderController extends Controller
                 $vehicleslog->time = now()->toTimeString();
                 $vehicleslog->date = now()->toDateString();
                 $vehicleslog->status = 'Vehicle Cancel';
-                $vehicleslog->vehicles_id = $id;
+                $vehicleslog->vehicles_id = $vehicle->id;
                 $vehicleslog->field = "Status";
                 $vehicleslog->old_value = $vehicle->status;
                 $vehicleslog->new_value = 'Vehicle Cancel';
