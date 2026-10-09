@@ -464,6 +464,8 @@ Route::get('/d', function () {
         Route::post('work-order/fetch-so-details', 'fetchSoDetailsForWorkOrder')->name('work-order.fetch-so-details');
         Route::get('work-order-create/{type}', 'workOrderCreate')->name('work-order-create.create');
         Route::get('work-order-info/{type}', 'index')->name('work-order.index');
+        Route::get('work-order/vin-report', 'vinReport')->name('work-order.vin-report');
+        Route::get('work-order/vin-report/export', 'vinReportExport')->name('work-order.vin-report.export');
         Route::post('/fetch-addons', 'fetchAddons')->name('fetch-addons');
         Route::post('/comments', 'storeComments')->name('comments.store');
         Route::post('work-order/so-unique-check', 'uniqueSO')->name('work-order.uniqueSO');
