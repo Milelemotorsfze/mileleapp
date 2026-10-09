@@ -47,6 +47,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Rap2hpoutre\FastExcel\FastExcel;
 use App\Support\OrderStockType;
 use App\Services\WorkOrderSoDataService;
+use App\Services\WorkOrderVinReportService;
+use Yajra\DataTables\Facades\DataTables;
 
 class WorkOrderController extends Controller
 {
@@ -79,6 +81,84 @@ class WorkOrderController extends Controller
         $formData = $this->getWorkOrderFormDropdownData($authId, $hasLimitedAccess, null, false);
 
         return view('work_order.export_exw.create', array_merge(compact('type'), $formData));
+    }
+    /**
+     * VIN report: every VIN linked to a work order with its WO / SO / PO / GRN / stock details.
+     */
+    public function vinReport(Request $request, WorkOrderVinReportService $report)
+    {
+        $limitedToUserId = $this->vinReportAccessUserId();
+        $filters = $this->vinReportFilters($request);
+
+        if ($request->ajax()) {
+            $query = $report->applyFilters($report->query($limitedToUserId), $filters);
+            return DataTables::query($query)->make(true);
+        }
+
+        (new UserActivityController)->createActivity('Open work order VIN report page');
+        $filterOptions = $report->filterOptions($limitedToUserId);
+        $columns = WorkOrderVinReportService::COLUMNS;
+
+        return view('work_order.export_exw.vin_report', compact('filterOptions', 'columns'));
+    }
+
+    public function vinReportExport(Request $request, WorkOrderVinReportService $report)
+    {
+        $limitedToUserId = $this->vinReportAccessUserId();
+        (new UserActivityController)->createActivity('Export work order VIN report');
+
+        $query = $report->applyFilters($report->query($limitedToUserId), $this->vinReportFilters($request))
+            ->orderByDesc('r.wo_date')
+            ->orderBy('r.wo_number')
+            ->orderBy('r.vin');
+
+        $rows = function () use ($query) {
+            foreach ($query->cursor() as $row) {
+                yield $row;
+            }
+        };
+
+        return (new FastExcel($rows()))->download('vin-report-' . now()->format('Y-m-d') . '.xlsx', function ($row) {
+            $line = [];
+            foreach (WorkOrderVinReportService::COLUMNS as $key => $heading) {
+                $value = $row->{$key};
+                if (in_array($key, ['wo_date', 'grn_date'], true) && $value) {
+                    $value = Carbon::parse($value)->format('d M Y');
+                }
+                $line[$heading] = $value ?? '';
+            }
+            return $line;
+        });
+    }
+
+    /**
+     * Aborts without report access; returns the user id when the user may only see their own work orders
+     * (same rule as the work order list in index()).
+     */
+    private function vinReportAccessUserId(): ?int
+    {
+        $user = Auth::user();
+        if (!$user->hasPermissionForSelectedRole([
+            'list-export-exw-wo', 'view-current-user-export-exw-wo-list',
+            'list-export-local-sale-wo', 'view-current-user-local-sale-wo-list'
+        ])) {
+            abort(403);
+        }
+
+        $hasLimitedAccess = $user->hasPermissionForSelectedRole([
+            'view-current-user-export-exw-wo-list',
+            'view-current-user-export-cnf-wo-list',
+            'view-current-user-local-sale-wo-list'
+        ]);
+        return $hasLimitedAccess ? $user->id : null;
+    }
+
+    private function vinReportFilters(Request $request): array
+    {
+        return $request->only(array_merge(
+            ['vin_search', 'wo_date_from', 'wo_date_to', 'grn_date_from', 'grn_date_to'],
+            array_keys(WorkOrderVinReportService::LIST_FILTERS)
+        ));
     }
     /**
      * Display a listing of the resource.

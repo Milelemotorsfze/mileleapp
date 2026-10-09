@@ -265,6 +265,7 @@
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
                                                 <a href="{{route('work-order.index','status_report')}}" class="dropdown-item" data-key="t-login">Status Report</a>
                                                 <a href="{{route('work-order.index','all')}}" class="dropdown-item" data-key="t-login">Full Data</a>
+                                                <a href="{{route('work-order.vin-report')}}" class="dropdown-item" data-key="t-login">Vin Report</a>
                                             </div>
                                         </div>
                                         @endif
