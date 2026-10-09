@@ -67,6 +67,10 @@
 	<a id="vin-report-export" href="{{ route('work-order.vin-report.export') }}" class="btn btn-sm btn-success float-end">
 		<i class="fa fa-file-excel" aria-hidden="true"></i> Export Excel
 	</a>
+	<button type="button" id="vin-report-refresh" class="btn btn-sm btn-info float-end me-1" title="Reload the latest data from Matrix">
+		<i class="fa fa-sync" aria-hidden="true"></i> Refresh Data
+	</button>
+	<small id="vin-report-built-at" class="text-muted float-end me-2 mt-1"></small>
 </div>
 <div class="card-body">
 	<form id="vin-report-filters" class="vin-filters" onsubmit="return false;">
@@ -218,6 +222,7 @@ $(document).ready(function () {
 	};
 
 	let initialLoad = true;
+	let forceRefresh = false;
 	$('#vin-report-table')
 		.on('preXhr.dt', function () {
 			if (initialLoad) {
@@ -226,7 +231,12 @@ $(document).ready(function () {
 			}
 			showLoader();
 		})
-		.on('xhr.dt', hideLoader); // fires on success and on error
+		.on('xhr.dt', function (e, settings, json) {
+			if (json && json.built_at) {
+				$('#vin-report-built-at').text('Data as of ' + json.built_at);
+			}
+			hideLoader(); // fires on success and on error
+		});
 
 	// Show a readable message instead of DataTables' default alert (e.g. when the session has expired).
 	$.fn.dataTable.ext.errMode = 'none';
@@ -253,7 +263,13 @@ $(document).ready(function () {
 		order: [[columnKeys.indexOf('wo_date'), 'desc']],
 		ajax: {
 			url: @json(route('work-order.vin-report')),
-			data: (d) => Object.assign(d, filterParams()),
+			data: (d) => {
+				Object.assign(d, filterParams());
+				if (forceRefresh) {
+					d.refresh = 1;
+					forceRefresh = false;
+				}
+			},
 		},
 		columns: columnKeys.map((key) => ({
 			data: key,
@@ -269,6 +285,12 @@ $(document).ready(function () {
 	});
 
 	const reload = () => table.ajax.reload();
+
+	// Report data is cached for a few minutes on the server; this rebuilds it immediately.
+	$('#vin-report-refresh').on('click', function () {
+		forceRefresh = true;
+		reload();
+	});
 	$('#vin-report-apply').on('click', reload);
 	$('#vin-report-filters').on('change', 'input[type="date"], select', reload);
 
@@ -297,7 +319,7 @@ $(document).ready(function () {
 					throw new Error('Export failed (' + response.status + '). Please try again.');
 				}
 				// A redirect to the login page comes back as HTML instead of the Excel file.
-				if ((response.headers.get('Content-Type') || '').indexOf('text/html') !== -1) {
+				if (response.redirected || (response.headers.get('Content-Type') || '').indexOf('text/html') !== -1) {
 					throw new Error('Your session has expired. Please refresh the page and log in again.');
 				}
 				const disposition = response.headers.get('Content-Disposition') || '';

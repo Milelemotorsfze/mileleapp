@@ -48,7 +48,6 @@ use Rap2hpoutre\FastExcel\FastExcel;
 use App\Support\OrderStockType;
 use App\Services\WorkOrderSoDataService;
 use App\Services\WorkOrderVinReportService;
-use Yajra\DataTables\Facades\DataTables;
 
 class WorkOrderController extends Controller
 {
@@ -88,15 +87,38 @@ class WorkOrderController extends Controller
     public function vinReport(Request $request, WorkOrderVinReportService $report)
     {
         $limitedToUserId = $this->vinReportAccessUserId();
-        $filters = $this->vinReportFilters($request);
 
         if ($request->ajax()) {
-            $query = $report->applyFilters($report->query($limitedToUserId), $filters);
-            return DataTables::query($query)->make(true);
+            $dataset = $report->dataset($request->boolean('refresh'));
+            $rows = $report->scopeRows($dataset['rows'], $limitedToUserId);
+            $total = count($rows);
+
+            $rows = $report->applyFilters($rows, $this->vinReportFilters($request));
+            $orderIndex = (int) $request->input('order.0.column', -1);
+            $orderColumn = (string) $request->input("columns.$orderIndex.data", 'wo_date');
+            $rows = $report->sortRows($rows, $orderColumn, (string) $request->input('order.0.dir', 'desc'));
+
+            $start = max(0, (int) $request->input('start', 0));
+            $length = (int) $request->input('length', 25);
+            $length = $length > 0 ? min($length, 500) : 25;
+
+            // Values are HTML-escaped here; the page renders them as HTML.
+            $page = array_map(function ($row) use ($report) {
+                return array_map(fn ($value) => is_string($value) ? e($value) : $value, $report->publicRow($row));
+            }, array_slice($rows, $start, $length));
+
+            return response()->json([
+                'draw' => (int) $request->input('draw', 0),
+                'recordsTotal' => $total,
+                'recordsFiltered' => count($rows),
+                'data' => $page,
+                'built_at' => $dataset['built_at'],
+            ]);
         }
 
         (new UserActivityController)->createActivity('Open work order VIN report page');
-        $filterOptions = $report->filterOptions($limitedToUserId);
+        $dataset = $report->dataset();
+        $filterOptions = $report->filterOptions($report->scopeRows($dataset['rows'], $limitedToUserId));
         $columns = WorkOrderVinReportService::COLUMNS;
 
         return view('work_order.export_exw.vin_report', compact('filterOptions', 'columns'));
@@ -107,28 +129,29 @@ class WorkOrderController extends Controller
         $limitedToUserId = $this->vinReportAccessUserId();
         (new UserActivityController)->createActivity('Export work order VIN report');
 
-        $query = $report->applyFilters($report->query($limitedToUserId), $this->vinReportFilters($request))
-            ->orderByDesc('r.wo_date')
-            ->orderBy('r.wo_number')
-            ->orderBy('r.vin');
+        $rows = $report->scopeRows($report->dataset()['rows'], $limitedToUserId);
+        $rows = $report->applyFilters($rows, $this->vinReportFilters($request));
+        $rows = $report->sortRows($rows, 'wo_date', 'desc');
 
-        $rows = function () use ($query) {
-            foreach ($query->cursor() as $row) {
-                yield $row;
+        $lines = function () use ($rows) {
+            foreach ($rows as $row) {
+                $line = [];
+                foreach (WorkOrderVinReportService::COLUMNS as $key => $heading) {
+                    $value = $row[$key];
+                    if (in_array($key, ['wo_date', 'grn_date'], true) && $value) {
+                        $value = Carbon::parse($value)->format('d M Y');
+                    }
+                    $line[$heading] = $value ?? '';
+                }
+                yield $line;
             }
         };
 
-        return (new FastExcel($rows()))->download('vin-report-' . now()->format('Y-m-d') . '.xlsx', function ($row) {
-            $line = [];
-            foreach (WorkOrderVinReportService::COLUMNS as $key => $heading) {
-                $value = $row->{$key};
-                if (in_array($key, ['wo_date', 'grn_date'], true) && $value) {
-                    $value = Carbon::parse($value)->format('d M Y');
-                }
-                $line[$heading] = $value ?? '';
-            }
-            return $line;
-        });
+        $response = (new FastExcel($lines()))->download('vin-report-' . now()->format('Y-m-d') . '.xlsx');
+        // Explicit type: the page treats an HTML response as an expired session (login redirect).
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+        return $response;
     }
 
     /**
