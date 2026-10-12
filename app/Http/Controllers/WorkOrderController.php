@@ -138,7 +138,10 @@ class WorkOrderController extends Controller
                 $line = [];
                 foreach (WorkOrderVinReportService::COLUMNS as $key => $heading) {
                     $value = $row[$key];
-                    if (in_array($key, ['wo_date', 'grn_date'], true) && $value) {
+                    if ($key === 'wo_date') {
+                        // Real Excel date (not text) so Excel filters group it by Year > Month > Day.
+                        $value = $value ? (\DateTimeImmutable::createFromFormat('!Y-m-d', $value) ?: '') : '';
+                    } elseif ($key === 'grn_date' && $value) {
                         $value = Carbon::parse($value)->format('d M Y');
                     }
                     $line[$heading] = $value ?? '';
@@ -147,7 +150,12 @@ class WorkOrderController extends Controller
             }
         };
 
-        $response = (new FastExcel($lines()))->download('vin-report-' . now()->format('Y-m-d') . '.xlsx');
+        // Same display format as the Stock report's PO Date (d-M-Y, e.g. 05-Jan-2025).
+        $woDateStyle = (new \OpenSpout\Common\Entity\Style\Style())->setFormat('dd-mmm-yyyy');
+
+        $response = (new FastExcel($lines()))
+            ->setColumnStyles([WorkOrderVinReportService::COLUMNS['wo_date'] => $woDateStyle])
+            ->download('vin-report-' . now()->format('Y-m-d') . '.xlsx');
         // Explicit type: the page treats an HTML response as an expired session (login redirect).
         $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 

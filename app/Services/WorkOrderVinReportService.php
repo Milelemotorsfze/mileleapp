@@ -20,6 +20,7 @@ class WorkOrderVinReportService
     public const COLUMNS = [
         'vin' => 'Chassis / VIN Number',
         'wo_number' => 'WO Number',
+        'wo_date' => 'WO Date',
         'so_number' => 'SO Number',
         'pol' => 'POL (Port of Loading)',
         'pod' => 'POD (Port of Discharge)',
@@ -37,7 +38,6 @@ class WorkOrderVinReportService
         'interior_colour' => 'Interior Color',
         'incoterm' => 'Incoterms',
         'grn_date' => 'GRN Date',
-        'wo_date' => 'WO Date',
         'destination_match' => 'Destination Match Status',
     ];
 
