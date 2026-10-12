@@ -1259,7 +1259,7 @@ $formAction = isset($workOrder)
 </div>
 <div id="overlay">
 	<div id="overlay-content">
-		<h2>Submitting, please wait...</h2>
+		<h2 id="overlay-message">Submitting, please wait...</h2>
 	</div>
 </div>
 @else
@@ -2396,6 +2396,7 @@ $formAction = isset($workOrder)
 		},
 		submitHandler: function(form) {
 			event.preventDefault();
+			$('#overlay-message').text('Submitting, please wait...');
 			$('#overlay').show();
 			const comments = [];
 			if (workOrder == null) {
@@ -4111,10 +4112,21 @@ $formAction = isset($workOrder)
 		return filled;
 	}
 
+	function showSoLoader() {
+		$('#overlay-message').text('Loading SO details, please wait...');
+		$('#overlay').show();
+	}
+
+	function hideSoLoader() {
+		$('#overlay').hide();
+	}
+
 	function fetchAndPopulateSoDetails(soNumber) {
 		if (!soNumber || !shouldAutoFillFromSo(soNumber)) {
+			hideSoLoader();
 			return;
 		}
+		showSoLoader();
 
 		var replaceExisting = soAutoFillAppliedFor !== null && soNumber !== soAutoFillAppliedFor;
 		var requestSeq = ++soDetailsRequestSeq;
@@ -4153,6 +4165,11 @@ $formAction = isset($workOrder)
 					return;
 				}
 				console.error('Unable to load SO details:', xhr.responseText);
+			},
+			complete: function() {
+				if (requestSeq === soDetailsRequestSeq) {
+					hideSoLoader();
+				}
 			}
 		});
 	}
@@ -4171,6 +4188,9 @@ $formAction = isset($workOrder)
 		if ($('#batch').length && (type == 'export_exw' || type == 'export_cnf')) {
 			selectedBatch = $('#batch').val();
 		}
+		if (shouldAutoFillFromSo(SONumber)) {
+			showSoLoader();
+		}
 		// Call the additional AJAX request to process the SO Number
 		$.ajax({
 			url: '/check-so-number',
@@ -4181,7 +4201,10 @@ $formAction = isset($workOrder)
 				work_order_id: editWoId ? editWoId : null
 			},
 			success: function(response) {
-				if (response.exists) {
+				// Batch controls only exist on export WOs; local sale skips straight to WO number + SO auto-fill.
+				if (!document.getElementById('is_batch')) {
+					setWo();
+				} else if (response.exists) {
 					if (response.is_batch == '1') {
 						document.getElementById('is_batch').checked = true;
 						if (response.largest_batch != 0) {
@@ -4214,9 +4237,12 @@ $formAction = isset($workOrder)
 				}
 				if (shouldAutoFillFromSo(SONumber)) {
 					fetchAndPopulateSoDetails(SONumber);
+				} else {
+					hideSoLoader();
 				}
 			},
 			error: function(xhr) {
+				hideSoLoader();
 				console.error(xhr.responseText);
 			}
 		});
