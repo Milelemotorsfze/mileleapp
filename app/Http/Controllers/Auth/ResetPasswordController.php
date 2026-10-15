@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Exception;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -41,7 +42,11 @@ class ResetPasswordController extends Controller
     protected $redirectTo = '/';
     public function createPassword($email)
     {
-        $email= Crypt::decryptString($email);
+        try {
+            $email = Crypt::decryptString($email);
+        } catch (DecryptException $e) {
+            return redirect()->route('login')->with('error', 'This password creation link is invalid. Please ask the administrator to send a new one.');
+        }
         return view('auth.createPassword', compact('email'));
     }
     public function storePassword(Request $request)
@@ -117,7 +122,7 @@ class ResetPasswordController extends Controller
                     $password = Crypt::encryptString($request->password);
                     $password_confirmation = Crypt::encryptString($request->password_confirmation);
                 return redirect()->route('createPassword.verification', ['user_id' => $user_id, 'email'=> $email,
-                    'password'=>$password,'password_confirmation',$password_confirmation])->with('success',  $message);
+                    'password'=>$password,'password_confirmation'=>$password_confirmation])->with('success',  $message);
         }
         else
         {

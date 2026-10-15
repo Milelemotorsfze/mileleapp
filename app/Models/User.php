@@ -109,7 +109,7 @@ class User extends Authenticatable
     }
     public function getCanSubmitOrReleasePassportAttribute() {
         $canSubmitOrReleasePassport = false;
-        if($this->id != 16) {
+        if($this->id != 16 && $this->empProfile) {
             if($this->empProfile->type == 'employee' && ($this->empProfile->passport_status == null OR $this->empProfile->passport_status == 'with_employee')) {
                 $isSubmitPending = PassportRequest::where([
                     ['employee_id',$this->id],

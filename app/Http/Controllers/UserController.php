@@ -53,7 +53,9 @@ namespace App\Http\Controllers;
             $user = User::findOrFail($id); 
             $roles = Role::all();
             $language = Language::pluck('name','name')->all();
-            return view('users.create',compact('user','roles', 'language'));
+            $jobposition =  MasterJobPosition::where('status', 'active')->get();
+            $departments =  MasterDepartment::where('status', 'active')->get();
+            return view('users.create',compact('user','roles', 'language', 'jobposition', 'departments'));
         }
         public function store(Request $request)
         {
@@ -130,6 +132,7 @@ namespace App\Http\Controllers;
             $user->assignRole($request->input('roles'));
             $data['email'] = $user->email;
             $data['emailEncrypt'] = Crypt::encryptString($user->email);
+            $data['link'] = route('user.createPassword', ['email' => $data['emailEncrypt']]);
             $data['name'] = $user->name;
             $template['from'] = 'no-reply@milele.com';
             $template['from_name'] = 'Milele Matrix';
