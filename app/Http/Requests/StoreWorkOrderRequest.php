@@ -49,6 +49,7 @@ class StoreWorkOrderRequest extends FormRequest
             'customer_email' => 'nullable|email|max:255',
             'customer_representative_email' => 'nullable|email|max:255',
             'freight_agent_email' => 'nullable|email|max:255',
+            'bl_number' => 'nullable|string|max:100',
         ];
     }
 

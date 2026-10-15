@@ -44,6 +44,7 @@ class WorkOrder extends Model
         'port_of_loading',
         'port_of_discharge',
         'final_destination',
+        'bl_number',
         'transport_type',
         'brn_file',
         'brn',

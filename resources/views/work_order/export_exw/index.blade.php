@@ -323,6 +323,7 @@
 									<th rowspan="2" class="light">Port Of Loading</th>
 									<th rowspan="2" class="light">Port Of Discharge</th>
 									<th rowspan="2" class="light">Final Destination</th>
+									<th rowspan="2" class="light">BL No.</th>
 									<th rowspan="2" class="light">Transport Type</th>
 									<th rowspan="2" class="light">BRN File</th>
 									<th rowspan="2" class="light">Airline/Shipping Line/Trailer No.</th>
@@ -592,6 +593,7 @@
 									<td>{{ $data->port_of_loading ?? '' }}</td>
 									<td>{{ $data->port_of_discharge ?? '' }}</td>
 									<td>{{ $data->final_destination ?? '' }}</td>
+									<td>{{ $data->bl_number ?? '' }}</td>
 									<td>{{ $data->transport_type ?? '' }}</td>
 									@component('components.view-download-buttons', ['filePath' => 'wo/brn_file/', 'fileName' => $data->brn_file])@endcomponent
 									<td>{{ $data->getTransportField('name') }}</td>

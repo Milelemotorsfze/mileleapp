@@ -355,6 +355,7 @@ class WorkOrderController extends Controller
                 'port_of_loading',
                 'port_of_discharge',
                 'final_destination',
+                'bl_number',
                 'transport_type',
                 'brn_file',
                 'brn',
@@ -439,6 +440,7 @@ class WorkOrderController extends Controller
                 'port_of_loading',
                 'port_of_discharge',
                 'final_destination',
+                'bl_number',
                 'transport_type',
                 'brn_file',
                 'brn',
@@ -497,6 +499,7 @@ class WorkOrderController extends Controller
                 'port_of_loading',
                 'port_of_discharge',
                 'final_destination',
+                'bl_number',
                 'transport_type',
                 'brn_file',
                 'brn',
@@ -802,6 +805,7 @@ class WorkOrderController extends Controller
                     'Port Of Loading' => $data->port_of_loading ?? '',
                     'Port Of Discharge' => $data->port_of_discharge ?? '',
                     'Final Destination' => $data->final_destination ?? '',
+                    'Bill of Lading (BL) No.' => $data->bl_number ?? '',
                     'Transport Type' => $data->transport_type ?? '',
                     'Airline/Shipping Line/Trailer No.' => $data->transport_type ? $data->getTransportField('name') ?? '' : '',
                     'AWB/Container No./Transportation Company' => $data->transport_type ? $data->getTransportField('id') ?? '' : '',
@@ -1877,6 +1881,7 @@ class WorkOrderController extends Controller
 
         $request->validate([
             'stock_type' => OrderStockType::validationRules(),
+            'bl_number' => 'nullable|string|max:100',
         ]);
 
         DB::beginTransaction();
@@ -1974,9 +1979,9 @@ class WorkOrderController extends Controller
                 }
             }
 
-            // Helper function to handle file upload and history recording
-            function handleFileUpload($request, $fileKey, $path, &$newData, $workOrder, $oldData, $deleteFlag = null, $CommentId)
-            {
+            // Helper to handle file upload and history recording.
+            // A closure (not a named function) so update() can run more than once per PHP process.
+            $handleFileUpload = function ($request, $fileKey, $path, &$newData, $workOrder, $oldData, $deleteFlag, $CommentId) {
                 $fileName = null;
                 if ($request->hasFile($fileKey)) {
                     $fileName = auth()->id() . '_' . time() . '.' . $request->file($fileKey)->extension();
@@ -2019,7 +2024,7 @@ class WorkOrderController extends Controller
                     ]);
                     $canDeleteComment = false;
                 }
-            }
+            };
 
             // Prepare old data for comparison
             $oldData = $workOrder->getOriginal();
@@ -2038,7 +2043,7 @@ class WorkOrderController extends Controller
             ];
 
             foreach ($filesToHandle as $fileKey => $path) {
-                handleFileUpload($request, $fileKey, $path, $newData, $workOrder, $oldData, 'is_' . $fileKey . '_delete', $CommentId);
+                $handleFileUpload($request, $fileKey, $path, $newData, $workOrder, $oldData, 'is_' . $fileKey . '_delete', $CommentId);
             }
 
             // List of fields to exclude
@@ -2788,6 +2793,7 @@ class WorkOrderController extends Controller
                         'enduser_trade_license',
                         'existing_customer_name',
                         'final_destination',
+                        'bl_number',
                         'forward_import_code',
                         'freight_agent_contact_number',
                         'freight_agent_contact_number.full',

@@ -22,6 +22,7 @@ class WorkOrderVinReportService
         'wo_number' => 'WO Number',
         'wo_date' => 'WO Date',
         'so_number' => 'SO Number',
+        'bl_number' => 'Bill of Lading (BL) No.',
         'pol' => 'POL (Port of Loading)',
         'pod' => 'POD (Port of Discharge)',
         'actual_destination' => 'Actual Destination',
@@ -61,7 +62,8 @@ class WorkOrderVinReportService
     public const NOT_MATCHING = 'Not Matching';
     public const NOT_AVAILABLE = 'Not Available';
 
-    private const CACHE_KEY = 'work_order_vin_report_rows';
+    // Bump the version whenever the row shape changes so stale cached rows are never served.
+    private const CACHE_KEY = 'work_order_vin_report_rows_v2';
     private const CACHE_SECONDS = 300;
 
     /**
@@ -128,7 +130,8 @@ class WorkOrderVinReportService
             if ($search !== ''
                 && stripos((string) $row['vin'], $search) === false
                 && stripos((string) $row['wo_number'], $search) === false
-                && stripos((string) $row['so_number'], $search) === false) {
+                && stripos((string) $row['so_number'], $search) === false
+                && stripos((string) $row['bl_number'], $search) === false) {
                 return false;
             }
 
@@ -242,6 +245,7 @@ class WorkOrderVinReportService
                 wv.vin,
                 wo.wo_number,
                 wo.so_number,
+                NULLIF(TRIM(wo.bl_number), '') as bl_number,
                 NULLIF(TRIM(wo.port_of_loading), '') as pol,
                 NULLIF(TRIM(wo.port_of_discharge), '') as pod,
                 NULLIF(TRIM(wo.final_destination), '') as actual_destination,
@@ -321,6 +325,7 @@ class WorkOrderVinReportService
                 'vin' => $r->vin,
                 'wo_number' => $r->wo_number,
                 'so_number' => $r->so_number,
+                'bl_number' => $r->bl_number,
                 'pol' => $r->pol,
                 'pod' => $r->pod,
                 'actual_destination' => $r->actual_destination,
