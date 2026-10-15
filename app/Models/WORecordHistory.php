@@ -56,6 +56,7 @@ class WORecordHistory extends Model
             'enduser_trade_license' => 'Enduser Trade License',
             'existing_customer_name' => 'Existing Customer Name',
             'final_destination' => 'Final Destination',
+            'bl_number' => 'Bill of Lading (BL) No.',
             'finance_approved_at' =>'Finance Approved At',
             'finance_approval_by' => 'Finance Approval By',
             'forward_import_code' => 'Forward Import Code',

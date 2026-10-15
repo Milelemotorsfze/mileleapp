@@ -214,14 +214,17 @@
 @php
 // Helper function to escape strings for safe embedding in JavaScript/HTML attributes
 // Handles: quotes (single & double), backslashes, newlines, and other special characters
-function escapeForJs($value) {
-	if ($value === null) {
-		return '';
+// Guarded so the view can be rendered more than once per PHP process.
+if (!function_exists('escapeForJs')) {
+	function escapeForJs($value) {
+		if ($value === null) {
+			return '';
+		}
+		// Use json_encode which properly escapes everything for JavaScript strings
+		// Remove surrounding quotes since we're embedding into existing string
+		$encoded = json_encode((string)$value, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+		return substr($encoded, 1, -1); // Remove surrounding quotes
 	}
-	// Use json_encode which properly escapes everything for JavaScript strings
-	// Remove surrounding quotes since we're embedding into existing string
-	$encoded = json_encode((string)$value, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
-	return substr($encoded, 1, -1); // Remove surrounding quotes
 }
 
 $canCreateOrEditWO = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo','create-lto-wo',
@@ -566,6 +569,13 @@ $formAction = isset($workOrder)
 						<input id="final_destination" type="text" class="form-control widthinput @error('final_destination') is-invalid @enderror"
 							name="final_destination" onkeyup="sanitizeInput(this)"
 							placeholder="Enter Final Destination" value="{{ isset($workOrder) ? $workOrder->final_destination : '' }}" autocomplete="final_destination" autofocus>
+					</div>
+
+					<div class="{{ in_array($type, ['export_exw', 'export_cnf']) ? 'col-xxl-3 col-lg-6 col-md-6' : 'col-xxl-4 col-lg-6 col-md-6' }}">
+						<label for="bl_number" class="col-form-label text-md-end">{{ __('Bill of Lading (BL) No.') }}</label>
+						<input id="bl_number" type="text" class="form-control widthinput @error('bl_number') is-invalid @enderror"
+							name="bl_number" onkeyup="sanitizeInput(this)" maxlength="100"
+							placeholder="Enter Bill of Lading (BL) No." value="{{ isset($workOrder) ? $workOrder->bl_number : '' }}" autocomplete="bl_number">
 					</div>
 
 					<div class="col-xxl-4 col-lg-6 col-md-6 radio-main-div">
@@ -2222,6 +2232,10 @@ $formAction = isset($workOrder)
 			final_destination: {
 				required: true,
 				noSpaces: true,
+			},
+			bl_number: {
+				noSpaces: true,
+				maxlength: 100,
 			},
 			brn_file: {
 				extension: "jpg|jpeg|png|pdf",

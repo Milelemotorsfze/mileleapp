@@ -76,8 +76,8 @@
 	<form id="vin-report-filters" class="vin-filters" onsubmit="return false;">
 		<div class="row g-2 mb-2">
 			<div class="col-xxl-3 col-lg-4 col-md-6">
-				<label for="vin_search">Search VIN / WO / SO</label>
-				<input type="text" class="form-control" id="vin_search" name="vin_search" placeholder="Full or partial VIN, WO or SO number" autocomplete="off">
+				<label for="vin_search">Search VIN / WO / SO / BL</label>
+				<input type="text" class="form-control" id="vin_search" name="vin_search" placeholder="Full or partial VIN, WO, SO or BL number" autocomplete="off">
 			</div>
 			<div class="col-xxl-2 col-lg-2 col-md-3 col-6">
 				<label for="wo_date_from">WO Date From</label>
