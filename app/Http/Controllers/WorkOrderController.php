@@ -48,6 +48,7 @@ use Rap2hpoutre\FastExcel\FastExcel;
 use App\Support\OrderStockType;
 use App\Services\WorkOrderSoDataService;
 use App\Services\WorkOrderVinReportService;
+use App\Services\LocationNameMatcher;
 
 class WorkOrderController extends Controller
 {
@@ -944,7 +945,9 @@ class WorkOrderController extends Controller
         DB::beginTransaction();
         try {
             $authId = Auth::id();
-            $input = $request->all();
+            // Ports / destination saved in the system's spelling ("JEBEL ALI" -> "Jebel Ali").
+            $requestData = app(LocationNameMatcher::class)->normalizeWorkOrderFields($request->all());
+            $input = $requestData;
             $input['customer_company_number'] = $request->customer_company_number['full'] ?? null;
             $input['customer_representative_contact'] = $request->customer_representative_contact['full'] ?? null;
             $input['delivery_contact_person_number'] = $request->delivery_contact_person_number['full'] ?? null;
@@ -1106,7 +1109,7 @@ class WorkOrderController extends Controller
                 'batch',
                 'is_batch'
             ];
-            $nonNullData = array_filter($request->all(), function ($value, $key) use ($excludeFields) {
+            $nonNullData = array_filter($requestData, function ($value, $key) use ($excludeFields) {
                 return !is_null($value) && !is_array($value) && !in_array($key, $excludeFields);
             }, ARRAY_FILTER_USE_BOTH);
             $nestedFields = [
@@ -1882,6 +1885,7 @@ class WorkOrderController extends Controller
         $request->validate([
             'stock_type' => OrderStockType::validationRules(),
             'bl_number' => 'nullable|string|max:100',
+            ...LocationNameMatcher::validationRules(),
         ]);
 
         DB::beginTransaction();
@@ -1905,7 +1909,7 @@ class WorkOrderController extends Controller
             $canDeleteComment = true;
             // Initialize newData array
             $newData = [];
-            $newData = $request->all();
+            $newData = app(LocationNameMatcher::class)->normalizeWorkOrderFields($request->all());
             if (isset($request->is_batch)) {
                 $newData['is_batch'] = 1;
                 $newData['batch'] = $request->batch;

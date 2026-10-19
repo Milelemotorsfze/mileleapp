@@ -1289,6 +1289,7 @@ $formAction = isset($workOrder)
 	let customers = [];
 	let vins = [];
 </script>
+<script src="{{ asset('js/custom/location-name-matcher.js') }}?v={{ @filemtime(public_path('js/custom/location-name-matcher.js')) }}"></script>
 <script type="text/javascript">
 	// Global helper function to escape strings for safe embedding in HTML attributes
 	// Prevents JS syntax errors from quotes, backslashes, newlines, and other special characters
@@ -2047,6 +2048,165 @@ $formAction = isset($workOrder)
 		return this.optional(element) || /^[^\s]+(\s+[^\s]+)*$/.test(value);
 	}, "No leading or trailing spaces allowed");
 
+	// Port / destination names. Every keystroke or paste is checked instantly in the browser
+	// (public/js/custom/location-name-matcher.js, same rules as App\Services\LocationNameMatcher)
+	// against the name lists loaded once by AJAX. The server confirms each result in the
+	// background and applies the same rule on save (App\Rules\KnownLocationName). When the typed
+	// text is a different spelling of an existing name (e.g. "jabelali" while "Jebel Ali" exists)
+	// one of the listed names must be selected.
+	const locationNameFields = { port_of_loading: 'port', port_of_discharge: 'port', final_destination: 'country' };
+	const locationNameCheckUrl = @json(route('work-order.location-name-check'));
+	const locationNamesUrl = @json(route('work-order.location-names'));
+	const locationNameServerResults = {}; // "type|lowercase value" -> result confirmed by the server
+	let locationNameMatcher = null; // ready once the name lists have loaded
+
+	$.validator.addMethod("knownLocationName", function(value, element) {
+		return this.optional(element) || $(element).data('locationNameStatus') !== 'select';
+	}, "This name already exists in the system. Please select one of the names below.");
+
+	function renderLocationNameHint($input, result) {
+		let $hint = $input.siblings('.location-name-hint');
+		if (!$hint.length) {
+			$hint = $('<div class="location-name-hint small mt-1"></div>').insertAfter($input);
+		}
+		$hint.empty();
+		const names = result && result.matches ? result.matches : [];
+		const mustSelect = !!result && result.status === 'select';
+		// Optional lists only while the user is in the field; a required choice stays until it is made.
+		if (names.length === 0 || (!mustSelect && !$input.is(':focus'))) {
+			$hint.hide();
+			return;
+		}
+		let heading = names.length + ' matching name' + (names.length > 1 ? 's' : '') + ' in the system (click to use):';
+		if (mustSelect) {
+			heading = 'Already in the system, please select one:';
+		} else if (result.status === 'exact') {
+			heading = 'Other matching names in the system:';
+		}
+		$('<div></div>').addClass(mustSelect ? 'text-danger' : 'text-muted').text(heading).appendTo($hint);
+		const $list = $('<div style="max-height: 110px; overflow-y: auto;"></div>').appendTo($hint);
+		names.forEach(function(name) {
+			$('<button type="button" class="btn btn-sm py-0 px-2 me-1 mt-1" tabindex="-1"></button>')
+				.addClass(result.suggestions.indexOf(name) !== -1 ? 'btn-outline-danger' : 'btn-outline-primary')
+				.text(name)
+				// Keep focus in the field: otherwise the field's change event re-draws the list
+				// under the mouse and the click is lost.
+				.on('mousedown', function(e) { e.preventDefault(); })
+				.on('click', function() {
+					$input.val(name).data('locationNameStatus', 'exact').data('locationNameShown', null);
+					$hint.hide().empty();
+					$input.valid();
+				})
+				.appendTo($list);
+		});
+		$hint.show();
+	}
+
+	function applyLocationNameResult($input, result, fixSpelling) {
+		// Correct the case/spacing only once the user has finished typing, not mid-word.
+		if (fixSpelling && result.status === 'exact' && result.canonical && $input.val() !== result.canonical) {
+			$input.val(result.canonical);
+		}
+		$input.data('locationNameStatus', result.status).data('locationNameShown', JSON.stringify(result));
+		renderLocationNameHint($input, result);
+		if ($input.closest('form').data('validator')) {
+			$input.valid();
+		}
+	}
+
+	// Cancels the server check in flight unless it is for the same text (then its answer is still wanted).
+	function cancelLocationNameRequest($input, keepForValue) {
+		const pending = $input.data('locationNameRequest');
+		if (pending && $input.data('locationNameRequestValue') !== keepForValue) {
+			pending.abort();
+			$input.removeData('locationNameRequest').removeData('locationNameRequestValue');
+		}
+	}
+
+	// Background check with the server; it only re-draws when the server disagrees.
+	function confirmLocationNameWithServer($input, value, fixSpelling) {
+		const type = locationNameFields[$input.attr('id')];
+		const cacheKey = type + '|' + value.toLowerCase();
+		cancelLocationNameRequest($input, value);
+		if ($input.data('locationNameRequest')) {
+			return; // the same text is already being checked
+		}
+		const request = $.getJSON(locationNameCheckUrl, { type: type, value: value })
+			.done(function(result) {
+				locationNameServerResults[cacheKey] = result;
+				if ($.trim($input.val() || '') === value && JSON.stringify(result) !== $input.data('locationNameShown')) {
+					applyLocationNameResult($input, result, fixSpelling);
+				}
+			})
+			.always(function() {
+				if ($input.data('locationNameRequest') === request) {
+					$input.removeData('locationNameRequest').removeData('locationNameRequestValue');
+				}
+			});
+		$input.data('locationNameRequest', request).data('locationNameRequestValue', value);
+	}
+
+	function checkLocationName($input, fixSpelling) {
+		const value = $.trim($input.val() || '');
+		const type = locationNameFields[$input.attr('id')];
+		clearTimeout($input.data('locationNameTimer'));
+		cancelLocationNameRequest($input, value);
+		if (value === '') {
+			$input.data('locationNameStatus', 'empty').data('locationNameShown', null);
+			renderLocationNameHint($input, null);
+			return;
+		}
+		const confirmed = locationNameServerResults[type + '|' + value.toLowerCase()];
+		if (confirmed) {
+			applyLocationNameResult($input, confirmed, fixSpelling);
+			return;
+		}
+		if (!locationNameMatcher) {
+			confirmLocationNameWithServer($input, value, fixSpelling); // lists not loaded yet
+			return;
+		}
+		// Instant result, then the server confirms once typing pauses (straight away when leaving the field).
+		applyLocationNameResult($input, locationNameMatcher.match(type, value), fixSpelling);
+		$input.data('locationNameTimer', setTimeout(function() {
+			confirmLocationNameWithServer($input, value, fixSpelling);
+		}, fixSpelling ? 0 : 400));
+	}
+
+	$(function() {
+		const $fields = Object.keys(locationNameFields).map(function(id) { return $('#' + id); }).filter(function($f) { return $f.length; });
+		if (!$fields.length) {
+			return;
+		}
+		$fields.forEach(function($input) {
+			// Every typed letter and every paste is checked immediately.
+			$input.on('input', function() { checkLocationName($input, false); });
+			// Coming back to the field shows the list again.
+			$input.on('focus', function() { checkLocationName($input, false); });
+			// Leaving the field: fix the spelling of exact names and hide optional lists.
+			// 'location-name:check' is triggered after the SO auto-fill sets the value.
+			$input.on('change location-name:check', function() { checkLocationName($input, true); });
+			$input.on('blur', function() {
+				if ($input.data('locationNameStatus') !== 'select') {
+					$input.siblings('.location-name-hint').hide();
+				}
+			});
+			if ($.trim($input.val() || '') !== '') {
+				checkLocationName($input, true); // editing an existing work order
+			}
+		});
+		// Load the name lists once; from then on every check happens in the browser.
+		if (typeof LocationNameMatcher === 'function') {
+			$.getJSON(locationNamesUrl).done(function(data) {
+				locationNameMatcher = new LocationNameMatcher(data);
+				$fields.forEach(function($input) {
+					if ($.trim($input.val() || '') !== '' && $input.data('locationNameShown') == null) {
+						checkLocationName($input, !$input.is(':focus'));
+					}
+				});
+			});
+		}
+	});
+
 	$.validator.addMethod("numericOnly", function(value, element) {
 		value = value.replace(/\s+/g, '');
 		return this.optional(element) || /^[0-9+]+$/.test(value);
@@ -2224,14 +2384,17 @@ $formAction = isset($workOrder)
 			port_of_loading: {
 				required: true,
 				noSpaces: true,
+				knownLocationName: true,
 			},
 			port_of_discharge: {
 				required: true,
 				noSpaces: true,
+				knownLocationName: true,
 			},
 			final_destination: {
 				required: true,
 				noSpaces: true,
+				knownLocationName: true,
 			},
 			bl_number: {
 				noSpaces: true,
@@ -3842,7 +4005,7 @@ $formAction = isset($workOrder)
 			if (!forceReplace && !isWorkOrderFieldEmpty(field.selector)) {
 				return;
 			}
-			$(field.selector).val(field.value);
+			$(field.selector).val(field.value).trigger('location-name:check');
 			pushSoAutoFillItem(filled, field.label, field.value);
 		});
 
