@@ -27,6 +27,7 @@ use App\Http\Controllers\HRM\OnBoarding\JoiningReportController;
 use App\Http\Controllers\HRM\OnBoarding\AssetAllocationController;
 use App\Http\Controllers\WorkOrderController;
 use App\Http\Controllers\WorkOrderExportController;
+use App\Http\Controllers\WorkOrderLocationNameController;
 use App\Http\Controllers\WOApprovalsController;
 use App\Http\Controllers\WoDocsStatusController;
 use App\Http\Controllers\WoStatusController;
@@ -481,6 +482,8 @@ Route::get('/d', function () {
         Route::post('/update-created-at', 'updateCreatedAt')->name('work-order.updateCreatedAt');
         Route::post('/update-date', 'updateDate')->name('work-order.updateDate');
     });
+    Route::get('work-order/location-name-check', [WorkOrderLocationNameController::class, 'check'])->name('work-order.location-name-check');
+    Route::get('work-order/location-names', [WorkOrderLocationNameController::class, 'names'])->name('work-order.location-names');
     Route::resource('work-order', WorkOrderController::class)->only([
         'show','store','edit','update','create'
     ]);

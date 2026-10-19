@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\So;
+use App\Services\LocationNameMatcher;
 use App\Support\OrderStockType;
 
 class StoreWorkOrderRequest extends FormRequest
@@ -50,6 +51,7 @@ class StoreWorkOrderRequest extends FormRequest
             'customer_representative_email' => 'nullable|email|max:255',
             'freight_agent_email' => 'nullable|email|max:255',
             'bl_number' => 'nullable|string|max:100',
+            ...LocationNameMatcher::validationRules(),
         ];
     }
 
