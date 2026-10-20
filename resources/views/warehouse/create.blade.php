@@ -240,7 +240,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details')
         <div class="col-lg-1 col-md-6">
             <span class="error">* </span>
             <label for="basicpill-firstname-input" class="form-label">Currency: </label>
-            <select class="form-control" autofocus name="currency" required>
+            <select class="form-control" autofocus name="currency" id="currency" required>
                 <option value="AED">AED</option>
                 <option value="USD" selected>USD</option>
                 <option value="EUR">EUR</option>
@@ -607,6 +607,14 @@ return [$color->id => $formattedName];
                 placeholder: 'Search and select salesperson',
                 width: '100%',
                 allowClear: true
+            });
+            $('#vendors').select2({
+                placeholder: 'Search and select vendor',
+                width: '100%'
+            });
+            $('#currency').select2({
+                placeholder: 'Search and select currency',
+                width: '100%'
             });
             $('#fd').select2();
             $('#pol').select2();
