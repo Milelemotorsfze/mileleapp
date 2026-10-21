@@ -1730,6 +1730,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
    });
    
    function updateCharts() {
+       // The bar chart (and its hidden date inputs) is only rendered for Calls-view users
+       if (!$('#barChart').length) {
+           return;
+       }
        var startDate = $('#start_date').val();
        var endDate = $('#end_date').val();
        $.ajax({
