@@ -1993,7 +1993,7 @@ class SalesOrderController extends Controller
             ->get();
         // Calculate commission rates for the selected salesperson
         foreach ($commissions as $item) {
-            $totalSales = $item->total_rate_in_aed;
+            $totalSales = $item->total_rate_in_aed ?? 0;
             $commissionSlot = DB::table('commission_slots')
                 ->where('min_sales', '<=', $totalSales)
                 ->where(function ($query) use ($totalSales) {
@@ -2053,7 +2053,7 @@ class SalesOrderController extends Controller
                 $item->commission_rate = 0;
                 continue;
             }
-            $totalSales = $item->total_rate_in_aed;
+            $totalSales = $item->total_rate_in_aed ?? 0;
             $commissionSlot = DB::table('commission_slots')
                 ->where('min_sales', '<=', $totalSales)
                 ->where(function ($query) use ($totalSales) {

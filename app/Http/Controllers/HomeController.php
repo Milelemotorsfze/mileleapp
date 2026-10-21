@@ -287,7 +287,7 @@ class HomeController extends Controller
                 ->groupBy('so.sales_person_id', 'users.name')
                 ->get();
             foreach ($commissons as $item) {
-                $totalSales = $item->total_rate_in_aed;
+                $totalSales = $item->total_rate_in_aed ?? 0;
                 $commissionSlot = DB::table('commission_slots')
                     ->where('min_sales', '<=', $totalSales)
                     ->where(function($query) use ($totalSales) {
@@ -350,10 +350,31 @@ class HomeController extends Controller
                 'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname','undersalesleads','commissons','dataforpie'));
         }
     }
+    /**
+     * The dashboard date pickers are only rendered for some roles and can post empty values,
+     * so a missing or unparseable end falls back to the picker's default (last 7 days)
+     * instead of reaching a >= / <= comparison as null.
+     */
+    private function dateRangeFromRequest(Request $request): array
+    {
+        $parse = function ($value, Carbon $default) {
+            if (!is_string($value) || trim($value) === '') {
+                return $default->toDateString();
+            }
+            try {
+                return Carbon::parse($value)->toDateString();
+            } catch (\Exception $e) {
+                return $default->toDateString();
+            }
+        };
+        return [
+            $parse($request->input('start_date'), Carbon::today()->subDays(6)),
+            $parse($request->input('end_date'), Carbon::today()),
+        ];
+    }
     public function marketingupdatechart(Request $request)
     {
-        $startdate = $request->input('start_date');
-        $enddate = $request->input('end_date');
+        [$startdate, $enddate] = $this->dateRangeFromRequest($request);
         $calls = DB::table('calls')
         ->select('calls.source', 'calls.location', 'lead_source.source_name')
         ->join('lead_source', 'calls.source', '=', 'lead_source.id')
@@ -384,8 +405,7 @@ class HomeController extends Controller
         return response()->json(['chartData' => $chartData]);
     }
     public function leaddistruition(Request $request) {
-        $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
+        [$startDate, $endDate] = $this->dateRangeFromRequest($request);
         $sales_persons_w = ModelHasRoles::where('role_id', 7)
         ->join('users', 'model_has_roles.model_id', '=', 'users.id')
         ->where('users.status', 'active')
@@ -427,8 +447,7 @@ class HomeController extends Controller
         $useractivities->activity = "View the Lead Distrubution Details";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-        $startDate = $request->query('start_date');
-        $endDate = $request->query('end_date');
+        [$startDate, $endDate] = $this->dateRangeFromRequest($request);
         $data = DB::table('calls')
         ->join('users', 'calls.sales_person', '=', 'users.id')
         ->selectRaw('DATE(calls.created_at) AS call_date, users.name AS sales_person_name, COUNT(calls.id) AS call_count')
