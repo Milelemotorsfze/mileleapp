@@ -3351,17 +3351,24 @@ class WorkOrderController extends Controller
                     $woApprovals->update();
                     $woVehicleIds = WOVehicles::where('work_order_id', $woApprovals->work_order_id)->pluck('id');
 
+                    // Latest history row per vehicle + field (only the columns needed to pick them).
                     $woVehicleHistory = WOVehicleRecordHistory::whereIn('w_o_vehicle_id', $woVehicleIds)
+                        ->select('id', 'w_o_vehicle_id', 'field_name', 'changed_at')
                         ->orderBy('changed_at', 'desc')
                         ->get()
                         ->unique(function ($item) {
                             return $item['field_name'] . $item['w_o_vehicle_id'];
                         });
-                    foreach ($woVehicleHistory as $record) {
-                        WOApprovalVehicleDataHistory::create([
-                            'w_o_approvals_id' => $woApprovals->id,
-                            'wo_vehicle_history_id' => $record->id
-                        ]);
+                    // Same rows as before, written in a few bulk inserts instead of one INSERT per row.
+                    $now = Carbon::now();
+                    $snapshotRows = $woVehicleHistory->map(fn ($record) => [
+                        'w_o_approvals_id' => $woApprovals->id,
+                        'wo_vehicle_history_id' => $record->id,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ])->values();
+                    foreach ($snapshotRows->chunk(500) as $chunk) {
+                        WOApprovalVehicleDataHistory::insert($chunk->all());
                     }
 
                     // If COO approval is approved, trigger finance approval notification
@@ -3382,55 +3389,18 @@ class WorkOrderController extends Controller
                             ]);
                         }
                         
-                        if ($financePending) {
-                            // Prepare the from details
-                            $template['from'] = 'no-reply@milele.com';
-                            $template['from_name'] = 'Milele Matrix';
-
-                            // Handle cases where customer_name is null
-                            $customerName = $workOrder->customer_name ?? 'Unknown Customer';
-
-                            // Prepare email data
-                            $subject = "COO approved the work order " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
-                            // Define a quick access link (adjust the route as needed)
-                            $accessLink = route('work-order.show', $workOrder->id);
-                            $approvalHistoryLink = route('fetchFinanceApprovalHistory', $workOrder->id);
-
-                            $rolesWithPermission = Role::whereHas('permissions', function ($query) {
-                                $query->where('name', 'do-finance-approval');
-                            })->pluck('id')->toArray();
-                            // Get users with the required roles and valid email addresses
-                            $recipients = \App\Models\User::role($rolesWithPermission)
-                                ->whereIn('status', ['new', 'active'])
-                                ->where('password', '!=', '')
-                                ->whereHas('roles')
-                                ->pluck('email')
-                                ->filter(function ($email) {
-                                    return !empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL);
-                                })
-                                ->toArray();
-
-                            if (!empty($recipients)) {
-                                Mail::send('work_order.emails.coo_approval', [
-                                    'workOrder' => $workOrder,
-                                    'subject' => $subject,
-                                    'accessLink' => $accessLink,
-                                    'approvalHistoryLink' => $approvalHistoryLink,
-                                    'customerName' => $customerName,
-                                    'userName' => $woApprovals->user->name,
-                                    'comments' => $woApprovals->comments,
-                                    'status' => $woApprovals->status,
-                                ], function ($message) use ($recipients, $subject) {
-                                    $message->to($recipients)
-                                        ->subject($subject);
-                                });
-                            }
-                        }
                     }
 
                     DB::commit();
-                    // Send email notification
-                    $this->sendCOOApprovalEmail($workOrder, $woApprovals->status, $woApprovals->comments, $woApprovals->user->name);
+
+                    // Emails go out after the response is sent, so the approver does not wait for them
+                    // (same emails, recipients and order as before).
+                    $workOrderId = $workOrder->id;
+                    $approvalId = $woApprovals->id;
+                    $this->dispatchAfterResponse(function () use ($workOrderId, $approvalId) {
+                        $this->sendCooApprovalEmails($workOrderId, $approvalId);
+                    });
+
                     return response()->json('success');
                 } else if ($woApprovals && $woApprovals->action_at != '') {
                     DB::commit();
@@ -3444,6 +3414,78 @@ class WorkOrderController extends Controller
             }
         }
     }
+    /**
+     * Emails for a COO decision, sent after the response:
+     * 1. when approved: "COO approved the work order" to the finance approvers,
+     * 2. always: "WO COO Office Approved/Rejected" to finance, operations, the creator and management.
+     */
+    private function sendCooApprovalEmails(int $workOrderId, int $approvalId): void
+    {
+        $workOrder = WorkOrder::query()->find($workOrderId);
+        $woApprovals = WOApprovals::query()->find($approvalId);
+        if (!$workOrder || !$woApprovals) {
+            return;
+        }
+        $userName = $woApprovals->user->name ?? '';
+
+        if ($woApprovals->status == 'approved') {
+            try {
+                $this->sendCooApprovedFinanceNotification($workOrder, $woApprovals, $userName);
+            } catch (\Exception $e) {
+                \Log::error($e);
+            }
+        }
+
+        $this->sendCOOApprovalEmail($workOrder, $woApprovals->status, $woApprovals->comments, $userName);
+    }
+
+    /** "COO approved the work order ..." to users who can do the finance approval. */
+    private function sendCooApprovedFinanceNotification(WorkOrder $workOrder, WOApprovals $woApprovals, string $userName): void
+    {
+        // Prepare the from details
+        $template['from'] = 'no-reply@milele.com';
+        $template['from_name'] = 'Milele Matrix';
+
+        // Handle cases where customer_name is null
+        $customerName = $workOrder->customer_name ?? 'Unknown Customer';
+
+        // Prepare email data
+        $subject = "COO approved the work order " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
+        // Define a quick access link (adjust the route as needed)
+        $accessLink = route('work-order.show', $workOrder->id);
+        $approvalHistoryLink = route('fetchFinanceApprovalHistory', $workOrder->id);
+
+        $rolesWithPermission = Role::whereHas('permissions', function ($query) {
+            $query->where('name', 'do-finance-approval');
+        })->pluck('id')->toArray();
+        // Get users with the required roles and valid email addresses
+        $recipients = \App\Models\User::role($rolesWithPermission)
+            ->whereIn('status', ['new', 'active'])
+            ->where('password', '!=', '')
+            ->whereHas('roles')
+            ->pluck('email')
+            ->filter(function ($email) {
+                return !empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL);
+            })
+            ->toArray();
+
+        if (!empty($recipients)) {
+            Mail::send('work_order.emails.coo_approval', [
+                'workOrder' => $workOrder,
+                'subject' => $subject,
+                'accessLink' => $accessLink,
+                'approvalHistoryLink' => $approvalHistoryLink,
+                'customerName' => $customerName,
+                'userName' => $userName,
+                'comments' => $woApprovals->comments,
+                'status' => $woApprovals->status,
+            ], function ($message) use ($recipients, $subject) {
+                $message->to($recipients)
+                    ->subject($subject);
+            });
+        }
+    }
+
     private function sendCOOApprovalEmail($workOrder, $status, $comments, $userName)
     {
         // Prepare the from details
