@@ -1240,17 +1240,10 @@ class SalesOrderController extends Controller
                     $quotationItem = QuotationItem::findOrFail($soVariant['quotation_item_id']);
 
                     // The form sends variant_id = quotation_item->reference_id, which is only a
-                    // real varaints.id for Varaint lines. For ModelLine/Brand lines it is a
-                    // model-line/brand id and violates the so_variants.variant_id FK. Resolve a
-                    // valid variant: keep it if it is a real variant, else derive it from the
-                    // chosen VINs (each vehicle knows its own variant); otherwise leave null.
-                    $variantId = null;
-                    $submittedVariantId = $soVariant['variant_id'] ?? null;
-                    if ($submittedVariantId && Varaint::whereKey($submittedVariantId)->exists()) {
-                        $variantId = (int) $submittedVariantId;
-                    } elseif (!empty($soVariant['vehicles'])) {
-                        $variantId = Vehicles::whereIn('id', $soVariant['vehicles'])->value('varaints_id');
-                    }
+                    // varaints.id on Varaint lines. On ModelLine/Brand lines it is a model-line/brand
+                    // id that can match an unrelated variant (PRADO line 120 -> HILUX DC variant 120),
+                    // so the variant is resolved from the quotation item, not the posted id.
+                    $variantId = $quotationItem->soVariantId((array) ($soVariant['vehicles'] ?? []));
 
                     $soVariantdata  = new SoVariant();
                     $soVariantdata->so_id = $so->id;
@@ -1494,6 +1487,11 @@ class SalesOrderController extends Controller
             }
 
             $quotationItem->selectedVehicleIds = $selectedVehicleIds;
+            // Pre-selected "Choose Variant". reference_id is a variant id only on Varaint lines; on
+            // ModelLine/Brand lines it can match an unrelated variant, so use the SO's saved variant.
+            $quotationItem->selectedVariantId = $quotationItem->reference_type === Varaint::class
+                ? $quotationItem->reference_id
+                : $soVariant?->variant_id;
 
             if (!empty($selectedVehicleIds)) {
                 $existingVehicleIds = collect($vehicles[$quotationItem->id] ?? [])

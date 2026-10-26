@@ -397,7 +397,7 @@
                                                         <select name="variants[{{$key+1}}][variant_id]"  required index="{{$key+1}}" id="variant-{{ $key+1 }}"
                                                         multiple class="variants form-control" data-is-gdn="{{ $quotationItem->isgdnExist }}">
                                                             @foreach($variants as $variant)
-                                                                <option value="{{ $variant->id }}" {{ $variant->id == $quotationItem->reference_id ? 'selected' : '' }}
+                                                                <option value="{{ $variant->id }}" {{ $variant->id == $quotationItem->selectedVariantId ? 'selected' : '' }}
                                                                    >{{ $variant->name ?? '' }}</option>
                                                             @endforeach
                                                         </select>
