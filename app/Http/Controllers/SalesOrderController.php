@@ -1035,7 +1035,11 @@ class SalesOrderController extends Controller
     public function createsalesorder($callId)
     {
 
-        $quotation = Quotation::where('calls_id', $callId)->first();
+        // A lead can have several PFIs (the leads list shows one row per PFI). Open the PFI whose
+        // "Sales Order" link was clicked; first() alone returns the lead's oldest, possibly deleted, PFI.
+        $quotation = Quotation::active()->where('calls_id', $callId)->where('id', request('quotation_id'))->first()
+            ?? Quotation::active()->where('calls_id', $callId)->first()
+            ?? Quotation::where('calls_id', $callId)->first();
         $calls = Calls::findOrFail($callId);
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
         $customerdetails = QuotationDetail::with('country', 'shippingPort', 'shippingPortOfLoad', 'paymentterms')->where('quotation_id', $quotation->id)->first();
