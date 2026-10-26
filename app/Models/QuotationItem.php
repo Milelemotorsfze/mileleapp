@@ -74,6 +74,32 @@ class QuotationItem extends Model
         return $this->belongsTo(Brand::class, 'brand_id');
     }
 
+    /**
+     * The variant a sales order line for this quotation item belongs to.
+     *
+     * reference_id is a varaints.id only on Varaint lines; on MasterModelLines / Brand lines it
+     * is a model-line / brand id, which can collide with an unrelated variant's id (model line
+     * PRADO and variant HILUX DC both have id 120). For those lines (or a Varaint line whose
+     * variant is gone) the variant comes from the chosen vehicles, otherwise it is unknown (null).
+     */
+    public function soVariantId(array $vehicleIds = []): ?int
+    {
+        if ($this->reference_type === Varaint::class
+            && $this->reference_id
+            && Varaint::whereKey($this->reference_id)->exists()) {
+            return (int) $this->reference_id;
+        }
+
+        $vehicleIds = array_filter($vehicleIds);
+        if (empty($vehicleIds)) {
+            return null;
+        }
+
+        $variantId = Vehicles::whereIn('id', $vehicleIds)->value('varaints_id');
+
+        return $variantId ? (int) $variantId : null;
+    }
+
     public $appends = [
         'quotation_addon_items',
         'vehicle_unit_price',
