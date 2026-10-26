@@ -2748,7 +2748,9 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                     const quotationUrlEdit = row.quotation_id
                         ? `{{ url('/proforma_invoice_edit/') }}/${data}/${row.quotation_id}`
                         : `{{ url('/proforma_invoice_edit/') }}/${data}`;
-                    const soUrl = `{{ url('/saleorder/') }}/${data}`;
+                    const soUrl = row.quotation_id
+                        ? `{{ url('/saleorder/') }}/${data}?quotation_id=${row.quotation_id}`
+                        : `{{ url('/saleorder/') }}/${data}`;
                     const preorderUrl = `{{ url('/preorder/') }}/${data}`;
                     let salesOrderOption = '';
                     let booking = '';
