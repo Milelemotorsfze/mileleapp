@@ -25,6 +25,7 @@ class PurchasingOrder extends Model
         'status',
         'po_type',
         'stock_type',
+        'so_number',
         'vendors_id',
         'payment_term_id',
         'currency',

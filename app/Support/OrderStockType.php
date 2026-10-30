@@ -21,6 +21,22 @@ class OrderStockType
         ];
     }
 
+    /**
+     * Stock types that are bought against a customer order, so the PO can carry an SO number.
+     */
+    public static function soNumberTypes(): array
+    {
+        return [
+            self::BACK_TO_BACK,
+            self::CROSS_TRADE,
+        ];
+    }
+
+    public static function allowsSoNumber(?string $value): bool
+    {
+        return in_array(self::normalize($value), self::soNumberTypes(), true);
+    }
+
     public static function normalize(?string $value): ?string
     {
         if ($value === null || $value === '') {

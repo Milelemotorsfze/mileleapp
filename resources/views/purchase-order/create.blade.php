@@ -125,6 +125,11 @@
                                 'labelFor' => 'basicpill-firstname-input',
                             ])
                         </div>
+                        @include('partials.order-so-number-input', [
+                            'selectedStockType' => old('stock_type'),
+                            'labelSuffix' => ': ',
+                            'wrapperClass' => 'col-lg-2 col-md-6',
+                        ])
                         <div class="col-lg-1 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label font-size-13 "> Territory </label>

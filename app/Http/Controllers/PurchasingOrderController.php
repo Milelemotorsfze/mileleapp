@@ -1048,6 +1048,7 @@ class PurchasingOrderController extends Controller
             'payment_term_id' => 'required',
             'po_type' => 'required',
             'stock_type' => OrderStockType::validationRules(),
+            'so_number' => 'nullable|string|max:100',
             'vendors_id' => 'required',
             'salesperson' => 'nullable|integer|exists:users,id',
         ]);
@@ -1065,6 +1066,10 @@ class PurchasingOrderController extends Controller
         $purchasingOrder->vendors_id = $vendors_id;
         $purchasingOrder->po_type = $po_type;
         $purchasingOrder->stock_type = $request->input('stock_type');
+        // SO number only applies to Back-to-Back / Cross Trade stock.
+        $purchasingOrder->so_number = OrderStockType::allowsSoNumber($request->input('stock_type'))
+            ? (trim((string) $request->input('so_number')) ?: null)
+            : null;
         $purchasingOrder->payment_term_id = $request->input('payment_term_id');
         $purchasingOrder->currency = $request->input('currency');
         $purchasingOrder->shippingmethod = $request->input('shippingmethod');
@@ -4152,6 +4157,7 @@ class PurchasingOrderController extends Controller
         info("update basci details");
         $request->validate([
             'stock_type' => OrderStockType::validationRules(),
+            'so_number' => 'nullable|string|max:100',
         ]);
         $purchasingOrder = PurchasingOrder::find($request->input('purchasing_order_id'));
         if (!$purchasingOrder) {
@@ -4171,6 +4177,7 @@ class PurchasingOrderController extends Controller
             'pl_number',
             'po_number',
             'stock_type',
+            'so_number',
         ];
         // Store old values
         $oldValues = $purchasingOrder->only($fieldsToUpdate);
@@ -4192,7 +4199,11 @@ class PurchasingOrderController extends Controller
                 $purchasingOrder->$field = $request->input($field);
             }
         }
-        
+        // SO number only applies to Back-to-Back / Cross Trade stock; clear it otherwise.
+        $purchasingOrder->so_number = OrderStockType::allowsSoNumber($purchasingOrder->stock_type)
+            ? (trim((string) $purchasingOrder->so_number) ?: null)
+            : null;
+
         // Only change PO status to 'Pending Approval' if not only estimation_date fields are updated
         if (!$onlyEstimationDateUpdated) {
             $purchasingOrder->status = "Pending Approval";

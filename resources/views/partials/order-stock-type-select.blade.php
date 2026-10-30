@@ -9,13 +9,17 @@
     $useStrongLabel = $useStrongLabel ?? false;
     $labelFor = $labelFor ?? $stockTypeName;
     $autofocus = $autofocus ?? false;
+    $markerInLabel = $markerInLabel ?? false;
     $selectedStockType = \App\Support\OrderStockType::normalize(old($stockTypeName, $selectedStockType ?? null));
 @endphp
 @if (!$hideLabel)
+@if ($markerInLabel)
+<label for="{{ $labelFor }}" class="{{ $labelClass }}"><span class="{{ $requiredMarkerClass }}">*</span> {{ $stockTypeLabel }}{{ $labelSuffix }}</label>
+@elseif ($useStrongLabel)
 <span class="{{ $requiredMarkerClass }}">* </span>
-@if ($useStrongLabel)
 <label for="{{ $labelFor }}"><strong>{{ $stockTypeLabel }}{{ $labelSuffix }}</strong></label>
 @else
+<span class="{{ $requiredMarkerClass }}">* </span>
 <label for="{{ $labelFor }}" class="{{ $labelClass }}">{{ $stockTypeLabel }}{{ $labelSuffix }}</label>
 @endif
 @endif

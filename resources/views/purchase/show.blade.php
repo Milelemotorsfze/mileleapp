@@ -1008,6 +1008,15 @@ return [$color->id => $formattedName];
                                         ])
                                     </div>
 
+                                    @include('partials.order-so-number-input', [
+                                        'selectedStockType' => $purchasingOrder->stock_type ?? null,
+                                        'selectedSoNumber' => $purchasingOrder->so_number ?? null,
+                                        'labelSuffix' => ':',
+                                        'labelClass' => 'form-label font-size-13 text-center',
+                                        'labelColumnClass' => 'col-md-4 p-3',
+                                        'inputColumnClass' => 'col-md-8 p-3',
+                                    ])
+
                                     <div class="col-md-4 p-3">
                                         <label for="shippingMethod" class="form-label font-size-13 text-center">Shipping Method:</label>
                                     </div>
@@ -1109,6 +1118,16 @@ return [$color->id => $formattedName];
                         <span>{{ $purchasingOrder->stock_type ?? '' }}</span>
                     </div>
                 </div>
+                @if($purchasingOrder->so_number)
+                <div class="row">
+                    <div class="col-lg-4 col-md-3 col-sm-12">
+                        <label for="choices-single-default" class="form-label"><strong>SO Number</strong></label>
+                    </div>
+                    <div class="col-lg-6 col-md-9 col-sm-12">
+                        <span>{{ $purchasingOrder->so_number }}</span>
+                    </div>
+                </div>
+                @endif
                 <div class="row">
                     <div class="col-lg-4 col-md-3 col-sm-12">
                         <label for="choices-single-default" class="form-label"><strong>PO Date</strong></label>

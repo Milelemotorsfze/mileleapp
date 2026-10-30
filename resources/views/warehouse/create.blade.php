@@ -8,10 +8,6 @@
         width: 100% !important;
     }
 
-    .form-label[for="basicpill-firstname-input"] {
-        margin-top: 12px;
-    }
-
     .btn.btn-success.btncenter {
         background-color: #28a745;
         color: #fff;
@@ -37,6 +33,45 @@
 
     .error {
         color: #FF0000;
+    }
+
+    /* PO header: every field is label + one 38px control, so the grid lines up with or without SO Number. */
+    .po-header .form-label {
+        display: block;
+        margin: 0 0 .4rem;
+    }
+
+    .po-header {
+        margin-bottom: 26px;
+    }
+
+    /* The theme styles select2's rendered text as the bordered box, already form-control sized. */
+    .po-header .select2-container .select2-selection--single {
+        height: auto;
+    }
+
+    .po-header .select2-container .select2-selection--single .select2-selection__rendered {
+        padding-right: 1.75rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .po-header .select2-container .select2-selection--single .select2-selection__arrow {
+        top: 0;
+        height: 100%;
+    }
+
+    .po-header .po-field-error {
+        display: block;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .po-header .po-total {
+        font-size: 1.25rem;
+        font-weight: 700;
+        line-height: calc(2.2525rem + 2px);
     }
 
     .iti {
@@ -180,26 +215,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details')
     </script>
     @endif
     {!! Form::open(array('route' => 'purchasing-order.store','method'=>'POST', 'id' => 'purchasing-order', 'enctype' => 'multipart/form-data')) !!}
-    <div class="row">
-        <div class="col-lg-2 col-md-6">
-            <span class="error">* </span>
-            <label for="basicpill-firstname-input" class="form-label">PO Date : </label>
+    <div class="row g-3 po-header">
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <label for="po_date" class="form-label"><span class="error">*</span> PO Date:</label>
             <input type="Date" id="po_date" name="po_date" class="form-control" placeholder="PO Date" required value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
         </div>
-        <div class="col-lg-2 col-md-6" style="margin-bottom: 15px;">
-            <span class="error">*</span>
-            <label for="po_number" class="form-label" style="display: block; margin-bottom: 5px;">Netsuit PO: </label>
-            <div style="display: flex; align-items: center;">
-                <span style="margin-right: 5px; font-weight: bold;">PO-</span>
-                <input type="text" id="po_number" name="po_number" class="form-control"
-                    style="flex-grow: 1; padding: 5px; border: 1px solid #ced4da; border-radius: 4px;"
-                    placeholder="Enter PO Number" required>
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <label for="po_number" class="form-label"><span class="error">*</span> Netsuit PO:</label>
+            <div class="input-group">
+                <span class="input-group-text fw-bold">PO-</span>
+                <input type="text" id="po_number" name="po_number" class="form-control" placeholder="Enter PO Number" required>
             </div>
-            <span id="po_error_message" style="color: red; font-size: 12px; margin-top: 5px; display: block;"></span>
+            <span id="po_error_message" class="error-text po-field-error"></span>
         </div>
-        <div class="col-lg-2 col-md-6">
-            <span class="error">* </span>
-            <label for="basicpill-firstname-input" class="form-label">Payment Terms : </label>
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <label for="payment_term" class="form-label"><span class="error">*</span> Payment Terms:</label>
             <select name="payment_term_id" class="form-select" id="payment_term" required>
                 <option value="" selected>Select Payment Term</option>
                 @foreach($payments as $payment)
@@ -207,9 +237,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details')
                 @endforeach
             </select>
         </div>
-        <div class="col-lg-2 col-md-6">
-            <span class="error">* </span>
-            <label for="basicpill-firstname-input" class="form-label">Vendors Name: </label>
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <label for="vendors" class="form-label"><span class="error">*</span> Vendors Name:</label>
             <select class="form-control" autofocus name="vendors_id" id="vendors" required>
                 <option value="" disabled>Select The Vendor</option>
                 @foreach($vendors as $vendors)
@@ -219,27 +248,31 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details')
                 @endforeach
             </select>
         </div>
-        <div class="col-lg-1 col-md-6">
-            <span class="error">* </span>
-            <label for="basicpill-firstname-input" class="form-label">PO Type: </label>
-            <select class="form-control" autofocus name="po_type" required>
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <label for="po_type" class="form-label"><span class="error">*</span> PO Type:</label>
+            <select class="form-select" autofocus name="po_type" id="po_type" required>
                 <option value="Normal">Normal</option>
                 <option value="Payment Adjustment">Payment Adjustment</option>
             </select>
         </div>
-        <div class="col-lg-2 col-md-6">
+        <div class="col-lg-2 col-md-4 col-sm-6">
             @include('partials.order-stock-type-select', [
                 'stockTypeLabel' => 'Stock Type',
                 'selectedStockType' => old('stock_type'),
-                'labelSuffix' => ': ',
+                'labelSuffix' => ':',
                 'requiredMarkerClass' => 'error',
-                'labelFor' => 'basicpill-firstname-input',
+                'markerInLabel' => true,
+                'inputClass' => 'form-select',
                 'autofocus' => true,
             ])
         </div>
-        <div class="col-lg-1 col-md-6">
-            <span class="error">* </span>
-            <label for="basicpill-firstname-input" class="form-label">Currency: </label>
+        @include('partials.order-so-number-input', [
+            'selectedStockType' => old('stock_type'),
+            'labelSuffix' => ':',
+            'wrapperClass' => 'col-lg-2 col-md-4 col-sm-6',
+        ])
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <label for="currency" class="form-label"><span class="error">*</span> Currency:</label>
             <select class="form-control" autofocus name="currency" id="currency" required>
                 <option value="AED">AED</option>
                 <option value="USD" selected>USD</option>
@@ -253,8 +286,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details')
                 <option value="ZAR">ZAR</option>
             </select>
         </div>
-        <div class="col-lg-2 col-md-6">
-            <div>Total Price: <span id="totalUnitPriceInput" style="font-weight: bold; font-size: larger;">0</span></div>
+        <div class="col-lg-2 col-md-4 col-sm-6 ms-lg-auto text-lg-end">
+            <span class="form-label d-block">Total Price:</span>
+            <div class="po-total"><span id="totalUnitPriceInput">0</span></div>
         </div>
     </div>
     <div id="variantRowsContainer" style="display: none;">
