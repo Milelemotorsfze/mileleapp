@@ -2946,6 +2946,12 @@ class VehiclesController extends Controller
             }
         }
 
+        // Expired reservation: the stock report screen blanks the end date and reserved salesperson
+        // (stock is available again), so its export must not show them either. Other reports keep raw values.
+        if ($reportKey === 'allstock' && $this->isStockExportReservationColumn($colDef) && $this->stockExportReservationHasExpired($row)) {
+            return '';
+        }
+
         $dataKey = $colDef['data'];
         $val = null;
         if ($dataKey !== '' && array_key_exists($dataKey, $row)) {
@@ -2977,6 +2983,43 @@ class VehiclesController extends Controller
     }
 
     /**
+     * Reservation columns of the stock report: start/end date and the reserved salesperson (bpn / bp.name).
+     *
+     * @param  array{title: string, data: string, name: string}  $colDef
+     */
+    protected function isStockExportReservationColumn(array $colDef): bool
+    {
+        return in_array($colDef['data'], ['reservation_start_date', 'reservation_end_date', 'bpn'], true)
+            || in_array($colDef['name'], ['vehicles.reservation_start_date', 'vehicles.reservation_end_date', 'bp.name'], true);
+    }
+
+    /**
+     * @param  array<string, mixed>  $row
+     */
+    protected function stockExportReservationIsActive(array $row): bool
+    {
+        $resEnd = $row['reservation_end_date'] ?? null;
+        if (! $resEnd) {
+            return false;
+        }
+        try {
+            return \Carbon\Carbon::parse($resEnd)->isFuture();
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    /**
+     * True only when the row has a reservation end date that is now or in the past.
+     *
+     * @param  array<string, mixed>  $row
+     */
+    protected function stockExportReservationHasExpired(array $row): bool
+    {
+        return ! empty($row['reservation_end_date']) && ! $this->stockExportReservationIsActive($row);
+    }
+
+    /**
      * @param  array<string, mixed>  $row
      */
     protected function computeStockReportStatusLabelForExport(array $row, string $reportKey): string
@@ -2986,15 +3029,7 @@ class VehiclesController extends Controller
         $gdnId = $row['gdn_id'] ?? null;
         $movementGrnId = $row['movement_grn_id'] ?? null;
         $soId = $row['so_id'] ?? null;
-        $resEnd = $row['reservation_end_date'] ?? null;
-        $resActive = false;
-        if ($resEnd) {
-            try {
-                $resActive = \Carbon\Carbon::parse($resEnd)->isFuture();
-            } catch (\Throwable $e) {
-                $resActive = false;
-            }
-        }
+        $resActive = $this->stockExportReservationIsActive($row);
 
         if (empty($grnInsp) && empty($inspectionDate) && empty($gdnId) && empty($movementGrnId)) {
             return 'Incoming';
