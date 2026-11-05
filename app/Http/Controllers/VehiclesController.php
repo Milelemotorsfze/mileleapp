@@ -3281,6 +3281,8 @@ class VehiclesController extends Controller
             'grn_date_to' => isset($raw['grn_date_to']) ? trim((string) $raw['grn_date_to']) : '',
             'so_date_from' => isset($raw['so_date_from']) ? trim((string) $raw['so_date_from']) : '',
             'so_date_to' => isset($raw['so_date_to']) ? trim((string) $raw['so_date_to']) : '',
+            'gdn_date_from' => isset($raw['gdn_date_from']) ? trim((string) $raw['gdn_date_from']) : '',
+            'gdn_date_to' => isset($raw['gdn_date_to']) ? trim((string) $raw['gdn_date_to']) : '',
             'price_min' => $this->normalizeStockBarPriceScalar($raw['price_min'] ?? ''),
             'price_max' => $this->normalizeStockBarPriceScalar($raw['price_max'] ?? ''),
         ];
@@ -3443,6 +3445,35 @@ SQL;
                 } catch (\Throwable $e) {
                 }
             }
+        }
+
+        // GDN date: subquery on vehicles.gdn_id so it works on reports that don't join `gdn` (e.g. Available Stock).
+        $gdnFrom = $this->parseStockBarDate($bar['gdn_date_from'] ?? '');
+        $gdnTo = $this->parseStockBarDate($bar['gdn_date_to'] ?? '');
+        if ($gdnFrom !== null || $gdnTo !== null) {
+            $query->whereIn('vehicles.gdn_id', function ($sub) use ($gdnFrom, $gdnTo) {
+                $sub->select('gdn.id')->from('gdn');
+                if ($gdnFrom !== null) {
+                    $sub->whereDate('gdn.date', '>=', $gdnFrom);
+                }
+                if ($gdnTo !== null) {
+                    $sub->whereDate('gdn.date', '<=', $gdnTo);
+                }
+            });
+        }
+    }
+
+    /** Y-m-d for a bar filter date input, or null when blank/unparseable. */
+    protected function parseStockBarDate($value): ?string
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+        try {
+            return Carbon::parse($value)->toDateString();
+        } catch (\Throwable $e) {
+            return null;
         }
     }
 

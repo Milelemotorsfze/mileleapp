@@ -8,6 +8,8 @@ $warehouses = isset($stockFilterWarehouses) ? $stockFilterWarehouses : collect()
 $territories = isset($stockFilterTerritories) ? collect($stockFilterTerritories) : collect();
 $modelYears = isset($stockFilterModelYears) ? collect($stockFilterModelYears) : collect();
 $fuelTypes = isset($stockFilterFuelTypes) ? collect($stockFilterFuelTypes) : collect();
+// Available Stock only lists vehicles without a GDN, so the GDN range would always be empty there.
+$showGdnDate = $stockFilterShowGdnDate ?? true;
 $stockVariantMeta = $variants->map(function ($v) {
 return [
 'id' => (string) $v->id,
@@ -314,7 +316,7 @@ return [
                 <section class="stock-adv-section">
                     <div class="stock-adv-section-title">Date ranges</div>
                     <div class="row g-2">
-                        <div class="col-12 col-md-4">
+                        <div class="col-12 col-md-6">
                             <div class="stock-adv-range-box d-flex gap-2">
                                 <div class="flex-fill stock-adv-field">
                                     <label class="form-label mb-0">PO from</label>
@@ -326,7 +328,7 @@ return [
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-md-4">
+                        <div class="col-12 col-md-6">
                             <div class="stock-adv-range-box d-flex gap-2">
                                 <div class="flex-fill stock-adv-field">
                                     <label class="form-label mb-0">GRN from</label>
@@ -338,7 +340,7 @@ return [
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-md-4">
+                        <div class="col-12 col-md-6">
                             <div class="stock-adv-range-box d-flex gap-2">
                                 <div class="flex-fill stock-adv-field">
                                     <label class="form-label mb-0">SO from</label>
@@ -350,6 +352,20 @@ return [
                                 </div>
                             </div>
                         </div>
+                        @if ($showGdnDate)
+                        <div class="col-12 col-md-6">
+                            <div class="stock-adv-range-box d-flex gap-2">
+                                <div class="flex-fill stock-adv-field">
+                                    <label class="form-label mb-0">GDN from</label>
+                                    <input type="date" class="form-control form-control-sm stock-adv-inp" data-field="gdn_date_from">
+                                </div>
+                                <div class="flex-fill stock-adv-field">
+                                    <label class="form-label mb-0">GDN to</label>
+                                    <input type="date" class="form-control form-control-sm stock-adv-inp" data-field="gdn_date_to">
+                                </div>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </section>
             </div>
@@ -831,6 +847,8 @@ return [
                 grn_date_to: $w.find('[data-field="grn_date_to"]').val() || '',
                 so_date_from: $w.find('[data-field="so_date_from"]').val() || '',
                 so_date_to: $w.find('[data-field="so_date_to"]').val() || '',
+                gdn_date_from: $w.find('[data-field="gdn_date_from"]').val() || '',
+                gdn_date_to: $w.find('[data-field="gdn_date_to"]').val() || '',
                 price_min: sanitizeNonNegativePriceScalar($w.find('[data-field="price_min"]').val()),
                 price_max: sanitizeNonNegativePriceScalar($w.find('[data-field="price_max"]').val())
             };
@@ -853,7 +871,7 @@ return [
                 (p.territories && p.territories.length) ||
                 (p.sales_person_ids && p.sales_person_ids.length) ||
                 (p.stock_statuses && p.stock_statuses.length) ||
-                (p.po_date_from || p.po_date_to || p.grn_date_from || p.grn_date_to || p.so_date_from || p.so_date_to) ||
+                (p.po_date_from || p.po_date_to || p.grn_date_from || p.grn_date_to || p.so_date_from || p.so_date_to || p.gdn_date_from || p.gdn_date_to) ||
                 (p.price_min && String(p.price_min).trim() !== '') ||
                 (p.price_max && String(p.price_max).trim() !== '');
         }
@@ -1367,6 +1385,12 @@ return [
                 rows.push({
                     label: 'SO date range',
                     value: (p.so_date_from || '…') + ' → ' + (p.so_date_to || '…')
+                });
+            }
+            if (p.gdn_date_from || p.gdn_date_to) {
+                rows.push({
+                    label: 'GDN date range',
+                    value: (p.gdn_date_from || '…') + ' → ' + (p.gdn_date_to || '…')
                 });
             }
             if (p.price_min && String(p.price_min).trim() !== '' || p.price_max && String(p.price_max).trim() !== '') {
