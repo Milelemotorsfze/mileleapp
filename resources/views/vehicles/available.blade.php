@@ -593,7 +593,7 @@ $hasEditEstimationDatePermission = Auth::user()->hasPermissionForSelectedRole('e
     <i class="bi bi-upload"></i> Upload ETA CSV
 </button>
 @endif
-@include('vehicles.partials.stock-advanced-filter-bar', ['stockFilterBarTableId' => 'dtBasicExample3'])
+@include('vehicles.partials.stock-advanced-filter-bar', ['stockFilterBarTableId' => 'dtBasicExample3', 'stockFilterShowGdnDate' => false])
 <div class="table-responsive" style="height: 80vh;">
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
