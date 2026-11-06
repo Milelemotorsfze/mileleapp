@@ -578,6 +578,7 @@ table.dataTable thead th select {
                   <th>Minimum Commission</th>
                   <!-- <th>GP %</th> -->
                   <th>Selling Price</th>
+                  <th>Bottom Price</th>
                 @endif
                   <th>Document Owership</th>
                   <th>Work Order Date</th>
@@ -884,6 +885,23 @@ if (hasPricePermission) {
                         }
                         return ''; // Return an empty string if there's no price
                     }
+        },
+        {
+                    data: 'bottom_price',
+                    name: 'vehicles.bottom_price',
+                    render: function(data, type, row) {
+                        if (data) {
+                            // Convert the string to a float, then format it with commas
+                            var formattedBottomPrice = parseFloat(data).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            });
+
+                            // Return the price wrapped in a span with button-like styling
+                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedBottomPrice + '</span>';
+                        }
+                        return ''; // Return an empty string if there's no price
+                    }
         });
     }
                 columns9.push(
@@ -971,23 +989,19 @@ if (hasPricePermission) {
         33: 'countries.name',
     };   
     if (canViewVehicleCost) {
-    columnMap[33] = 'costprice';
-    columnMap[34] = 'costcurrency';
-    columnMap[35] = 'vehicles.minimum_commission';
-    columnMap[36] = 'vehicles.price';
-    columnMap[37] = 'vehicles.ownership_type';
-    columnMap[38] = 'vehicles.custom_inspection_number';
-    columnMap[39] = 'vehicles.custom_inspection_status';
+    columnMap[34] = 'costprice';
+    // columnMap[35]: Currency is a computed column, it cannot be filtered in SQL
+    columnMap[36] = 'vehicles.minimum_commission';
+    columnMap[37] = 'vehicles.price';
+    columnMap[38] = 'vehicles.bottom_price';
+    columnMap[39] = 'vehicles.ownership_type';
 } else if (hasPricePermission) {
-    columnMap[33] = 'vehicles.minimum_commission';
-    columnMap[34] = 'vehicles.price';
-    columnMap[35] = 'vehicles.ownership_type';
-    columnMap[36] = 'vehicles.custom_inspection_number';
-    columnMap[37] = 'vehicles.custom_inspection_status';
+    columnMap[34] = 'vehicles.minimum_commission';
+    columnMap[35] = 'vehicles.price';
+    columnMap[36] = 'vehicles.bottom_price';
+    columnMap[37] = 'vehicles.ownership_type';
 } else {
-    columnMap[33] = 'vehicles.ownership_type';
-    columnMap[34] = 'vehicles.custom_inspection_number';
-    columnMap[35] = 'vehicles.custom_inspection_status';
+    columnMap[34] = 'vehicles.ownership_type';
 }
     var table8 = $('#dtBasicExample8').DataTable({
           processing: true,
@@ -1108,7 +1122,7 @@ if (hasPricePermission) {
                     });
                     select.append('<option value="' + d + '">' + formattedDate + '</option>');
                 }
-                else if (columnHeader === 'Selling Price') {
+                else if (columnHeader === 'Selling Price' || columnHeader === 'Bottom Price') {
                     var formattedPrice = parseFloat(d).toLocaleString('en-US', {
                         minimumFractionDigits: 0,
                         maximumFractionDigits: 0

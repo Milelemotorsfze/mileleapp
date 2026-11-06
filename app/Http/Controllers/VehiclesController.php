@@ -1904,13 +1904,26 @@ class VehiclesController extends Controller
             return redirect()->back()->with('error', 'Vehicle has already been delivered and cannot be canceled.');
         }
     }
+    /** A vehicle's log rows; bottom price changes only for users who may see selling prices. */
+    protected function vehicleLogQueryForCurrentUser(int $vehicleId)
+    {
+        $query = Vehicleslog::with('roleName')->where('vehicles_id', $vehicleId);
+        if (!Auth::user()->hasPermissionForSelectedRole('selling-price-stock-report-view')) {
+            $query->where(function ($log) {
+                $log->whereNull('field')->orWhere('field', '!=', 'bottom_price');
+            });
+        }
+
+        return $query;
+    }
+
     public function viewLogDetails($id)
     {
         $vehicle = Vehicles::find($id);
         $documentsLog = Documentlog::with('roleName')->where('documents_id', $vehicle->documents_id);
         $soLog = Solog::with('roleName')->where('so_id', $vehicle->so_id);
         $remarks = Remarks::where('vehicles_id', $id)->where('department', 'warehouse')->get();
-        $vehiclesLog = Vehicleslog::with('roleName')->where('vehicles_id', $vehicle->id);
+        $vehiclesLog = $this->vehicleLogQueryForCurrentUser($vehicle->id);
         $mergedLogs = $documentsLog->union($soLog)->union($vehiclesLog)->orderBy('updated_at')->get();
         $pendingVehicleDetailApprovalRequests = VehicleApprovalRequests::where('vehicle_id', $id)->orderBy('id', 'DESC')->get();
         $previousId = Vehicles::where('id', '<', $id)->max('id');
@@ -2775,7 +2788,19 @@ class VehiclesController extends Controller
                 $this->applyStockReportGlobalSearchToQuery($q, $request->input('search.value'), $reportKey);
             }, false)
             ->with('stock_bar_diagnostics', $stockBarDiag)
+            ->makeVisible(['bottom_price']) // hidden on the model; stockBottomPriceSelect() decides who gets it
             ->toJson();
+    }
+
+    /**
+     * Bottom price column for the stock lists. Users who may not see selling prices get NULL,
+     * so the value never reaches their browser or their export.
+     */
+    protected function stockBottomPriceSelect()
+    {
+        return Auth::user()->hasPermissionForSelectedRole('selling-price-stock-report-view')
+            ? 'vehicles.bottom_price'
+            : DB::raw('NULL as bottom_price');
     }
 
     /**
@@ -2876,7 +2901,7 @@ class VehiclesController extends Controller
             $serial = 0;
 
             foreach ($query->cursor() as $model) {
-                $row = $model instanceof \Illuminate\Database\Eloquent\Model ? $model->toArray() : (array) $model;
+                $row = $model instanceof \Illuminate\Database\Eloquent\Model ? $model->makeVisible('bottom_price')->toArray() : (array) $model;
                 $vinKey = $this->stockExportVinDedupeKey($row);
                 if (isset($seenVin[$vinKey])) {
                     continue;
@@ -2967,7 +2992,7 @@ class VehiclesController extends Controller
             return '';
         }
 
-        if (is_numeric($val) && in_array($title, ['Price', 'Selling Price', 'Minimum Commission', 'Vehicle Cost'], true)) {
+        if (is_numeric($val) && in_array($title, ['Price', 'Selling Price', 'Bottom Price', 'Minimum Commission', 'Vehicle Cost'], true)) {
             return (string) (0 + $val);
         }
 
@@ -3775,6 +3800,7 @@ SQL;
                     'inspection_pdi.id as pdi_inspectionid',
                     'vehicles.engine',
                     'vehicles.price',
+                    $this->stockBottomPriceSelect(),
                     'countries.name as fd',
                     'brands.brand_name',
                     'varaints.name as variant',
@@ -4173,33 +4199,27 @@ SQL;
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         if ($request->ajax()) {
-            $data = Vehicles::select([
-                'brands.brand_name',
-                'vehicles.gp',
-                'vehicles.minimum_commission',
-                'vehicles.varaints_id',
-                'vehicles.int_colour',
-                'vehicles.ex_colour',
-                'vehicles.price',
-                'vehicles.csr_price',
-                'varaints.name',
-                'master_model_lines.model_line',
-                'int_color.name as interior_color',
-                'ex_color.name as exterior_color',
-            ])
-                ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
-                ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
-                ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
-                ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
-                ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                ->groupBy('brands.brand_name', 'vehicles.gp', 'vehicles.minimum_commission', 'vehicles.varaints_id', 'vehicles.int_colour', 'vehicles.ex_colour', 'vehicles.price', 'vehicles.csr_price', 'varaints.name', 'master_model_lines.model_line', 'int_color.name', 'ex_color.name');
+            $data = $this->variantPriceListingQuery();
 
-            return DataTables::of($data)
+            $table = DataTables::of($data);
+            // Rows that tie on the sorted column keep the order the old 12-column GROUP BY gave
+            // them (brand, gp, commission, variant, colours, prices), so one variant's colours
+            // stay together within a brand.
+            $tieBreak = implode(', ', self::VARIANT_PRICE_LISTING_ORDER);
+            $sortableColumns = [
+                'brands.brand_name', 'master_model_lines.model_line', 'varaints.name', 'varaints.my', 'int_color.name',
+                'ex_color.name', 'vehicles.minimum_commission', 'vehicles.price', 'vehicles.bottom_price',
+            ];
+            foreach ($sortableColumns as $column) {
+                $table->orderColumn($column, "{$column} \$1, {$tieBreak}");
+            }
+
+            return $table
                 ->editColumn('price', function ($data) {
                     return number_format($data->price, 0, '.', ',');
                 })
-                ->editColumn('csr_price', function ($data) {
-                    return number_format($data->csr_price, 0, '.', ',');
+                ->editColumn('bottom_price', function ($data) {
+                    return number_format((float) $data->bottom_price, 0, '.', ',');
                 })
                 ->editColumn('minimum_commission', function ($data) {
                     return number_format($data->minimum_commission, 0, '.', ',');
@@ -4208,6 +4228,65 @@ SQL;
         }
         return view('variant-prices.allindex');
     }
+
+    /** Group key of the variant price listing; also the tiebreak order of its rows. */
+    protected const VARIANT_PRICE_LISTING_ORDER = [
+        'brands.brand_name',
+        'vehicles.gp',
+        'vehicles.minimum_commission',
+        'vehicles.varaints_id',
+        'vehicles.int_colour',
+        'vehicles.ex_colour',
+        'vehicles.price',
+        'vehicles.bottom_price',
+    ];
+
+    /**
+     * One row per distinct (variant, interior, exterior, gp, minimum commission, price, bottom price)
+     * among non-deleted vehicles that have an existing variant, with brand / model line /
+     * variant / model year / colour names attached.
+     *
+     * The vehicles are collapsed to their distinct price combinations first and the names are
+     * joined onto that small set afterwards, instead of joining every vehicle and grouping by
+     * every column. Every joined name hangs off a primary key, so no rows are lost or doubled.
+     * The derived table is aliased "vehicles" so the DataTables column names in the view
+     * (vehicles.price, brands.brand_name, int_color.name, ...) keep working for search and sort.
+     */
+    protected function variantPriceListingQuery(): \Illuminate\Database\Query\Builder
+    {
+        $priceColumns = ['varaints_id', 'int_colour', 'ex_colour', 'gp', 'minimum_commission', 'price', 'bottom_price'];
+
+        $combinations = Vehicles::query()
+            ->select($priceColumns)
+            // Vehicles with no (or a missing) variant only produced a "null" row that cannot be
+            // priced: allvariantpriceupdate requires an existing variant.
+            ->whereIn('varaints_id', DB::table('varaints')->select('id'))
+            ->groupBy($priceColumns)
+            ->toBase();
+
+        return DB::query()
+            ->fromSub($combinations, 'vehicles')
+            ->select([
+                'brands.brand_name',
+                'vehicles.gp',
+                'vehicles.minimum_commission',
+                'vehicles.varaints_id',
+                'vehicles.int_colour',
+                'vehicles.ex_colour',
+                'vehicles.price',
+                'vehicles.bottom_price',
+                'varaints.name',
+                'varaints.my as model_year',
+                'master_model_lines.model_line',
+                'int_color.name as interior_color',
+                'ex_color.name as exterior_color',
+            ])
+            ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+            ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+            ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+            ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+            ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id');
+    }
     public function allvariantpriceupdate(Request $request)
     {
         // Validate the incoming request
@@ -4215,7 +4294,7 @@ SQL;
             $request->all(),
             [
                 'varaints_id' => 'required|integer|exists:varaints,id',
-                'field' => 'required|string|in:price,gp,minimum_commission,csr_price',
+                'field' => 'required|string|in:price,gp,minimum_commission,bottom_price',
                 'value' => 'required|string|min:1',
                 'reason' => 'nullable|string|max:500',
                 'notify_departments' => 'nullable'
@@ -4267,8 +4346,8 @@ SQL;
             return response()->json(['error' => 'Vehicle not found'], 404);
         }
 
-        // Note: CSR price validation is now handled on the frontend
-        // Server-side validation removed to allow simultaneous updates
+        // Note: bottom price vs price validation is handled on the frontend, because the page
+        // saves price and bottom price as two simultaneous requests
 
         // Store old value for email notification
         $oldValue = $vehicles->first()->{$request->field};
@@ -4280,12 +4359,12 @@ SQL;
         if ($field == 'minimum_commission') {
             $value = str_replace(',', '', $value);
         }
-        if ($field == 'csr_price') {
+        if ($field == 'bottom_price') {
             $value = str_replace(',', '', $value);
         }
-        
+
         // Additional validation for numeric fields to ensure they're greater than 0
-        if (in_array($field, ['price', 'csr_price', 'minimum_commission'])) {
+        if (in_array($field, ['price', 'bottom_price', 'minimum_commission'])) {
             $numericValue = floatval($value);
             if ($numericValue <= 0) {
                 return response()->json([
@@ -4296,36 +4375,9 @@ SQL;
             }
         }
 
-        foreach ($vehicles as $vehicle) {
-            $vehicle->$field = $value ?? 0;
-            $vehicle->save();
-            
-            // Log the update for debugging
-            \Log::info("Vehicle price update", [
-                'vehicle_id' => $vehicle->id,
-                'field' => $field,
-                'old_value' => $oldValue,
-                'new_value' => $value,
-                'csr_price' => $vehicle->csr_price,
-                'price' => $vehicle->price
-            ]);
-            
-            $currentDateTime = Carbon::now();
-            $vehicleslog = new Vehicleslog();
-            $vehicleslog->time = $currentDateTime->toTimeString();
-            $vehicleslog->date = $currentDateTime->toDateString();
-            $vehicleslog->status = 'Update Vehicles Selling Price / GP';
-            $vehicleslog->vehicles_id = $vehicle->id;
-            $vehicleslog->field = $field;
-            $vehicleslog->old_value = $oldValue;
-            $vehicleslog->new_value = $value;
-            $vehicleslog->category = "Sales";
-            $vehicleslog->created_by = auth()->user()->id;
-            $vehicleslog->role = Auth::user()->selectedRole;
-            $vehicleslog->save();
-        }
+        $this->saveVariantPriceField($vehicles, $field, $value ?? 0, $oldValue);
 
-        // Send email notification to departments only if requested and field is not CSR price
+        // Send email notification to departments only if requested and field is not bottom price
         $notifyDepartmentsInput = $request->input('notify_departments');
         $notifyDepartments = false;
         
@@ -4334,8 +4386,8 @@ SQL;
             $notifyDepartments = true;
         }
         
-        // Don't send notifications for CSR price updates
-        if ($field === 'csr_price') {
+        // Don't send notifications for bottom price updates
+        if ($field === 'bottom_price') {
             $notifyDepartments = false;
         }
         
@@ -4345,15 +4397,20 @@ SQL;
             'field' => $field,
             'old_value' => $oldValue,
             'new_value' => $value,
-            'csr_price_excluded' => $field === 'csr_price'
+            'bottom_price_excluded' => $field === 'bottom_price'
         ]);
         
         if ($notifyDepartments) {
-            try {
-                $this->sendPriceUpdateNotification($vehicles, $field, $oldValue, $value, $request->reason);
-            } catch (\Exception $e) {
-                \Log::error('Failed to send price update notification: ' . $e->getMessage());
-            }
+            // Sent once the response has gone back to the browser: the Gmail API call takes
+            // seconds and the user does not need to wait for it.
+            $reason = $request->reason;
+            app()->terminating(function () use ($vehicles, $field, $oldValue, $value, $reason) {
+                try {
+                    $this->sendPriceUpdateNotification($vehicles, $field, $oldValue, $value, $reason);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to send price update notification: ' . $e->getMessage());
+                }
+            });
         }
 
         return response()->json([
@@ -4361,6 +4418,65 @@ SQL;
             'message' => 'Vehicle updated successfully',
             'new_value' => $value,
             'field' => $field
+        ]);
+    }
+
+    /**
+     * Writes one price field to every vehicle of a variant/colour combination and logs it per
+     * vehicle, in one transaction with one UPDATE and one batched log INSERT instead of two
+     * auto-committed queries per vehicle.
+     *
+     * Like the per-vehicle save() it replaces, only vehicles whose value actually changes are
+     * updated (and get a new updated_at), while every vehicle gets a vehicles_log row. The
+     * in-memory models are updated too, for the notification email.
+     */
+    protected function saveVariantPriceField($vehicles, string $field, $value, $oldValue): void
+    {
+        $changedIds = [];
+        foreach ($vehicles as $vehicle) {
+            $vehicle->$field = $value;
+            if ($vehicle->isDirty($field)) {
+                $changedIds[] = $vehicle->id;
+            }
+        }
+
+        $now = Carbon::now();
+        $user = Auth::user();
+        $role = $user->selectedRole; // queries roles on every access when no role is selected
+        $logRows = $vehicles->map(fn ($vehicle) => [
+            'time' => $now->toTimeString(),
+            'date' => $now->toDateString(),
+            'status' => 'Update Vehicles Selling Price / GP',
+            'vehicles_id' => $vehicle->id,
+            'field' => $field,
+            'old_value' => $oldValue,
+            'new_value' => $value,
+            'category' => 'Sales',
+            'created_by' => $user->id,
+            'role' => $role,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ])->all();
+
+        DB::transaction(function () use ($changedIds, $field, $value, $now, $logRows) {
+            foreach (array_chunk($changedIds, 500) as $ids) {
+                Vehicles::whereIn('id', $ids)->update([$field => $value, 'updated_at' => $now]);
+            }
+            foreach (array_chunk($logRows, 500) as $rows) {
+                Vehicleslog::insert($rows);
+            }
+        });
+
+        foreach ($vehicles as $vehicle) {
+            $vehicle->syncOriginalAttribute($field);
+        }
+
+        \Log::info('Vehicle price update', [
+            'vehicle_ids' => $vehicles->pluck('id')->all(),
+            'changed_vehicle_ids' => $changedIds,
+            'field' => $field,
+            'old_value' => $oldValue,
+            'new_value' => $value,
         ]);
     }
 
@@ -4676,6 +4792,7 @@ SQL;
                     'inspection_grn.id as grn_inspectionid',
                     'vehicles.territory',
                     'vehicles.price as price',
+                    $this->stockBottomPriceSelect(),
                     'inspection_pdi.id as pdi_inspectionid',
                     'vehicles.grn_remark',
                     'brands.brand_name',
@@ -4871,6 +4988,7 @@ SQL;
                     'vehicles.inspection_status',
                     'vehicles.ownership_type',
                     'vehicles.price',
+                    $this->stockBottomPriceSelect(),
                     'vehicles.territory',
                     'vehicles.sales_remarks',
                     'vehicles.minimum_commission',
@@ -5088,6 +5206,7 @@ SQL;
                     'inspection_pdi.id as pdi_inspectionid',
                     'vehicles.engine',
                     'vehicles.price',
+                    $this->stockBottomPriceSelect(),
                     'countries.name as fd',
                     'brands.brand_name',
                     'varaints.name as variant',
