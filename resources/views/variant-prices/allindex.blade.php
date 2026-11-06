@@ -68,7 +68,7 @@
         background-color: #fff3cd !important;
         border-color: #ffeaa7 !important;
     }
-    .csr-required-blink {
+    .bottom-price-required-blink {
         animation: blink 1s infinite;
         border-color: #dc3545 !important;
     }
@@ -80,6 +80,28 @@
         padding: 2px 6px !important;
         font-size: 11px !important;
         line-height: 1.2 !important;
+    }
+    #price-update-loader {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        background: rgba(255, 255, 255, 0.6);
+        align-items: center;
+        justify-content: center;
+    }
+    #price-update-loader.active {
+        display: flex;
+    }
+    #price-update-loader .loader-box {
+        background: #fff;
+        border-radius: 6px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 500;
     }
 </style>
 @section('content')
@@ -110,6 +132,14 @@
       </div>
     </div>
   </div>
+
+<!-- Shown while price changes are being saved -->
+<div id="price-update-loader" role="status" aria-live="polite">
+    <div class="loader-box">
+        <div class="spinner-border text-primary" role="presentation"></div>
+        <span>Updating prices...</span>
+    </div>
+</div>
 
 <!-- Price Change Reason Modal -->
 <div class="modal fade" id="priceChangeReasonModal" tabindex="-1" aria-labelledby="priceChangeReasonModalLabel" aria-hidden="true">
@@ -142,15 +172,17 @@
                     <th>Brand</th>
                     <th>Model Line</th>
                     <th>Variant</th>
+                    <th>Model Year</th>
                     <th>Interior Colour</th>
                     <th>Exterior Colour</th>
                     <th>Minimum Commission</th>
                     <!-- <th>GP</th> -->
                     <th>Price</th>
-                    <th>CSR Price</th>
+                    <th>Bottom Price</th>
                     <th>Action</th>
                 </tr>
                 <tr>
+                    <th><select class="filter-select"><option value="">All</option></select></th>
                     <th><select class="filter-select"><option value="">All</option></select></th>
                     <th><select class="filter-select"><option value="">All</option></select></th>
                     <th><select class="filter-select"><option value="">All</option></select></th>
@@ -170,6 +202,11 @@
 </div>  
 <script>
     $(document).ready(function () {
+        // Prices arrive formatted ("175,000"); parseFloat alone would read that as 175.
+        function toNumber(value) {
+            return parseFloat(String(value === null || value === undefined ? '' : value).replace(/,/g, '')) || 0;
+        }
+
         var table = $('#dtBasicExample1').DataTable({
             processing: true,
             serverSide: true,
@@ -184,6 +221,7 @@
                 return '<a href="#" onclick="openModal(' + row.varaints_id + ')" style="text-decoration: underline;">' + data + '</a>';
             }
         },
+                { data: 'model_year', name: 'varaints.my' },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 {
@@ -212,15 +250,16 @@
                     }
                 },
                 {
-                    data: 'csr_price', 
-                    name: 'vehicles.csr_price', 
+                    data: 'bottom_price', 
+                    name: 'vehicles.bottom_price', 
                     render: function (data, type, row) {
-                        var displayValue = data === null || data == 0 ? '' : parseFloat(data).toLocaleString('en-US', {
+                        var amount = toNumber(data);
+                        var displayValue = amount === 0 ? '' : amount.toLocaleString('en-US', {
                             minimumFractionDigits: 0,
                             maximumFractionDigits: 2
                         });
-                        var originalValue = data === null || data == 0 ? '0' : data;
-                        return `<input type="text" class="editable-csr_price" data-varaint-id="${row.varaints_id}" data-int-colour="${row.int_colour}" data-ex-colour="${row.ex_colour}" data-original-value="${originalValue}" value="${displayValue}" />`;
+                        var originalValue = amount;
+                        return `<input type="text" class="editable-bottom_price" data-varaint-id="${row.varaints_id}" data-int-colour="${row.int_colour}" data-ex-colour="${row.ex_colour}" data-original-value="${originalValue}" value="${displayValue}" />`;
                     }
                 },
                 {
@@ -240,13 +279,23 @@
                 },
             ],
             pageLength: -1,
+            // DataTables' width estimation re-renders every cell of every row (all rows are on one
+            // page) and measures a cloned table; the browser lays the columns out itself anyway.
+            autoWidth: false,
             initComplete: function () {
                 this.api().columns().every(function () {
                     var column = this;
                     var select = $(column.header()).find('select');
-                    column.data().unique().sort().each(function (d, j) {
-                        select.append('<option value="'+d+'">'+d+'</option>');
+                    if (!select.length) {
+                        return; // Action column has no filter dropdown
+                    }
+                    // Same options as data().unique().sort(), built in one pass and inserted
+                    // into the DOM once instead of one append per option.
+                    var options = '';
+                    Array.from(new Set(column.data().toArray())).sort().forEach(function (d) {
+                        options += '<option value="'+d+'">'+d+'</option>';
                     });
+                    select.append(options);
                     select.select2({
                         width: '100%'
                     });
@@ -269,7 +318,7 @@
         $('#dtBasicExample1').on('input', 'input.editable-minimum_commission', function () {
             this.value = this.value.replace(/[^0-9]/g, '');
         });
-        $('#dtBasicExample1').on('input', 'input.editable-csr_price', function () {
+        $('#dtBasicExample1').on('input', 'input.editable-bottom_price', function () {
             let value = $(this).val().replace(/[^0-9.]/g, '');
             if (value) {
                 let parts = value.split('.');
@@ -292,6 +341,34 @@
         var originalPrice = null; // Store original price for comparison
         
 
+        // Loader: stays up until every save request in flight (price and bottom price go out
+        // together) has finished; the row's Update button shows a spinner meanwhile.
+        var pendingSaves = 0;
+        var pendingSavesByRow = {};
+        function updateButtonFor(varaints_id, int_colour, ex_colour) {
+            return $(`button.update-prices-btn[data-varaint-id="${varaints_id}"][data-int-colour="${int_colour}"][data-ex-colour="${ex_colour}"]`);
+        }
+        function startSaving(varaints_id, int_colour, ex_colour) {
+            var key = varaints_id + '|' + int_colour + '|' + ex_colour;
+            pendingSaves++;
+            pendingSavesByRow[key] = (pendingSavesByRow[key] || 0) + 1;
+            $('#price-update-loader').addClass('active');
+            updateButtonFor(varaints_id, int_colour, ex_colour).prop('disabled', true)
+                .html('<span class="spinner-border spinner-border-sm" role="presentation"></span> Updating');
+        }
+        function finishSaving(varaints_id, int_colour, ex_colour) {
+            var key = varaints_id + '|' + int_colour + '|' + ex_colour;
+            pendingSaves = Math.max(0, pendingSaves - 1);
+            pendingSavesByRow[key] = Math.max(0, (pendingSavesByRow[key] || 1) - 1);
+            if (pendingSavesByRow[key] === 0) {
+                updateButtonFor(varaints_id, int_colour, ex_colour).text('Update');
+                checkUpdateButton(varaints_id, int_colour, ex_colour);
+            }
+            if (pendingSaves === 0) {
+                $('#price-update-loader').removeClass('active');
+            }
+        }
+
         function saveField(varaints_id, int_colour, ex_colour, fieldName, newValue, reason = '', notifyDepartments = false) {
             // Remove any commas from price before sending
             if (fieldName === 'price') {
@@ -310,7 +387,7 @@
             });
             
             // Additional debugging for price updates
-            if (fieldName === 'price' || fieldName === 'csr_price') {
+            if (fieldName === 'price' || fieldName === 'bottom_price') {
                 console.log('Price field update details:', {
                     field: fieldName,
                     value: newValue,
@@ -330,6 +407,12 @@
                     value: newValue,
                     reason: reason,
                     notify_departments: notifyDepartments
+                },
+                beforeSend: function () {
+                    startSaving(varaints_id, int_colour, ex_colour);
+                },
+                complete: function () {
+                    finishSaving(varaints_id, int_colour, ex_colour);
                 },
                 success: function(response) {
                     console.log('AJAX Success:', response);
@@ -360,13 +443,13 @@
                     if (xhr.status === 422) {
                         const response = xhr.responseJSON;
                         
-                        // Check if it's a CSR price validation error
-                        if (response.requires_csr_price) {
+                        // Check if it's a bottom price validation error
+                        if (response.requires_bottom_price) {
                             var confirm = alertify.alert(response.error, function (e) {
-                                // Focus on the CSR price field for this variant
-                                var csrPriceInput = $(`input.editable-csr_price[data-varaint-id="${varaints_id}"][data-int-colour="${int_colour}"][data-ex-colour="${ex_colour}"]`);
-                                csrPriceInput.focus();
-                            }).set({title:"CSR Price Required"});
+                                // Focus on the bottom price field for this variant
+                                var bottomPriceInput = $(`input.editable-bottom_price[data-varaint-id="${varaints_id}"][data-int-colour="${int_colour}"][data-ex-colour="${ex_colour}"]`);
+                                bottomPriceInput.focus();
+                            }).set({title:"Bottom Price Required"});
                         } else if (response.field && response.error) {
                             // Handle field-specific validation errors (like price must be > 0)
                             var fieldName = response.field.replace('_', ' ');
@@ -397,25 +480,26 @@
         // Function to check if update button should be enabled
         function checkUpdateButton(varaints_id, int_colour, ex_colour) {
             var priceInput = $(`input.editable-price[data-varaint-id="${varaints_id}"][data-int-colour="${int_colour}"][data-ex-colour="${ex_colour}"]`);
-            var csrPriceInput = $(`input.editable-csr_price[data-varaint-id="${varaints_id}"][data-int-colour="${int_colour}"][data-ex-colour="${ex_colour}"]`);
+            var bottomPriceInput = $(`input.editable-bottom_price[data-varaint-id="${varaints_id}"][data-int-colour="${int_colour}"][data-ex-colour="${ex_colour}"]`);
             var updateBtn = $(`button.update-prices-btn[data-varaint-id="${varaints_id}"][data-int-colour="${int_colour}"][data-ex-colour="${ex_colour}"]`);
             
-            var priceValue = priceInput.val().replace(/[^0-9]/g, '');
-            var csrPriceValue = csrPriceInput.val().replace(/[^0-9]/g, '');
-            var priceNumeric = parseFloat(priceValue) || 0;
-            var csrPriceNumeric = parseFloat(csrPriceValue) || 0;
-            
+            var priceNumeric = toNumber(priceInput.val());
+            var bottomPriceNumeric = toNumber(bottomPriceInput.val());
+
             // Get original values
-            var originalPrice = parseFloat(priceInput.data('original-value') || '0') || 0;
-            var originalCsrPrice = parseFloat(csrPriceInput.data('original-value') || '0') || 0;
+            var originalPrice = toNumber(priceInput.data('original-value'));
+            var originalBottomPrice = toNumber(bottomPriceInput.data('original-value'));
             
             // Check if both fields have valid values and at least one has changed
             var priceChanged = priceNumeric !== originalPrice;
-            var csrPriceChanged = csrPriceNumeric !== originalCsrPrice;
-            var bothValid = priceNumeric > 0 && csrPriceNumeric > 0;
-            var hasChanges = priceChanged || csrPriceChanged;
+            var bottomPriceChanged = bottomPriceNumeric !== originalBottomPrice;
+            var bothValid = priceNumeric > 0 && bottomPriceNumeric > 0;
+            var hasChanges = priceChanged || bottomPriceChanged;
             
-            if (bothValid && hasChanges) {
+            var stillSaving = (pendingSavesByRow[varaints_id + '|' + int_colour + '|' + ex_colour] || 0) > 0;
+            if (stillSaving) {
+                updateBtn.prop('disabled', true);
+            } else if (bothValid && hasChanges) {
                 updateBtn.prop('disabled', false).removeClass('btn-secondary').addClass('btn-primary');
             } else {
                 updateBtn.prop('disabled', true).removeClass('btn-primary').addClass('btn-secondary');
@@ -454,39 +538,39 @@
             // Close modal
             $('#priceChangeReasonModal').modal('hide');
             
-            // Update both price and CSR price
+            // Update both price and bottom price
             updateBothPrices(currentFieldData, reason);
         });
         
         // Function to update both prices
         function updateBothPrices(data, reason) {
-            var priceChanged = data.price !== data.original_price;
-            var csrPriceChanged = data.csr_price !== data.original_csr_price;
+            var priceChanged = toNumber(data.price) !== toNumber(data.original_price);
+            var bottomPriceChanged = toNumber(data.bottom_price) !== toNumber(data.original_bottom_price);
             
-            if (priceChanged && csrPriceChanged) {
-                // Both changed, show notification dialog only for price (not CSR price)
+            if (priceChanged && bottomPriceChanged) {
+                // Both changed, show notification dialog only for price (not bottom price)
                 var dialog = alertify.confirm(
-                    'Both Price and CSR Price have been updated. Do you want to notify departments about the Price change? (CSR Price updates will not trigger notifications)'
+                    'Both Price and Bottom Price have been updated. Do you want to notify departments about the Price change? (Bottom Price updates will not trigger notifications)'
                 );
                 dialog.set({ title: "Notify Departments?", labels: { ok: "Notify", cancel: "Don't Notify" } });
                 dialog.set('onok', function(){
                     // Update price with notification enabled
                     updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'price', data.price, reason, true);
-                    // Update CSR price without notification (always false)
-                    updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'csr_price', data.csr_price, reason, false);
+                    // Update bottom price without notification (always false)
+                    updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'bottom_price', data.bottom_price, reason, false);
                 });
                 dialog.set('oncancel', function(){
                     // Update price without notification
                     updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'price', data.price, reason, false);
-                    // Update CSR price without notification (always false)
-                    updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'csr_price', data.csr_price, reason, false);
+                    // Update bottom price without notification (always false)
+                    updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'bottom_price', data.bottom_price, reason, false);
                 });
             } else if (priceChanged) {
                 // Only price changed
                 updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'price', data.price, reason, false);
-            } else if (csrPriceChanged) {
-                // Only CSR price changed - no notification dialog
-                updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'csr_price', data.csr_price, reason, false);
+            } else if (bottomPriceChanged) {
+                // Only bottom price changed - no notification dialog
+                updatePriceField(data.varaints_id, data.int_colour, data.ex_colour, 'bottom_price', data.bottom_price, reason, false);
             }
         }
         
@@ -563,7 +647,7 @@ $('#dtBasicExample1').on('blur', 'input.editable-minimum_commission', function (
     // If no change, do nothing
 });
 
-$('#dtBasicExample1').on('blur', 'input.editable-csr_price', function () {
+$('#dtBasicExample1').on('blur', 'input.editable-bottom_price', function () {
     var $this = $(this);
     var rawValue = $this.val().replace(/,/g, ''); // Remove commas but keep decimal points
     
@@ -590,22 +674,30 @@ $('#dtBasicExample1').on('click', 'button.update-prices-btn', function () {
     var ex_colour = $this.data('ex-colour');
     
     var priceInput = $(`input.editable-price[data-varaint-id="${varaints_id}"][data-int-colour="${int_colour}"][data-ex-colour="${ex_colour}"]`);
-    var csrPriceInput = $(`input.editable-csr_price[data-varaint-id="${varaints_id}"][data-int-colour="${int_colour}"][data-ex-colour="${ex_colour}"]`);
+    var bottomPriceInput = $(`input.editable-bottom_price[data-varaint-id="${varaints_id}"][data-int-colour="${int_colour}"][data-ex-colour="${ex_colour}"]`);
     
     var priceValue = priceInput.val().replace(/[^0-9]/g, '');
-    var csrPriceValue = csrPriceInput.val().replace(/,/g, ''); // Remove commas but keep decimal points
+    var bottomPriceValue = bottomPriceInput.val().replace(/,/g, ''); // Remove commas but keep decimal points
     var originalPrice = priceInput.data('original-value') || '0';
-    var originalCsrPrice = csrPriceInput.data('original-value') || '0';
-    
+    var originalBottomPrice = bottomPriceInput.data('original-value') || '0';
+
+    // The bottom price is the lowest the vehicle may be sold for, so it cannot be above the price
+    if (toNumber(bottomPriceValue) > toNumber(priceValue)) {
+        alertify.alert('Bottom Price cannot be higher than Price.', function () {
+            bottomPriceInput.focus();
+        }).set({title: "Bottom Price Validation Error"});
+        return;
+    }
+
     // Store the data for the modal
     currentFieldData = {
         varaints_id: varaints_id,
         int_colour: int_colour,
         ex_colour: ex_colour,
         price: priceValue,
-        csr_price: csrPriceValue,
+        bottom_price: bottomPriceValue,
         original_price: originalPrice,
-        original_csr_price: originalCsrPrice
+        original_bottom_price: originalBottomPrice
     };
     
     // Clear previous reason

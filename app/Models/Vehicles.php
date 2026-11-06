@@ -48,7 +48,14 @@ class Vehicles extends Model
         'purchased_paid_percentage',
         'estimation_date',
         'csr_price',
+        'bottom_price',
 
+    ];
+    // Lowest allowed selling price: never included when a vehicle is sent to the browser as
+    // JSON (quotation and PO endpoints return whole vehicles). The stock lists opt back in,
+    // for users with the selling price permission.
+    protected $hidden = [
+        'bottom_price',
     ];
     public function dn()
     {
