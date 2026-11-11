@@ -50,16 +50,16 @@ class WOBOEClaimsController extends Controller
             ->whereNotNull('declaration_number')
             ->whereNotNull('declaration_date')
             ->get();
-            // Filter out vehicles with 'Delivered' status in PHP (since it's an appended attribute)
-            $datas = $boes->filter(function ($boe) { 
-                return isset($boe->workOrder) 
-                && $boe->workOrder->has_claim === 'yes'
-                    && $boe->workOrder->delivery_summary !== 'DELIVERED WITH DOCUMENTS' 
+            // Approval statuses are appended attributes, so they are checked in PHP.
+            // Delivery status is intentionally NOT a condition: a BOE stays claimable
+            // even after every vehicle on the work order is marked Delivered.
+            $datas = $boes->filter(function ($boe) {
+                return isset($boe->workOrder)
+                    && $boe->workOrder->has_claim === 'yes'
                     && $boe->workOrder->sales_support_data_confirmation === 'Confirmed'
-                    && $boe->workOrder->finance_approval_status === 'Approved' 
-                    && $boe->workOrder->coo_approval_status === 'Approved'
-                    ; // Only keep vehicles with non-delivered status
-            });  
+                    && $boe->workOrder->finance_approval_status === 'Approved'
+                    && $boe->workOrder->coo_approval_status === 'Approved';
+            });
             $countries = Country::select('id','name')->orderBy('name')->get();
             (new UserActivityController)->createActivity('Open Claim Pending BOE Listing');
             return view('work_order.claims.index', compact('datas','countries'));
