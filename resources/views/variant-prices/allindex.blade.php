@@ -111,11 +111,64 @@
         {{ session('success') }}
     </div>
 @endif
+@if($errors->has('file'))
+    <div class="alert alert-danger">
+        <strong>The CSV file was not accepted:</strong> {{ $errors->first('file') }}
+    </div>
+@endif
+    @if(Auth::user()->hasPermissionForSelectedRole('vehicle-selling-price'))
+    <div class="float-end">
+        <a class="btn btn-sm btn-outline-primary" href="{{ route('variantprices.export') }}">
+            <i class="fa fa-download"></i> Sample CSV
+        </a>
+        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#priceCsvUploadModal">
+            <i class="fa fa-upload"></i> Upload as CSV
+        </button>
+    </div>
+    @endif
     <h4 class="card-title">
      Variant Price Update
     </h4>
     <br>
 </div>
+@if(Auth::user()->hasPermissionForSelectedRole('vehicle-selling-price'))
+<div class="modal fade" id="priceCsvUploadModal" tabindex="-1" aria-labelledby="priceCsvUploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form class="modal-content" method="POST" action="{{ route('variantprices.import.upload') }}" enctype="multipart/form-data" id="priceCsvUploadForm">
+            @csrf
+            <div class="modal-header">
+                <h5 class="modal-title" id="priceCsvUploadModalLabel">Upload Prices as CSV</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2">
+                    Start from <a href="{{ route('variantprices.export') }}">Sample CSV</a>, change the prices and upload the file.
+                    You will see a preview before anything is saved.
+                </p>
+                <ul class="small mb-3 ps-3">
+                    <li>Rows are matched on <strong>Brand, Model Line, Variant, Model Year, Interior Colour, Exterior Colour</strong>. Rows that do not match are reported, never created.</li>
+                    <li>Only <strong>Minimum Commission</strong>, <strong>Price</strong> and <strong>Bottom Price</strong> are updated. A blank cell leaves that value as it is.</li>
+                    <li>Values must be numbers greater than 0 (Minimum Commission a whole number), and Bottom Price must not be higher than Price.</li>
+                    <li>Each combination may appear only once in the file.</li>
+                </ul>
+                <label for="priceCsvFile" class="form-label">CSV file (max 5 MB)</label>
+                <input type="file" class="form-control" id="priceCsvFile" name="file" accept=".csv,text/csv" required>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="priceCsvUploadSubmit">Preview</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    document.getElementById('priceCsvUploadForm').addEventListener('submit', function () {
+        var button = document.getElementById('priceCsvUploadSubmit');
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="presentation"></span> Checking file...';
+    });
+</script>
+@endif
 <div class="card-body">
 <div class="modal fade" id="variantview" tabindex="-1" aria-labelledby="variantviewLabel" aria-hidden="true">
     <div class="modal-dialog">

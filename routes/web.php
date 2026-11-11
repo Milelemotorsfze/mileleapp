@@ -50,6 +50,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\SalesPersonLanguagesController;
 use App\Http\Controllers\VariantController;
 use App\Http\Controllers\VariantPriceController;
+use App\Http\Controllers\VariantPriceImportController;
 use App\Http\Controllers\VehiclePendingApprovalRequestController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\VendorDocumentController;
@@ -1150,6 +1151,13 @@ Route::get('/check-trashed-gdn', function () {
     Route::post('/vehiclenetsuitecost/upload', [VehicleNetSuiteCostController::class, 'upload'])->name('vehiclenetsuitecost.upload');
     Route::get('/all-variant-prices', [VehiclesController::class, 'allvariantprice'])->name('variantprices.allvariantprice');
     Route::post('/all-variant-prices-update', [VehiclesController::class, 'allvariantpriceupdate'])->name('variantprices.allvariantpriceupdate');
+    Route::controller(VariantPriceImportController::class)->prefix('all-variant-prices')->name('variantprices.')->group(function () {
+        Route::get('/export', 'export')->name('export');
+        Route::post('/import', 'upload')->name('import.upload');
+        Route::get('/import/{token}', 'preview')->name('import.preview');
+        Route::post('/import/{token}/confirm', 'confirm')->name('import.confirm');
+        Route::post('/import/{token}/cancel', 'cancel')->name('import.cancel');
+    });
     Route::post('/custom-inspection-update', [VehiclesController::class, 'custominspectionupdate'])->name('vehicles.savecustominspection');
     Route::post('/booking/canceling', [BookingController::class, 'canceling'])->name('booking.canceling');
     Route::post('/get-reservation', [VehiclesController::class, 'getReservation'])->name('get.reservation');
