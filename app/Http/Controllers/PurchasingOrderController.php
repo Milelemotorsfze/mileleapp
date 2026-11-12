@@ -1016,17 +1016,7 @@ class PurchasingOrderController extends Controller
             ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')
             ->get();
         $payments = PaymentTerms::get();
-        $sales_persons = ModelHasRoles::join('users', 'model_has_roles.model_id', '=', 'users.id')
-            ->where(function ($query) {
-                $query->where('users.status', 'active')
-                    ->where(function ($query) {
-                        $query->where('model_has_roles.role_id', 7)
-                            ->orWhere('model_has_roles.model_id', 17);
-                    });
-            })
-            ->orWhere('users.id', 40)
-            ->orderBy('users.name', 'asc')
-            ->get(['users.id', 'users.name']);
+        $sales_persons = $this->reservationSalesPersons();
         return view('warehouse.create', compact('variants', 'vendors', 'payments', 'countries', 'ports', 'sales_persons'));
     }
     public function getBrandsAndModelLines(Request $request)
@@ -1624,6 +1614,15 @@ class PurchasingOrderController extends Controller
             ->where('currency', $purchasingOrder->currency)
             ->where('vendors_id', $purchasingOrder->vendors_id)->select('id', 'po_number')
             ->orderBy('id', 'DESC')->get();
+        // Reservation salesperson options for the "Edit Basic Details" modal. Keep the current
+        // one selectable even if they are no longer in the list (e.g. deactivated).
+        $sales_persons = $this->reservationSalesPersons();
+        if ($purchasingOrder->sales_person_id && !$sales_persons->contains('id', $purchasingOrder->sales_person_id)) {
+            $currentSalesPerson = User::find($purchasingOrder->sales_person_id, ['id', 'name']);
+            if ($currentSalesPerson) {
+                $sales_persons->prepend($currentSalesPerson);
+            }
+        }
 
         return view('purchase.show', [
             'currentId' => $id,
@@ -1665,7 +1664,8 @@ class PurchasingOrderController extends Controller
             'additionalpaymentintreq',
             'vehiclesdn',
             'purchaseOrders',
-            'purchasingOrderTotalCost'
+            'purchasingOrderTotalCost',
+            'sales_persons'
         ));
     }
 
@@ -4158,6 +4158,7 @@ class PurchasingOrderController extends Controller
         $request->validate([
             'stock_type' => OrderStockType::validationRules(),
             'so_number' => 'nullable|string|max:100',
+            'salesperson' => 'nullable|integer|exists:users,id',
         ]);
         $purchasingOrder = PurchasingOrder::find($request->input('purchasing_order_id'));
         if (!$purchasingOrder) {
@@ -4295,6 +4296,13 @@ class PurchasingOrderController extends Controller
                 $purchasingordereventsLog->save();
             }
         }
+        // Reservation salesperson: only touched when the modal posts the field.
+        if ($request->has('salesperson')) {
+            $reservationChange = $this->applyReservationSalespersonChange($purchasingOrder, $request->input('salesperson'));
+            if ($reservationChange) {
+                $changedFields[] = $reservationChange;
+            }
+        }
         if (!empty($changedFields)) {
             if ($purchasingOrder->is_demand_planning_po == 1) {
                 $recipients = config('mail.custom_recipients.dp');
@@ -4331,6 +4339,82 @@ class PurchasingOrderController extends Controller
             }
         }
         return response()->json(['message' => 'Purchase order details updated successfully'], 200);
+    }
+
+    /**
+     * Add, change or remove a PO's reservation salesperson from "Edit Basic Details".
+     *
+     * - Added (none -> X): unreserved, unsold vehicles of the PO are reserved for X for 14 days and the
+     *   "reservation created" mail is queued for the next morning (same as PO creation).
+     * - Changed (X -> Y): X's vehicles move to Y with a fresh 14-day window; Y is mailed now and X gets the
+     *   hand-over mail if X had already been told about the reservation.
+     * - Removed (X -> none): X's vehicles are released; X gets the cancelled mail if already told.
+     *
+     * Logs the change and returns a changed-field row for the PO-updated mail, or null if unchanged.
+     */
+    private function applyReservationSalespersonChange(PurchasingOrder $purchasingOrder, $newSalesPersonId): ?array
+    {
+        $oldSalesPersonId = $purchasingOrder->sales_person_id ? (int) $purchasingOrder->sales_person_id : null;
+        $newSalesPersonId = $newSalesPersonId ? (int) $newSalesPersonId : null;
+        if ($oldSalesPersonId === $newSalesPersonId) {
+            return null;
+        }
+
+        // The old salesperson was already mailed unless their "created" mail is still waiting for the morning run.
+        $oldWasNotified = $oldSalesPersonId && !$purchasingOrder->reservation_created_mail_pending;
+
+        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+        $startDate = $newSalesPersonId ? Carbon::now($dubaiTimeZone)->toDateString() : null;
+        $endDate = $newSalesPersonId ? Carbon::now($dubaiTimeZone)->addDays(14)->toDateString() : null;
+
+        $vehicles = Vehicles::where('purchasing_order_id', $purchasingOrder->id);
+        if ($oldSalesPersonId) {
+            $vehicles->where('booking_person_id', $oldSalesPersonId);
+        } else {
+            $vehicles->whereNull('booking_person_id')
+                ->whereNull('so_id')
+                ->whereNull('gdn_id')
+                ->where('status', '!=', 'cancel');
+        }
+        foreach ($vehicles->get() as $vehicle) {
+            $vehicle->booking_person_id = $newSalesPersonId;
+            $vehicle->reservation_start_date = $startDate;
+            $vehicle->reservation_end_date = $endDate;
+            $vehicle->save();
+        }
+
+        $purchasingOrder->sales_person_id = $newSalesPersonId;
+        // New reservation: mail next morning like PO creation. Re-assignment mails right away; removal sends none.
+        $purchasingOrder->reservation_created_mail_pending = $newSalesPersonId && !$oldSalesPersonId;
+        $purchasingOrder->save();
+
+        if ($newSalesPersonId && $oldSalesPersonId) {
+            $this->sendReservationCreatedEmail($purchasingOrder->id, $newSalesPersonId);
+            if ($oldWasNotified) {
+                $this->sendReservationReassignedEmail($purchasingOrder->id, $oldSalesPersonId, $newSalesPersonId);
+            }
+        } elseif (!$newSalesPersonId && $oldWasNotified) {
+            $this->sendReservationCancelledEmail($purchasingOrder->id, $oldSalesPersonId);
+        }
+
+        $oldName = $oldSalesPersonId ? (User::find($oldSalesPersonId)->name ?? 'Unknown') : 'None';
+        $newName = $newSalesPersonId ? (User::find($newSalesPersonId)->name ?? 'Unknown') : 'None';
+
+        $log = new PurchasingOrderEventsLog();
+        $log->event_type = "Update PO Basic Details";
+        $log->purchasing_order_id = $purchasingOrder->id;
+        $log->created_by = auth()->user()->id;
+        $log->field = "Reservation Salesperson Changed";
+        $log->old_value = $oldName;
+        $log->new_value = $newName;
+        $log->description = "Changed Reservation Salesperson from $oldName to $newName";
+        $log->save();
+
+        return [
+            'field' => 'Reservation Salesperson',
+            'old_value' => $oldName,
+            'new_value' => $newName,
+        ];
     }
     public function pendingvins($status)
     {
@@ -6647,7 +6731,17 @@ class PurchasingOrderController extends Controller
      */
     public function getSalesPersons()
     {
-        $sales_persons = ModelHasRoles::join('users', 'model_has_roles.model_id', '=', 'users.id')
+        return response()->json($this->reservationSalesPersons());
+    }
+
+    /**
+     * Users that can be picked as a PO reservation salesperson (active sales-role users plus
+     * the fixed extra accounts). Shared by PO create, PO detail "Edit Basic Details" and the
+     * stocks-page reservation modal.
+     */
+    private function reservationSalesPersons()
+    {
+        return ModelHasRoles::join('users', 'model_has_roles.model_id', '=', 'users.id')
             ->where(function ($query) {
                 $query->where('users.status', 'active')
                     ->where(function ($query) {
@@ -6657,9 +6751,9 @@ class PurchasingOrderController extends Controller
             })
             ->orWhere('users.id', 40)
             ->orderBy('users.name', 'asc')
-            ->get(['users.id', 'users.name']);
-
-        return response()->json($sales_persons);
+            ->get(['users.id', 'users.name'])
+            ->unique('id')
+            ->values();
     }
 
     /**

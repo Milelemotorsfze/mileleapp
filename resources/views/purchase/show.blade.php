@@ -1074,6 +1074,18 @@ return [$color->id => $formattedName];
                                             @endforeach
                                         </select>
                                     </div>
+                                    <div class="col-md-4 p-3">
+                                        <label for="basic_salesperson" class="form-label font-size-13 text-center">Reservation Sales Person:</label>
+                                    </div>
+                                    <div class="col-md-8 p-3">
+                                        <select name="salesperson" class="form-control" id="basic_salesperson">
+                                            <option value="">No Reservation</option>
+                                            @foreach($sales_persons as $salesPerson)
+                                            <option value="{{ $salesPerson->id }}" {{ $salesPerson->id == $purchasingOrder->sales_person_id ? 'selected' : '' }}>{{ $salesPerson->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <small class="text-muted">Vehicles of this PO are reserved for 14 days under the selected salesperson.</small>
+                                    </div>
                                     @if($purchasingOrder->is_demand_planning_purchase_order == false)
                                     <div class="col-md-4 p-3">
                                         <label for="shippingCost" class="form-label font-size-13 text-center">PFI Number:</label>
@@ -3905,6 +3917,13 @@ return [$color->id => $formattedName];
                 var purchaseId = $(this).data('purchase-id');
                 $('#purchaseId').val(purchaseId);
                 $('#editModal').modal('show');
+            });
+            // Searchable reservation salesperson; dropdownParent keeps the search box usable inside the modal.
+            $('#basic_salesperson').select2({
+                placeholder: 'Search and select salesperson',
+                allowClear: true,
+                width: '100%',
+                dropdownParent: $('#editModal')
             });
             $('.view-doc-btn').on('click', function() {
                 $('#viewdocModal').modal('show');
