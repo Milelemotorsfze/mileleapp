@@ -97,6 +97,7 @@ $grades = $oldModelId ? \App\Models\MasterGrades::where('model_line_id', $oldMod
                         {{-- <option value="Diesel PHEV" {{ old('fuel_type', $modelDescription->fuel_type) == 'Diesel PHEV' ? 'selected' : '' }}>Diesel PHEV</option> --}}
                         <option value="Petrol Hybrid" {{ old('fuel_type', $modelDescription->fuel_type) == 'Petrol Hybrid' ? 'selected' : '' }}>Petrol Hybrid</option>
                         <option value="PHEV" {{ old('fuel_type', $modelDescription->fuel_type) == 'PHEV' ? 'selected' : '' }}>PHEV (Plug-in Hybrid Electric Vehicle)</option>
+                        <option value="EREV" {{ old('fuel_type', $modelDescription->fuel_type) == 'EREV' ? 'selected' : '' }}>EREV (Extended-Range Electric Vehicle)</option>
                         {{-- <option value="M HEV" {{ old('fuel_type', $modelDescription->fuel_type) == 'M HEV' ? 'selected' : '' }}>M HEV</option> --}}
                         <option value="EV" {{ old('fuel_type', $modelDescription->fuel_type) == 'EV' ? 'selected' : '' }}>EV</option>
                     </select>
@@ -184,6 +185,8 @@ $grades = $oldModelId ? \App\Models\MasterGrades::where('model_line_id', $oldMod
             fuel = 'DMHE';
         } else if (fuel === 'PHEV') {
             fuel = 'PHEV';
+        } else if (fuel === 'EREV') {
+            fuel = 'EREV';
         }
         var gear = $('#gear').val() ? $('#gear').val() : '';
         var driveTrain = $('#drive_train').val() ? $('#drive_train').val() : '';
